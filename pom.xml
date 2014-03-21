@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>eu.3cixty</groupId>
+  <artifactId>QueryManager</artifactId>
+  <name>QueryManager</name>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+<!--
+  <repositories>
+  <repository>
+    <id>apache-repo-snapshots</id>
+    <url>https://repository.apache.org/content/repositories/releases/</url>
+    <releases>
+      <enabled>false</enabled>
+    </releases>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </repository>
+	</repositories>
+-->
+  <dependencies>
+<!-- 	<dependency>
+	  <groupId>org.facebook4j</groupId>
+	  <artifactId>facebook4j-core</artifactId>
+	  <version>[2.0,)</version>
+	</dependency>
+-->
+<dependency>
+	<groupId>com.hp.hpl.jena</groupId>
+	<artifactId>jena</artifactId>
+	<version>2.5.5</version>
+</dependency>
+	
+  </dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+  </build>
+</project>
