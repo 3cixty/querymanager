@@ -4,23 +4,24 @@ import java.util.Set;
 
 import eu.threecixty.profile.annotations.Description;
 import eu.threecixty.profile.annotations.Exists;
-import eu.threecixty.profile.annotations.Extend;
+import eu.threecixty.profile.annotations.Uses;
 
 /**
- * information about a Place
+ * Employer Information
  * @author Rachit.Agarwal@inria.fr
  *
  */
-@Extend(hasText="http://www.w3.org/2006/vcard/ns#Location")
-public class PlaceDetail {
-	@Description(hasText="name of the place")
+public class Employer {
+	@Description(hasText="name of the employer")
 	private String hasName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
 	private Address hasAddress;
-	@Description(hasText="Description of the place")
+	@Description(hasText="Description of the school")
 	private String hasDetails="";
-	@Description(hasText="Nature of the place")
-	private NatureOfPlace isTheNatureOfPlace;
+	@Uses(hasText="http://www.w3.org/2006/vcard/ns#url")
+	private String hasURL;
+	@Description(hasText="Telephone number")
+	private String hasTelephone;
 	@Description(hasText = "comments")
 	private Set <String> hasKeyTags;
 	public String getHasName() {
@@ -41,11 +42,17 @@ public class PlaceDetail {
 	public void setHasDetails(String hasDetails) {
 		this.hasDetails = hasDetails;
 	}
-	public NatureOfPlace getIsTheNatureOfPlace() {
-		return isTheNatureOfPlace;
+	public String getHasURL() {
+		return hasURL;
 	}
-	public void setIsTheNatureOfPlace(NatureOfPlace isTheNatureOfPlace) {
-		this.isTheNatureOfPlace = isTheNatureOfPlace;
+	public void setHasURL(String hasURL) {
+		this.hasURL = hasURL;
+	}
+	public String getHasTelephone() {
+		return hasTelephone;
+	}
+	public void setHasTelephone(String hasTelephone) {
+		this.hasTelephone = hasTelephone;
 	}
 	public Set<String> getHasKeyTags() {
 		return hasKeyTags;
@@ -53,6 +60,5 @@ public class PlaceDetail {
 	public void setHasKeyTags(Set<String> hasKeyTags) {
 		this.hasKeyTags = hasKeyTags;
 	}
-	
 	
 }

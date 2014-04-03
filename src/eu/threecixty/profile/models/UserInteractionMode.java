@@ -19,5 +19,7 @@ public enum UserInteractionMode {
 	LikeTo, 
 	MayBe,
 	Declined,
+	Discontinued,
+	Others,
 	None
 }

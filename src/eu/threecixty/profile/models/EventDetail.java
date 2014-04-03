@@ -2,14 +2,14 @@ package eu.threecixty.profile.models;
 
 import eu.threecixty.profile.annotations.Description;
 import eu.threecixty.profile.annotations.Exists;
-import eu.threecixty.profile.annotations.Extend;
+
 /**
  * information about a Event
  * @author Rachit.Agarwal@inria.fr
  *
  */
 public class EventDetail {
-	@Extend(hasText="http://www.w3.org/2006/vcard/ns#Kind")
+	@Description(hasText="name of the event")
 	private String hasName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
     private Address hasAddress;

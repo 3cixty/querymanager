@@ -1,5 +1,6 @@
 package eu.threecixty.profile.models;
 
+import java.util.Date;
 import java.util.Set;
 
 import eu.threecixty.profile.annotations.Description;
@@ -13,6 +14,8 @@ public class Rating {
 	private float rating=0;
 	@Description(hasText="user interaction mode")
     private UserInteractionMode hasUserInteractionMode;
+	@Description(hasText="time at which the user rated")
+    private Date hasRatingTime;
 	@Description(hasText="comments by the user")
     private Set <String> hasKeyTags;
 	public float getRating() {
@@ -26,6 +29,12 @@ public class Rating {
 	}
 	public void setHasUserInteractionMode(UserInteractionMode hasUserInteractionMode) {
 		this.hasUserInteractionMode = hasUserInteractionMode;
+	}
+	public Date getHasRatingTime() {
+		return hasRatingTime;
+	}
+	public void setHasRatingTime(Date hasRatingTime) {
+		this.hasRatingTime = hasRatingTime;
 	}
 	public Set<String> getHasKeyTags() {
 		return hasKeyTags;

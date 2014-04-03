@@ -31,4 +31,28 @@ public class Preference {
 	@MobidotInputs
 	Set<Transport> hasTransport;
 
+	public Set<Transport> getHasTransport() {
+		return hasTransport;
+	}
+
+	public void setHasTransport(Set<Transport> hasTransport) {
+		this.hasTransport = hasTransport;
+	}
+
+	public Set<Event> getHasEvents() {
+		return hasEvents;
+	}
+
+	public void setHasEvents(Set<Event> hasEvents) {
+		this.hasEvents = hasEvents;
+	}
+
+	public Set<Place> getHasPlaces() {
+		return hasPlaces;
+	}
+
+	public void setHasPlaces(Set<Place> hasPlaces) {
+		this.hasPlaces = hasPlaces;
+	}
+
 }

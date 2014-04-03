@@ -14,7 +14,7 @@ import eu.threecixty.profile.annotations.Uses;
  */
 @Extend(hasText= "http://www.w3.org/2006/vcard/ns#Organization")
 public class TravelAgency {
-	@Extend(hasText="http://www.w3.org/2006/vcard/ns#Kind")
+	@Description(hasText="Name of Travel Agency")
 	private String hasName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
     private Address hasAddress;  

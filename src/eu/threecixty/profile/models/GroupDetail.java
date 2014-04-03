@@ -12,7 +12,7 @@ import eu.threecixty.profile.annotations.Extend;
  */
 @Extend(hasText="http://www.w3.org/2006/vcard/ns#Group")
 public class GroupDetail {
-	@Extend(hasText="http://www.w3.org/2006/vcard/ns#Kind")
+	@Description(hasText="Name of the group")
     private String hasName="";
 	@Description(hasText="Group details")
     private String hasDetail="";

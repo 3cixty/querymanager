@@ -1,6 +1,6 @@
 package eu.threecixty.profile.models;
 
-import eu.threecixty.profile.annotations.Extend;
+import eu.threecixty.profile.annotations.Description;
 
 /**
  * Language details
@@ -9,7 +9,7 @@ import eu.threecixty.profile.annotations.Extend;
  */
 public class LanguageInformation {
 
-	@Extend(hasText="http://www.w3.org/2006/vcard/ns#Kind")
+	@Description(hasText="Name of the language")
 	private String hasName="";
 
 	public String getHasName() {

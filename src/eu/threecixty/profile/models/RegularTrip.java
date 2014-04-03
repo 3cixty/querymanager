@@ -14,9 +14,9 @@ public class RegularTrip {
 		+ "[start street, start city - end street, end city] or [place name 1 - place name 2], "
 		+ "to distinguish between trips")
     String tripName=""; 
-    @Description(hasText = "Average deparature time, in seconds since 0:00")
+    @Description(hasText = "Average departure time, in seconds since 0:00")
     Long departureTime; 
-    @Description(hasText = "Standard deviation in the deparature time, in seconds")
+    @Description(hasText = "Standard deviation in the departure time, in seconds")
     Long departureTimeSD; 
     @Description(hasText = "Average travel time, in seconds")
     Long travelTime; 

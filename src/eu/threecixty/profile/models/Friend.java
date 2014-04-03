@@ -12,15 +12,15 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class Friend {
 	@Description(hasText = "Other profile")
-	private Profile hasUser;
+	private UserProfile hasUser;
 	@Description(hasText = "relationship with the other user")
     private Relationship hasType;
 	@Description(hasText = "comments on the relationship")
     private Set <String> hasKeyTags;
-	public Profile getHasUser() {
+	public UserProfile getHasUser() {
 		return hasUser;
 	}
-	public void setHasUser(Profile hasUser) {
+	public void setHasUser(UserProfile hasUser) {
 		this.hasUser = hasUser;
 	}
 	public Relationship getHasType() {

@@ -18,9 +18,9 @@ public class Address {
 	private String postalCode="";
 	@Description(hasText="Country of residence")
 	private String countryName="";
-	@Description(hasText="longitude information")
+	@Description(hasText="longitude information. Uses http://www.w3.org/2006/vcard/ns#longitude")
 	private Double longitute=0.0;
-	@Description(hasText="latitude information")
+	@Description(hasText="latitude information. Uses http://www.w3.org/2006/vcard/ns#latitude")
 	private Double lontitude=0.0;
 	
 	public Long getPostOfficeBox() {

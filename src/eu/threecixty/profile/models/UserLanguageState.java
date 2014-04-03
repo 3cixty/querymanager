@@ -12,5 +12,7 @@ public enum UserLanguageState {
 	ReadWrite,
 	ReadSpeak,
 	WriteSpeak,
-	ReadWriteSpeak
+	ReadWriteSpeak,
+	Others,
+	None
 }

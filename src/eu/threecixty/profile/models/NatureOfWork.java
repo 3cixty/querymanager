@@ -18,6 +18,8 @@ public enum NatureOfWork {
 	Professor,
 	AssociateProfessor,
 	AssistantProfessor,
+	Secretary,
+	ResearchEngineer,
 	Lecturer,
 	Others,
 	None

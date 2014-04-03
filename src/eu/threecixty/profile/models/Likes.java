@@ -1,9 +1,8 @@
 package eu.threecixty.profile.models;
 import eu.threecixty.profile.annotations.Description;
-import eu.threecixty.profile.annotations.Extend;
 
 public class Likes {
-	@Extend(hasText="http://www.w3.org/2006/vcard/ns#Kind")
+	@Description(hasText="Name of the like")
 	private String hasName=""; 
 	@Description(hasText="type of the entity liked")
 	private LikeType hasLikeType;

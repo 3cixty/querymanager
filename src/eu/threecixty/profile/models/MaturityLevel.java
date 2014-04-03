@@ -10,5 +10,7 @@ public enum MaturityLevel {
 	Beginner, 
 	FalseBeginner,
 	Intermediate,
-	Expert
+	Expert,
+	Others,
+	None
 }

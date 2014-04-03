@@ -4,7 +4,6 @@ import java.util.Set;
 
 import eu.threecixty.profile.annotations.Description;
 import eu.threecixty.profile.annotations.Exists;
-import eu.threecixty.profile.annotations.Extend;
 import eu.threecixty.profile.annotations.Uses;
 
 /**
@@ -13,7 +12,7 @@ import eu.threecixty.profile.annotations.Uses;
  *
  */
 public class HotelDetail {
-	@Extend(hasText="http://www.w3.org/2006/vcard/ns#Kind")
+	@Description(hasText="name of the hotel")
 	private String hasName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
     private Address hasAddress;  
@@ -32,7 +31,7 @@ public class HotelDetail {
 	@Description(hasText="Nearby Public Transport facility")
 	private String hasNearbyTransportMode="";
 	@Description(hasText="How to reach details")
-	String hasHowToReach="";
+	private String hasHowToReach="";
 	@Description(hasText="Star information from 1 to 7")
 	private int hasCategory;
 	@Description(hasText="Type of food served")

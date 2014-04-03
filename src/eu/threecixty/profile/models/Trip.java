@@ -24,7 +24,7 @@ public class Trip {
     		+ "if a user decided the modality,  automatic if modality was derived by an automated "
     		+ "recognizer, override if the user chose to override or correct the automatically derived modality")
     private DecisionLevel tripModalityLevel; 
-    @Description(hasText = "Modality used during trip (foot, bike, car, bus, ...) as orginally automatically derived, "
+    @Description(hasText = "Modality used during trip (foot, bike, car, bus, ...) as originally automatically derived, "
     		+ "to be able to generate a confusion or correction matrix")
     private ModalityType tripModalityAutomatic; 
     @Description(hasText = "Weather at the start of the trip")

@@ -18,7 +18,7 @@ public class InfraRoute {
 	private String routeReference;
 	@Description(hasText="Intended modality for this route")
 	private ModalityType routeModality;
-	@Description(hasText="descrives het symbol that is used to mark the way along the route e.g. Red Cross")
+	@Description(hasText="describes the symbol that is used to mark the way along the route e.g. Red Cross")
 	private String routeSymbol;
 	@Description(hasText="the route is operated by this company")
 	private String routeOperator;
