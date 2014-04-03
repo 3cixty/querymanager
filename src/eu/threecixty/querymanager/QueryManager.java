@@ -1,158 +1,209 @@
 package eu.threecixty.querymanager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
+
+import eu.threecixty.profile.IProfiler;
+import eu.threecixty.profile.models.Event;
+import eu.threecixty.profile.models.Place;
+import eu.threecixty.profile.models.Preference;
 
  class QueryManager implements IQueryManager {
 
-	private String filenameOrURI=null;
-	private ClassLoader classLoader;
-	private Query query;
-	private Query augmentedQuery;
-	private String uid=null;
-	private Model connectCache;
-	private Model connection;
+	 /**Current query*/
+	private IQuery query;
+
+	/**Current augmented query*/
+	private IAugmentedQuery augmentedQuery;
 	
-	public QueryManager() {
+	/**Attribute which is related to user profile*/
+	private Model rdfModel;
+
+	/**User ID*/
+	private String uid;
+	
+	/**User's preferences*/
+	private Preference preference;
+	
+	public QueryManager(String uid) {
+		this(uid, null);
 	}
 
-	public String getFilenameOrURI() {
-		return filenameOrURI;
-	}
-
-	public void setFilenameOrURI(String filenameOrURI) {
-		this.filenameOrURI = filenameOrURI;
-	}
-
-	public ClassLoader getClassLoader() {
-		return classLoader;
-	}
-
-	public void setClassLoader(ClassLoader classLoader) {
-		this.classLoader = classLoader;
+	public QueryManager(String uid, Model userProfileModel) {
+		this.rdfModel = userProfileModel;
 	}
 	
-	public Query getAugmentedQuery() {
+	@Override
+	public IAugmentedQuery getAugmentedQuery() {
 		return augmentedQuery;
 	}
 
-	public void setAugmentedQuery(Query augmentedQuery) {
-		this.augmentedQuery = augmentedQuery;
-	}
-
-	public String getUid() {
-		return uid;
-	}
-
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
-
-	public Model getConnectCache() {
-		return connectCache;
-	}
-
-	public void setConnectCache(Model connectCache) {
-		this.connectCache = connectCache;
-	}
-
-	public Model getConnection() {
-		return connection;
-	}
-
-	public void setConnection(Model connection) {
-		this.connection = connection;
-	}
-
-	public Query getQuery() {
+	public IQuery getQuery() {
 		return query;
 	}
 
-	/**
-	 * overloaded setQuery. If user is not a part of the system
-	 * 
-	 * @param: the query
-	 * @return: void
-	 */
-	public void setQuery(Query inputQuery){
-		this.query = inputQuery;
-		this.augmentedQuery = inputQuery;
-	}
-
-	/**
-	 * overloaded setQuery. If user is a part of the system
-	 * 
-	 * @param: the query and a user ID
-	 * @return: nothing note: user ID is Thales privacy manager part. it is they
-	 *          who authenticate the system
-	 */
-	public void setQuery(Query inputQuery, String UID) {
-		setQuery(inputQuery);
-		setUid(UID);
-	}
-	
-	public void connectToCache() {
+	public void setQuery(IQuery query){
+		if (query == null) return;
+		this.query = query;
 	}
 	
 	@Override
-	public ResultSet checkInCacheAndReturnResult(Query inputQuery) {
+	public ResultSet connectToEventMedia(Query augmentedQuery) {
+		// TODO: call the EventMedia component
 		return null;
 	}
 
-	public void setAuthenticationParameters(String UID) {
-		// TODO Auto-generated method stub
+	@Override
+	public void requestPreferences(IProfiler profiler) {
+		if (profiler != null) {
+			this.preference = profiler.getPreference();
+		}
+	}
+
+	@Override
+	public void storeResultInUserQueryProfile(Query inputQuery, Query augmentedQuery,String updateQueryString) {
+		// TODO: update KB of UserProfile. Write the update query.
+		//runnning on the server with multiple instances so concurrency control has to be there.
 		
-	}
-
-	@Override
-	public void connectToKnowledgebase(ClassLoader classLoader, String filenameOrURI) {
-		FileManager.get().addLocatorClassLoader(classLoader);
-		setConnection(FileManager.get().loadModel(filenameOrURI));
-	}
-	
-	@Override
-	public void setAugmentedQuery(Query augmentedQuery, ResultSet preferences) {
-		if (preferences==null){
-			this.augmentedQuery=augmentedQuery;
-		}
-		else { 
-			// TODO: implement this part
-		}
-	}
-	
-	@Override
-	public ResultSet extractPreferenceSocial(String UID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResultSet extractPreferenceMobile(String UID) {
-		// TODO Auto-generated method stub
-		return null;
-	}	
-
-	@Override
-	public ResultSet getResultFromKB(Query augmentedQuery,Model connection) {
-		// TODO Auto-generated method stub
-		QueryExecution qexec=QueryExecutionFactory.create(augmentedQuery,connection);
-		ResultSet results;
-		try{
-			results = qexec.execSelect();
-		}finally{
-			qexec.close();
-		}
-		return results;
-	}
-	
-	@Override
-	public void storeResultInCache(Query inputQuery, Query augmentedQuery, ResultSet result) {
-		// TODO Auto-generated method stub
+/*		Query updateQuery=QueryFactory.create(updateQueryString);
+		UpdateRequest request=UpdateFactory.create(updateQueryString);
 		
+		updateProcessRemote.execute();//(updateQueryString);
+		//GraphStore graphStore = GraphStoreFactory.create();
+		UpdateAction.execute(request, this.connection);*/
 	}
 
+	@Override
+	public void performAugmentingTask() {
+		if (preference == null) return;
+		if (query == null) return;
+		List<IAugmentedQuery> possibleAugmentedQueries = new ArrayList<IAugmentedQuery>();
+		findPossibleAugmentedQueries(possibleAugmentedQueries);
+		if (possibleAugmentedQueries.size() > 0) {
+			augmentedQuery = getBestAugmentedQuery(possibleAugmentedQueries);
+		}
+	}
+
+	@Override
+	public Model getModel() {
+		return rdfModel;
+	}
+
+	@Override
+	public void setModel(Model model) {
+		this.rdfModel = model;
+	}
+
+	@Override
+	public void setModel(String rdfContent) {
+		if (rdfContent == null) return;
+		rdfModel = ModelFactory.createDefaultModel();
+		rdfModel = rdfModel.read(rdfContent);
+	}
+
+	@Override
+	public void setModelFromFileOrUri(String filenameOrURI) {
+		if (filenameOrURI == null) return;
+		rdfModel = FileManager.get().loadModel(filenameOrURI);
+	}
+
+	@Override
+	public String getUID() {
+		return uid;
+	}
+
+	@Override
+	public Query createJenaQuery(String queryStr) {
+		if (rdfModel == null || queryStr == null) return null;
+		return QueryFactory.create(queryStr);
+	}
+
+	@Override
+	public QResult executeQuery(IAugmentedQuery query) {
+		if (query == null) return null;
+		if (rdfModel == null) return null;
+		QueryExecution qe = QueryExecutionFactory.create(query.getQuery().getQuery(), rdfModel);
+		
+		ResultSet rs = qe.execSelect();
+		
+		return new QResult(rs, qe);
+	}
+
+	@Override
+	public QResult executeAugmentedQuery() {
+		return executeQuery(augmentedQuery);
+	}
+
+	/**
+	 * This method find all the possible augmented queries.
+	 * @param possibleAugmentedQueries
+	 */
+	private void findPossibleAugmentedQueries(
+			List<IAugmentedQuery> possibleAugmentedQueries) {
+		// TODO: how to augment a query from a given preference
+		// How to validate whether a query was augmented, what are criteria?
+		// How to validate that a query is not augmented from a given query and preference
+		
+		// for sake of simplicity, take all preferences relevant to places and events
+		if (preference == null) return;
+		
+		AugmentedQuery tmpAugmentedQuery = new AugmentedQuery(query.cloneQuery());
+		
+		if (query instanceof PlaceQuery) {
+			addPlaces((PlaceQuery) tmpAugmentedQuery.getQuery());
+		} else if (query instanceof EventQuery) {
+			addEvent((EventQuery) tmpAugmentedQuery.getQuery());
+		}
+
+		possibleAugmentedQueries.add(tmpAugmentedQuery);
+	}
+
+	/**
+	 * This method finds the best augmented query from a list of possible augmented queries.
+	 * @param possibleAugmentedQueries
+	 * @return
+	 */
+	private IAugmentedQuery getBestAugmentedQuery(List<IAugmentedQuery> possibleAugmentedQueries) {
+		// TODO: make decision about selecting the best one from a list of possible augmented queries
+		// for sake of simplicity: pick the first one
+		if (possibleAugmentedQueries.size() > 0) {
+			return possibleAugmentedQueries.get(0);
+		}
+		
+		return null;
+	}
+
+	/**
+	 * Adds places preferences to the query.
+	 * @param pq
+	 */
+	private void addPlaces(PlaceQuery pq) {
+		Set <Place> places = preference.getHasPlaces();
+		if (places == null) return;
+		for (Place place: places) {
+			pq.addPlace(place);
+		}
+	}
+
+	/**
+	 * Adds event preferences to the query.
+	 * @param eQuery
+	 */
+	private void addEvent(EventQuery eQuery) {
+		Set <Event> events = preference.getHasEvents();
+		if (events == null) return;
+		for (Event event: events) {
+			eQuery.addEvent(event);
+		}
+	}
 }

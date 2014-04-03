@@ -1,0 +1,14 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:xsd="hhttp://www.w3.org/2001/XMLSchema#"
+    >
+  <rdf:Description>
+    <foaf:name>Alice</foaf:name>
+    <xsd:rate rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</xsd:rate>
+  </rdf:Description>
+  <rdf:Description>
+    <foaf:name>Bob</foaf:name>
+    <xsd:rate rdf:datatype="http://www.w3.org/2001/XMLSchema#float">9.0</xsd:rate>
+  </rdf:Description>
+</rdf:RDF>
