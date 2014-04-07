@@ -1,7 +1,7 @@
 package eu.threecixty.querymanager;
 
 /**
- * Wrapper for augmented query.
+ * Augmented query.
  *
  * @author Cong-Kinh NGUYEN
  *
