@@ -32,7 +32,7 @@ public class TestQM {
 		qm.requestPreferences(profiler);
 		
 		// suppose that we recognize that the query is for places
-		IQuery placeQuery = new PlaceQuery(query);
+		ThreeCixtyQuery placeQuery = new PlaceQuery(query);
 		
 		qm.setQuery(placeQuery);
 		

@@ -21,10 +21,10 @@ import eu.threecixty.profile.models.Preference;
  class QueryManager implements IQueryManager {
 
 	 /**Current query*/
-	private IQuery query;
+	private ThreeCixtyQuery query;
 
 	/**Current augmented query*/
-	private IAugmentedQuery augmentedQuery;
+	private AugmentedQuery augmentedQuery;
 	
 	/**Attribute which is related to user profile*/
 	private Model rdfModel;
@@ -44,15 +44,15 @@ import eu.threecixty.profile.models.Preference;
 	}
 	
 	@Override
-	public IAugmentedQuery getAugmentedQuery() {
+	public AugmentedQuery getAugmentedQuery() {
 		return augmentedQuery;
 	}
 
-	public IQuery getQuery() {
+	public ThreeCixtyQuery getQuery() {
 		return query;
 	}
 
-	public void setQuery(IQuery query){
+	public void setQuery(ThreeCixtyQuery query){
 		if (query == null) return;
 		this.query = query;
 	}
@@ -87,7 +87,7 @@ import eu.threecixty.profile.models.Preference;
 	public void performAugmentingTask() {
 		if (preference == null) return;
 		if (query == null) return;
-		List<IAugmentedQuery> possibleAugmentedQueries = new ArrayList<IAugmentedQuery>();
+		List<AugmentedQuery> possibleAugmentedQueries = new ArrayList<AugmentedQuery>();
 		findPossibleAugmentedQueries(possibleAugmentedQueries);
 		if (possibleAugmentedQueries.size() > 0) {
 			augmentedQuery = getBestAugmentedQuery(possibleAugmentedQueries);
@@ -114,6 +114,7 @@ import eu.threecixty.profile.models.Preference;
 	@Override
 	public void setModelFromFileOrUri(String filenameOrURI) {
 		if (filenameOrURI == null) return;
+		FileManager.get().addLocatorClassLoader(QueryManager.class.getClassLoader());
 		rdfModel = FileManager.get().loadModel(filenameOrURI);
 	}
 
@@ -129,7 +130,7 @@ import eu.threecixty.profile.models.Preference;
 	}
 
 	@Override
-	public QResult executeQuery(IAugmentedQuery query) {
+	public QResult executeQuery(AugmentedQuery query) {
 		if (query == null) return null;
 		if (rdfModel == null) return null;
 		QueryExecution qe = QueryExecutionFactory.create(query.getQuery().getQuery(), rdfModel);
@@ -149,7 +150,7 @@ import eu.threecixty.profile.models.Preference;
 	 * @param possibleAugmentedQueries
 	 */
 	private void findPossibleAugmentedQueries(
-			List<IAugmentedQuery> possibleAugmentedQueries) {
+			List<AugmentedQuery> possibleAugmentedQueries) {
 		// TODO: how to augment a query from a given preference
 		// How to validate whether a query was augmented, what are criteria?
 		// How to validate that a query is not augmented from a given query and preference
@@ -173,7 +174,7 @@ import eu.threecixty.profile.models.Preference;
 	 * @param possibleAugmentedQueries
 	 * @return
 	 */
-	private IAugmentedQuery getBestAugmentedQuery(List<IAugmentedQuery> possibleAugmentedQueries) {
+	private AugmentedQuery getBestAugmentedQuery(List<AugmentedQuery> possibleAugmentedQueries) {
 		// TODO: make decision about selecting the best one from a list of possible augmented queries
 		// for sake of simplicity: pick the first one
 		if (possibleAugmentedQueries.size() > 0) {

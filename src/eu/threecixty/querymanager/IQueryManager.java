@@ -95,9 +95,9 @@ public interface IQueryManager {
 	/**
 	 * Get augmented query. This method returns the augmented query resulted by the task {@link #performAugmentingTask()}.
 	 * Required by the step 5 in the global architecture.
-	 * @return
+	 * @return Current augmented query.
 	 */
-	IAugmentedQuery getAugmentedQuery();
+	AugmentedQuery getAugmentedQuery();
 
 	/**
 	 * Gets the model representing the knowledgebase of user profile.
@@ -140,20 +140,20 @@ public interface IQueryManager {
 	 * Get current query.
 	 * @return
 	 */
-	IQuery getQuery();
+	ThreeCixtyQuery getQuery();
 
 	/**
 	 * Set current query.
 	 * @param query
 	 */
-	void setQuery(IQuery query);
+	void setQuery(ThreeCixtyQuery query);
 
 	/**
 	 * Execute a given augmented query.
 	 * @param query
-	 * @return
+	 * @return an instance of QResult which contains results by executing an augmented query.
 	 */
-	QResult executeQuery(IAugmentedQuery query);
+	QResult executeQuery(AugmentedQuery query);
 
 	/**
 	 * Execute found augmented query. The augmented query was resulted by the {@link #performAugmentingTask()} method.
