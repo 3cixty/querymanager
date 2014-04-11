@@ -1,6 +1,7 @@
 package eu.threecixty.querymanager;
+import java.io.InputStream;
+
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.IProfiler;
@@ -13,9 +14,9 @@ import eu.threecixty.profile.IProfiler;
 public interface IQueryManager {
 	
 	/**
-	 * Connect to EventMedia an Evolved Sparql Endpoint and get the results. 
-	 * This method is to be also used to send the query to the KB Virtuoso via EventMedia.
-	 * This method serves the purpose of the wrapper to EventMedia.
+	 * This method asks EventMedia to execute the augmented query received by the
+	 * {@linkplain #performAugmentingTask()} method.
+	 * <br><br>
 	 * 
 	 * Details of the component EventMedia are listed in:
 	 * https://docs.google.com/file/d/0Byc_j3CYjZgzcWVObzU4aGRKT1U/edit.
@@ -30,9 +31,11 @@ public interface IQueryManager {
 	 * https://docs.google.com/drawings/d/1nf4fPRJDia2lOZoYuWikeJpWgpUWU7kzODDhovQC2rk/edit.
 	 * 
 	 * @param: Augmented Query
+	 * @param format
+	 * 			The returned string format
 	 * @return: Result in jena.Query.ResultSet format
 	 */
-	public ResultSet connectToEventMedia(Query augmentedQuery);
+	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format);
 	
 //	/**
 //	 * Connect to Knowledgebase of the User Profiles. 
@@ -110,6 +113,12 @@ public interface IQueryManager {
 	 * @param model
 	 */
 	void setModel(Model model);
+
+	/**
+	 * Set model.
+	 * @param modelStream
+	 */
+	void setModel(InputStream modelStream);
 
 	/**
 	 * Set model from a given RDF content.

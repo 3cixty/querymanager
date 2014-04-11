@@ -1,5 +1,6 @@
 package eu.threecixty.querymanager;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,9 @@ import eu.threecixty.profile.models.Preference;
 	
 	@Override
 	public AugmentedQuery getAugmentedQuery() {
+		if (augmentedQuery == null) {
+			augmentedQuery = new AugmentedQuery(query);
+		}
 		return augmentedQuery;
 	}
 
@@ -58,7 +62,8 @@ import eu.threecixty.profile.models.Preference;
 	}
 	
 	@Override
-	public ResultSet connectToEventMedia(Query augmentedQuery) {
+	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
+			EventMediaFormat format) {
 		// TODO: call the EventMedia component
 		return null;
 	}
@@ -102,6 +107,13 @@ import eu.threecixty.profile.models.Preference;
 	@Override
 	public void setModel(Model model) {
 		this.rdfModel = model;
+	}
+
+	@Override
+	public void setModel(InputStream modelStream) {
+		if (modelStream == null) return;
+		rdfModel = ModelFactory.createDefaultModel();
+		rdfModel = rdfModel.read(modelStream, "UTF-8");
 	}
 
 	@Override
