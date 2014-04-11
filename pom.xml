@@ -4,59 +4,27 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>eu.3cixty</groupId>
-  <artifactId>QueryManager</artifactId>
-  <name>QueryManager</name>
-  <packaging>jar</packaging>
+  <artifactId>querymanager-parent</artifactId>
+  <name>QueryManager-Parent</name>
+  <packaging>pom</packaging>
   <version>1.0</version>
-<!--
-  <repositories>
-  <repository>
-    <id>apache-repo-snapshots</id>
-    <url>https://repository.apache.org/content/repositories/releases/</url>
-    <releases>
-      <enabled>false</enabled>
-    </releases>
-    <snapshots>
-      <enabled>true</enabled>
-    </snapshots>
-  </repository>
-	</repositories>
--->
-  <dependencies>
-<!-- 	<dependency>
-	  <groupId>org.facebook4j</groupId>
-	  <artifactId>facebook4j-core</artifactId>
-	  <version>[2.0,)</version>
-	</dependency>
--->
-
-    <dependency>
-	  <groupId>com.hp.hpl.jena</groupId>
-	  <artifactId>jena</artifactId>
-	  <version>2.5.5</version>
-    </dependency>
-
-    <dependency>
-	  <groupId>junit</groupId>
-	  <artifactId>junit</artifactId>
-	  <version>4.11</version>
-	  <scope>test</scope>
-    </dependency>
-            
-</dependencies>
+  
+  <modules>
+    <module>querymanager-java</module>
+	<module>querymanager-webservice</module>
+  </modules>
   
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
-	<resources>
-		<resource>
-			<directory>resources</directory>
-		</resource>
-	</resources>
-    <testResources>
-      <testResource>
-        <directory>test-resources</directory>
-      </testResource>
-    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
