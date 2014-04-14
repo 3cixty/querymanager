@@ -33,7 +33,7 @@ public interface IQueryManager {
 	 * @param: Augmented Query
 	 * @param format
 	 * 			The returned string format
-	 * @return: Result in jena.Query.ResultSet format
+	 * @return: a RDF or JSON in string format
 	 */
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format);
 	
