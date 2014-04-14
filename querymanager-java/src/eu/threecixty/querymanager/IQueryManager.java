@@ -33,23 +33,10 @@ public interface IQueryManager {
 	 * @param: Augmented Query
 	 * @param format
 	 * 			The returned string format
-	 * @return: a RDF or JSON in string format
+	 * @return: a RDF or JSON in string format. Return Null if any error occurs.
 	 */
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format);
 	
-//	/**
-//	 * Connect to Knowledgebase of the User Profiles. 
-//	 * This method is to be also used to connect to the KB of user Profiles.
-//	 * Required for Step 5 of the global architecture.
-//	 * https://docs.google.com/drawings/d/1nf4fPRJDia2lOZoYuWikeJpWgpUWU7kzODDhovQC2rk/edit.
-//	 * 
-//	 * ToDo: Add privacy block. This is required. Check with Thales. 
-//	 * 
-//	 * @param: ClassLoader
-//	 * @param: KB source
-//	 */
-//	public void connectToKnowledgebaseOfUserProfiles(ClassLoader classLoader, String filenameOrURI);
-
 	/**
 	 * Request preferences from Knowledge-Base of User Profiles.
 	 * 
@@ -58,22 +45,9 @@ public interface IQueryManager {
 	 * https://docs.google.com/drawings/d/1nf4fPRJDia2lOZoYuWikeJpWgpUWU7kzODDhovQC2rk/edit.
 	 * 
 	 * @param profiler
-	 * @return: User social preferences in jena.Query.ResultSet format.
 	 **/
 	public void requestPreferences(IProfiler profiler);
 
-//	/**
-//	 * Augments the query with the preferences extracted from the user profile.
-//	 * Currently social and mobility related.
-//	 * Required for Step 5 of the global architecture.
-//	 * https://docs.google.com/drawings/d/1nf4fPRJDia2lOZoYuWikeJpWgpUWU7kzODDhovQC2rk/edit.
-//	 * 
-//	 * note: Call the function multiple times to add social and mobility related preferences.
-//	 * 
-//	 * @param: Augmented query
-//	 * @param: The preferences of the user in jena.Query.ResultSet format
-//	 */
-//	public void setAugmentedQuery(Query augmentedQuery, ResultSet preferences);
 
 	/**
 	 * Log: Store the result in the history.
@@ -104,7 +78,7 @@ public interface IQueryManager {
 
 	/**
 	 * Gets the model representing the knowledgebase of user profile.
-	 * @return
+	 * @return RDF model
 	 */
 	Model getModel();
 
@@ -134,14 +108,14 @@ public interface IQueryManager {
 
 	/**
 	 * Get userID.
-	 * @return
+	 * @return UserID/session key
 	 */
 	String getUID();
 
 	/**
-	 * Create a Jena query from a given query string.
+	 * Create a Query object from a given query string.
 	 * @param queryStr
-	 * @return
+	 * @return Query
 	 */
 	Query createJenaQuery(String queryStr);
 
@@ -166,7 +140,7 @@ public interface IQueryManager {
 
 	/**
 	 * Execute found augmented query. The augmented query was resulted by the {@link #performAugmentingTask()} method.
-	 * @return
+	 * @return an instance of QResult which contains results by executing an augmented query.
 	 */
 	QResult executeAugmentedQuery();
 }
