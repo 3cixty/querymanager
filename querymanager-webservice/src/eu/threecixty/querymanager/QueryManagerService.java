@@ -74,6 +74,8 @@ public class QueryManagerService {
 		qm.setQuery(placeQuery);
 		
 		// perform query augmentation when necessary
+		// TODO: remove the following line to augment a query (now Events database seems to only contain event's links. Question: how to do with event's name, ... )
+		isUsingPreferences = false;
 		if (isUsingPreferences) {
 		    qm.performAugmentingTask();
 		}

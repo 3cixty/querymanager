@@ -1,6 +1,11 @@
 package eu.threecixty.querymanager;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +25,8 @@ import eu.threecixty.profile.models.Place;
 import eu.threecixty.profile.models.Preference;
 
  class QueryManager implements IQueryManager {
+	 
+	 private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
 
 	 /**Current query*/
 	private ThreeCixtyQuery query;
@@ -65,6 +72,30 @@ import eu.threecixty.profile.models.Preference;
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
 			EventMediaFormat format) {
 		// TODO: call the EventMedia component
+		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
+				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
+		try {
+			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQuery.convert2String(), "UTF-8");
+			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
+			URL url = new URL(urlStr);
+			if (url != null) {
+				InputStream input = url.openStream();
+				StringBuilder sb = new StringBuilder();
+				byte [] b = new byte[1024];
+				int readBytes = 0;
+				while ((readBytes = input.read(b)) >= 0) {
+					 sb.append(new String(b, 0, readBytes));
+				}
+				input.close();
+				return sb.toString();
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
