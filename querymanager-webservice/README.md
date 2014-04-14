@@ -21,15 +21,12 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   ```
   
   where:
-  parameter|value
-  ---------|-----
-  {userkey}|is user session which is to be decided.
-  
-  {isUsingPreferences}|true or false. This is used to whether or not augment the query with the user preferences.
-  
-  {format}|requested result format (rdf or json)
-  
-  {query}|a sparql query
+  |parameter|value|
+  |---------|-----|
+  |{userkey}|is user session which is to be decided|
+  |{isUsingPreferences}|true or false. This is used to whether or not augment the query with the user preferences|
+  |{format}|requested result format (rdf or json)|
+  |{query}|a sparql query|
   			
   
   Example for a full URL to invoke the service on local Tomcat server:
