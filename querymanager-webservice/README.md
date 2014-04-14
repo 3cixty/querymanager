@@ -34,9 +34,13 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   [http://localhost:8080/querymanager-webservice-1.0/services/executeQuery/kinh/false/json/select%20*%20where%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D](http://localhost:8080/querymanager-webservice-1.0/services/executeQuery/kinh/false/json/select%20*%20where%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D)
   
   [http://localhost:8080/querymanager-webservice-1.0](http://localhost:8080/querymanager-webservice-1.0) is the baseUrl
+  
   kinh is a {userkey}
+  
   false is an {isUsingPreferences}
+  
   json is a {format}
+  
   select%20*%20where%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D is a {query}. 
   
   The query is encoded by URL Encoding 
