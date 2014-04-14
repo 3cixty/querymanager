@@ -1,6 +1,6 @@
 This document shows you how to deploy querymanager-webservice and how to make a remote query to QueryManager.
 
-## How to deploy querymanager-webservice:
+### How to deploy querymanager-webservice:
 
 - Go to the "querymanager" repository and execute the following command:
   ```
@@ -10,7 +10,7 @@ This document shows you how to deploy querymanager-webservice and how to make a 
 - Go to the "querymanager-webservice" folder, copy the .war file in the "target" folder to your Web application server (Tomcat for example).
   
 
-## How to make a remote query to QueryManager:
+### How to make a remote query to QueryManager:
 
 - Suppose you deployed querymanager-webservice on your local server. Let the baseUrl point to the root path for querymanager-webservice you just deployed
 
