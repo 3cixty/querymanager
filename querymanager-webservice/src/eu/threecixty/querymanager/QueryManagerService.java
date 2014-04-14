@@ -28,10 +28,14 @@ public class QueryManagerService {
 	/**
 	 * 
 	 * @param userkey
+	 * 			User key to execute a remote query. To be decided
 	 * @param isUsingPreferences
+	 * 			Option which indicates whether or not QueryManager augments a given query before executing at EventMedia
 	 * @param format
+	 * 			result format received. There are two types of format supported: rdf or json.
 	 * @param query
-	 * @return
+	 * 			a sparql query.
+	 * @return a string which is in the given format.
 	 */
     @GET
     @Path("/executeQuery/{userkey}/{isUsingPreferences}/{format}/{query}")
