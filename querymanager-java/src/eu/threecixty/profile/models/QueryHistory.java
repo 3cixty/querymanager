@@ -2,8 +2,9 @@ package eu.threecixty.profile.models;
 
 import java.util.Date;
 
-import com.hp.hpl.jena.graph.query.Query;
+import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.ResultSet;
+
 
 import eu.threecixty.profile.annotations.Description;
 

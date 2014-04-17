@@ -15,8 +15,8 @@ public class TestQM {
 	public void testMakeAQuery() {
 		String uid = "kinh";
 		String filenameOrURI = "data.rdf";
-		String queryString = "PREFIX foaf:   <http://xmlns.com/foaf/0.1/> \n PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>" +
-				" SELECT ?name ?rate WHERE { }";
+		String queryString = "PREFIX foaf:   <http://xmlns.com/foaf/0.1/> \n PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#> \n PREFIX lode:    <http://linkedevents.org/ontology/> \n " +
+				" SELECT ?category ( COUNT(*) AS ?count ) WHERE { ?event a lode:Event; lode:hasCategory ?category . } GROUP BY ?category ORDER BY DESC ( ?count ) LIMIT 20 ";
 		
 		IProfiler profiler = new Profiler(uid);
 		
