@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -44,7 +45,7 @@ public class QueryManagerService {
     		@PathParam("isUsingPreferences")boolean isUsingPreferences,
     		@PathParam("format")String format, @PathParam("query")String query) {
     	if (userkey == null || format == null || query == null) return null;
-
+    	
     	EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
     	if (eventMediaFormat == null) return null;
     	
@@ -66,7 +67,9 @@ public class QueryManagerService {
 			e.printStackTrace();
 		}
 		
-		Query jenaQuery = qm.createJenaQuery(query);
+		String allPrefixes = getAllPrefixes() + " ";
+		
+		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
 		
 		// take preferences into account to augment queries (only fade place preferences are available)
 		qm.requestPreferences(profiler);
@@ -83,7 +86,31 @@ public class QueryManagerService {
 		if (isUsingPreferences) {
 		    qm.performAugmentingTask();
 		}
-    	
+		
         return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), eventMediaFormat);   
+    }
+
+    private String getAllPrefixes() {
+		String rootPath = InitServlet.getRealRootPath();
+		try {
+			InputStream inStream = new FileInputStream(rootPath + File.separatorChar 
+					+ "WEB-INF" + File.separatorChar + "prefix.properties");
+			StringBuilder sb = new StringBuilder();
+			Properties props = new Properties();
+			props.load(inStream);
+			inStream.close();
+			for (java.util.Map.Entry<Object, Object> entry: props.entrySet()) {
+				sb.append("PREFIX " + entry.getKey() + ":\t");
+				sb.append('<');
+				sb.append(entry.getValue());
+				sb.append(">\n");
+			}
+			return sb.toString();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	return null;
     }
 }

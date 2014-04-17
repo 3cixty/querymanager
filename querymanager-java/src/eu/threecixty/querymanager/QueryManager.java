@@ -75,8 +75,11 @@ import eu.threecixty.profile.models.Preference;
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		try {
-			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQuery.convert2String(), "UTF-8");
+			String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
+			
+			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
+
 			URL url = new URL(urlStr);
 			if (url != null) {
 				InputStream input = url.openStream();
@@ -249,5 +252,15 @@ import eu.threecixty.profile.models.Preference;
 		for (Event event: events) {
 			eQuery.addEvent(event);
 		}
+	}
+
+	private String removePrefixes(String query) {
+		int lastPrefixIndex = query.lastIndexOf("PREFIX");
+		if (lastPrefixIndex < 0) return query;
+		int index = query.indexOf('\n', lastPrefixIndex);
+		if (index >= lastPrefixIndex) {
+			return query.substring(index + 2);
+		}
+		return query;
 	}
 }

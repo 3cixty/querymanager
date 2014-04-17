@@ -1,5 +1,10 @@
 package eu.threecixty.querymanager;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,8 +20,20 @@ public class TestQM {
 	public void testMakeAQuery() {
 		String uid = "kinh";
 		String filenameOrURI = "data.rdf";
-		String queryString = "PREFIX foaf:   <http://xmlns.com/foaf/0.1/> \n PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#> \n PREFIX lode:    <http://linkedevents.org/ontology/> \n " +
-				" SELECT ?category ( COUNT(*) AS ?count ) WHERE { ?event a lode:Event; lode:hasCategory ?category . } GROUP BY ?category ORDER BY DESC ( ?count ) LIMIT 20 ";
+		String queryString = "PREFIX foaf:   <http://xmlns.com/foaf/0.1/> \n PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#> \n PREFIX lode:    <http://linkedevents.org/ontology/> \n SELECT ?category ( COUNT(*) AS ?count ) WHERE { ?event a lode:Event; lode:hasCategory ?category . } GROUP BY ?category ORDER BY DESC ( ?count ) LIMIT 20  ";
+//				" SELECT ?category ( COUNT(*) AS ?count ) WHERE { ?event a lode:Event; lode:hasCategory ?category . } GROUP BY ?category ORDER BY DESC ( ?count ) LIMIT 20 ";
+		
+		try {
+			String tmp = URLEncoder.encode(queryString, "UTF-8");
+			System.out.println(tmp);
+			File file = new File("D:\\tmp.txt");
+			FileOutputStream out = new FileOutputStream(file);
+			out.write(tmp.getBytes());
+			out.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		IProfiler profiler = new Profiler(uid);
 		
