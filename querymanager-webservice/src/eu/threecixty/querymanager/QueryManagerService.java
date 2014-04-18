@@ -90,6 +90,10 @@ public class QueryManagerService {
         return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), eventMediaFormat);   
     }
 
+    /**
+     * To validate the sparql query, we need prefixes. These prefixes are same as those used by EventMedia.
+     * @return string
+     */
     private String getAllPrefixes() {
 		String rootPath = InitServlet.getRealRootPath();
 		try {
@@ -111,6 +115,6 @@ public class QueryManagerService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	return null;
+    	return "";
     }
 }
