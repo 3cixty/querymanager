@@ -91,15 +91,19 @@ import eu.threecixty.profile.models.Preference;
 				}
 				input.close();
 				return sb.toString();
+			} else {
+				return "no url at " + urlStr;
 			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
+			return "ERROR:" + e.getMessage();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
+			return "ERROR:" + e.getMessage();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return "ERROR:" + e.getMessage();
 		}
-		return null;
 	}
 
 	@Override
