@@ -40,4 +40,4 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   - json is a {format}
   - select%20*%20where%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D is a {query}. 
   
-  The query is encoded by URL Encoding (http://www.w3c.org)
+  The query is UTF-8 encoded
