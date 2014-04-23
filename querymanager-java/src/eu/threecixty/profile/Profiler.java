@@ -54,16 +54,16 @@ public class Profiler implements IProfiler {
 		Set<Place> fakePlaces = new HashSet<Place>();
 		Place fakePlace = new Place();
 		PlaceDetail fakePD = new PlaceDetail();
-		fakePD.setHasName("Bob");
+		fakePD.setHasName("France");
 		fakePlace.setHasPlaceDetail(fakePD);
 		
 		fakePlaces.add(fakePlace);
 		fakePref.setHasPlaces(fakePlaces);
 
-		Rating fakeRating = new Rating();
-		
-		fakeRating.setRating(9.0f);
-		fakePlace.setHasRating(fakeRating);
+//		Rating fakeRating = new Rating();
+//		
+//		fakeRating.setRating(9.0f);
+//		fakePlace.setHasRating(fakeRating);
 		
 		return fakePref;
 	}

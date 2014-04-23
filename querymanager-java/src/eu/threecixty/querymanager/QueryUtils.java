@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.Var;
@@ -194,11 +195,14 @@ public class QueryUtils {
 	 * @param node
 	 */
 	private static void addTripleFilter(Query query, String nameInRDFModel, NodeValue node) {
-		Triple pattern = Triple.create(Var.alloc("x"),
-		        Var.alloc(":" +nameInRDFModel), Var.alloc(nameInRDFModel));
+
+		
+
+//		Triple pattern = Triple.create(Var.alloc("x"),
+//		        Var.alloc(":" +nameInRDFModel), Var.alloc(nameInRDFModel));
 
 		ElementTriplesBlock block = new ElementTriplesBlock();
-		block.addTriple(pattern);
+//		block.addTriple(pattern);
 
 		Expr expr = new E_Equals(new ExprVar(nameInRDFModel), node);
 		ElementFilter filter = new ElementFilter(expr);
@@ -208,6 +212,20 @@ public class QueryUtils {
 
 		body.addElement(block);
 		body.addElement(filter);
+		
+		Triple pattern1 = Triple.create(Var.alloc("event"),
+		        Var.alloc("p1"), Var.alloc("place"));
+		Triple pattern2 = Triple.create(Var.alloc("place"),
+		        Var.alloc("p2"), Var.alloc("address"));
+		Triple pattern3 = Triple.create(Var.alloc("address"),
+		        Var.alloc("p3"), Var.alloc("country"));
+
+
+		block.addTriple(pattern1);
+		block.addTriple(pattern2);
+		block.addTriple(pattern3);
+		
+		query.setDistinct(true);
 
 		query.setQueryPattern(body);
 	}
