@@ -11,7 +11,7 @@
   
   <modules>
     <module>querymanager-java</module>
-	<module>querymanager-webservice</module>
+	<module>querymanagerServlet</module>
   </modules>
   
   <build>
