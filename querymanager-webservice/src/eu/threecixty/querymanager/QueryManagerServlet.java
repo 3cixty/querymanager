@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Properties;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,11 +32,17 @@ public class QueryManagerServlet extends HttpServlet {
 
 	private static String allPrefixes = null;
 	
+	public static String realPath;
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public void init(ServletConfig config) throws ServletException {
+	    super.init(config);
+	    realPath = this.getServletContext().getRealPath("/");
+	}
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -59,7 +66,7 @@ public class QueryManagerServlet extends HttpServlet {
 
     		// TODO: set to RDF model
     		//qm.setModelFromFileOrUri(filenameOrURI);
-    		String rootPath = InitServlet.getRealRootPath();
+    		String rootPath = getRealRootPath();
     		try {
     			InputStream inStream = new FileInputStream(rootPath + File.separatorChar 
     					+ "WEB-INF" + File.separatorChar + "data.rdf");
@@ -108,7 +115,7 @@ public class QueryManagerServlet extends HttpServlet {
      * @return string
      */
     private String getAllPrefixes() {
-		String rootPath = InitServlet.getRealRootPath();
+		String rootPath = getRealRootPath();
 		try {
 			InputStream inStream = new FileInputStream(rootPath + File.separatorChar 
 					+ "WEB-INF" + File.separatorChar + "prefix.properties");
@@ -129,5 +136,9 @@ public class QueryManagerServlet extends HttpServlet {
 			e.printStackTrace();
 		}
     	return "";
+    }
+
+    private String getRealRootPath() {
+    	return realPath;
     }
 }
