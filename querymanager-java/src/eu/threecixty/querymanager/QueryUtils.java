@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.Var;
@@ -210,21 +211,22 @@ public class QueryUtils {
 		ElementGroup body = (ElementGroup) query.getQueryPattern();
 		if (body == null)  body = new ElementGroup();
 
-		body.addElement(block);
-		body.addElement(filter);
 		
 		Triple pattern1 = Triple.create(Var.alloc("event"),
-		        Var.alloc("p1"), Var.alloc("place"));
+		        NodeFactory.createURI("http://linkedevents.org/ontology/atPlace"), Var.alloc("place"));
 		Triple pattern2 = Triple.create(Var.alloc("place"),
-		        Var.alloc("p2"), Var.alloc("address"));
+				NodeFactory.createURI("http://www.w3.org/2006/vcard/ns#adr"), Var.alloc("address"));
 		Triple pattern3 = Triple.create(Var.alloc("address"),
-		        Var.alloc("p3"), Var.alloc("country"));
+				NodeFactory.createURI("http://www.w3.org/2006/vcard/ns#country-name"), Var.alloc("country"));
 
 
 		block.addTriple(pattern1);
 		block.addTriple(pattern2);
 		block.addTriple(pattern3);
 		
+		body.addElement(block);
+		body.addElement(filter);
+
 		query.setDistinct(true);
 
 		query.setQueryPattern(body);

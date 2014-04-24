@@ -76,7 +76,6 @@ import eu.threecixty.profile.models.Preference;
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		try {
 			String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
-			
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
