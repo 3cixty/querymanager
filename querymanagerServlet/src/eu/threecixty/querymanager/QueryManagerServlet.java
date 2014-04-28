@@ -29,6 +29,7 @@ public class QueryManagerServlet extends HttpServlet {
 	private static final String QUERY_PARAM = "query";
 	
 	private static final String PARAM_EXCEPTION = "There is an error for parameters";
+	private static final String ACCESS_TOKEN_EXCEPTION = "Access token is incorrect or expired";
 
 	private static String allPrefixes = null;
 	
@@ -56,58 +57,80 @@ public class QueryManagerServlet extends HttpServlet {
 		String format = req.getParameter(FORMAT_PARAM);
 		String query = req.getParameter(QUERY_PARAM);
     	
-    	EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
-    	
-    	if (userkey != null && eventMediaFormat != null && query != null) {
-    	
-    		IProfiler profiler = new Profiler(userkey);
+		String user_id =  TokenVerifier.getInstance().getUserId(userkey); // which corresponds with Google user_id (from Google account)
+		if (user_id == null || user_id.equals("")) {
+			out.write(ACCESS_TOKEN_EXCEPTION);
+		} else {
+			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 
-    		IQueryManager qm = new QueryManager(userkey);
-
-    		// TODO: set to RDF model
-    		//qm.setModelFromFileOrUri(filenameOrURI);
-    		String rootPath = getRealRootPath();
-    		try {
-    			InputStream inStream = new FileInputStream(rootPath + File.separatorChar 
-    					+ "WEB-INF" + File.separatorChar + "data.rdf");
-    			qm.setModel(inStream);
-    			inStream.close();
-    		} catch (FileNotFoundException e) {
-    			e.printStackTrace();
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-    		if (allPrefixes == null) {
-    			allPrefixes = getAllPrefixes() + " ";
-    		}
-
-    		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
-
-    		// take preferences into account to augment queries (only fade place preferences are available)
-    		qm.requestPreferences(profiler);
-
-    		// TODO: correct the following line by exactly recognizing query's type
-    		// suppose that we recognize that the query is for places
-    		ThreeCixtyQuery placeQuery = new PlaceQuery(jenaQuery);
-
-    		qm.setQuery(placeQuery);
-
-    		// perform query augmentation when necessary
-    		// TODO: remove the following line to augment a query (now Events database seems to only contain event's links. Question: how to do with event's name, ... )
-    		//isUsingPreferences = false;
-    		if (isUsingPreferences) {
-    			qm.performAugmentingTask();
-    		}
-
-    		String result = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), eventMediaFormat);
-    		
-    		// write out the result
-    		out.write(result);
-    	} else {
-    		out.write(PARAM_EXCEPTION);
-    	}
+			if (eventMediaFormat != null && query != null) {
+				String result = executeQuery(user_id, isUsingPreferences, eventMediaFormat, query);
+				out.write(result);
+			} else {
+				out.write(PARAM_EXCEPTION);
+			}
+		}
 		
 		out.close();
+	}
+
+	/**
+	 * Executes the query.
+	 *
+	 * @param user_id
+	 * 			user ID which retrieves from access token
+	 * @param isUsingPreferences
+	 * 			which indicates that preferences are whether or not used
+	 * @param eventMediaFormat
+	 * 			which indicates a desired result format
+	 * @param query
+	 * 			Which is a query to be executed
+	 * @return
+	 */
+	private String executeQuery(String user_id,
+			boolean isUsingPreferences, EventMediaFormat eventMediaFormat, String query) {
+		IProfiler profiler = new Profiler(user_id);
+
+		IQueryManager qm = new QueryManager(user_id);
+
+		// TODO: set to RDF model
+		//qm.setModelFromFileOrUri(filenameOrURI);
+		String rootPath = getRealRootPath();
+		try {
+			InputStream inStream = new FileInputStream(rootPath + File.separatorChar 
+					+ "WEB-INF" + File.separatorChar + "data.rdf");
+			qm.setModel(inStream);
+			inStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (allPrefixes == null) {
+			allPrefixes = getAllPrefixes() + " ";
+		}
+
+		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
+
+		// take preferences into account to augment queries (only fade place preferences are available)
+		qm.requestPreferences(profiler);
+
+		// TODO: correct the following line by exactly recognizing query's type
+		// suppose that we recognize that the query is for places
+		ThreeCixtyQuery placeQuery = new PlaceQuery(jenaQuery);
+
+		qm.setQuery(placeQuery);
+
+		// perform query augmentation when necessary
+		// TODO: remove the following line to augment a query (now Events database seems to only contain event's links. Question: how to do with event's name, ... )
+		//isUsingPreferences = false;
+		if (isUsingPreferences) {
+			qm.performAugmentingTask();
+		}
+
+		String result = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), eventMediaFormat);
+		
+		return result;
 	}
 
     /**
