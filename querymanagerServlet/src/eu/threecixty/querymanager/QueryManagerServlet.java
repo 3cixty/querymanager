@@ -23,7 +23,7 @@ import eu.threecixty.profile.Profiler;
 @WebServlet("InitServlet")
 public class QueryManagerServlet extends HttpServlet {
 
-	private static final String USER_KEY_PARAM = "userKey";
+	private static final String ACCESS_TOKEN_PARAM = "accessToken";
 	private static final String IS_USING_PREFS_PARAM = "isUsingPreferences";
 	private static final String FORMAT_PARAM = "format";
 	private static final String QUERY_PARAM = "query";
@@ -52,7 +52,7 @@ public class QueryManagerServlet extends HttpServlet {
 	    PrintWriter out = resp.getWriter();
 	    resp.setContentType("text/plain");
 		
-		String userkey = req.getParameter(USER_KEY_PARAM);
+		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
 		boolean isUsingPreferences = "true".equalsIgnoreCase(req.getParameter(IS_USING_PREFS_PARAM));
 		String format = req.getParameter(FORMAT_PARAM);
 		String query = req.getParameter(QUERY_PARAM);
