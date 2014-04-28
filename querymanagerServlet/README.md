@@ -24,7 +24,7 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   
   |parameter|value|
   |:---------|:-----|
-  |{userkey}|is user session which is to be decided|
+  |{accessToken}|is an access token which lasts for one hour|
   |{isUsingPreferences}|true or false. This is used to whether or not augment the query with the user preferences|
   |{format}|requested result format (rdf or json)|
   |{query}|a sparql query|
