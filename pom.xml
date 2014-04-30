@@ -11,7 +11,9 @@
   
   <modules>
     <module>querymanager-java</module>
+	<!--
 	<module>privacyManager</module>
+	-->
 	<module>querymanagerServlet</module>
   </modules>
   
