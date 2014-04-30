@@ -53,9 +53,6 @@ import eu.threecixty.profile.models.Preference;
 	
 	@Override
 	public AugmentedQuery getAugmentedQuery() {
-		if (augmentedQuery == null) {
-			augmentedQuery = new AugmentedQuery(query);
-		}
 		return augmentedQuery;
 	}
 
@@ -66,6 +63,7 @@ import eu.threecixty.profile.models.Preference;
 	public void setQuery(ThreeCixtyQuery query){
 		if (query == null) return;
 		this.query = query;
+		augmentedQuery = new AugmentedQuery(query);
 	}
 	
 	@Override
@@ -76,23 +74,22 @@ import eu.threecixty.profile.models.Preference;
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		try {
 			String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
+			
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
 			URL url = new URL(urlStr);
-			if (url != null) {
-				InputStream input = url.openStream();
-				StringBuilder sb = new StringBuilder();
-				byte [] b = new byte[1024];
-				int readBytes = 0;
-				while ((readBytes = input.read(b)) >= 0) {
-					 sb.append(new String(b, 0, readBytes));
-				}
-				input.close();
-				return sb.toString();
-			} else {
-				return "no url at " + urlStr;
+
+			InputStream input = url.openStream();
+			StringBuilder sb = new StringBuilder();
+			byte [] b = new byte[1024];
+			int readBytes = 0;
+			while ((readBytes = input.read(b)) >= 0) {
+				sb.append(new String(b, 0, readBytes));
 			}
+			input.close();
+			return sb.toString();
+
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return "ERROR:" + e.getMessage();
@@ -174,7 +171,7 @@ import eu.threecixty.profile.models.Preference;
 
 	@Override
 	public Query createJenaQuery(String queryStr) {
-		if (rdfModel == null || queryStr == null) return null;
+		if (queryStr == null) return null;
 		return QueryFactory.create(queryStr);
 	}
 

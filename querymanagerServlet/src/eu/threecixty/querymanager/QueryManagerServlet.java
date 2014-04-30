@@ -51,20 +51,24 @@ public class QueryManagerServlet extends HttpServlet {
 
 	    PrintWriter out = resp.getWriter();
 	    resp.setContentType("text/plain");
-		
+	    IProfiler profiler = null;
 		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
 		boolean isUsingPreferences = "true".equalsIgnoreCase(req.getParameter(IS_USING_PREFS_PARAM));
 		String format = req.getParameter(FORMAT_PARAM);
 		String query = req.getParameter(QUERY_PARAM);
     	
 		String user_id =  TokenVerifier.getInstance().getUserId(userkey); // which corresponds with Google user_id (from Google account)
-		if (user_id == null || user_id.equals("")) {
+		if ((user_id == null || user_id.equals("")) && (!"false".equals(userkey))) {
 			out.write(ACCESS_TOKEN_EXCEPTION);
 		} else {
+			boolean isAccessTokenFalse = "false".equals(userkey);
+			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
+			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 
 			if (eventMediaFormat != null && query != null) {
-				String result = executeQuery(user_id, isUsingPreferences, eventMediaFormat, query);
+				String result = executeQuery(profiler, qm, isAccessTokenFalse ? false : isUsingPreferences,
+						eventMediaFormat, query);
 				out.write(result);
 			} else {
 				out.write(PARAM_EXCEPTION);
@@ -77,8 +81,10 @@ public class QueryManagerServlet extends HttpServlet {
 	/**
 	 * Executes the query.
 	 *
-	 * @param user_id
-	 * 			user ID which retrieves from access token
+	 * @param profiler
+	 * 			user profile
+	 * @param qm
+	 * 			query manager
 	 * @param isUsingPreferences
 	 * 			which indicates that preferences are whether or not used
 	 * @param eventMediaFormat
@@ -87,25 +93,11 @@ public class QueryManagerServlet extends HttpServlet {
 	 * 			Which is a query to be executed
 	 * @return
 	 */
-	private String executeQuery(String user_id,
+	private String executeQuery(IProfiler profiler, IQueryManager qm,
 			boolean isUsingPreferences, EventMediaFormat eventMediaFormat, String query) {
-		IProfiler profiler = new Profiler(user_id);
-
-		IQueryManager qm = new QueryManager(user_id);
 
 		// TODO: set to RDF model
 		//qm.setModelFromFileOrUri(filenameOrURI);
-		String rootPath = getRealRootPath();
-		try {
-			InputStream inStream = new FileInputStream(rootPath + File.separatorChar 
-					+ "WEB-INF" + File.separatorChar + "data.rdf");
-			qm.setModel(inStream);
-			inStream.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		if (allPrefixes == null) {
 			allPrefixes = getAllPrefixes() + " ";
 		}
