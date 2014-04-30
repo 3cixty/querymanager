@@ -29,7 +29,7 @@ public class QueryManagerServlet extends HttpServlet {
 	private static final String QUERY_PARAM = "query";
 	
 	private static final String PARAM_EXCEPTION = "There is an error for parameters";
-	private static final String ACCESS_TOKEN_EXCEPTION = "Access token is incorrect or expired";
+	private static final String ACCESS_TOKEN_EXCEPTION = "{ AccessToken: 'Access token is incorrect or expired' }";
 
 	private static String allPrefixes = null;
 	
@@ -50,7 +50,6 @@ public class QueryManagerServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 	    PrintWriter out = resp.getWriter();
-	    resp.setContentType("text/plain");
 	    IProfiler profiler = null;
 		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
 		boolean isUsingPreferences = "true".equalsIgnoreCase(req.getParameter(IS_USING_PREFS_PARAM));
@@ -59,8 +58,10 @@ public class QueryManagerServlet extends HttpServlet {
     	
 		String user_id =  TokenVerifier.getInstance().getUserId(userkey); // which corresponds with Google user_id (from Google account)
 		if ((user_id == null || user_id.equals("")) && (!"false".equals(userkey))) {
+			resp.setContentType("application/json");
 			out.write(ACCESS_TOKEN_EXCEPTION);
 		} else {
+			resp.setContentType("text/plain");
 			boolean isAccessTokenFalse = "false".equals(userkey);
 			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
 			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
