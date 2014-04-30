@@ -10,17 +10,11 @@
   </parent>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>travelMate</artifactId>
-  <name>TravelMate</name>
+  <artifactId>privacyManager</artifactId>
+  <name>PrivacyManager</name>
   <packaging>jar</packaging>
   <version>1.0</version>
-  
-  <repositories>
-    <repository>
-          <id>private-travelmate-thales</id>
-          <url>file://${basedir}/lib</url>
-    </repository>
-  </repositories> 
+
   
   <dependencies>
     <dependency>
