@@ -24,7 +24,7 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   
   |parameter|value|
   |:---------|:-----|
-  |{accessToken}|is an access token which lasts for one hour|
+  |{accessToken}|is an access token which lasts for one hour or false. When accessToken equaling to false, the query isn't augmented| 
   |{isUsingPreferences}|true or false. This is used to whether or not augment the query with the user preferences|
   |{format}|requested result format (rdf or json)|
   |{query}|a sparql query|
