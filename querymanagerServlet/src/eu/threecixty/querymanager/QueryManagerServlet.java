@@ -29,7 +29,6 @@ public class QueryManagerServlet extends HttpServlet {
 	private static final String QUERY_PARAM = "query";
 	
 	private static final String PARAM_EXCEPTION = "There is an error for parameters";
-	private static final String ACCESS_TOKEN_EXCEPTION = "{ AccessToken: 'Access token is incorrect or expired' }";
 
 	private static String allPrefixes = null;
 	
@@ -61,8 +60,8 @@ public class QueryManagerServlet extends HttpServlet {
 			user_id = TokenVerifier.getInstance().getUserId(userkey); // which corresponds with Google user_id (from Google account)
 		}
 		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
-			resp.setContentType("application/json");
-			out.write(ACCESS_TOKEN_EXCEPTION);
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			out.write("Access token is incorrect or expired");
 		} else {
 			resp.setContentType("text/plain");
 			
@@ -108,6 +107,11 @@ public class QueryManagerServlet extends HttpServlet {
 
 		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
 
+		// populate user preferences from user profile
+		if (profiler != null) {
+//		    profiler.PopulateProfile();
+		}
+		
 		// take preferences into account to augment queries (only fade place preferences are available)
 		qm.requestPreferences(profiler);
 
