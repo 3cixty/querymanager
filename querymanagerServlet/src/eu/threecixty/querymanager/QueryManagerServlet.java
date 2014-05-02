@@ -55,14 +55,17 @@ public class QueryManagerServlet extends HttpServlet {
 		boolean isUsingPreferences = "true".equalsIgnoreCase(req.getParameter(IS_USING_PREFS_PARAM));
 		String format = req.getParameter(FORMAT_PARAM);
 		String query = req.getParameter(QUERY_PARAM);
-    	
-		String user_id =  TokenVerifier.getInstance().getUserId(userkey); // which corresponds with Google user_id (from Google account)
-		if ((user_id == null || user_id.equals("")) && (!"false".equals(userkey))) {
+		boolean isAccessTokenFalse = "false".equals(userkey);
+		String user_id =  null;
+		if (!isAccessTokenFalse) {
+			user_id = TokenVerifier.getInstance().getUserId(userkey); // which corresponds with Google user_id (from Google account)
+		}
+		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
 			resp.setContentType("application/json");
 			out.write(ACCESS_TOKEN_EXCEPTION);
 		} else {
 			resp.setContentType("text/plain");
-			boolean isAccessTokenFalse = "false".equals(userkey);
+			
 			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
 			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
