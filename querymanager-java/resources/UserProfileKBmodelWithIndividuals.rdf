@@ -2461,6 +2461,17 @@
     
 
 
+    <!-- http://www.eu.3cixty.org/profile#hasNumberofTimesVisited -->
+
+    <owl:DatatypeProperty rdf:about="&profile;hasNumberofTimesVisited">
+        <rdfs:domain rdf:resource="&profile;UserEventRating"/>
+        <rdfs:domain rdf:resource="&profile;UserHotelRating"/>
+        <rdfs:domain rdf:resource="&profile;UserPlaceRating"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.eu.3cixty.org/profile#hasOriginDestinationPair -->
 
     <owl:DatatypeProperty rdf:about="&profile;hasOriginDestinationPair">
@@ -4413,6 +4424,7 @@
         <vcard:hasName rdf:resource="&profile;100900047095598983805Name"/>
         <hasPreference rdf:resource="&profile;100900047095598983805Preference"/>
         <hasProfileIdentities rdf:resource="&profile;100900047095598983805ProfileIdentities"/>
+        <foaf:knows rdf:resource="&profile;110248277616794929135"/>
     </owl:NamedIndividual>
     
 
@@ -4421,6 +4433,8 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805Address">
         <rdf:type rdf:resource="&vcard;Address"/>
+        <vcard:longitude rdf:datatype="&xsd;double">-2.598761</vcard:longitude>
+        <vcard:latitude rdf:datatype="&xsd;double">51.452745</vcard:latitude>
         <vcard:country-name>England</vcard:country-name>
         <townName>Bristol</townName>
     </owl:NamedIndividual>
@@ -4459,6 +4473,7 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805HiltonMilanHotelRating">
         <rdf:type rdf:resource="&profile;UserHotelRating"/>
+        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">3</hasNumberofTimesVisited>
         <hasHotelDetail rdf:resource="&profile;HiltonMilanHotelDetail"/>
         <hasRating rdf:resource="&profile;Rating5Visited"/>
     </owl:NamedIndividual>
@@ -4505,6 +4520,98 @@
     
 
 
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135 -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135">
+        <rdf:type rdf:resource="&profile;UserProfile"/>
+        <hasUID>110248277616794929135</hasUID>
+        <foaf:knows rdf:resource="&profile;100900047095598983805"/>
+        <vcard:hasName rdf:resource="&profile;110248277616794929135Name"/>
+        <hasPreference rdf:resource="&profile;110248277616794929135Preference"/>
+        <hasProfileIdentities rdf:resource="&profile;110248277616794929135ProfileIdentities"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135HiltonMilanHotelRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135HiltonMilanHotelRating">
+        <rdf:type rdf:resource="&profile;UserHotelRating"/>
+        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">2</hasNumberofTimesVisited>
+        <hasHotelDetail rdf:resource="&profile;HiltonMilanHotelDetail"/>
+        <hasRating rdf:resource="&profile;Rating4Visited"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPlaceDetailPreference -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ItalyPlaceDetailPreference">
+        <rdf:type rdf:resource="&profile;PlaceDetailPreference"/>
+        <hasNatureOfPlace>Country</hasNatureOfPlace>
+        <hasPreferredApproximateAddress rdf:resource="&profile;110248277616794929135ItalyPlaceDetailPreference"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPlacePreference -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ItalyPlacePreference">
+        <rdf:type rdf:resource="&profile;PlacePreference"/>
+        <hasPlaceDetailPreference rdf:resource="&profile;110248277616794929135ItalyPlaceDetailPreference"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPreferedAddress -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ItalyPreferedAddress">
+        <rdf:type rdf:resource="&vcard;Address"/>
+        <vcard:country-name>Italy</vcard:country-name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135Name -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135Name">
+        <rdf:type rdf:resource="&vcard;Name"/>
+        <vcard:given-name>Samira</vcard:given-name>
+        <vcard:family-name>Kochbati</vcard:family-name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135Preference -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135Preference">
+        <rdf:type rdf:resource="&profile;Preference"/>
+        <hasPlacePreference rdf:resource="&profile;110248277616794929135ItalyPlacePreference"/>
+        <hasUserEnteredRatings rdf:resource="&profile;110248277616794929135UserEnteredRating"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ProfileIdentities -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ProfileIdentities">
+        <rdf:type rdf:resource="&profile;ProfileIdentities"/>
+        <hasSource>https://plus.google.com</hasSource>
+        <hasUserAccountID>110248277616794929135</hasUserAccountID>
+        <hasUserInteractionMode>Active</hasUserInteractionMode>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135UserEnteredRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;110248277616794929135UserEnteredRating">
+        <rdf:type rdf:resource="&profile;UserEnteredRatings"/>
+        <hasUserHotelRating rdf:resource="&profile;110248277616794929135HiltonMilanHotelRating"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress -->
 
     <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelAddress">
@@ -4536,6 +4643,16 @@
         <hasNatureOfPlace>Hotel</hasNatureOfPlace>
         <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
         <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#Rating4Visited -->
+
+    <owl:NamedIndividual rdf:about="&profile;Rating4Visited">
+        <rdf:type rdf:resource="&profile;Rating"/>
+        <hasUserInteractionMode>Visited</hasUserInteractionMode>
+        <hasUserDefinedRating>4</hasUserDefinedRating>
     </owl:NamedIndividual>
     
 
