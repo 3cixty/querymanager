@@ -3842,6 +3842,7 @@
     <owl:DatatypeProperty rdf:about="&profile;townName">
         <rdfs:comment>Town name</rdfs:comment>
         <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain rdf:resource="&vcard;Address"/>
     </owl:DatatypeProperty>
     
 
