@@ -109,7 +109,7 @@ public class QueryManagerServlet extends HttpServlet {
 
 		// populate user preferences from user profile
 		if (profiler != null) {
-//		    profiler.PopulateProfile();
+		    profiler.PopulateProfile();
 		}
 		
 		// take preferences into account to augment queries (only fade place preferences are available)
