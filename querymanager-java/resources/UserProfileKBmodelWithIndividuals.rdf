@@ -26,11 +26,11 @@
      xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
      xmlns:profile="http://www.eu.3cixty.org/profile#">
     <owl:Ontology rdf:about="http://www.eu.3cixty.org/profile">
-        <author>Rachit Agarwal (Inria)</author>
-        <author>Mihaela Brut (Thales)</author>
-        <author>Johan Koolwaaij (Mobidot)</author>
-        <author>Animesh Pathak (Inria)</author>
         <owl:versionInfo>1.0.0</owl:versionInfo>
+        <author>Animesh Pathak (Inria)</author>
+        <author>Johan Koolwaaij (Mobidot)</author>
+        <author>Mihaela Brut (Thales)</author>
+        <author>Rachit Agarwal (Inria)</author>
         <owl:imports rdf:resource="http://linkedevents.org/ontology/"/>
         <owl:imports rdf:resource="http://www.w3.org/2006/vcard/ns"/>
         <owl:imports rdf:resource="http://xmlns.com/foaf/0.1/"/>
@@ -610,8 +610,8 @@
     <!-- http://xmlns.com/foaf/0.1/knows -->
 
     <rdf:Description rdf:about="&foaf;knows">
-        <rdfs:range rdf:resource="&profile;UserProfile"/>
         <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="&profile;UserProfile"/>
     </rdf:Description>
     
 
@@ -4436,8 +4436,8 @@
         <rdf:type rdf:resource="&vcard;Address"/>
         <vcard:longitude rdf:datatype="&xsd;double">-2.598761</vcard:longitude>
         <vcard:latitude rdf:datatype="&xsd;double">51.452745</vcard:latitude>
-        <vcard:country-name>England</vcard:country-name>
         <townName>Bristol</townName>
+        <vcard:country-name>England</vcard:country-name>
     </owl:NamedIndividual>
     
 
@@ -4465,7 +4465,7 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805EnglandPreferredAddress">
         <rdf:type rdf:resource="&vcard;Address"/>
-        <vcard:country-name>England</vcard:country-name>
+        <vcard:country-name>France</vcard:country-name>
     </owl:NamedIndividual>
     
 
@@ -4485,8 +4485,35 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805Name">
         <rdf:type rdf:resource="&vcard;Name"/>
-        <vcard:given-name>Ellwita</vcard:given-name>
         <vcard:family-name>Boyle</vcard:family-name>
+        <vcard:given-name>Ellwita</vcard:given-name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPlaceDetailPreference -->
+
+    <owl:NamedIndividual rdf:about="&profile;100900047095598983805ParisPlaceDetailPreference">
+        <rdf:type rdf:resource="&profile;PlaceDetailPreference"/>
+        <hasPreferredApproximateAddress rdf:resource="&profile;100900047095598983805ParisPreferredAddress"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPlaceReference -->
+
+    <owl:NamedIndividual rdf:about="&profile;100900047095598983805ParisPlaceReference">
+        <rdf:type rdf:resource="&profile;PlacePreference"/>
+        <hasPlaceDetailPreference rdf:resource="&profile;100900047095598983805ParisPlaceDetailPreference"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPreferredAddress -->
+
+    <owl:NamedIndividual rdf:about="&profile;100900047095598983805ParisPreferredAddress">
+        <rdf:type rdf:resource="&vcard;Address"/>
+        <townName>Paris</townName>
     </owl:NamedIndividual>
     
 
@@ -4496,6 +4523,7 @@
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805Preference">
         <rdf:type rdf:resource="&profile;Preference"/>
         <hasPlacePreference rdf:resource="&profile;100900047095598983805EnglandPlacePreference"/>
+        <hasPlacePreference rdf:resource="&profile;100900047095598983805ParisPlaceReference"/>
         <hasUserEnteredRatings rdf:resource="&profile;100900047095598983805UserEnteredRating"/>
     </owl:NamedIndividual>
     
@@ -4505,9 +4533,9 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805ProfileIdentities">
         <rdf:type rdf:resource="&profile;ProfileIdentities"/>
-        <hasUserInteractionMode>Active</hasUserInteractionMode>
-        <hasSource>https://plus.google.com</hasSource>
         <hasUserAccountID>100900047095598983805</hasUserAccountID>
+        <hasSource>https://plus.google.com</hasSource>
+        <hasUserInteractionMode>Active</hasUserInteractionMode>
     </owl:NamedIndividual>
     
 
@@ -4577,8 +4605,8 @@
 
     <owl:NamedIndividual rdf:about="&profile;110248277616794929135Name">
         <rdf:type rdf:resource="&vcard;Name"/>
-        <vcard:given-name>Samira</vcard:given-name>
         <vcard:family-name>Kochbati</vcard:family-name>
+        <vcard:given-name>Samira</vcard:given-name>
     </owl:NamedIndividual>
     
 
@@ -4597,9 +4625,9 @@
 
     <owl:NamedIndividual rdf:about="&profile;110248277616794929135ProfileIdentities">
         <rdf:type rdf:resource="&profile;ProfileIdentities"/>
-        <hasSource>https://plus.google.com</hasSource>
-        <hasUserAccountID>110248277616794929135</hasUserAccountID>
         <hasUserInteractionMode>Active</hasUserInteractionMode>
+        <hasUserAccountID>110248277616794929135</hasUserAccountID>
+        <hasSource>https://plus.google.com</hasSource>
     </owl:NamedIndividual>
     
 
@@ -4617,10 +4645,10 @@
 
     <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelAddress">
         <rdf:type rdf:resource="&vcard;Address"/>
-        <townName>Milan</townName>
-        <vcard:country-name>Italy</vcard:country-name>
-        <vcard:street-address>Via Luigi Galvani, 12</vcard:street-address>
         <vcard:postal-code>20124</vcard:postal-code>
+        <vcard:street-address>Via Luigi Galvani, 12</vcard:street-address>
+        <vcard:country-name>Italy</vcard:country-name>
+        <townName>Milan</townName>
     </owl:NamedIndividual>
     
 
@@ -4630,8 +4658,8 @@
     <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelDetail">
         <rdf:type rdf:resource="&profile;HotelDetail"/>
         <hasHotelStarCategory rdf:datatype="&xsd;int">4</hasHotelStarCategory>
-        <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
         <hasNatureOfPlace>Hotel</hasNatureOfPlace>
+        <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
         <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
     </owl:NamedIndividual>
     
@@ -4641,8 +4669,8 @@
 
     <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelPlaceDetail">
         <rdf:type rdf:resource="&profile;PlaceDetail"/>
-        <hasNatureOfPlace>Hotel</hasNatureOfPlace>
         <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
+        <hasNatureOfPlace>Hotel</hasNatureOfPlace>
         <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
     </owl:NamedIndividual>
     
@@ -4652,8 +4680,8 @@
 
     <owl:NamedIndividual rdf:about="&profile;Rating4Visited">
         <rdf:type rdf:resource="&profile;Rating"/>
-        <hasUserInteractionMode>Visited</hasUserInteractionMode>
         <hasUserDefinedRating>4</hasUserDefinedRating>
+        <hasUserInteractionMode>Visited</hasUserInteractionMode>
     </owl:NamedIndividual>
     
 
