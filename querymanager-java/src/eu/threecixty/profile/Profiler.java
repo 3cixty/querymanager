@@ -21,7 +21,9 @@ public class Profiler implements IProfiler {
 	private String uID;
 
 	public Profiler(String uid) {
-		this.uID = uid;
+		// TODO: uncomment and remove fixed UID
+		this.uID = "100900047095598983805";
+//		this.uID = uid;
 	}
 	
 	@Override
