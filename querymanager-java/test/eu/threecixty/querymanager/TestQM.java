@@ -1,19 +1,14 @@
 package eu.threecixty.querymanager;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.ResultSetFormatter;
 
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
@@ -22,8 +17,7 @@ public class TestQM {
 	
 	@Test
 	public void testMakeAQuery() {
-		String uid = "kinh";
-		String filenameOrURI = "data.rdf";
+		String uid = "100900047095598983805";
 		String queryString = "SELECT ?category ( COUNT(*) AS ?count )"
 				+ " WHERE "
 				+ "{"
@@ -51,23 +45,13 @@ public class TestQM {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		try {
-			String tmp = URLEncoder.encode(queryString, "UTF-8");
-			System.out.println(tmp);
-			File file = new File("tmp.txt");
-			FileOutputStream out = new FileOutputStream(file);
-			out.write(tmp.getBytes());
-			out.close();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.PopulateProfile();
+		}
 		
 		IQueryManager qm = new QueryManager(uid);
-		qm.setModelFromFileOrUri(filenameOrURI);
 		
 		Query query = qm.createJenaQuery(allPrefixes+queryString);
 		
@@ -82,7 +66,7 @@ public class TestQM {
 		// perform query augmentation
 		qm.performAugmentingTask();
 		
-		QResult qResult = qm.executeAugmentedQuery();		
+
 		
 		// query was already augmented
 		Assert.assertFalse(queryString.equals(qm.getAugmentedQuery().getQuery().getQuery()));
@@ -90,20 +74,14 @@ public class TestQM {
 		System.out.println("Original Query: " + queryString + "\n"+ "\n");
 		
 		System.out.println("Query after being augmented: " + qm.getAugmentedQuery().getQuery().getQuery()+ "\n"+ "\n");
-				
-		// 
-		ResultSetFormatter.out(System.out, qResult.getResultSet());
-		
-		// release all resources used for executing the query
-		qResult.releaseBuffer();
+
 		System.out.println("--------------------------------------------------------------------------\n");
 	}
 	
 	@Test
 	public void testMakeAQuery2() {
 		String format="json";
-		String uid = "kinh";
-		String filenameOrURI = "data.rdf";
+		String uid = "100900047095598983805";
 		EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 		String queryString = "SELECT  ?event ?title ?description "
 				+ "WHERE"
@@ -135,22 +113,13 @@ public class TestQM {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		try {
-			String tmp = URLEncoder.encode(queryString, "UTF-8");
-			System.out.println(tmp);
-			File file = new File("tmp.txt");
-			FileOutputStream out = new FileOutputStream(file);
-			out.write(tmp.getBytes());
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		
 		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.PopulateProfile();
+		}
 		
 		IQueryManager qm = new QueryManager(uid);
-		qm.setModelFromFileOrUri(filenameOrURI);
 		
 		Query query = qm.createJenaQuery(allPrefixes+queryString);
 		

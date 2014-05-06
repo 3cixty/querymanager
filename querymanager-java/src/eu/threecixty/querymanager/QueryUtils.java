@@ -8,23 +8,25 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.sparql.core.TriplePath;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.E_Equals;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
+import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
+import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
 
 /**
  * Utility class.
@@ -40,6 +42,10 @@ public class QueryUtils {
 	/**Attribute which maps between a class name and a static method name to create an instance of NodeValue from
 	 * an instance of the class name*/
 	private static Map<Class<?>, String> clazzNodeValueMethodNames = new HashMap<Class<?>, String>();
+
+	/**Attribute which maps between a combination of predicate and object (fixed within an Ontology) and a variable name by default.
+	 * This variable name needs to be replaced by a real variable name used in the query.*/
+	private static Map<String, String> predicateObjects = new HashMap <String, String>();
 
 	//initiate the following code once
 	static {
@@ -67,6 +73,9 @@ public class QueryUtils {
 			clazzNodeValueMethodNames.put(boolean.class, "makeBoolean");
 			clazzNodeValueMethodNames.put(Boolean.class, "makeBoolean");
 		}
+		if (predicateObjects.size() == 0) {
+			predicateObjects.put("event", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://linkedevents.org/ontology/Event");
+		}
 	}
 	
 	/**
@@ -81,7 +90,7 @@ public class QueryUtils {
 	}
 
 	/**
-	 * Add preferences found a given object to the query.
+	 * Add preferences found in the attributes of a given object to the query.
 	 * <br><br>
 	 * The method checks if there is a configuration file associated with
 	 * the class of a given object. If not, the method immediately returns. Otherwise,
@@ -90,7 +99,7 @@ public class QueryUtils {
 	 * 
 	 * @param object
 	 */
-	public static void addPreference(Query query, Object object) {
+	public static void addPreferences(Query query, Object object) {
 		if (object == null) return;
 		Class <?> clazz = object.getClass();
 		Properties props = clazzProperties.get(clazz);
@@ -100,18 +109,163 @@ public class QueryUtils {
 			clazzProperties.put(clazz, props);
 		}
 		// For a pair in properties, Key must be the same with a class' attribute,
-		// Value must be the same with what is used in RDF model.
+		// Value must follow the expression [subject,predicate,object]*,filterVariable
 		for (Object objKey: props.keySet()) {
 			String attrName = (String) objKey;
-			String nameInRDFModel = (String) props.get(attrName);
-			try {
-				Field field = clazz.getDeclaredField(attrName);
-				if (field == null) continue;
-				addPreference(query, object, field, attrName, nameInRDFModel);
-			} catch (Exception e) {
-				e.printStackTrace();
+			String property = (String) props.get(attrName);
+			
+			addPreference(query, object, attrName, property);
+		}
+	}
+
+	/**
+	 * Adds preference which is the value of a given attribute name (attName) in a given object instance (object)
+	 * into the query (query).
+	 * <br><br>
+	 * The triple links and filter are defined in the corresponding property file.
+	 *
+	 * @param query
+	 * 			The query needs to be augmented.
+	 * @param object
+	 * 			The preference instance.
+	 * @param attrName
+	 * 			The preference instance's attribute name.
+	 * @param propertyName
+	 * 			The property name in the property file.
+	 */
+	public static void addPreferenceFromAttributeNameAndPropertyName(Query query, Object object,
+			String attrName, String propertyName) {
+		if (object == null || query == null || attrName == null || propertyName == null) return;
+		Class <?> clazz = object.getClass();
+		Properties props = clazzProperties.get(clazz);
+		if (props == null) {
+			props = loadProperties(clazz);
+			if (props == null) return;
+			clazzProperties.put(clazz, props);
+		}
+		// Property Value must follow the regular expression [subject,predicate,object]*,filterVariableName
+		String property = (String) props.get(propertyName);
+		if (property == null) return;
+		addPreference(query, object, attrName, property);
+
+	}
+
+	/**
+	 * Adds preferences into a given query.
+	 * <br><br>
+	 * <code>
+	 * Here is an example of a given propertyValue:
+	 * event,lode:atPlace,_augplace,_augplace,vcard:adr,_augaddress,_augaddress,vcard:country-name,_augcountryname,_augcountryname.
+	 * <br><br>
+	 * The first element will be replaced by the real variable name used in a given query. Then every three consecutive elements is composed of a triple.
+	 * The last element will be a filter variable name to be added into the query.
+	 * </code>
+	 * @param query
+	 * 			The query.
+	 * @param object
+	 * 			The instance containing preference object.
+	 * @param attrName
+	 * 			The attribute name in the given instance.
+	 * @param propertyValue
+	 * 			The property which defines a list of consecutive triples and filter.
+	 */
+	public static void addPreference(Query query, Object object, String attrName, String propertyValue) {
+		if (query == null || object == null || attrName == null || propertyValue == null) return;
+		// last element is a filter variable
+		// triples correspond with every three elements
+		String [] configStrs = propertyValue.split(",");
+		String filterVarName = configStrs[configStrs.length - 1];
+	
+		Class <?> clazz = object.getClass();
+		
+		if (configStrs.length > 1) {
+			String realVarName = findRealVariableName(query, configStrs[0]);
+			if (realVarName != null && !realVarName.equals("")) configStrs[0] = realVarName;
+		}
+		
+		try {
+			Field field = clazz.getDeclaredField(attrName);
+			if (field == null) return;
+			addTriples(query, configStrs);
+			addFilter(query, object, field, filterVarName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Adds triples described by a given array to the query.
+	 * @param query
+	 * 				The query.
+	 * @param configStrs
+	 * 				Array containing every three consecutive elements which is a triple.
+	 */
+	private static void addTriples(Query query, String[] configStrs) {
+		if (configStrs.length <= 1) return;
+		ElementGroup body = (ElementGroup) query.getQueryPattern();
+		for (int i = 0; i < configStrs.length / 3; i++) {
+			if (i * 3 + 2 >= configStrs.length - 1) return;
+			String subject = configStrs[i * 3];
+			String predicate = configStrs[i * 3 + 1];
+			String predicateURI = replacePrefix(query, predicate);
+			if (predicateURI == null) continue;
+			String object = configStrs[i * 3 + 2];
+			Triple pattern = Triple.create(Var.alloc(subject),
+			        NodeFactory.createURI(predicateURI), Var.alloc(object));
+			body.addTriplePattern(pattern);
+		}
+		
+	}
+
+	/**
+	 * Returns the full URI for a given predicate.
+	 * @param query
+	 * 				The query.
+	 * @param predicate
+	 * 				The predicate.
+	 * @return string containing the full predicate's URI.
+	 */
+	private static String replacePrefix(Query query, String predicate) {
+		int index = predicate.indexOf(':');
+		if (index < 0) return null;
+		String prefix = predicate.substring(0, index);
+		String fullUri = query.getPrefix(prefix);
+		return fullUri + predicate.substring(index + 1);
+	}
+
+	/**
+	 * Finds the real variable name used in a given query for the first subject in a property line.
+	 * @param query
+	 * @param predefinedVarName
+	 * @return
+	 */
+	private static String findRealVariableName(Query query, String predefinedVarName) {
+		ElementGroup body = (ElementGroup) query.getQueryPattern();
+		if (body == null) return null;
+		String predicateObject = predicateObjects.get(predefinedVarName);
+		if (predicateObject == null) return null;
+		for (Element el: body.getElements()) {
+			if (el instanceof ElementPathBlock) {
+				ElementPathBlock epb = (ElementPathBlock) el;
+				Iterator<TriplePath> triplePaths = epb.getPattern().iterator();
+				for ( ; triplePaths.hasNext(); ) {
+					TriplePath tp = triplePaths.next();
+					if (predicateObject.equals(
+							tp.getPredicate().toString() + " " + tp.getObject().toString())) {
+						return tp.getSubject().getName();
+					}
+				}
+				triplePaths = epb.patternElts();
+				for ( ; triplePaths.hasNext(); ) {
+					TriplePath tp = triplePaths.next();
+					if (predicateObject.equals(
+							tp.getPredicate().toString() + " " + tp.getObject().toString())) {
+						return tp.getSubject().getName();
+					}
+				}
 			}
 		}
+		return null;
 	}
 
 	/**
@@ -120,11 +274,11 @@ public class QueryUtils {
 	 * @param object
 	 * @param field
 	 * @param attrName
-	 * @param nameInRDFModel
+	 * @param filterVarName
 	 * @throws Exception
 	 */
-	private static void addPreference(Query query, Object object, Field field, String attrName,
-			String nameInRDFModel) throws Exception {
+	private static void addFilter(Query query, Object object, Field field, 
+			String filterVarName) throws Exception {
 	    boolean accessible = field.isAccessible();
 	    if (!accessible) {
 	    	field.setAccessible(true);
@@ -136,17 +290,17 @@ public class QueryUtils {
 	    if (methodName != null) {
 	    	Method method = NodeValue.class.getMethod(methodName, fieldTypeClass);
 	    	NodeValue node = (NodeValue) method.invoke(null, fieldInstanceValue);
-	    	addTripleFilter(query, nameInRDFModel, node);
+	    	addTripleFilter(query, filterVarName, node);
 	    } else {
 	    	// for DateTime, List, Set. The other types are not supported
 	    	if (fieldTypeClass == Date.class) {
 	    		Calendar cal = Calendar.getInstance();
 	    		cal.setTime((Date) fieldInstanceValue);
 	    		NodeValue node = NodeValue.makeDate(cal);
-	    		addTripleFilter(query, nameInRDFModel, node);
+	    		addTripleFilter(query, filterVarName, node);
 	    	} else {
 	    		addTripleFilterForCollection(query, field, fieldTypeClass,
-	    				fieldInstanceValue, nameInRDFModel);
+	    				fieldInstanceValue, filterVarName);
 	    	}
 	    }
 
@@ -163,11 +317,11 @@ public class QueryUtils {
 	 * @param field
 	 * @param fieldTypeClass
 	 * @param fieldInstanceValue
-	 * @param nameInRDFModel
+	 * @param filterVarName
 	 * @throws Exception
 	 */
 	private static void addTripleFilterForCollection(Query query, Field field, Class<?> fieldTypeClass,
-			Object fieldInstanceValue, String nameInRDFModel) throws Exception {
+			Object fieldInstanceValue, String filterVarName) throws Exception {
 		ParameterizedType paramType = (ParameterizedType) field.getGenericType();
 		if (paramType == null) return;
 		Class <?> paramClazz = (Class<?>) paramType.getActualTypeArguments()[0];
@@ -178,13 +332,13 @@ public class QueryUtils {
 			List <?> list = (List<?>) fieldInstanceValue;
 			for (Object tmp: list) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
-		    	addTripleFilter(query, nameInRDFModel, node);
+		    	addTripleFilter(query, filterVarName, node);
 			}
 		} else if (fieldTypeClass.isAssignableFrom(Set.class)) {
 			Set <?> sets = (Set <?>) fieldInstanceValue;
 			for (Object tmp: sets) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
-		    	addTripleFilter(query, nameInRDFModel, node);
+		    	addTripleFilter(query, filterVarName, node);
 			}
 		}
 	}
@@ -192,41 +346,19 @@ public class QueryUtils {
 	/**
 	 * Add a triple filter composed by a given name and node to the query.
 	 *
-	 * @param nameInRDFModel
+	 * @param filtervarName
 	 * @param node
 	 */
-	private static void addTripleFilter(Query query, String nameInRDFModel, NodeValue node) {
+	private static void addTripleFilter(Query query, String filtervarName, NodeValue node) {
 
-		
-
-//		Triple pattern = Triple.create(Var.alloc("x"),
-//		        Var.alloc(":" +nameInRDFModel), Var.alloc(nameInRDFModel));
-
-		ElementTriplesBlock block = new ElementTriplesBlock();
-//		block.addTriple(pattern);
-
-		Expr expr = new E_Equals(new ExprVar(nameInRDFModel), node);
+		Expr expr = new E_Equals(new ExprVar(filtervarName), node);
 		ElementFilter filter = new ElementFilter(expr);
 
 		ElementGroup body = (ElementGroup) query.getQueryPattern();
 		if (body == null)  body = new ElementGroup();
 
-		
-		Triple pattern1 = Triple.create(Var.alloc("event"),
-		        NodeFactory.createURI("http://linkedevents.org/ontology/atPlace"), Var.alloc("place"));
-		Triple pattern2 = Triple.create(Var.alloc("place"),
-				NodeFactory.createURI("http://www.w3.org/2006/vcard/ns#adr"), Var.alloc("address"));
-		Triple pattern3 = Triple.create(Var.alloc("address"),
-				NodeFactory.createURI("http://www.w3.org/2006/vcard/ns#country-name"), Var.alloc("country"));
-
-
-		block.addTriple(pattern1);
-		block.addTriple(pattern2);
-		block.addTriple(pattern3);
-		
-		body.addElement(block);
 		body.addElement(filter);
-
+		
 		query.setDistinct(true);
 
 		query.setQueryPattern(body);

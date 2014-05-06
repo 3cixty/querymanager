@@ -1,13 +1,16 @@
 package eu.threecixty.profile;
 
 
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.threecixty.profile.models.Place;
 import eu.threecixty.profile.models.PlaceDetail;
 import eu.threecixty.profile.models.Preference;
-import eu.threecixty.profile.models.Rating;
 
 public class Profiler implements IProfiler {
 
@@ -24,7 +27,19 @@ public class Profiler implements IProfiler {
 	@Override
 	public void PopulateProfile() {
 		// TODO: set kbUserProfile here....
-
+		if (kbUserProfile == null) {
+		    kbUserProfile = new UserProfile();
+		}
+		
+		Preference pref = new Preference();
+		kbUserProfile.setPreferences(pref); // set preferences
+		
+		InputStream input = Profiler.class.getResourceAsStream("/UserProfileKBmodelWithIndividuals.rdf");
+		if (input != null) {
+		    Model rdfModel = ModelFactory.createDefaultModel().read(input, "UTF-8");
+		    ProfilerPlaceUtils.addCountryName(pref, rdfModel, uID);
+		    ProfilerPlaceUtils.addTownName(pref, rdfModel, uID);
+		}
 	}
 
 	@Override
@@ -48,23 +63,14 @@ public class Profiler implements IProfiler {
 	public Preference getPreference() {
 		if (kbUserProfile != null && kbUserProfile.getPreferences() != null) {
 			return kbUserProfile.getPreferences();
+		} else {
+			if (kbUserProfile == null) {
+			    kbUserProfile = new UserProfile();
+			}
+			Preference pref = new Preference();
+			kbUserProfile.setPreferences(pref); 
+			return pref;
 		}
-		// TODO remove the following lines when there will be possible to use ProfilingTechniques
-		Preference fakePref = new Preference();
-		Set<Place> fakePlaces = new HashSet<Place>();
-		Place fakePlace = new Place();
-		PlaceDetail fakePD = new PlaceDetail();
-		fakePD.setHasName("France");
-		fakePlace.setHasPlaceDetail(fakePD);
-		
-		fakePlaces.add(fakePlace);
-		fakePref.setHasPlaces(fakePlaces);
-
-//		Rating fakeRating = new Rating();
-//		
-//		fakeRating.setRating(9.0f);
-//		fakePlace.setHasRating(fakeRating);
-		
-		return fakePref;
 	}
+	
 }

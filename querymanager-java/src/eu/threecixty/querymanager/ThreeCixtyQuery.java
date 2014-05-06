@@ -47,6 +47,33 @@ public abstract class ThreeCixtyQuery {
 	 * @param object
 	 */
 	protected void addPreference(Object object) {
-		QueryUtils.addPreference(query, object);
+		QueryUtils.addPreferences(query, object);
+	}
+
+	/**
+	 * Adds preference found in a given instance object into the query.
+	 * @param object
+	 * 			The preference instance which contains preference information such as place, country, city, etc.
+	 * @param attrName
+	 * 			The attribute name in the preference instance.
+	 * @param propertyValue
+	 * 			The property which defines triple links and filter.
+	 */
+	protected void addPreference(Object object, String attrName, String propertyValue) {
+		QueryUtils.addPreference(query, object, attrName, propertyValue);
+	}
+
+	/**
+	 * Adds preference found in a given instance object with a given attribute name and a given property name in the property file.
+	 * @param object
+	 * 				The preference object.
+	 * @param attrName
+	 * 				The preference object's attribute name. The attribute name containing a value in the instance object which will be used to add a filter.
+	 * @param propertyName
+	 * 				The property name in the property file. The property name will be used to find triple links in the property file.
+	 */
+	protected void addPreferenceFromAttributeNameAndPropertyName(Object object,
+			String attrName, String propertyName) {
+		QueryUtils.addPreferenceFromAttributeNameAndPropertyName(query, object, attrName, propertyName);
 	}
 }

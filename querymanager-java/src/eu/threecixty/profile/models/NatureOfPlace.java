@@ -6,6 +6,8 @@ package eu.threecixty.profile.models;
  *
  */
 public enum NatureOfPlace {
+	Country,
+	City,
 	Museum,
 	Cemetery,
 	Church, 

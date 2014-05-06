@@ -2,6 +2,7 @@ package eu.threecixty.querymanager;
 
 import com.hp.hpl.jena.query.Query;
 
+import eu.threecixty.profile.models.Address;
 import eu.threecixty.profile.models.Place;
 import eu.threecixty.profile.models.PlaceDetail;
 import eu.threecixty.profile.models.Rating;
@@ -35,7 +36,14 @@ public class PlaceQuery extends ThreeCixtyQuery {
 
 		PlaceDetail placeDetail = place.getHasPlaceDetail();
 		if (placeDetail != null) {
-			addPreference(placeDetail);
+			
+			addPreferenceFromAttributeNameAndPropertyName(placeDetail, "hasName",
+					placeDetail.getIsTheNatureOfPlace().toString().toLowerCase());
+
+			Address address = placeDetail.getHasAddress();
+			if (address != null) {
+				addPreference(address);
+			}
 		}
 		Rating rating = place.getHasRating();
 		if (rating != null) {
