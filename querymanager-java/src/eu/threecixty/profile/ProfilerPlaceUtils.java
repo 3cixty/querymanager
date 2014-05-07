@@ -12,14 +12,14 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.models.NatureOfPlace;
-import eu.threecixty.profile.models.UserPlaceRating;
+import eu.threecixty.profile.models.Place;
 import eu.threecixty.profile.models.PlaceDetail;
 import eu.threecixty.profile.models.Preference;
 
 /**
- * Utility class for populating informaton place.
+ * Utility class for populating information place.
  *
- * @author Cong-Kinh NGUYEn
+ * @author Cong-Kinh NGUYEN
  *
  */
 public class ProfilerPlaceUtils {
@@ -70,12 +70,12 @@ public class ProfilerPlaceUtils {
 		qe.close();
 
 		if (countryName != null) {
-		    Set <UserPlaceRating> places = pref.getHasPlaces();
-		    if (places == null) places = new HashSet <UserPlaceRating>();
-		    UserPlaceRating place = new UserPlaceRating();
+		    Set <Place> places = pref.getHasPlaces();
+		    if (places == null) places = new HashSet <Place>();
+		    Place place = new Place();
 		    PlaceDetail pd = new PlaceDetail();
-		    pd.setHasName(countryName);
-		    pd.setIsTheNatureOfPlace(NatureOfPlace.Country);
+		    pd.setHasPlaceName(countryName);
+		    pd.setHasNatureOfPlace(NatureOfPlace.Country);
 		    place.setHasPlaceDetail(pd);
 		    places.add(place);
 		    pref.setHasPlaces(places);
@@ -115,22 +115,122 @@ public class ProfilerPlaceUtils {
 		
 		ResultSet rs = qe.execSelect();
 		
-		String countryName = null;
+		String townName = null;
 		if (rs.hasNext()) {
 			QuerySolution qs = rs.next();
-			countryName = qs.getLiteral("locality").getString();
-			
+			townName = qs.getLiteral("locality").getString();
 		}
 		
 		qe.close();
 
-		if (countryName != null) {
-		    Set <UserPlaceRating> places = pref.getHasPlaces();
-		    if (places == null) places = new HashSet <UserPlaceRating>();
-		    UserPlaceRating place = new UserPlaceRating();
+		if (townName != null) {
+		    Set <Place> places = pref.getHasPlaces();
+		    if (places == null) places = new HashSet <Place>();
+		    Place place = new Place();
 		    PlaceDetail pd = new PlaceDetail();
-		    pd.setHasName(countryName);
-		    pd.setIsTheNatureOfPlace(NatureOfPlace.City);
+		    pd.setHasPlaceName(townName);
+		    pd.setHasNatureOfPlace(NatureOfPlace.City);
+		    place.setHasPlaceDetail(pd);
+		    places.add(place);
+		    pref.setHasPlaces(places);
+		}
+	}
+
+	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
+	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+	public static void addPlaceNameFromRating(Preference pref, Model model, String uID, float rating) {
+	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
+	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
+	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
+	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
+	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
+	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
+	    qStr += "SELECT  DISTINCT  ?placename\n";
+	    qStr += "WHERE {\n\n";
+	    qStr += "?root a owl:NamedIndividual .\n";
+	    qStr += "?root profile:hasUID ?uid .\n";
+	    qStr += "?root profile:hasPreference ?p1 .\n";
+	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
+	    qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    qStr += "?s1 profile:hasRating ?r1 .\n";
+	    qStr += "?r1 profile:hasUserDefinedRating ?r2 .\n";
+	    qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
+	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
+	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
+	    qStr += "}";
+	    
+	    Query query = QueryFactory.create(qStr);
+	    
+		QueryExecution qe = QueryExecutionFactory.create(query, model);
+		
+		ResultSet rs = qe.execSelect();
+		
+		String placename = null;
+		if (rs.hasNext()) {
+			QuerySolution qs = rs.next();
+			placename = qs.getLiteral("placename").getString();
+		}
+		
+		qe.close();
+
+		if (placename != null) {
+		    Set <Place> places = pref.getHasPlaces();
+		    if (places == null) places = new HashSet <Place>();
+		    Place place = new Place();
+		    PlaceDetail pd = new PlaceDetail();
+		    pd.setHasPlaceName(placename);
+		    pd.setHasNatureOfPlace(NatureOfPlace.Others);
+		    place.setHasPlaceDetail(pd);
+		    places.add(place);
+		    pref.setHasPlaces(places);
+		}
+	}
+
+	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
+	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+	public static void addPlaceNameFromNumberOfTimesVisited(Preference pref, Model model, String uID, int numberOfTimesVisited) {
+	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
+	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
+	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
+	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
+	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
+	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
+	    qStr += "SELECT  DISTINCT  ?placename\n";
+	    qStr += "WHERE {\n\n";
+	    qStr += "?root a owl:NamedIndividual .\n";
+	    qStr += "?root profile:hasUID ?uid .\n";
+	    qStr += "?root profile:hasPreference ?p1 .\n";
+	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
+	    qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    qStr += "?s1 profile:hasNumberofTimesVisited ?n1  .\n";
+	    qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
+	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
+	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
+	    qStr += "}";
+	    
+	    Query query = QueryFactory.create(qStr);
+	    
+		QueryExecution qe = QueryExecutionFactory.create(query, model);
+		
+		ResultSet rs = qe.execSelect();
+		
+		String placename = null;
+		if (rs.hasNext()) {
+			QuerySolution qs = rs.next();
+			placename = qs.getLiteral("placename").getString();
+		}
+		
+		qe.close();
+
+		if (placename != null) {
+		    Set <Place> places = pref.getHasPlaces();
+		    if (places == null) places = new HashSet <Place>();
+		    Place place = new Place();
+		    PlaceDetail pd = new PlaceDetail();
+		    pd.setHasPlaceName(placename);
+		    pd.setHasNatureOfPlace(NatureOfPlace.Others);
 		    place.setHasPlaceDetail(pd);
 		    places.add(place);
 		    pref.setHasPlaces(places);

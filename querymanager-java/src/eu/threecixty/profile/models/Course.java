@@ -40,23 +40,11 @@ public class Course extends EventDetail{
 	public void setIsOfferedby(School isOfferedby) {
 		this.isOfferedby = isOfferedby;
 	}
-	public String getHasDetails() {
-		return hasDetails;
-	}
-	public void setHasDetails(String hasDetails) {
-		this.hasDetails = hasDetails;
-	}
 	public String getHasURL() {
 		return hasURL;
 	}
 	public void setHasURL(String hasURL) {
 		this.hasURL = hasURL;
-	}
-	public TemporalDetails getHasTemporalDetail() {
-		return hasTemporalDetail;
-	}
-	public void setHasTemporalDetail(TemporalDetails hasTemporalDetail) {
-		this.hasTemporalDetail = hasTemporalDetail;
 	}
 	public CourseType getHasCourseType() {
 		return hasCourseType;

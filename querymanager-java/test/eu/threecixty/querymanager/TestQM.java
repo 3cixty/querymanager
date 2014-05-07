@@ -16,7 +16,7 @@ import eu.threecixty.profile.Profiler;
 public class TestQM {
 	
 	@Test
-	public void testMakeAQuery() {
+	public void testAugmentQueryWithCurrentCountry() {
 		String uid = "100900047095598983805";
 		String queryString = "SELECT ?category ( COUNT(*) AS ?count )"
 				+ " WHERE "
@@ -26,63 +26,32 @@ public class TestQM {
 				+ "GROUP BY ?category "
 				+ "ORDER BY DESC ( ?count ) "
 				+ "LIMIT 20";
-		String allPrefixes="";
-		try {
-			InputStream inStream = System.class.getResourceAsStream("/prefix.properties");
-			StringBuilder sb = new StringBuilder();
-			Properties props = new Properties();
-			props.load(inStream);
-			inStream.close();
-			for (java.util.Map.Entry<Object, Object> entry: props.entrySet()) {
-				sb.append("PREFIX " + entry.getKey() + ":\t");
-				sb.append('<');
-				sb.append(entry.getValue());
-				sb.append(">\n");
-			}
-			allPrefixes=sb.toString() + " ";
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String allPrefixes =  getPrefixes();
 		
 		IProfiler profiler = new Profiler(uid);
 		if (profiler != null) {
+			profiler.requireCurrentCountry(true);
 			profiler.PopulateProfile();
 		}
 		
 		IQueryManager qm = new QueryManager(uid);
 		
-		Query query = qm.createJenaQuery(allPrefixes+queryString);
 		
-		// take preferences into account to augment queries (only fade place preferences are available)
-		qm.requestPreferences(profiler);
-		
-		// suppose that we recognize that the query is for places
-		ThreeCixtyQuery placeQuery = new PlaceQuery(query);
-		
-		qm.setQuery(placeQuery);
-		
-		// perform query augmentation
-		qm.performAugmentingTask();
-		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
 
-		
+		String currentCountry = "France";
 		// query was already augmented
-		Assert.assertFalse(queryString.equals(qm.getAugmentedQuery().getQuery().getQuery()));
+		Assert.assertFalse(queryString.contains(currentCountry));
+		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(currentCountry));
 
-		System.out.println("Original Query: " + queryString + "\n"+ "\n");
-		
-		System.out.println("Query after being augmented: " + qm.getAugmentedQuery().getQuery().getQuery()+ "\n"+ "\n");
-
-		System.out.println("--------------------------------------------------------------------------\n");
+//		System.out.println("Original Query: " + queryString + "\n"+ "\n");
+//		
+//		System.out.println("Query after being augmented: " + qm.getAugmentedQuery().getQuery().getQuery()+ "\n"+ "\n");
 	}
 	
 	@Test
-	public void testMakeAQuery2() {
-		String format="json";
+	public void testAugmentQueryWithCurrentTown() {
 		String uid = "100900047095598983805";
-		EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 		String queryString = "SELECT  ?event ?title ?description "
 				+ "WHERE"
 				+ "  { ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
@@ -94,7 +63,140 @@ public class TestQM {
 				+ "    FILTER ( str(?publisher) = <http://www.last.fm> )"
 				+ "  }"
 				+ "LIMIT   20";
-		String allPrefixes="";
+		String allPrefixes = getPrefixes();
+
+		
+		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.requireCurrentTown(true);
+			profiler.PopulateProfile();
+		}
+		
+		IQueryManager qm = new QueryManager(uid);
+		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
+		
+		String currentTown = "Paris";
+		
+		Assert.assertFalse(queryString.contains(currentTown));
+		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(currentTown));
+	}
+
+	@Test
+	public void testAugmentQueryWithoutInformationAboutPlace() {
+		String uid = "100900047095598983805";
+		String queryString = "SELECT  ?event ?title ?description "
+				+ "WHERE"
+				+ "  { ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event dc:title ?title ."
+				+ "    ?event dc:description ?description ."
+				+ "    ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event lode:involvedAgent ?involvedAgent ."
+				+ "    ?involvedAgent dc:publisher ?publisher"
+				+ "    FILTER ( str(?publisher) = <http://www.last.fm> )"
+				+ "  }"
+				+ "LIMIT   20";
+		String allPrefixes = getPrefixes();
+
+		
+		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.PopulateProfile();
+		}
+		
+		IQueryManager qm = new QueryManager(uid);
+		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
+		
+		String currentTown = "Paris";
+		
+		Assert.assertFalse(queryString.contains(currentTown));
+		// the target query does not contain the current town
+		Assert.assertFalse(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(currentTown));
+	}
+
+	@Test
+	public void testAugmentQueryWithPlaceNameRating() {
+		String uid = "100900047095598983805";
+		String queryString = "SELECT  ?event ?title ?description "
+				+ "WHERE"
+				+ "  { ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event dc:title ?title ."
+				+ "    ?event dc:description ?description ."
+				+ "    ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event lode:involvedAgent ?involvedAgent ."
+				+ "    ?involvedAgent dc:publisher ?publisher"
+				+ "    FILTER ( str(?publisher) = <http://www.last.fm> )"
+				+ "  }"
+				+ "LIMIT   20";
+		String allPrefixes = getPrefixes();
+
+		
+		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.requireScoreRatedAtLeast(5);
+			profiler.PopulateProfile();
+		}
+		
+		IQueryManager qm = new QueryManager(uid);
+		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
+		
+		String placeName = "Hilton Milan Hotel";
+		
+		Assert.assertFalse(queryString.contains(placeName));
+		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(placeName));
+	}
+
+	@Test
+	public void testAugmentQueryWithPlaceNameVisited() {
+		String uid = "100900047095598983805";
+		String queryString = "SELECT  ?event ?title ?description "
+				+ "WHERE"
+				+ "  { ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event dc:title ?title ."
+				+ "    ?event dc:description ?description ."
+				+ "    ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event lode:involvedAgent ?involvedAgent ."
+				+ "    ?involvedAgent dc:publisher ?publisher"
+				+ "    FILTER ( str(?publisher) = <http://www.last.fm> )"
+				+ "  }"
+				+ "LIMIT   20";
+		String allPrefixes = getPrefixes();
+
+		
+		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.requireNumberOfTimesVisitedAtLeast(3);
+			profiler.PopulateProfile();
+		}
+		
+		IQueryManager qm = new QueryManager(uid);
+		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
+		
+		String placeName = "Hilton Milan Hotel";
+		
+		Assert.assertFalse(queryString.contains(placeName));
+		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(placeName));
+	}
+
+	private void performAugmentQuery(IQueryManager qm, IProfiler profiler,
+			String queryStr, boolean isUsingPreferences) {
+		Query query = qm.createJenaQuery(queryStr);
+		
+		qm.requestPreferences(profiler);
+		
+		ThreeCixtyQuery placeQuery = new PlaceQuery(query);
+		
+		qm.setQuery(placeQuery);
+		
+		if (isUsingPreferences) {
+		    qm.performAugmentingTask();
+		}
+	}
+
+	private String getPrefixes() {
 		try {
 			InputStream inStream = System.class.getResourceAsStream("/prefix.properties");
 			StringBuilder sb = new StringBuilder();
@@ -107,36 +209,12 @@ public class TestQM {
 				sb.append(entry.getValue());
 				sb.append(">\n");
 			}
-			allPrefixes=sb.toString() + " ";
+			return sb.toString() + " ";
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		IProfiler profiler = new Profiler(uid);
-		if (profiler != null) {
-			profiler.PopulateProfile();
-		}
-		
-		IQueryManager qm = new QueryManager(uid);
-		
-		Query query = qm.createJenaQuery(allPrefixes+queryString);
-		
-		qm.requestPreferences(profiler);
-		
-		ThreeCixtyQuery placeQuery = new PlaceQuery(query);
-		
-		qm.setQuery(placeQuery);
-		
-		Boolean isUsingPreferences = false;
-		if (isUsingPreferences) {
-		    qm.performAugmentingTask();
-		}
-		System.out.println("Original Query: " + queryString + "\n");
-		
-		System.out.println("Query after being augmented: " + qm.getAugmentedQuery().getQuery().getQuery()+ "\n");
-		
-		System.out.println(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), eventMediaFormat)+ "\n"+ "\n");
+		return " ";
 	}
 }

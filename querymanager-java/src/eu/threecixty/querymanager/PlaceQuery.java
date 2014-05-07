@@ -37,8 +37,8 @@ public class PlaceQuery extends ThreeCixtyQuery {
 		PlaceDetail placeDetail = place.getHasPlaceDetail();
 		if (placeDetail != null) {
 			
-			addPreferenceFromAttributeNameAndPropertyName(placeDetail, "hasName",
-					placeDetail.getIsTheNatureOfPlace().toString().toLowerCase());
+			addPreferenceFromAttributeNameAndPropertyName(placeDetail, "hasPlaceName",
+					placeDetail.getHasNatureOfPlace().toString().toLowerCase());
 
 			Address address = placeDetail.getHasAddress();
 			if (address != null) {

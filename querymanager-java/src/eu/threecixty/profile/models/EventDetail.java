@@ -16,7 +16,7 @@ public class EventDetail{
 	@Description(hasText = "Details")
 	private String hasDetails="";
 	@Description(hasText="Start and end information about the event")
-    private TemporalDetails hasTemporalDetails;
+	private TemporalDetails hasTemporalDetails;
 	@Description(hasText="Nature of the event")
     private NatureOfEvent hasNatureOfEvent;
 	public String getHasEventName() {
