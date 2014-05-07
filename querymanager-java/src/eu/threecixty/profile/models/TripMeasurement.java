@@ -10,14 +10,14 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class TripMeasurement extends Measurement {
 	@Description(hasText="Trip information")
-	private Trip reading;
+	private Trip hasTrip;
 	@Description(hasText="ID")
     private String clientId="";
-	public Trip getReading() {
-		return reading;
+	public Trip getHasTrip() {
+		return hasTrip;
 	}
-	public void setReading(Trip reading) {
-		this.reading = reading;
+	public void setHasTrip(Trip hasTrip) {
+		this.hasTrip = hasTrip;
 	}
 	public String getClientId() {
 		return clientId;
@@ -25,4 +25,5 @@ public class TripMeasurement extends Measurement {
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
 	}
+
 }

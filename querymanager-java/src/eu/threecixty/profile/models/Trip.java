@@ -9,183 +9,176 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class Trip {
 	@Description(hasText = "Average speed of a trip, in meter per second")
-    private Double averageSpeed=0.0; 
+    private Double hasTripAverageSpeed=0.0; 
     @Description(hasText = "Total distance of a trip, in meter")
-    private Double totalDistance=0.0; 
+    private Double hasTripTotalDistance=0.0; 
     @Description(hasText = "Total distance of a trip, measured along map matched route")
-    private Double totalInfraSegmentDistance=0.0; 
+    private Double hasTripTotalInfraSegmentDistance=0.0; 
     @Description(hasText = "Type of the trip, identifies a.o. whether or not the user is moving,"
     		+ " e.g. static or enroute")
-    private TripType tripType; 
+    private TripType hasTripTripType; 
     @Description(hasText = "Modality used during trip (foot, bike, car, bus, ...) as automatically "
     		+ "derived or user corrected")
-    private ModalityType tripModality; 
+    private ModalityType hasModalityType; 
     @Description(hasText = "Modality selection level: none if the modality is not set, manual "
     		+ "if a user decided the modality,  automatic if modality was derived by an automated "
     		+ "recognizer, override if the user chose to override or correct the automatically derived modality")
-    private DecisionLevel tripModalityLevel; 
+    private DecisionLevel hasDecisionLevel; 
     @Description(hasText = "Modality used during trip (foot, bike, car, bus, ...) as originally automatically derived, "
     		+ "to be able to generate a confusion or correction matrix")
-    private ModalityType tripModalityAutomatic; 
+    private ModalityType hasTripModalityAutomatic; 
     @Description(hasText = "Weather at the start of the trip")
-    private Weather tripWeather; 
+    private Weather hasTripWeather; 
     @Description(hasText = "Important personal places along the trip route. In the simplest form this "
     		+ "could be home and office as start and end point, but later also a friend's place to pick him up")
-    private PersonalPlace[] tripPlaces; 
+    private PersonalPlace[] hasPersonalPlaces; 
     @Description(hasText = "Role of the user on this specific trip, e.g. driver or passenger in the back seat")
-    private ModalityRole userRole; 
+    private ModalityRole hasModalityRole; 
     @Description(hasText = "The individual's travel objective with this trip. Indicate the main objective, "
     		+ "e.g. GoingToWork and EnjoyingTheView can be combined in one trip, but the first is the main objective.")
-    private TravelObjectiveType tripMainObjective; 
+    private TravelObjectiveType hasTravelObjectiveType; 
     @Description(hasText = "Unique trip ID")
-    private Long id; 
+    private Long hasTripId; 
     @Description(hasText = "Unique trip group ID. All single-modality trips with the same "
     		+ "group ID constitute a door-to-door trip, in chronological trip order")
-    private String groupId=""; 
+    private String hasTripGroupId=""; 
     @Description(hasText = "Costs of a trip, in Euros")
-    private Double totalCost=0.0; 
-    @Description(hasText = "Emissions of the trip, per emission type")
-    private Emission[] totalEmission; 
+    private Double hasTripTotalCost=0.0; 
     @Description(hasText = "Number of passengers")
-    private Integer numberOfPassengers=0; 
+    private Integer hasTripNumberOfPassengers=0; 
     @Description(hasText = "Timestamp of the last automatic trip analysis")
-    private Long lastAnalyzed; 
+    private Long hasTripLastAnalyzed; 
     //@Description(hasText = "Domain-specific properties of a trip")
     //private Tag[] tags; 
     @Description(hasText = "ID of the regular trip this trip matches with, 0 if no match")
-    private Long regularTripId; 
+    private Long hasRegularTripId; 
     @Description(hasText = "Locations mapped on the OSM network")
-    private MappedLocation[] mappedLocations; 
+    private MappedLocation[] hasMappedLocations; 
     @Description(hasText = "Routes associated with this trip")
-    private InfraRoute[] associatedRoutes; 
+    private InfraRoute[] hasInfraRoutes; 
     @Description(hasText = "Total calories spent on this trip")
-    private Double totalCalories=0.0; //Total calories spent on this trip
-	public Double getAverageSpeed() {
-		return averageSpeed;
+    private Double hasTripTotalCalories=0.0; //Total calories spent on this trip
+	public Double getHasTripAverageSpeed() {
+		return hasTripAverageSpeed;
 	}
-	public void setAverageSpeed(Double averageSpeed) {
-		this.averageSpeed = averageSpeed;
+	public void setHasTripAverageSpeed(Double hasTripAverageSpeed) {
+		this.hasTripAverageSpeed = hasTripAverageSpeed;
 	}
-	public Double getTotalDistance() {
-		return totalDistance;
+	public Double getHasTripTotalDistance() {
+		return hasTripTotalDistance;
 	}
-	public void setTotalDistance(Double totalDistance) {
-		this.totalDistance = totalDistance;
+	public void setHasTripTotalDistance(Double hasTripTotalDistance) {
+		this.hasTripTotalDistance = hasTripTotalDistance;
 	}
-	public Double getTotalInfraSegmentDistance() {
-		return totalInfraSegmentDistance;
+	public Double getHasTripTotalInfraSegmentDistance() {
+		return hasTripTotalInfraSegmentDistance;
 	}
-	public void setTotalInfraSegmentDistance(Double totalInfraSegmentDistance) {
-		this.totalInfraSegmentDistance = totalInfraSegmentDistance;
+	public void setHasTripTotalInfraSegmentDistance(
+			Double hasTripTotalInfraSegmentDistance) {
+		this.hasTripTotalInfraSegmentDistance = hasTripTotalInfraSegmentDistance;
 	}
-	public TripType getTripType() {
-		return tripType;
+	public TripType getHasTripTripType() {
+		return hasTripTripType;
 	}
-	public void setTripType(TripType tripType) {
-		this.tripType = tripType;
+	public void setHasTripTripType(TripType hasTripTripType) {
+		this.hasTripTripType = hasTripTripType;
 	}
-	public ModalityType getTripModality() {
-		return tripModality;
+	public ModalityType getHasModalityType() {
+		return hasModalityType;
 	}
-	public void setTripModality(ModalityType tripModality) {
-		this.tripModality = tripModality;
+	public void setHasModalityType(ModalityType hasModalityType) {
+		this.hasModalityType = hasModalityType;
 	}
-	public DecisionLevel getTripModalityLevel() {
-		return tripModalityLevel;
+	public DecisionLevel getHasDecisionLevel() {
+		return hasDecisionLevel;
 	}
-	public void setTripModalityLevel(DecisionLevel tripModalityLevel) {
-		this.tripModalityLevel = tripModalityLevel;
+	public void setHasDecisionLevel(DecisionLevel hasDecisionLevel) {
+		this.hasDecisionLevel = hasDecisionLevel;
 	}
-	public ModalityType getTripModalityAutomatic() {
-		return tripModalityAutomatic;
+	public ModalityType getHasTripModalityAutomatic() {
+		return hasTripModalityAutomatic;
 	}
-	public void setTripModalityAutomatic(ModalityType tripModalityAutomatic) {
-		this.tripModalityAutomatic = tripModalityAutomatic;
+	public void setHasTripModalityAutomatic(ModalityType hasTripModalityAutomatic) {
+		this.hasTripModalityAutomatic = hasTripModalityAutomatic;
 	}
-	public Weather getTripWeather() {
-		return tripWeather;
+	public Weather getHasTripWeather() {
+		return hasTripWeather;
 	}
-	public void setTripWeather(Weather tripWeather) {
-		this.tripWeather = tripWeather;
+	public void setHasTripWeather(Weather hasTripWeather) {
+		this.hasTripWeather = hasTripWeather;
 	}
-	public PersonalPlace[] getTripPlaces() {
-		return tripPlaces;
+	public PersonalPlace[] getHasPersonalPlaces() {
+		return hasPersonalPlaces;
 	}
-	public void setTripPlaces(PersonalPlace[] tripPlaces) {
-		this.tripPlaces = tripPlaces;
+	public void setHasPersonalPlaces(PersonalPlace[] hasPersonalPlaces) {
+		this.hasPersonalPlaces = hasPersonalPlaces;
 	}
-	public ModalityRole getUserRole() {
-		return userRole;
+	public ModalityRole getHasModalityRole() {
+		return hasModalityRole;
 	}
-	public void setUserRole(ModalityRole userRole) {
-		this.userRole = userRole;
+	public void setHasModalityRole(ModalityRole hasModalityRole) {
+		this.hasModalityRole = hasModalityRole;
 	}
-	public TravelObjectiveType getTripMainObjective() {
-		return tripMainObjective;
+	public TravelObjectiveType getHasTravelObjectiveType() {
+		return hasTravelObjectiveType;
 	}
-	public void setTripMainObjective(TravelObjectiveType tripMainObjective) {
-		this.tripMainObjective = tripMainObjective;
+	public void setHasTravelObjectiveType(TravelObjectiveType hasTravelObjectiveType) {
+		this.hasTravelObjectiveType = hasTravelObjectiveType;
 	}
-	public Long getId() {
-		return id;
+	public Long getHasTripId() {
+		return hasTripId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public void setHasTripId(Long hasTripId) {
+		this.hasTripId = hasTripId;
 	}
-	public String getGroupId() {
-		return groupId;
+	public String getHasTripGroupId() {
+		return hasTripGroupId;
 	}
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
+	public void setHasTripGroupId(String hasTripGroupId) {
+		this.hasTripGroupId = hasTripGroupId;
 	}
-	public Double getTotalCost() {
-		return totalCost;
+	public Double getHasTripTotalCost() {
+		return hasTripTotalCost;
 	}
-	public void setTotalCost(Double totalCost) {
-		this.totalCost = totalCost;
+	public void setHasTripTotalCost(Double hasTripTotalCost) {
+		this.hasTripTotalCost = hasTripTotalCost;
 	}
-	public Emission[] getTotalEmission() {
-		return totalEmission;
+	public Integer getHasTripNumberOfPassengers() {
+		return hasTripNumberOfPassengers;
 	}
-	public void setTotalEmission(Emission[] totalEmission) {
-		this.totalEmission = totalEmission;
+	public void setHasTripNumberOfPassengers(Integer hasTripNumberOfPassengers) {
+		this.hasTripNumberOfPassengers = hasTripNumberOfPassengers;
 	}
-	public Integer getNumberOfPassengers() {
-		return numberOfPassengers;
+	public Long getHasTripLastAnalyzed() {
+		return hasTripLastAnalyzed;
 	}
-	public void setNumberOfPassengers(Integer numberOfPassengers) {
-		this.numberOfPassengers = numberOfPassengers;
+	public void setHasTripLastAnalyzed(Long hasTripLastAnalyzed) {
+		this.hasTripLastAnalyzed = hasTripLastAnalyzed;
 	}
-	public Long getLastAnalyzed() {
-		return lastAnalyzed;
+	public Long getHasRegularTripId() {
+		return hasRegularTripId;
 	}
-	public void setLastAnalyzed(Long lastAnalyzed) {
-		this.lastAnalyzed = lastAnalyzed;
+	public void setHasRegularTripId(Long hasRegularTripId) {
+		this.hasRegularTripId = hasRegularTripId;
 	}
-	public Long getRegularTripId() {
-		return regularTripId;
+	public MappedLocation[] getHasMappedLocations() {
+		return hasMappedLocations;
 	}
-	public void setRegularTripId(Long regularTripId) {
-		this.regularTripId = regularTripId;
+	public void setHasMappedLocations(MappedLocation[] hasMappedLocations) {
+		this.hasMappedLocations = hasMappedLocations;
 	}
-	public MappedLocation[] getMappedLocations() {
-		return mappedLocations;
+	public InfraRoute[] getHasInfraRoutes() {
+		return hasInfraRoutes;
 	}
-	public void setMappedLocations(MappedLocation[] mappedLocations) {
-		this.mappedLocations = mappedLocations;
+	public void setHasInfraRoutes(InfraRoute[] hasInfraRoutes) {
+		this.hasInfraRoutes = hasInfraRoutes;
 	}
-	public InfraRoute[] getAssociatedRoutes() {
-		return associatedRoutes;
+	public Double getHasTripTotalCalories() {
+		return hasTripTotalCalories;
 	}
-	public void setAssociatedRoutes(InfraRoute[] associatedRoutes) {
-		this.associatedRoutes = associatedRoutes;
+	public void setHasTripTotalCalories(Double hasTripTotalCalories) {
+		this.hasTripTotalCalories = hasTripTotalCalories;
 	}
-	public Double getTotalCalories() {
-		return totalCalories;
-	}
-	public void setTotalCalories(Double totalCalories) {
-		this.totalCalories = totalCalories;
-	}
-    
+	
     
 }

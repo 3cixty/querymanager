@@ -21,12 +21,18 @@ public class Name {
 	@Description(hasText="additional names")
 	private String additionalName="";
 	@Description(hasText="nick name")
-	private String nickName="";
+	private String nickname="";
 	public String getGivenName() {
 		return givenName;
 	}
 	public void setGivenName(String givenName) {
 		this.givenName = givenName;
+	}
+	public String getMiddleName() {
+		return middleName;
+	}
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
 	}
 	public String getFamilyName() {
 		return familyName;
@@ -52,11 +58,11 @@ public class Name {
 	public void setAdditionalName(String additionalName) {
 		this.additionalName = additionalName;
 	}
-	public String getNickName() {
-		return nickName;
+	public String getNickname() {
+		return nickname;
 	}
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	
 }

@@ -12,7 +12,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.models.NatureOfPlace;
-import eu.threecixty.profile.models.Place;
+import eu.threecixty.profile.models.UserPlaceRating;
 import eu.threecixty.profile.models.PlaceDetail;
 import eu.threecixty.profile.models.Preference;
 
@@ -70,9 +70,9 @@ public class ProfilerPlaceUtils {
 		qe.close();
 
 		if (countryName != null) {
-		    Set <Place> places = pref.getHasPlaces();
-		    if (places == null) places = new HashSet <Place>();
-		    Place place = new Place();
+		    Set <UserPlaceRating> places = pref.getHasPlaces();
+		    if (places == null) places = new HashSet <UserPlaceRating>();
+		    UserPlaceRating place = new UserPlaceRating();
 		    PlaceDetail pd = new PlaceDetail();
 		    pd.setHasName(countryName);
 		    pd.setIsTheNatureOfPlace(NatureOfPlace.Country);
@@ -125,9 +125,9 @@ public class ProfilerPlaceUtils {
 		qe.close();
 
 		if (countryName != null) {
-		    Set <Place> places = pref.getHasPlaces();
-		    if (places == null) places = new HashSet <Place>();
-		    Place place = new Place();
+		    Set <UserPlaceRating> places = pref.getHasPlaces();
+		    if (places == null) places = new HashSet <UserPlaceRating>();
+		    UserPlaceRating place = new UserPlaceRating();
 		    PlaceDetail pd = new PlaceDetail();
 		    pd.setHasName(countryName);
 		    pd.setIsTheNatureOfPlace(NatureOfPlace.City);

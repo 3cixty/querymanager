@@ -16,7 +16,7 @@ public class UserProfile{
     //following are the required fields
     @RequiredNotNullEntities
     @Description(hasText="User ID on the 3cxity Plateform")
-    private String UID="";
+    private String hasUID="";
     @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Name")
     private Name hasName;    
     @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
@@ -39,10 +39,10 @@ public class UserProfile{
     @Description(hasText = "Collection of Hobbies of the user.")
     private Set <String> hasHobbies;
     @Description(hasText = "Collection of languages the user speaks.")
-    private Set <Language> languagesSpoken;
+    private Set <Language> hasLanguage;
     @Description(hasText = "Collection of friends the user has. This collection also holds the information "
     		+ "about the type of friendship")
-    private Set <Friend> hasContacts;                                                                                                               
+    private Set <UserProfile> knows;                                                                                                               
     @Description(hasText = "History of user made query. Check this new architecture")
     private Set<QueryHistory> hasQueryHistory; 
     
@@ -54,7 +54,7 @@ public class UserProfile{
     private Set <Eduation> hasEducation;
     @Description(hasText = "Collection that holds the Employment history of the user. "
     				+ "This collection holds the user’s previous employers and the current employer if any")
-    private Set <EmployerInformation> hasEmployer;
+    private Set <EmployerInformation> hasEmployerInformation;
   
     public Name getHasName() {
 		return hasName;
@@ -104,17 +104,17 @@ public class UserProfile{
 	public void setHasHobbies(Set<String> hasHobbies) {
 		this.hasHobbies = hasHobbies;
 	}
-	public Set<Language> getLanguagesSpoken() {
-		return languagesSpoken;
+	public Set<Language> getHasLanguage() {
+		return hasLanguage;
 	}
-	public void setLanguagesSpoken(Set<Language> languagesSpoken) {
-		this.languagesSpoken = languagesSpoken;
+	public void setHasLanguage(Set<Language> hasLanguage) {
+		this.hasLanguage = hasLanguage;
 	}
-	public Set<Friend> getHasContacts() {
-		return hasContacts;
+	public Set<UserProfile> getKnows() {
+		return knows;
 	}
-	public void setHasContacts(Set<Friend> hasContacts) {
-		this.hasContacts = hasContacts;
+	public void setKnows(Set<UserProfile> knows) {
+		this.knows = knows;
 	}
 	public Set<Skills> getHasSkills() {
 		return hasSkills;
@@ -128,10 +128,22 @@ public class UserProfile{
 	public void setHasEducation(Set<Eduation> hasEducation) {
 		this.hasEducation = hasEducation;
 	}
-	public Set<EmployerInformation> getHasEmployer() {
-		return hasEmployer;
+	public Set<EmployerInformation> getHasEmployerInformation() {
+		return hasEmployerInformation;
 	}
-	public void setHasEmployer(Set<EmployerInformation> hasEmployer) {
-		this.hasEmployer = hasEmployer;
-	} 
+	public void setHasEmployerInformation(Set<EmployerInformation> hasEmployerInformation) {
+		this.hasEmployerInformation = hasEmployerInformation;
+	}
+	public String getHasUID() {
+		return hasUID;
+	}
+	public void setHasUID(String hasUID) {
+		this.hasUID = hasUID;
+	}
+	public Set<QueryHistory> getHasQueryHistory() {
+		return hasQueryHistory;
+	}
+	public void setHasQueryHistory(Set<QueryHistory> hasQueryHistory) {
+		this.hasQueryHistory = hasQueryHistory;
+	}
 }

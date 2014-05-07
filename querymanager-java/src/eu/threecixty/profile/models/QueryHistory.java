@@ -16,10 +16,6 @@ import eu.threecixty.profile.annotations.Description;
 public class QueryHistory {
 	@Description(hasText="user Input query")
 	private Query query;
-	@Description(hasText="Augmented query")
-	private Query augmentedquery;
-	@Description(hasText="Result of the augmented query")
-	private ResultSet result;
 	@Description(hasText="time at which the user queried the KB")
     private Date hasQueringTime;
 	public Query getQuery() {
@@ -27,18 +23,6 @@ public class QueryHistory {
 	}
 	public void setQuery(Query query) {
 		this.query = query;
-	}
-	public Query getAugmentedquery() {
-		return augmentedquery;
-	}
-	public void setAugmentedquery(Query augmentedquery) {
-		this.augmentedquery = augmentedquery;
-	}
-	public ResultSet getResult() {
-		return result;
-	}
-	public void setResult(ResultSet result) {
-		this.result = result;
 	}
 	public Date getHasQueringTime() {
 		return hasQueringTime;

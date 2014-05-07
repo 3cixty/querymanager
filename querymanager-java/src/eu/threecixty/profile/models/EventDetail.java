@@ -8,20 +8,22 @@ import eu.threecixty.profile.annotations.Exists;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class EventDetail {
+public class EventDetail{
 	@Description(hasText="name of the event")
-	private String hasName="";
+	private String hasEventName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
     private Address hasAddress;
+	@Description(hasText = "Details")
+	private String hasDetails="";
 	@Description(hasText="Start and end information about the event")
-    private Information hasInformation;
+    private TemporalDetails hasTemporalDetails;
 	@Description(hasText="Nature of the event")
-    private NatureOfEvent isThenatureOfEvent;
-	public String getHasName() {
-		return hasName;
+    private NatureOfEvent hasNatureOfEvent;
+	public String getHasEventName() {
+		return hasEventName;
 	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
+	public void setHasEventName(String hasEventName) {
+		this.hasEventName = hasEventName;
 	}
 	public Address getHasAddress() {
 		return hasAddress;
@@ -29,17 +31,24 @@ public class EventDetail {
 	public void setHasAddress(Address hasAddress) {
 		this.hasAddress = hasAddress;
 	}
-	public Information getHasInformation() {
-		return hasInformation;
+	public String getHasDetails() {
+		return hasDetails;
 	}
-	public void setHasInformation(Information hasInformation) {
-		this.hasInformation = hasInformation;
+	public void setHasDetails(String hasDetails) {
+		this.hasDetails = hasDetails;
 	}
-	public NatureOfEvent getIsThenatureOfEvent() {
-		return isThenatureOfEvent;
+	public TemporalDetails getHasTemporalDetails() {
+		return hasTemporalDetails;
 	}
-	public void setIsThenatureOfEvent(NatureOfEvent isThenatureOfEvent) {
-		this.isThenatureOfEvent = isThenatureOfEvent;
+	public void setHasTemporalDetails(TemporalDetails hasTemporalDetails) {
+		this.hasTemporalDetails = hasTemporalDetails;
 	}
+	public NatureOfEvent getHasNatureOfEvent() {
+		return hasNatureOfEvent;
+	}
+	public void setHasNatureOfEvent(NatureOfEvent hasNatureOfEvent) {
+		this.hasNatureOfEvent = hasNatureOfEvent;
+	}
+	
 	
 }

@@ -8,7 +8,7 @@ import java.util.Set;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import eu.threecixty.profile.models.Place;
+import eu.threecixty.profile.models.UserPlaceRating;
 import eu.threecixty.profile.models.PlaceDetail;
 import eu.threecixty.profile.models.Preference;
 

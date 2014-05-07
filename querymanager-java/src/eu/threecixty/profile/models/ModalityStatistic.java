@@ -11,109 +11,102 @@ import eu.threecixty.profile.annotations.*;
  */
 public class ModalityStatistic {
     @Description(hasText = "Chosen modality")
-    ModalityType modalityType;
+    private ModalityType hasModalityType;
     @Description(hasText = "Travel objective")
-    TravelObjectiveType objectiveType;
+    private TravelObjectiveType hasTravelObjectiveType;
     @Description(hasText = "Origin destination on name of type level, e.g. 'home-office','office-home'")
-    String originDestinationPair=""; 
+    private String hasOriginDestinationPair=""; 
     @Description(hasText = "Standardized weather condition string, based on the trip weather")
-    String weatherCondition=""; 
+    private String hasWeatherCondition=""; 
     @Description(hasText = "Indicates whether this trip was during rush hour")
-    Boolean inRushHour; 
+    private Boolean hasInRushHour; 
     @Description(hasText = "Total count of trips in this category")
-    Long totalcount; 
+    private Long hasTotalcount; 
     @Description(hasText = "Total time, in seconds")
-    Long totalTime; 
+    private Long hasTotalTime; 
     @Description(hasText = "Total distance, in meter")
-    Double totalDistance=0.0; 
+    private Double hasTotalDistance=0.0; 
     @Description(hasText = "Average speed, in meter per second")
-    Double averageSpeed=0.0; 
+    private Double hasAverageSpeed=0.0; 
     @Description(hasText = "Total time lost relative to fastest time for a trip, in seconds")
-    Long totalLostTime; 
+    private Long hasTotalLostTime; 
     @Description(hasText = "Total cost of the travels, in Euros")
-    Double totalCost=0.0; 
-    @Description(hasText = "Total emissions of the travels, per emission type")
-    Emission[] totalEmission; 
+    private Double hasTotalCost=0.0; 
     @Description(hasText = "Total calories spent travelling")
-    Double totalCalories;
-	public ModalityType getModalityType() {
-		return modalityType;
+    private Double hasTotalCalories;
+	public ModalityType getHasModalityType() {
+		return hasModalityType;
 	}
-	public void setModalityType(ModalityType modalityType) {
-		this.modalityType = modalityType;
+	public void setHasModalityType(ModalityType hasModalityType) {
+		this.hasModalityType = hasModalityType;
 	}
-	public TravelObjectiveType getObjectiveType() {
-		return objectiveType;
+	public TravelObjectiveType getHasTravelObjectiveType() {
+		return hasTravelObjectiveType;
 	}
-	public void setObjectiveType(TravelObjectiveType objectiveType) {
-		this.objectiveType = objectiveType;
+	public void setHasTravelObjectiveType(TravelObjectiveType hasTravelObjectiveType) {
+		this.hasTravelObjectiveType = hasTravelObjectiveType;
 	}
-	public String getOriginDestinationPair() {
-		return originDestinationPair;
+	public String getHasOriginDestinationPair() {
+		return hasOriginDestinationPair;
 	}
-	public void setOriginDestinationPair(String originDestinationPair) {
-		this.originDestinationPair = originDestinationPair;
+	public void setHasOriginDestinationPair(String hasOriginDestinationPair) {
+		this.hasOriginDestinationPair = hasOriginDestinationPair;
 	}
-	public String getWeatherCondition() {
-		return weatherCondition;
+	public String getHasWeatherCondition() {
+		return hasWeatherCondition;
 	}
-	public void setWeatherCondition(String weatherCondition) {
-		this.weatherCondition = weatherCondition;
+	public void setHasWeatherCondition(String hasWeatherCondition) {
+		this.hasWeatherCondition = hasWeatherCondition;
 	}
-	public Boolean getInRushHour() {
-		return inRushHour;
+	public Boolean getHasInRushHour() {
+		return hasInRushHour;
 	}
-	public void setInRushHour(Boolean inRushHour) {
-		this.inRushHour = inRushHour;
+	public void setHasInRushHour(Boolean hasInRushHour) {
+		this.hasInRushHour = hasInRushHour;
 	}
-	public Long getTotalcount() {
-		return totalcount;
+	public Long getHasTotalcount() {
+		return hasTotalcount;
 	}
-	public void setTotalcount(Long totalcount) {
-		this.totalcount = totalcount;
+	public void setHasTotalcount(Long hasTotalcount) {
+		this.hasTotalcount = hasTotalcount;
 	}
-	public Long getTotalTime() {
-		return totalTime;
+	public Long getHasTotalTime() {
+		return hasTotalTime;
 	}
-	public void setTotalTime(Long totalTime) {
-		this.totalTime = totalTime;
+	public void setHasTotalTime(Long hasTotalTime) {
+		this.hasTotalTime = hasTotalTime;
 	}
-	public Double getTotalDistance() {
-		return totalDistance;
+	public Double getHasTotalDistance() {
+		return hasTotalDistance;
 	}
-	public void setTotalDistance(Double totalDistance) {
-		this.totalDistance = totalDistance;
+	public void setHasTotalDistance(Double hasTotalDistance) {
+		this.hasTotalDistance = hasTotalDistance;
 	}
-	public Double getAverageSpeed() {
-		return averageSpeed;
+	public Double getHasAverageSpeed() {
+		return hasAverageSpeed;
 	}
-	public void setAverageSpeed(Double averageSpeed) {
-		this.averageSpeed = averageSpeed;
+	public void setHasAverageSpeed(Double hasAverageSpeed) {
+		this.hasAverageSpeed = hasAverageSpeed;
 	}
-	public Long getTotalLostTime() {
-		return totalLostTime;
+	public Long getHasTotalLostTime() {
+		return hasTotalLostTime;
 	}
-	public void setTotalLostTime(Long totalLostTime) {
-		this.totalLostTime = totalLostTime;
+	public void setHasTotalLostTime(Long hasTotalLostTime) {
+		this.hasTotalLostTime = hasTotalLostTime;
 	}
-	public Double getTotalCost() {
-		return totalCost;
+	public Double getHasTotalCost() {
+		return hasTotalCost;
 	}
-	public void setTotalCost(Double totalCost) {
-		this.totalCost = totalCost;
+	public void setHasTotalCost(Double hasTotalCost) {
+		this.hasTotalCost = hasTotalCost;
 	}
-	public Emission[] getTotalEmission() {
-		return totalEmission;
+	public Double getHasTotalCalories() {
+		return hasTotalCalories;
 	}
-	public void setTotalEmission(Emission[] totalEmission) {
-		this.totalEmission = totalEmission;
+	public void setHasTotalCalories(Double hasTotalCalories) {
+		this.hasTotalCalories = hasTotalCalories;
 	}
-	public Double getTotalCalories() {
-		return totalCalories;
-	}
-	public void setTotalCalories(Double totalCalories) {
-		this.totalCalories = totalCalories;
-	} 
+	
     
 }
 

@@ -9,33 +9,24 @@ import eu.threecixty.profile.annotations.Description;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class Language {
-	@Description(hasText="language information")
-	private LanguageInformation hasLanguageInformation;
+public class Language extends LanguageDetail{
 	@Description(hasText="user knowledge about the language")
-    private UserLanguageState isKnown;          
+    private UserLanguageState hasLanguageState;          
 	@Description(hasText="user would like to gather what knowledge about the language")
-    private UserLanguageState isWanted;         
+    private UserLanguageState wantedLanguageState;         
 	@Description(hasText="comments")
     private Set <String> hasKeyTags;
-	
-	public LanguageInformation getHasLanguageInformation() {
-		return hasLanguageInformation;
+	public UserLanguageState getHasLanguageState() {
+		return hasLanguageState;
 	}
-	public void setHasLanguageInformation(LanguageInformation hasLanguageInformation) {
-		this.hasLanguageInformation = hasLanguageInformation;
+	public void setHasLanguageState(UserLanguageState hasLanguageState) {
+		this.hasLanguageState = hasLanguageState;
 	}
-	public UserLanguageState getIsKnown() {
-		return isKnown;
+	public UserLanguageState getWantedLanguageState() {
+		return wantedLanguageState;
 	}
-	public void setIsKnown(UserLanguageState isKnown) {
-		this.isKnown = isKnown;
-	}
-	public UserLanguageState getIsWanted() {
-		return isWanted;
-	}
-	public void setIsWanted(UserLanguageState isWanted) {
-		this.isWanted = isWanted;
+	public void setWantedLanguageState(UserLanguageState wantedLanguageState) {
+		this.wantedLanguageState = wantedLanguageState;
 	}
 	public Set<String> getHasKeyTags() {
 		return hasKeyTags;
@@ -43,6 +34,6 @@ public class Language {
 	public void setHasKeyTags(Set<String> hasKeyTags) {
 		this.hasKeyTags = hasKeyTags;
 	}
-	
+
     
 }

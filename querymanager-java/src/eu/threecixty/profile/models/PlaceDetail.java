@@ -14,20 +14,20 @@ import eu.threecixty.profile.annotations.Extend;
 @Extend(hasText="http://www.w3.org/2006/vcard/ns#Location")
 public class PlaceDetail {
 	@Description(hasText="name of the place")
-	private String hasName="";
+	private String hasPlaceName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
 	private Address hasAddress;
 	@Description(hasText="Description of the place")
 	private String hasDetails="";
 	@Description(hasText="Nature of the place")
-	private NatureOfPlace isTheNatureOfPlace;
+	private NatureOfPlace hasNatureOfPlace;
 	@Description(hasText = "comments")
 	private Set <String> hasKeyTags;
-	public String getHasName() {
-		return hasName;
+	public String getHasPlaceName() {
+		return hasPlaceName;
 	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
+	public void setHasPlaceName(String hasPlaceName) {
+		this.hasPlaceName = hasPlaceName;
 	}
 	public Address getHasAddress() {
 		return hasAddress;
@@ -41,11 +41,11 @@ public class PlaceDetail {
 	public void setHasDetails(String hasDetails) {
 		this.hasDetails = hasDetails;
 	}
-	public NatureOfPlace getIsTheNatureOfPlace() {
-		return isTheNatureOfPlace;
+	public NatureOfPlace getHasNatureOfPlace() {
+		return hasNatureOfPlace;
 	}
-	public void setIsTheNatureOfPlace(NatureOfPlace isTheNatureOfPlace) {
-		this.isTheNatureOfPlace = isTheNatureOfPlace;
+	public void setHasNatureOfPlace(NatureOfPlace hasNatureOfPlace) {
+		this.hasNatureOfPlace = hasNatureOfPlace;
 	}
 	public Set<String> getHasKeyTags() {
 		return hasKeyTags;
@@ -53,6 +53,7 @@ public class PlaceDetail {
 	public void setHasKeyTags(Set<String> hasKeyTags) {
 		this.hasKeyTags = hasKeyTags;
 	}
+	
 	
 	
 }

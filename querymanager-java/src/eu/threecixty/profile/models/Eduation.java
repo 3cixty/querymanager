@@ -13,7 +13,7 @@ public class Eduation {
 	@Description(hasText="Higest Level Of Aquired Education")
 	private HigestLevelOfAquiredEducation hasHigestLevelOfAquiredEducation;
 	@Description(hasText="School Attended")
-	private Set <SchoolAttended> hasAttendedSchool; 
+	private Set <SchoolAttended> hasSchoolAttended; 
 	@Description(hasText="Courses Undertaken")
 	private Set <Course> hasTakenCourse;
 	@Description(hasText="comments")
@@ -25,11 +25,11 @@ public class Eduation {
 			HigestLevelOfAquiredEducation hasHigestLevelOfAquiredEducation) {
 		this.hasHigestLevelOfAquiredEducation = hasHigestLevelOfAquiredEducation;
 	}
-	public Set<SchoolAttended> getHasAttendedSchool() {
-		return hasAttendedSchool;
+	public Set<SchoolAttended> getHasSchool() {
+		return hasSchoolAttended;
 	}
-	public void setHasAttendedSchool(Set<SchoolAttended> hasAttendedSchool) {
-		this.hasAttendedSchool = hasAttendedSchool;
+	public void setHasSchoolAttended(Set<SchoolAttended> hasSchoolAttended) {
+		this.hasSchoolAttended = hasSchoolAttended;
 	}
 	public Set<Course> getHasTakenCourse() {
 		return hasTakenCourse;

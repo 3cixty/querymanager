@@ -11,44 +11,44 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class PersonalPlace {
     @Description(hasText = "Place ID")
-    Long id; 
+    private Long hasPersonalPlaceId; 
     @Description(hasText = "User ID who visits this place frequently")
-    Long userid; 
+    private Long hasUID; 
     @Description(hasText = "Place location latitude")
-    Double latitude; 
+    private Double latitude; 
     @Description(hasText = "Place location longitude")
-    Double longitude; 
+    private Double longitude; 
     @Description(hasText = "Place location accuracy, in meters")
-    Double accuracy; 
+    private Double hasPersonalPlaceAccuracy; 
     @Description(hasText = "Place name")
-    String name; 
+    private String hasPersonalPlaceName; 
     @Description(hasText = "Place type")
-    String type;
+    private String hasPersonalPlaceType;
     @Description(hasText = "Place postal code")
-    String postalcode; 
+    private String postalcode; 
     @Description(hasText = "Total duration of stay of the user in this place, in seconds")
-    Long stayDuration; 
+    private Long hasPersonalPlaceStayDuration; 
     @Description(hasText = "Total duration of stay of the user in this place, relatively with respect to the observed time period for place detection")
-    Double stayPercentage; 
+    private Double hasPersonalPlaceStayPercentage; 
     @Description(hasText = "Duration of stay per week day")
-    String weekdayPattern; 
+    private String hasPersonalPlaceWeekdayPattern; 
     @Description(hasText = "Duration of stay per day hour")
-    String dayhourPattern; 
+    private String hasPersonalPlaceDayhourPattern; 
     @Description(hasText = "Set to manual if the user changed name and/or location")
-    DecisionLevel level; 
+    private DecisionLevel hasDecisionlevel; 
     @Description(hasText = "External IDs of this place, as a + concatenated string, with e.g. FourSquare and FaceBook identities: 4sq:43432+fb:8348734")
-    String externalIds;
-	public Long getId() {
-		return id;
+    private String hasPersonalPlaceexternalIds;
+	public Long getHasPersonalPlaceId() {
+		return hasPersonalPlaceId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public void setHasPersonalPlaceId(Long hasPersonalPlaceId) {
+		this.hasPersonalPlaceId = hasPersonalPlaceId;
 	}
-	public Long getUserid() {
-		return userid;
+	public Long getHasUID() {
+		return hasUID;
 	}
-	public void setUserid(Long userid) {
-		this.userid = userid;
+	public void setHasUID(Long hasUID) {
+		this.hasUID = hasUID;
 	}
 	public Double getLatitude() {
 		return latitude;
@@ -62,23 +62,23 @@ public class PersonalPlace {
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	public Double getAccuracy() {
-		return accuracy;
+	public Double getHasPersonalPlaceAccuracy() {
+		return hasPersonalPlaceAccuracy;
 	}
-	public void setAccuracy(Double accuracy) {
-		this.accuracy = accuracy;
+	public void setHasPersonalPlaceAccuracy(Double hasPersonalPlaceAccuracy) {
+		this.hasPersonalPlaceAccuracy = hasPersonalPlaceAccuracy;
 	}
-	public String getName() {
-		return name;
+	public String getHasPersonalPlaceName() {
+		return hasPersonalPlaceName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setHasPersonalPlaceName(String hasPersonalPlaceName) {
+		this.hasPersonalPlaceName = hasPersonalPlaceName;
 	}
-	public String getType() {
-		return type;
+	public String getHasPersonalPlaceType() {
+		return hasPersonalPlaceType;
 	}
-	public void setType(String type) {
-		this.type = type;
+	public void setHasPersonalPlaceType(String hasPersonalPlaceType) {
+		this.hasPersonalPlaceType = hasPersonalPlaceType;
 	}
 	public String getPostalcode() {
 		return postalcode;
@@ -86,41 +86,45 @@ public class PersonalPlace {
 	public void setPostalcode(String postalcode) {
 		this.postalcode = postalcode;
 	}
-	public Long getStayDuration() {
-		return stayDuration;
+	public Long getHasPersonalPlaceStayDuration() {
+		return hasPersonalPlaceStayDuration;
 	}
-	public void setStayDuration(Long stayDuration) {
-		this.stayDuration = stayDuration;
+	public void setHasPersonalPlaceStayDuration(Long hasPersonalPlaceStayDuration) {
+		this.hasPersonalPlaceStayDuration = hasPersonalPlaceStayDuration;
 	}
-	public Double getStayPercentage() {
-		return stayPercentage;
+	public Double getHasPersonalPlaceStayPercentage() {
+		return hasPersonalPlaceStayPercentage;
 	}
-	public void setStayPercentage(Double stayPercentage) {
-		this.stayPercentage = stayPercentage;
+	public void setHasPersonalPlaceStayPercentage(
+			Double hasPersonalPlaceStayPercentage) {
+		this.hasPersonalPlaceStayPercentage = hasPersonalPlaceStayPercentage;
 	}
-	public String getWeekdayPattern() {
-		return weekdayPattern;
+	public String getHasPersonalPlaceWeekdayPattern() {
+		return hasPersonalPlaceWeekdayPattern;
 	}
-	public void setWeekdayPattern(String weekdayPattern) {
-		this.weekdayPattern = weekdayPattern;
+	public void setHasPersonalPlaceWeekdayPattern(
+			String hasPersonalPlaceWeekdayPattern) {
+		this.hasPersonalPlaceWeekdayPattern = hasPersonalPlaceWeekdayPattern;
 	}
-	public String getDayhourPattern() {
-		return dayhourPattern;
+	public String getHasPersonalPlaceDayhourPattern() {
+		return hasPersonalPlaceDayhourPattern;
 	}
-	public void setDayhourPattern(String dayhourPattern) {
-		this.dayhourPattern = dayhourPattern;
+	public void setHasPersonalPlaceDayhourPattern(
+			String hasPersonalPlaceDayhourPattern) {
+		this.hasPersonalPlaceDayhourPattern = hasPersonalPlaceDayhourPattern;
 	}
-	public DecisionLevel getLevel() {
-		return level;
+	public DecisionLevel getHasDecisionlevel() {
+		return hasDecisionlevel;
 	}
-	public void setLevel(DecisionLevel level) {
-		this.level = level;
+	public void setHasDecisionlevel(DecisionLevel hasDecisionlevel) {
+		this.hasDecisionlevel = hasDecisionlevel;
 	}
-	public String getExternalIds() {
-		return externalIds;
+	public String getHasPersonalPlaceexternalIds() {
+		return hasPersonalPlaceexternalIds;
 	}
-	public void setExternalIds(String externalIds) {
-		this.externalIds = externalIds;
-	} 
+	public void setHasPersonalPlaceexternalIds(String hasPersonalPlaceexternalIds) {
+		this.hasPersonalPlaceexternalIds = hasPersonalPlaceexternalIds;
+	}
+	
     
  }

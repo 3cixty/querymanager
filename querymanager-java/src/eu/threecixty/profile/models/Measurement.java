@@ -10,55 +10,56 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class Measurement {
 	@Description(hasText = "In seconds since epoch, in UTC")
-    private Long time; 
+    private Long hasMeasurementTime; 
     @Description(hasText = "In seconds")
-    private Long validity; //In seconds
+    private Long hasMeasurementValidity; //In seconds
     @Description(hasText = "In seconds, GMT+1 equals 3600")
-    private Long timezone; 
+    private Long hasMeasurementTimeZone; 
     @Description(hasText = "Unique ID of a measurement or derived value, "
     		+ "IDs are unique per reading type (location, vri, weather, ...)")
-    private Long id; 
+    private Long hasMeasurementId; 
     @Description(hasText = "Unique ID of the user (key for personal data)")
-    private Long userid; 
+    private Long hasUID; 
     @Description(hasText = "Data quality, default is good")
-    private DataQuality quality; 
+    private DataQuality hasDataQuality; 
     //@Description(hasText = "Describes the client submitting the data")
     //ClientCharacteristic client; 
-	public Long getTime() {
-		return time;
+	public Long getHasMeasurementTime() {
+		return hasMeasurementTime;
 	}
-	public void setTime(Long time) {
-		this.time = time;
+	public void setHasMeasurementTime(Long hasMeasurementTime) {
+		this.hasMeasurementTime = hasMeasurementTime;
 	}
-	public Long getValidity() {
-		return validity;
+	public Long getHasMeasurementValidity() {
+		return hasMeasurementValidity;
 	}
-	public void setValidity(Long validity) {
-		this.validity = validity;
+	public void setHasMeasurementValidity(Long hasMeasurementValidity) {
+		this.hasMeasurementValidity = hasMeasurementValidity;
 	}
-	public Long getTimezone() {
-		return timezone;
+	public Long getHasMeasurementTimeZone() {
+		return hasMeasurementTimeZone;
 	}
-	public void setTimezone(Long timezone) {
-		this.timezone = timezone;
+	public void setHasMeasurementTimeZone(Long hasMeasurementTimeZone) {
+		this.hasMeasurementTimeZone = hasMeasurementTimeZone;
 	}
-	public Long getId() {
-		return id;
+	public Long getHasMeasurementId() {
+		return hasMeasurementId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public void setHasMeasurementId(Long hasMeasurementId) {
+		this.hasMeasurementId = hasMeasurementId;
 	}
-	public Long getUserid() {
-		return userid;
+	public Long getHasUID() {
+		return hasUID;
 	}
-	public void setUserid(Long userid) {
-		this.userid = userid;
+	public void setHasUID(Long hasUID) {
+		this.hasUID = hasUID;
 	}
-	public DataQuality getQuality() {
-		return quality;
+	public DataQuality getHasDataQuality() {
+		return hasDataQuality;
 	}
-	public void setQuality(DataQuality quality) {
-		this.quality = quality;
+	public void setHasDataQuality(DataQuality hasDataQuality) {
+		this.hasDataQuality = hasDataQuality;
 	}
+	
     
 }

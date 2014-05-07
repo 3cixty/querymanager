@@ -9,68 +9,69 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class InfraRoute {
 	@Description(hasText="ID in terms of OSM, O if unknown")
-	private int ID;
+	private int hasInfraRouteID;
 	@Description(hasText="route name")
-	private String name;
+	private String hasInfraRouteName;
 	@Description(hasText="route type")
-	private String type;
+	private String hasInfraRouteType;
 	@Description(hasText="route reference")
-	private String routeReference;
+	private String hasInfraRouteReference;
 	@Description(hasText="Intended modality for this route")
-	private ModalityType routeModality;
+	private ModalityType hasModalityType;
 	@Description(hasText="describes the symbol that is used to mark the way along the route e.g. Red Cross")
-	private String routeSymbol;
+	private String hasInfraRouteSymbol;
 	@Description(hasText="the route is operated by this company")
-	private String routeOperator;
+	private String hasInfraRouteOperator;
 	@Description(hasText="A wider network of routes of which this is an example")
-	private String routeNetwork;
-	public int getID() {
-		return ID;
+	private String hasInfraRouteNetwork;
+	public int getHasInfraRouteID() {
+		return hasInfraRouteID;
 	}
-	public void setID(int iD) {
-		ID = iD;
+	public void setHasInfraRouteID(int hasInfraRouteID) {
+		this.hasInfraRouteID = hasInfraRouteID;
 	}
-	public String getName() {
-		return name;
+	public String getHasInfraRouteName() {
+		return hasInfraRouteName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setHasInfraRouteName(String hasInfraRouteName) {
+		this.hasInfraRouteName = hasInfraRouteName;
 	}
-	public String getType() {
-		return type;
+	public String getHasInfraRouteType() {
+		return hasInfraRouteType;
 	}
-	public void setType(String type) {
-		this.type = type;
+	public void setHasInfraRouteType(String hasInfraRouteType) {
+		this.hasInfraRouteType = hasInfraRouteType;
 	}
-	public String getRouteReference() {
-		return routeReference;
+	public String getHasInfraRouteReference() {
+		return hasInfraRouteReference;
 	}
-	public void setRouteReference(String routeReference) {
-		this.routeReference = routeReference;
+	public void setHasInfraRouteReference(String hasInfraRouteReference) {
+		this.hasInfraRouteReference = hasInfraRouteReference;
 	}
-	public ModalityType getRouteModality() {
-		return routeModality;
+	public ModalityType getHasModalityType() {
+		return hasModalityType;
 	}
-	public void setRouteModality(ModalityType routeModality) {
-		this.routeModality = routeModality;
+	public void setHasModalityType(ModalityType hasModalityType) {
+		this.hasModalityType = hasModalityType;
 	}
-	public String getRouteSymbol() {
-		return routeSymbol;
+	public String getHasInfraRouteSymbol() {
+		return hasInfraRouteSymbol;
 	}
-	public void setRouteSymbol(String routeSymbol) {
-		this.routeSymbol = routeSymbol;
+	public void setHasInfraRouteSymbol(String hasInfraRouteSymbol) {
+		this.hasInfraRouteSymbol = hasInfraRouteSymbol;
 	}
-	public String getRouteOperator() {
-		return routeOperator;
+	public String getHasInfraRouteOperator() {
+		return hasInfraRouteOperator;
 	}
-	public void setRouteOperator(String routeOperator) {
-		this.routeOperator = routeOperator;
+	public void setHasInfraRouteOperator(String hasInfraRouteOperator) {
+		this.hasInfraRouteOperator = hasInfraRouteOperator;
 	}
-	public String getRouteNetwork() {
-		return routeNetwork;
+	public String getHasInfraRouteNetwork() {
+		return hasInfraRouteNetwork;
 	}
-	public void setRouteNetwork(String routeNetwork) {
-		this.routeNetwork = routeNetwork;
+	public void setHasInfraRouteNetwork(String hasInfraRouteNetwork) {
+		this.hasInfraRouteNetwork = hasInfraRouteNetwork;
 	}
+	
 	
 }

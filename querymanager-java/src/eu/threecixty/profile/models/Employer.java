@@ -13,7 +13,7 @@ import eu.threecixty.profile.annotations.Uses;
  */
 public class Employer {
 	@Description(hasText="name of the employer")
-	private String hasName="";
+	private String hasEmployerName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
 	private Address hasAddress;
 	@Description(hasText="Description of the school")
@@ -24,11 +24,11 @@ public class Employer {
 	private String hasTelephone;
 	@Description(hasText = "comments")
 	private Set <String> hasKeyTags;
-	public String getHasName() {
-		return hasName;
+	public String getHasEmployerName() {
+		return hasEmployerName;
 	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
+	public void setHasEmployerName(String hasEmployerName) {
+		this.hasEmployerName = hasEmployerName;
 	}
 	public Address getHasAddress() {
 		return hasAddress;

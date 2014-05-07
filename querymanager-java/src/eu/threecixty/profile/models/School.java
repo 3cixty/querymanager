@@ -14,7 +14,7 @@ import eu.threecixty.profile.annotations.Uses;
  */
 public class School {
 	@Description(hasText="name of the school")
-	private String hasName="";
+	private String hasSchoolName="";
 	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
 	private Address hasAddress;
 	@Description(hasText="Description of the school")
@@ -25,11 +25,11 @@ public class School {
 	private String hasTelephone;
 	@Description(hasText = "comments")
 	private Set <String> hasKeyTags;
-	public String getHasName() {
-		return hasName;
+	public String getHasSchoolName() {
+		return hasSchoolName;
 	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
+	public void setHasSchoolName(String hasSchoolName) {
+		this.hasSchoolName = hasSchoolName;
 	}
 	public Address getHasAddress() {
 		return hasAddress;

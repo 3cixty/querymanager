@@ -7,19 +7,11 @@ import eu.threecixty.profile.annotations.Description;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class Agency {
-	@Description(hasText="Agency details")
-	private TravelAgency hasTravelAgency;
+public class Agency extends TravelAgency{
 	@Description(hasText="User rating of the Agency")
     private Rating hasRating;
 	@Description(hasText="number of times User visited the Agency")
     private int hasNumberOfTimesServed;
-	public TravelAgency getHasTravelAgency() {
-		return hasTravelAgency;
-	}
-	public void setHasTravelAgency(TravelAgency hasTravelAgency) {
-		this.hasTravelAgency = hasTravelAgency;
-	}
 	public Rating getHasRating() {
 		return hasRating;
 	}

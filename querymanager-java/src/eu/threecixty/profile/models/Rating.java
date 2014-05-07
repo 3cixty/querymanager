@@ -11,18 +11,18 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class Rating {
 	@Description(hasText="rating given by the user on scale of 1 to 10")
-	private float rating=0;
+	private Double hasUseDefinedRating;
 	@Description(hasText="user interaction mode")
     private UserInteractionMode hasUserInteractionMode;
 	@Description(hasText="time at which the user rated")
     private Date hasRatingTime;
 	@Description(hasText="comments by the user")
     private Set <String> hasKeyTags;
-	public float getRating() {
-		return rating;
+	public Double getHasUseDefinedRating() {
+		return hasUseDefinedRating;
 	}
-	public void setRating(float rating) {
-		this.rating = rating;
+	public void setHasUseDefinedRating(Double hasUseDefinedRating) {
+		this.hasUseDefinedRating = hasUseDefinedRating;
 	}
 	public UserInteractionMode getHasUserInteractionMode() {
 		return hasUserInteractionMode;
@@ -42,5 +42,6 @@ public class Rating {
 	public void setHasKeyTags(Set<String> hasKeyTags) {
 		this.hasKeyTags = hasKeyTags;
 	}
+	
 	
 }

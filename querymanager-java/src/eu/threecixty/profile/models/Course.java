@@ -9,31 +9,19 @@ import eu.threecixty.profile.annotations.Uses;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class Course {
-	@Description(hasText="name of the cource")
-	private String hasName="";
+public class Course extends EventDetail{
 	@Description(hasText="Name of the instructor")
 	private String hasCourseInstructor="";
 	@Description(hasText="Duration of the course")
 	private String hasCourseDuration="";
 	@Description(hasText="is offered by")
 	private School isOfferedby;
-	@Description(hasText="Description of the place")
-	private String hasDetails="";
 	@Uses(hasText="http://www.w3.org/2006/vcard/ns#url")
 	private String hasURL="";
-	@Description(hasText="Start and end information about the event")
-    private Information hasInformation;
 	@Description(hasText="type of course")
-  	private CourseType isCourseType;
+  	private CourseType hasCourseType;
 	@Description(hasText = "comments")
 	private Set <String> hasKeyTags;
-	public String getHasName() {
-		return hasName;
-	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
-	}
 	public String getHasCourseInstructor() {
 		return hasCourseInstructor;
 	}
@@ -64,11 +52,17 @@ public class Course {
 	public void setHasURL(String hasURL) {
 		this.hasURL = hasURL;
 	}
-	public Information getHasInformation() {
-		return hasInformation;
+	public TemporalDetails getHasTemporalDetail() {
+		return hasTemporalDetail;
 	}
-	public void setHasInformation(Information hasInformation) {
-		this.hasInformation = hasInformation;
+	public void setHasTemporalDetail(TemporalDetails hasTemporalDetail) {
+		this.hasTemporalDetail = hasTemporalDetail;
+	}
+	public CourseType getHasCourseType() {
+		return hasCourseType;
+	}
+	public void setHasCourseType(CourseType hasCourseType) {
+		this.hasCourseType = hasCourseType;
 	}
 	public Set<String> getHasKeyTags() {
 		return hasKeyTags;
@@ -76,4 +70,5 @@ public class Course {
 	public void setHasKeyTags(Set<String> hasKeyTags) {
 		this.hasKeyTags = hasKeyTags;
 	}
+	
 }

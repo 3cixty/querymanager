@@ -3,15 +3,15 @@ import eu.threecixty.profile.annotations.Description;
 
 public class Likes {
 	@Description(hasText="Name of the like")
-	private String hasName=""; 
+	private String hasLikeName=""; 
 	@Description(hasText="type of the entity liked")
 	private LikeType hasLikeType;
 	
-	public String getHasName() {
-		return hasName;
+	public String getHasLikeName() {
+		return hasLikeName;
 	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
+	public void setHasLikeName(String hasLikeName) {
+		this.hasLikeName = hasLikeName;
 	}
 	public LikeType getHasLikeType() {
 		return hasLikeType;

@@ -11,16 +11,16 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class Skills {
 	@Description(hasText="Name of the skill")
-	private String hasName;
+	private String hasSkillName;
 	@Description(hasText="Maturity Level of the user on the skill")
 	private MaturityLevel hasMaturityLevel;
 	@Description(hasText="comments")
 	private Set <String> keyTags;
-	public String getHasName() {
-		return hasName;
+	public String getHasSkillName() {
+		return hasSkillName;
 	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
+	public void setHasSkillName(String hasSkillName) {
+		this.hasSkillName = hasSkillName;
 	}
 	public MaturityLevel getHasMaturityLevel() {
 		return hasMaturityLevel;

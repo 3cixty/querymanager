@@ -11,82 +11,48 @@ import eu.threecixty.profile.annotations.Uses;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class HotelDetail {
-	@Description(hasText="name of the hotel")
-	private String hasName="";
-	@Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
-    private Address hasAddress;  
-	@Description(hasText="hotel details")
-	private String hasDetail="";
+public class HotelDetail extends PlaceDetail {
 	@Description(hasText="hotel chains")
-	private Set <Address> hasChains;
-	@Uses(hasText="http://www.w3.org/2006/vcard/ns#url")
-	private String hasURL;
+	private Set <Address> hasHotelChains;
 	@Description(hasText="lowest Price")
-	private Double hasPriceLow=0.0;
+	private Double hasHotelPriceLow=0.0;
 	@Description(hasText="highest Price")
-	private Double hasPriceHigh=0.0;
+	private Double hasHotelPriceHigh=0.0;
 	@Description(hasText="Room Type available eg. single, double, triple, quad, single and double, ...")
-	private String hasRoomTypes="";
+	private String hasHotelRoomTypes="";
 	@Description(hasText="Nearby Public Transport facility")
 	private String hasNearbyTransportMode="";
 	@Description(hasText="How to reach details")
 	private String hasHowToReach="";
 	@Description(hasText="Star information from 1 to 7")
-	private int hasCategory;
+	private int hasHotelStarCategory;
 	@Description(hasText="Type of food served")
-	private TypeOfFood hasTypeofFood;
+	private TypeOfFood hasTypeOfFood;
 	@Description(hasText="Facilities available")
 	private Set <String> hasFacilities;
-	@Description(hasText="comments")
-	private Set <String> hasKeyTags;
-	public String getHasName() {
-		return hasName;
+	public Set<Address> getHasHotelChains() {
+		return hasHotelChains;
 	}
-	public void setHasName(String hasName) {
-		this.hasName = hasName;
+	public void setHasHotelChains(Set<Address> hasHotelChains) {
+		this.hasHotelChains = hasHotelChains;
 	}
-	public Address getHasAddress() {
-		return hasAddress;
+	public Double getHasHotelPriceLow() {
+		return hasHotelPriceLow;
 	}
-	public void setHasAddress(Address hasAddress) {
-		this.hasAddress = hasAddress;
+	public void setHasHotelPriceLow(Double hasHotelPriceLow) {
+		this.hasHotelPriceLow = hasHotelPriceLow;
 	}
-	public String getHasDetail() {
-		return hasDetail;
+	public Double getHasHotelPriceHigh() {
+		return hasHotelPriceHigh;
 	}
-	public void setHasDetail(String hasDetail) {
-		this.hasDetail = hasDetail;
+	public void setHasHotelPriceHigh(Double hasHotelPriceHigh) {
+		this.hasHotelPriceHigh = hasHotelPriceHigh;
 	}
-	public Set<Address> getHasChains() {
-		return hasChains;
+	public String getHasHotelRoomTypes() {
+		return hasHotelRoomTypes;
 	}
-	public void setHasChains(Set<Address> hasChains) {
-		this.hasChains = hasChains;
-	}
-	public String getHasURL() {
-		return hasURL;
-	}
-	public void setHasURL(String hasURL) {
-		this.hasURL = hasURL;
-	}
-	public Double getHasPriceLow() {
-		return hasPriceLow;
-	}
-	public void setHasPriceLow(Double hasPriceLow) {
-		this.hasPriceLow = hasPriceLow;
-	}
-	public Double getHasPriceHigh() {
-		return hasPriceHigh;
-	}
-	public void setHasPriceHigh(Double hasPriceHigh) {
-		this.hasPriceHigh = hasPriceHigh;
-	}
-	public String getHasRoomTypes() {
-		return hasRoomTypes;
-	}
-	public void setHasRoomTypes(String hasRoomTypes) {
-		this.hasRoomTypes = hasRoomTypes;
+	public void setHasHotelRoomTypes(String hasHotelRoomTypes) {
+		this.hasHotelRoomTypes = hasHotelRoomTypes;
 	}
 	public String getHasNearbyTransportMode() {
 		return hasNearbyTransportMode;
@@ -100,29 +66,23 @@ public class HotelDetail {
 	public void setHasHowToReach(String hasHowToReach) {
 		this.hasHowToReach = hasHowToReach;
 	}
-	public int getHasCategory() {
-		return hasCategory;
+	public int getHasHotelStarCategory() {
+		return hasHotelStarCategory;
 	}
-	public void setHasCategory(int hasCategory) {
-		this.hasCategory = hasCategory;
+	public void setHasHotelStarCategory(int hasHotelStarCategory) {
+		this.hasHotelStarCategory = hasHotelStarCategory;
 	}
-	public TypeOfFood getHasTypeofFood() {
-		return hasTypeofFood;
+	public TypeOfFood getHasTypeOfFood() {
+		return hasTypeOfFood;
 	}
-	public void setHasTypeofFood(TypeOfFood hasTypeofFood) {
-		this.hasTypeofFood = hasTypeofFood;
+	public void setHasTypeOfFood(TypeOfFood hasTypeOfFood) {
+		this.hasTypeOfFood = hasTypeOfFood;
 	}
 	public Set<String> getHasFacilities() {
 		return hasFacilities;
 	}
 	public void setHasFacilities(Set<String> hasFacilities) {
 		this.hasFacilities = hasFacilities;
-	}
-	public Set<String> getHasKeyTags() {
-		return hasKeyTags;
-	}
-	public void setHasKeyTags(Set<String> hasKeyTags) {
-		this.hasKeyTags = hasKeyTags;
 	}
 	
 	

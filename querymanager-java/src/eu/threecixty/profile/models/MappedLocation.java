@@ -10,58 +10,58 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class MappedLocation  {
 	@Description(hasText = "Local ID")
-    Long id; 
+    Long hasMappedLocationId; 
     @Description(hasText = "OSM node ID")
-    Long nodeId; 
+    Long hasMappedLocationNodeId; 
     @Description(hasText = "OSM way ID")
-    Long wayId; 
+    Long hasMappedLocationWayId; 
     @Description(hasText = "Time stamp, interpolated to this node ID, in UTC. "
     		+ "Time zone information can be copied from the TripMeasurement. In case of a RegularTrip, "
     		+ "time is relative to trip start time.")
-    Long time; 
+    Long hasMappedLocationTime; 
     @Description(hasText = "Latitude of the node")
     Double latitude=0.0; 
     @Description(hasText = "Longitude of the node")
     Double longitude=0.0; 
     @Description(hasText = "Distance between this node and the previous one")
-    Double distance=0.0; 
+    Double hasMappedLocationDistance=0.0; 
     @Description(hasText = "Name of the way")
-    String name=""; 
+    String hasMappedLocationName=""; 
     @Description(hasText = "Highway classification")
-    String highway="";
+    String hasMappedLocationHighway="";
     @Description(hasText = "Railway classification")
-    String railway=""; 
+    String hasMappedLocationRailway=""; 
     @Description(hasText = "Waterway classification")
-    String waterway=""; 
+    String hasMappedLocationWaterway=""; 
     @Description(hasText = "Aerialway classification")
-    String aerialway=""; 
+    String hasMappedLocationAerialway=""; 
     @Description(hasText = "Service road classification")
-    String service=""; 
+    String hasMappedLocationServiceRoadway=""; 
     @Description(hasText = "Measure for the accuracy of the mapping")
-    Double deviation=0.0;
-	public Long getId() {
-		return id;
+    Double hasMappedLocationDeviation=0.0;
+	public Long getHasMappedLocationId() {
+		return hasMappedLocationId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public void setHasMappedLocationId(Long hasMappedLocationId) {
+		this.hasMappedLocationId = hasMappedLocationId;
 	}
-	public Long getNodeId() {
-		return nodeId;
+	public Long getHasMappedLocationNodeId() {
+		return hasMappedLocationNodeId;
 	}
-	public void setNodeId(Long nodeId) {
-		this.nodeId = nodeId;
+	public void setHasMappedLocationNodeId(Long hasMappedLocationNodeId) {
+		this.hasMappedLocationNodeId = hasMappedLocationNodeId;
 	}
-	public Long getWayId() {
-		return wayId;
+	public Long getHasMappedLocationWayId() {
+		return hasMappedLocationWayId;
 	}
-	public void setWayId(Long wayId) {
-		this.wayId = wayId;
+	public void setHasMappedLocationWayId(Long hasMappedLocationWayId) {
+		this.hasMappedLocationWayId = hasMappedLocationWayId;
 	}
-	public Long getTime() {
-		return time;
+	public Long getHasMappedLocationTime() {
+		return hasMappedLocationTime;
 	}
-	public void setTime(Long time) {
-		this.time = time;
+	public void setHasMappedLocationTime(Long hasMappedLocationTime) {
+		this.hasMappedLocationTime = hasMappedLocationTime;
 	}
 	public Double getLatitude() {
 		return latitude;
@@ -75,54 +75,54 @@ public class MappedLocation  {
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	public Double getDistance() {
-		return distance;
+	public Double getHasMappedLocationDistance() {
+		return hasMappedLocationDistance;
 	}
-	public void setDistance(Double distance) {
-		this.distance = distance;
+	public void setHasMappedLocationDistance(Double hasMappedLocationDistance) {
+		this.hasMappedLocationDistance = hasMappedLocationDistance;
 	}
-	public String getName() {
-		return name;
+	public String getHasMappedLocationName() {
+		return hasMappedLocationName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setHasMappedLocationName(String hasMappedLocationName) {
+		this.hasMappedLocationName = hasMappedLocationName;
 	}
-	public String getHighway() {
-		return highway;
+	public String getHasMappedLocationHighway() {
+		return hasMappedLocationHighway;
 	}
-	public void setHighway(String highway) {
-		this.highway = highway;
+	public void setHasMappedLocationHighway(String hasMappedLocationHighway) {
+		this.hasMappedLocationHighway = hasMappedLocationHighway;
 	}
-	public String getRailway() {
-		return railway;
+	public String getHasMappedLocationRailway() {
+		return hasMappedLocationRailway;
 	}
-	public void setRailway(String railway) {
-		this.railway = railway;
+	public void setHasMappedLocationRailway(String hasMappedLocationRailway) {
+		this.hasMappedLocationRailway = hasMappedLocationRailway;
 	}
-	public String getWaterway() {
-		return waterway;
+	public String getHasMappedLocationWaterway() {
+		return hasMappedLocationWaterway;
 	}
-	public void setWaterway(String waterway) {
-		this.waterway = waterway;
+	public void setHasMappedLocationWaterway(String hasMappedLocationWaterway) {
+		this.hasMappedLocationWaterway = hasMappedLocationWaterway;
 	}
-	public String getAerialway() {
-		return aerialway;
+	public String getHasMappedLocationAerialway() {
+		return hasMappedLocationAerialway;
 	}
-	public void setAerialway(String aerialway) {
-		this.aerialway = aerialway;
+	public void setHasMappedLocationAerialway(String hasMappedLocationAerialway) {
+		this.hasMappedLocationAerialway = hasMappedLocationAerialway;
 	}
-	public String getService() {
-		return service;
+	public String getHasMappedLocationServiceRoadway() {
+		return hasMappedLocationServiceRoadway;
 	}
-	public void setService(String service) {
-		this.service = service;
+	public void setHasMappedLocationServiceRoadway(String hasMappedLocationServiceRoadway) {
+		this.hasMappedLocationServiceRoadway = hasMappedLocationServiceRoadway;
 	}
-	public Double getDeviation() {
-		return deviation;
+	public Double getHasMappedLocationDeviation() {
+		return hasMappedLocationDeviation;
 	}
-	public void setDeviation(Double deviation) {
-		this.deviation = deviation;
-	} 
+	public void setHasMappedLocationDeviation(Double hasMappedLocationDeviation) {
+		this.hasMappedLocationDeviation = hasMappedLocationDeviation;
+	}
     
     
  }
