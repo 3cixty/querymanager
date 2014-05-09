@@ -25,10 +25,10 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   |parameter|value|
   |:---------|:-----|
   |{accessToken}|is an access token which lasts for one hour or false. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description <b>Access token is incorrect or expired<b> | 
-  |{isUsingPreferences}|true or false. This is used to whether or not augment the query with the user preferences|
+  |{isUsingPreferences}|<b>true</b> or <b>false</b>. This is used to whether or not augment the query with the user preferences|
   |{format}|requested result format (rdf or json)|
   |{query}|a sparql query|
-  |{filter}|location or enteredRating. QueryManager will take this value to augment a query|
+  |{filter}|<b>location</b> or <b>enteredRating</b>. QueryManager will take this value to augment a query|
   
 -  Example for a full URL to invoke the service on local Tomcat server:
   
