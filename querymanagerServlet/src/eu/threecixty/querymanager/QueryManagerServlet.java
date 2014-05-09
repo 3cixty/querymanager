@@ -27,6 +27,14 @@ public class QueryManagerServlet extends HttpServlet {
 	private static final String IS_USING_PREFS_PARAM = "isUsingPreferences";
 	private static final String FORMAT_PARAM = "format";
 	private static final String QUERY_PARAM = "query";
+
+	private static final String FILTER_PARAM = "filter";
+	
+	// FILTER Options
+	private static final String LOCATION = "location";
+	private static final String ENTERED_RATING = "enteredrating";
+	
+	
 	
 	private static final String PARAM_EXCEPTION = "There is an error for parameters";
 
@@ -71,7 +79,7 @@ public class QueryManagerServlet extends HttpServlet {
 
 			if (eventMediaFormat != null && query != null) {
 				String result = executeQuery(profiler, qm, isAccessTokenFalse ? false : isUsingPreferences,
-						eventMediaFormat, query);
+						eventMediaFormat, query, req);
 				out.write(result);
 			} else {
 				out.write(PARAM_EXCEPTION);
@@ -97,7 +105,7 @@ public class QueryManagerServlet extends HttpServlet {
 	 * @return
 	 */
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
-			boolean isUsingPreferences, EventMediaFormat eventMediaFormat, String query) {
+			boolean isUsingPreferences, EventMediaFormat eventMediaFormat, String query, HttpServletRequest req) {
 
 		// TODO: set to RDF model
 		//qm.setModelFromFileOrUri(filenameOrURI);
@@ -109,6 +117,7 @@ public class QueryManagerServlet extends HttpServlet {
 
 		// populate user preferences from user profile
 		if (profiler != null) {
+			setFilterToProfiler(req, profiler);
 		    profiler.PopulateProfile();
 		}
 		
@@ -122,8 +131,6 @@ public class QueryManagerServlet extends HttpServlet {
 		qm.setQuery(placeQuery);
 
 		// perform query augmentation when necessary
-		// TODO: remove the following line to augment a query (now Events database seems to only contain event's links. Question: how to do with event's name, ... )
-		//isUsingPreferences = false;
 		if (isUsingPreferences) {
 			qm.performAugmentingTask();
 		}
@@ -133,7 +140,24 @@ public class QueryManagerServlet extends HttpServlet {
 		return result;
 	}
 
-    /**
+    private void setFilterToProfiler(HttpServletRequest req,  IProfiler profiler) {
+    	try {
+    		String filter = req.getParameter(FILTER_PARAM);
+    		if (filter == null) return;
+    		if (filter.equalsIgnoreCase(LOCATION)) {
+    			profiler.requireCurrentCountry(true);
+    			profiler.requireCurrentTown(true);
+    		} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
+    			// TODO: fixed value
+    			// should find minimum value from PreferredProfile
+    			profiler.requireScoreRatedAtLeast(5);
+    			profiler.requireNumberOfTimesVisitedAtLeast(3);
+    		}
+    	} catch (Exception e) {
+    	}
+	}
+
+	/**
      * To validate the sparql query, we need prefixes. These prefixes are same as those used by EventMedia.
      * @return string
      */
