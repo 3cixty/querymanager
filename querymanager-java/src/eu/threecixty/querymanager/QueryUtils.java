@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,13 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.TriplePath;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.E_Equals;
+import com.hp.hpl.jena.sparql.expr.E_LogicalOr;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
@@ -89,6 +90,40 @@ public class QueryUtils {
 		return query.toString();
 	}
 
+//	public static void addPreferences(Query query, Object object) {
+//		List <Expr> exprs = createExprs(query, object);
+//		createFiltersWithOrOperandForExprs(query, exprs);
+//	}
+//
+//	public static void addPreferenceFromAttributeNameAndPropertyName(Query query, Object object,
+//			String attrName, String propertyName) {
+//		List <Expr> exprs = createExprsFromAttributeNameAndPropertyName(query, object, attrName, propertyName);
+//		createFiltersWithOrOperandForExprs(query, exprs);
+//	}
+//
+//	public static void addPreference(Query query, Object object, String attrName, String propertyValue) {
+//		List <Expr> exprs = createExprs(query, object, attrName, propertyValue);
+//		createFiltersWithOrOperandForExprs(query, exprs);
+//	}
+
+	public static void createFiltersWithOrOperandForExprs(Query query, List<Expr> exprs) {
+		if (exprs.size() == 0) return;
+		ElementGroup body = (ElementGroup) query.getQueryPattern();
+		if (body == null)  body = new ElementGroup();
+		if (exprs.size() == 1) {
+			ElementFilter filter = new ElementFilter(exprs.get(0));
+			body.addElementFilter(filter);
+		} else {
+			Expr tmpExpr = exprs.get(0);
+			for (int i = 1; i < exprs.size(); i++) {
+				tmpExpr = new E_LogicalOr(tmpExpr, exprs.get(i));
+			}
+			ElementFilter filter = new ElementFilter(tmpExpr);
+			body.addElementFilter(filter);
+		}
+		query.setQueryPattern(body);
+	}
+
 	/**
 	 * Add preferences found in the attributes of a given object to the query.
 	 * <br><br>
@@ -99,13 +134,14 @@ public class QueryUtils {
 	 * 
 	 * @param object
 	 */
-	public static void addPreferences(Query query, Object object) {
-		if (object == null) return;
+	public static List <Expr> createExprs(Query query, Object object) {
+		List <Expr> exprs = new ArrayList <Expr>();
+		if (object == null) return exprs;
 		Class <?> clazz = object.getClass();
 		Properties props = clazzProperties.get(clazz);
 		if (props == null) {
 			props = loadProperties(clazz);
-			if (props == null) return;
+			if (props == null) return exprs;
 			clazzProperties.put(clazz, props);
 		}
 		// For a pair in properties, Key must be the same with a class' attribute,
@@ -114,8 +150,9 @@ public class QueryUtils {
 			String attrName = (String) objKey;
 			String property = (String) props.get(attrName);
 			
-			addPreference(query, object, attrName, property);
+			exprs.addAll(createExprs(query, object, attrName, property));
 		}
+		return exprs;
 	}
 
 	/**
@@ -133,20 +170,21 @@ public class QueryUtils {
 	 * @param propertyName
 	 * 			The property name in the property file.
 	 */
-	public static void addPreferenceFromAttributeNameAndPropertyName(Query query, Object object,
+	public static List <Expr> createExprsFromAttributeNameAndPropertyName(Query query, Object object,
 			String attrName, String propertyName) {
-		if (object == null || query == null || attrName == null || propertyName == null) return;
+		List <Expr> exprs = new ArrayList <Expr>();
+		if (object == null || query == null || attrName == null || propertyName == null) return exprs;
 		Class <?> clazz = object.getClass();
 		Properties props = clazzProperties.get(clazz);
 		if (props == null) {
 			props = loadProperties(clazz);
-			if (props == null) return;
+			if (props == null) return exprs;
 			clazzProperties.put(clazz, props);
 		}
 		// Property Value must follow the regular expression [subject,predicate,object]*,filterVariableName
 		String property = (String) props.get(propertyName);
-		if (property == null) return;
-		addPreference(query, object, attrName, property);
+		if (property == null) return exprs;
+		return createExprs(query, object, attrName, property);
 
 	}
 
@@ -169,8 +207,9 @@ public class QueryUtils {
 	 * @param propertyValue
 	 * 			The property which defines a list of consecutive triples and filter.
 	 */
-	public static void addPreference(Query query, Object object, String attrName, String propertyValue) {
-		if (query == null || object == null || attrName == null || propertyValue == null) return;
+	public static List<Expr> createExprs(Query query, Object object, String attrName, String propertyValue) {
+		List <Expr> exprs = new ArrayList <Expr>();
+		if (query == null || object == null || attrName == null || propertyValue == null) return exprs;
 		// last element is a filter variable
 		// triples correspond with every three elements
 		String [] configStrs = propertyValue.split(",");
@@ -185,12 +224,13 @@ public class QueryUtils {
 		
 		try {
 			Field field = clazz.getDeclaredField(attrName);
-			if (field == null) return;
+			if (field == null) return exprs;
 			addTriples(query, configStrs);
-			addFilter(query, object, field, filterVarName);
+			exprs = createExprs(object, field, filterVarName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return exprs;
 	}
 
 	/**
@@ -277,36 +317,40 @@ public class QueryUtils {
 	 * @param filterVarName
 	 * @throws Exception
 	 */
-	private static void addFilter(Query query, Object object, Field field, 
+	private static List <Expr> createExprs(Object object, Field field, 
 			String filterVarName) throws Exception {
+		List <Expr> exprs = new ArrayList <Expr>();
 	    boolean accessible = field.isAccessible();
 	    if (!accessible) {
 	    	field.setAccessible(true);
 	    }
 	    Class <?> fieldTypeClass = field.getType();
 	    Object fieldInstanceValue = field.get(object);
-	    if (fieldInstanceValue == null) return;
+	    if (fieldInstanceValue == null) return exprs;
 	    String methodName = clazzNodeValueMethodNames.get(fieldTypeClass);
 	    if (methodName != null) {
 	    	Method method = NodeValue.class.getMethod(methodName, fieldTypeClass);
 	    	NodeValue node = (NodeValue) method.invoke(null, fieldInstanceValue);
-	    	addTripleFilter(query, filterVarName, node);
+	    	Expr expr = createExprForFilter(filterVarName, node);
+	    	exprs.add(expr);
 	    } else {
 	    	// for DateTime, List, Set. The other types are not supported
 	    	if (fieldTypeClass == Date.class) {
 	    		Calendar cal = Calendar.getInstance();
 	    		cal.setTime((Date) fieldInstanceValue);
 	    		NodeValue node = NodeValue.makeDate(cal);
-	    		addTripleFilter(query, filterVarName, node);
+		    	Expr expr = createExprForFilter(filterVarName, node);
+		    	exprs.add(expr);
 	    	} else {
-	    		addTripleFilterForCollection(query, field, fieldTypeClass,
-	    				fieldInstanceValue, filterVarName);
+	    		exprs.addAll(createExprsForFilterOfCollection(field, fieldTypeClass,
+	    				fieldInstanceValue, filterVarName));
 	    	}
 	    }
 
 		if (!accessible) { // reset accessible flag
 			field.setAccessible(accessible);
 		}
+		return exprs;
 	}
 
 	/**
@@ -320,27 +364,31 @@ public class QueryUtils {
 	 * @param filterVarName
 	 * @throws Exception
 	 */
-	private static void addTripleFilterForCollection(Query query, Field field, Class<?> fieldTypeClass,
+	private static List<Expr> createExprsForFilterOfCollection(Field field, Class<?> fieldTypeClass,
 			Object fieldInstanceValue, String filterVarName) throws Exception {
+		List <Expr> exprs = new ArrayList <Expr>();
 		ParameterizedType paramType = (ParameterizedType) field.getGenericType();
-		if (paramType == null) return;
+		if (paramType == null) return exprs;
 		Class <?> paramClazz = (Class<?>) paramType.getActualTypeArguments()[0];
 		String methodNameForCollectionParam = clazzNodeValueMethodNames.get(paramClazz);
 		Method methodForCollectionParam = NodeValue.class.getMethod(methodNameForCollectionParam, paramClazz);
-		if (methodNameForCollectionParam == null) return;
+		if (methodNameForCollectionParam == null) return exprs;
 		if (fieldTypeClass.isAssignableFrom(List.class)) {
 			List <?> list = (List<?>) fieldInstanceValue;
 			for (Object tmp: list) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
-		    	addTripleFilter(query, filterVarName, node);
+		    	Expr expr = createExprForFilter(filterVarName, node);
+		    	exprs.add(expr);
 			}
 		} else if (fieldTypeClass.isAssignableFrom(Set.class)) {
 			Set <?> sets = (Set <?>) fieldInstanceValue;
 			for (Object tmp: sets) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
-		    	addTripleFilter(query, filterVarName, node);
+		    	Expr expr = createExprForFilter(filterVarName, node);
+		    	exprs.add(expr);
 			}
 		}
+		return exprs;
 	}
 
 	/**
@@ -349,19 +397,28 @@ public class QueryUtils {
 	 * @param filtervarName
 	 * @param node
 	 */
-	private static void addTripleFilter(Query query, String filtervarName, NodeValue node) {
+	private static Expr createExprForFilter(String filtervarName, NodeValue node) {
 
 		Expr expr = new E_Equals(new ExprVar(filtervarName), node);
-		ElementFilter filter = new ElementFilter(expr);
-
-		ElementGroup body = (ElementGroup) query.getQueryPattern();
-		if (body == null)  body = new ElementGroup();
-
-		body.addElement(filter);
 		
-		query.setDistinct(true);
+		
+//		Expr expr1 = new E_Equals(new ExprVar("_augplaceName"), NodeValue.makeString("test"));
+//
+//		
+//E_LogicalOr elo = new E_LogicalOr(expr, expr1);
+//
+//
+//
+//		ElementFilter filter = new ElementFilter(elo);
+		
+//		ElementFilter filter = new ElementFilter(expr);
+		
 
-		query.setQueryPattern(body);
+//		ElementGroup body = (ElementGroup) query.getQueryPattern();
+//		if (body == null)  body = new ElementGroup();
+//
+//		query.setQueryPattern(body);
+		return expr;
 	}
 
 	/**

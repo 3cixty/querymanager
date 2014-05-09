@@ -1,7 +1,10 @@
 package eu.threecixty.querymanager;
 
 
+import java.util.List;
+
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.sparql.expr.Expr;
 
 /**
  * Abstract class to represent a query.
@@ -37,7 +40,8 @@ public abstract class ThreeCixtyQuery {
 	}
 
 	/**
-	 * Add preferences found a given object to the query.
+	 * Creates expressions for filter to add to query.
+	 *
 	 * <br><br>
 	 * The method checks if there is a configuration file associated with
 	 * the class of a given object. If not, the method immediately returns. Otherwise,
@@ -46,8 +50,8 @@ public abstract class ThreeCixtyQuery {
 	 * 
 	 * @param object
 	 */
-	protected void addPreference(Object object) {
-		QueryUtils.addPreferences(query, object);
+	protected List<Expr> createExprs(Object object) {
+		return QueryUtils.createExprs(query, object);
 	}
 
 	/**
@@ -59,8 +63,8 @@ public abstract class ThreeCixtyQuery {
 	 * @param propertyValue
 	 * 			The property which defines triple links and filter.
 	 */
-	protected void addPreference(Object object, String attrName, String propertyValue) {
-		QueryUtils.addPreference(query, object, attrName, propertyValue);
+	protected List <Expr> createExprs(Object object, String attrName, String propertyValue) {
+		return QueryUtils.createExprs(query, object, attrName, propertyValue);
 	}
 
 	/**
@@ -72,8 +76,8 @@ public abstract class ThreeCixtyQuery {
 	 * @param propertyName
 	 * 				The property name in the property file. The property name will be used to find triple links in the property file.
 	 */
-	protected void addPreferenceFromAttributeNameAndPropertyName(Object object,
+	protected List <Expr> createExprsFromAttributeNameAndPropertyName(Object object,
 			String attrName, String propertyName) {
-		QueryUtils.addPreferenceFromAttributeNameAndPropertyName(query, object, attrName, propertyName);
+		return QueryUtils.createExprsFromAttributeNameAndPropertyName(query, object, attrName, propertyName);
 	}
 }

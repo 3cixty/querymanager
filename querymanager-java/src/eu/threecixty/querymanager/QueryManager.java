@@ -17,6 +17,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.profile.IProfiler;
@@ -237,9 +238,11 @@ import eu.threecixty.profile.models.Preference;
 	private void addPlaces(PlaceQuery pq) {
 		Set <Place> places = preference.getHasPlaces();
 		if (places == null) return;
+		List <Expr> exprs = new ArrayList <Expr>();
 		for (Place place: places) {
-			pq.addPlace(place);
+			exprs.addAll(pq.createExpressions(place));
 		}
+		QueryUtils.createFiltersWithOrOperandForExprs(pq.getQuery(), exprs);
 	}
 
 	/**
@@ -249,9 +252,11 @@ import eu.threecixty.profile.models.Preference;
 	private void addEvent(EventQuery eQuery) {
 		Set <Event> events = preference.getHasEvents();
 		if (events == null) return;
+		List <Expr> exprs = new ArrayList <Expr>();
 		for (Event event: events) {
-			eQuery.addEvent(event);
+			exprs.addAll(eQuery.createExpressions(event));
 		}
+		QueryUtils.createFiltersWithOrOperandForExprs(eQuery.getQuery(), exprs);
 	}
 
 	private String removePrefixes(String query) {

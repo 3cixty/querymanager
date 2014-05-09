@@ -1,6 +1,10 @@
 package eu.threecixty.querymanager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.models.Address;
 import eu.threecixty.profile.models.Place;
@@ -27,27 +31,29 @@ public class PlaceQuery extends ThreeCixtyQuery {
 	}
 
 	/**
-	 * Adds place as preference to query.
+	 * Creates expressions for filter to add to query.
 	 *
 	 * @param place
 	 */
-	public void addPlace(Place place) {
-		if (query == null || place == null) return;
+	public List <Expr> createExpressions(Place place) {
+		List <Expr> exprs = new ArrayList <Expr>();
+		if (query == null || place == null) return exprs;
 
 		PlaceDetail placeDetail = place.getHasPlaceDetail();
 		if (placeDetail != null) {
 			
-			addPreferenceFromAttributeNameAndPropertyName(placeDetail, "hasPlaceName",
-					placeDetail.getHasNatureOfPlace().toString().toLowerCase());
+			exprs.addAll(createExprsFromAttributeNameAndPropertyName(placeDetail, "hasPlaceName",
+					placeDetail.getHasNatureOfPlace().toString().toLowerCase()));
 
 			Address address = placeDetail.getHasAddress();
 			if (address != null) {
-				addPreference(address);
+				exprs.addAll(createExprs(address));
 			}
 		}
 		Rating rating = place.getHasRating();
 		if (rating != null) {
-			addPreference(rating);
+			exprs.addAll(createExprs(rating));
 		}
+		return exprs;
 	}
 }
