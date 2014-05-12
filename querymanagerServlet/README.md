@@ -44,7 +44,7 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   
   For the query, the response in json is as the following:
   <code>
-  { "head": { "link": [], "vars": ["event", "title", "description"] }, ..., "AugmentedQuery": "SELECT  ?event ?title ?description\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event dc:title ?title .\n    ?event dc:description ?description .\n    ?event rdf:type lode:Event .\n    ?event lode:involvedAgent ?involvedAgent .\n    ?involvedAgent dc:publisher ?publisher\n    FILTER ( str(?publisher) = <http://www.last.fm> )\n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname ;\n              vcard:locality      ?_augcityname .\n    FILTER ( ( ?_augcountryname = \"Italy\" ) || ( ?_augcityname = \"Milano\" ) )\n  }\nLIMIT   20\n" }
+  { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQuery": "SELECT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:locality  ?_augcityname ;\n              vcard:country-name  ?_augcountryname .\n    FILTER ( ( ?_augcityname = \"Milano\" ) || ( ?_augcountryname = \"Italy\" ) )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}
   </code>
   
   The query is UTF-8 encoded
