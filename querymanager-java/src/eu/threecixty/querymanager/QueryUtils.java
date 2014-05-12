@@ -28,6 +28,7 @@ import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
+import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 
 /**
  * Utility class.
@@ -237,6 +238,7 @@ public class QueryUtils {
 			String object = configStrs[i * 3 + 2];
 			Triple pattern = Triple.create(Var.alloc(subject),
 			        NodeFactory.createURI(predicateURI), Var.alloc(object));
+			if (existTriple(pattern, body)) continue;
 			body.addTriplePattern(pattern);
 		}
 		
@@ -402,6 +404,27 @@ public class QueryUtils {
 		exprs.clear();
 		exprs.addAll(tmpExprs);
 		tmpExprs.clear();
+	}
+
+	/**
+	 * Checks whether or not a given triple exists in a given element group.
+	 * @param triple
+	 * @param body
+	 * @return
+	 */
+	private static boolean existTriple(Triple triple, ElementGroup body) {
+		for (Element element: body.getElements()) {
+			if (element instanceof ElementTriplesBlock) {
+				ElementTriplesBlock etb = (ElementTriplesBlock) element;
+				
+				Iterator <Triple> triples = etb.patternElts();
+				for ( ; triples.hasNext(); ) {
+					Triple tmp = triples.next();
+					if (triple.equals(tmp)) return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
