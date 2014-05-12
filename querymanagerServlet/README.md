@@ -26,7 +26,7 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   |:---------|:-----|
   |{accessToken}|is an access token which lasts for one hour or false. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description <b>Access token is incorrect or expired<b> | 
   |{isUsingPreferences}|<b>true</b> or <b>false</b>. This is used to whether or not augment the query with the user preferences|
-  |{format}|requested result format (rdf or json)|
+  |{format}|requested result format (rdf or json). When the format is <b>json</b>, the augmented query can be got through the "AugmentedQuery" key in the string return|
   |{query}|a sparql query|
   |{filter}|<b>location</b> or <b>enteredRating</b>. QueryManager will take this value to augment a query|
   
@@ -41,5 +41,10 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   - json is a {format}
   - SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020 is a {query}.
   - location is a {filter} 
+  
+  For the query, the response in json is as the following:
+  <code>
+  { "head": { "link": [], "vars": ["event", "title", "description"] }, ..., "AugmentedQuery": "SELECT  ?event ?title ?description\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event dc:title ?title .\n    ?event dc:description ?description .\n    ?event rdf:type lode:Event .\n    ?event lode:involvedAgent ?involvedAgent .\n    ?involvedAgent dc:publisher ?publisher\n    FILTER ( str(?publisher) = <http://www.last.fm> )\n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname ;\n              vcard:locality      ?_augcityname .\n    FILTER ( ( ?_augcountryname = \"Italy\" ) || ( ?_augcityname = \"Milano\" ) )\n  }\nLIMIT   20\n" }
+  </code>
   
   The query is UTF-8 encoded
