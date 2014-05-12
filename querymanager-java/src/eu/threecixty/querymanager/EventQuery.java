@@ -1,8 +1,8 @@
 package eu.threecixty.querymanager;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
@@ -23,24 +23,22 @@ public class EventQuery extends ThreeCixtyQuery {
 	}
 
 	/**
-	 * Creates expressions for filter to add to query.
+	 * Add expressions and triples for a given event into a list of expressions and triples.
 	 * @param event
 	 * @return
 	 */
-	public List <Expr> createExpressions(Event event) {
-		List <Expr> exprs = new ArrayList<Expr>();
-		if (query == null || event == null) return exprs;
+	public void addExpressionsAndTriples(Event event, List <Expr> exprs, List <Triple> triples) {
+		if (query == null || event == null) return;
 		
 		Rating rating = event.getHasRating();
 		if (rating != null) {
-			exprs.addAll(createExprs(rating));
+			addExprsAndTriples(rating, exprs, triples);
 		}
 
 		EventDetail eventDetail = event.getHasEventDetail();
 		if (eventDetail != null) {
-			exprs.addAll(createExprs(eventDetail));
+			addExprsAndTriples(eventDetail, exprs, triples);
 		}
-		return exprs;
 	}
 
 	@Override

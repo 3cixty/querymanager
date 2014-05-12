@@ -28,7 +28,6 @@ import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 
 /**
  * Utility class.
@@ -91,7 +90,14 @@ public class QueryUtils {
 		return query.toString();
 	}
 
-	public static void createFiltersWithOrOperandForExprs(Query query, List<Expr> exprs) {
+	/**
+	 * Creates the filter with an <b>Or</b> operand from a given list of expressions.
+	 * <br><br>
+	 * All the expressions will be used the Or operand to filter in the query.
+	 * @param query
+	 * @param exprs
+	 */
+	public static void createFilterWithOrOperandForExprs(Query query, List<Expr> exprs) {
 		if (exprs.size() == 0) return;
 		removeDoubleExpressions(exprs);
 		ElementGroup body = (ElementGroup) query.getQueryPattern();
@@ -111,23 +117,38 @@ public class QueryUtils {
 	}
 
 	/**
-	 * Add preferences found in the attributes of a given object to the query.
+	 * Adds a list of triples into a given query.
+	 * @param triples
+	 * @param query
+	 */
+	public static void addTriplesIntoQuery(List <Triple> triples, Query query) {
+		ElementGroup body = (ElementGroup) query.getQueryPattern();
+		if (body == null)  body = new ElementGroup();
+		for (Triple triple: triples) {
+			body.addTriplePattern(triple);
+		}
+		query.setQueryPattern(body);
+	}
+
+	/**
+	 * Adds expressions and triples from a given object which a part in preferences to a 
+	 * list of expressions and a list of triples.
 	 * <br><br>
 	 * The method checks if there is a configuration file associated with
 	 * the class of a given object. If not, the method immediately returns. Otherwise,
-	 * the method add filters by taking values in a given instance's attributes which were
-	 * defined in the configuration file.
+	 * the method adds predefined triples in the property file and expressions by
+	 * taking the given instance's attributes and a corresponding property configuration
+	 * found in the property file.
 	 * 
 	 * @param object
 	 */
-	public static List <Expr> createExprs(Query query, Object object) {
-		List <Expr> exprs = new ArrayList <Expr>();
-		if (object == null) return exprs;
+	public static void addExprsAndTriples(Query query, Object object, List <Expr> exprs, List<Triple> triples) {
+		if (object == null) return;
 		Class <?> clazz = object.getClass();
 		Properties props = clazzProperties.get(clazz);
 		if (props == null) {
 			props = loadProperties(clazz);
-			if (props == null) return exprs;
+			if (props == null) return;
 			clazzProperties.put(clazz, props);
 		}
 		// For a pair in properties, Key must be the same with a class' attribute,
@@ -136,16 +157,12 @@ public class QueryUtils {
 			String attrName = (String) objKey;
 			String property = (String) props.get(attrName);
 			
-			exprs.addAll(createExprs(query, object, attrName, property));
+			addExprsAndTriples(query, object, attrName, property, exprs, triples);
 		}
-		return exprs;
 	}
 
 	/**
-	 * Adds preference which is the value of a given attribute name (attName) in a given object instance (object)
-	 * into the query (query).
-	 * <br><br>
-	 * The triple links and filter are defined in the corresponding property file.
+	 * Adds expressions and triples from a given attribute name of a given object and a given property name in the property file.
 	 *
 	 * @param query
 	 * 			The query needs to be augmented.
@@ -156,33 +173,32 @@ public class QueryUtils {
 	 * @param propertyName
 	 * 			The property name in the property file.
 	 */
-	public static List <Expr> createExprsFromAttributeNameAndPropertyName(Query query, Object object,
-			String attrName, String propertyName) {
-		List <Expr> exprs = new ArrayList <Expr>();
-		if (object == null || query == null || attrName == null || propertyName == null) return exprs;
+	public static void addExprsAndTriplesFromAttributeNameAndPropertyName(Query query, Object object,
+			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples) {
+		if (object == null || query == null || attrName == null || propertyName == null) return;
 		Class <?> clazz = object.getClass();
 		Properties props = clazzProperties.get(clazz);
 		if (props == null) {
 			props = loadProperties(clazz);
-			if (props == null) return exprs;
+			if (props == null) return;
 			clazzProperties.put(clazz, props);
 		}
 		// Property Value must follow the regular expression [subject,predicate,object]*,filterVariableName
 		String property = (String) props.get(propertyName);
-		if (property == null) return exprs;
-		return createExprs(query, object, attrName, property);
+		if (property == null) return;
+		addExprsAndTriples(query, object, attrName, property, exprs, triples);
 
 	}
 
 	/**
-	 * Adds preferences into a given query.
+	 * Adds expressions and triples by taking the value from a given attribute name of a given object.
 	 * <br><br>
 	 * <code>
 	 * Here is an example of a given propertyValue:
 	 * event,lode:atPlace,_augplace,_augplace,vcard:adr,_augaddress,_augaddress,vcard:country-name,_augcountryname,_augcountryname.
 	 * <br><br>
 	 * The first element will be replaced by the real variable name used in a given query. Then every three consecutive elements is composed of a triple.
-	 * The last element will be a filter variable name to be added into the query.
+	 * The last element will be a filter variable name to be used to create expressions.
 	 * </code>
 	 * @param query
 	 * 			The query.
@@ -193,9 +209,9 @@ public class QueryUtils {
 	 * @param propertyValue
 	 * 			The property which defines a list of consecutive triples and filter.
 	 */
-	public static List<Expr> createExprs(Query query, Object object, String attrName, String propertyValue) {
-		List <Expr> exprs = new ArrayList <Expr>();
-		if (query == null || object == null || attrName == null || propertyValue == null) return exprs;
+	public static void addExprsAndTriples(Query query, Object object, String attrName, String propertyValue,
+			List<Expr> exprs, List <Triple> triples) {
+		if (query == null || object == null || attrName == null || propertyValue == null) return;
 		// last element is a filter variable
 		// triples correspond with every three elements
 		String [] configStrs = propertyValue.split(",");
@@ -210,25 +226,25 @@ public class QueryUtils {
 		
 		try {
 			Field field = clazz.getDeclaredField(attrName);
-			if (field == null) return exprs;
-			addTriples(query, configStrs);
-			exprs = createExprs(object, field, filterVarName);
+			if (field == null) return;
+			addTriples(query, configStrs, triples);
+			addExprs(object, field, filterVarName, exprs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return exprs;
 	}
 
 	/**
-	 * Adds triples described by a given array to the query.
+	 * Adds triples described by a given array into a given list of triples.
 	 * @param query
 	 * 				The query.
 	 * @param configStrs
 	 * 				Array containing every three consecutive elements which is a triple.
+	 * @param result
+	 * 				The given list of triples.
 	 */
-	private static void addTriples(Query query, String[] configStrs) {
+	private static void addTriples(Query query, String[] configStrs, List <Triple> result) {
 		if (configStrs.length <= 1) return;
-		ElementGroup body = (ElementGroup) query.getQueryPattern();
 		for (int i = 0; i < configStrs.length / 3; i++) {
 			if (i * 3 + 2 >= configStrs.length - 1) return;
 			String subject = configStrs[i * 3];
@@ -238,8 +254,8 @@ public class QueryUtils {
 			String object = configStrs[i * 3 + 2];
 			Triple pattern = Triple.create(Var.alloc(subject),
 			        NodeFactory.createURI(predicateURI), Var.alloc(object));
-			if (existTriple(pattern, body)) continue;
-			body.addTriplePattern(pattern);
+			if (result.contains(pattern)) continue;
+			result.add(pattern);
 		}
 		
 	}
@@ -296,30 +312,29 @@ public class QueryUtils {
 	}
 
 	/**
-	 * Add preferences wrapped in a given field from an instance Object.
+	 * Adds expressions from a given field and a given expression variable name.
 	 *
 	 * @param object
 	 * @param field
-	 * @param attrName
 	 * @param filterVarName
+	 * @param results
 	 * @throws Exception
 	 */
-	private static List <Expr> createExprs(Object object, Field field, 
-			String filterVarName) throws Exception {
-		List <Expr> exprs = new ArrayList <Expr>();
+	private static void addExprs(Object object, Field field, 
+			String filterVarName, List <Expr> results) throws Exception {
 	    boolean accessible = field.isAccessible();
 	    if (!accessible) {
 	    	field.setAccessible(true);
 	    }
 	    Class <?> fieldTypeClass = field.getType();
 	    Object fieldInstanceValue = field.get(object);
-	    if (fieldInstanceValue == null) return exprs;
+	    if (fieldInstanceValue == null) return;
 	    String methodName = clazzNodeValueMethodNames.get(fieldTypeClass);
 	    if (methodName != null) {
 	    	Method method = NodeValue.class.getMethod(methodName, fieldTypeClass);
 	    	NodeValue node = (NodeValue) method.invoke(null, fieldInstanceValue);
 	    	Expr expr = createExprForFilter(filterVarName, node);
-	    	exprs.add(expr);
+	    	results.add(expr);
 	    } else {
 	    	// for DateTime, List, Set. The other types are not supported
 	    	if (fieldTypeClass == Date.class) {
@@ -327,21 +342,21 @@ public class QueryUtils {
 	    		cal.setTime((Date) fieldInstanceValue);
 	    		NodeValue node = NodeValue.makeDate(cal);
 		    	Expr expr = createExprForFilter(filterVarName, node);
-		    	exprs.add(expr);
+		    	results.add(expr);
 	    	} else {
-	    		exprs.addAll(createExprsForFilterOfCollection(field, fieldTypeClass,
-	    				fieldInstanceValue, filterVarName));
+	    		addExprsForFilterOfCollection(field, fieldTypeClass,
+	    				fieldInstanceValue, filterVarName, results);
 	    	}
 	    }
 
 		if (!accessible) { // reset accessible flag
 			field.setAccessible(accessible);
 		}
-		return exprs;
+		return;
 	}
 
 	/**
-	 * Add triple filters wrapped by elements' value in a given field.
+	 * Adds expressions for a collection.
 	 * <br><br>
 	 * This method only considers a given field is either a list or set
 	 * of Integer, Long, Float, Double, Boolean, String.
@@ -351,31 +366,30 @@ public class QueryUtils {
 	 * @param filterVarName
 	 * @throws Exception
 	 */
-	private static List<Expr> createExprsForFilterOfCollection(Field field, Class<?> fieldTypeClass,
-			Object fieldInstanceValue, String filterVarName) throws Exception {
-		List <Expr> exprs = new ArrayList <Expr>();
+	private static void addExprsForFilterOfCollection(Field field, Class<?> fieldTypeClass,
+			Object fieldInstanceValue, String filterVarName, List <Expr> results) throws Exception {
 		ParameterizedType paramType = (ParameterizedType) field.getGenericType();
-		if (paramType == null) return exprs;
+		if (paramType == null) return ;
 		Class <?> paramClazz = (Class<?>) paramType.getActualTypeArguments()[0];
 		String methodNameForCollectionParam = clazzNodeValueMethodNames.get(paramClazz);
 		Method methodForCollectionParam = NodeValue.class.getMethod(methodNameForCollectionParam, paramClazz);
-		if (methodNameForCollectionParam == null) return exprs;
+		if (methodNameForCollectionParam == null) return ;
 		if (fieldTypeClass.isAssignableFrom(List.class)) {
 			List <?> list = (List<?>) fieldInstanceValue;
 			for (Object tmp: list) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
 		    	Expr expr = createExprForFilter(filterVarName, node);
-		    	exprs.add(expr);
+		    	results.add(expr);
 			}
 		} else if (fieldTypeClass.isAssignableFrom(Set.class)) {
 			Set <?> sets = (Set <?>) fieldInstanceValue;
 			for (Object tmp: sets) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
 		    	Expr expr = createExprForFilter(filterVarName, node);
-		    	exprs.add(expr);
+		    	results.add(expr);
 			}
 		}
-		return exprs;
+		return ;
 	}
 
 	/**
@@ -404,27 +418,6 @@ public class QueryUtils {
 		exprs.clear();
 		exprs.addAll(tmpExprs);
 		tmpExprs.clear();
-	}
-
-	/**
-	 * Checks whether or not a given triple exists in a given element group.
-	 * @param triple
-	 * @param body
-	 * @return
-	 */
-	private static boolean existTriple(Triple triple, ElementGroup body) {
-		for (Element element: body.getElements()) {
-			if (element instanceof ElementTriplesBlock) {
-				ElementTriplesBlock etb = (ElementTriplesBlock) element;
-				
-				Iterator <Triple> triples = etb.patternElts();
-				for ( ; triples.hasNext(); ) {
-					Triple tmp = triples.next();
-					if (triple.equals(tmp)) return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	/**

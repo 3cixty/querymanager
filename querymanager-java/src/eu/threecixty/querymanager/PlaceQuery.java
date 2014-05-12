@@ -1,8 +1,8 @@
 package eu.threecixty.querymanager;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
@@ -31,29 +31,27 @@ public class PlaceQuery extends ThreeCixtyQuery {
 	}
 
 	/**
-	 * Creates expressions for filter to add to query.
+	 * Add expressions and triples for a given place into a list of expressions and triples.
 	 *
 	 * @param place
 	 */
-	public List <Expr> createExpressions(Place place) {
-		List <Expr> exprs = new ArrayList <Expr>();
-		if (query == null || place == null) return exprs;
+	public void addExpressionsAndTriples(Place place, List <Expr> exprs, List <Triple> triples) {
+		if (query == null || place == null) return;
 
 		PlaceDetail placeDetail = place.getHasPlaceDetail();
 		if (placeDetail != null) {
 			
-			exprs.addAll(createExprsFromAttributeNameAndPropertyName(placeDetail, "hasPlaceName",
-					placeDetail.getHasNatureOfPlace().toString().toLowerCase()));
+			addExprsAndTriplesFromAttributeNameAndPropertyName(placeDetail, "hasPlaceName",
+					placeDetail.getHasNatureOfPlace().toString().toLowerCase(), exprs, triples);
 
 			Address address = placeDetail.getHasAddress();
 			if (address != null) {
-				exprs.addAll(createExprs(address));
+				addExprsAndTriples(address, exprs, triples);
 			}
 		}
 		Rating rating = place.getHasRating();
 		if (rating != null) {
-			exprs.addAll(createExprs(rating));
+			addExprsAndTriples(rating, exprs, triples);
 		}
-		return exprs;
 	}
 }

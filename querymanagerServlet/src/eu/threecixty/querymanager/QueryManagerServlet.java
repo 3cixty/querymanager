@@ -107,8 +107,6 @@ public class QueryManagerServlet extends HttpServlet {
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
 			boolean isUsingPreferences, EventMediaFormat eventMediaFormat, String query, HttpServletRequest req) {
 
-		// TODO: set to RDF model
-		//qm.setModelFromFileOrUri(filenameOrURI);
 		if (allPrefixes == null) {
 			allPrefixes = getAllPrefixes() + " ";
 		}
@@ -116,8 +114,8 @@ public class QueryManagerServlet extends HttpServlet {
 		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
 
 		// populate user preferences from user profile
-		if (profiler != null) {
-			setFilterToProfiler(req, profiler);
+		if ((profiler != null) && isUsingPreferences) {
+			setInfoRequirementsFromProfiler(req, profiler);
 		    profiler.PopulateProfile();
 		}
 		
@@ -140,7 +138,12 @@ public class QueryManagerServlet extends HttpServlet {
 		return result;
 	}
 
-    private void setFilterToProfiler(HttpServletRequest req,  IProfiler profiler) {
+	/**
+	 * Requires information to populate from UserProfile.
+	 * @param req
+	 * @param profiler
+	 */
+    private void setInfoRequirementsFromProfiler(HttpServletRequest req,  IProfiler profiler) {
     	try {
     		String filter = req.getParameter(FILTER_PARAM);
     		if (filter == null) return;

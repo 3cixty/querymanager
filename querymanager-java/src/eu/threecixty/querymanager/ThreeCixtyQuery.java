@@ -3,6 +3,7 @@ package eu.threecixty.querymanager;
 
 import java.util.List;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
@@ -40,22 +41,17 @@ public abstract class ThreeCixtyQuery {
 	}
 
 	/**
-	 * Creates expressions for filter to add to query.
-	 *
-	 * <br><br>
-	 * The method checks if there is a configuration file associated with
-	 * the class of a given object. If not, the method immediately returns. Otherwise,
-	 * the method add filters by taking values in a given instance's attributes which were
-	 * defined in the configuration file.
+	 * Adds expressions and triples found from a given object to a list of expressions and triples.
 	 * 
 	 * @param object
 	 */
-	protected List<Expr> createExprs(Object object) {
-		return QueryUtils.createExprs(query, object);
+	protected void addExprsAndTriples(Object object, List <Expr> exprs, List <Triple> triples) {
+		QueryUtils.addExprsAndTriples(query, object, exprs, triples);
 	}
 
 	/**
-	 * Adds preference found in a given instance object into the query.
+	 * Adds expressions and triples found from a given attribute name of a given object and a given
+	 * property value to a list of expressions and triples.
 	 * @param object
 	 * 			The preference instance which contains preference information such as place, country, city, etc.
 	 * @param attrName
@@ -63,12 +59,13 @@ public abstract class ThreeCixtyQuery {
 	 * @param propertyValue
 	 * 			The property which defines triple links and filter.
 	 */
-	protected List <Expr> createExprs(Object object, String attrName, String propertyValue) {
-		return QueryUtils.createExprs(query, object, attrName, propertyValue);
+	protected void addExprsAndTriples(Object object, String attrName, String propertyValue, List <Expr> exprs, List <Triple> triples) {
+		QueryUtils.addExprsAndTriples(query, object, attrName, propertyValue, exprs, triples);
 	}
 
 	/**
-	 * Adds preference found in a given instance object with a given attribute name and a given property name in the property file.
+	 * Adds expressions and triples found from a given attribute name of a given object and a given
+	 * property name in the property file to a list of expressions and triples.
 	 * @param object
 	 * 				The preference object.
 	 * @param attrName
@@ -76,8 +73,8 @@ public abstract class ThreeCixtyQuery {
 	 * @param propertyName
 	 * 				The property name in the property file. The property name will be used to find triple links in the property file.
 	 */
-	protected List <Expr> createExprsFromAttributeNameAndPropertyName(Object object,
-			String attrName, String propertyName) {
-		return QueryUtils.createExprsFromAttributeNameAndPropertyName(query, object, attrName, propertyName);
+	protected void addExprsAndTriplesFromAttributeNameAndPropertyName(Object object,
+			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples) {
+		QueryUtils.addExprsAndTriplesFromAttributeNameAndPropertyName(query, object, attrName, propertyName, exprs, triples);
 	}
 }

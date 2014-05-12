@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -239,10 +240,12 @@ import eu.threecixty.profile.models.Preference;
 		Set <Place> places = preference.getHasPlaces();
 		if (places == null) return;
 		List <Expr> exprs = new ArrayList <Expr>();
+		List <Triple> triples = new ArrayList <Triple>();
 		for (Place place: places) {
-			exprs.addAll(pq.createExpressions(place));
+			pq.addExpressionsAndTriples(place, exprs, triples);
 		}
-		QueryUtils.createFiltersWithOrOperandForExprs(pq.getQuery(), exprs);
+		QueryUtils.addTriplesIntoQuery(triples, pq.getQuery());
+		QueryUtils.createFilterWithOrOperandForExprs(pq.getQuery(), exprs);
 	}
 
 	/**
@@ -253,10 +256,12 @@ import eu.threecixty.profile.models.Preference;
 		Set <Event> events = preference.getHasEvents();
 		if (events == null) return;
 		List <Expr> exprs = new ArrayList <Expr>();
+		List <Triple> triples = new ArrayList <Triple>();
 		for (Event event: events) {
-			exprs.addAll(eQuery.createExpressions(event));
+			eQuery.addExpressionsAndTriples(event, exprs, triples);
 		}
-		QueryUtils.createFiltersWithOrOperandForExprs(eQuery.getQuery(), exprs);
+		QueryUtils.addTriplesIntoQuery(triples, eQuery.getQuery());
+		QueryUtils.createFilterWithOrOperandForExprs(eQuery.getQuery(), exprs);	
 	}
 
 	private String removePrefixes(String query) {
