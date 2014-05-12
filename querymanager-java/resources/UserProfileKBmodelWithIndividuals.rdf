@@ -4465,7 +4465,7 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805EnglandPreferredAddress">
         <rdf:type rdf:resource="&vcard;Address"/>
-        <vcard:country-name>France</vcard:country-name>
+        <vcard:country-name>Italy</vcard:country-name>
     </owl:NamedIndividual>
     
 
@@ -4513,7 +4513,7 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805ParisPreferredAddress">
         <rdf:type rdf:resource="&vcard;Address"/>
-        <townName>Paris</townName>
+        <townName>Milano</townName>
     </owl:NamedIndividual>
     
 
