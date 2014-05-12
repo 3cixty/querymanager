@@ -90,24 +90,9 @@ public class QueryUtils {
 		return query.toString();
 	}
 
-//	public static void addPreferences(Query query, Object object) {
-//		List <Expr> exprs = createExprs(query, object);
-//		createFiltersWithOrOperandForExprs(query, exprs);
-//	}
-//
-//	public static void addPreferenceFromAttributeNameAndPropertyName(Query query, Object object,
-//			String attrName, String propertyName) {
-//		List <Expr> exprs = createExprsFromAttributeNameAndPropertyName(query, object, attrName, propertyName);
-//		createFiltersWithOrOperandForExprs(query, exprs);
-//	}
-//
-//	public static void addPreference(Query query, Object object, String attrName, String propertyValue) {
-//		List <Expr> exprs = createExprs(query, object, attrName, propertyValue);
-//		createFiltersWithOrOperandForExprs(query, exprs);
-//	}
-
 	public static void createFiltersWithOrOperandForExprs(Query query, List<Expr> exprs) {
 		if (exprs.size() == 0) return;
+		removeDoubleExpressions(exprs);
 		ElementGroup body = (ElementGroup) query.getQueryPattern();
 		if (body == null)  body = new ElementGroup();
 		if (exprs.size() == 1) {
@@ -400,25 +385,23 @@ public class QueryUtils {
 	private static Expr createExprForFilter(String filtervarName, NodeValue node) {
 
 		Expr expr = new E_Equals(new ExprVar(filtervarName), node);
-		
-		
-//		Expr expr1 = new E_Equals(new ExprVar("_augplaceName"), NodeValue.makeString("test"));
-//
-//		
-//E_LogicalOr elo = new E_LogicalOr(expr, expr1);
-//
-//
-//
-//		ElementFilter filter = new ElementFilter(elo);
-		
-//		ElementFilter filter = new ElementFilter(expr);
-		
-
-//		ElementGroup body = (ElementGroup) query.getQueryPattern();
-//		if (body == null)  body = new ElementGroup();
-//
-//		query.setQueryPattern(body);
 		return expr;
+	}
+
+	/**
+	 * Removes double expressions.
+	 *
+	 * @param exprs
+	 */
+	private static void removeDoubleExpressions(List <Expr> exprs) {
+		List <Expr> tmpExprs = new ArrayList <Expr>();
+		for (Expr expr: exprs) {
+			if (tmpExprs.contains(expr)) continue;
+			tmpExprs.add(expr);
+		}
+		exprs.clear();
+		exprs.addAll(tmpExprs);
+		tmpExprs.clear();
 	}
 
 	/**
