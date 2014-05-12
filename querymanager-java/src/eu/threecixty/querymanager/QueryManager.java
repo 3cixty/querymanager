@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -90,6 +92,13 @@ import eu.threecixty.profile.models.Preference;
 				sb.append(new String(b, 0, readBytes));
 			}
 			input.close();
+			if (EventMediaFormat.JSON == format) {
+				int lastIndex = sb.lastIndexOf("}");
+				if (lastIndex >= 0) {
+					String augmentedQueryJson = ", \"AugmentedQuery\": " + JSONObject.quote(augmentedQueryStr);
+					sb.insert(lastIndex, augmentedQueryJson);
+				}
+			}
 			return sb.toString();
 
 		} catch (UnsupportedEncodingException e) {

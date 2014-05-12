@@ -29,6 +29,12 @@
 	  <artifactId>jena-arq</artifactId>
 	  <version>2.11.2-SNAPSHOT</version>
     </dependency>
+
+    <dependency>
+	  <groupId>org.json</groupId>
+	  <artifactId>json</artifactId>
+	  <version>20140107</version>
+    </dependency>
             
     <dependency>
 	  <groupId>junit</groupId>
