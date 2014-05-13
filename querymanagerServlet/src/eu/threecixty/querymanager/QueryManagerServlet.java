@@ -29,6 +29,7 @@ public class QueryManagerServlet extends HttpServlet {
 	private static final String QUERY_PARAM = "query";
 
 	private static final String FILTER_PARAM = "filter";
+	private static final String FRIENDS_PARAM = "friends";
 	
 	// FILTER Options
 	private static final String LOCATION = "location";
@@ -145,16 +146,22 @@ public class QueryManagerServlet extends HttpServlet {
 	 */
     private void setInfoRequirementsFromProfiler(HttpServletRequest req,  IProfiler profiler) {
     	try {
-    		String filter = req.getParameter(FILTER_PARAM);
-    		if (filter == null) return;
-    		if (filter.equalsIgnoreCase(LOCATION)) {
-    			profiler.requireCurrentCountry(true);
-    			profiler.requireCurrentTown(true);
-    		} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
-    			// TODO: fixed value
-    			// should find minimum value from PreferredProfile
-    			profiler.requireScoreRatedAtLeast(5);
-    			profiler.requireNumberOfTimesVisitedAtLeast(3);
+    		String friends = req.getParameter(FRIENDS_PARAM);
+    		if (friends == null || "false".equalsIgnoreCase(friends)) { // prefs based on "I"
+        		String filter = req.getParameter(FILTER_PARAM);
+        		if (filter == null) return;
+    			if (filter.equalsIgnoreCase(LOCATION)) {
+    				profiler.requireCurrentCountry(true);
+    				profiler.requireCurrentTown(true);
+    			} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
+    				// TODO: fixed value
+    				// should find minimum value from PreferredProfile
+    				profiler.requireScoreRatedAtLeast(5);
+    				profiler.requireNumberOfTimesVisitedAtLeast(3);
+    			}
+    		} else { // based on "my friends"
+    			profiler.requireNumberOfTimesVisitedForFriendsAtLeast(2); // value rated in UserProfile
+    			profiler.requireScoreRatedForFriendsAtLeast(4);
     		}
     	} catch (Exception e) {
     	}
