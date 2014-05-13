@@ -28,6 +28,18 @@ public interface IProfiler {
 	void requireScoreRatedAtLeast(float f);
 
 	/**
+	 * Requires number of times visited for friends at least.
+	 * @param number
+	 */
+	void requireNumberOfTimesVisitedForFriendsAtLeast(int number);
+	
+	/**
+	 * Requires score rated for friends at least.
+	 * @param f
+	 */
+	void requireScoreRatedForFriendsAtLeast(float f);
+
+	/**
 	 * Requires current country.
 	 * @param currentCountryRequired
 	 */

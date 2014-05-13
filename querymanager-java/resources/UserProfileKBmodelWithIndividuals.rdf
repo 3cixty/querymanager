@@ -4680,7 +4680,7 @@
 
     <owl:NamedIndividual rdf:about="&profile;Rating4Visited">
         <rdf:type rdf:resource="&profile;Rating"/>
-        <hasUserDefinedRating>4</hasUserDefinedRating>
+        <hasUserDefinedRating rdf:datatype="&xsd;double">4</hasUserDefinedRating>
         <hasUserInteractionMode>Visited</hasUserInteractionMode>
     </owl:NamedIndividual>
     

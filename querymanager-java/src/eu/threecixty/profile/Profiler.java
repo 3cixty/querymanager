@@ -21,6 +21,9 @@ public class Profiler implements IProfiler {
 	private int numberOfTimeVisitedAtLeast = -1;
 	private float scoreRatedAtLeast = -1;
 
+	private int numberOfTimeVisitedForFriendsAtLeast = -1;
+	private float scoreRatedForFriendsAtLeast = -1;
+
 	public Profiler(String uid) {
 		// TODO: uncomment and remove fixed UID
 		this.uID = "100900047095598983805";
@@ -53,6 +56,12 @@ public class Profiler implements IProfiler {
 		    }
 		    if (numberOfTimeVisitedAtLeast != -1) {
 		        ProfilerPlaceUtils.addPlaceNameFromNumberOfTimesVisited(pref, rdfModel, uID, numberOfTimeVisitedAtLeast);
+		    }
+		    if (scoreRatedForFriendsAtLeast != -1) {
+		    	ProfilerPlaceUtils.addPlaceNameFromRatingOfFriends(pref, rdfModel, uID, scoreRatedForFriendsAtLeast);
+		    }
+		    if (numberOfTimeVisitedForFriendsAtLeast != -1) {
+		    	ProfilerPlaceUtils.addPlaceNameFromNumberOfTimesVisitedOfFriends(pref, rdfModel, uID, numberOfTimeVisitedForFriendsAtLeast);
 		    }
 		}
 	}
@@ -102,6 +111,8 @@ public class Profiler implements IProfiler {
 	public void initDefaultParametersForAugmentation() {
 		numberOfTimeVisitedAtLeast = -1;
 		scoreRatedAtLeast = -1;
+		numberOfTimeVisitedForFriendsAtLeast = -1;
+		scoreRatedForFriendsAtLeast = -1;
 		currentCountryRequired = false;
 		currentTownRequired = false;
 	}
@@ -114,6 +125,17 @@ public class Profiler implements IProfiler {
 	@Override
 	public void requireCurrentTown(boolean currentTownRequired) {
 		this.currentTownRequired = currentTownRequired;
+	}
+
+	@Override
+	public void requireNumberOfTimesVisitedForFriendsAtLeast(int number) {
+		this.numberOfTimeVisitedForFriendsAtLeast = number;
+		
+	}
+
+	@Override
+	public void requireScoreRatedForFriendsAtLeast(float f) {
+		this.scoreRatedForFriendsAtLeast = f;
 	}
 	
 }
