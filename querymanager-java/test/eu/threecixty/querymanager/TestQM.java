@@ -39,7 +39,7 @@ public class TestQM {
 		
 		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
 
-		String currentCountry = "France";
+		String currentCountry = "Italy";
 		// query was already augmented
 		Assert.assertFalse(queryString.contains(currentCountry));
 		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(currentCountry));
@@ -76,7 +76,7 @@ public class TestQM {
 		
 		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
 		
-		String currentTown = "Paris";
+		String currentTown = "Milano";
 		
 		Assert.assertFalse(queryString.contains(currentTown));
 		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(currentTown));
@@ -168,6 +168,72 @@ public class TestQM {
 		IProfiler profiler = new Profiler(uid);
 		if (profiler != null) {
 			profiler.requireNumberOfTimesVisitedAtLeast(3);
+			profiler.PopulateProfile();
+		}
+		
+		IQueryManager qm = new QueryManager(uid);
+		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
+		
+		String placeName = "Hilton Milan Hotel";
+		
+		Assert.assertFalse(queryString.contains(placeName));
+		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(placeName));
+	}
+
+	@Test
+	public void testAugmentQueryWithPlaceNameVisitedBasedOnMyFriends() {
+		String uid = "100900047095598983805";
+		String queryString = "SELECT  ?event ?title ?description "
+				+ "WHERE"
+				+ "  { ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event dc:title ?title ."
+				+ "    ?event dc:description ?description ."
+				+ "    ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event lode:involvedAgent ?involvedAgent ."
+				+ "    ?involvedAgent dc:publisher ?publisher"
+				+ "    FILTER ( str(?publisher) = <http://www.last.fm> )"
+				+ "  }"
+				+ "LIMIT   20";
+		String allPrefixes = getPrefixes();
+
+		
+		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.requireNumberOfTimesVisitedForFriendsAtLeast(2);
+			profiler.PopulateProfile();
+		}
+		
+		IQueryManager qm = new QueryManager(uid);
+		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
+		
+		String placeName = "Hilton Milan Hotel";
+		
+		Assert.assertFalse(queryString.contains(placeName));
+		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(placeName));
+	}
+
+	@Test
+	public void testAugmentQueryWithPlaceNameRatingBasedOnMyFriends() {
+		String uid = "100900047095598983805";
+		String queryString = "SELECT  ?event ?title ?description "
+				+ "WHERE"
+				+ "  { ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event dc:title ?title ."
+				+ "    ?event dc:description ?description ."
+				+ "    ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event lode:involvedAgent ?involvedAgent ."
+				+ "    ?involvedAgent dc:publisher ?publisher"
+				+ "    FILTER ( str(?publisher) = <http://www.last.fm> )"
+				+ "  }"
+				+ "LIMIT   20";
+		String allPrefixes = getPrefixes();
+
+		
+		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.requireScoreRatedForFriendsAtLeast(4);
 			profiler.PopulateProfile();
 		}
 		
