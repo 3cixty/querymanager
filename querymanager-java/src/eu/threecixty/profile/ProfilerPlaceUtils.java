@@ -40,20 +40,16 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
 	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
 	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n\n";
+	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "SELECT  DISTINCT  ?countryname\n";
 	    qStr += "WHERE {\n\n";
 	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root vcard:hasName ?name .\n";
-	    qStr += "?name vcard:given-name ?gn .\n";
-	    qStr += "?name vcard:family-name ?fn .\n";
-	    qStr += "?root ?p1 ?uid .\n";
-	    qStr += "?root ?p2 ?oPrefs .\n";
-	    qStr += " ?oPrefs ?p3 ?oOPrefs .\n\n";
-	    qStr += "?oOPrefs ?p4 ?oOOPrefs .    ?oOOPrefs ?p5 ?oOOOPrefs .  ?oOOPrefs ?p6 ?oOOOOPrefs .  ?oOOOPrefs vcard:country-name ?countryname .\n";
+	    qStr += "?root profile:hasUID ?uid .\n";
+	    qStr += "?root vcard:hasAddress ?address . \n";
+	    qStr += "?address vcard:country-name ?countryname .";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "FILTER (STR(?oOOOOPrefs) = \"Country\") . \n\n";
 	    qStr += "}";
-	    
+
 	    Query query = QueryFactory.create(qStr);
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
@@ -102,10 +98,9 @@ public class ProfilerPlaceUtils {
 	    qStr += "SELECT  DISTINCT  ?locality\n";
 	    qStr += "WHERE {\n\n";
 	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root ?p1 ?uid .\n";
-	    qStr += "?root ?p2 ?oPrefs .\n";
-	    qStr += " ?oPrefs ?p3 ?oOPrefs .\n\n";
-	    qStr += "?oOPrefs ?p4 ?oOOPrefs .    ?oOOPrefs ?p5 ?oOOOPrefs .  ?oOOOPrefs  profile:townName ?locality .\n";
+	    qStr += "?root profile:hasUID ?uid .\n";
+	    qStr += "?root vcard:hasAddress ?address . \n";
+	    qStr += "?address profile:townName ?locality .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "}";
 	    

@@ -4436,8 +4436,8 @@
         <rdf:type rdf:resource="&vcard;Address"/>
         <vcard:longitude rdf:datatype="&xsd;double">-2.598761</vcard:longitude>
         <vcard:latitude rdf:datatype="&xsd;double">51.452745</vcard:latitude>
-        <townName>Bristol</townName>
-        <vcard:country-name>England</vcard:country-name>
+        <townName>Milano</townName>
+        <vcard:country-name>Italy</vcard:country-name>
     </owl:NamedIndividual>
     
 
