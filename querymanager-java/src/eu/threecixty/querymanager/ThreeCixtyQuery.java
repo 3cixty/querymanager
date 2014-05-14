@@ -7,6 +7,8 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
+import eu.threecixty.ThreeCixtyExpression;
+
 /**
  * Abstract class to represent a query.
  *
@@ -45,8 +47,8 @@ public abstract class ThreeCixtyQuery {
 	 * 
 	 * @param object
 	 */
-	protected void addExprsAndTriples(Object object, List <Expr> exprs, List <Triple> triples) {
-		QueryUtils.addExprsAndTriples(query, object, exprs, triples);
+	protected void addExprsAndTriples(Object object, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
+		QueryUtils.addExprsAndTriples(query, object, exprs, triples, threeCixyExpr);
 	}
 
 	/**
@@ -59,8 +61,8 @@ public abstract class ThreeCixtyQuery {
 	 * @param propertyValue
 	 * 			The property which defines triple links and filter.
 	 */
-	protected void addExprsAndTriples(Object object, String attrName, String propertyValue, List <Expr> exprs, List <Triple> triples) {
-		QueryUtils.addExprsAndTriples(query, object, attrName, propertyValue, exprs, triples);
+	protected void addExprsAndTriples(Object object, String attrName, String propertyValue, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
+		QueryUtils.addExprsAndTriples(query, object, attrName, propertyValue, exprs, triples, threeCixyExpr);
 	}
 
 	/**
@@ -74,7 +76,7 @@ public abstract class ThreeCixtyQuery {
 	 * 				The property name in the property file. The property name will be used to find triple links in the property file.
 	 */
 	protected void addExprsAndTriplesFromAttributeNameAndPropertyName(Object object,
-			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples) {
-		QueryUtils.addExprsAndTriplesFromAttributeNameAndPropertyName(query, object, attrName, propertyName, exprs, triples);
+			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
+		QueryUtils.addExprsAndTriplesFromAttributeNameAndPropertyName(query, object, attrName, propertyName, exprs, triples, threeCixyExpr);
 	}
 }

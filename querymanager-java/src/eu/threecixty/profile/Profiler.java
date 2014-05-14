@@ -24,6 +24,8 @@ public class Profiler implements IProfiler {
 	private int numberOfTimeVisitedForFriendsAtLeast = -1;
 	private float scoreRatedForFriendsAtLeast = -1;
 
+	private double distanceFromCurrentPosition = -1;
+
 	public Profiler(String uid) {
 		// TODO: uncomment and remove fixed UID
 		this.uID = "100900047095598983805";
@@ -62,6 +64,9 @@ public class Profiler implements IProfiler {
 		    }
 		    if (numberOfTimeVisitedForFriendsAtLeast != -1) {
 		    	ProfilerPlaceUtils.addPlaceNameFromNumberOfTimesVisitedOfFriends(pref, rdfModel, uID, numberOfTimeVisitedForFriendsAtLeast);
+		    }
+		    if (distanceFromCurrentPosition != -1) {
+		    	ProfilerPlaceUtils.addGPSCoordinates(pref, rdfModel, uID, distanceFromCurrentPosition);
 		    }
 		}
 	}
@@ -115,6 +120,7 @@ public class Profiler implements IProfiler {
 		scoreRatedForFriendsAtLeast = -1;
 		currentCountryRequired = false;
 		currentTownRequired = false;
+		distanceFromCurrentPosition = -1;
 	}
 
 	@Override
@@ -136,6 +142,11 @@ public class Profiler implements IProfiler {
 	@Override
 	public void requireScoreRatedForFriendsAtLeast(float f) {
 		this.scoreRatedForFriendsAtLeast = f;
+	}
+
+	@Override
+	public void requireAreaWithin(double d) {
+		this.distanceFromCurrentPosition = d;
 	}
 	
 }

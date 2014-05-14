@@ -6,6 +6,7 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
+import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.models.Event;
 import eu.threecixty.profile.models.EventDetail;
 import eu.threecixty.profile.models.Rating;
@@ -32,12 +33,12 @@ public class EventQuery extends ThreeCixtyQuery {
 		
 		Rating rating = event.getHasRating();
 		if (rating != null) {
-			addExprsAndTriples(rating, exprs, triples);
+			addExprsAndTriples(rating, exprs, triples, ThreeCixtyExpression.Equal);
 		}
 
 		EventDetail eventDetail = event.getHasEventDetail();
 		if (eventDetail != null) {
-			addExprsAndTriples(eventDetail, exprs, triples);
+			addExprsAndTriples(eventDetail, exprs, triples, ThreeCixtyExpression.Equal);
 		}
 	}
 

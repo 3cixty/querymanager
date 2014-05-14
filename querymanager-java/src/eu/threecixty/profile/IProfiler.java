@@ -52,6 +52,12 @@ public interface IProfiler {
 	void requireCurrentTown(boolean currentTownRequired);
 
 	/**
+	 * Requires an area within d kilometer.
+	 * @param d
+	 */
+	void requireAreaWithin(double d);
+
+	/**
 	 * Gets user ID.
 	 * @return
 	 */

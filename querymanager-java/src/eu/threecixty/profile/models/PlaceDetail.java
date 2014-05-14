@@ -23,6 +23,8 @@ public class PlaceDetail {
 	private NatureOfPlace hasNatureOfPlace;
 	@Description(hasText = "comments")
 	private Set <String> hasKeyTags;
+	// This attribute is used to deal with a region for a place
+	private Area area;
 	public String getHasPlaceName() {
 		return hasPlaceName;
 	}
@@ -53,7 +55,11 @@ public class PlaceDetail {
 	public void setHasKeyTags(Set<String> hasKeyTags) {
 		this.hasKeyTags = hasKeyTags;
 	}
-	
-	
+	public Area getArea() {
+		return area;
+	}
+	public void setArea(Area area) {
+		this.area = area;
+	}
 	
 }

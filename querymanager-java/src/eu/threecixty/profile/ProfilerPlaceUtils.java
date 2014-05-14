@@ -11,10 +11,13 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
+import eu.threecixty.profile.models.Area;
 import eu.threecixty.profile.models.NatureOfPlace;
 import eu.threecixty.profile.models.Place;
 import eu.threecixty.profile.models.PlaceDetail;
 import eu.threecixty.profile.models.Preference;
+import eu.threecixty.querymanager.GpsCoordinateUtils;
+import eu.threecixty.querymanager.GpsCoordinateUtils.GpsCoordinate;
 
 /**
  * Utility class for populating information place.
@@ -125,6 +128,76 @@ public class ProfilerPlaceUtils {
 			    place.setHasPlaceDetail(pd);
 			    places.add(place);
 			}
+		}
+		
+		qe.close();
+
+		pref.setHasPlaces(places);
+	}
+
+	/**
+	 * Adds GPS coordinates into preference.
+	 *
+	 * @param pref
+	 * 				The preference.
+	 * @param model
+	 * 				The RDF model.
+	 * @param uID
+	 * 				User identity.
+	 */
+	public static void addGPSCoordinates(Preference pref, Model model, String uID, double distanceFromCurrentPosition) {
+		
+	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
+	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
+	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
+	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
+	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
+	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
+	    qStr += "PREFIX my: <java:eu.threecixty.functions.>\n\n";
+	    qStr += "SELECT  DISTINCT  ?lon ?lat \n";
+	    qStr += "WHERE {\n\n";
+	    qStr += "?root a owl:NamedIndividual .\n";
+	    qStr += "?root profile:hasUID ?uid .\n";
+	    qStr += "?root vcard:hasAddress ?address . \n";
+	    qStr += "?address vcard:longitude ?lon . \n";
+	    qStr += "?address vcard:latitude ?lat . \n";
+	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
+	    qStr += "}";
+	    
+	    Query query = QueryFactory.create(qStr);
+	    
+		QueryExecution qe = QueryExecutionFactory.create(query, model);
+		
+		ResultSet rs = qe.execSelect();
+		
+	    Set <Place> places = pref.getHasPlaces();
+	    if (places == null) places = new HashSet <Place>();
+		
+		for ( ; rs.hasNext(); ) {
+			QuerySolution qs = rs.next();
+			double lon = qs.getLiteral("lon").getDouble();
+			double lat = qs.getLiteral("lat").getDouble();
+			
+			GpsCoordinate originalPoint = GpsCoordinateUtils.convert(lat, lon);
+			GpsCoordinate leftPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 270);
+			GpsCoordinate rightPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 90);
+			GpsCoordinate topPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 0);
+			GpsCoordinate bottomPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 180);
+
+			double maxLat = GpsCoordinateUtils.getLatitudeInDegree(topPoint);
+			double minLat = GpsCoordinateUtils.getLatitudeInDegree(bottomPoint);
+			double minLon = GpsCoordinateUtils.getLogitudeInDegree(leftPoint);
+			double maxLon = GpsCoordinateUtils.getLogitudeInDegree(rightPoint);
+
+			Area area = new Area(minLat, minLon, maxLat, maxLon);
+
+			Place place = new Place();
+			PlaceDetail pd = new PlaceDetail();
+			pd.setArea(area);
+			place.setHasPlaceDetail(pd);
+			
+			places.add(place);
+
 		}
 		
 		qe.close();
@@ -338,7 +411,7 @@ public class ProfilerPlaceUtils {
 
 		pref.setHasPlaces(places);
 	}
-
+	
 	private ProfilerPlaceUtils() {
 	}
 }

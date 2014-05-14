@@ -20,7 +20,13 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.TriplePath;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.E_Equals;
+import com.hp.hpl.jena.sparql.expr.E_GreaterThan;
+import com.hp.hpl.jena.sparql.expr.E_GreaterThanOrEqual;
+import com.hp.hpl.jena.sparql.expr.E_LessThan;
+import com.hp.hpl.jena.sparql.expr.E_LessThanOrEqual;
+import com.hp.hpl.jena.sparql.expr.E_LogicalAnd;
 import com.hp.hpl.jena.sparql.expr.E_LogicalOr;
+import com.hp.hpl.jena.sparql.expr.E_NotEquals;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
@@ -28,6 +34,8 @@ import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
+
+import eu.threecixty.ThreeCixtyExpression;
 
 /**
  * Utility class.
@@ -117,6 +125,25 @@ public class QueryUtils {
 	}
 
 	/**
+	 * Creates an expression which is composed of AND for all the given list of expressions.
+	 * @param exprs
+	 * @return
+	 */
+	public static Expr createExprWithAndOperandForExprs(List<Expr> exprs) {
+		if (exprs.size() == 0) return null;
+		removeDoubleExpressions(exprs);
+		if (exprs.size() == 1) {
+			return exprs.get(0);
+		} else {
+			Expr tmpExpr = exprs.get(0);
+			for (int i = 1; i < exprs.size(); i++) {
+				tmpExpr = new E_LogicalAnd(tmpExpr, exprs.get(i));
+			}
+			return tmpExpr;
+		}
+	}
+
+	/**
 	 * Adds a list of triples into a given query.
 	 * @param triples
 	 * @param query
@@ -142,7 +169,7 @@ public class QueryUtils {
 	 * 
 	 * @param object
 	 */
-	public static void addExprsAndTriples(Query query, Object object, List <Expr> exprs, List<Triple> triples) {
+	public static void addExprsAndTriples(Query query, Object object, List <Expr> exprs, List<Triple> triples, ThreeCixtyExpression threeCixyExpr) {
 		if (object == null) return;
 		Class <?> clazz = object.getClass();
 		Properties props = clazzProperties.get(clazz);
@@ -157,7 +184,7 @@ public class QueryUtils {
 			String attrName = (String) objKey;
 			String property = (String) props.get(attrName);
 			
-			addExprsAndTriples(query, object, attrName, property, exprs, triples);
+			addExprsAndTriples(query, object, attrName, property, exprs, triples, threeCixyExpr);
 		}
 	}
 
@@ -174,7 +201,7 @@ public class QueryUtils {
 	 * 			The property name in the property file.
 	 */
 	public static void addExprsAndTriplesFromAttributeNameAndPropertyName(Query query, Object object,
-			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples) {
+			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
 		if (object == null || query == null || attrName == null || propertyName == null) return;
 		Class <?> clazz = object.getClass();
 		Properties props = clazzProperties.get(clazz);
@@ -186,7 +213,7 @@ public class QueryUtils {
 		// Property Value must follow the regular expression [subject,predicate,object]*,filterVariableName
 		String property = (String) props.get(propertyName);
 		if (property == null) return;
-		addExprsAndTriples(query, object, attrName, property, exprs, triples);
+		addExprsAndTriples(query, object, attrName, property, exprs, triples, threeCixyExpr);
 
 	}
 
@@ -210,7 +237,7 @@ public class QueryUtils {
 	 * 			The property which defines a list of consecutive triples and filter.
 	 */
 	public static void addExprsAndTriples(Query query, Object object, String attrName, String propertyValue,
-			List<Expr> exprs, List <Triple> triples) {
+			List<Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
 		if (query == null || object == null || attrName == null || propertyValue == null) return;
 		// last element is a filter variable
 		// triples correspond with every three elements
@@ -228,7 +255,7 @@ public class QueryUtils {
 			Field field = clazz.getDeclaredField(attrName);
 			if (field == null) return;
 			addTriples(query, configStrs, triples);
-			addExprs(object, field, filterVarName, exprs);
+			addExprs(object, field, filterVarName, exprs, threeCixyExpr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -321,19 +348,20 @@ public class QueryUtils {
 	 * @throws Exception
 	 */
 	private static void addExprs(Object object, Field field, 
-			String filterVarName, List <Expr> results) throws Exception {
+			String filterVarName, List <Expr> results, ThreeCixtyExpression threeCixyExpr) throws Exception {
 	    boolean accessible = field.isAccessible();
 	    if (!accessible) {
 	    	field.setAccessible(true);
 	    }
 	    Class <?> fieldTypeClass = field.getType();
 	    Object fieldInstanceValue = field.get(object);
+
 	    if (fieldInstanceValue == null) return;
 	    String methodName = clazzNodeValueMethodNames.get(fieldTypeClass);
 	    if (methodName != null) {
 	    	Method method = NodeValue.class.getMethod(methodName, fieldTypeClass);
 	    	NodeValue node = (NodeValue) method.invoke(null, fieldInstanceValue);
-	    	Expr expr = createExprForFilter(filterVarName, node);
+	    	Expr expr = createExprForFilter(filterVarName, node, threeCixyExpr);
 	    	results.add(expr);
 	    } else {
 	    	// for DateTime, List, Set. The other types are not supported
@@ -341,11 +369,11 @@ public class QueryUtils {
 	    		Calendar cal = Calendar.getInstance();
 	    		cal.setTime((Date) fieldInstanceValue);
 	    		NodeValue node = NodeValue.makeDate(cal);
-		    	Expr expr = createExprForFilter(filterVarName, node);
+		    	Expr expr = createExprForFilter(filterVarName, node, threeCixyExpr);
 		    	results.add(expr);
 	    	} else {
 	    		addExprsForFilterOfCollection(field, fieldTypeClass,
-	    				fieldInstanceValue, filterVarName, results);
+	    				fieldInstanceValue, filterVarName, results, threeCixyExpr);
 	    	}
 	    }
 
@@ -367,7 +395,7 @@ public class QueryUtils {
 	 * @throws Exception
 	 */
 	private static void addExprsForFilterOfCollection(Field field, Class<?> fieldTypeClass,
-			Object fieldInstanceValue, String filterVarName, List <Expr> results) throws Exception {
+			Object fieldInstanceValue, String filterVarName, List <Expr> results, ThreeCixtyExpression threeCixyExpr) throws Exception {
 		ParameterizedType paramType = (ParameterizedType) field.getGenericType();
 		if (paramType == null) return ;
 		Class <?> paramClazz = (Class<?>) paramType.getActualTypeArguments()[0];
@@ -378,14 +406,14 @@ public class QueryUtils {
 			List <?> list = (List<?>) fieldInstanceValue;
 			for (Object tmp: list) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
-		    	Expr expr = createExprForFilter(filterVarName, node);
+		    	Expr expr = createExprForFilter(filterVarName, node, threeCixyExpr);
 		    	results.add(expr);
 			}
 		} else if (fieldTypeClass.isAssignableFrom(Set.class)) {
 			Set <?> sets = (Set <?>) fieldInstanceValue;
 			for (Object tmp: sets) {
 		    	NodeValue node = (NodeValue) methodForCollectionParam.invoke(null, tmp);
-		    	Expr expr = createExprForFilter(filterVarName, node);
+		    	Expr expr = createExprForFilter(filterVarName, node, threeCixyExpr);
 		    	results.add(expr);
 			}
 		}
@@ -398,10 +426,23 @@ public class QueryUtils {
 	 * @param filtervarName
 	 * @param node
 	 */
-	private static Expr createExprForFilter(String filtervarName, NodeValue node) {
+	private static Expr createExprForFilter(String filtervarName, NodeValue node, ThreeCixtyExpression threeCixyExpr) {
 
-		Expr expr = new E_Equals(new ExprVar(filtervarName), node);
-		return expr;
+		if (threeCixyExpr == null) return null;
+
+		if (threeCixyExpr == ThreeCixtyExpression.Equal) {
+			return new E_Equals(new ExprVar(filtervarName), node);
+		} else if (threeCixyExpr == ThreeCixtyExpression.GreaterThan) {
+			return new E_GreaterThan(new ExprVar(filtervarName), node);
+		} else if (threeCixyExpr == ThreeCixtyExpression.GreaterThanOrEqual) {
+			return new E_GreaterThanOrEqual(new ExprVar(filtervarName), node);
+		} else if (threeCixyExpr == ThreeCixtyExpression.LessThan) {
+			return new E_LessThan(new ExprVar(filtervarName), node);
+		} else if (threeCixyExpr == ThreeCixtyExpression.LessThanOrEqual) {
+			return new E_LessThanOrEqual(new ExprVar(filtervarName), node);
+		} else {
+			return new E_NotEquals(new ExprVar(filtervarName), node);
+		}
 	}
 
 	/**
