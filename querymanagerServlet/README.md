@@ -28,7 +28,7 @@ This document shows you how to deploy querymanager-webservice and how to make a 
   |{isUsingPreferences}|<b>true</b> or <b>false</b>. This is used to whether or not augment the query with the user preferences|
   |{format}|requested result format (rdf or json). When the format is <b>json</b>, the augmented query can be got through the <b>AugmentedQuery</b> key in the string return|
   |{query}|a sparql query|
-  |{filter}|<b>location</b> or <b>enteredRating</b>. QueryManager will take this value to augment a query|
+  |{filter}|<b>location</b>, <b>enteredRating</b> or <b>gpslocation</b>. QueryManager will take this value to augment a query|
   |{friends}|<b>true</b> or <b>false</b>. This value is used to augment a query based on either <b>my friends</b> or <b>I</b>|
   
 -  Example for a full URL to invoke the service on local Tomcat server:
