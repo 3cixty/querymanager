@@ -74,6 +74,12 @@ public abstract class ThreeCixtyQuery {
 	 * 				The preference object's attribute name. The attribute name containing a value in the instance object which will be used to add a filter.
 	 * @param propertyName
 	 * 				The property name in the property file. The property name will be used to find triple links in the property file.
+	 * @param exprs
+	 * 				The list of expressions which is used to contain ones created by this method
+	 * @param triples
+	 * 				The list of triples which is used to contain ones created by this method
+	 * @param threeCixyExpr
+	 * 				The expression which is used for filtering results.
 	 */
 	protected void addExprsAndTriplesFromAttributeNameAndPropertyName(Object object,
 			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
