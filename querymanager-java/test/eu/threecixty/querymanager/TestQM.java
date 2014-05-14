@@ -247,6 +247,39 @@ public class TestQM {
 		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(placeName));
 	}
 
+	@Test
+	public void testAugmentQueryWithCurrentGpsCoordinates() {
+		String uid = "100900047095598983805";
+		String queryString = "SELECT  ?event ?title ?description "
+				+ "WHERE"
+				+ "  { ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event dc:title ?title ."
+				+ "    ?event dc:description ?description ."
+				+ "    ?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> lode:Event ."
+				+ "    ?event lode:involvedAgent ?involvedAgent ."
+				+ "    ?involvedAgent dc:publisher ?publisher"
+				+ "    FILTER ( str(?publisher) = <http://www.last.fm> )"
+				+ "  }"
+				+ "LIMIT   20";
+		String allPrefixes = getPrefixes();
+
+		
+		IProfiler profiler = new Profiler(uid);
+		if (profiler != null) {
+			profiler.requireAreaWithin(10);
+			profiler.PopulateProfile();
+		}
+		
+		IQueryManager qm = new QueryManager(uid);
+		
+		performAugmentQuery(qm, profiler, allPrefixes+queryString, true);
+		
+		String latStr = "51.39886741923267";
+		
+		Assert.assertFalse(queryString.contains(latStr));
+		Assert.assertTrue(qm.getAugmentedQuery().getQuery().getQuery().toString().contains(latStr));
+	}
+
 	private void performAugmentQuery(IQueryManager qm, IProfiler profiler,
 			String queryStr, boolean isUsingPreferences) {
 		Query query = qm.createJenaQuery(queryStr);
