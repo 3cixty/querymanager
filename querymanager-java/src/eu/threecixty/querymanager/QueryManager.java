@@ -73,12 +73,11 @@ import eu.threecixty.profile.models.Preference;
 	@Override
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
 			EventMediaFormat format) {
-		// TODO: call the EventMedia component
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		try {
 			String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
-			System.out.println(augmentedQueryStr);
+			
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
