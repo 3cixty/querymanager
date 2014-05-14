@@ -34,6 +34,7 @@ public class QueryManagerServlet extends HttpServlet {
 	// FILTER Options
 	private static final String LOCATION = "location";
 	private static final String ENTERED_RATING = "enteredrating";
+	private static final String GPS_LOCATION = "gpslocation";
 	
 	
 	
@@ -158,6 +159,9 @@ public class QueryManagerServlet extends HttpServlet {
     				// should find minimum value from PreferredProfile
     				profiler.requireScoreRatedAtLeast(5);
     				profiler.requireNumberOfTimesVisitedAtLeast(3);
+    			} else if (filter.equalsIgnoreCase(GPS_LOCATION)) {
+    				// TODO: fixed value
+    				profiler.requireAreaWithin(10);
     			}
     		} else { // based on "my friends"
     			profiler.requireNumberOfTimesVisitedForFriendsAtLeast(2); // value rated in UserProfile
