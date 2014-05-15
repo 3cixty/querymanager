@@ -13,7 +13,7 @@ import eu.threecixty.privacy.store.Value;
  * JPA implementation for interface {@link Value} used in tests.
  */
 @Entity
-@Table(name = "entity")
+@Table(name = "ENTITY")
 public class ValueTable implements Serializable, Value {
 
 	/**
@@ -22,32 +22,24 @@ public class ValueTable implements Serializable, Value {
 	private static final long serialVersionUID = -5021574837721853489L;
 
 	@Id
-	@Column(name = "_id")
-	private Long id;
-
 	@Column(name = "ontology")
 	private String ontology;
 
-	@Id
 	@Column(name = "owner")
-	private Long userId;
+	private String owner;
 
 	@Column(name = "resource")
 	private String resource;
 
 	@Column(name = "provider")
 	private String provider;
-
-	public Long getId() {
-		return id;
+	
+	public String getOwner() {
+		return owner;
 	}
 
 	public String getOntology() {
 		return ontology;
-	}
-
-	public long getUserId() {
-		return userId;
 	}
 
 	public String getResource() {
@@ -58,16 +50,12 @@ public class ValueTable implements Serializable, Value {
 		return provider;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 	public void setOntology(String ontology) {
 		this.ontology = ontology;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public void setResource(String resource) {

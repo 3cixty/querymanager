@@ -119,7 +119,7 @@ public class SerialStore implements Storage<Serializable> {
 		Value registeredResource = dataSource.getResourceByOntology(ontology);
 		if ((registeredResource == null) && createIfMissing) {
 			// Need to create the resource.
-			User registeredUser = dataSource.getUserByName(user);
+			User registeredUser = dataSource.findUser(user);
 			if (registeredUser == null) {
 				// When the user is not registered yet add it to the index
 				registeredUser = dataSource.addUser(user, null);
@@ -128,7 +128,7 @@ public class SerialStore implements Storage<Serializable> {
 				}
 			}
 
-			registeredResource = dataSource.addResource(registeredUser.getUserId(), ontology,
+			registeredResource = dataSource.addResource(registeredUser.getId(), ontology,
 					UUID.randomUUID().toString(), "filesystem:internal");
 			if (registeredResource == null) {
 				throw new IOException("could not create resource in store index");

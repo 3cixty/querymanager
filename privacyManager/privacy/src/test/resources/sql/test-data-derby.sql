@@ -1,23 +1,22 @@
 -- Create the tables
-CREATE TABLE user
+-- NB: "USER" is a keyword so it can't be used as table name.
+CREATE TABLE PRIVACY_USER
 (
-   _id numeric,
-   user varchar(255),
+   id varchar(255),
    auth blob 
 );
 
-CREATE TABLE entity
+CREATE TABLE ENTITY
 (
-   _id numeric,
    ontology varchar(255),
-   owner integer,
+   owner varchar(255),
    resource varchar(255),
    provider varchar(255)
 );
 
 -- Insert the mock data
-insert into user (_id, user, auth)
-values (1,'admin','admin');
+INSERT INTO PRIVACY_USER (id, auth)
+VALUES ('user@admin', null);
 
-insert into user (_id, user, auth)
-values (2,'guest',null);
+INSERT INTO PRIVACY_USER (id, auth)
+VALUES ('user@guest', null);

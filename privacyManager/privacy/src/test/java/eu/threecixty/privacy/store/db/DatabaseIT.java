@@ -30,7 +30,7 @@ public class DatabaseIT {
 
 	@Test
 	public void test() {
-		Long someUser = new Long(1);
+		String someUser = "user@admin";
         
         UserTable bean = em.find(UserTable.class, someUser);
         assertNotNull(
@@ -38,9 +38,19 @@ public class DatabaseIT {
             , bean
         );
         
-        assertEquals(Long.valueOf(1L), bean.getUserId());
-        assertEquals("admin", bean.getName());
-        assertEquals("admin".getBytes(), bean.getAuthenticator());
+        assertEquals(someUser, bean.getId());
+        assertEquals(null, bean.getAuthenticator());
+
+        someUser = "user@guest";
+        
+        bean = em.find(UserTable.class, someUser);
+        assertNotNull(
+              String.format("Not found! someVarchar=\"%s\"",someUser)
+            , bean
+        );
+        
+        assertEquals(someUser, bean.getId());
+        assertEquals(null, bean.getAuthenticator());
 	}
 
 }
