@@ -21,10 +21,14 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sparql.expr.Expr;
+import com.hp.hpl.jena.sparql.syntax.ElementFilter;
+import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.util.FileManager;
 
+import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.models.Event;
+import eu.threecixty.profile.models.Period;
 import eu.threecixty.profile.models.Place;
 import eu.threecixty.profile.models.Preference;
 
@@ -254,6 +258,11 @@ import eu.threecixty.profile.models.Preference;
 		}
 		QueryUtils.addTriplesIntoQuery(triples, pq.getQuery());
 		QueryUtils.createFilterWithOrOperandForExprs(pq.getQuery(), exprs);
+
+		Set <Period> periods = preference.getHasPeriods();
+		if (periods != null) {
+			addPeriodsToQuery(periods, pq);
+		}
 	}
 
 	/**
@@ -269,7 +278,40 @@ import eu.threecixty.profile.models.Preference;
 			eQuery.addExpressionsAndTriples(event, exprs, triples);
 		}
 		QueryUtils.addTriplesIntoQuery(triples, eQuery.getQuery());
-		QueryUtils.createFilterWithOrOperandForExprs(eQuery.getQuery(), exprs);	
+		QueryUtils.createFilterWithOrOperandForExprs(eQuery.getQuery(), exprs);
+
+		Set <Period> periods = preference.getHasPeriods();
+		if (periods != null) {
+			addPeriodsToQuery(periods, eQuery);
+		}
+	}
+
+	private void addPeriodsToQuery(Set<Period> periods, ThreeCixtyQuery query) {
+		List <Expr> exprs = new ArrayList<Expr>();
+		List <Triple> triples = new ArrayList <Triple>();
+		List <Expr> tmpExprs = new ArrayList <Expr>();
+		for (Period period: periods) {
+			tmpExprs.clear();
+			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "startDate", "datetime",
+					tmpExprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "endDate", "datetime",
+					tmpExprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+			Expr expr = QueryUtils.createExprWithAndOperandForExprs(tmpExprs);
+			if (expr != null) {
+				exprs.add(expr);
+			}
+		}
+		
+		QueryUtils.addTriplesIntoQuery(triples, query.getQuery());
+		
+		Expr exprResult = QueryUtils.createExprWithOrOperandForExprs(exprs);
+		if (exprResult != null) {
+			ElementGroup body = (ElementGroup) query.getQuery().getQueryPattern();
+			if (body == null)  body = new ElementGroup();
+			ElementFilter filter = new ElementFilter(exprResult);
+			body.addElementFilter(filter);
+			query.getQuery().setQueryPattern(body);
+		}
 	}
 
 	private String removePrefixes(String query) {

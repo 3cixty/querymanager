@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +14,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.models.Area;
 import eu.threecixty.profile.models.NatureOfPlace;
+import eu.threecixty.profile.models.Period;
 import eu.threecixty.profile.models.Place;
 import eu.threecixty.profile.models.PlaceDetail;
 import eu.threecixty.profile.models.Preference;
@@ -410,6 +412,24 @@ public class ProfilerPlaceUtils {
 		qe.close();
 
 		pref.setHasPlaces(places);
+	}
+
+	public static void addDays(Preference pref, int days) {
+		try {
+			//
+//			java.text.DateFormat format = new java.text.SimpleDateFormat("d/M/yyyy");
+//			Date startDate = format.parse("1/1/2014");
+			Date startDate = new Date();
+
+			Date endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000L);
+			Period period = new Period(startDate, endDate);
+			Set <Period> periods = pref.getHasPeriods();
+			if (periods == null) periods = new HashSet <Period>();
+			periods.add(period);
+			pref.setHasPeriods(periods);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private ProfilerPlaceUtils() {

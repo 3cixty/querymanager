@@ -25,6 +25,7 @@ public class Profiler implements IProfiler {
 	private float scoreRatedForFriendsAtLeast = -1;
 
 	private double distanceFromCurrentPosition = -1;
+	private int days = -1;
 
 	public Profiler(String uid) {
 		// TODO: uncomment and remove fixed UID
@@ -67,6 +68,9 @@ public class Profiler implements IProfiler {
 		    }
 		    if (distanceFromCurrentPosition != -1) {
 		    	ProfilerPlaceUtils.addGPSCoordinates(pref, rdfModel, uID, distanceFromCurrentPosition);
+		    }
+		    if (days != 1) {
+		    	ProfilerPlaceUtils.addDays(pref, days);
 		    }
 		}
 	}
@@ -121,6 +125,7 @@ public class Profiler implements IProfiler {
 		currentCountryRequired = false;
 		currentTownRequired = false;
 		distanceFromCurrentPosition = -1;
+		days = -1;
 	}
 
 	@Override
@@ -147,6 +152,11 @@ public class Profiler implements IProfiler {
 	@Override
 	public void requireAreaWithin(double d) {
 		this.distanceFromCurrentPosition = d;
+	}
+
+	@Override
+	public void requirePeriod(int days) {
+		this.days = days;
 	}
 	
 }

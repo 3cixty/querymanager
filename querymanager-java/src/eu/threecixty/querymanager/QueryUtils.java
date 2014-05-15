@@ -106,22 +106,34 @@ public class QueryUtils {
 	 * @param exprs
 	 */
 	public static void createFilterWithOrOperandForExprs(Query query, List<Expr> exprs) {
-		if (exprs.size() == 0) return;
-		removeDoubleExpressions(exprs);
 		ElementGroup body = (ElementGroup) query.getQueryPattern();
 		if (body == null)  body = new ElementGroup();
+		Expr tmpExpr = createExprWithOrOperandForExprs(exprs);
+		if (tmpExpr == null) return;
+		ElementFilter filter = new ElementFilter(tmpExpr);
+		body.addElementFilter(filter);
+		query.setQueryPattern(body);
+	}
+
+	/**
+	 * Creates an expression which is composed of with the <b>OR</b> operand for a given list of expressions.
+	 * <br><br>
+	 * All the expressions will be used the Or operand to filter in the query.
+	 * @param query
+	 * @param exprs
+	 */
+	public static Expr createExprWithOrOperandForExprs(List<Expr> exprs) {
+		if (exprs.size() == 0) return null;
+		removeDoubleExpressions(exprs);
 		if (exprs.size() == 1) {
-			ElementFilter filter = new ElementFilter(exprs.get(0));
-			body.addElementFilter(filter);
+			return exprs.get(0);
 		} else {
 			Expr tmpExpr = exprs.get(0);
 			for (int i = 1; i < exprs.size(); i++) {
 				tmpExpr = new E_LogicalOr(tmpExpr, exprs.get(i));
 			}
-			ElementFilter filter = new ElementFilter(tmpExpr);
-			body.addElementFilter(filter);
+			return tmpExpr;
 		}
-		query.setQueryPattern(body);
 	}
 
 	/**

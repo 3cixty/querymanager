@@ -25,6 +25,9 @@ public class Preference {
 	/**Attribute which stores information about events populated*/
 	private Set <Event> hasEvents;
 
+	/**Attribute which stores information about periods which events take place*/
+	private Set <Period> hasPeriods;
+
 	@ThalesInputs
 	private Set<SmartPhoneSensorData> hasSmartPhoneSensorData;
 	@ThalesInputs
@@ -182,5 +185,13 @@ public class Preference {
 
 	public void setHasEvents(Set<Event> hasEvents) {
 		this.hasEvents = hasEvents;
+	}
+
+	public Set<Period> getHasPeriods() {
+		return hasPeriods;
+	}
+
+	public void setHasPeriods(Set<Period> hasPeriods) {
+		this.hasPeriods = hasPeriods;
 	}
 }

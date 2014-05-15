@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import eu.threecixty.profile.models.Period;
 import eu.threecixty.profile.models.Preference;
 
 public interface IProfiler {
@@ -56,6 +57,8 @@ public interface IProfiler {
 	 * @param d
 	 */
 	void requireAreaWithin(double d);
+
+	void requirePeriod(int days);
 
 	/**
 	 * Gets user ID.
