@@ -6,8 +6,11 @@
 		<artifactId>privacy-parent</artifactId>
 		<version>1.0</version>
 	</parent>
-	<groupId>org.j3cixty.privacy</groupId>
+	
+	<groupId>eu.3cixty.privacy</groupId>
 	<artifactId>privacy-impl</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	
 	<name>3Cixty privacy manager implementation</name>
 
 	<properties>
@@ -21,7 +24,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>eu.threecixty.privacy</groupId>
+			<groupId>eu.3cixty.privacy</groupId>
 			<artifactId>privacy-api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -116,7 +119,7 @@
 							<password>${threecixty.property.test.data.pass}</password>
 							<sources>
 								<script>
-									<sourceFile>src/test/resources/sql/test-data-derby.sql</sourceFile>
+									<sourceFile>${project.build.directory}/test-classes/sql/test-data-derby.sql</sourceFile>
 								</script>
 							</sources>
 						</configuration>

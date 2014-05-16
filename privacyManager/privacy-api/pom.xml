@@ -5,8 +5,11 @@
     <artifactId>privacy-parent</artifactId>
     <version>1.0</version>
   </parent>
+  
   <groupId>eu.3cixty.privacy</groupId>
   <artifactId>privacy-api</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
   <name>Privacy API</name>
   <description>3Cixty privacy manager API</description>
 </project>
