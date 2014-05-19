@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONObject;
-
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -21,8 +19,6 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.syntax.ElementFilter;
-import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.ThreeCixtyExpression;
@@ -81,7 +77,7 @@ import eu.threecixty.profile.models.Preference;
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		try {
 			String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
-			
+			System.out.println(augmentedQueryStr);
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
@@ -95,13 +91,13 @@ import eu.threecixty.profile.models.Preference;
 				sb.append(new String(b, 0, readBytes));
 			}
 			input.close();
-			if (EventMediaFormat.JSON == format) {
-				int lastIndex = sb.lastIndexOf("}");
-				if (lastIndex >= 0) {
-					String augmentedQueryJson = ", \"AugmentedQuery\": " + JSONObject.quote(augmentedQueryStr);
-					sb.insert(lastIndex, augmentedQueryJson);
-				}
-			}
+//			if (EventMediaFormat.JSON == format) {
+//				int lastIndex = sb.lastIndexOf("}");
+//				if (lastIndex >= 0) {
+//					String augmentedQueryJson = ", \"AugmentedQuery\": " + JSONObject.quote(augmentedQueryStr);
+//					sb.insert(lastIndex, augmentedQueryJson);
+//				}
+//			}
 			return sb.toString();
 
 		} catch (UnsupportedEncodingException e) {
@@ -138,12 +134,50 @@ import eu.threecixty.profile.models.Preference;
 
 	@Override
 	public void performAugmentingTask() {
-		if (preference == null) return;
-		if (query == null) return;
-		List<AugmentedQuery> possibleAugmentedQueries = new ArrayList<AugmentedQuery>();
-		findPossibleAugmentedQueries(possibleAugmentedQueries);
-		if (possibleAugmentedQueries.size() > 0) {
-			augmentedQuery = getBestAugmentedQuery(possibleAugmentedQueries);
+		if (preference == null || query == null) return;
+		List <Triple> triples = new ArrayList <Triple>();
+		List <Expr> exprs = new ArrayList <Expr>();
+		addTriplesAndExprsToLists(triples, exprs);
+		performORAugmentation(triples, exprs); // perform ORAugmentation by default
+	}
+
+	public void performANDAugmentation(List<Triple> triples, List<Expr> exprs) {
+		if (preference == null || query == null) return;
+		if (triples.size() == 0 && exprs.size() == 0) return;
+		augmentedQuery = new AugmentedQuery(query.cloneQuery());
+		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
+		QueryUtils.addAND_ExprsIntoQuery(exprs, augmentedQuery.getQuery().getQuery());
+	}
+
+	public void performORAugmentation(List<Triple> triples, List<Expr> exprs) {
+		if (preference == null || query == null) return;
+		if (triples.size() == 0 && exprs.size() == 0) return;
+		augmentedQuery = new AugmentedQuery(query.cloneQuery());
+		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
+		QueryUtils.addFilterWithOrOperandForExprsIntoQuery(exprs, augmentedQuery.getQuery().getQuery());
+	}
+
+	@Override
+	public void addTriplesAndExprsToLists(
+			List<Triple> triples, List<Expr> exprs) {
+		if (query == null || preference == null) return;
+		Set <Place> places = preference.getHasPlaces();
+		if (places != null) {
+			for (Place place: places) {
+				query.addExpressionsAndTriples(place, exprs, triples);
+			}
+		}
+
+		Set <Event> events = preference.getHasEvents();
+		if (events != null) {
+			for (Event event: events) {
+				query.addExpressionsAndTriples(event, exprs, triples);
+			}
+		}
+
+		Set <Period> periods = preference.getHasPeriods();
+		if (periods != null) {
+			addPeriodsToTriplesAndExprsList(periods, query, triples, exprs);
 		}
 	}
 
@@ -205,113 +239,27 @@ import eu.threecixty.profile.models.Preference;
 		return executeQuery(augmentedQuery);
 	}
 
-	/**
-	 * This method find all the possible augmented queries.
-	 * @param possibleAugmentedQueries
-	 */
-	private void findPossibleAugmentedQueries(
-			List<AugmentedQuery> possibleAugmentedQueries) {
-		// TODO: how to augment a query from a given preference
-		// How to validate whether a query was augmented, what are criteria?
-		// How to validate that a query is not augmented from a given query and preference
-		
-		// for sake of simplicity, take all preferences relevant to places and events
-		if (preference == null) return;
-		
-		AugmentedQuery tmpAugmentedQuery = new AugmentedQuery(query.cloneQuery());
-		
-		if (query instanceof PlaceQuery) {
-			addPlaces((PlaceQuery) tmpAugmentedQuery.getQuery());
-		} else if (query instanceof EventQuery) {
-			addEvent((EventQuery) tmpAugmentedQuery.getQuery());
-		}
-
-		possibleAugmentedQueries.add(tmpAugmentedQuery);
-	}
-
-	/**
-	 * This method finds the best augmented query from a list of possible augmented queries.
-	 * @param possibleAugmentedQueries
-	 * @return
-	 */
-	private AugmentedQuery getBestAugmentedQuery(List<AugmentedQuery> possibleAugmentedQueries) {
-		// TODO: make decision about selecting the best one from a list of possible augmented queries
-		// for sake of simplicity: pick the first one
-		if (possibleAugmentedQueries.size() > 0) {
-			return possibleAugmentedQueries.get(0);
-		}
-		
-		return null;
-	}
-
-	/**
-	 * Adds places preferences to the query.
-	 * @param pq
-	 */
-	private void addPlaces(PlaceQuery pq) {
-		Set <Place> places = preference.getHasPlaces();
-		if (places == null) return;
-		List <Expr> exprs = new ArrayList <Expr>();
-		List <Triple> triples = new ArrayList <Triple>();
-		for (Place place: places) {
-			pq.addExpressionsAndTriples(place, exprs, triples);
-		}
-		QueryUtils.addTriplesIntoQuery(triples, pq.getQuery());
-		QueryUtils.createFilterWithOrOperandForExprs(pq.getQuery(), exprs);
-
-		Set <Period> periods = preference.getHasPeriods();
-		if (periods != null) {
-			addPeriodsToQuery(periods, pq);
-		}
-	}
-
-	/**
-	 * Adds event preferences to the query.
-	 * @param eQuery
-	 */
-	private void addEvent(EventQuery eQuery) {
-		Set <Event> events = preference.getHasEvents();
-		if (events == null) return;
-		List <Expr> exprs = new ArrayList <Expr>();
-		List <Triple> triples = new ArrayList <Triple>();
-		for (Event event: events) {
-			eQuery.addExpressionsAndTriples(event, exprs, triples);
-		}
-		QueryUtils.addTriplesIntoQuery(triples, eQuery.getQuery());
-		QueryUtils.createFilterWithOrOperandForExprs(eQuery.getQuery(), exprs);
-
-		Set <Period> periods = preference.getHasPeriods();
-		if (periods != null) {
-			addPeriodsToQuery(periods, eQuery);
-		}
-	}
-
-	private void addPeriodsToQuery(Set<Period> periods, ThreeCixtyQuery query) {
-		List <Expr> exprs = new ArrayList<Expr>();
-		List <Triple> triples = new ArrayList <Triple>();
-		List <Expr> tmpExprs = new ArrayList <Expr>();
+	private void addPeriodsToTriplesAndExprsList(Set<Period> periods, ThreeCixtyQuery query, List <Triple> triples, List <Expr> exprs) {
+		List <Expr> orTmpExprs = new ArrayList<Expr>();
+		List <Expr> andTmpExprs = new ArrayList <Expr>();
 		for (Period period: periods) {
-			tmpExprs.clear();
+			andTmpExprs.clear();
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "startDate", "datetime",
-					tmpExprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+					andTmpExprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "endDate", "datetime",
-					tmpExprs, triples, ThreeCixtyExpression.LessThanOrEqual);
-			Expr expr = QueryUtils.createExprWithAndOperandForExprs(tmpExprs);
+					andTmpExprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+			Expr expr = QueryUtils.createExprWithAndOperandForExprs(andTmpExprs);
 			if (expr != null) {
-				exprs.add(expr);
+				orTmpExprs.add(expr);
 			}
 		}
 		
-		QueryUtils.addTriplesIntoQuery(triples, query.getQuery());
-		
-		Expr exprResult = QueryUtils.createExprWithOrOperandForExprs(exprs);
+		Expr exprResult = QueryUtils.createExprWithOrOperandForExprs(orTmpExprs);
 		if (exprResult != null) {
-			ElementGroup body = (ElementGroup) query.getQuery().getQueryPattern();
-			if (body == null)  body = new ElementGroup();
-			ElementFilter filter = new ElementFilter(exprResult);
-			body.addElementFilter(filter);
-			query.getQuery().setQueryPattern(body);
+			exprs.add(exprResult);
 		}
+		orTmpExprs.clear();
+		andTmpExprs.clear();
 	}
 
 	private String removePrefixes(String query) {

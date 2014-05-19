@@ -25,6 +25,8 @@ public abstract class ThreeCixtyQuery {
 	 */
 	public abstract ThreeCixtyQuery cloneQuery();
 
+	public abstract void addExpressionsAndTriples(Object object, List <Expr> exprs, List <Triple> triples);
+
 	/**
 	 * Gets Jena's query.
 	 *

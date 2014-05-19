@@ -1,8 +1,11 @@
 package eu.threecixty.querymanager;
 import java.io.InputStream;
+import java.util.List;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
 
@@ -68,6 +71,32 @@ public interface IQueryManager {
 	 * Required by the step 5 in the global architecture.
 	 */
 	void performAugmentingTask();
+	
+	/**
+	 * Performs query augmentation by creating an AND expression for a given list of expressions.
+	 * @param triples
+	 * 				The list of triples which link information for expressions.
+	 * @param exprs
+	 * 				The list of expressions which are filters.
+	 */
+	void performANDAugmentation(List<Triple> triples, List<Expr> exprs);
+	
+	/**
+	 * Performs query augmentation by creating an OR expression for a given list of expressions.
+	 * @param triples
+	 * 				The list of triples which link information for expressions.
+	 * @param exprs
+	 * 				The list of expressions which are filters.
+	 */
+	void performORAugmentation(List<Triple> triples, List<Expr> exprs);
+
+	/**
+	 * Adds triples and expressions found by using preferences into a given list of triples and expressions. 
+	 *
+	 * @param triples
+	 * @param exprs
+	 */
+	void addTriplesAndExprsToLists(List <Triple> triples, List <Expr> exprs);
 
 	/**
 	 * Get augmented query. This method returns the augmented query resulted by the task {@link #performAugmentingTask()}.

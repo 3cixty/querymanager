@@ -28,8 +28,10 @@ public class EventQuery extends ThreeCixtyQuery {
 	 * @param event
 	 * @return
 	 */
-	public void addExpressionsAndTriples(Event event, List <Expr> exprs, List <Triple> triples) {
-		if (query == null || event == null) return;
+	public void addExpressionsAndTriples(Object object, List <Expr> exprs, List <Triple> triples) {
+		if (query == null || object == null) return;
+		if (!(object instanceof Event)) return;
+		Event event = (Event) object;
 		
 		Rating rating = event.getHasRating();
 		if (rating != null) {

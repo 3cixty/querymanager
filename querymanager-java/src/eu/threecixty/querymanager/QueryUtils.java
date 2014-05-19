@@ -102,10 +102,10 @@ public class QueryUtils {
 	 * Creates the filter with an <b>Or</b> operand from a given list of expressions.
 	 * <br><br>
 	 * All the expressions will be used the Or operand to filter in the query.
-	 * @param query
 	 * @param exprs
+	 * @param query
 	 */
-	public static void createFilterWithOrOperandForExprs(Query query, List<Expr> exprs) {
+	public static void addFilterWithOrOperandForExprsIntoQuery(List<Expr> exprs, Query query) {
 		ElementGroup body = (ElementGroup) query.getQueryPattern();
 		if (body == null)  body = new ElementGroup();
 		Expr tmpExpr = createExprWithOrOperandForExprs(exprs);
@@ -165,6 +165,24 @@ public class QueryUtils {
 		if (body == null)  body = new ElementGroup();
 		for (Triple triple: triples) {
 			body.addTriplePattern(triple);
+		}
+		query.setQueryPattern(body);
+	}
+
+	/**
+	 * Adds AND expression for a given list of expressions to a given query.
+	 * @param exprs
+	 * @param query
+	 */
+	public static void addAND_ExprsIntoQuery(List <Expr> exprs, Query query) {
+		if (exprs.size() == 0) return;
+		removeDoubleExpressions(exprs);
+
+		ElementGroup body = (ElementGroup) query.getQueryPattern();
+		if (body == null)  body = new ElementGroup();
+		for (Expr expr: exprs) {
+		    ElementFilter filter = new ElementFilter(expr);
+		    body.addElementFilter(filter);
 		}
 		query.setQueryPattern(body);
 	}
@@ -462,7 +480,7 @@ public class QueryUtils {
 	 *
 	 * @param exprs
 	 */
-	private static void removeDoubleExpressions(List <Expr> exprs) {
+	public static void removeDoubleExpressions(List <Expr> exprs) {
 		List <Expr> tmpExprs = new ArrayList <Expr>();
 		for (Expr expr: exprs) {
 			if (tmpExprs.contains(expr)) continue;

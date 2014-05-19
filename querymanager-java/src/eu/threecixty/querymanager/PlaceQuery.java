@@ -38,8 +38,10 @@ public class PlaceQuery extends ThreeCixtyQuery {
 	 *
 	 * @param place
 	 */
-	public void addExpressionsAndTriples(Place place, List <Expr> exprs, List <Triple> triples) {
-		if (query == null || place == null) return;
+	public void addExpressionsAndTriples(Object object, List <Expr> exprs, List <Triple> triples) {
+		if (query == null || object == null) return;
+		if (!(object instanceof Place)) return;
+		Place place = (Place) object;
 
 		PlaceDetail placeDetail = place.getHasPlaceDetail();
 		if (placeDetail != null) {
