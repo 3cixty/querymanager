@@ -31,13 +31,6 @@ public class QueryManagerServlet extends HttpServlet {
 	private static final String FILTER_PARAM = "filter";
 	private static final String FRIENDS_PARAM = "friends";
 	
-	// FILTER Options
-	private static final String LOCATION = "location";
-	private static final String ENTERED_RATING = "enteredrating";
-	private static final String GPS_LOCATION = "gpslocation";
-	
-	
-	
 	private static final String PARAM_EXCEPTION = "There is an error for parameters";
 
 	private static String allPrefixes = null;
@@ -115,60 +108,17 @@ public class QueryManagerServlet extends HttpServlet {
 
 		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
 
-		// populate user preferences from user profile
-		if ((profiler != null) && isUsingPreferences) {
-			setInfoRequirementsFromProfiler(req, profiler);
-		    profiler.PopulateProfile();
-		}
-		
-		// take preferences into account to augment queries (only fade place preferences are available)
-		qm.requestPreferences(profiler);
-
 		// TODO: correct the following line by exactly recognizing query's type
 		// suppose that we recognize that the query is for places
 		ThreeCixtyQuery placeQuery = new PlaceQuery(jenaQuery);
 
 		qm.setQuery(placeQuery);
-
-		// perform query augmentation when necessary
-		if (isUsingPreferences) {
-			qm.performAugmentingTask();
-		}
-
-		String result = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), eventMediaFormat);
 		
-		return result;
-	}
-
-	/**
-	 * Requires information to populate from UserProfile.
-	 * @param req
-	 * @param profiler
-	 */
-    private void setInfoRequirementsFromProfiler(HttpServletRequest req,  IProfiler profiler) {
-    	try {
-    		String friends = req.getParameter(FRIENDS_PARAM);
-    		if (friends == null || "false".equalsIgnoreCase(friends)) { // prefs based on "I"
-        		String filter = req.getParameter(FILTER_PARAM);
-        		if (filter == null) return;
-    			if (filter.equalsIgnoreCase(LOCATION)) {
-    				profiler.requireCurrentCountry(true);
-    				profiler.requireCurrentTown(true);
-    			} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
-    				// TODO: fixed value
-    				// should find minimum value from PreferredProfile
-    				profiler.requireScoreRatedAtLeast(5);
-    				profiler.requireNumberOfTimesVisitedAtLeast(3);
-    			} else if (filter.equalsIgnoreCase(GPS_LOCATION)) {
-    				// TODO: fixed value
-    				profiler.requireAreaWithin(10);
-    			}
-    		} else { // based on "my friends"
-    			profiler.requireNumberOfTimesVisitedForFriendsAtLeast(2); // value rated in UserProfile
-    			profiler.requireScoreRatedForFriendsAtLeast(4);
-    		}
-    	} catch (Exception e) {
-    	}
+		String filter = req.getParameter(FILTER_PARAM);
+		String friends = req.getParameter(FRIENDS_PARAM);
+		boolean basedOnFriends = (friends == null || "false".equalsIgnoreCase(friends));
+		String result = QueryManagerDecision.run(profiler, qm, filter, basedOnFriends, eventMediaFormat);
+		return  result;
 	}
 
 	/**
