@@ -110,13 +110,13 @@ public class QueryManagerServlet extends HttpServlet {
 
 		// TODO: correct the following line by exactly recognizing query's type
 		// suppose that we recognize that the query is for places
-		ThreeCixtyQuery placeQuery = new PlaceQuery(jenaQuery);
+		ThreeCixtyQuery placeQuery = new ThreeCixtyQuery(jenaQuery);
 
 		qm.setQuery(placeQuery);
 		
 		String filter = req.getParameter(FILTER_PARAM);
 		String friends = req.getParameter(FRIENDS_PARAM);
-		boolean basedOnFriends = (friends == null || "false".equalsIgnoreCase(friends));
+		boolean basedOnFriends = (friends != null && "true".equalsIgnoreCase(friends));
 		String result = QueryManagerDecision.run(profiler, qm, filter, basedOnFriends, eventMediaFormat);
 		return  result;
 	}
