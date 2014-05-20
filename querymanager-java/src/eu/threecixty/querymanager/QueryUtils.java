@@ -27,6 +27,7 @@ import com.hp.hpl.jena.sparql.expr.E_LessThanOrEqual;
 import com.hp.hpl.jena.sparql.expr.E_LogicalAnd;
 import com.hp.hpl.jena.sparql.expr.E_LogicalOr;
 import com.hp.hpl.jena.sparql.expr.E_NotEquals;
+import com.hp.hpl.jena.sparql.expr.E_Str;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
@@ -470,6 +471,8 @@ public class QueryUtils {
 			return new E_LessThan(new ExprVar(filtervarName), node);
 		} else if (threeCixyExpr == ThreeCixtyExpression.LessThanOrEqual) {
 			return new E_LessThanOrEqual(new ExprVar(filtervarName), node);
+		} else if (threeCixyExpr == ThreeCixtyExpression.StringEqual) {
+			return new E_Equals(new E_Str(new ExprVar(filtervarName)), node);
 		} else {
 			return new E_NotEquals(new ExprVar(filtervarName), node);
 		}

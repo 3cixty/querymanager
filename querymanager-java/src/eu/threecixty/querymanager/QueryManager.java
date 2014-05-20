@@ -76,6 +76,7 @@ import eu.threecixty.profile.models.Preference;
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		try {
+			augmentedQuery.getQuery().getQuery().setDistinct(true);
 			String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
 			System.out.println(augmentedQueryStr);
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");

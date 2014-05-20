@@ -1,6 +1,5 @@
 package eu.threecixty.profile;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -414,15 +413,15 @@ public class ProfilerPlaceUtils {
 		pref.setHasPlaces(places);
 	}
 
-	public static void addDays(Preference pref, int days) {
+	public static void addDays(Preference pref, Period period) {
 		try {
 			//
 //			java.text.DateFormat format = new java.text.SimpleDateFormat("d/M/yyyy");
 //			Date startDate = format.parse("1/1/2014");
-			Date startDate = new Date();
-
-			Date endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000L);
-			Period period = new Period(startDate, endDate);
+//			Date startDate = new Date();
+//
+//			Date endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000L);
+//			Period period = new Period(startDate, endDate);
 			Set <Period> periods = pref.getHasPeriods();
 			if (periods == null) periods = new HashSet <Period>();
 			periods.add(period);

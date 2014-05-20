@@ -1,5 +1,7 @@
 package eu.threecixty.querymanager;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -11,6 +13,7 @@ import com.hp.hpl.jena.sparql.expr.E_LogicalNot;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
+import eu.threecixty.profile.models.Period;
 
 /**
  * The class is used to make decision about query augmentation.
@@ -21,6 +24,7 @@ public class QueryManagerDecision {
 
 	private static final String LOCATION = "location";
 	private static final String ENTERED_RATING = "enteredrating";
+	private static final String PREFERRED = "preferred";
 
 	/**
 	 * Executes the query found in a given query manager.
@@ -39,6 +43,8 @@ public class QueryManagerDecision {
 				return filterBasedOnLocation(profiler, qm, format);
 			} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
 				return filterBasedOnEnteredRating(profiler, qm, format);
+			} else if (filter.equalsIgnoreCase(PREFERRED)) {
+				return filterBasedOnPreferredEvent(profiler, qm, format);
 			}
 		} else {
 			return filterBasedOnFriends(profiler, qm, format);
@@ -75,7 +81,14 @@ public class QueryManagerDecision {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requirePeriod(2); // 2 days
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.HOUR, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 1);
+		Date startDate = calendar.getTime();
+		Date endDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000L - 2 * 1000);
+		Period period = new Period(startDate, endDate); // for 2 days
+		profiler.requirePeriod(period);
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 		Expr daysExpr = createExpr(exprs);
 		
@@ -168,6 +181,24 @@ public class QueryManagerDecision {
 		return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
 	}
 
+	private static String filterBasedOnPreferredEvent(IProfiler profiler, IQueryManager qm,
+			EventMediaFormat format) {
+		// TODO
+		List <Triple> triples = new ArrayList <Triple>();
+		List <Expr> exprs = new ArrayList<Expr>();
+		profiler.initDefaultParametersForAugmentation();
+		profiler.requireEventName(true);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
+		Expr eventNameExpr = createExpr(exprs);
+		
+		profiler.initDefaultParametersForAugmentation();
+		profiler.requirePreferredEventDates(true);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
+		Expr preferredDates = createExpr(exprs);
+
+		return filterBasedOnTwoExprs(eventNameExpr, preferredDates, qm, triples, format);
+	}
+
 	/**
 	 * Executes the query (at EventMedia) based on two expressions.
 	 * @param expr1
@@ -196,12 +227,12 @@ public class QueryManagerDecision {
 			qm.performANDAugmentation(triples, exprs);
 			results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
 			
-			exprs.set(0, new E_LogicalNot(expr1)); // (none first one) and second one 
+			exprs.set(0, new E_LogicalNot(expr1)); // (not first one) and second one 
 			qm.performANDAugmentation(triples, exprs);
 			results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
 
 			exprs.set(0, expr1);
-			exprs.set(1, new E_LogicalNot(expr2)); // first one and (none second one)
+			exprs.set(1, new E_LogicalNot(expr2)); // first one and (not second one)
 			qm.performANDAugmentation(triples, exprs);
 			results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
 			

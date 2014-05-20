@@ -286,7 +286,7 @@ public class TestQM {
 		
 		qm.requestPreferences(profiler);
 		
-		ThreeCixtyQuery placeQuery = new PlaceQuery(query);
+		ThreeCixtyQuery placeQuery = new ThreeCixtyQuery(query);
 		
 		qm.setQuery(placeQuery);
 		

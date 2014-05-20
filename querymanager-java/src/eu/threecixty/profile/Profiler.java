@@ -6,6 +6,7 @@ import java.io.InputStream;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import eu.threecixty.profile.models.Period;
 import eu.threecixty.profile.models.Preference;
 
 public class Profiler implements IProfiler {
@@ -25,7 +26,10 @@ public class Profiler implements IProfiler {
 	private float scoreRatedForFriendsAtLeast = -1;
 
 	private double distanceFromCurrentPosition = -1;
-	private int days = -1;
+	private Period period = null;
+
+	private boolean eventNameRequired = false;
+	private boolean preferredEventDatesRequired = false;
 
 	public Profiler(String uid) {
 		// TODO: uncomment and remove fixed UID
@@ -69,8 +73,14 @@ public class Profiler implements IProfiler {
 		    if (distanceFromCurrentPosition != -1) {
 		    	ProfilerPlaceUtils.addGPSCoordinates(pref, rdfModel, uID, distanceFromCurrentPosition);
 		    }
-		    if (days != 1) {
-		    	ProfilerPlaceUtils.addDays(pref, days);
+		    if (period != null) {
+		    	ProfilerPlaceUtils.addDays(pref, period);
+		    }
+		    if (eventNameRequired) {
+		    	ProfilerEventUtils.addEventName(pref, rdfModel, uID);
+		    }
+		    if (preferredEventDatesRequired) {
+		    	ProfilerEventUtils.addPeriod(pref, rdfModel, uID);
 		    }
 		}
 	}
@@ -125,7 +135,9 @@ public class Profiler implements IProfiler {
 		currentCountryRequired = false;
 		currentTownRequired = false;
 		distanceFromCurrentPosition = -1;
-		days = -1;
+		period = null;
+		eventNameRequired = false;
+		preferredEventDatesRequired = false;
 	}
 
 	@Override
@@ -155,8 +167,18 @@ public class Profiler implements IProfiler {
 	}
 
 	@Override
-	public void requirePeriod(int days) {
-		this.days = days;
+	public void requirePeriod(Period period) {
+		this.period = period;
+	}
+
+	@Override
+	public void requireEventName(boolean eventNameRequired) {
+		this.eventNameRequired = eventNameRequired;
+	}
+
+	@Override
+	public void requirePreferredEventDates(boolean preferredEventDates) {
+		this.preferredEventDatesRequired = preferredEventDates;
 	}
 	
 }

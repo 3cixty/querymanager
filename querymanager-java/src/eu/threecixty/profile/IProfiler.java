@@ -58,7 +58,23 @@ public interface IProfiler {
 	 */
 	void requireAreaWithin(double d);
 
-	void requirePeriod(int days);
+	/**
+	 * Requires a period of time from today to next <code>ndays</code> days
+	 * @param ndays
+	 */
+	void requirePeriod(Period period);
+
+	/**
+	 * Requires event name.
+	 * @param eventNameRequired
+	 */
+	void requireEventName(boolean eventNameRequired);
+
+	/**
+	 * Requires preferred event dates.
+	 * @param preferredEventDates
+	 */
+	void requirePreferredEventDates(boolean preferredEventDates);
 
 	/**
 	 * Gets user ID.
