@@ -34,22 +34,13 @@ public interface StoreIndex {
 	public abstract User addUser(String user, String authenticator);
 
 	/**
-	 * Fetch a store user from its ID, obtained from a previous query.
-	 * 
-	 * @param userId
-	 *            the record ID for user, which must be unique
-	 * @return the matching StoreUser or null if it failed or none is found.
-	 */
-	public abstract User getUserById(long userId);
-
-	/**
-	 * Fetch a store user from its name.
+	 * Fetch a store user from its ID.
 	 * 
 	 * @param user
-	 *            the user name to search for
+	 *            the user ID to search for
 	 * @return the matching StoreUser or null if it failed or none is found.
 	 */
-	public abstract User getUserByName(String user);
+	public abstract User findUser(String user);
 
 	/**
 	 * Add a resource into the index. The operation fails if a resource of same
@@ -62,9 +53,9 @@ public interface StoreIndex {
 	 * its value is stored
 	 * </p>
 	 * 
-	 * @param userId
+	 * @param user
 	 *            the ID of the user who owns this resource. This value is
-	 *            obtained with {@link #getUserByName(String)} and must be
+	 *            obtained with {@link #findUser(String)} and must be
 	 *            already registered in the index.
 	 * @param ontology
 	 *            the ontology URL string that identifies this resource. Must
@@ -79,7 +70,7 @@ public interface StoreIndex {
 	 *            the resource
 	 * @return the created StoreResource or null if the operation failed.
 	 */
-	public abstract Value addResource(long userId, String ontology,
+	public abstract Value addResource(String user, String ontology,
 			String resource, String provider);
 
 	/**

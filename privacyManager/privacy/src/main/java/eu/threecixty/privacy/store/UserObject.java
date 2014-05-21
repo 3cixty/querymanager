@@ -4,30 +4,19 @@ package eu.threecixty.privacy.store;
  * Mutable implementation of the {@link User} interface.
  */
 public class UserObject implements User {
-	private Long userId;
-	private String name;
+
+	private String id;
 	private byte[] auth;
 
 	/* (non-Javadoc)
-	 * @see eu.threecixty.privacy.store.IUser#getUserId()
+	 * @see eu.threecixty.privacy.store.IUser#getId()
 	 */
-	public Long getUserId() {
-		return userId;
+	public String getId() {
+		return id;
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	/* (non-Javadoc)
-	 * @see eu.threecixty.privacy.store.IUser#getName()
-	 */
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/* (non-Javadoc)
@@ -43,8 +32,7 @@ public class UserObject implements User {
 
 	@Override
 	public String toString() {
-		return "StoreUser [id=" + userId + ", name=" + name + ", authenticator="
-				+ auth + "]";
+		return "StoreUser [id=" + id + ", authenticator=" + auth + "]";
 	}
 
 }

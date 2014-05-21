@@ -9,18 +9,20 @@
 	</parent>
 
 	<artifactId>privacy-parent</artifactId>
+	
 	<name>PrivacyManager project</name>
 	<packaging>pom</packaging>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<skip.integration.tests>true</skip.integration.tests>
+		<skip.integration.tests>false</skip.integration.tests>
 	</properties>
 
 	<modules>
 		<module>privacy-api</module>
 		<module>privacy</module>
+<!-- 		<module>privacy-demo</module> -->
 	</modules>
 
 	<dependencyManagement>

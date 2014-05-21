@@ -117,9 +117,9 @@ public class SQLIndex implements StoreIndex {
 		return null;
 	}
 
-	public User getUserById(long userId) {
+	public User findUser(String user) {
 		try {
-			return schema.getUserById(conn, userId);
+			return schema.getUser(conn, user);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -127,20 +127,10 @@ public class SQLIndex implements StoreIndex {
 		return null;
 	}
 
-	public User getUserByName(String user) {
-		try {
-			return schema.getUserByName(conn, user);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-
-	public Value addResource(long ownerUid, String ontology,
+	public Value addResource(String user, String ontology,
 			String resource, String provider) {
 		try {
-			return schema.addResource(conn, ownerUid, ontology, resource, provider);
+			return schema.addResource(conn, user, ontology, resource, provider);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -150,7 +140,7 @@ public class SQLIndex implements StoreIndex {
 
 	public Value getResourceByOntology(String ontology) {
 		try {
-			return schema.getResourceByOntology(conn, ontology);
+			return schema.getResource(conn, ontology);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

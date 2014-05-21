@@ -4,29 +4,14 @@ package eu.threecixty.privacy.store;
  * Mutable implementation of the {@link Value} interface.
  */
 public class ValueObject implements Value {
-	private Long id;
 	private String ontology;
 	
-	/** References an id from the user table. */
-	private Long userId;
+	/** References an id from the PRIVACY_USER table. */
+	private String owner;
 	
 	private String resource;
 	private String provider;
 
-	/* (non-Javadoc)
-	 * @see eu.threecixty.privacy.store.IUser#getId()
-	 */
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	/* (non-Javadoc)
-	 * @see eu.threecixty.privacy.store.IUser#getOntology()
-	 */
 	public String getOntology() {
 		return ontology;
 	}
@@ -35,15 +20,12 @@ public class ValueObject implements Value {
 		this.ontology = ontology;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.threecixty.privacy.store.IUser#getOnwerUid()
-	 */
-	public long getUserId() {
-		return userId;
+	public String getOwner() {
+		return owner;
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 	/* (non-Javadoc)
@@ -70,8 +52,9 @@ public class ValueObject implements Value {
 
 	@Override
 	public String toString() {
-		return "StoreResource [id=" + id + ", ontology=" + ontology
-				+ ", creatorUid=" + userId + ", resource=" + resource
+		return "StoreResource [ontology=" + ontology
+				+ ", owner=" + owner
+				+ ", resource=" + resource
 				+ ", provider=" + provider + "]";
 	}
 }
