@@ -78,56 +78,76 @@ public class QueryManagerDecision {
 	 */
 	private static String filterBasedOnLocation(IProfiler profiler, IQueryManager qm,
 			EventMediaFormat format) {
-		List <Triple> triples = new ArrayList <Triple>();
+		List <Triple> triples1 = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 1);
-		Date startDate = calendar.getTime();
-		Date endDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000L - 2 * 1000);
-		Period period = new Period(startDate, endDate); // for 2 days
+		Period period = createPeriod(); // two days
 		profiler.requirePeriod(period);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
+		findTriplesAndExprs(profiler, qm, triples1, exprs);
 		Expr daysExpr = createExpr(exprs);
 		
+		List <Triple> triples2 = new ArrayList <Triple>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireAreaWithin(2); // within 2 km
-		findTriplesAndExprs(profiler, qm, triples, exprs);
+		findTriplesAndExprs(profiler, qm, triples2, exprs);
 		Expr areaExpr = createExpr(exprs);
 
+		List <Triple> triples3 = new ArrayList <Triple>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireCurrentTown(true);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
+		findTriplesAndExprs(profiler, qm, triples3, exprs);
 		Expr townExpr = createExpr(exprs);
 		
+		List <Triple> triples4 = new ArrayList <Triple>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireCurrentCountry(true);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
+		findTriplesAndExprs(profiler, qm, triples4, exprs);
 		Expr countryExpr = createExpr(exprs);
 		
-		if (daysExpr != null) exprs.add(daysExpr);
-		if (areaExpr != null) exprs.add(areaExpr);
-		if (townExpr != null) exprs.add(townExpr);
-		if (countryExpr != null) exprs.add(countryExpr);
+		List <Triple> allTriples = new ArrayList <Triple>();
+		List <List<Triple>> triplesCollection = new ArrayList <List<Triple>>();
+		
+		if (daysExpr != null) {
+			triplesCollection.add(triples1);
+			allTriples.addAll(triples1);
+			exprs.add(daysExpr);
+		}
+		if (areaExpr != null) {
+			triplesCollection.add(triples2);
+			allTriples.addAll(triples2);
+			exprs.add(areaExpr);
+		}
+		if (townExpr != null) {
+			triplesCollection.add(triples3);
+			allTriples.addAll(triples3);
+			exprs.add(townExpr);
+		}
+		if (countryExpr != null) {
+			triplesCollection.add(triples4);
+			allTriples.addAll(triples4);
+			exprs.add(countryExpr);
+		}
 		
 		QueryUtils.removeDoubleExpressions(exprs);
 
 		if (exprs.size() == 0) {
 			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 		} else if (exprs.size() == 1) {
-			qm.performANDAugmentation(triples, exprs);
+			qm.performANDAugmentation(allTriples, exprs);
 			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 		} else {
-			List <String> results = new ArrayList <String>();
-			for (int i = 0; i < exprs.size() - 1; i++) {
-				qm.performANDAugmentation(triples, exprs);
-				results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
-				Expr notExpr = new E_LogicalNot(exprs.get(i));
-				exprs.set(i, notExpr);
+			if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
+				return executeQueryAugmentationForCounting(qm, format, triplesCollection, exprs);
+			} else { 
+				List <String> results = new ArrayList <String>();
+				for (int i = 0; i < exprs.size() - 1; i++) {
+					qm.performANDAugmentation(allTriples, exprs);
+					results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
+					Expr notExpr = new E_LogicalNot(exprs.get(i));
+					exprs.set(i, notExpr);
+				}
+				return getResultWithLimitNumber(results, qm.getQuery().getQuery().getLimit());
 			}
-			return getResultWithLimitNumber(results, qm.getQuery().getQuery().getLimit());
 		}
 	}
 
@@ -153,17 +173,23 @@ public class QueryManagerDecision {
 		profiler.requireNumberOfTimesVisitedAtLeast(3);
 		findTriplesAndExprs(profiler, qm, triples, exprs2);
 
+		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
+			exprs1.addAll(exprs2);
+			qm.performORAugmentation(triples, exprs1);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		} else {
 		
-		for (Expr tmpExpr: exprs1) {
-			if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
-		}
-		QueryUtils.removeDoubleExpressions(exprs1);
-		QueryUtils.removeDoubleExpressions(exprs2);
+			for (Expr tmpExpr: exprs1) {
+				if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
+			}
+			QueryUtils.removeDoubleExpressions(exprs1);
+			QueryUtils.removeDoubleExpressions(exprs2);
 
-		Expr scoreExpr = createExpr(exprs1);
-		Expr visitedExpr = createExpr(exprs2);
-		
-		return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
+			Expr scoreExpr = createExpr(exprs1);
+			Expr visitedExpr = createExpr(exprs2);
+
+			return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
+		}
 	}
 
 	/**
@@ -188,17 +214,23 @@ public class QueryManagerDecision {
 		profiler.requireNumberOfTimesVisitedForFriendsAtLeast(2);
 		findTriplesAndExprs(profiler, qm, triples, exprs2);
 
+		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
+			exprs1.addAll(exprs2);
+			qm.performORAugmentation(triples, exprs1);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		} else {
 		
-		for (Expr tmpExpr: exprs1) {
-			if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
-		}
-		QueryUtils.removeDoubleExpressions(exprs1);
-		QueryUtils.removeDoubleExpressions(exprs2);
+			for (Expr tmpExpr: exprs1) {
+				if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
+			}
+			QueryUtils.removeDoubleExpressions(exprs1);
+			QueryUtils.removeDoubleExpressions(exprs2);
 
-		Expr scoreExpr = createExpr(exprs1);
-		Expr visitedExpr = createExpr(exprs2);
-		
-		return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
+			Expr scoreExpr = createExpr(exprs1);
+			Expr visitedExpr = createExpr(exprs2);
+
+			return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
+		}
 	}
 
 	private static String filterBasedOnPreferredEvent(IProfiler profiler, IQueryManager qm,
@@ -216,7 +248,16 @@ public class QueryManagerDecision {
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 		Expr preferredDates = createExpr(exprs);
 
-		return filterBasedOnTwoExprs(eventNameExpr, preferredDates, qm, triples, format);
+		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
+			List <Expr> exprs1 = new ArrayList<Expr>();
+			if (eventNameExpr != null) exprs1.add(eventNameExpr);
+			if (preferredDates != null) exprs1.add(preferredDates);
+			qm.performORAugmentation(triples, exprs1);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		} else {
+		
+		    return filterBasedOnTwoExprs(eventNameExpr, preferredDates, qm, triples, format);
+		}
 	}
 
 	/**
@@ -291,7 +332,7 @@ public class QueryManagerDecision {
 	 * @param limit
 	 * @return
 	 */
-	public static String getResultWithLimitNumber(List <String> resultsOfQueries, long limit) {	
+	private static String getResultWithLimitNumber(List <String> resultsOfQueries, long limit) {	
 		JSONArray rets = new JSONArray();
 		for (String result: resultsOfQueries) {
 			JSONObject obj = new JSONObject(result);
@@ -318,6 +359,27 @@ public class QueryManagerDecision {
 		buffer.append(rets.toString());
 		buffer.append('}').append('}');
 		return buffer.toString();
+	}
+
+	private static String executeQueryAugmentationForCounting(IQueryManager qm,
+			EventMediaFormat format, List <List<Triple>> triples, List <Expr> exprs) {
+		// only keep the last element which is the largest subset
+		Expr lastEl = exprs.get(exprs.size() - 1);
+		List <Triple> lastTriples = triples.get(exprs.size() - 1);
+		exprs.clear();
+		exprs.add(lastEl);
+		qm.performANDAugmentation(lastTriples, exprs);
+		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+	}
+
+	private static Period createPeriod() {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.HOUR, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 1);
+		Date startDate = calendar.getTime();
+		Date endDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000L - 2 * 1000);
+		return new Period(startDate, endDate); // for 2 days
 	}
 
 	/**
