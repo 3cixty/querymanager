@@ -24,5 +24,18 @@ public class Event {
 	public void setHasRating(Rating hasRating) {
 		this.hasRating = hasRating;
 	}
-	
+
+	public boolean equals(Object object) {
+		if (object == null) return false;
+		if (this == object) return true;
+		if (!(object instanceof Event)) return false;
+		Event event = (Event) object;
+		if (hasEventDetail == null) {
+			if (event.hasEventDetail != null) return false;
+		} else if (!hasEventDetail.equals(event.hasEventDetail)) return false;
+		if (hasRating == null) {
+			if (event.hasRating != null) return false;
+		} else if (!hasRating.equals(event.hasRating)) return false;
+		return true;
+	}
 }

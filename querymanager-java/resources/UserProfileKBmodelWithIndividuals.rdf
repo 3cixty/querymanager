@@ -4476,7 +4476,7 @@
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805EventDetail">
         <rdf:type rdf:resource="&profile;EventDetails"/>
         <hasDateUntil>24/5/2014</hasDateUntil>
-        <hasEventName>Concert in Milan</hasEventName>
+        <hasEventName>Brand New</hasEventName>
         <hasDateFrom>20/05/2014</hasDateFrom>
         <hasNatureOfEvent>Concert</hasNatureOfEvent>
     </owl:NamedIndividual>
@@ -4520,6 +4520,26 @@
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805Likes">
         <rdf:type rdf:resource="&profile;Like"/>
         <hasLikeType>Event</hasLikeType>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805MusicDefinedRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;100900047095598983805MusicDefinedRating">
+        <rdf:type rdf:resource="&profile;Rating"/>
+        <hasUserInteractionMode>Visited</hasUserInteractionMode>
+        <hasUserDefinedRating rdf:datatype="&xsd;double">4</hasUserDefinedRating>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805MusicRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;100900047095598983805MusicRating">
+        <rdf:type rdf:resource="&profile;UserEventRating"/>
+        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">3</hasNumberofTimesVisited>
+        <hasEventDetail rdf:resource="&profile;100900047095598983805EventDetail"/>
     </owl:NamedIndividual>
     
 
@@ -4590,6 +4610,7 @@
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805UserEnteredRating">
         <rdf:type rdf:resource="&profile;UserEnteredRatings"/>
         <hasUserHotelRating rdf:resource="&profile;100900047095598983805HiltonMilanHotelRating"/>
+        <hasUserEventRating rdf:resource="&profile;100900047095598983805MusicRating"/>
     </owl:NamedIndividual>
     
 

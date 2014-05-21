@@ -62,4 +62,20 @@ public class PlaceDetail {
 		this.area = area;
 	}
 	
+	public boolean equals(Object object) {
+		if (object == null) return false;
+		if (this == object) return true;
+		if (!(object instanceof PlaceDetail)) return false;
+		PlaceDetail pd = (PlaceDetail) object;
+		if (hasPlaceName == null) {
+			if (pd.hasPlaceName != null) return false;
+		} else if (!hasPlaceName.equals(pd.hasPlaceName)) return false;
+		if (hasAddress == null) {
+			if (pd.hasAddress != null) return false;
+		} else if (!hasAddress.equals(pd.hasAddress)) return false;
+		if (hasNatureOfPlace == null) {
+			if (pd.hasNatureOfPlace != null) return false;
+		} else if (hasNatureOfPlace != pd.hasNatureOfPlace) return false;
+		return true;
+	}
 }

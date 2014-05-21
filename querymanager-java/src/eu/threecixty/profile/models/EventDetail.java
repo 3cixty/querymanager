@@ -50,5 +50,20 @@ public class EventDetail{
 		this.hasNatureOfEvent = hasNatureOfEvent;
 	}
 	
-	
+	public boolean equals(Object object) {
+		if (object == null) return false;
+		if (this == object) return true;
+		if (!(object instanceof EventDetail)) return false;
+		EventDetail ed = (EventDetail) object;
+		if (hasEventName == null) {
+			if (ed.hasEventName != null) return false;
+		} else if (!hasEventName.equals(ed.hasEventName)) return false;
+		if (hasNatureOfEvent == null) {
+			if (ed.hasNatureOfEvent != null) return false;
+		} else if (hasNatureOfEvent != ed.hasNatureOfEvent) return false;
+		if (hasTemporalDetails == null) {
+			if (ed.hasTemporalDetails != null) return false;
+		} else if (!hasTemporalDetails.equals(ed.hasTemporalDetails)) return false;
+		return true;
+	}
 }

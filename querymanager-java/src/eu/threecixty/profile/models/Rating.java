@@ -43,5 +43,18 @@ public class Rating {
 		this.hasKeyTags = hasKeyTags;
 	}
 	
-	
+	public boolean equals(Object object) {
+		if (object == null) return false;
+		if (this == object) return true;
+		if (!(object instanceof Rating)) return false;
+		Rating rating = (Rating) object;
+		if (hasUserInteractionMode == null) {
+			if (rating.hasUserInteractionMode != null) return false;
+		} else if (hasUserInteractionMode != rating.hasUserInteractionMode) return false;
+		if (hasRatingTime == null) {
+			if (rating.hasRatingTime != null) return false;
+		} else if (!hasRatingTime.equals(rating.hasRatingTime)) return false;
+		
+		return hasUseDefinedRating == rating.hasUseDefinedRating;
+	}
 }

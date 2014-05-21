@@ -37,4 +37,17 @@ public class TemporalDetails {
 		this.hasKeyTags = hasKeyTags;
 	}
 	
+	public boolean equals(Object object) {
+		if (object == null) return false;
+		if (this == object) return true;
+		if (!(object instanceof TemporalDetails)) return false;
+		TemporalDetails td = (TemporalDetails) object;
+		if (hasDateFrom == null) {
+			if (td.hasDateFrom != null) return false;
+		} else if (!hasDateFrom.equals(td.hasDateFrom)) return false;
+		if (hasDateUntil == null) {
+			if (td.hasDateUntil != null) return false;
+		} else if (!hasDateUntil.equals(td.hasDateUntil)) return false;
+		return true;
+	}
 }

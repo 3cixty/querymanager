@@ -142,16 +142,26 @@ public class QueryManagerDecision {
 			EventMediaFormat format) {
 		// TODO: find minimum values from preferences
 		List <Triple> triples = new ArrayList <Triple>();
-		List <Expr> exprs = new ArrayList<Expr>();
+		List <Expr> exprs1 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireScoreRatedAtLeast(5);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
-		Expr scoreExpr = createExpr(exprs);
+		findTriplesAndExprs(profiler, qm, triples, exprs1);
+
 		
+		List <Expr> exprs2 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireNumberOfTimesVisitedAtLeast(3);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
-		Expr visitedExpr = createExpr(exprs);
+		findTriplesAndExprs(profiler, qm, triples, exprs2);
+
+		
+		for (Expr tmpExpr: exprs1) {
+			if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
+		}
+		QueryUtils.removeDoubleExpressions(exprs1);
+		QueryUtils.removeDoubleExpressions(exprs2);
+
+		Expr scoreExpr = createExpr(exprs1);
+		Expr visitedExpr = createExpr(exprs2);
 		
 		return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
 	}
@@ -167,16 +177,26 @@ public class QueryManagerDecision {
 			EventMediaFormat format) {
 		// TODO: find minimum values from preferences
 		List <Triple> triples = new ArrayList <Triple>();
-		List <Expr> exprs = new ArrayList<Expr>();
+		List <Expr> exprs1 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireScoreRatedForFriendsAtLeast(4);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
-		Expr scoreExpr = createExpr(exprs);
+		findTriplesAndExprs(profiler, qm, triples, exprs1);
+
 		
+		List <Expr> exprs2 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireNumberOfTimesVisitedForFriendsAtLeast(2);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
-		Expr visitedExpr = createExpr(exprs);
+		findTriplesAndExprs(profiler, qm, triples, exprs2);
+
+		
+		for (Expr tmpExpr: exprs1) {
+			if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
+		}
+		QueryUtils.removeDoubleExpressions(exprs1);
+		QueryUtils.removeDoubleExpressions(exprs2);
+
+		Expr scoreExpr = createExpr(exprs1);
+		Expr visitedExpr = createExpr(exprs2);
 		
 		return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
 	}

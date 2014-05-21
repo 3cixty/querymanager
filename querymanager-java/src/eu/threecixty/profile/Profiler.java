@@ -21,7 +21,7 @@ public class Profiler implements IProfiler {
 	private boolean currentTownRequired = false;
 	private int numberOfTimeVisitedAtLeast = -1;
 	private float scoreRatedAtLeast = -1;
-
+	
 	private int numberOfTimeVisitedForFriendsAtLeast = -1;
 	private float scoreRatedForFriendsAtLeast = -1;
 
@@ -60,15 +60,19 @@ public class Profiler implements IProfiler {
 		    
 		    if (scoreRatedAtLeast != -1) {
 		        ProfilerPlaceUtils.addPlaceNameFromRating(pref, rdfModel, uID, scoreRatedAtLeast);
+		        ProfilerEventUtils.addEventNameFromRating(pref, rdfModel, uID, scoreRatedAtLeast);
 		    }
 		    if (numberOfTimeVisitedAtLeast != -1) {
 		        ProfilerPlaceUtils.addPlaceNameFromNumberOfTimesVisited(pref, rdfModel, uID, numberOfTimeVisitedAtLeast);
+		        ProfilerEventUtils.addEventNameFromNumberOfTimesVisited(pref, rdfModel, uID, numberOfTimeVisitedAtLeast);
 		    }
 		    if (scoreRatedForFriendsAtLeast != -1) {
 		    	ProfilerPlaceUtils.addPlaceNameFromRatingOfFriends(pref, rdfModel, uID, scoreRatedForFriendsAtLeast);
+		    	ProfilerEventUtils.addEventNameFromRatingOfFriends(pref, rdfModel, uID, scoreRatedForFriendsAtLeast);
 		    }
 		    if (numberOfTimeVisitedForFriendsAtLeast != -1) {
 		    	ProfilerPlaceUtils.addPlaceNameFromNumberOfTimesVisitedOfFriends(pref, rdfModel, uID, numberOfTimeVisitedForFriendsAtLeast);
+		    	ProfilerEventUtils.addEventNameFromNumberOfTimesVisitedOfFriends(pref, rdfModel, uID, numberOfTimeVisitedForFriendsAtLeast);
 		    }
 		    if (distanceFromCurrentPosition != -1) {
 		    	ProfilerPlaceUtils.addGPSCoordinates(pref, rdfModel, uID, distanceFromCurrentPosition);
@@ -80,7 +84,7 @@ public class Profiler implements IProfiler {
 		    	ProfilerEventUtils.addEventName(pref, rdfModel, uID);
 		    }
 		    if (preferredEventDatesRequired) {
-		    	ProfilerEventUtils.addPeriod(pref, rdfModel, uID);
+		    	ProfilerEventUtils.addPreferredStartAndEndDate(pref, rdfModel, uID);
 		    }
 		}
 	}
@@ -130,6 +134,7 @@ public class Profiler implements IProfiler {
 	public void initDefaultParametersForAugmentation() {
 		numberOfTimeVisitedAtLeast = -1;
 		scoreRatedAtLeast = -1;
+		
 		numberOfTimeVisitedForFriendsAtLeast = -1;
 		scoreRatedForFriendsAtLeast = -1;
 		currentCountryRequired = false;
