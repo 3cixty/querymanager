@@ -146,7 +146,7 @@ public class QueryManagerDecision {
 					qm.performANDAugmentation(allTriples, exprs);
 					aRespMsg = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 					findTriplesResult(aRespMsg, limit, triplesResults);
-					if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, aRespMsg);
+					if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, aRespMsg);
 					Expr notExpr = new E_LogicalNot(exprs.get(i));
 					exprs.set(i, notExpr);
 				}
@@ -301,20 +301,20 @@ public class QueryManagerDecision {
 			qm.performANDAugmentation(triples, exprs);
 			String result1 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 			findTriplesResult(result1, limit, triplesResults);
-			if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, result1);
+			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result1);
 			
 			exprs.set(0, new E_LogicalNot(expr1)); // (not first one) and second one 
 			qm.performANDAugmentation(triples, exprs);
 			String result2 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 			findTriplesResult(result2, limit, triplesResults);
-			if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, result2);
+			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result2);
 
 			exprs.set(0, expr1);
 			exprs.set(1, new E_LogicalNot(expr2)); // first one and (not second one)
 			qm.performANDAugmentation(triples, exprs);
 			String result3 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 			findTriplesResult(result3, limit, triplesResults);
-			if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, result3);
+			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result3);
 			
 			return createRespFromJSONArray(triplesResults, result1);
 		}
