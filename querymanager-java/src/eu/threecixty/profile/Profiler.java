@@ -217,7 +217,6 @@ public class Profiler implements IProfiler {
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uid + "\") . \n\n";
 	    qStr += "}";
-	    System.out.println(qStr);
 	    Query query = QueryFactory.create(qStr);
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);

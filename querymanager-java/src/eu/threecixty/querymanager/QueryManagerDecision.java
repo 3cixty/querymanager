@@ -27,7 +27,7 @@ public class QueryManagerDecision {
 	private static final String PREFERRED = "preferred";
 
 	/**
-	 * Executes the query found in a given query manager.
+	 * Augments and executes the query found in a given query manager.
 	 * @param profiler
 	 * @param qm
 	 * @param filter
@@ -138,15 +138,20 @@ public class QueryManagerDecision {
 		} else {
 			if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
 				return executeQueryAugmentationForCounting(qm, format, triplesCollection, exprs);
-			} else { 
-				List <String> results = new ArrayList <String>();
+			} else {
+				long limit = qm.getQuery().getQuery().getLimit();
+				JSONArray triplesResults = new JSONArray();
+				String aRespMsg = null;
 				for (int i = 0; i < exprs.size() - 1; i++) {
 					qm.performANDAugmentation(allTriples, exprs);
-					results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
+					aRespMsg = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+					findTriplesResult(aRespMsg, limit, triplesResults);
+					if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, aRespMsg);
 					Expr notExpr = new E_LogicalNot(exprs.get(i));
 					exprs.set(i, notExpr);
 				}
-				return getResultWithLimitNumber(results, qm.getQuery().getQuery().getLimit());
+				if (aRespMsg == null) return "";
+				return createRespFromJSONArray(triplesResults, aRespMsg);
 			}
 		}
 	}
@@ -233,6 +238,13 @@ public class QueryManagerDecision {
 		}
 	}
 
+	/**
+	 * Executes the query (at EventMedia) based on preferred events info.
+	 * @param profiler
+	 * @param qm
+	 * @param format
+	 * @return
+	 */
 	private static String filterBasedOnPreferredEvent(IProfiler profiler, IQueryManager qm,
 			EventMediaFormat format) {
 		// TODO
@@ -283,21 +295,28 @@ public class QueryManagerDecision {
 			qm.performANDAugmentation(triples, exprs);
 			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 		} else {
-			List <String> results = new ArrayList <String>();
+			long limit = qm.getQuery().getQuery().getLimit();
+			JSONArray triplesResults = new JSONArray();
 			
 			qm.performANDAugmentation(triples, exprs);
-			results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
+			String result1 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			findTriplesResult(result1, limit, triplesResults);
+			if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, result1);
 			
 			exprs.set(0, new E_LogicalNot(expr1)); // (not first one) and second one 
 			qm.performANDAugmentation(triples, exprs);
-			results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
+			String result2 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			findTriplesResult(result2, limit, triplesResults);
+			if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, result2);
 
 			exprs.set(0, expr1);
 			exprs.set(1, new E_LogicalNot(expr2)); // first one and (not second one)
 			qm.performANDAugmentation(triples, exprs);
-			results.add(qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format));
+			String result3 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			findTriplesResult(result3, limit, triplesResults);
+			if (triplesResults.length() >= limit) return createRespFromJSONArray(triplesResults, result3);
 			
-			return getResultWithLimitNumber(results, qm.getQuery().getQuery().getLimit());
+			return createRespFromJSONArray(triplesResults, result1);
 		}
 	}
 
@@ -332,35 +351,42 @@ public class QueryManagerDecision {
 	 * @param limit
 	 * @return
 	 */
-	private static String getResultWithLimitNumber(List <String> resultsOfQueries, long limit) {	
-		JSONArray rets = new JSONArray();
-		for (String result: resultsOfQueries) {
-			JSONObject obj = new JSONObject(result);
-			JSONObject objResults = obj.getJSONObject("results");
-			JSONArray arrBindings = objResults.getJSONArray("bindings");
-			for (int i = 0; i < arrBindings.length(); i++) {
-				if (rets.length() >= limit && limit != -1) {
-					break;
-				}
-				rets.put(arrBindings.getJSONObject(i));
-			}
-			if (rets.length() >= limit && limit != -1) {
-				break;
-			}
-		}
-		if (rets.length() == 0) return resultsOfQueries.get(0);
+	private static String createRespFromJSONArray(JSONArray triplesResults, String aRespMsg) {	
+		if (triplesResults.length() == 0) return aRespMsg;
 		StringBuffer buffer = new StringBuffer();
 		String bindingStr = "\"bindings\": ";
-		String firstResult = resultsOfQueries.get(0);
-		int bindingsIndex = firstResult.indexOf(bindingStr);
+		int bindingsIndex = aRespMsg.indexOf(bindingStr);
 		if (bindingsIndex < 0) return "";
-		buffer.append(firstResult.substring(0, bindingsIndex));
+		buffer.append(aRespMsg.substring(0, bindingsIndex));
 		buffer.append(bindingStr);
-		buffer.append(rets.toString());
+		buffer.append(triplesResults.toString());
 		buffer.append('}').append('}');
 		return buffer.toString();
 	}
 
+	private static void findTriplesResult(String aRespMsg, long limit, JSONArray triplesResults) {
+		JSONObject obj = new JSONObject(aRespMsg);
+		JSONObject objResults = obj.getJSONObject("results");
+		JSONArray arrBindings = objResults.getJSONArray("bindings");
+		for (int i = 0; i < arrBindings.length(); i++) {
+			if (triplesResults.length() >= limit && limit != -1) {
+				return;
+			}
+			triplesResults.put(arrBindings.getJSONObject(i));
+		}
+		if (triplesResults.length() >= limit && limit != -1) {
+			return;
+		}
+	}
+
+	/**
+	 * Augments and executes a query (at EventMedia).
+	 * @param qm
+	 * @param format
+	 * @param triples
+	 * @param exprs
+	 * @return
+	 */
 	private static String executeQueryAugmentationForCounting(IQueryManager qm,
 			EventMediaFormat format, List <List<Triple>> triples, List <Expr> exprs) {
 		// only keep the last element which is the largest subset
@@ -372,6 +398,10 @@ public class QueryManagerDecision {
 		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 	}
 
+	/**
+	 * Creates a period of two days from now
+	 * @return
+	 */
 	private static Period createPeriod() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.HOUR, 0);
