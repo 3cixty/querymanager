@@ -3,17 +3,26 @@ package eu.threecixty.querymanager;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.hp.hpl.jena.query.Query;
 
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
+import eu.threecixty.profile.RdfFileManager;
 
 public class TestQM {
+
+	@BeforeClass
+	public static void setup() {
+		URL resourceUrl = TestQM.class.getResource("/UserProfileKBmodelWithIndividuals.rdf");
+		RdfFileManager.getInstance().setPathToRdfFile(resourceUrl.getPath());
+	}
 	
 	@Test
 	public void testAugmentQueryWithCurrentCountry() {
