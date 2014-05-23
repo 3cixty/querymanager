@@ -46,4 +46,4 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   - `location` is a `{filter}`
   - `true` is a `{friends}`
   
-  The query is UTF-8 encoded
+  The query is URLEncoded
