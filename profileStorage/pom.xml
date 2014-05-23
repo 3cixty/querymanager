@@ -3,50 +3,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  
   <groupId>eu.3cixty</groupId>
-  <artifactId>profiler</artifactId>
-  <name>Profiler</name>
-  <packaging>jar</packaging>
+  <artifactId>profiler-parent</artifactId>
+  <name>Profiler-Parent</name>
+  <packaging>pom</packaging>
   <version>1.0</version>
   
-  <repositories>
-      <repository>
-          <id>mvn repo</id>
-          <url>http://repository.apache.org/content/groups/snapshots</url>
-      </repository>
-  </repositories>
-  
-  <dependencies>
-
-    <dependency>
-	  <groupId>org.apache.jena</groupId>
-	  <artifactId>jena-arq</artifactId>
-	  <version>2.11.2-SNAPSHOT</version>
-    </dependency>
-
-            
-    <dependency>
-	  <groupId>junit</groupId>
-	  <artifactId>junit</artifactId>
-	  <version>4.11</version>
-	  <scope>test</scope>
-    </dependency>
-            
-</dependencies>
+  <modules>
+    <module>profiler</module>
+	<!--
+	<module>models</module>
+	-->
+  </modules>
   
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
-	<resources>
-		<resource>
-			<directory>resources</directory>
-		</resource>
-	</resources>
-    <testResources>
-      <testResource>
-        <directory>test-resources</directory>
-      </testResource>
-    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
