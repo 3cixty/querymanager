@@ -19,6 +19,7 @@ import com.hp.hpl.jena.query.Query;
 
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
+import eu.threecixty.profile.RdfFileManager;
 
 @WebServlet("InitServlet")
 public class QueryManagerServlet extends HttpServlet {
@@ -45,6 +46,7 @@ public class QueryManagerServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 	    super.init(config);
 	    realPath = this.getServletContext().getRealPath("/");
+	    RdfFileManager.getInstance().setPathToRdfFile(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
 	}
 	
 	@Override
@@ -67,7 +69,7 @@ public class QueryManagerServlet extends HttpServlet {
 			out.write("Access token is incorrect or expired");
 		} else {
 			resp.setContentType("text/plain");
-			
+			if (!Profiler.existUID(user_id)) GoogleAccountUtils.updateInfo(userkey);
 			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
 			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
