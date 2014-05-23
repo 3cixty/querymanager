@@ -1,7 +1,7 @@
 package eu.threecixty.profile;
 
-import eu.threecixty.profile.models.Period;
-import eu.threecixty.profile.models.Preference;
+import eu.threecixty.profile.oldmodels.Period;
+import eu.threecixty.profile.oldmodels.Preference;
 
 public interface IProfiler {
 

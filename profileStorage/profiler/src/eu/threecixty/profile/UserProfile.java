@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.Date;
 
 import eu.threecixty.profile.annotations.*;
-import eu.threecixty.profile.models.*;
+import eu.threecixty.profile.oldmodels.*;
 
 /**
  * User Profile

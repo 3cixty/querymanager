@@ -2,13 +2,11 @@ package eu.threecixty.profile;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+
 
 /**
  * This class is used to read and update RDF file.
@@ -43,15 +41,23 @@ public class RdfFileManager {
 	public void setPathToRdfFile(String absolutePath) {
 		this.absolutePath = absolutePath;
 	}
+
+	/**
+	 * Gets absolute path to RDF file.
+	 * @return
+	 */
+	public String getPathToRdfFile() {
+		return absolutePath;
+	}
 	
 	/**
 	 * Gets RDF model.
 	 * @return
 	 */
 	public Model getRdfModel() {
-		if (model == null) {
-			synchronized (_sync) {
-				if (model == null) {
+//		if (model == null) {
+//			synchronized (_sync) {
+//				if (model == null) {
 					if (absolutePath == null || "".equals(absolutePath)) {
 						throw new RuntimeException(NULLPATH_EXCEPTION);
 					}
@@ -64,28 +70,10 @@ public class RdfFileManager {
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					}
-				}
-			}
-		}
+//				}
+//			}
+//		}
 		return model;
-	}
-
-	/**
-	 * Writes a given RDF model to file.
-	 * @param model
-	 */
-	public synchronized void writeModel(Model model) {
-		if (model == null) return;
-		if (absolutePath == null) throw new RuntimeException(NULLPATH_EXCEPTION);
-		try {
-			OutputStream output = new FileOutputStream(absolutePath);
-			model.write(output, "RDF/XML-ABBREV");
-			output.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**

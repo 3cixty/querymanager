@@ -9,12 +9,12 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
-import eu.threecixty.profile.models.Period;
-import eu.threecixty.profile.models.Preference;
+import eu.threecixty.profile.oldmodels.Period;
+import eu.threecixty.profile.oldmodels.Preference;
 
 public class Profiler implements IProfiler {
 
-	private static Model rdfModel = null;
+	private Model rdfModel = null;
 	
 	private ProfilingTechniques profilingTechnique;
 	
@@ -35,21 +35,11 @@ public class Profiler implements IProfiler {
 
 	private boolean eventNameRequired = false;
 	private boolean preferredEventDatesRequired = false;
-
-	public static Model getModel() {
-		return rdfModel;
-	}
 	
 	public Profiler(String uid) {
-		if (rdfModel == null) {
-			rdfModel = RdfFileManager.getInstance().getRdfModel();
-		}
-//		if (existUID(uid, rdfModel)) {
-			this.uID = uid;
-//		} else {
-//			// TODO: uncomment and remove fixed UID, update info from Google account
-//		    this.uID = "100900047095598983805";
-//		}
+
+		rdfModel = RdfFileManager.getInstance().getRdfModel();
+		this.uID = uid;
 		
 		initDefaultParametersForAugmentation();
 	}
@@ -206,7 +196,8 @@ public class Profiler implements IProfiler {
 	 */
 	public static boolean existUID(String uid) {
 		if (uid == null) return false;
-		if (rdfModel == null) rdfModel = RdfFileManager.getInstance().getRdfModel();
+		Model model = RdfFileManager.getInstance().getRdfModel();
+		if (model == null) return false;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -219,7 +210,7 @@ public class Profiler implements IProfiler {
 	    qStr += "}";
 	    Query query = QueryFactory.create(qStr);
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, rdfModel);
+		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
 		
 		ResultSet rs = qe.execSelect();

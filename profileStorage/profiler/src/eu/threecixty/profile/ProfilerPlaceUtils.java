@@ -12,12 +12,12 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
-import eu.threecixty.profile.models.Area;
-import eu.threecixty.profile.models.NatureOfPlace;
-import eu.threecixty.profile.models.Period;
-import eu.threecixty.profile.models.Place;
-import eu.threecixty.profile.models.PlaceDetail;
-import eu.threecixty.profile.models.Preference;
+import eu.threecixty.profile.oldmodels.Area;
+import eu.threecixty.profile.oldmodels.NatureOfPlace;
+import eu.threecixty.profile.oldmodels.Period;
+import eu.threecixty.profile.oldmodels.Place;
+import eu.threecixty.profile.oldmodels.PlaceDetail;
+import eu.threecixty.profile.oldmodels.Preference;
 
 /**
  * Utility class for populating information place.

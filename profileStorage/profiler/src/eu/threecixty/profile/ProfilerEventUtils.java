@@ -13,10 +13,10 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
-import eu.threecixty.profile.models.Event;
-import eu.threecixty.profile.models.EventDetail;
-import eu.threecixty.profile.models.Preference;
-import eu.threecixty.profile.models.TemporalDetails;
+import eu.threecixty.profile.oldmodels.Event;
+import eu.threecixty.profile.oldmodels.EventDetail;
+import eu.threecixty.profile.oldmodels.Preference;
+import eu.threecixty.profile.oldmodels.TemporalDetails;
 
 /**
  * Utility class for populating event information.
