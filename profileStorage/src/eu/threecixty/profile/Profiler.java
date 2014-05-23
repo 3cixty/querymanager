@@ -36,16 +36,20 @@ public class Profiler implements IProfiler {
 	private boolean eventNameRequired = false;
 	private boolean preferredEventDatesRequired = false;
 
+	public static Model getModel() {
+		return rdfModel;
+	}
+	
 	public Profiler(String uid) {
 		if (rdfModel == null) {
 			rdfModel = RdfFileManager.getInstance().getRdfModel();
 		}
-		if (existUID(uid, rdfModel)) {
+//		if (existUID(uid, rdfModel)) {
 			this.uID = uid;
-		} else {
-			// TODO: uncomment and remove fixed UID, update info from Google account
-		    this.uID = "100900047095598983805";
-		}
+//		} else {
+//			// TODO: uncomment and remove fixed UID, update info from Google account
+//		    this.uID = "100900047095598983805";
+//		}
 		
 		initDefaultParametersForAugmentation();
 	}
@@ -200,7 +204,9 @@ public class Profiler implements IProfiler {
 	 * @param uid
 	 * @return
 	 */
-	private boolean existUID(String uid, Model model) {
+	public static boolean existUID(String uid) {
+		if (uid == null) return false;
+		if (rdfModel == null) rdfModel = RdfFileManager.getInstance().getRdfModel();
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -213,7 +219,7 @@ public class Profiler implements IProfiler {
 	    qStr += "}";
 	    Query query = QueryFactory.create(qStr);
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
+		QueryExecution qe = QueryExecutionFactory.create(query, rdfModel);
 		
 		
 		ResultSet rs = qe.execSelect();
