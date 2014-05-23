@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>eu.3cixty</groupId>
+    <artifactId>profiler-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+  
+  <groupId>eu.3cixty</groupId>
+  <artifactId>models</artifactId>
+  <name>Models</name>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  
+  <repositories>
+    <repository>
+          <id>private-local-protege-codegeneration</id>
+          <url>file://${basedir}/libs</url>
+    </repository>
+  </repositories> 
+  
+  <dependencies>
+
+	<dependency>
+		<groupId>edu.stanford.protege</groupId>
+		<artifactId>org.semanticweb.owl.owlapi</artifactId>
+		<version>3.4.4</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.protege</groupId>
+		<artifactId>local-generator</artifactId>
+		<version>1.0</version>
+	</dependency>
+
+	<dependency>
+		<groupId>edu.stanford.protege</groupId>
+		<artifactId>protege</artifactId>
+		<version>3.5.0-beta-651</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.protege</groupId>
+		<artifactId>protege-editor-owl</artifactId>
+		<version>4.1.0</version>
+	</dependency>
+
+    <dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.11</version>
+	  <scope>test</scope>
+    </dependency>
+            
+</dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+	<resources>
+		<resource>
+			<directory>resources</directory>
+		</resource>
+	</resources>
+    <testResources>
+      <testResource>
+        <directory>test-resources</directory>
+      </testResource>
+    </testResources>
+  </build>
+</project>

@@ -11,9 +11,7 @@
   
   <modules>
     <module>profiler</module>
-	<!--
 	<module>models</module>
-	-->
   </modules>
   
   <build>
