@@ -9,13 +9,13 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.ThreeCixtyExpression;
-import eu.threecixty.profile.models.Address;
-import eu.threecixty.profile.models.Area;
-import eu.threecixty.profile.models.Event;
-import eu.threecixty.profile.models.EventDetail;
-import eu.threecixty.profile.models.Place;
-import eu.threecixty.profile.models.PlaceDetail;
-import eu.threecixty.profile.models.Rating;
+import eu.threecixty.profile.oldmodels.Address;
+import eu.threecixty.profile.oldmodels.Area;
+import eu.threecixty.profile.oldmodels.Event;
+import eu.threecixty.profile.oldmodels.EventDetail;
+import eu.threecixty.profile.oldmodels.Place;
+import eu.threecixty.profile.oldmodels.PlaceDetail;
+import eu.threecixty.profile.oldmodels.Rating;
 
 /**
  * Abstract class to represent a query.

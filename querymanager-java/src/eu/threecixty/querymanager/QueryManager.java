@@ -23,10 +23,10 @@ import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.IProfiler;
-import eu.threecixty.profile.models.Event;
-import eu.threecixty.profile.models.Period;
-import eu.threecixty.profile.models.Place;
-import eu.threecixty.profile.models.Preference;
+import eu.threecixty.profile.oldmodels.Event;
+import eu.threecixty.profile.oldmodels.Period;
+import eu.threecixty.profile.oldmodels.Place;
+import eu.threecixty.profile.oldmodels.Preference;
 
  class QueryManager implements IQueryManager {
 	 

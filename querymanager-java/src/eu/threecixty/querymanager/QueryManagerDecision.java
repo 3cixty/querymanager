@@ -13,7 +13,7 @@ import com.hp.hpl.jena.sparql.expr.E_LogicalNot;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
-import eu.threecixty.profile.models.Period;
+import eu.threecixty.profile.oldmodels.Period;
 
 /**
  * The class is used to make decision about query augmentation.
