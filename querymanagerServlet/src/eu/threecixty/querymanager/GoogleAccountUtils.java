@@ -15,6 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import eu.threecixty.models.MyFactory;
 import eu.threecixty.models.Name;
 import eu.threecixty.models.UserProfile;
+import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.RdfFileManager;
 
 /**
@@ -26,19 +27,24 @@ import eu.threecixty.profile.RdfFileManager;
 public class GoogleAccountUtils {
 
 	/**
-	 * Extract Google info from a given accessToken to update a given RDF model.
+	 * Validates a given access token, then extract Google info to update UserProfile if there is
+	 * no information about this user.
 	 * @param accessToken
-	 * @param model
+	 * @return public user ID if the given access token is valid. Otherwise, the method returns an empty string.
 	 */
-	public static void updateInfo(String accessToken) {
-		if (accessToken == null) return;
+	public static String updateInfo(String accessToken) {
+		if (accessToken == null) return "";
+		String user_id = null;
 		try {
 			String reqMsg = readUrl(
-					"https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + accessToken);
+					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
 			JSONObject json = new JSONObject(reqMsg);
-			String user_id = json.getString("id");
-			String givenName = json.getString("given_name");
-			String familyName = json.getString("family_name");
+			user_id = json.getString("id");
+			JSONObject nameObj = json.getJSONObject("name");
+			String givenName = nameObj.getString("givenName");
+			String familyName = nameObj.getString("familyName");
+			
+			if (Profiler.existUID(user_id)) return user_id; // no need to update info as it exists
 			
             OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
             File file = new File(RdfFileManager.getInstance().getPathToRdfFile());
@@ -58,6 +64,8 @@ public class GoogleAccountUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		if (user_id == null) return "";
+		return user_id;
 	}
 
 	/**

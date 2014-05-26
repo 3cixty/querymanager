@@ -62,14 +62,13 @@ public class QueryManagerServlet extends HttpServlet {
 		boolean isAccessTokenFalse = "false".equals(userkey);
 		String user_id =  null;
 		if (!isAccessTokenFalse) {
-			user_id = TokenVerifier.getInstance().getUserId(userkey); // which corresponds with Google user_id (from Google account)
+			user_id = GoogleAccountUtils.updateInfo(userkey); // which corresponds with Google user_id (from Google account)
 		}
 		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			out.write("Access token is incorrect or expired");
 		} else {
 			resp.setContentType("text/plain");
-			if (!Profiler.existUID(user_id)) GoogleAccountUtils.updateInfo(userkey);
 			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
 			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
