@@ -3,8 +3,9 @@ package eu.threecixty.privacy.store;
 import java.io.IOException;
 
 /**
- * Index of users and resources. It maps each logical entity to its physical
- * representation in the store.
+ * Index of users and resources. This index allows a level of indirection
+ * between the resource and the place where it is stored. It maps each logical
+ * entity to its physical representation in the store.
  */
 public interface StoreIndex {
 
@@ -55,8 +56,8 @@ public interface StoreIndex {
 	 * 
 	 * @param user
 	 *            the ID of the user who owns this resource. This value is
-	 *            obtained with {@link #findUser(String)} and must be
-	 *            already registered in the index.
+	 *            obtained with {@link #findUser(String)} and must be already
+	 *            registered in the index.
 	 * @param ontology
 	 *            the ontology URL string that identifies this resource. Must
 	 *            not be null or an empty string. Must be unique in the index as

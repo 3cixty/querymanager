@@ -2,7 +2,7 @@ package eu.threecixty.privacy.policies;
 
 import java.io.Serializable;
 
-import eu.threecixty.privacy.model.ModelImpl;
+import eu.threecixty.privacy.model.DefaultModelFactory;
 import eu.threecixty.privacy.semantic.Model;
 import eu.threecixty.privacy.semantic.Scope;
 import eu.threecixty.privacy.storage.Credential;
@@ -29,7 +29,7 @@ import eu.threecixty.privacy.storage.Credential;
 
 	public Scope getSubject() {
 		String ontology = "http://id@" + identityToken;
-		Model model = new ModelImpl(ontology);
+		Model model = new DefaultModelFactory().newModel(ontology);
 		return model.newScope("global");
 	}
 

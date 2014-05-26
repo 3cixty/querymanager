@@ -22,7 +22,7 @@ public class SQLIndex implements StoreIndex {
 	
 	private Connection conn;
 	
-	private final Schema schema = new SchemaV1();
+	private Schema schema = new SchemaV1();
 	
 	/**
 	 * Create an object capable of creating or opening an index in the specified
@@ -70,6 +70,22 @@ public class SQLIndex implements StoreIndex {
 		this.pass = pass;
 	}
 	
+	/**
+	 * @return the schema set with {@link #setSchema(Schema)} or the default
+	 *         instance if the method was not called.
+	 */
+	public Schema getSchema() {
+		return schema;
+	}
+
+	/**
+	 * Set the schema defining the structure of the index.
+	 * @param schema
+	 */
+	public void setSchema(Schema schema) {
+		this.schema = schema;
+	}
+
 	/**
 	 * Open the index database using the credentials set with
 	 * {@link #setCredentials(String, String)}. These credentials are reset
