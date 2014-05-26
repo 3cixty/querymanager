@@ -94,6 +94,7 @@ public class PreferencesUtils {
 		if (profiler == null) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
+		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 		buffer.append("SELECT  DISTINCT  ?numberOfTimes \n");
 		buffer.append("WHERE {\n\n");
@@ -126,6 +127,7 @@ public class PreferencesUtils {
 		if (profiler == null) return DEFAULT_MINIMUM_SCORE_RATED;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
+		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 		buffer.append("SELECT  DISTINCT  ?scoreRated \n");
 		buffer.append("WHERE {\n\n");
