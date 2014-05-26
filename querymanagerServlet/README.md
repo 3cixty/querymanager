@@ -46,4 +46,11 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   - `location` is a `{filter}`
   - `true` is a `{friends}`
   
+   
   The query is URLEncoded
+
+  For the output of the query: if the format is 'json', the output also includes an array of augmented queries used to get that output. The array is in the JSON string format.
+  Here is an example of the output:
+  <code>
+   { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQueries": [{"AugmentedQuery":"SELECT DISTINCT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname .\n    FILTER ( ?_augcountryname = \"Italy\" )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}]}
+  </code>
