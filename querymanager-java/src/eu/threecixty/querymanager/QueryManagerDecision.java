@@ -13,6 +13,7 @@ import com.hp.hpl.jena.sparql.expr.E_LogicalNot;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
+import eu.threecixty.profile.PreferencesUtils;
 import eu.threecixty.profile.oldmodels.Period;
 
 /**
@@ -169,13 +170,13 @@ public class QueryManagerDecision {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs1 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireScoreRatedAtLeast(5);
+		profiler.requireScoreRatedAtLeast(PreferencesUtils.getMinimumScoreRated(profiler));
 		findTriplesAndExprs(profiler, qm, triples, exprs1);
 
 		
 		List <Expr> exprs2 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireNumberOfTimesVisitedAtLeast(3);
+		profiler.requireNumberOfTimesVisitedAtLeast(PreferencesUtils.getMinimumNumberOfTimesVisited(profiler));
 		findTriplesAndExprs(profiler, qm, triples, exprs2);
 
 		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
@@ -210,13 +211,15 @@ public class QueryManagerDecision {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs1 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireScoreRatedForFriendsAtLeast(4);
+		profiler.requireScoreRatedForFriendsAtLeast(
+				PreferencesUtils.getMinimumScoreRatedForFriends(profiler));
 		findTriplesAndExprs(profiler, qm, triples, exprs1);
 
 		
 		List <Expr> exprs2 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireNumberOfTimesVisitedForFriendsAtLeast(2);
+		profiler.requireNumberOfTimesVisitedForFriendsAtLeast(
+				PreferencesUtils.getMinimumNumberOfTimesVisitedForFriends(profiler));
 		findTriplesAndExprs(profiler, qm, triples, exprs2);
 
 		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
