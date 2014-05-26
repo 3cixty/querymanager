@@ -5,7 +5,7 @@ import eu.threecixty.privacy.semantic.Scope;
 /**
  * <p> A proof of qualification, competence, or authority generally issued 
  *     by a third party. Credentials may be necessary to retrieve resources 
- *     value from the {@link SecureStorage}. Simple credentials may hold 
+ *     value from the {@link Storage}. Simple credentials may hold 
  *     user ID / password, more advanced credentials may include certificates.</p>
  *     
  * <p> Credentials are usually checked when accessing resources from the 

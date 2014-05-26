@@ -1,4 +1,4 @@
-package eu.threecixty.privacy.store.serial;
+package eu.threecixty.privacy.store;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,11 +22,6 @@ import eu.threecixty.privacy.semantic.Scope;
 import eu.threecixty.privacy.storage.Credential;
 import eu.threecixty.privacy.storage.Policy;
 import eu.threecixty.privacy.storage.Storage;
-import eu.threecixty.privacy.store.IOUtils;
-import eu.threecixty.privacy.store.StoreIndex;
-import eu.threecixty.privacy.store.StoreStreamer;
-import eu.threecixty.privacy.store.User;
-import eu.threecixty.privacy.store.Value;
 
 
 /**
@@ -35,6 +30,7 @@ import eu.threecixty.privacy.store.Value;
  */
 public class SerialStore implements Storage<Serializable> {
 	
+	public static final String PROP_STORE_DIR = "eu.3cixty.store.dir";
 	// Root directory for storage on disk
 	// Should be set by calling {@link #setRootDir(String)}
 	private final String mRootDir;
@@ -140,8 +136,19 @@ public class SerialStore implements Storage<Serializable> {
 	
 	private final StoreIndex dataSource;
 
+	/**
+	 * Create an implementation of {@link Storage} serializing the data to the
+	 * file system.
+	 * 
+	 * @param props
+	 *            the creation properties. Set {@link #PROP_STORE_DIR} in order
+	 *            to define the location of the file system repository. The
+	 *            default location is the working directory (".")
+	 * @param dataSource
+	 *            the index to map entities to the files
+	 */
 	public SerialStore(Properties props, StoreIndex dataSource) {
-		mRootDir = props.getProperty("org.theresis.cimst.storage.repo", ".");
+		mRootDir = props.getProperty(PROP_STORE_DIR, ".");
 		
 		new File(mRootDir).mkdirs();
 		this.dataSource = dataSource;

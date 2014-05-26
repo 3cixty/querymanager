@@ -11,7 +11,7 @@ import eu.threecixty.privacy.semantic.Resource;
 import eu.threecixty.privacy.semantic.Scope;
 import eu.threecixty.privacy.semantic.Statement;
 
-public class ModelImpl implements Model, Serializable {
+class ModelImpl implements Model, Serializable {
 
 	/**
 	 * 
@@ -54,7 +54,7 @@ public class ModelImpl implements Model, Serializable {
         return s;
     }
 
-    public class EntityImpl implements Entity, Serializable {
+    class EntityImpl implements Entity, Serializable {
         /**
 		 * 
 		 */

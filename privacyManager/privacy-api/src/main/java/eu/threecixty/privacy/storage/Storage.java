@@ -47,8 +47,6 @@ public interface Storage<T> {
 	 * @param credential
 	 *            the credential of the subject requesting write access or
 	 *            <code>null</code> for anonymous access.
-	 * @param the
-	 *            new policy defining the access modes to the resource
 	 * @throws SecurityException
 	 *             if the policy associated to the resource does not allow write
 	 *             access.

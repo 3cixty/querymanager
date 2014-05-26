@@ -1,4 +1,4 @@
-package eu.threecixty.privacy.secure;
+package eu.threecixty.privacy.security;
 
 import java.io.IOException;
 

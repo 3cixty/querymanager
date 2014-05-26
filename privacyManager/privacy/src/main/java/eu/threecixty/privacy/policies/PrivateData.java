@@ -5,14 +5,14 @@ import java.io.Serializable;
 import eu.threecixty.privacy.semantic.Resource;
 import eu.threecixty.privacy.storage.Credential;
 
-public final class PrivateDate extends BasePolicy {
+public final class PrivateData extends BasePolicy {
 
 	/**
 	 * @param owner
 	 *            Something that will uniquely identity the owner of the data
 	 *            created with this policy. Must not be null.
 	 */
-	public PrivateDate(Serializable owner) {
+	public PrivateData(Serializable owner) {
 		super(owner);
 	}
 	

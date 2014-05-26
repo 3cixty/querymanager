@@ -7,8 +7,7 @@ import eu.threecixty.privacy.store.Value;
 import eu.threecixty.privacy.store.User;
 
 /**
- * @author T0129842
- * 
+ * An abstraction of the database model and administration.
  */
 public interface Schema {
 

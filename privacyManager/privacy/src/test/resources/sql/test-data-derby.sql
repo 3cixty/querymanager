@@ -1,5 +1,4 @@
 -- Create the tables
--- NB: "USER" is a keyword so it can't be used as table name.
 CREATE TABLE PRIVACY_USER
 (
    id varchar(255),
