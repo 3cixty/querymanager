@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -47,6 +50,8 @@ import eu.threecixty.profile.oldmodels.Preference;
 	/**User's preferences*/
 	private Preference preference;
 	
+	private String augmentedQueryStr;
+	
 	public QueryManager(String uid) {
 		this(uid, null);
 	}
@@ -58,6 +63,17 @@ import eu.threecixty.profile.oldmodels.Preference;
 	@Override
 	public AugmentedQuery getAugmentedQuery() {
 		return augmentedQuery;
+	}
+
+	public String getAugmentedQueryWithoutPrefixes() {
+		return augmentedQueryStr;
+	}
+
+	private  String getAugmentedQueryWithoutPrefixes(AugmentedQuery augmentedQuery) {
+		if (augmentedQuery == null) return "";
+		augmentedQuery.getQuery().getQuery().setDistinct(true);
+		String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
+		return augmentedQueryStr;
 	}
 
 	public ThreeCixtyQuery getQuery() {
@@ -72,13 +88,12 @@ import eu.threecixty.profile.oldmodels.Preference;
 	
 	@Override
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
-			EventMediaFormat format) {
+			EventMediaFormat format, boolean augmentedQueryIncluded) {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
+		augmentedQueryStr = "";
 		try {
-			augmentedQuery.getQuery().getQuery().setDistinct(true);
-			String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
-			System.out.println(augmentedQueryStr);
+			augmentedQueryStr = getAugmentedQueryWithoutPrefixes(augmentedQuery);
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
@@ -92,13 +107,17 @@ import eu.threecixty.profile.oldmodels.Preference;
 				sb.append(new String(b, 0, readBytes));
 			}
 			input.close();
-//			if (EventMediaFormat.JSON == format) {
-//				int lastIndex = sb.lastIndexOf("}");
-//				if (lastIndex >= 0) {
-//					String augmentedQueryJson = ", \"AugmentedQuery\": " + JSONObject.quote(augmentedQueryStr);
-//					sb.insert(lastIndex, augmentedQueryJson);
-//				}
-//			}
+			if (EventMediaFormat.JSON == format && augmentedQueryIncluded) {
+				int lastIndex = sb.lastIndexOf("}");
+				if (lastIndex >= 0) {
+					JSONArray jsonArr = new JSONArray();
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("AugmentedQuery", augmentedQueryStr);
+					jsonArr.put(jsonObj);
+					String augmentedQueryJson = ", " + "\"AugmentedQueries\": " + jsonArr.toString();
+					sb.insert(lastIndex, augmentedQueryJson);
+				}
+			}
 			return sb.toString();
 
 		} catch (UnsupportedEncodingException e) {

@@ -132,10 +132,10 @@ public class QueryManagerDecision {
 		QueryUtils.removeDoubleExpressions(exprs);
 
 		if (exprs.size() == 0) {
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 		} else if (exprs.size() == 1) {
 			qm.performANDAugmentation(allTriples, exprs);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 		} else {
 			if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
 				return executeQueryAugmentationForCounting(qm, format, triplesCollection, exprs);
@@ -143,16 +143,19 @@ public class QueryManagerDecision {
 				long limit = qm.getQuery().getQuery().getLimit();
 				JSONArray triplesResults = new JSONArray();
 				String aRespMsg = null;
+				List <String> augQueriesResponse = new ArrayList <String>();
 				for (int i = 0; i < exprs.size() - 1; i++) {
 					qm.performANDAugmentation(allTriples, exprs);
-					aRespMsg = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+					aRespMsg = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
 					findTriplesResult(aRespMsg, limit, triplesResults);
-					if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, aRespMsg);
+					String response = qm.getAugmentedQueryWithoutPrefixes();
+					augQueriesResponse.add(response);
+					if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, aRespMsg, augQueriesResponse);
 					Expr notExpr = new E_LogicalNot(exprs.get(i));
 					exprs.set(i, notExpr);
 				}
 				if (aRespMsg == null) return "";
-				return createRespFromJSONArray(triplesResults, aRespMsg);
+				return createRespFromJSONArray(triplesResults, aRespMsg, augQueriesResponse);
 			}
 		}
 	}
@@ -182,7 +185,7 @@ public class QueryManagerDecision {
 		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
 			exprs1.addAll(exprs2);
 			qm.performORAugmentation(triples, exprs1);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 		} else {
 		
 			for (Expr tmpExpr: exprs1) {
@@ -225,7 +228,7 @@ public class QueryManagerDecision {
 		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
 			exprs1.addAll(exprs2);
 			qm.performORAugmentation(triples, exprs1);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 		} else {
 		
 			for (Expr tmpExpr: exprs1) {
@@ -268,7 +271,7 @@ public class QueryManagerDecision {
 			if (eventNameExpr != null) exprs1.add(eventNameExpr);
 			if (preferredDates != null) exprs1.add(preferredDates);
 			qm.performORAugmentation(triples, exprs1);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 		} else {
 		
 		    return filterBasedOnTwoExprs(eventNameExpr, preferredDates, qm, triples, format);
@@ -293,33 +296,37 @@ public class QueryManagerDecision {
 		QueryUtils.removeDoubleExpressions(exprs);
 
 		if (exprs.size() == 0) {
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 		} else if (exprs.size() == 1) {
 			qm.performANDAugmentation(triples, exprs);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 		} else {
+			List <String> augmentedQueries = new ArrayList <String>();
 			long limit = qm.getQuery().getQuery().getLimit();
 			JSONArray triplesResults = new JSONArray();
 			
 			qm.performANDAugmentation(triples, exprs);
-			String result1 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			String result1 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
 			findTriplesResult(result1, limit, triplesResults);
-			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result1);
+			augmentedQueries.add(qm.getAugmentedQueryWithoutPrefixes());
+			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result1, augmentedQueries);
 			
 			exprs.set(0, new E_LogicalNot(expr1)); // (not first one) and second one 
 			qm.performANDAugmentation(triples, exprs);
-			String result2 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			String result2 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
 			findTriplesResult(result2, limit, triplesResults);
-			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result2);
+			augmentedQueries.add(qm.getAugmentedQueryWithoutPrefixes());
+			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result2, augmentedQueries);
 
 			exprs.set(0, expr1);
 			exprs.set(1, new E_LogicalNot(expr2)); // first one and (not second one)
 			qm.performANDAugmentation(triples, exprs);
-			String result3 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			String result3 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
 			findTriplesResult(result3, limit, triplesResults);
-			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result3);
+			augmentedQueries.add(qm.getAugmentedQueryWithoutPrefixes());
+			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result3, augmentedQueries);
 			
-			return createRespFromJSONArray(triplesResults, result1);
+			return createRespFromJSONArray(triplesResults, result1, augmentedQueries);
 		}
 	}
 
@@ -354,7 +361,8 @@ public class QueryManagerDecision {
 	 * @param limit
 	 * @return
 	 */
-	private static String createRespFromJSONArray(JSONArray triplesResults, String aRespMsg) {	
+	private static String createRespFromJSONArray(JSONArray triplesResults, String aRespMsg,
+			List <String> augmentedQueriesResponse) {	
 		if (triplesResults.length() == 0) return aRespMsg;
 		StringBuffer buffer = new StringBuffer();
 		String bindingStr = "\"bindings\": ";
@@ -363,7 +371,16 @@ public class QueryManagerDecision {
 		buffer.append(aRespMsg.substring(0, bindingsIndex));
 		buffer.append(bindingStr);
 		buffer.append(triplesResults.toString());
-		buffer.append('}').append('}');
+		buffer.append('}');
+		buffer.append(',');
+		JSONArray augmentedQueriesArr = new JSONArray();
+		for (String augQuery: augmentedQueriesResponse) {
+		JSONObject jsonObj = new JSONObject();
+		    jsonObj.put("AugmentedQuery", augQuery);
+		    augmentedQueriesArr.put(jsonObj);
+		}
+		buffer.append("\"AugmentedQueries\": ").append(augmentedQueriesArr.toString());
+		buffer.append('}');
 		return buffer.toString();
 	}
 
@@ -398,7 +415,7 @@ public class QueryManagerDecision {
 		exprs.clear();
 		exprs.add(lastEl);
 		qm.performANDAugmentation(lastTriples, exprs);
-		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 	}
 
 	/**
