@@ -161,10 +161,12 @@ public class ProfilerEventUtils {
 	    qStr += "?u1 profile:hasUserEventRating ?s1 .\n";
 	    qStr += "?s1 profile:hasRating ?r1 .\n";
 	    qStr += "?r1 profile:hasUserDefinedRating ?r2 .\n";
+	    qStr += "?r1 profile:hasUserInteractionMode ?mode .\n";
 	    qStr += "?s1 profile:hasEventDetail ?ed1 .\n";
 	    qStr += "?ed1 profile:hasEventName ?eventname .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
+	    qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
 	    
 	    Query query = QueryFactory.create(qStr);
@@ -267,10 +269,12 @@ public class ProfilerEventUtils {
 	    qStr += "?u1 profile:hasUserEventRating ?s1 .\n";
 	    qStr += "?s1 profile:hasRating ?r1 .\n";
 	    qStr += "?r1 profile:hasUserDefinedRating ?r2 .\n";
+	    qStr += "?r1 profile:hasUserInteractionMode ?mode .\n";
 	    qStr += "?s1 profile:hasEventDetail ?h1 .\n";
 	    qStr += "?h1 profile:hasEventName ?eventname .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
+	    qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
 	    
 	    Query query = QueryFactory.create(qStr);
