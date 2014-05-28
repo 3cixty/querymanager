@@ -12,6 +12,7 @@
   <modules>
     <module>profiler</module>
 	<module>models</module>
+	<module>privacyManager</module>
   </modules>
   
   <build>
