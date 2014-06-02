@@ -172,7 +172,7 @@ public class PreferencesUtils {
 		for ( ; rs.hasNext(); ) {
 			QuerySolution qs = rs.next();
 			try {
-			    double d = Double.parseDouble(qs.getLiteral(varName).toString());
+			    double d = qs.getLiteral(varName).getDouble();
 			    if (d < ret) ret = d;
 			} catch (Exception e) {
 				e.printStackTrace();
