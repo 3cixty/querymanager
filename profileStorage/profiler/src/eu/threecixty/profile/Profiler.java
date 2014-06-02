@@ -36,6 +36,8 @@ public class Profiler implements IProfiler {
 	private boolean eventNameRequired = false;
 	private boolean preferredEventDatesRequired = false;
 	
+	private boolean friendsLikeVisitRequired = false;
+	
 	public Profiler(String uid) {
 
 		rdfModel = RdfFileManager.getInstance().getRdfModel();
@@ -89,6 +91,9 @@ public class Profiler implements IProfiler {
 		}
 		if (preferredEventDatesRequired) {
 			ProfilerEventUtils.addPreferredStartAndEndDate(pref, rdfModel, uID);
+		}
+		if (friendsLikeVisitRequired) {
+			ProfilerEventUtils.addEventNamesWhichFriendsLikeToVisit(pref, rdfModel, uID);
 		}
 	}
 
@@ -146,6 +151,7 @@ public class Profiler implements IProfiler {
 		period = null;
 		eventNameRequired = false;
 		preferredEventDatesRequired = false;
+		friendsLikeVisitRequired = false;
 	}
 
 	@Override
@@ -187,6 +193,10 @@ public class Profiler implements IProfiler {
 	@Override
 	public void requirePreferredEventDates(boolean preferredEventDates) {
 		this.preferredEventDatesRequired = preferredEventDates;
+	}
+
+	public void requireFriendsLikeVisit(boolean friendsLikeVisitRequired) {
+		this.friendsLikeVisitRequired = friendsLikeVisitRequired;
 	}
 	
 	/**

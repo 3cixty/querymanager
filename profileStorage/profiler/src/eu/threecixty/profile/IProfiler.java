@@ -76,6 +76,8 @@ public interface IProfiler {
 	 */
 	void requirePreferredEventDates(boolean preferredEventDates);
 
+	void requireFriendsLikeVisit(boolean friendsLikeVisitRequired);
+
 	/**
 	 * Gets user ID.
 	 * @return
