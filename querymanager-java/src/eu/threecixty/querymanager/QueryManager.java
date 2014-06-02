@@ -88,12 +88,13 @@ import eu.threecixty.profile.oldmodels.Preference;
 	
 	@Override
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
-			EventMediaFormat format, boolean augmentedQueryIncluded) {
+			EventMediaFormat format) {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQueryStr = "";
 		try {
 			augmentedQueryStr = getAugmentedQueryWithoutPrefixes(augmentedQuery);
+			
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
@@ -107,7 +108,7 @@ import eu.threecixty.profile.oldmodels.Preference;
 				sb.append(new String(b, 0, readBytes));
 			}
 			input.close();
-			if (EventMediaFormat.JSON == format && augmentedQueryIncluded) {
+			if (EventMediaFormat.JSON == format) {
 				int lastIndex = sb.lastIndexOf("}");
 				if (lastIndex >= 0) {
 					JSONArray jsonArr = new JSONArray();
@@ -161,13 +162,13 @@ import eu.threecixty.profile.oldmodels.Preference;
 		performORAugmentation(triples, exprs); // perform ORAugmentation by default
 	}
 
-	public void performANDAugmentation(List<Triple> triples, List<Expr> exprs) {
-		if (preference == null || query == null) return;
-		if (triples.size() == 0 && exprs.size() == 0) return;
-		augmentedQuery = new AugmentedQuery(query.cloneQuery());
-		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
-		QueryUtils.addAND_ExprsIntoQuery(exprs, augmentedQuery.getQuery().getQuery());
-	}
+//	public void performANDAugmentation(List<Triple> triples, List<Expr> exprs) {
+//		if (preference == null || query == null) return;
+//		if (triples.size() == 0 && exprs.size() == 0) return;
+//		augmentedQuery = new AugmentedQuery(query.cloneQuery());
+//		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
+//		QueryUtils.addAND_ExprsIntoQuery(exprs, augmentedQuery.getQuery().getQuery());
+//	}
 
 	public void performORAugmentation(List<Triple> triples, List<Expr> exprs) {
 		if (preference == null || query == null) return;
@@ -175,6 +176,9 @@ import eu.threecixty.profile.oldmodels.Preference;
 		augmentedQuery = new AugmentedQuery(query.cloneQuery());
 		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
 		QueryUtils.addFilterWithOrOperandForExprsIntoQuery(exprs, augmentedQuery.getQuery().getQuery());
+		if (augmentedQuery.getQuery().getQuery().hasAggregators()) return;
+		QueryUtils.addOrderToQuery(exprs, augmentedQuery.getQuery().getQuery());
+		QueryUtils.addVarNameResultsToQuery(exprs, augmentedQuery.getQuery().getQuery());
 	}
 
 	@Override
@@ -260,26 +264,12 @@ import eu.threecixty.profile.oldmodels.Preference;
 	}
 
 	private void addPeriodsToTriplesAndExprsList(Set<Period> periods, ThreeCixtyQuery query, List <Triple> triples, List <Expr> exprs) {
-		List <Expr> orTmpExprs = new ArrayList<Expr>();
-		List <Expr> andTmpExprs = new ArrayList <Expr>();
 		for (Period period: periods) {
-			andTmpExprs.clear();
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "startDate", "datetime",
-					andTmpExprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+					exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "endDate", "datetime",
-					andTmpExprs, triples, ThreeCixtyExpression.LessThanOrEqual);
-			Expr expr = QueryUtils.createExprWithAndOperandForExprs(andTmpExprs);
-			if (expr != null) {
-				orTmpExprs.add(expr);
-			}
+					exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
 		}
-		
-		Expr exprResult = QueryUtils.createExprWithOrOperandForExprs(orTmpExprs);
-		if (exprResult != null) {
-			exprs.add(exprResult);
-		}
-		orTmpExprs.clear();
-		andTmpExprs.clear();
 	}
 
 	private String removePrefixes(String query) {

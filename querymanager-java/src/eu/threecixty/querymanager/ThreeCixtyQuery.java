@@ -1,7 +1,5 @@
 package eu.threecixty.querymanager;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.graph.Triple;
@@ -126,22 +124,16 @@ public class ThreeCixtyQuery {
 
 		EventDetail eventDetail = event.getHasEventDetail();
 		if (eventDetail != null) {
-			List <Expr> edExprs = new ArrayList <Expr>();
 			if (eventDetail.getHasEventName() != null && !eventDetail.getHasEventName().equals("")) {
 			    addExprsAndTriplesFromAttributeNameAndPropertyName(eventDetail, "hasEventName",
-					    "hasEventName", edExprs, triples, ThreeCixtyExpression.StringEqual);
+					    "hasEventName", exprs, triples, ThreeCixtyExpression.StringEqual);
 			}
-			Expr expr1 = QueryUtils.createExprWithOrOperandForExprs(edExprs);
-			if (expr1 != null) exprs.add(expr1);
-			edExprs.clear();
 			if (eventDetail.getHasTemporalDetails() != null) {
 			    addExprsAndTriplesFromAttributeNameAndPropertyName(eventDetail.getHasTemporalDetails(), "hasDateFrom",
-					    "datetime", edExprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+					    "datetime", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
 			    addExprsAndTriplesFromAttributeNameAndPropertyName(eventDetail.getHasTemporalDetails(), "hasDateUntil",
-					    "datetime", edExprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+					    "datetime", exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
 			}
-			Expr expr2 = QueryUtils.createExprWithAndOperandForExprs(edExprs);
-			if (expr2 != null) exprs.add(expr2);
 		}
 	}
 
@@ -166,17 +158,14 @@ public class ThreeCixtyQuery {
 
 			Area area = placeDetail.getArea();
 			if (area != null) {
-				List <Expr> areaExprs = new ArrayList <Expr>();
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "minLat",
-						"latitude", areaExprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+						"latitude", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "maxLat",
-						"latitude", areaExprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+						"latitude", exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "minLon",
-						"longitute", areaExprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+						"longitute", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "maxLon",
-						"longitute", areaExprs, triples, ThreeCixtyExpression.LessThanOrEqual);
-				Expr expr = QueryUtils.createExprWithAndOperandForExprs(areaExprs);
-				exprs.add(expr);
+						"longitute", exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
 			}
 		}
 		Rating rating = place.getHasRating();

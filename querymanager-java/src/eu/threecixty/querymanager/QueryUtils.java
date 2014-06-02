@@ -293,6 +293,34 @@ public class QueryUtils {
 	}
 
 	/**
+	 * Adds ORDER DESC created by a given list of expressions to a given query.
+	 * @param exprs
+	 * 				List of expressions which is supposed that the more index value is, the less priority is.
+	 * @param query
+	 * 				The Jena query.
+	 */
+	public static void addOrderToQuery(List <Expr> exprs, Query query) {
+		// TODO: relate to other parts which will use this method
+		if (exprs == null || query == null) return;
+		for (Expr expr: exprs) {
+			query.addOrderBy(expr, Query.ORDER_DESCENDING);
+		}
+	}
+
+	/**
+	 * Adds var names in order to make ORDER DESC when a given query contains GROUP BY.
+	 * @param addedVarNameResults
+	 * @param query
+	 */
+	public static void addVarNameResultsToQuery(List<Expr> exprs, Query query) {
+		if (exprs == null || query == null) return;
+		if (query.hasAggregators()) return;
+		for (Expr expr: exprs) {
+			query.addResultVar(expr);
+		}
+	}
+
+	/**
 	 * Adds triples described by a given array into a given list of triples.
 	 * @param query
 	 * 				The query.

@@ -5,11 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.sparql.expr.E_LogicalNot;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
@@ -79,84 +75,36 @@ public class QueryManagerDecision {
 	 */
 	private static String filterBasedOnLocation(IProfiler profiler, IQueryManager qm,
 			EventMediaFormat format) {
-		List <Triple> triples1 = new ArrayList <Triple>();
+		
+		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		Period period = createPeriod(); // two days
 		profiler.requirePeriod(period);
-		findTriplesAndExprs(profiler, qm, triples1, exprs);
-		Expr daysExpr = createExpr(exprs);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 		
-		List <Triple> triples2 = new ArrayList <Triple>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireAreaWithin(2); // within 2 km
-		findTriplesAndExprs(profiler, qm, triples2, exprs);
-		Expr areaExpr = createExpr(exprs);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 
-		List <Triple> triples3 = new ArrayList <Triple>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireCurrentTown(true);
-		findTriplesAndExprs(profiler, qm, triples3, exprs);
-		Expr townExpr = createExpr(exprs);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 		
-		List <Triple> triples4 = new ArrayList <Triple>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireCurrentCountry(true);
-		findTriplesAndExprs(profiler, qm, triples4, exprs);
-		Expr countryExpr = createExpr(exprs);
-		
-		List <Triple> allTriples = new ArrayList <Triple>();
-		List <List<Triple>> triplesCollection = new ArrayList <List<Triple>>();
-		
-		if (daysExpr != null) {
-			triplesCollection.add(triples1);
-			allTriples.addAll(triples1);
-			exprs.add(daysExpr);
-		}
-		if (areaExpr != null) {
-			triplesCollection.add(triples2);
-			allTriples.addAll(triples2);
-			exprs.add(areaExpr);
-		}
-		if (townExpr != null) {
-			triplesCollection.add(triples3);
-			allTriples.addAll(triples3);
-			exprs.add(townExpr);
-		}
-		if (countryExpr != null) {
-			triplesCollection.add(triples4);
-			allTriples.addAll(triples4);
-			exprs.add(countryExpr);
-		}
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 		
 		QueryUtils.removeDoubleExpressions(exprs);
 
 		if (exprs.size() == 0) {
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 		} else if (exprs.size() == 1) {
-			qm.performANDAugmentation(allTriples, exprs);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
+			qm.performORAugmentation(triples, exprs);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 		} else {
-			if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
-				return executeQueryAugmentationForCounting(qm, format, triplesCollection, exprs);
-			} else {
-				long limit = qm.getQuery().getQuery().getLimit();
-				JSONArray triplesResults = new JSONArray();
-				String aRespMsg = null;
-				List <String> augQueriesResponse = new ArrayList <String>();
-				for (int i = 0; i < exprs.size() - 1; i++) {
-					qm.performANDAugmentation(allTriples, exprs);
-					aRespMsg = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
-					findTriplesResult(aRespMsg, limit, triplesResults);
-					String response = qm.getAugmentedQueryWithoutPrefixes();
-					augQueriesResponse.add(response);
-					if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, aRespMsg, augQueriesResponse);
-					Expr notExpr = new E_LogicalNot(exprs.get(i));
-					exprs.set(i, notExpr);
-				}
-				if (aRespMsg == null) return "";
-				return createRespFromJSONArray(triplesResults, aRespMsg, augQueriesResponse);
-			}
+			qm.performORAugmentation(triples, exprs);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 		}
 	}
 
@@ -171,34 +119,19 @@ public class QueryManagerDecision {
 			EventMediaFormat format) {
 		// TODO: find minimum values from preferences
 		List <Triple> triples = new ArrayList <Triple>();
-		List <Expr> exprs1 = new ArrayList<Expr>();
+		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireScoreRatedAtLeast(PreferencesUtils.getMinimumScoreRated(profiler));
-		findTriplesAndExprs(profiler, qm, triples, exprs1);
-
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 		
-		List <Expr> exprs2 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireNumberOfTimesVisitedAtLeast(PreferencesUtils.getMinimumNumberOfTimesVisited(profiler));
-		findTriplesAndExprs(profiler, qm, triples, exprs2);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 
-		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
-			exprs1.addAll(exprs2);
-			qm.performORAugmentation(triples, exprs1);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
-		} else {
-		
-			for (Expr tmpExpr: exprs1) {
-				if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
-			}
-			QueryUtils.removeDoubleExpressions(exprs1);
-			QueryUtils.removeDoubleExpressions(exprs2);
+		QueryUtils.removeDoubleExpressions(exprs);
 
-			Expr scoreExpr = createExpr(exprs1);
-			Expr visitedExpr = createExpr(exprs2);
-
-			return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
-		}
+		qm.performORAugmentation(triples, exprs);
+		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 	}
 
 	/**
@@ -210,38 +143,26 @@ public class QueryManagerDecision {
 	 */
 	private static String filterBasedOnFriends(IProfiler profiler, IQueryManager qm,
 			EventMediaFormat format) {
-		// TODO: find minimum values from preferences
 		List <Triple> triples = new ArrayList <Triple>();
-		List <Expr> exprs1 = new ArrayList<Expr>();
+		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireScoreRatedForFriendsAtLeast(
 				PreferencesUtils.getMinimumScoreRatedForFriends(profiler));
-		findTriplesAndExprs(profiler, qm, triples, exprs1);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 
-		
-		List <Expr> exprs2 = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireNumberOfTimesVisitedForFriendsAtLeast(
 				PreferencesUtils.getMinimumNumberOfTimesVisitedForFriends(profiler));
-		findTriplesAndExprs(profiler, qm, triples, exprs2);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 
-		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
-			exprs1.addAll(exprs2);
-			qm.performORAugmentation(triples, exprs1);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
-		} else {
-		
-			for (Expr tmpExpr: exprs1) {
-				if (exprs2.contains(tmpExpr)) exprs2.remove(tmpExpr);
-			}
-			QueryUtils.removeDoubleExpressions(exprs1);
-			QueryUtils.removeDoubleExpressions(exprs2);
+		profiler.initDefaultParametersForAugmentation();
+		profiler.requireFriendsLikeVisit(true);
+		findTriplesAndExprs(profiler, qm, triples, exprs);
 
-			Expr scoreExpr = createExpr(exprs1);
-			Expr visitedExpr = createExpr(exprs2);
+		QueryUtils.removeDoubleExpressions(exprs);
 
-			return filterBasedOnTwoExprs(scoreExpr, visitedExpr, qm, triples, format);
-		}
+		qm.performORAugmentation(triples, exprs);
+		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 	}
 
 	/**
@@ -259,75 +180,15 @@ public class QueryManagerDecision {
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireEventName(true);
 		findTriplesAndExprs(profiler, qm, triples, exprs);
-		Expr eventNameExpr = createExpr(exprs);
 		
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requirePreferredEventDates(true);
 		findTriplesAndExprs(profiler, qm, triples, exprs);
-		Expr preferredDates = createExpr(exprs);
-
-		if (qm.getAugmentedQuery().getQuery().getQuery().hasAggregators()) {
-			List <Expr> exprs1 = new ArrayList<Expr>();
-			if (eventNameExpr != null) exprs1.add(eventNameExpr);
-			if (preferredDates != null) exprs1.add(preferredDates);
-			qm.performORAugmentation(triples, exprs1);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
-		} else {
-		
-		    return filterBasedOnTwoExprs(eventNameExpr, preferredDates, qm, triples, format);
-		}
-	}
-
-	/**
-	 * Executes the query (at EventMedia) based on two expressions.
-	 * @param expr1
-	 * @param expr2
-	 * @param qm
-	 * @param triples
-	 * @param format
-	 * @return
-	 */
-	private static String filterBasedOnTwoExprs(Expr expr1, Expr expr2, IQueryManager qm, List <Triple> triples,
-			EventMediaFormat format) {
-		List <Expr> exprs = new ArrayList <Expr>();
-		if (expr1 != null) exprs.add(expr1);
-		if (expr2 != null) exprs.add(expr2);
 
 		QueryUtils.removeDoubleExpressions(exprs);
 
-		if (exprs.size() == 0) {
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
-		} else if (exprs.size() == 1) {
-			qm.performANDAugmentation(triples, exprs);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
-		} else {
-			List <String> augmentedQueries = new ArrayList <String>();
-			long limit = qm.getQuery().getQuery().getLimit();
-			JSONArray triplesResults = new JSONArray();
-			
-			qm.performANDAugmentation(triples, exprs);
-			String result1 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
-			findTriplesResult(result1, limit, triplesResults);
-			augmentedQueries.add(qm.getAugmentedQueryWithoutPrefixes());
-			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result1, augmentedQueries);
-			
-			exprs.set(0, new E_LogicalNot(expr1)); // (not first one) and second one 
-			qm.performANDAugmentation(triples, exprs);
-			String result2 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
-			findTriplesResult(result2, limit, triplesResults);
-			augmentedQueries.add(qm.getAugmentedQueryWithoutPrefixes());
-			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result2, augmentedQueries);
-
-			exprs.set(0, expr1);
-			exprs.set(1, new E_LogicalNot(expr2)); // first one and (not second one)
-			qm.performANDAugmentation(triples, exprs);
-			String result3 = qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, false);
-			findTriplesResult(result3, limit, triplesResults);
-			augmentedQueries.add(qm.getAugmentedQueryWithoutPrefixes());
-			if (triplesResults.length() >= limit && limit != -1) return createRespFromJSONArray(triplesResults, result3, augmentedQueries);
-			
-			return createRespFromJSONArray(triplesResults, result1, augmentedQueries);
-		}
+		qm.performORAugmentation(triples, exprs);
+		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 	}
 
 	/**
@@ -342,80 +203,6 @@ public class QueryManagerDecision {
 		profiler.PopulateProfile();
 		qm.requestPreferences(profiler);
 		qm.addTriplesAndExprsToLists(triples, exprs);
-	}
-
-	/**
-	 * Creates OR expression for a given list of expressions.
-	 * @param exprs
-	 * @return
-	 */
-	private static Expr createExpr(List <Expr> exprs) {
-		Expr tmpExpr = QueryUtils.createExprWithOrOperandForExprs(exprs);
-		exprs.clear();
-		return tmpExpr;
-	}
-
-	/**
-	 * Creates result from a list of subsets' result.
-	 * @param resultsOfQueries
-	 * @param limit
-	 * @return
-	 */
-	private static String createRespFromJSONArray(JSONArray triplesResults, String aRespMsg,
-			List <String> augmentedQueriesResponse) {	
-		if (triplesResults.length() == 0) return aRespMsg;
-		StringBuffer buffer = new StringBuffer();
-		String bindingStr = "\"bindings\": ";
-		int bindingsIndex = aRespMsg.indexOf(bindingStr);
-		if (bindingsIndex < 0) return "";
-		buffer.append(aRespMsg.substring(0, bindingsIndex));
-		buffer.append(bindingStr);
-		buffer.append(triplesResults.toString());
-		buffer.append('}');
-		buffer.append(',');
-		JSONArray augmentedQueriesArr = new JSONArray();
-		for (String augQuery: augmentedQueriesResponse) {
-		JSONObject jsonObj = new JSONObject();
-		    jsonObj.put("AugmentedQuery", augQuery);
-		    augmentedQueriesArr.put(jsonObj);
-		}
-		buffer.append("\"AugmentedQueries\": ").append(augmentedQueriesArr.toString());
-		buffer.append('}');
-		return buffer.toString();
-	}
-
-	private static void findTriplesResult(String aRespMsg, long limit, JSONArray triplesResults) {
-		JSONObject obj = new JSONObject(aRespMsg);
-		JSONObject objResults = obj.getJSONObject("results");
-		JSONArray arrBindings = objResults.getJSONArray("bindings");
-		for (int i = 0; i < arrBindings.length(); i++) {
-			if (triplesResults.length() >= limit && limit != -1) {
-				return;
-			}
-			triplesResults.put(arrBindings.getJSONObject(i));
-		}
-		if (triplesResults.length() >= limit && limit != -1) {
-			return;
-		}
-	}
-
-	/**
-	 * Augments and executes a query (at EventMedia).
-	 * @param qm
-	 * @param format
-	 * @param triples
-	 * @param exprs
-	 * @return
-	 */
-	private static String executeQueryAugmentationForCounting(IQueryManager qm,
-			EventMediaFormat format, List <List<Triple>> triples, List <Expr> exprs) {
-		// only keep the last element which is the largest subset
-		Expr lastEl = exprs.get(exprs.size() - 1);
-		List <Triple> lastTriples = triples.get(exprs.size() - 1);
-		exprs.clear();
-		exprs.add(lastEl);
-		qm.performANDAugmentation(lastTriples, exprs);
-		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, true);
 	}
 
 	/**

@@ -38,7 +38,7 @@ public interface IQueryManager {
 	 * 			The returned string format
 	 * @return: a RDF or JSON in string format. Return Null if any error occurs.
 	 */
-	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format, boolean augmentedQueryIncluded);
+	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format);
 	
 	/**
 	 * Request preferences from Knowledge-Base of User Profiles.
@@ -79,7 +79,7 @@ public interface IQueryManager {
 	 * @param exprs
 	 * 				The list of expressions which are filters.
 	 */
-	void performANDAugmentation(List<Triple> triples, List<Expr> exprs);
+//	void performANDAugmentation(List<Triple> triples, List<Expr> exprs);
 	
 	/**
 	 * Performs query augmentation by creating an OR expression for a given list of expressions.
