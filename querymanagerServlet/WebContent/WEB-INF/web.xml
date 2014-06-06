@@ -8,15 +8,28 @@
   
     <display-name>QueryManagerServlet</display-name>
 
-<servlet>
-  <servlet-name>queryManagerServlet</servlet-name>
-  <servlet-class>eu.threecixty.querymanager.QueryManagerServlet</servlet-class>
-</servlet>
+	<listener>
+		<listener-class>eu.threecixty.querymanager.ThreeCixtyContextListener</listener-class>
+	</listener>
 
-  <servlet-mapping>
-    <servlet-name>queryManagerServlet</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
+	<servlet>
+	  <servlet-name>queryManagerServlet</servlet-name>
+	  <servlet-class>eu.threecixty.querymanager.QueryManagerServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+	  <servlet-name>settingsServlet</servlet-name>
+	  <servlet-class>eu.threecixty.querymanager.SettingsServlet</servlet-class>
+	</servlet>
+	
+	  <servlet-mapping>
+	    <servlet-name>queryManagerServlet</servlet-name>
+	    <url-pattern>/queryManagerServlet</url-pattern>
+	  </servlet-mapping>
+	  <servlet-mapping>
+	    <servlet-name>settingsServlet</servlet-name>
+	    <url-pattern>/settingsServlet</url-pattern>
+	  </servlet-mapping>
   
     <filter>
             <!-- The CORS filter with parameters -->

@@ -19,7 +19,6 @@ import com.hp.hpl.jena.query.Query;
 
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
-import eu.threecixty.profile.RdfFileManager;
 
 @WebServlet("InitServlet")
 public class QueryManagerServlet extends HttpServlet {
@@ -46,7 +45,6 @@ public class QueryManagerServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 	    super.init(config);
 	    realPath = this.getServletContext().getRealPath("/");
-	    RdfFileManager.getInstance().setPathToRdfFile(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
 	}
 	
 	@Override

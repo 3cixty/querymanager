@@ -26,6 +26,8 @@ import eu.threecixty.profile.RdfFileManager;
  */
 public class GoogleAccountUtils {
 
+	private static final String PROFILE_URI = "http://www.eu.3cixty.org/profile#";
+	
 	/**
 	 * Validates a given access token, then extract Google info to update UserProfile if there is
 	 * no information about this user.
@@ -54,9 +56,9 @@ public class GoogleAccountUtils {
            
             MyFactory mf = new MyFactory(ontology);
 
-            UserProfile userProfile = mf.createUserProfile(user_id);
+            UserProfile userProfile = mf.createUserProfile(PROFILE_URI + user_id);
             userProfile.addHasUID(user_id);
-            Name name = mf.createName(user_id + familyName);
+            Name name = mf.createName(PROFILE_URI + user_id + familyName);
             name.addFamily_name(familyName);
             name.addGiven_name(givenName);
             userProfile.addHas_name(name);
