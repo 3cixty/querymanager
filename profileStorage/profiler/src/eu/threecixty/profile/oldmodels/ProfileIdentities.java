@@ -14,6 +14,8 @@ public class ProfileIdentities {
     private String hasUserAccountID="";
 	@Description(hasText="User status on the profile identity being used. It tells whether the user is using the social media or not")
     private UserInteractionMode hasUserInteractionMode;
+
+	private String serviceProvider;
 	
 	public String getHasSource() {
 		return hasSource;
@@ -33,4 +35,11 @@ public class ProfileIdentities {
 	public void setHasUserInteractionMode(UserInteractionMode hasUserInteractionMode) {
 		this.hasUserInteractionMode = hasUserInteractionMode;
 	}
+	public String getServiceProvider() {
+		return serviceProvider;
+	}
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
+	
 }
