@@ -26,11 +26,11 @@
      xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
      xmlns:profile="http://www.eu.3cixty.org/profile#">
     <owl:Ontology rdf:about="http://www.eu.3cixty.org/profile">
-        <owl:versionInfo>1.0.0</owl:versionInfo>
-        <author>Animesh Pathak (Inria)</author>
-        <author>Johan Koolwaaij (Mobidot)</author>
-        <author>Mihaela Brut (Thales)</author>
         <author>Rachit Agarwal (Inria)</author>
+        <author>Mihaela Brut (Thales)</author>
+        <author>Johan Koolwaaij (Mobidot)</author>
+        <author>Animesh Pathak (Inria)</author>
+        <owl:versionInfo>1.0.0</owl:versionInfo>
         <owl:imports rdf:resource="http://linkedevents.org/ontology/"/>
         <owl:imports rdf:resource="http://www.w3.org/2006/vcard/ns"/>
         <owl:imports rdf:resource="http://xmlns.com/foaf/0.1/"/>
@@ -610,8 +610,8 @@
     <!-- http://xmlns.com/foaf/0.1/knows -->
 
     <rdf:Description rdf:about="&foaf;knows">
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
         <rdfs:range rdf:resource="&profile;UserProfile"/>
+        <rdfs:domain rdf:resource="&profile;UserProfile"/>
     </rdf:Description>
     
 
@@ -683,7 +683,7 @@
         <rdfs:comment>User 1</rdfs:comment>
         <rdfs:domain rdf:resource="&profile;Accompanying"/>
         <owl:equivalentProperty rdf:resource="&profile;hasUID"/>
-        <rdfs:range rdf:resource="&xsd;long"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -694,7 +694,7 @@
         <rdfs:comment>User 2</rdfs:comment>
         <rdfs:domain rdf:resource="&profile;Accompanying"/>
         <owl:equivalentProperty rdf:resource="&profile;hasUID"/>
-        <rdfs:range rdf:resource="&xsd;long"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -4416,6 +4416,61 @@
     
 
 
+    <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress -->
+
+    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelAddress">
+        <rdf:type rdf:resource="&vcard;Address"/>
+        <townName>Milan</townName>
+        <vcard:country-name>Italy</vcard:country-name>
+        <vcard:street-address>Via Luigi Galvani, 12</vcard:street-address>
+        <vcard:postal-code>20124</vcard:postal-code>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelDetail -->
+
+    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelDetail">
+        <rdf:type rdf:resource="&profile;HotelDetail"/>
+        <hasHotelStarCategory rdf:datatype="&xsd;int">4</hasHotelStarCategory>
+        <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
+        <hasNatureOfPlace>Hotel</hasNatureOfPlace>
+        <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelPlaceDetail -->
+
+    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelPlaceDetail">
+        <rdf:type rdf:resource="&profile;PlaceDetail"/>
+        <hasNatureOfPlace>Hotel</hasNatureOfPlace>
+        <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
+        <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#Rating4Visited -->
+
+    <owl:NamedIndividual rdf:about="&profile;Rating4Visited">
+        <rdf:type rdf:resource="&profile;Rating"/>
+        <hasUserDefinedRating rdf:datatype="&xsd;double">4.0</hasUserDefinedRating>
+        <hasUserInteractionMode>Visited</hasUserInteractionMode>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#Rating5Visited -->
+
+    <owl:NamedIndividual rdf:about="&profile;Rating5Visited">
+        <rdf:type rdf:resource="&profile;Rating"/>
+        <hasUserDefinedRating rdf:datatype="&xsd;double">5.0</hasUserDefinedRating>
+        <hasUserInteractionMode>Visited</hasUserInteractionMode>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.eu.3cixty.org/profile#100900047095598983805 -->
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805">
@@ -4437,8 +4492,8 @@
         <rdf:type rdf:resource="&vcard;Address"/>
         <vcard:longitude rdf:datatype="&xsd;double">-2.598761</vcard:longitude>
         <vcard:latitude rdf:datatype="&xsd;double">51.452745</vcard:latitude>
-        <townName>Milano</townName>
         <vcard:country-name>Italy</vcard:country-name>
+        <townName>Milano</townName>
     </owl:NamedIndividual>
     
 
@@ -4476,9 +4531,9 @@
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805EventDetail">
         <rdf:type rdf:resource="&profile;EventDetails"/>
         <hasDateUntil>24/5/2014</hasDateUntil>
-        <hasEventName>Brand New</hasEventName>
         <hasDateFrom>20/05/2014</hasDateFrom>
         <hasNatureOfEvent>Concert</hasNatureOfEvent>
+        <hasEventName>Brand New</hasEventName>
     </owl:NamedIndividual>
     
 
@@ -4497,9 +4552,9 @@
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805EventPreferenceDetail">
         <rdf:type rdf:resource="&profile;EventDetailPreference"/>
         <hasEventName>Toy</hasEventName>
-        <hasPreferredStartDate>19/05/2014</hasPreferredStartDate>
         <hasNatureOfEvent>Music</hasNatureOfEvent>
         <hasPreferredEndDate>22/05/2014</hasPreferredEndDate>
+        <hasPreferredStartDate>19/05/2014</hasPreferredStartDate>
     </owl:NamedIndividual>
     
 
@@ -4528,8 +4583,8 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805MusicDefinedRating">
         <rdf:type rdf:resource="&profile;Rating"/>
+        <hasUserDefinedRating rdf:datatype="&xsd;double">4.0</hasUserDefinedRating>
         <hasUserInteractionMode>Visited</hasUserInteractionMode>
-        <hasUserDefinedRating rdf:datatype="&xsd;double">4</hasUserDefinedRating>
     </owl:NamedIndividual>
     
 
@@ -4548,8 +4603,8 @@
 
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805Name">
         <rdf:type rdf:resource="&vcard;Name"/>
-        <vcard:family-name>Boyle</vcard:family-name>
         <vcard:given-name>Ellwita</vcard:given-name>
+        <vcard:family-name>Boyle</vcard:family-name>
     </owl:NamedIndividual>
     
 
@@ -4599,8 +4654,8 @@
     <owl:NamedIndividual rdf:about="&profile;100900047095598983805ProfileIdentities">
         <rdf:type rdf:resource="&profile;ProfileIdentities"/>
         <hasUserAccountID>100900047095598983805</hasUserAccountID>
-        <hasSource>https://plus.google.com</hasSource>
         <hasUserInteractionMode>Active</hasUserInteractionMode>
+        <hasSource>https://plus.google.com</hasSource>
     </owl:NamedIndividual>
     
 
@@ -4691,8 +4746,8 @@
 
     <owl:NamedIndividual rdf:about="&profile;110248277616794929135ProfileIdentities">
         <rdf:type rdf:resource="&profile;ProfileIdentities"/>
-        <hasUserInteractionMode>Active</hasUserInteractionMode>
         <hasUserAccountID>110248277616794929135</hasUserAccountID>
+        <hasUserInteractionMode>Active</hasUserInteractionMode>
         <hasSource>https://plus.google.com</hasSource>
     </owl:NamedIndividual>
     
@@ -4704,64 +4759,9 @@
         <rdf:type rdf:resource="&profile;UserEnteredRatings"/>
         <hasUserHotelRating rdf:resource="&profile;110248277616794929135HiltonMilanHotelRating"/>
     </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress -->
-
-    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelAddress">
-        <rdf:type rdf:resource="&vcard;Address"/>
-        <vcard:postal-code>20124</vcard:postal-code>
-        <vcard:street-address>Via Luigi Galvani, 12</vcard:street-address>
-        <vcard:country-name>Italy</vcard:country-name>
-        <townName>Milan</townName>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelDetail -->
-
-    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelDetail">
-        <rdf:type rdf:resource="&profile;HotelDetail"/>
-        <hasHotelStarCategory rdf:datatype="&xsd;int">4</hasHotelStarCategory>
-        <hasNatureOfPlace>Hotel</hasNatureOfPlace>
-        <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
-        <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelPlaceDetail -->
-
-    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelPlaceDetail">
-        <rdf:type rdf:resource="&profile;PlaceDetail"/>
-        <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
-        <hasNatureOfPlace>Hotel</hasNatureOfPlace>
-        <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#Rating4Visited -->
-
-    <owl:NamedIndividual rdf:about="&profile;Rating4Visited">
-        <rdf:type rdf:resource="&profile;Rating"/>
-        <hasUserDefinedRating rdf:datatype="&xsd;double">4.0</hasUserDefinedRating>
-        <hasUserInteractionMode>Visited</hasUserInteractionMode>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#Rating5Visited -->
-
-    <owl:NamedIndividual rdf:about="&profile;Rating5Visited">
-        <rdf:type rdf:resource="&profile;Rating"/>
-        <hasUserDefinedRating rdf:datatype="&xsd;double">5.0</hasUserDefinedRating>
-        <hasUserInteractionMode>Visited</hasUserInteractionMode>
-    </owl:NamedIndividual>
 </rdf:RDF>
 
 
 
-<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
 
