@@ -311,7 +311,7 @@ public class SettingsStorage {
 	private static ProfileIdentities convertProfileIdentities(
 			eu.threecixty.profile.oldmodels.ProfileIdentities oldProfile, MyFactory mf, String uid) {
 		ProfileIdentities pi = mf.createProfileIdentities(PROFILE_URI
-				+ uid + oldProfile.getServiceProvider() + oldProfile.getHasUserAccountID());
+				+ uid + oldProfile.getHasSource() + oldProfile.getHasUserAccountID());
 		if (oldProfile.getHasSource() != null) pi.addHasSource(oldProfile.getHasSource());
 		if (oldProfile.getHasUserAccountID() != null) pi.addHasUserAccountID(oldProfile.getHasUserAccountID());
 		return pi;
