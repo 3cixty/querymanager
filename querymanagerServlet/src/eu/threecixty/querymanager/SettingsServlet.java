@@ -39,7 +39,7 @@ public class SettingsServlet extends HttpServlet {
 	private static final String PROFILE_IDENTITIES_SOURCE_PARAM = "pi_source";
 	private static final String PROFILE_IDENTITIES_ACCOUNT_ID_PARAM = "pi_id";
 	private static final String PROFILE_IDENTITIES_ACCESS_TOKEN_PARAM = "pi_at";
-	private static final String PROFILE_IDENTITIES_SERVICE_PROVIDER_PARAM = "pi_provider";
+//	private static final String PROFILE_IDENTITIES_SERVICE_PROVIDER_PARAM = "pi_provider";
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -86,20 +86,19 @@ public class SettingsServlet extends HttpServlet {
 			addProfileIdentities(req.getParameter(PROFILE_IDENTITIES_SOURCE_PARAM),
 					req.getParameter(PROFILE_IDENTITIES_ACCOUNT_ID_PARAM),
 					req.getParameter(PROFILE_IDENTITIES_ACCESS_TOKEN_PARAM),
-					req.getParameter(PROFILE_IDENTITIES_SERVICE_PROVIDER_PARAM), settings);
+					settings);
 		} else {
 			String[] sources = req.getParameterValues(PROFILE_IDENTITIES_SOURCE_PARAM);
 			String [] accountIds = req.getParameterValues(PROFILE_IDENTITIES_ACCOUNT_ID_PARAM);
 			String [] accessTokens = req.getParameterValues(PROFILE_IDENTITIES_ACCESS_TOKEN_PARAM);
-			String [] serviceProviders = req.getParameterValues(PROFILE_IDENTITIES_SERVICE_PROVIDER_PARAM);
 			if (sources == null || sources.length == 0 || accountIds == null
 					|| accountIds.length == 0 || accessTokens == null || accessTokens.length == 0
-					|| serviceProviders == null || serviceProviders.length == 0) return;
+					) return;
 			if (sources.length != accountIds.length || sources.length != accessTokens.length
 					|| accountIds.length != accessTokens.length) return;
-			if (sources.length != serviceProviders.length) return;
+			
 			for (int i = 0; i < sources.length; i++) {
-				addProfileIdentities(sources[i], accountIds[i], accessTokens[i], serviceProviders[i], settings);
+				addProfileIdentities(sources[i], accountIds[i], accessTokens[i], settings);
 			}
 		}
 	}
@@ -110,11 +109,10 @@ public class SettingsServlet extends HttpServlet {
 	 * @param source
 	 * @param accountId
 	 * @param accessToken
-	 * @param serviceProvider
 	 * @param settings
 	 */
 	private void addProfileIdentities(String source, String accountId,
-			String accessToken, String serviceProvider, ThreeCixtySettings settings) {
+			String accessToken, ThreeCixtySettings settings) {
 		if (!isNotNullOrEmpty(source) || !isNotNullOrEmpty(accountId)
 				|| !isNotNullOrEmpty(accessToken)) return;
 		List <ProfileIdentities> profileIdentities = settings.getIdentities();
@@ -122,7 +120,6 @@ public class SettingsServlet extends HttpServlet {
 		ProfileIdentities tmpProfile = new ProfileIdentities();
 		tmpProfile.setHasSource(source);
 		tmpProfile.setHasUserAccountID(accountId);
-		tmpProfile.setServiceProvider(serviceProvider);
 		// TODO: update private data from accessToken ?
 		profileIdentities.add(tmpProfile);
 		settings.setIdentities(profileIdentities);
