@@ -16,11 +16,20 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - Suppose you deployed querymanagerServlet on your local server. Let the baseUrl point to the root path for querymanagerServlet you just deployed
 
-- Invoke the service by the following template:
+- Invoke the services by the following template:
 
   ```
   ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}
+  ~baseUrl/settingsServlet?accessToken={accessToken}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
   ```
+
+  How to invoke the services will be discussed by the following sections.
+  
+1. Query augmentation
+
+- The template for calling query augmentation
+ 
+  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}
   
   where:
   
@@ -33,7 +42,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{filter}|<b>location</b>, <b>enteredRating</b> or <b>preferred</b>. QueryManager will take this value to augment a query|
   |{friends}|<b>true</b> or <b>false</b>. This value is used to augment a query based on either <b>my friends</b> or <b>I</b>|
   
--  Example for a full URL to invoke the service on local Tomcat server:
+- Example for a full URL to invoke the service on local Tomcat server:
   
   [http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location&friends=true](http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?userKey=kinh&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location&friends=true)
   
@@ -54,3 +63,31 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   <code>
    { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQueries": [{"AugmentedQuery":"SELECT DISTINCT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname .\n    FILTER ( ?_augcountryname = \"Italy\" )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}]}
   </code>
+  
+2. Updating profile information
+
+- The template for updating profile information (take URL to show, but use HTTP POST in reality)
+
+  ~baseUrl/settingsServlet?accessToken={accessToken}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
+
+  where:
+
+  |parameter|required|value|
+  |:---------||:-----|
+  |{accessToken}|yes|is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description <b>Access token is incorrect or expired<b> | 
+  |townName|no|is a town name, for example <b>Milano</b>, <b>Paris</b>, etc.|
+  |{countryName}|no|is a country name, for example <b>Italy</b>, <b>France</b>, etc.|
+  |{lat}|no|is latitude value|
+  |{lon}|no|is longitude|
+  |{startDate}|no|is a start date for an event which a user prefers to participate in. The start date format follows the pattern <b>bb-mm-yyyy</b>, for example <b>25-07-2015</b>|
+  |{endDate}|no|is an end date for an event which a user prefers to participate in. The end date format is the same with the start date format|
+  |{pi_source}|no|is profile information source, for example <b>Mobidot</b>, <b>Google</b>, <b>Facebook</b>| 
+  |{pi_id}|no|is profile information UID, for example UID from Mobidot, Facebook|
+  |{pi_at}|no|is access token to access to the source described by {pi_source}|
+ 
+  Note that group parameters (pi_source, pi_id, pi_at) go altogether. They can be an array of groups 
+
+- Example for the template to update profile information:
+  
+  ~baseUrl/settingsServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&townName=Milano&countryName=Italy&lat=2.12345&lon=46.1234&startDate=18-06-2014&endDate=21-06-2013&pi_source[0]=Facebook&pi_id[0]=112233445566&pi_at[0]=facebookFakeAccessToken&pi_source[1]=Mobidot&pi_id[1]=nguyen&pi_at[1]=fakeMobidotAccessToken
+  
