@@ -66,6 +66,8 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
 2. Updating profile information
 
+  (Web Interface will soon be available)
+
 - The template for updating profile information (take URL to show, but use HTTP POST in reality)
 
   ~baseUrl/settingsServlet?accessToken={accessToken}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
