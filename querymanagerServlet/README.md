@@ -61,30 +61,35 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
   For the output of the query: if the format is 'json', the output also includes an array of augmented queries used to get that output. The array is in the JSON string format.
   Here is an example of the output:
-  <code>
+
+```
    { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQueries": [{"AugmentedQuery":"SELECT DISTINCT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname .\n    FILTER ( ?_augcountryname = \"Italy\" )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}]}
-  </code>
+```
  
 2. Tray services
 
 - The servlet to deal with Tray Items is called through HTTP POST at
   
+```
   ~baseUrl/trayServlet
+```
+
+  The parameters and actions to call the tray servlet follow the documentation on Google Drive at [https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web](https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web)
   
-  The parameters and actions to call the tray servlet follow the documentation on Google Drive at https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web
-  
-  For example, if querymanagerServlet.war was deployed on local machine (Tomcat, port 8080), Tray services can be called at
-  
+  For example, if `querymanagerServlet.war` was deployed on local machine (Tomcat, port 8080), Tray services can be called at
+  ```
   http://localhost:8080/querymanagerServlet-1.0/trayServlet
+  ```
   
 3. Updating profile information
 
   (Web Interface will soon be available)
 
-- The template for updating profile information (take URL to show, but use HTTP POST in reality)
+- The template for updating profile information (take URL to show, but use `HTTP POST` in reality)
 
+```
   ~baseUrl/settingsServlet?accessToken={accessToken}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
-
+```
   where:
 
   |parameter: required|value|
