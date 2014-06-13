@@ -26,7 +26,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 ###  How to invoke the services will be discussed by the following sections.
   
-1. Query augmentation
+####  Query augmentation
 
 - The template for calling query augmentation
   ```
@@ -66,7 +66,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQueries": [{"AugmentedQuery":"SELECT DISTINCT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname .\n    FILTER ( ?_augcountryname = \"Italy\" )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}]}
   ```
  
-2. Tray services
+#### Tray services
 
 - The servlet to deal with Tray Items is called through HTTP POST at
   ```
@@ -80,7 +80,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   http://localhost:8080/querymanagerServlet-1.0/trayServlet
   ```
   
-3. Updating profile information
+####  Updating profile information
 
   (Web Interface will soon be available)
 
