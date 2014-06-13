@@ -87,17 +87,17 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
   where:
 
-  |parameter|required|value|
-  |:---------||:-----|
-  |{accessToken}|yes|is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description <b>Access token is incorrect or expired<b> | 
-  |townName|no|is a town name, for example <b>Milano</b>, <b>Paris</b>, etc.|
-  |{countryName}|no|is a country name, for example <b>Italy</b>, <b>France</b>, etc.|
-  |{lat}|no|is latitude value|
-  |{lon}|no|is longitude|
-  |{startDate}|no|is a start date for an event which a user prefers to participate in. The start date format follows the pattern <b>bb-mm-yyyy</b>, for example <b>25-07-2015</b>|
-  |{endDate}|no|is an end date for an event which a user prefers to participate in. The end date format is the same with the start date format|
-  |{pi_source}|no|is profile information source, for example <b>Mobidot</b>, <b>Google</b>, <b>Facebook</b>| 
-  |{pi_id}|no|is profile information UID, for example UID from Mobidot, Facebook|
+  |parameter: required|value|
+  |:---------|:-----|
+  |{accessToken}: yes|is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description <b>Access token is incorrect or expired<b> | 
+  |{townName}: no|is a town name, for example <b>Milano</b>, <b>Paris</b>, etc.|
+  |{countryName}: no|is a country name, for example <b>Italy</b>, <b>France</b>, etc.|
+  |{lat}: no|is latitude value|
+  |{lon}: no|is longitude|
+  |{startDate}: no|is a start date for an event which a user prefers to participate in. The start date format follows the pattern <b>bb-mm-yyyy</b>, for example <b>25-07-2015</b>|
+  |{endDate}: no|is an end date for an event which a user prefers to participate in. The end date format is the same with the start date format|
+  |{pi_source}: no|is profile information source, for example <b>Mobidot</b>, <b>Google</b>, <b>Facebook</b>| 
+  |{pi_id}: no|is profile information UID, for example UID from Mobidot, Facebook|
   |{pi_at}|no|is access token to access to the source described by {pi_source}|
  
   Note that group parameters (pi_source, pi_id, pi_at) go altogether. They can be an array of groups 
