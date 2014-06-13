@@ -37,12 +37,12 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
   |parameter|value|
   |:---------|:-----|
-  |{accessToken}|is an access token which lasts for one hour or false. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description *Access token is incorrect or expired* |
-  |{isUsingPreferences}|*true* or *false*. This is used to whether or not augment the query with the user preferences|
+  |{accessToken}|is an access token which lasts for one hour or false. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description **Access token is incorrect or expired** |
+  |{isUsingPreferences}|**true** or **false**. This is used to whether or not augment the query with the user preferences|
   |{format}|requested result format (rdf or json)|
   |{query}|a sparql query|
-  |{filter}|*location*, *enteredRating* or *preferred*. QueryManager will take this value to augment a query|
-  |{friends}|*true* or *false*. This value is used to augment a query based on either *my friends* or *I*|
+  |{filter}|**location**, **enteredRating** or **preferred**. QueryManager will take this value to augment a query|
+  |{friends}|*true* or *false*. This value is used to augment a query based on either **my friends** or **I**|
   
 - Example for a full URL to invoke the service on local Tomcat server:
   [http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location&friends=true](http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?userKey=kinh&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location&friends=true)
@@ -93,15 +93,15 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
   |parameter|required|value|
   |:---------|:-----|:-----|
-  |{accessToken}| yes| is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description *Access token is incorrect or expired* |
-  |{townName}| no| is a town name, for example *Milano*, *Paris*, etc.|
-  |{countryName}| no| is a country name, for example *Italy*, *France*, etc.|
+  |{accessToken}| yes| is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description **Access token is incorrect or expired** |
+  |{townName}| no| is a town name, for example **Milano**, **Paris**, etc.|
+  |{countryName}| no| is a country name, for example **Italy**, **France**, etc.|
   |{lat}| no| is latitude value|
   |{lon}| no|is longitude|
-  |{startDate}| no| is a start date for an event which a user prefers to participate in. The start date format follows the pattern *dd-mm-yyyy*, for example *25-07-2015*|
+  |{startDate}| no| is a start date for an event which a user prefers to participate in. The start date format follows the pattern **dd-mm-yyyy**, for example **25-07-2015**|
   |{endDate}| no| is an end date for an event which a user prefers to participate in. The end date format is the same with the start date format|
-  |{pi_source}| no| is profile information source, for example *Mobidot*, *Google*, *Facebook*|
-  |{pi_id}| no| is profile information UID, for example UID from Mobidot, Facebook|
+  |{pi_source}| no| is profile information source, for example **Mobidot**, **Google**, **Facebook**|
+  |{pi_id}| no| is profile information UID, for example UID from **Mobidot**, **Facebook**|
   |{pi_at}| no| is access token to access to the source described by {pi_source}|
   
   Note that group parameters `(pi_source, pi_id, pi_at)` go altogether. They can be an array of groups 
