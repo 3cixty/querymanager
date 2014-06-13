@@ -5,6 +5,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import eu.threecixty.profile.RdfFileManager;
+import eu.threecixty.profile.TrayStorage;
 
 @WebListener
 public class ThreeCixtyContextListener implements ServletContextListener {
@@ -16,6 +17,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent context) {
 	    String realPath = context.getServletContext().getRealPath("/");
 	    RdfFileManager.getInstance().setPathToRdfFile(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
+	    TrayStorage.setPath(realPath);
 	}
 
 }
