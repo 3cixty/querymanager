@@ -24,13 +24,15 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   ~baseUrl/settingsServlet
   ```
 
-  How to invoke the services will be discussed by the following sections.
+###  How to invoke the services will be discussed by the following sections.
   
-1. Query augmentation
+- Query augmentation
 
-- The template for calling query augmentation
+-- The template for calling query augmentation
  
+ ```
   ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}
+  ```
   
   where:
   
@@ -60,15 +62,16 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   The query is URLEncoded
 
   For the output of the query: if the format is 'json', the output also includes an array of augmented queries used to get that output. The array is in the JSON string format.
+  
   Here is an example of the output:
 
-```
-   { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQueries": [{"AugmentedQuery":"SELECT DISTINCT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname .\n    FILTER ( ?_augcountryname = \"Italy\" )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}]}
-```
+  ```
+  { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQueries": [{"AugmentedQuery":"SELECT DISTINCT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname .\n    FILTER ( ?_augcountryname = \"Italy\" )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}]}
+  ```
  
-2. Tray services
+- Tray services
 
-- The servlet to deal with Tray Items is called through HTTP POST at
+-- The servlet to deal with Tray Items is called through HTTP POST at
   
 ```
   ~baseUrl/trayServlet
@@ -77,24 +80,26 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   The parameters and actions to call the tray servlet follow the documentation on Google Drive at [https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web](https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web)
   
   For example, if `querymanagerServlet.war` was deployed on local machine (Tomcat, port 8080), Tray services can be called at
+  
   ```
   http://localhost:8080/querymanagerServlet-1.0/trayServlet
   ```
   
-3. Updating profile information
+- Updating profile information
 
   (Web Interface will soon be available)
 
-- The template for updating profile information (take URL to show, but use `HTTP POST` in reality)
+-- The template for updating profile information (take URL to show, but use `HTTP POST` in reality)
 
-```
+ ```
   ~baseUrl/settingsServlet?accessToken={accessToken}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
-```
+ ```
+ 
   where:
 
-  |parameter: required|value|
+  |parameter :required |value |
   |:---------|:-----|
-  |{accessToken}: yes|is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description <b>Access token is incorrect or expired<b> | 
+  |{accessToken}: yes|is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description <b>Access token is incorrect or expired<b> |
   |{townName}: no|is a town name, for example <b>Milano</b>, <b>Paris</b>, etc.|
   |{countryName}: no|is a country name, for example <b>Italy</b>, <b>France</b>, etc.|
   |{lat}: no|is latitude value|
@@ -103,11 +108,12 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{endDate}: no|is an end date for an event which a user prefers to participate in. The end date format is the same with the start date format|
   |{pi_source}: no|is profile information source, for example <b>Mobidot</b>, <b>Google</b>, <b>Facebook</b>| 
   |{pi_id}: no|is profile information UID, for example UID from Mobidot, Facebook|
-  |{pi_at}|no|is access token to access to the source described by {pi_source}|
+  |{pi_at}: no|is access token to access to the source described by {pi_source}|
  
   Note that group parameters (pi_source, pi_id, pi_at) go altogether. They can be an array of groups 
 
 - Example for the template to update profile information:
   
+ ```
   ~baseUrl/settingsServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&townName=Milano&countryName=Italy&lat=2.12345&lon=46.1234&startDate=18-06-2014&endDate=21-06-2013&pi_source[0]=Facebook&pi_id[0]=112233445566&pi_at[0]=facebookFakeAccessToken&pi_source[1]=Mobidot&pi_id[1]=nguyen&pi_at[1]=fakeMobidotAccessToken
-  
+ ``` 
