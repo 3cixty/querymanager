@@ -1,6 +1,11 @@
 package eu.threecixty.profile;
 
-
+/**
+ * This class defines tray item information.
+ * Question: should we need to check whether or not event information is correct.
+ * @author Cong-Kinh NGUYEN
+ *
+ */
 public class Tray {
 	
 	private String itemId;
@@ -12,7 +17,7 @@ public class Tray {
 	
 	private boolean attended;
 	private String dateTimeAttended;
-	private int rating;
+	private int rating = -1;
 	
 	
 	public String getItemId() {

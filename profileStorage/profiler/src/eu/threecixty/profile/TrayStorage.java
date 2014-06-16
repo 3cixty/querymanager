@@ -18,6 +18,11 @@ import com.google.gson.Gson;
 import eu.threecixty.profile.Tray.ItemType;
 import eu.threecixty.profile.Tray.OrderType;
 
+/**
+ * This class is to deal with managing tray items in the KB.
+ * @author Cong-Kinh NGUYEN
+ *
+ */
 public class TrayStorage {
 
 	private static final String TRAY_FILENAME = "temporaryTrayFile.xml";
@@ -167,9 +172,10 @@ public class TrayStorage {
 		    tray.setTimestamp(jsonObj.getLong("timestamp"));
 		    tray.setUid(jsonObj.getString("uid"));
 		    tray.setSource(jsonObj.getString("source"));
-		    tray.setAttended(jsonObj.getBoolean("attended"));
-		    tray.setDateTimeAttended(jsonObj.getString("dateTimeAttended"));
-		    tray.setRating(jsonObj.getInt("rating"));
+		    
+		    if (jsonObj.has("attended")) tray.setAttended(jsonObj.getBoolean("attended"));
+		    if (jsonObj.has("dateTimeAttended")) tray.setDateTimeAttended(jsonObj.getString("dateTimeAttended"));
+		    if (jsonObj.has("dateTimeAttended")) tray.setRating(jsonObj.getInt("rating"));
 		    trays.add(tray);
 		}
 		} catch (Exception e) {
