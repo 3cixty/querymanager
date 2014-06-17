@@ -26,7 +26,7 @@
 
     <dependency>
 	  <groupId>eu.3cixty</groupId>
-	  <artifactId>profiler</artifactId>
+	  <artifactId>profileKB</artifactId>
 	  <version>1.0</version>
     </dependency>
 
