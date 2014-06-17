@@ -88,7 +88,7 @@ import eu.threecixty.profile.oldmodels.Preference;
 	
 	@Override
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
-			EventMediaFormat format) {
+			EventMediaFormat format, boolean augmentedQueryIncluded) {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQueryStr = "";
@@ -108,15 +108,17 @@ import eu.threecixty.profile.oldmodels.Preference;
 				sb.append(new String(b, 0, readBytes));
 			}
 			input.close();
-			if (EventMediaFormat.JSON == format) {
-				int lastIndex = sb.lastIndexOf("}");
-				if (lastIndex >= 0) {
-					JSONArray jsonArr = new JSONArray();
-					JSONObject jsonObj = new JSONObject();
-					jsonObj.put("AugmentedQuery", augmentedQueryStr);
-					jsonArr.put(jsonObj);
-					String augmentedQueryJson = ", " + "\"AugmentedQueries\": " + jsonArr.toString();
-					sb.insert(lastIndex, augmentedQueryJson);
+			if (augmentedQueryIncluded) {
+				if (EventMediaFormat.JSON == format) {
+					int lastIndex = sb.lastIndexOf("}");
+					if (lastIndex >= 0) {
+						JSONArray jsonArr = new JSONArray();
+						JSONObject jsonObj = new JSONObject();
+						jsonObj.put("AugmentedQuery", augmentedQueryStr);
+						jsonArr.put(jsonObj);
+						String augmentedQueryJson = ", " + "\"AugmentedQueries\": " + jsonArr.toString();
+						sb.insert(lastIndex, augmentedQueryJson);
+					}
 				}
 			}
 			return sb.toString();

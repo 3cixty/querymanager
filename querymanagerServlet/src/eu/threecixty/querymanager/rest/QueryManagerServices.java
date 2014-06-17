@@ -209,7 +209,7 @@ public class QueryManagerServices {
 
 		qm.setQuery(placeQuery);
 		
-		String result = QueryManagerDecision.run(profiler, qm, filter, EventMediaFormat.JSON);
+		String result = QueryManagerDecision.run(profiler, qm, filter, EventMediaFormat.JSON, false);
 		return  result;
 	}
 

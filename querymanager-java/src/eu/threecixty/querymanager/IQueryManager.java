@@ -38,7 +38,7 @@ public interface IQueryManager {
 	 * 			The returned string format
 	 * @return: a RDF or JSON in string format. Return Null if any error occurs.
 	 */
-	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format);
+	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format, boolean augmentedQueryIncluded);
 	
 	/**
 	 * Request preferences from Knowledge-Base of User Profiles.

@@ -113,7 +113,7 @@ public class QueryManagerServlet extends HttpServlet {
 		qm.setQuery(placeQuery);
 		
 		String filter = req.getParameter(FILTER_PARAM);
-		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat);
+		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat, true);
 		return  result;
 	}
 
