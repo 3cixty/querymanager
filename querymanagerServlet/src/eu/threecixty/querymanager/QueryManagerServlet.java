@@ -29,7 +29,6 @@ public class QueryManagerServlet extends HttpServlet {
 	private static final String QUERY_PARAM = "query";
 
 	private static final String FILTER_PARAM = "filter";
-	private static final String FRIENDS_PARAM = "friends";
 	
 	private static final String PARAM_EXCEPTION = "There is an error for parameters";
 
@@ -114,9 +113,7 @@ public class QueryManagerServlet extends HttpServlet {
 		qm.setQuery(placeQuery);
 		
 		String filter = req.getParameter(FILTER_PARAM);
-		String friends = req.getParameter(FRIENDS_PARAM);
-		boolean basedOnFriends = (friends != null && "true".equalsIgnoreCase(friends));
-		String result = QueryManagerDecision.run(profiler, qm, filter, basedOnFriends, eventMediaFormat);
+		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat);
 		return  result;
 	}
 

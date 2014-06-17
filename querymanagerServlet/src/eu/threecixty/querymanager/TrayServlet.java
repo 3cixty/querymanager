@@ -131,7 +131,7 @@ public class TrayServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//doPost(req, resp);
+		doPost(req, resp);
 	}
 
 	private boolean cleanTrays(HttpServletRequest req) {

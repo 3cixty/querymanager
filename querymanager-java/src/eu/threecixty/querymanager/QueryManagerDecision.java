@@ -22,6 +22,7 @@ public class QueryManagerDecision {
 	private static final String LOCATION = "location";
 	private static final String ENTERED_RATING = "enteredrating";
 	private static final String PREFERRED = "preferred";
+	private static final String FRIENDS = "friends";
 
 	/**
 	 * Augments and executes the query found in a given query manager.
@@ -32,22 +33,23 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	public static String run(IProfiler profiler, IQueryManager qm, String filter,
-			boolean basedOnFriends, EventMediaFormat format) {
-		if (filter == null) return "";
+			EventMediaFormat format) {
 		
-		if (!basedOnFriends) {
-			if (filter.equalsIgnoreCase(LOCATION)) {
-				return filterBasedOnLocation(profiler, qm, format);
-			} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
-				return filterBasedOnEnteredRating(profiler, qm, format);
-			} else if (filter.equalsIgnoreCase(PREFERRED)) {
-				return filterBasedOnPreferredEvent(profiler, qm, format);
+		if (profiler != null && filter != null) {
+			if (!filter.equals(FRIENDS)) {
+				if (filter.equalsIgnoreCase(LOCATION)) {
+					return filterBasedOnLocation(profiler, qm, format);
+				} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
+					return filterBasedOnEnteredRating(profiler, qm, format);
+				} else if (filter.equalsIgnoreCase(PREFERRED)) {
+					return filterBasedOnPreferredEvent(profiler, qm, format);
+				}
+			} else {
+				return filterBasedOnFriends(profiler, qm, format);
 			}
-		} else {
-			return filterBasedOnFriends(profiler, qm, format);
 		}
 		
-		return "";
+		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 	}
 
 	/**

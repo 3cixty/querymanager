@@ -31,7 +31,7 @@ import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Place;
 import eu.threecixty.profile.oldmodels.Preference;
 
- class QueryManager implements IQueryManager {
+ public class QueryManager implements IQueryManager {
 	 
 	 private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
 
