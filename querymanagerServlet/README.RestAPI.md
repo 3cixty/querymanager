@@ -18,27 +18,30 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
  
  - There are 6 groups of events: locality, category, country, publisher, placeName, and artist
  
- - All restAPIs' messages are strings in JSON format.  
+ - All restAPI responses are strings in JSON format.  
 
 #### Counting total items:
 
-  ~baseUrl/services/queryManager/countItems
+  `~baseUrl/services/queryManager/countItems`
  
   For example
  
+ ```
   { "head": { "link": [], "vars": ["count"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "183422" }} ] } }
+   ```
     
 #### Getting aggregated items information in a group:
+
+  `~baseUrl/services/queryManager/getAggregatedItems/{group}`
  
-  ~baseUrl/services/queryManager/getAggregatedItems/{group}
+  where: `{group}` is one of six values mentioned earlier.
  
-  where: {group} is one of six values mentioned earlier.
+  This API will return you the first 20 aggregated items in the `group`. If you want to specify the offset and limit items you receive, you should use next API.
+  Here is an example for the `artist` group (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist`):
  
-  This API will return you the first 20 aggregated items in the {group}. If you want to specify the offset and limit items you receive, you should use next API.
-  Here is an example for the 'artist' group ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist'):
- 
+ ```
   { "head": { "link": [], "vars": ["artist", "count"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "artist": { "type": "literal", "value": "Editors" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "231" }},
@@ -62,9 +65,11 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
     { "artist": { "type": "literal", "xml:lang": "de", "value": "Sigur R\u00F3s" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "145" }},
     { "artist": { "type": "literal", "xml:lang": "id", "value": "Utah Jazz" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "143" }} ] } }
  
+ ```
+ 
 #### Getting aggregated items information in a group with offset and limit:
 
-  ~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}
+  `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}`
   
   where:
   
@@ -72,21 +77,23 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |:---------|:-----|
   |{group}| **locality**, **category**, **country**, **publisher**, **placeName**, and **artist** |
   |{offset}| The offset value is set only when its value is greater than or equal to 0 |
-  |{limit}|If the limit value is less than 0, the function doesn't take into account of limit number; that means the function returns all the items which belong to the {group}. Otherwise, {limit} is the limit items returned by executing this API |
+  |{limit}|If the limit value is less than 0, the function doesn't take into account of limit number; that means the function returns all the items which belong to the `group`. Otherwise, `limit` is the limit items returned by executing this API |
 
   This API does the same with the previous API, but can be able to customize the input for offset and limit value.
-  Here is an example of 'artist' group with offset = 1 and limit = 3 ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3'):
+  Here is an example of `artist` group with offset = 1 and limit = 3 (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3`):
   
+  ```
   { "head": { "link": [], "vars": ["artist", "count"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "artist": { "type": "literal", "xml:lang": "et", "value": "Muse" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "219" }},
     { "artist": { "type": "literal", "xml:lang": "de", "value": "Franz Ferdinand" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "217" }},
     { "artist": { "type": "literal", "value": "Bloc Party" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "179" }} ] } }
-      
+    
+    ``` 
 
 #### Getting aggregated items information in a group with offset and limit and a filter for another group:
 
-  ~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}
+  `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}`
 
   where:
   
@@ -98,19 +105,21 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{groupname1}| **locality**, **category**, **country**, **publisher**, **placeName**, and **artist**|
   |{groupvalue1}|This value should correspond with one of possible values which are found from the group {groupname1}. For example using {groupname1} is **country**, {groupvalue1} can be **France**, **Italy**, etc.|
 
-  This API does the same with previous API, but limit results with an equal expression between {groupname1} and {groupvalue1}.
-  Here is an example of 'artist' group with offset = 1, limit = 3, groupname1 = 'country', and groupvalue1 = 'France' ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3/country/France')
+  This API does the same with previous API, but limit results with an equal expression between `groupname1` and `groupvalue1`.
+  Here is an example of 'artist' group with offset = 1, limit = 3, groupname1 = 'country', and groupvalue1 = 'France' (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3/country/France`)
   
+  ```
   { "head": { "link": [], "vars": ["artist", "count"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "artist": { "type": "literal", "xml:lang": "vi", "value": "Birdy Nam Nam" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "10" }},
     { "artist": { "type": "literal", "xml:lang": "hr", "value": "Gojira" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "10" }},
     { "artist": { "type": "literal", "xml:lang": "nl", "value": "Revolver" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "9" }} ] } }
   
+  ```
   
 #### Getting aggregated items information in a group with offset and limit and two filters for two groups:  
   
-  ~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}
+  `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}`
 
   where:
   
@@ -124,23 +133,26 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{groupname2}| **locality**, **category**, **country**, **publisher**, **placeName**, and **artist**|
   |{groupvalue2}|This value should correspond with one of possible values which are found from the group {groupname2}. For example using {groupname2} is **locality**, {groupvalue2} can be **Paris**, **Lodon**, etc.|
 
-  This API does the same with previous API, but limit results with two equal expressions of between {groupname1} and {groupvalue1} and between {groupname2} and {groupvalue2}.
-  Here is an example of 'artist' group with offset = 1, limit = 3, groupname1 = 'country', groupvalue1 = 'France', groupname2 = 'locality', and groupvalue2 = 'Paris' ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3/country/France/locality/Paris')
+  This API does the same with previous API, but limit results with two equal expressions of between `groupname1` and `groupvalue1` and between `groupname2` and `groupvalue2`.
+  Here is an example of 'artist' group with offset = 1, limit = 3, groupname1 = 'country', groupvalue1 = 'France', groupname2 = 'locality', and groupvalue2 = 'Paris' (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3/country/France/locality/Paris`)
 
+  ```
   { "head": { "link": [], "vars": ["artist", "count"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "artist": { "type": "literal", "value": "Mademoiselle K" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "7" }},
     { "artist": { "type": "literal", "value": "21 Love Hotel" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "7" }},
     { "artist": { "type": "literal", "xml:lang": "tl", "value": "Mina Tindle" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "6" }} ] } }
-
+   
+   ```
 
 #### Getting items in detail:
 
-  ~baseUrl/services/queryManager/getItems
+  `~baseUrl/services/queryManager/getItems`
  
   This API will return 20 items found in the virtuoso KB. This API doesn't use filter information at all.
-  Here is an example ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems')
+  Here is an example (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems`)
   
+  ```
   { "head": { "link": [], "vars": ["event", "title", "description"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/000ad3b7-98ce-4865-b2f8-efbec380a06d" }	, "title": { "type": "literal", "value": "Toxic Holocaust, Health" }	, "description": { "type": "literal", "value": "Health is from Los Angeles." }},
@@ -163,17 +175,18 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/006779d8-3719-4b90-bb09-a20f6a0b2cf6" }	, "title": { "type": "literal", "value": "Eight is NEVER Enough - Improv Comedy Off Broadway" }	, "description": { "type": "literal", "value": "Catch the latest Off-Broadway Production of \"Eight is NEVER Enough!\" live every Monday night at the Laugh Factory in TImes Square. Featuring all new fast paced and high-energy improvisation scenes, hilarious musical parodies and original characters created by one of the most talented troupe of up and coming comedy performers in the country. CAST: Walt Frasier, Laurice Fattal, Spero Chumas, Kevin Kenny, Doug, Gerber, Paige Barr, Keisha Zollar. For Group bookings call 212-568-6560." }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/0077619f-1c29-46bd-a312-e772c1641729" }	, "title": { "type": "literal", "value": "New York Mets Vs Oakland Athletics" }	, "description": { "type": "literal", "value": "The Mets host the visiting Athletics in this MLB regular season game." }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/007850de-8cbc-4951-8c68-99dcb8c15358" }	, "title": { "type": "literal", "value": "The Strange Death of Liberal England + Members of The Public + Captain Black" }	, "description": { "type": "literal", "value": "- <a href=\"http://www.myspace.com/tsdole\">The Strange Death of Liberal England</a>\r\n- <a href=\"http://www.myspace.com/membersofthepublicbeta\">Members of The Public</a>\r\n- <a href=\"http://www.myspace.com/captainblack\">Captain Black</a>\r\n\r\n\u00A35 via <a href=\"http://www.wegottickets.com/event/16854\">WeGotTickets</a>\r\n\u00A36 door" }} ] } }
-  
+  ```
   
 #### Getting items in detail with your access token received from Google OAuth:
  
-  ~baseUrl/services/queryManager/getItems/{accessToken}
+  `~baseUrl/services/queryManager/getItems/{accessToken}`
  
-   where: {accessToken} is an access token which you receive from Google OAuth.
+   where: `accessToken` is an access token which you receive from Google OAuth.
    
    This API does the same with previous API. In addition, if you are new to 3cixty platform, your basic information (Google UID, first name, and last name) will be grabbed automatically through Goolge Profile to store in the 3cixty KB.
-   Here is an example ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8')
+   Here is an example (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8`)
 
+  ```
   { "head": { "link": [], "vars": ["event", "title", "description"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/000ad3b7-98ce-4865-b2f8-efbec380a06d" }	, "title": { "type": "literal", "value": "Toxic Holocaust, Health" }	, "description": { "type": "literal", "value": "Health is from Los Angeles." }},
@@ -196,11 +209,11 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/006779d8-3719-4b90-bb09-a20f6a0b2cf6" }	, "title": { "type": "literal", "value": "Eight is NEVER Enough - Improv Comedy Off Broadway" }	, "description": { "type": "literal", "value": "Catch the latest Off-Broadway Production of \"Eight is NEVER Enough!\" live every Monday night at the Laugh Factory in TImes Square. Featuring all new fast paced and high-energy improvisation scenes, hilarious musical parodies and original characters created by one of the most talented troupe of up and coming comedy performers in the country. CAST: Walt Frasier, Laurice Fattal, Spero Chumas, Kevin Kenny, Doug, Gerber, Paige Barr, Keisha Zollar. For Group bookings call 212-568-6560." }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/0077619f-1c29-46bd-a312-e772c1641729" }	, "title": { "type": "literal", "value": "New York Mets Vs Oakland Athletics" }	, "description": { "type": "literal", "value": "The Mets host the visiting Athletics in this MLB regular season game." }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/007850de-8cbc-4951-8c68-99dcb8c15358" }	, "title": { "type": "literal", "value": "The Strange Death of Liberal England + Members of The Public + Captain Black" }	, "description": { "type": "literal", "value": "- <a href=\"http://www.myspace.com/tsdole\">The Strange Death of Liberal England</a>\r\n- <a href=\"http://www.myspace.com/membersofthepublicbeta\">Members of The Public</a>\r\n- <a href=\"http://www.myspace.com/captainblack\">Captain Black</a>\r\n\r\n\u00A35 via <a href=\"http://www.wegottickets.com/event/16854\">WeGotTickets</a>\r\n\u00A36 door" }} ] } }
-
+  ```
  
 #### Getting items in detail with your access token and preferences:
 
-  ~baseUrl/services/queryManager/getItems/{accessToken}/{filter}
+  `~baseUrl/services/queryManager/getItems/{accessToken}/{filter}`
 
   where:
   
@@ -211,8 +224,9 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
    
   TODO: explain API (20 first items conform to preferences used)
    
-  Here is an example with {filter} = 'location' ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/location')
+  Here is an example with `filter` = **location** (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/location`)
 
+  ```
   { "head": { "link": [], "vars": ["event", "title", "description", "callret-3", "callret-4"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/56f60e21-6422-4618-a68d-bc4d49251889" }	, "title": { "type": "literal", "xml:lang": "nl", "value": "Mobb Deep" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }},
@@ -236,12 +250,14 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/377d55c3-34fc-4cae-b689-3f2518e83e65" }	, "title": { "type": "literal", "xml:lang": "de", "value": "Mobilee Paris : Anja Schneider, Rodriguez JR. Live & Lee Van Dowski" }	, "description": { "type": "literal", "value": "ANJA SCHNEIDER [Mobilee - DE] <br>RODRIGUEZ JR. LIVE [Mobilee - FR] <br>LEE VAN DOWSKI [Mobilee - CH] <br>Mobilee est l'un des 10 labels les plus chart\u00E9s de tous les temps sur le site de r\u00E9f\u00E9rence Resident Advisor. C'est \u00E0 la fois un des labels qui ont construit la sc\u00E8ne berlinoise (aux c\u00F4t\u00E9s de B-Pitch Control, Perlon et Ostgut entre autres) et une vraie r\u00E9f\u00E9rence mondiale. Mais c'est aussi un des labels avec lesquels le collectif WIHM Central a construit une vraie histoire commune au fil des ann\u00E9es en organisant avec eux pas mal d'\u00E9v\u00E9nements dans diff\u00E9rents lieux parisiens. Pour cette premi\u00E8re nuit au Zig Zag, c'est RODRIGUEZ JR (le seul fran\u00E7ais de cette prestigieuse \u00E9curie) qui assurera le show avec un de ces lives fous dont il a le secret avant que la ma\u00EEtresse de c\u00E9r\u00E9monie, la gigantesque ANJA SCHNEIDER, ne viennent prendre les platines aux c\u00F4t\u00E9s du v\u00E9t\u00E9ran suisse LEE VAN DOWSKI pour distiller ce son \u00E0 la fois percutant et doux, sombre et m\u00E9lodieux qui est la signature du label. <br>Les pr\u00E9ventes \u00E0 partir de 10 \u20AC : <a href=\"http://www.digitick.com/mobilee-night-anja-schneider-rodriguez-jr-live-lee-van-dowski-soiree-zig-zag-paris-20-juin-2014-css4-digitick-pg101-ri2475282.html\" rel=\"nofollow\"> http://www.digitick.com/mobilee-night-anja-schneider-rodriguez-jr-live-lee-van-dowski-soiree-zig-zag-paris-20-juin-2014-css4-digitick-pg101-ri2475282.html</a> <br>Sur place (s'il y en a \u00E0 l'int\u00E9rieur...), 20 \u20AC. <br>R\u00E9servations bouteilles (190 \u20AC avec 4 entr\u00E9es incluses) : <br>- mail : <a href=\"mailto:resa@zigzagclub.fr\">resa@zigzagclub.fr</a> <br>- t\u00E9l\u00E9phone : 0635250361 <br>Powered by FUNKTION ONE <br>ZIG ZAG <br>32 rue Marbeuf <br>75008 - Paris <br><a href=\"http://zigzagclub.fr/\" rel=\"nofollow\"> http://zigzagclub.fr/</a> <br><a href=\"https://www.facebook.com/ZigZagClubParis\" rel=\"nofollow\">https://www.facebook.com/ZigZagClubParis</a> <br><a href=\"https://www.facebook.com/wihmcentral\" rel=\"nofollow\">https://www.facebook.com/wihmcentral</a> @fr" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/c274365e-9612-4779-8f69-b607c0494c26" }	, "title": { "type": "literal", "xml:lang": "fr", "value": "F\u00EAte de la Musique" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }} ] } }
 
-  Note that in this example and other following examples in this document, you should only consider values for 'event', 'title', and 'description' as other values such as 'callret-3', 'call-ret4', etc. will be removed in our next versions.
+  ```
+
+  Note that in this example and other following examples in this document, you should only consider values for `event`, `title`, and `description` as other values such as `callret-3`, `call-ret4`, etc. will be removed in our next versions.
   
   
 #### Getting items in detail with your access token, preferences, offset and limit:
 
-  ~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}
+  `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}`
 
   where:
   
@@ -252,18 +268,20 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{limit}|an integer value. If this value is less than 0, that means there is no limit for items received. Otherwise, this value is the maximal number of items received|
   |{filter}| **location**, **enteredRating**, **preferred** or **friends**. This value is used to refine results received from EventMedia |
 
-  This API does the same with previous API, but instead of receiving the 20 first items, you are able to custimize items you will receive by indicating {offset} and {limit}.
-  Here is an example with 'offset' = 2 and {limit} = '2' ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/2/2/location')
+  This API does the same with previous API, but instead of receiving the 20 first items, you are able to custimize items you will receive by indicating `offset` and `limit`.
+  Here is an example with `offset = 2` and `limit = 2` (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/2/2/location`)
 
+  ```
   { "head": { "link": [], "vars": ["event", "title", "description", "callret-3", "callret-4"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/7ac1c253-3211-4ba8-97c8-0ab643570d52" }	, "title": { "type": "literal", "xml:lang": "en", "value": "Christine and the Queens" }	, "description": { "type": "literal", "xml:lang": "en", "value": "<a href=\"https://twitter.com/QueensChristine/status/445497987024691200\" rel=\"nofollow\">https://twitter.com/QueensChristine/status/445497987024691200</a> " }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/4b53efda-1e65-4ae1-9ef1-77dfce208aa5" }	, "title": { "type": "literal", "xml:lang": "fr", "value": "Front Line Assembly" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }} ] } }
-
+  
+  ```
 
 #### Getting items in detail with your access token, preferences, offset, limit, and a group filter:
 
-  ~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}
+  `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}`
 
   where:
   
@@ -276,9 +294,10 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{groupname1}| **locality**, **category**, **country**, **publisher**, **placeName**, and **artist**|
   |{groupvalue1}|This value should correspond with one of possible values which are found from the group {groupname1}. For example using {groupname1} is **country**, {groupvalue1} can be **France**, **Italy**, etc.|
 
-  This API does the same with previous API, but the API is able to filter more information by indicating clearly which {groupname1} & {groupvalue1} items belong to.
-  Here is an example with {groupname1} = 'locality', and {groupvalue1} = 'Milano' ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/0/10/location/locality/Milano')
+  This API does the same with previous API, but the API is able to filter more information by indicating clearly which `groupname1` & `groupvalue1` items belong to.
+  Here is an example with `groupname1 = locality`, and `groupvalue1 = Milano` (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/0/10/location/locality/Milano`)
 
+   ```
   { "head": { "link": [], "vars": ["event", "title", "description", "callret-3", "callret-4"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/fe3afd69-5804-4d80-bd4f-fba26fc2a03c" }	, "title": { "type": "literal", "xml:lang": "en", "value": "Where We Are Tour" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }},
@@ -292,9 +311,11 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/e47afc9d-03cc-4fdc-9754-155c40343d12" }	, "title": { "type": "literal", "xml:lang": "en", "value": "Milano City Sound 2014" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/0a6b0bac-7afa-4201-aa79-cde4c1a71981" }	, "title": { "type": "literal", "xml:lang": "nl", "value": "Eels" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }} ] } }
 
+   ```
+
 #### Getting items in detail with your access token, preferences, offset, limit, and two group filters:
 
-  ~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}
+  `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}`
 
   where:
   
@@ -309,9 +330,10 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{groupname2}| **locality**, **category**, **country**, **publisher**, **placeName**, and **artist**|
   |{groupvalue2}|This value should correspond with one of possible values which are found from the group {groupname2}. For example using {groupname2} is **locality**, {groupvalue2} can be **Paris**, **Lodon**, etc.|
 
-  This API does the same with previous API, but the API is able to filter more information by indicating clearly which {groupname1} & {groupvalue1} and {groupname2} & {groupvalue2} items belong to.
-  Here is an example with {groupname1} = 'locality' & {groupvalue1} = 'Milano', and {groupname2} = 'category' & {groupvalue2} = 'Festivals' ('http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/0/10/location/locality/Milano/category/Festivals')
+  This API does the same with previous API, but the API is able to filter more information by indicating clearly which `groupname1` & `groupvalue1` and `groupname2` & `groupvalue2` items belong to.
+  Here is an example with `groupname1 = locality` & `groupvalue1 = Milano`, and `groupname2 = category` & `groupvalue2 = Festivals` (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems/ya29.LgAtbiB6lREbPyEAAAAIVZWWanZDyNPG0sAyIAKz4loEvFKTBV5NBnJlO-Mc4IKtoDoJO58eiLh_awPjIO8/0/10/location/locality/Milano/category/Festivals`)
 
+   ```
   { "head": { "link": [], "vars": ["event", "title", "description", "callret-3", "callret-4"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/0329a47a-92c1-4c72-905f-c5265b563aa7" }	, "title": { "type": "literal", "value": "Give it A Name 2010" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }},
@@ -325,4 +347,4 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/321b7298-0a05-4841-932c-9baf6cb7225d" }	, "title": { "type": "literal", "value": "Mi Ami Ancora 2010" }	, "description": { "type": "literal", "value": "<div class=\"bbcode\">A Febbraio, a grande richiesta, torna l\u2019edizione invernale del festival della Bellezza.<br />\r\n<br />\r\nROCKIT, l\u2019Associazione Nazionale che promuove Tutta! Roba! Italiana! dal 1997, con milioni di pageview mensili e 30mila utenti, in un momento di presunta crisi alza lo sguardo e rilancia con un festival invernale: il MI AMI ANCORA.<br />\r\n<br />\r\nNumeri: 6 Febbraio. 2 palchi per i live (salone + dauntaun), 1 spazio reading (baretto), 1 area relax (teatro), 1 zona expo con centinaia di espositori e autoproduzioni.<br />\r\n10 euro per 15 ore consecutive di sangue caldo, carezze romantiche e dancefloor.<br />\r\n<br />\r\nTorna l\u2019edizione invernale del MI AMI, dopo il successo del 2008 e lo spessore ormai raggiunto dalle 5 edizioni della versione \u201Cmaster\u201D estiva. Cambia leggermente il format, con uno start up previsto per le 5 del pomeriggio di Sabato 13 e un finale \u201Capro gli occhi e ti penso\u201D previsto per le 9 della domenica mattina.<br />\r\nMI AMI ANCORA: 15ore per la vita (la tua)<br />\r\n<br />\r\nCon l\u2019etereo marchio di coraggio e poesia che contraddistingue gli eventi di Rockit, il MI AMI ANCORA ospiter\u00E0 oltre 40 band, numerosi dj set, reading, fumetti e live painting, spazi di perversione, momenti di relax, giochi alcolici e ritiri spirituali fuori dai cancelli della citt\u00E0 \u201Cchiusa\u201D e immersi nella fragilit\u00E0 dei vizi.<br />\r\n<br />\r\n6 febbraio 2010: Un nuovo appuntamento imprescindibile per la musica italiana Nuova e Bella, un palcoscenico importante per tutti gli addetti ai lavori, una vetrina ricca di musica, arte, cultura, libri, fumetti, abbigliamento, moda.</div>" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }},
     { "event": { "type": "uri", "value": "http://data.linkedevents.org/event/9a2e70dd-4bc1-498c-95f2-3c87db6f9b97" }	, "title": { "type": "literal", "value": "Rock of Ages Fest" }	, "callret-3": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "0" }	, "callret-4": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1" }} ] } }
 
-
+   ```
