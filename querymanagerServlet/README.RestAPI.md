@@ -11,7 +11,6 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - Go to the "querymanagerServlet" folder, copy the .war file in the "target" folder to your Web application server (Tomcat for example).
   
-
 ### How to make a remote query to QueryManager by invoking restful web services
 
  Before going into detail of invoking restAPI, we need to define some terms used in this document.
@@ -19,22 +18,23 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
  - There are 6 groups of events: locality, category, country, publisher, placeName, and artist
  
  - All restAPI responses are strings in JSON format.  
+ 
 
 #### Counting total items:
 
-  `~baseUrl/services/queryManager/countItems`
+ - `~baseUrl/services/queryManager/countItems`
  
-  For example
+ - For example
  
  ```
   { "head": { "link": [], "vars": ["count"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "183422" }} ] } }
    ```
-    
+
 #### Getting aggregated items information in a group:
 
-  `~baseUrl/services/queryManager/getAggregatedItems/{group}`
+ - `~baseUrl/services/queryManager/getAggregatedItems/{group}`
  
   where: `{group}` is one of six values mentioned earlier.
  
@@ -69,7 +69,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
  
 #### Getting aggregated items information in a group with offset and limit:
 
-  `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}`
+ - `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}`
   
   where:
   
@@ -94,7 +94,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 #### Getting aggregated items information in a group with offset and limit and a filter for another group:
 
-  `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}`
+ - `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}`
 
   where:
   
@@ -120,7 +120,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
 #### Getting aggregated items information in a group with offset and limit and two filters for two groups:  
   
-  `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}`
+ - `~baseUrl/services/queryManager/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}`
 
   where:
   
@@ -148,7 +148,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 #### Getting items in detail:
 
-  `~baseUrl/services/queryManager/getItems`
+ - `~baseUrl/services/queryManager/getItems`
  
   This API will return 20 items found in the virtuoso KB. This API doesn't use filter information at all.
   Here is an example (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getItems`)
@@ -180,7 +180,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
 #### Getting items in detail with your access token received from Google OAuth:
  
-  `~baseUrl/services/queryManager/getItems/{accessToken}`
+ - `~baseUrl/services/queryManager/getItems/{accessToken}`
  
    where: `accessToken` is an access token which you receive from Google OAuth.
    
@@ -214,7 +214,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
  
 #### Getting items in detail with your access token and preferences:
 
-  `~baseUrl/services/queryManager/getItems/{accessToken}/{filter}`
+  - `~baseUrl/services/queryManager/getItems/{accessToken}/{filter}`
 
   where:
   
@@ -258,7 +258,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
 #### Getting items in detail with your access token, preferences, offset and limit:
 
-  `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}`
+  - `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}`
 
   where:
   
@@ -282,7 +282,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 #### Getting items in detail with your access token, preferences, offset, limit, and a group filter:
 
-  `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}`
+  - `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}`
 
   where:
   
@@ -316,7 +316,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 #### Getting items in detail with your access token, preferences, offset, limit, and two group filters:
 
-  `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}`
+  - `~baseUrl/services/queryManager/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}`
 
   where:
   
