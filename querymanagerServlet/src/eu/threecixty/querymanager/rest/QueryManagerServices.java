@@ -46,41 +46,41 @@ public class QueryManagerServices {
 	private static String allPrefixes;
 	
 	@GET
-	@Path("/countEvents")
+	@Path("/countItems")
 	@Produces("text/plain")
-	public String countEvents() {
+	public String countItems() {
 		String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 		QueryManager qm = new QueryManager("false");
 		return executeQuery(null, qm, query, null);
 	}
 
 	@GET
-	@Path("/getGroupInfo/{group}")
+	@Path("/getAggregatedItems/{group}")
 	@Produces("text/plain")
-	public String getGroupInfo(@PathParam("group") String group) {
-		return getGroupInfo(group, 0, 20, null, null, null, null);
+	public String getAggregatedItems(@PathParam("group") String group) {
+		return getAggregatedItems(group, 0, 20, null, null, null, null);
 	}
 
 	@GET
-	@Path("/getGroupInfo/{group}/{offset}/{limit}")
+	@Path("/getAggregatedItems/{group}/{offset}/{limit}")
 	@Produces("text/plain")
-	public String getGroupInfo(@PathParam("group") String group, @PathParam("offset") int offset,
+	public String getAggregatedItems(@PathParam("group") String group, @PathParam("offset") int offset,
 			@PathParam("limit") int limit) {
-		return getGroupInfo(group, offset, limit, null, null, null, null);
+		return getAggregatedItems(group, offset, limit, null, null, null, null);
 	}
 
 	@GET
-	@Path("/getGroupInfo/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}")
+	@Path("/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}")
 	@Produces("text/plain")
-	public String getGroupInfo(@PathParam("group") String group, @PathParam("offset") int offset,
+	public String getAggregatedItems(@PathParam("group") String group, @PathParam("offset") int offset,
 			@PathParam("limit") int limit, @PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-		return getGroupInfo(group, offset, limit, groupname1, groupvalue1, null, null);
+		return getAggregatedItems(group, offset, limit, groupname1, groupvalue1, null, null);
 	}
 
 	@GET
-	@Path("/getGroupInfo/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
+	@Path("/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
 	@Produces("text/plain")
-	public String getGroupInfo(@PathParam("group") String group, @PathParam("offset") int offset,
+	public String getAggregatedItems(@PathParam("group") String group, @PathParam("offset") int offset,
 			@PathParam("limit") int limit, @PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
 			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
 		if (groupTriples.containsKey(group)) {
@@ -95,81 +95,81 @@ public class QueryManagerServices {
 	}
 	
 	@GET
-	@Path("/getEvents")
+	@Path("/getItems")
 	@Produces("text/plain")
-	public String getEvents() {
-		return getEvents("false");
+	public String getItems() {
+		return getItems("false");
 	}
 
 	@GET
-	@Path("/getEvents/{accessToken}")
+	@Path("/getItems/{accessToken}")
 	@Produces("text/plain")
-	public String getEvents(@PathParam("accessToken") String accessToken) {
-		return getEvents(accessToken, null);
+	public String getItems(@PathParam("accessToken") String accessToken) {
+		return getItems(accessToken, null);
 	}
 	
 	@GET
-	@Path("/getEvents/{accessToken}/{filter}")
+	@Path("/getItems/{accessToken}/{filter}")
 	@Produces("text/plain")
-	public String getEvents(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter) {
-		return getEvents(accessToken, 0, 20, filter);
+	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter) {
+		return getItems(accessToken, 0, 20, filter);
 	}
 	
 	@GET
-	@Path("/getEvents/{accessToken}/{offset}/{limit}/{filter}")
+	@Path("/getItems/{accessToken}/{offset}/{limit}/{filter}")
 	@Produces("text/plain")
-	public String getEvents(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
+	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
 			@PathParam("limit") int limit, @PathParam("filter") String filter) {
-		return getEvents(accessToken, offset, limit, filter, null, null, null, null);
+		return getItems(accessToken, offset, limit, filter, null, null, null, null);
 	}
 
 	@GET
-	@Path("/getEvents/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}")
+	@Path("/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}")
 	@Produces("text/plain")
-	public String getEvents(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
+	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
 			@PathParam("limit") int limit, @PathParam("filter") String filter,
 			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-		return getEvents(accessToken, offset, limit, filter, groupname1, groupvalue1, null, null);
+		return getItems(accessToken, offset, limit, filter, groupname1, groupvalue1, null, null);
 	}
 
 //	@GET
-//	@Path("/getEvents/{accessToken}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
+//	@Path("/getItems/{accessToken}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
 //	@Produces("text/plain")
-//	public String getEvents(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter,
+//	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter,
 //			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
 //			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
-//		return getEvents(accessToken, 0, 20, filter, groupname1, groupvalue1, groupname2, groupvalue2);
+//		return getItems(accessToken, 0, 20, filter, groupname1, groupvalue1, groupname2, groupvalue2);
 //	}
 //
 //	@GET
-//	@Path("/getEvents/{accessToken}/{filter}/{groupname1}/{groupvalue1}")
+//	@Path("/getItems/{accessToken}/{filter}/{groupname1}/{groupvalue1}")
 //	@Produces("text/plain")
-//	public String getEvents(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter,
+//	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter,
 //			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-//		return getEvents(accessToken, filter, groupname1, groupvalue1, null, null);
+//		return getItems(accessToken, filter, groupname1, groupvalue1, null, null);
 //	}
 //
 //	@GET
-//	@Path("/getEvents/{accessToken}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
+//	@Path("/getItems/{accessToken}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
 //	@Produces("text/plain")
-//	public String getEvents(@PathParam("accessToken") String accessToken,
+//	public String getItems(@PathParam("accessToken") String accessToken,
 //			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
 //			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
-//		return getEvents(accessToken, 0, 20, null, groupname1, groupvalue1, groupname2, groupvalue2);
+//		return getItems(accessToken, 0, 20, null, groupname1, groupvalue1, groupname2, groupvalue2);
 //	}
 //
 //	@GET
-//	@Path("/getEvents/{accessToken}/{groupname1}/{groupvalue1}")
+//	@Path("/getItems/{accessToken}/{groupname1}/{groupvalue1}")
 //	@Produces("text/plain")
-//	public String getEvents(@PathParam("accessToken") String accessToken,
+//	public String getItems(@PathParam("accessToken") String accessToken,
 //			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-//		return getEvents(accessToken, groupname1, groupvalue1, null, null);
+//		return getItems(accessToken, groupname1, groupvalue1, null, null);
 //	}
 
 	@GET
-	@Path("/getEvents/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
+	@Path("/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
 	@Produces("text/plain")
-	public String getEvents(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
+	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
 			@PathParam("limit") int limit, @PathParam("filter") String filter,
 			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
 			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
