@@ -80,16 +80,17 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{limit}|If the limit value is less than 0, the function doesn't take into account of limit number; that means the function returns all the items which belong to the `group`. Otherwise, `limit` is the limit items returned by executing this API |
 
   This API does the same with the previous API, but can be able to customize the input for offset and limit value.
-  Here is an example of `artist` group with offset = 1 and limit = 3 (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3`):
+  Here is an example of `artist` group with offset = 1 and limit = 3 (`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/getAggregatedItems/artist/1/3`)
   
   ```
+
   { "head": { "link": [], "vars": ["artist", "count"] },
   "results": { "distinct": false, "ordered": true, "bindings": [
     { "artist": { "type": "literal", "xml:lang": "et", "value": "Muse" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "219" }},
     { "artist": { "type": "literal", "xml:lang": "de", "value": "Franz Ferdinand" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "217" }},
     { "artist": { "type": "literal", "value": "Bloc Party" }	, "count": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "179" }} ] } }
-    
-    ``` 
+ 
+   ```
 
 #### Getting aggregated items information in a group with offset and limit and a filter for another group:
 
