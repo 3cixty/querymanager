@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.hp.hpl.jena.query.Query;
 
+import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 

@@ -18,10 +18,10 @@ import javax.ws.rs.WebApplicationException;
 
 import com.hp.hpl.jena.query.Query;
 
+import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.querymanager.EventMediaFormat;
-import eu.threecixty.querymanager.GoogleAccountUtils;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
