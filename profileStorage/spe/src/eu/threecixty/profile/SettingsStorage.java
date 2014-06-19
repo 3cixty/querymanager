@@ -45,8 +45,7 @@ public class SettingsStorage {
 			String uid = settings.getUid();
 			
 			UserProfile userProfile = mf.getUserProfile(PROFILE_URI + uid);
-			System.out.println(uid);
-			System.out.println(userProfile);
+
 			if (userProfile == null) return;
 			
 			addProfileIdentitiesIntoUserProfile(settings, mf, userProfile);
@@ -268,7 +267,7 @@ public class SettingsStorage {
 		Address addr = null;
 		if (userProfile.hasHas_address()) addr = (Address) userProfile.getHas_address().iterator().next();
 		else addr = mf.createAddress(PROFILE_URI + settings.getUid() + "Address");
-		System.out.println(addr);
+
 		if (isNotNullOrEmpty(settings.getCountryName())) {
 			if (addr.hasCountry_name()) {
 				Object objCountryName = addr.getCountry_name().iterator().next();

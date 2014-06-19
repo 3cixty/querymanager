@@ -12,6 +12,7 @@
   <modules>
     <module>profileKB</module>
 	<module>models</module>
+	<module>spe</module>
 	<module>privacyManager</module>
   </modules>
   
