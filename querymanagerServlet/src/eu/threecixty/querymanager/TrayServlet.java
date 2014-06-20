@@ -32,6 +32,12 @@ public class TrayServlet extends HttpServlet {
 	private static final int CLEAN_ERROR = 404;
 	private static final int UPDATE_ERROR = 405;
 	
+	private static final String ADD_EXCEPTION_MSG = "Invalid parameters or duplicated tray items";
+	
+	private static final String LIST_EXCEPTION_MSG = "Invalid parameters";
+	
+	private static final int OK_CODE = 200;
+	
 	/**
 	 * 
 	 */
@@ -47,12 +53,15 @@ public class TrayServlet extends HttpServlet {
 			if (action.equals("add_tray_element")) {
 				if (!addTrayElement(req)) {
 					resp.setStatus(ADD_ERROR);
-				}
+					out.write(ADD_EXCEPTION_MSG);
+				} else resp.setStatus(OK_CODE);
 			} else if (action.equals("get_tray_elements")) {
 				List <Tray> trays = getTrayElements(req);
 				if (trays == null) {
 					resp.setStatus(LIST_ERROR);
+					out.write(LIST_EXCEPTION_MSG);
 				} else {
+					resp.setStatus(OK_CODE);
 					Gson gson = new Gson();
 					String content = gson.toJson(trays);
 					out.write(content);
@@ -62,6 +71,7 @@ public class TrayServlet extends HttpServlet {
 				if (trays == null) {
 					resp.setStatus(LOGIN_ERROR);
 				} else {
+					resp.setStatus(OK_CODE);
 					Gson gson = new Gson();
 					String content = gson.toJson(trays);
 					out.write(content);
@@ -69,11 +79,11 @@ public class TrayServlet extends HttpServlet {
 			} else if (action.equals("empty_tray")) {
 				if (!cleanTrays(req)) {
 					resp.setStatus(CLEAN_ERROR);
-				}
+				} else resp.setStatus(OK_CODE);
 			} else if (action.equals("update_tray_element")) {
 				if (!updateTray(req)) {
 					resp.setStatus(UPDATE_ERROR);
-				}
+				} else resp.setStatus(OK_CODE);
 			}
 			
 		}
