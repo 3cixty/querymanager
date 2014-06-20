@@ -138,13 +138,6 @@ public class TrayServlet extends HttpServlet {
 		return TrayStorage.update(tray);
 	}
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doPost(req, resp);
-	}
-
 	private boolean cleanTrays(HttpServletRequest req) {
 		String token = req.getParameter("token");
 		if (token == null || token.equals("")) return false;
