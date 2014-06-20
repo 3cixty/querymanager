@@ -86,7 +86,7 @@ public class Tray {
 	}
 
 	public enum ItemType {
-		Event, PoI, Transportation
+		event, poi, transportation
 	};
 	
 	public enum OrderType {
