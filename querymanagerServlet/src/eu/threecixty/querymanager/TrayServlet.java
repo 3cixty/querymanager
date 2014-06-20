@@ -85,7 +85,7 @@ public class TrayServlet extends HttpServlet {
 		if (itemId == null || itemId.equals("")) return false;
 		String itemTypeStr = req.getParameter("element_type");
 		if (itemTypeStr == null || itemTypeStr.equals("")) return false;
-		ItemType itemType = ItemType.valueOf(itemTypeStr);
+		ItemType itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
 		String token = req.getParameter("token");
 		String uid = GoogleAccountUtils.updateInfo(token);
 		String source = req.getParameter("source");
@@ -165,7 +165,7 @@ public class TrayServlet extends HttpServlet {
 		int limit = (limitStr == null) ? 100 : Integer.parseInt(limitStr);
 		String orderStr = req.getParameter("order_type");
 		OrderType orderType = (orderStr == null) ? OrderType.Desc
-				: orderStr.equals("desc") ? OrderType.Desc : OrderType.Asc;
+				: orderStr.equalsIgnoreCase("Desc") ? OrderType.Desc : OrderType.Asc;
 		String showPastEventsStr = req.getParameter("show_past_events");
 		boolean showPastEvents = (showPastEventsStr == null) ? true : "true".equalsIgnoreCase(showPastEventsStr);
 		
@@ -180,7 +180,7 @@ public class TrayServlet extends HttpServlet {
 		if (itemTypeStr == null) return false;
 		ItemType itemType = null;
 		try {
-			itemType = ItemType.valueOf(itemTypeStr);
+			itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
 			if (itemType == null) return false;
 		} catch (Exception e) {
 			e.printStackTrace();
