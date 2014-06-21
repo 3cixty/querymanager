@@ -57,7 +57,7 @@ public class TrayStorage {
 			}
 		}
 		if (index == -1) return false;
-		allTrays.set(index, tray);
+		allTrays.remove(index);
 		return save(allTrays);
 	}
 
