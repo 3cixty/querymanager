@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,9 +9,13 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.vocab.XSDVocabulary;
+
+import uk.ac.manchester.cs.owl.owlapi.OWLDatatypeImpl;
 
 import eu.threecixty.models.Address;
 import eu.threecixty.models.EventDetails;
@@ -29,6 +34,8 @@ import eu.threecixty.models.UserPlaceRating;
 import eu.threecixty.models.UserProfile;
 import eu.threecixty.profile.oldmodels.EventDetail;
 import eu.threecixty.profile.oldmodels.LikeType;
+import eu.threecixty.profile.oldmodels.NatureOfEvent;
+import eu.threecixty.profile.oldmodels.NatureOfPlace;
 import eu.threecixty.profile.oldmodels.UserEnteredRating;
 
 
@@ -74,7 +81,6 @@ public class ProfileInformationStorage {
 			    spePrefs.setHasUserEnteredRating(toUserEnteredRatings);
 			}
 			
-			
 			return profileInfo;
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
@@ -84,7 +90,381 @@ public class ProfileInformationStorage {
 
 	// TODO
 	public static boolean saveProfile(ProfileInformation profile) {
+		if (profile == null) return false;
+		try {
+			MyFactory mf = getMyFactory();
+			UserProfile kbUserProfile = mf.getUserProfile(PROFILE_URI + profile.getUid());
+
+			if (kbUserProfile == null) {
+				kbUserProfile = mf.createUserProfile(PROFILE_URI + profile.getUid());
+			}
+			
+			saveNameInfoToKB(profile, kbUserProfile, mf);
+			
+			saveAddressInfoToKB(profile, kbUserProfile, mf);
+			
+			if (profile.getPreference() != null) {
+				savePreferenceToKB(profile.getUid(), profile.getPreference(), kbUserProfile, mf);
+			}
+			
+			mf.saveOwlOntology();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return false;
+	}
+
+	/**
+	 * TODO: Note that this method does not remove old information about preferences.
+	 *
+	 * Saves preferences into the KB.
+	 * @param preference
+	 * @param kbUserProfile
+	 * @param mf
+	 */
+	private static void savePreferenceToKB(String uid, SpePreference preference,
+			UserProfile kbUserProfile, MyFactory mf) {
+		// TODO Auto-generated method stub
+		Preference kbPreference = null;
+		if (kbUserProfile.hasHasPreference()) {
+			kbPreference = kbUserProfile.getHasPreference().iterator().next();
+		} else {
+			kbPreference = mf.createPreference(PROFILE_URI + uid + "Preference");
+			kbUserProfile.addHasPreference(kbPreference);
+		}
+		if (preference.getHasUserEnteredRating() != null
+				&& preference.getHasUserEnteredRating().size() > 0) {
+			UserEnteredRatings kbUserEnteredRatings = null;
+			if (kbPreference.hasHasUserEnteredRatings()) {
+				kbUserEnteredRatings = kbPreference.getHasUserEnteredRatings().iterator().next();
+			} else {
+				kbUserEnteredRatings = mf.createUserEnteredRatings(PROFILE_URI + uid + "UserEnteredRatings");
+				kbPreference.addHasUserEnteredRatings(kbUserEnteredRatings);
+			}
+			saveUserEnteredRatingToKB(uid, preference.getHasUserEnteredRating().iterator().next(),
+					kbUserEnteredRatings, mf);
+		}
+	}
+
+	/**
+	 * Save user entered rating to the KB.
+	 * @param uid
+	 * @param userEnteredRating
+	 * @param kbUserEnteredRatings
+	 * @param mf
+	 */
+	private static void saveUserEnteredRatingToKB(String uid,
+			UserEnteredRating userEnteredRating,
+			UserEnteredRatings kbUserEnteredRatings, MyFactory mf) {
+		if (userEnteredRating.getHasUserEventRating() != null) {
+			for (eu.threecixty.profile.oldmodels.UserEventRating userEventRating:
+				userEnteredRating.getHasUserEventRating()) {
+				saveUserEventRatingToKB(uid, userEventRating, kbUserEnteredRatings, mf);
+			}
+		}
+		if (userEnteredRating.getHasUserPlaceRating() != null) {
+			for (eu.threecixty.profile.oldmodels.UserPlaceRating userPlaceRating:
+				userEnteredRating.getHasUserPlaceRating()) {
+				saveUserPlaceRatingToKB(uid, userPlaceRating, kbUserEnteredRatings, mf);
+			}
+		}
+		if (userEnteredRating.getHasUserHotelRating() != null) {
+			for (eu.threecixty.profile.oldmodels.UserHotelRating userHotelRating:
+				userEnteredRating.getHasUserHotelRating()) {
+				saveUserHotelRatingToKB(uid, userHotelRating, kbUserEnteredRatings, mf);
+			}
+		}
+	}
+
+	/**
+	 * Saves user hotel rating to the KB.
+	 * @param uid
+	 * @param userHotelRating
+	 * @param kbUserEnteredRatings
+	 * @param mf
+	 */
+	private static void saveUserHotelRatingToKB(String uid,
+			eu.threecixty.profile.oldmodels.UserHotelRating userHotelRating,
+			UserEnteredRatings kbUserEnteredRatings, MyFactory mf) {
+		UserHotelRating kbUserHotelRating = mf.createUserHotelRating(PROFILE_URI + uid + "UserHotelRating" + System.currentTimeMillis());
+		if (userHotelRating.getHasNumberOfTImesVisited() > 0) {
+			kbUserHotelRating.addHasNumberofTimesVisited(userHotelRating.getHasNumberOfTImesVisited());
+		}
+		if (userHotelRating.getHasRating() != null) {
+			Rating kbRating = mf.createRating(PROFILE_URI + uid + "Rating" + System.currentTimeMillis());
+			saveRatingToKB(userHotelRating.getHasRating(), kbRating, mf);
+			kbUserHotelRating.addHasRating(kbRating);
+		}
+		if (userHotelRating.getHasHotelDetail() != null) {
+			HotelDetail kbHotelDetail = mf.createHotelDetail(PROFILE_URI + uid + "HotelDetail" + System.currentTimeMillis());
+			saveHotelDetailToKB(uid, userHotelRating.getHasHotelDetail(), kbHotelDetail, mf);
+			kbUserHotelRating.addHasHotelDetail(kbHotelDetail);
+		}
+		kbUserEnteredRatings.addHasUserHotelRating(kbUserHotelRating);
+	}
+
+	/**
+	 * Saves hotel detail to the KB.
+	 * @param uid
+	 * @param hotelDetail
+	 * @param kbHotelDetail
+	 * @param mf
+	 */
+	private static void saveHotelDetailToKB(String uid,
+			eu.threecixty.profile.oldmodels.HotelDetail hotelDetail,
+			HotelDetail kbHotelDetail, MyFactory mf) {
+		// TODO Auto-generated method stub
+		if (hotelDetail.getHasAddress() != null) {
+			Address kbAddress = mf.createAddress(PROFILE_URI + uid + "Address" + System.currentTimeMillis());
+			saveAddressToKB(uid, hotelDetail.getHasAddress(), kbAddress, mf);
+			kbHotelDetail.addHas_address(kbAddress);
+		}
+//		if (hotelDetail.get)
+	}
+
+	/**
+	 * Saves user place rating to the KB.
+	 * @param uid
+	 * @param userPlaceRating
+	 * @param kbUserEnteredRatings
+	 * @param mf
+	 */
+	private static void saveUserPlaceRatingToKB(String uid,
+			eu.threecixty.profile.oldmodels.UserPlaceRating userPlaceRating,
+			UserEnteredRatings kbUserEnteredRatings, MyFactory mf) {
+		UserPlaceRating kbUserPlaceRating = mf.createUserPlaceRating(PROFILE_URI + uid + "UserPlaceRating" + System.currentTimeMillis());
+		if (userPlaceRating.getHasNumberOfTimesVisited() > 0) {
+			kbUserPlaceRating.addHasNumberofTimesVisited(userPlaceRating.getHasNumberOfTimesVisited());
+		}
+		if (userPlaceRating.getHasRating() != null) {
+			Rating kbRating = mf.createRating(PROFILE_URI + uid + "Rating" + System.currentTimeMillis());
+			saveRatingToKB(userPlaceRating.getHasRating(), kbRating, mf);
+			kbUserPlaceRating.addHasRating(kbRating);
+		}
+		if (userPlaceRating.getHasPlaceDetail() != null) {
+			PlaceDetail kbPlaceDetail = mf.createPlaceDetail(PROFILE_URI + uid + "PlaceDetail" + System.currentTimeMillis());
+			savePlaceDetailToKB(uid, userPlaceRating.getHasPlaceDetail(), kbPlaceDetail, mf);
+			kbUserPlaceRating.addHasPlaceDetail(kbPlaceDetail);
+		}
+		
+		kbUserEnteredRatings.addHasUserPlaceRating(kbUserPlaceRating);
+	}
+
+	/**
+	 * Saves place detail to the KB.
+	 * @param placeDetail
+	 * @param kbPlaceDetail
+	 * @param mf
+	 */
+	private static void savePlaceDetailToKB(String uid,
+			eu.threecixty.profile.oldmodels.PlaceDetail placeDetail,
+			PlaceDetail kbPlaceDetail, MyFactory mf) {
+		if (placeDetail.getHasAddress() != null) {
+			Address kbAddress = mf.createAddress(PROFILE_URI + uid + "Address" + System.currentTimeMillis());
+			saveAddressToKB(uid, placeDetail.getHasAddress(), kbAddress, mf);
+			kbPlaceDetail.addHas_address(kbAddress);
+		}
+		if (!isNullOrEmpty(placeDetail.getHasPlaceName())) {
+			kbPlaceDetail.addHasPlaceName(placeDetail.getHasPlaceName());
+		}
+		if (placeDetail.getHasNatureOfPlace() != null) {
+			kbPlaceDetail.addHasNatureOfPlace(NatureOfPlace.valueOf(placeDetail.getHasNatureOfPlace().toString()));
+		}
+	}
+
+	/**
+	 * Saves user event rating to the KB.
+	 * @param uid
+	 * @param userEventRating
+	 * @param kbUserEnteredRatings
+	 * @param mf
+	 */
+	private static void saveUserEventRatingToKB(String uid,
+			eu.threecixty.profile.oldmodels.UserEventRating userEventRating,
+			UserEnteredRatings kbUserEnteredRatings, MyFactory mf) {
+		String eventRatingName = userEventRating.getHasEventDetail() != null ?
+				userEventRating.getHasEventDetail().getHasEventName() != null ? userEventRating.getHasEventDetail().getHasEventName() + kbUserEnteredRatings.getHasUserEventRating().size() : kbUserEnteredRatings.getHasUserEventRating().size() + "" : kbUserEnteredRatings.getHasUserEventRating().size() + ""; 
+		UserEventRating kbUserEventRating = mf.createUserEventRating(
+				PROFILE_URI + uid + "UserEventRating" + eventRatingName);
+		
+		kbUserEventRating.addHasNumberofTimesVisited(userEventRating.getHasNumberOfTimesVisited());
+		
+		if (userEventRating.getHasEventDetail() != null) {
+			EventDetails kbEventDetail = mf.createEventDetails(PROFILE_URI + uid + "UserEventRating" + eventRatingName + "EventDetails");
+			saveEventDetailToKB(uid, userEventRating.getHasEventDetail(), kbEventDetail, mf);
+			kbUserEventRating.addHasEventDetail(kbEventDetail);
+		}
+		
+		if (userEventRating.getHasRating() != null) {
+			Rating kbRating = mf.createRating(PROFILE_URI + uid + "UserEventRating" + eventRatingName + "Rating");
+			saveRatingToKB(userEventRating.getHasRating(), kbRating, mf);
+			kbUserEventRating.addHasRating(kbRating);
+		}
+		
+		kbUserEnteredRatings.addHasUserEventRating(kbUserEventRating);
+	}
+
+	/**
+	 * Saves rating information to the KB.
+	 * @param rating
+	 * @param kbRating
+	 * @param mf
+	 */
+	private static void saveRatingToKB(
+			eu.threecixty.profile.oldmodels.Rating rating, Rating kbRating,
+			MyFactory mf) {
+		if (rating.getHasUseDefinedRating() > 0) {
+			kbRating.addHasUserDefinedRating(rating.getHasUseDefinedRating().floatValue());
+		}
+		if (rating.getHasUserInteractionMode() != null) {
+			kbRating.addHasUserInteractionMode(rating.getHasUserInteractionMode().toString());
+		}
+	}
+
+	/**
+	 * Saves event detail to the KB.
+	 * @param eventDetail
+	 * @param kbEventDetail
+	 * @param mf
+	 */
+	private static void saveEventDetailToKB(String uid, EventDetail eventDetail,
+			EventDetails kbEventDetail, MyFactory mf) {
+		if (eventDetail.getHasAddress() != null) {
+			Address kbAddress = mf.createAddress(PROFILE_URI + uid + "Address" + System.currentTimeMillis());
+			saveAddressToKB(uid, eventDetail.getHasAddress(), kbAddress, mf);
+			kbEventDetail.addAt_place(kbAddress);
+		}
+		if (!isNullOrEmpty(eventDetail.getHasEventName())) {
+			kbEventDetail.addHasEventName(eventDetail.getHasEventName());
+		}
+		if (eventDetail.getHasNatureOfEvent() != null) {
+			kbEventDetail.addHasNatureOfEvent(NatureOfEvent.valueOf(eventDetail.getHasNatureOfEvent().toString()));
+		}
+		if (eventDetail.getHasTemporalDetails() != null) {
+			TemporalDetails kbTemporalDetails = mf.createTemporalDetails(PROFILE_URI + uid + "TemporalDetails" + System.currentTimeMillis());
+			saveTemporalDetailsToKB(uid, eventDetail.getHasTemporalDetails(), kbTemporalDetails, mf);
+			kbEventDetail.addHasTemporalDetails(kbTemporalDetails);
+		}
+	}
+
+	/**
+	 * Saves temporal details to the KB.
+	 * @param uid
+	 * @param temporalDetails
+	 * @param kbTemporalDetails
+	 * @param mf
+	 */
+	private static void saveTemporalDetailsToKB(String uid,
+			eu.threecixty.profile.oldmodels.TemporalDetails temporalDetails,
+			TemporalDetails kbTemporalDetails, MyFactory mf) {
+		if (temporalDetails.getHasDateFrom() != null) {
+			OWLLiteral startDateLiteral = OWLManager.getOWLDataFactory().getOWLLiteral(
+					convert(temporalDetails.getHasDateFrom()),
+					new OWLDatatypeImpl(XSDVocabulary.DATE_TIME.getIRI()));
+			kbTemporalDetails.addHasDateFrom(startDateLiteral);
+		}
+		if (temporalDetails.getHasDateUntil() != null) {
+			OWLLiteral endDateLiteral = OWLManager.getOWLDataFactory().getOWLLiteral(
+					convert(temporalDetails.getHasDateUntil()),
+					new OWLDatatypeImpl(XSDVocabulary.DATE_TIME.getIRI()));
+			kbTemporalDetails.addHasDateUntil(endDateLiteral);
+		}
+	}
+
+	/**
+	 * Saves address to the KB.
+	 * @param uid
+	 * @param address
+	 * @param kbAddress
+	 * @param mf
+	 */
+	private static void saveAddressToKB(String uid,
+			eu.threecixty.profile.oldmodels.Address address,
+			Address kbAddress, MyFactory mf) {
+		if (!isNullOrEmpty(address.getCountryName())) {
+			kbAddress.addCountry_name(address.getCountryName());
+		}
+		if (!isNullOrEmpty(address.getPostalCode())) {
+			kbAddress.addPostal_code(address.getPostalCode());
+		}
+		if (!isNullOrEmpty(address.getStreetAddress())) {
+			kbAddress.addStreet_address(address.getStreetAddress());
+		}
+		if (!isNullOrEmpty(address.getTownName())) {
+			kbAddress.addTownName(address.getTownName());
+		}
+		if (address.getLatitude() > 0) {
+			kbAddress.addLatitude(address.getLatitude());
+		}
+		if (address.getLongitute() > 0) {
+			kbAddress.addLongitude(address.getLongitute());
+		}
+	}
+
+	/**
+	 * Saves name information into the KB.
+	 * @param profile
+	 * @param kbUserProfile
+	 * @param mf
+	 */
+	private static void saveNameInfoToKB(ProfileInformation profile,
+			UserProfile kbUserProfile, MyFactory mf) {
+		if (!isNullOrEmpty(profile.getLastName())) {
+			Name name = null;
+			if (kbUserProfile.hasHas_name()) {
+				name = (Name) kbUserProfile.getHas_name().iterator().next();
+				kbUserProfile.removeHas_name(name);
+			} else name = mf.createName(PROFILE_URI + profile.getUid() + profile.getLastName());
+			name.addFamily_name(profile.getLastName());
+			if (!isNullOrEmpty(profile.getFirstName())) {
+				name.addGiven_name(profile.getFirstName());
+			}
+			kbUserProfile.addHas_name(name);
+		}
+	}
+
+	/**
+	 * Saves address information into the KB.
+	 * @param profile
+	 * @param kbUserProfile
+	 */
+	private static void saveAddressInfoToKB(ProfileInformation profile,
+			UserProfile kbUserProfile, MyFactory mf) {
+		Address addr = null;
+		if (kbUserProfile.hasHas_address()) addr = (Address) kbUserProfile.getHas_address().iterator().next();
+		else addr = mf.createAddress(PROFILE_URI + profile.getUid() + "Address");
+
+		if (!isNullOrEmpty(profile.getCountryName())) {
+			if (addr.hasCountry_name()) {
+				Object objCountryName = addr.getCountry_name().iterator().next();
+				addr.removeCountry_name(objCountryName);
+			}
+			addr.addCountry_name(profile.getCountryName());
+		}
+		if (!isNullOrEmpty(profile.getTownName())) {
+			if (addr.hasTownName()) {
+				String objTownName = addr.getTownName().iterator().next();
+				addr.removeTownName(objTownName);
+			}
+			addr.addTownName(profile.getTownName());
+		}
+
+		if (profile.getLatitude() != 0) {
+			if (addr.hasLatitude()) {
+				Object objLatitude = addr.getLatitude().iterator().next();
+				addr.removeLatitude(objLatitude);
+			}
+			addr.addLatitude((float) profile.getLatitude());
+		}
+
+		if (profile.getLongitude() != 0) {
+			if (addr.hasLongitude()) {
+				Object objLongitude = addr.getLongitude().iterator().next();
+				addr.removeLongitude(objLongitude);
+			}
+			addr.addLongitude((float) profile.getLongitude());
+		}
 	}
 
 	/**
@@ -166,8 +546,49 @@ public class ProfileInformationStorage {
 	 */
 	private static void loadHotelDetailFromKBToPI(HotelDetail fromHotelDetail,
 			eu.threecixty.profile.oldmodels.HotelDetail toHotelDetail) {
-		// TODO Auto-generated method stub
-		//if (fromHotelDetail.h)
+		if (fromHotelDetail.hasHas_address()) {
+			Address fromAddress = (Address) fromHotelDetail.getHas_address().iterator().next();
+			eu.threecixty.profile.oldmodels.Address toAddress = new eu.threecixty.profile.oldmodels.Address();
+			toHotelDetail.setHasAddress(toAddress);
+			loadAddressFromKBToPI(fromAddress, toAddress);
+		}
+		if (fromHotelDetail.hasHasHotelChains()) {
+			Set <eu.threecixty.profile.oldmodels.Address> toHotelChainAddresses = new HashSet <eu.threecixty.profile.oldmodels.Address>();
+			toHotelDetail.setHasHotelChains(toHotelChainAddresses);
+			Iterator <? extends Address> fromHotelChainAddresses = fromHotelDetail.getHasHotelChains().iterator();
+			for (; fromHotelChainAddresses.hasNext(); ) {
+				Address fromHotelChainAddress = fromHotelChainAddresses.next();
+				eu.threecixty.profile.oldmodels.Address toHotelChainAddress = new eu.threecixty.profile.oldmodels.Address();
+				toHotelChainAddresses.add(toHotelChainAddress);
+				loadAddressFromKBToPI(fromHotelChainAddress, toHotelChainAddress);
+			}
+		}
+		if (fromHotelDetail.hasHasHotelPriceHigh()) {
+			toHotelDetail.setHasHotelPriceHigh((Double) fromHotelDetail.getHasHotelPriceHigh().iterator().next());
+		}
+		if (fromHotelDetail.hasHasHotelPriceLow()) {
+			toHotelDetail.setHasHotelPriceLow((Double) fromHotelDetail.getHasHotelPriceLow().iterator().next());
+		}
+		if (fromHotelDetail.hasHasHotelRoomType()) {
+			toHotelDetail.setHasHotelRoomTypes(fromHotelDetail.getHasHotelRoomType().iterator().next().toString());
+		}
+		if (fromHotelDetail.hasHasHotelStarCategory()) {
+			toHotelDetail.setHasHotelStarCategory((Integer) fromHotelDetail.getHasHotelStarCategory().iterator().next());
+		}
+		if (fromHotelDetail.hasHasNatureOfPlace()) {
+			String nopStr = fromHotelDetail.getHasNatureOfPlace().iterator().next().toString();
+			toHotelDetail.setHasNatureOfPlace(eu.threecixty.profile.oldmodels.NatureOfPlace.valueOf(nopStr));
+		}
+		if (fromHotelDetail.hasHasNearByTransportMode()) {
+			toHotelDetail.setHasNearbyTransportMode(fromHotelDetail.getHasNearByTransportMode().iterator().next());
+		}
+		if (fromHotelDetail.hasHasPlaceName()) {
+			toHotelDetail.setHasPlaceName(fromHotelDetail.getHasNearByTransportMode().iterator().next());
+		}
+		if (fromHotelDetail.hasHasTypeOfFood()) {
+			String tofStr = fromHotelDetail.getHasTypeOfFood().iterator().next().toString();
+			toHotelDetail.setHasTypeOfFood(eu.threecixty.profile.oldmodels.TypeOfFood.valueOf(tofStr));
+		}
 	}
 
 	/**
@@ -405,6 +826,16 @@ public class ProfileInformationStorage {
 			to.setLongitude((Double) objLongitude);
 		}
 	}
+	
+	/**
+	 * Checks whether or not a given input string contains something.
+	 * @param input
+	 * @return
+	 */
+	private static boolean isNullOrEmpty(String input) {
+		if (input == null || input.equals("")) return false;
+		return true;
+	}
 
 	/**
 	 * Gets my factory.
@@ -420,6 +851,16 @@ public class ProfileInformationStorage {
 
 		MyFactory mf = new MyFactory(ontology);
 		return mf;
+	}
+	
+	/**
+	 * Converts a given date to string.
+	 * @param date
+	 * @return
+	 */
+	private static String convert(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		return sdf.format(date);
 	}
 
 	public static boolean existUID(String uid) {

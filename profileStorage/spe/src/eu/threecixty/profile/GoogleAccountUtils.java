@@ -64,7 +64,7 @@ public class GoogleAccountUtils {
             userProfile.addHas_name(name);
             mf.saveOwlOntology();
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		if (user_id == null) return "";
 		return user_id;
@@ -92,7 +92,7 @@ public class GoogleAccountUtils {
 			ProfileInformationStorage.saveProfile(profile);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		if (user_id == null) return "";
 		return user_id;
