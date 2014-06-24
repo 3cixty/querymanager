@@ -2,7 +2,6 @@ package eu.threecixty.querymanager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +33,7 @@ public class SPEServiceTests extends HTTPCall {
 //	private static final String SPE_SERVICE = "http://localhost:8080/querymanagerServlet/services/spe/";
 	
 	// TODO: change whenever the access token is expired
-	private String accessToken = "ya29.LgDRTKWMxZDXWSEAAAA9IV7hE1vFn5lFV2EEJpmAIggZ-RgrSAtSiY9A1TDXPBtbq-N6wx1juHh7nIE71Bg";
+	private String accessToken = "ya29.LgDtRCXgzvQqbCEAAAAcwkb-zwEke7eHzLOWHIYbJ_0I8z7am-lGPbnFcPAmPBohmoOUbI42b5ZSOa9-tIE";
 	
 	@Test
 	public void testSaveAndLoadProfile() {
@@ -83,6 +82,8 @@ public class SPEServiceTests extends HTTPCall {
 		params.append(accessToken);
 		params.append("&profile=");
 		params.append(gson.toJson(profileInformation));
+		
+		System.out.println(gson.toJson(profileInformation));
 		
 		try {
 			sendPost(SPE_SERVICE + "saveProfile", params.toString());
@@ -199,7 +200,6 @@ public class SPEServiceTests extends HTTPCall {
 		userHotelRating.setHasRating(rating);
 		rating.setHasUseDefinedRating(4.0);
 		rating.setHasUserInteractionMode(UserInteractionMode.Stayed);
-		rating.setHasRatingTime(Calendar.getInstance().getTime());
 		
 		HotelDetail hotelDetail = new HotelDetail();
 		userHotelRating.setHasHotelDetail(hotelDetail);
@@ -246,7 +246,6 @@ public class SPEServiceTests extends HTTPCall {
 		userPlaceRating.setHasRating(rating);
 		rating.setHasUseDefinedRating(5.0);
 		rating.setHasUserInteractionMode(UserInteractionMode.Went);
-		rating.setHasRatingTime(Calendar.getInstance().getTime());
 		
 		PlaceDetail placeDetail = new PlaceDetail();
 		userPlaceRating.setHasPlaceDetail(placeDetail);
@@ -273,7 +272,6 @@ public class SPEServiceTests extends HTTPCall {
 		userEventRating.setHasRating(rating);
 		rating.setHasUseDefinedRating(4.0);
 		rating.setHasUserInteractionMode(UserInteractionMode.Visited);
-		rating.setHasRatingTime(Calendar.getInstance().getTime());
 		
 		EventDetail eventDetail = new EventDetail();
 		userEventRating.setHasEventDetail(eventDetail);
