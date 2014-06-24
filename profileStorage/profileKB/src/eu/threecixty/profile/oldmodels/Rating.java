@@ -1,6 +1,5 @@
 package eu.threecixty.profile.oldmodels;
 
-import java.util.Date;
 import java.util.Set;
 
 import eu.threecixty.profile.annotations.Description;
@@ -14,8 +13,8 @@ public class Rating {
 	private Double hasUseDefinedRating;
 	@Description(hasText="user interaction mode")
     private UserInteractionMode hasUserInteractionMode;
-	@Description(hasText="time at which the user rated")
-    private Date hasRatingTime;
+//	@Description(hasText="time at which the user rated")
+//    private Date hasRatingTime;
 	@Description(hasText="comments by the user")
     private Set <String> hasKeyTags;
 	public Double getHasUseDefinedRating() {
@@ -30,12 +29,12 @@ public class Rating {
 	public void setHasUserInteractionMode(UserInteractionMode hasUserInteractionMode) {
 		this.hasUserInteractionMode = hasUserInteractionMode;
 	}
-	public Date getHasRatingTime() {
-		return hasRatingTime;
-	}
-	public void setHasRatingTime(Date hasRatingTime) {
-		this.hasRatingTime = hasRatingTime;
-	}
+//	public Date getHasRatingTime() {
+//		return hasRatingTime;
+//	}
+//	public void setHasRatingTime(Date hasRatingTime) {
+//		this.hasRatingTime = hasRatingTime;
+//	}
 	public Set<String> getHasKeyTags() {
 		return hasKeyTags;
 	}
@@ -51,9 +50,9 @@ public class Rating {
 		if (hasUserInteractionMode == null) {
 			if (rating.hasUserInteractionMode != null) return false;
 		} else if (hasUserInteractionMode != rating.hasUserInteractionMode) return false;
-		if (hasRatingTime == null) {
-			if (rating.hasRatingTime != null) return false;
-		} else if (!hasRatingTime.equals(rating.hasRatingTime)) return false;
+//		if (hasRatingTime == null) {
+//			if (rating.hasRatingTime != null) return false;
+//		} else if (!hasRatingTime.equals(rating.hasRatingTime)) return false;
 		
 		return hasUseDefinedRating == rating.hasUseDefinedRating;
 	}
