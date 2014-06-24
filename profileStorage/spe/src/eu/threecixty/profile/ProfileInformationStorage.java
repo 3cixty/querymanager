@@ -1,12 +1,16 @@
 package eu.threecixty.profile;
 
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import org.protege.owl.codegeneration.WrappedIndividual;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLLiteral;
@@ -34,8 +38,6 @@ import eu.threecixty.models.UserPlaceRating;
 import eu.threecixty.models.UserProfile;
 import eu.threecixty.profile.oldmodels.EventDetail;
 import eu.threecixty.profile.oldmodels.LikeType;
-import eu.threecixty.profile.oldmodels.NatureOfEvent;
-import eu.threecixty.profile.oldmodels.NatureOfPlace;
 import eu.threecixty.profile.oldmodels.UserEnteredRating;
 
 
@@ -48,8 +50,12 @@ public class ProfileInformationStorage {
 	
 	private static final String PROFILE_URI = "http://www.eu.3cixty.org/profile#";
 
-	// TODO
-	public static ProfileInformation loadProfile(String uid) {
+	/**
+	 * Loads profile information from the KB.
+	 * @param uid
+	 * @return
+	 */
+	public synchronized static ProfileInformation loadProfile(String uid) {
 		if (uid == null || uid.equals("")) return null;
 		try {
 			MyFactory mf = getMyFactory();
@@ -58,12 +64,13 @@ public class ProfileInformationStorage {
 			if (userProfile == null) return null;
 			
 			ProfileInformation profileInfo = new ProfileInformation();
-			
 			profileInfo.setUid(uid);
-			loadNameFromKBToPI(userProfile, profileInfo);
-			loadAddressInfoFromKBToPI(userProfile, profileInfo);
+			loadNameFromKBToPI(mf, uid, userProfile, profileInfo);
+			loadAddressInfoFromKBToPI(mf, uid, userProfile, profileInfo);
 
-			if (!userProfile.hasHasPreference()) return profileInfo;
+			if (!userProfile.hasHasPreference()) {
+				return profileInfo;
+			}
 			
 			SpePreference spePrefs = new SpePreference();
 			profileInfo.setPreference(spePrefs);
@@ -76,20 +83,24 @@ public class ProfileInformationStorage {
 				Set <eu.threecixty.profile.oldmodels.UserEnteredRating> toUserEnteredRatings = new HashSet <eu.threecixty.profile.oldmodels.UserEnteredRating>();
 			    UserEnteredRatings fromUserEnteredRating = kbPrefs.getHasUserEnteredRatings().iterator().next();
 			    UserEnteredRating toUserEnteredRating = new UserEnteredRating();
-			    loadUserEnteredRatingFromKBToPI(fromUserEnteredRating, toUserEnteredRating);
+			    loadUserEnteredRatingFromKBToPI(mf, fromUserEnteredRating, toUserEnteredRating);
 			    toUserEnteredRatings.add(toUserEnteredRating);
 			    spePrefs.setHasUserEnteredRating(toUserEnteredRatings);
 			}
 			
 			return profileInfo;
-		} catch (OWLOntologyCreationException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	// TODO
-	public static boolean saveProfile(ProfileInformation profile) {
+	/**
+	 * Saves profile information to the KB.
+	 * @param profile
+	 * @return
+	 */
+	public synchronized static boolean saveProfile(ProfileInformation profile) {
 		if (profile == null) return false;
 		try {
 			MyFactory mf = getMyFactory();
@@ -125,7 +136,6 @@ public class ProfileInformationStorage {
 	 */
 	private static void savePreferenceToKB(String uid, SpePreference preference,
 			UserProfile kbUserProfile, MyFactory mf) {
-		// TODO Auto-generated method stub
 		Preference kbPreference = null;
 		if (kbUserProfile.hasHasPreference()) {
 			kbPreference = kbUserProfile.getHasPreference().iterator().next();
@@ -142,8 +152,11 @@ public class ProfileInformationStorage {
 				kbUserEnteredRatings = mf.createUserEnteredRatings(PROFILE_URI + uid + "UserEnteredRatings");
 				kbPreference.addHasUserEnteredRatings(kbUserEnteredRatings);
 			}
-			saveUserEnteredRatingToKB(uid, preference.getHasUserEnteredRating().iterator().next(),
-					kbUserEnteredRatings, mf);
+			Iterator <UserEnteredRating> iterators = preference.getHasUserEnteredRating().iterator();
+			for (; iterators.hasNext(); ) {
+				UserEnteredRating userEnteredRating = iterators.next();
+			    saveUserEnteredRatingToKB(uid, userEnteredRating, kbUserEnteredRatings, mf);
+			}
 		}
 	}
 
@@ -214,13 +227,44 @@ public class ProfileInformationStorage {
 	private static void saveHotelDetailToKB(String uid,
 			eu.threecixty.profile.oldmodels.HotelDetail hotelDetail,
 			HotelDetail kbHotelDetail, MyFactory mf) {
-		// TODO Auto-generated method stub
 		if (hotelDetail.getHasAddress() != null) {
 			Address kbAddress = mf.createAddress(PROFILE_URI + uid + "Address" + System.currentTimeMillis());
 			saveAddressToKB(uid, hotelDetail.getHasAddress(), kbAddress, mf);
 			kbHotelDetail.addHas_address(kbAddress);
 		}
-//		if (hotelDetail.get)
+		if (hotelDetail.getHasHotelChains() != null) {
+			Iterator <eu.threecixty.profile.oldmodels.Address> hotelChainAddresses = hotelDetail.getHasHotelChains().iterator();
+			for ( ; hotelChainAddresses.hasNext(); ) {
+				eu.threecixty.profile.oldmodels.Address hotelChainAddress = hotelChainAddresses.next();
+				Address kbHotelChainAddress = mf.createAddress(PROFILE_URI + uid + "HotelChainAddress" + System.currentTimeMillis());
+				saveAddressToKB(uid, hotelChainAddress, kbHotelChainAddress, mf);
+				kbHotelDetail.addHasHotelChains(kbHotelChainAddress);
+			}
+		}
+		if (hotelDetail.getHasHotelPriceHigh() > 0) {
+			kbHotelDetail.addHasHotelPriceHigh(hotelDetail.getHasHotelPriceHigh().floatValue());
+		}
+		if (hotelDetail.getHasHotelPriceLow() > 0) {
+			kbHotelDetail.addHasHotelPriceLow(hotelDetail.getHasHotelPriceLow().floatValue());
+		}
+		if (!isNullOrEmpty(hotelDetail.getHasHotelRoomTypes())) {
+			kbHotelDetail.addHasHotelRoomType(hotelDetail.getHasHotelRoomTypes());
+		}
+		if (hotelDetail.getHasHotelStarCategory() > 0) {
+			kbHotelDetail.addHasHotelStarCategory(hotelDetail.getHasHotelStarCategory());
+		}
+		if (!isNullOrEmpty(hotelDetail.getHasNearbyTransportMode())) {
+			kbHotelDetail.addHasNearByTransportMode(hotelDetail.getHasNearbyTransportMode());
+		}
+		if (hotelDetail.getHasNatureOfPlace() != null) {
+			kbHotelDetail.addHasNatureOfPlace(hotelDetail.getHasNatureOfPlace().toString());
+		}
+		if (!isNullOrEmpty(hotelDetail.getHasPlaceName())) {
+			kbHotelDetail.addHasPlaceName(hotelDetail.getHasPlaceName());
+		}
+		if (hotelDetail.getHasTypeOfFood() != null) {
+			kbHotelDetail.addHasTypeOfFood(hotelDetail.getHasTypeOfFood().toString());
+		}
 	}
 
 	/**
@@ -269,7 +313,7 @@ public class ProfileInformationStorage {
 			kbPlaceDetail.addHasPlaceName(placeDetail.getHasPlaceName());
 		}
 		if (placeDetail.getHasNatureOfPlace() != null) {
-			kbPlaceDetail.addHasNatureOfPlace(NatureOfPlace.valueOf(placeDetail.getHasNatureOfPlace().toString()));
+			kbPlaceDetail.addHasNatureOfPlace(placeDetail.getHasNatureOfPlace().toString());
 		}
 	}
 
@@ -283,21 +327,19 @@ public class ProfileInformationStorage {
 	private static void saveUserEventRatingToKB(String uid,
 			eu.threecixty.profile.oldmodels.UserEventRating userEventRating,
 			UserEnteredRatings kbUserEnteredRatings, MyFactory mf) {
-		String eventRatingName = userEventRating.getHasEventDetail() != null ?
-				userEventRating.getHasEventDetail().getHasEventName() != null ? userEventRating.getHasEventDetail().getHasEventName() + kbUserEnteredRatings.getHasUserEventRating().size() : kbUserEnteredRatings.getHasUserEventRating().size() + "" : kbUserEnteredRatings.getHasUserEventRating().size() + ""; 
-		UserEventRating kbUserEventRating = mf.createUserEventRating(
-				PROFILE_URI + uid + "UserEventRating" + eventRatingName);
+		long time = System.currentTimeMillis();
+		UserEventRating kbUserEventRating = mf.createUserEventRating(PROFILE_URI + uid + "UserEventRating" + time);
 		
 		kbUserEventRating.addHasNumberofTimesVisited(userEventRating.getHasNumberOfTimesVisited());
 		
 		if (userEventRating.getHasEventDetail() != null) {
-			EventDetails kbEventDetail = mf.createEventDetails(PROFILE_URI + uid + "UserEventRating" + eventRatingName + "EventDetails");
+			EventDetails kbEventDetail = mf.createEventDetails(PROFILE_URI + uid + "UserEventRating" +  "EventDetails" + time);
 			saveEventDetailToKB(uid, userEventRating.getHasEventDetail(), kbEventDetail, mf);
 			kbUserEventRating.addHasEventDetail(kbEventDetail);
 		}
 		
 		if (userEventRating.getHasRating() != null) {
-			Rating kbRating = mf.createRating(PROFILE_URI + uid + "UserEventRating" + eventRatingName + "Rating");
+			Rating kbRating = mf.createRating(PROFILE_URI + uid + "UserEventRating" + "Rating" + time);
 			saveRatingToKB(userEventRating.getHasRating(), kbRating, mf);
 			kbUserEventRating.addHasRating(kbRating);
 		}
@@ -339,7 +381,7 @@ public class ProfileInformationStorage {
 			kbEventDetail.addHasEventName(eventDetail.getHasEventName());
 		}
 		if (eventDetail.getHasNatureOfEvent() != null) {
-			kbEventDetail.addHasNatureOfEvent(NatureOfEvent.valueOf(eventDetail.getHasNatureOfEvent().toString()));
+			kbEventDetail.addHasNatureOfEvent(eventDetail.getHasNatureOfEvent().toString());
 		}
 		if (eventDetail.getHasTemporalDetails() != null) {
 			TemporalDetails kbTemporalDetails = mf.createTemporalDetails(PROFILE_URI + uid + "TemporalDetails" + System.currentTimeMillis());
@@ -388,6 +430,9 @@ public class ProfileInformationStorage {
 		if (!isNullOrEmpty(address.getPostalCode())) {
 			kbAddress.addPostal_code(address.getPostalCode());
 		}
+		if (address.getPostOfficeBox() > 0) {
+			kbAddress.addPost_office_box(address.getPostOfficeBox() + "");
+		}
 		if (!isNullOrEmpty(address.getStreetAddress())) {
 			kbAddress.addStreet_address(address.getStreetAddress());
 		}
@@ -395,10 +440,10 @@ public class ProfileInformationStorage {
 			kbAddress.addTownName(address.getTownName());
 		}
 		if (address.getLatitude() > 0) {
-			kbAddress.addLatitude(address.getLatitude());
+			kbAddress.addLatitude((float) address.getLatitude());
 		}
 		if (address.getLongitute() > 0) {
-			kbAddress.addLongitude(address.getLongitute());
+			kbAddress.addLongitude((float) address.getLongitute());
 		}
 	}
 
@@ -410,18 +455,37 @@ public class ProfileInformationStorage {
 	 */
 	private static void saveNameInfoToKB(ProfileInformation profile,
 			UserProfile kbUserProfile, MyFactory mf) {
-		if (!isNullOrEmpty(profile.getLastName())) {
-			Name name = null;
-			if (kbUserProfile.hasHas_name()) {
-				name = (Name) kbUserProfile.getHas_name().iterator().next();
-				kbUserProfile.removeHas_name(name);
-			} else name = mf.createName(PROFILE_URI + profile.getUid() + profile.getLastName());
-			name.addFamily_name(profile.getLastName());
-			if (!isNullOrEmpty(profile.getFirstName())) {
-				name.addGiven_name(profile.getFirstName());
-			}
-			kbUserProfile.addHas_name(name);
+		if (kbUserProfile.hasHas_name()) {
+			WrappedIndividual obj = kbUserProfile.getHas_name().iterator().next();
+			kbUserProfile.removeHas_name(obj);
 		}
+		Name name = mf.createName(PROFILE_URI + profile.getUid() + "Name");
+		if (!isNullOrEmpty(profile.getLastName())) {
+			Iterator <? extends Object> iterators = name.getFamily_name().iterator();
+			List <Object> list = new ArrayList <Object>();
+			for ( ; iterators.hasNext(); ) {
+				list.add(iterators.next());
+			}
+			for (Object obj: list) {
+				name.removeFamily_name(obj);
+			}
+			name.addFamily_name(profile.getLastName());
+			
+		}
+		if (!isNullOrEmpty(profile.getFirstName())) {
+			
+			Iterator <? extends Object> iterators = name.getGiven_name().iterator();
+			List <Object> list = new ArrayList <Object>();
+			for ( ; iterators.hasNext(); ) {
+				list.add(iterators.next());
+			}
+			for (Object obj: list) {
+				name.removeGiven_name(obj);
+			}
+			
+			name.addGiven_name(profile.getFirstName());
+		}
+		kbUserProfile.addHas_name(name);
 	}
 
 	/**
@@ -431,9 +495,13 @@ public class ProfileInformationStorage {
 	 */
 	private static void saveAddressInfoToKB(ProfileInformation profile,
 			UserProfile kbUserProfile, MyFactory mf) {
-		Address addr = null;
-		if (kbUserProfile.hasHas_address()) addr = (Address) kbUserProfile.getHas_address().iterator().next();
-		else addr = mf.createAddress(PROFILE_URI + profile.getUid() + "Address");
+		if (kbUserProfile.hasHas_address()) {
+			WrappedIndividual addrObj = kbUserProfile.getHas_address().iterator().next();
+			kbUserProfile.removeHas_address(addrObj);
+		}
+
+		Address addr = mf.createAddress(PROFILE_URI + profile.getUid() + "Address");
+		kbUserProfile.addHas_address(addr);
 
 		if (!isNullOrEmpty(profile.getCountryName())) {
 			if (addr.hasCountry_name()) {
@@ -472,7 +540,7 @@ public class ProfileInformationStorage {
 	 * @param from
 	 * @param to
 	 */
-	private static void loadUserEnteredRatingFromKBToPI(
+	private static void loadUserEnteredRatingFromKBToPI(MyFactory mf,
 			UserEnteredRatings from, UserEnteredRating to) {
 		Set <eu.threecixty.profile.oldmodels.UserEventRating> toUserEventRatings = new HashSet <eu.threecixty.profile.oldmodels.UserEventRating>();
 		to.setHasUserEventRatin(toUserEventRatings);
@@ -494,7 +562,7 @@ public class ProfileInformationStorage {
 				UserPlaceRating fromUserPlaceRating = fromUserPlaceRatings.next();
 				eu.threecixty.profile.oldmodels.UserPlaceRating toUserPlaceRating = new eu.threecixty.profile.oldmodels.UserPlaceRating();
 				toUserPlaceRatings.add(toUserPlaceRating);
-				loadUserPlaceRatingFromKBToPI(fromUserPlaceRating, toUserPlaceRating);
+				loadUserPlaceRatingFromKBToPI(mf, fromUserPlaceRating, toUserPlaceRating);
 			}
 		}
 		
@@ -506,7 +574,7 @@ public class ProfileInformationStorage {
 				UserHotelRating fromUserHotelRating = fromUserHotelRatings.next();
 				eu.threecixty.profile.oldmodels.UserHotelRating toUserHotelRating = new eu.threecixty.profile.oldmodels.UserHotelRating();
 				toUserHotelRatings.add(toUserHotelRating);
-				loadUserHotelRatingFromKBToPI(fromUserHotelRating, toUserHotelRating);
+				loadUserHotelRatingFromKBToPI(mf, fromUserHotelRating, toUserHotelRating);
 			}
 		}
 	}
@@ -516,7 +584,7 @@ public class ProfileInformationStorage {
 	 * @param fromUserHotelRating
 	 * @param toUserHotelRating
 	 */
-	private static void loadUserHotelRatingFromKBToPI(
+	private static void loadUserHotelRatingFromKBToPI(MyFactory mf,
 			UserHotelRating fromUserHotelRating,
 			eu.threecixty.profile.oldmodels.UserHotelRating toUserHotelRating) {
 		if (fromUserHotelRating.hasHasNumberofTimesVisited()) {
@@ -535,7 +603,7 @@ public class ProfileInformationStorage {
 			HotelDetail fromHotelDetail = fromUserHotelRating.getHasHotelDetail().iterator().next();
 			eu.threecixty.profile.oldmodels.HotelDetail toHotelDetail = new eu.threecixty.profile.oldmodels.HotelDetail();
 			toUserHotelRating.setHasHotelDetail(toHotelDetail);
-			loadHotelDetailFromKBToPI(fromHotelDetail, toHotelDetail);
+			loadHotelDetailFromKBToPI(mf, fromHotelDetail, toHotelDetail);
 		}
 	}
 
@@ -544,10 +612,11 @@ public class ProfileInformationStorage {
 	 * @param fromHotelDetail
 	 * @param toHotelDetail
 	 */
-	private static void loadHotelDetailFromKBToPI(HotelDetail fromHotelDetail,
+	private static void loadHotelDetailFromKBToPI(MyFactory mf, HotelDetail fromHotelDetail,
 			eu.threecixty.profile.oldmodels.HotelDetail toHotelDetail) {
 		if (fromHotelDetail.hasHas_address()) {
-			Address fromAddress = (Address) fromHotelDetail.getHas_address().iterator().next();
+			WrappedIndividual wi = fromHotelDetail.getHas_address().iterator().next();
+			Address fromAddress = mf.getAddress(wi.getOwlIndividual().getIRI().toString());
 			eu.threecixty.profile.oldmodels.Address toAddress = new eu.threecixty.profile.oldmodels.Address();
 			toHotelDetail.setHasAddress(toAddress);
 			loadAddressFromKBToPI(fromAddress, toAddress);
@@ -564,10 +633,12 @@ public class ProfileInformationStorage {
 			}
 		}
 		if (fromHotelDetail.hasHasHotelPriceHigh()) {
-			toHotelDetail.setHasHotelPriceHigh((Double) fromHotelDetail.getHasHotelPriceHigh().iterator().next());
+			toHotelDetail.setHasHotelPriceHigh(Double.parseDouble(
+					fromHotelDetail.getHasHotelPriceHigh().iterator().next().toString()));
 		}
 		if (fromHotelDetail.hasHasHotelPriceLow()) {
-			toHotelDetail.setHasHotelPriceLow((Double) fromHotelDetail.getHasHotelPriceLow().iterator().next());
+			toHotelDetail.setHasHotelPriceLow(Double.parseDouble(
+					fromHotelDetail.getHasHotelPriceLow().iterator().next().toString()));
 		}
 		if (fromHotelDetail.hasHasHotelRoomType()) {
 			toHotelDetail.setHasHotelRoomTypes(fromHotelDetail.getHasHotelRoomType().iterator().next().toString());
@@ -583,7 +654,7 @@ public class ProfileInformationStorage {
 			toHotelDetail.setHasNearbyTransportMode(fromHotelDetail.getHasNearByTransportMode().iterator().next());
 		}
 		if (fromHotelDetail.hasHasPlaceName()) {
-			toHotelDetail.setHasPlaceName(fromHotelDetail.getHasNearByTransportMode().iterator().next());
+			toHotelDetail.setHasPlaceName(fromHotelDetail.getHasPlaceName().iterator().next());
 		}
 		if (fromHotelDetail.hasHasTypeOfFood()) {
 			String tofStr = fromHotelDetail.getHasTypeOfFood().iterator().next().toString();
@@ -596,7 +667,7 @@ public class ProfileInformationStorage {
 	 * @param fromUserPlaceRating
 	 * @param toUserPlaceRating
 	 */
-	private static void loadUserPlaceRatingFromKBToPI(
+	private static void loadUserPlaceRatingFromKBToPI(MyFactory mf,
 			UserPlaceRating fromUserPlaceRating,
 			eu.threecixty.profile.oldmodels.UserPlaceRating toUserPlaceRating) {
 		if (fromUserPlaceRating.hasHasNumberofTimesVisited()) {
@@ -612,7 +683,7 @@ public class ProfileInformationStorage {
 			PlaceDetail fromPlaceDetail = fromUserPlaceRating.getHasPlaceDetail().iterator().next();
 			eu.threecixty.profile.oldmodels.PlaceDetail toPlaceDetail = new eu.threecixty.profile.oldmodels.PlaceDetail();
 			toUserPlaceRating.setHasPlaceDetail(toPlaceDetail);
-			loadPlaceDetailFromKBToPI(fromPlaceDetail, toPlaceDetail);
+			loadPlaceDetailFromKBToPI(mf, fromPlaceDetail, toPlaceDetail);
 		}
 	}
 
@@ -621,10 +692,11 @@ public class ProfileInformationStorage {
 	 * @param fromPlaceDetail
 	 * @param toPlaceDetail
 	 */
-	private static void loadPlaceDetailFromKBToPI(PlaceDetail fromPlaceDetail,
+	private static void loadPlaceDetailFromKBToPI(MyFactory mf, PlaceDetail fromPlaceDetail,
 			eu.threecixty.profile.oldmodels.PlaceDetail toPlaceDetail) {
 		if (fromPlaceDetail.hasHas_address()) {
-			Address fromAddress = (Address) fromPlaceDetail.getHas_address().iterator().next();
+			WrappedIndividual wi = fromPlaceDetail.getHas_address().iterator().next();
+			Address fromAddress = mf.getAddress(wi.getOwlIndividual().getIRI().toString());
 			eu.threecixty.profile.oldmodels.Address toAddress = new eu.threecixty.profile.oldmodels.Address();
 			toPlaceDetail.setHasAddress(toAddress);
 			loadAddressFromKBToPI(fromAddress, toAddress);
@@ -672,7 +744,7 @@ public class ProfileInformationStorage {
 			eu.threecixty.profile.oldmodels.Rating toRating) {
 		if (fromRating.hasHasUserDefinedRating()) {
 			Object objRating = fromRating.getHasUserDefinedRating().iterator().next();
-			toRating.setHasUseDefinedRating((Double) objRating);
+			toRating.setHasUseDefinedRating(Double.parseDouble(objRating.toString()));
 		}
 		if (fromRating.hasHasUserInteractionMode()) {
 			String uimStr = fromRating.getHasUserInteractionMode().iterator().next().toString();
@@ -717,12 +789,12 @@ public class ProfileInformationStorage {
 			TemporalDetails fromTemporalDetails,
 			eu.threecixty.profile.oldmodels.TemporalDetails toTemporalDetails) {
 		if (fromTemporalDetails.hasHasDateFrom()) {
-			Date fromDate = (Date) fromTemporalDetails.getHasDateFrom().iterator().next();
-			toTemporalDetails.setHasDateFrom(fromDate);
+			Object dateObj = fromTemporalDetails.getHasDateFrom().iterator().next();
+			toTemporalDetails.setHasDateFrom(convert(dateObj.toString()));
 		}
 		if (fromTemporalDetails.hasHasDateUntil()) {
-			Date toDate = (Date) fromTemporalDetails.getHasDateUntil().iterator().next();
-			toTemporalDetails.setHasDateUntil(toDate);
+			Object dateObj = fromTemporalDetails.getHasDateUntil().iterator().next();
+			toTemporalDetails.setHasDateUntil(convert(dateObj.toString()));
 		}
 	}
 
@@ -749,10 +821,10 @@ public class ProfileInformationStorage {
 			toAddress.setPostOfficeBox(Long.parseLong(fromAddress.getPost_office_box().iterator().next()));
 		}
 		if (fromAddress.hasLatitude()) {
-			toAddress.setLatitude((Double) fromAddress.getLatitude().iterator().next());
+			toAddress.setLatitude(Double.parseDouble(fromAddress.getLatitude().iterator().next().toString()));
 		}
 		if (fromAddress.hasLongitude()) {
-			toAddress.setLongitute((Double) fromAddress.getLongitude().iterator().next());
+			toAddress.setLongitute(Double.parseDouble(fromAddress.getLongitude().iterator().next().toString()));
 		}
 	}
 
@@ -787,15 +859,15 @@ public class ProfileInformationStorage {
 	 * @param from
 	 * @param to
 	 */
-	private static void loadNameFromKBToPI(UserProfile from,
+	private static void loadNameFromKBToPI(MyFactory mf, String uid, UserProfile from,
 			ProfileInformation to) {
 		if (from.hasHas_name()) {
-			Name name = (Name) from.getHas_name().iterator().next();
-			if (name.hasGiven_name()) {
-			    to.setFirstName(name.getGiven_name().iterator().next().toString());
-			}
+			Name name = mf.getName(PROFILE_URI + uid + "Name");
 			if (name.hasFamily_name()) {
 				to.setLastName(name.getFamily_name().iterator().next().toString());
+			}
+			if (name.hasGiven_name()) {
+				to.setFirstName(name.getGiven_name().iterator().next().toString());
 			}
 		}
 	}
@@ -805,10 +877,10 @@ public class ProfileInformationStorage {
 	 * @param from
 	 * @param to
 	 */
-	private static void loadAddressInfoFromKBToPI(UserProfile from,
+	private static void loadAddressInfoFromKBToPI(MyFactory mf, String uid, UserProfile from,
 			ProfileInformation to) {
 		if (!from.hasHas_address()) return;
-		Address addr = (Address) from.getHas_address().iterator().next();
+		Address addr = mf.getAddress(PROFILE_URI + uid + "Address");
 		if (addr.hasCountry_name()) {
 			Object objCountryName = addr.getCountry_name().iterator().next();
 			to.setCountryName(objCountryName.toString());
@@ -819,11 +891,11 @@ public class ProfileInformationStorage {
 		}
 		if (addr.hasLatitude()) {
 			Object objLatitude = addr.getLatitude().iterator().next();
-			to.setLatitude((Double) objLatitude);
+			to.setLatitude(Double.parseDouble(objLatitude.toString()));
 		}
 		if (addr.hasLongitude()) {
 			Object objLongitude = addr.getLongitude().iterator().next();
-			to.setLongitude((Double) objLongitude);
+			to.setLongitude(Double.parseDouble(objLongitude.toString()));
 		}
 	}
 	
@@ -833,8 +905,8 @@ public class ProfileInformationStorage {
 	 * @return
 	 */
 	private static boolean isNullOrEmpty(String input) {
-		if (input == null || input.equals("")) return false;
-		return true;
+		if (input == null || input.equals("")) return true;
+		return false;
 	}
 
 	/**
@@ -861,6 +933,18 @@ public class ProfileInformationStorage {
 	private static String convert(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		return sdf.format(date);
+	}
+	
+	private static Date convert(String dateStr) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		int index = dateStr.indexOf("\"", 5);
+		if (index < 0) return null;
+		try {
+			return sdf.parse(dateStr.substring(1, index));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static boolean existUID(String uid) {

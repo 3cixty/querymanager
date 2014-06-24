@@ -58,7 +58,7 @@ public class GoogleAccountUtils {
 
             UserProfile userProfile = mf.createUserProfile(PROFILE_URI + user_id);
             userProfile.addHasUID(user_id);
-            Name name = mf.createName(PROFILE_URI + user_id + familyName);
+            Name name = mf.createName(PROFILE_URI + user_id + "Name");
             name.addFamily_name(familyName);
             name.addGiven_name(givenName);
             userProfile.addHas_name(name);
