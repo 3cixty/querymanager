@@ -226,10 +226,10 @@ public class TrayStorage {
 	}
 	
 	private static String getContent() {
-		if (path == null) return "";
+		if (path == null) return "[]";
 		StringBuffer buffer = new StringBuffer();
 		File file = new File(path + "/" + TRAY_FILENAME);
-		if (!file.exists()) return buffer.toString();
+		if (!file.exists()) return "[]";
 		FileInputStream input = null;
 		try {
 			input = new FileInputStream(file);
@@ -248,6 +248,7 @@ public class TrayStorage {
 					e.printStackTrace();
 				}
 		}
+		if (buffer.length() == 0) return "[]";
 		return buffer.toString();
 	}
 

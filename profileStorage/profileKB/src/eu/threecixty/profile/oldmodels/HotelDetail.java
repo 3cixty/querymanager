@@ -3,8 +3,6 @@ package eu.threecixty.profile.oldmodels;
 import java.util.Set;
 
 import eu.threecixty.profile.annotations.Description;
-import eu.threecixty.profile.annotations.Exists;
-import eu.threecixty.profile.annotations.Uses;
 
 /**
  * Hotel Details
