@@ -498,6 +498,15 @@
     
 
 
+    <!-- http://www.eu.3cixty.org/profile#hasTrayItem -->
+
+    <owl:ObjectProperty rdf:about="&profile;hasTrayItem">
+        <rdfs:range rdf:resource="&profile;Tray"/>
+        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.eu.3cixty.org/profile#hasTrip -->
 
     <owl:ObjectProperty rdf:about="&profile;hasTrip">
@@ -624,6 +633,26 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#attended -->
+
+    <owl:DatatypeProperty rdf:about="&profile;attended">
+        <rdfs:comment>whether or not the item was attended</rdfs:comment>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#dateTimeAttended -->
+
+    <owl:DatatypeProperty rdf:about="&profile;dateTimeAttended">
+        <rdfs:comment>time when the item was attended</rdfs:comment>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
+        <rdfs:range rdf:resource="&xsd;long"/>
+    </owl:DatatypeProperty>
     
 
 
@@ -3068,6 +3097,7 @@
     <owl:DatatypeProperty rdf:about="&profile;hasSource">
         <rdfs:comment>has source url</rdfs:comment>
         <rdfs:domain rdf:resource="&profile;ProfileIdentities"/>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3654,6 +3684,7 @@
         <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
         <rdfs:domain rdf:resource="&profile;QueryHistory"/>
         <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
         <rdfs:domain rdf:resource="&profile;UserProfile"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
@@ -3675,6 +3706,7 @@
     <owl:DatatypeProperty rdf:about="&profile;hasUserDefinedRating">
         <rdfs:comment>Rating given by User  on scale of 1 to 10</rdfs:comment>
         <rdfs:domain rdf:resource="&profile;Rating"/>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3817,6 +3849,48 @@
     
 
 
+    <!-- http://www.eu.3cixty.org/profile#itemID -->
+
+    <owl:DatatypeProperty rdf:about="&profile;itemID">
+        <rdfs:comment>item id of the item in the tray</rdfs:comment>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#itemType -->
+
+    <owl:DatatypeProperty rdf:about="&profile;itemType">
+        <rdfs:comment>type of the item</rdfs:comment>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="&rdf;List"/>
+                        <rdf:first>event</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="&rdf;List"/>
+                                <rdf:first>poi</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="&rdf;List"/>
+                                        <rdf:first>transportation</rdf:first>
+                                        <rdf:rest rdf:resource="&rdf;nil"/>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.eu.3cixty.org/profile#middleName -->
 
     <owl:DatatypeProperty rdf:about="&profile;middleName">
@@ -3833,6 +3907,16 @@
         <rdfs:comment>user Input query</rdfs:comment>
         <rdfs:domain rdf:resource="&profile;QueryHistory"/>
         <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#timestamp -->
+
+    <owl:DatatypeProperty rdf:about="&profile;timestamp">
+        <rdfs:comment>time when the item is stored</rdfs:comment>
+        <rdfs:domain rdf:resource="&profile;Tray"/>
+        <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
 
@@ -4328,6 +4412,12 @@
     <owl:Class rdf:about="&profile;Transport">
         <rdfs:comment>Using this class one can request for example a list of trip (including rich details) made by a user, a list of the modalities frequently used by a user (including usage statistics), or favorite places of a user (including visit statistics).</rdfs:comment>
     </owl:Class>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#Tray -->
+
+    <owl:Class rdf:about="&profile;Tray"/>
     
 
 
