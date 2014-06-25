@@ -10,12 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 
+import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 
 import eu.threecixty.profile.GoogleAccountUtils;
@@ -57,37 +60,23 @@ public class QueryManagerServices {
 	@GET
 	@Path("/getAggregatedItems/{group}")
 	@Produces("text/plain")
-	public String getAggregatedItems(@PathParam("group") String group) {
-		return getAggregatedItems(group, 0, 20, null, null, null, null);
-	}
-
-	@GET
-	@Path("/getAggregatedItems/{group}/{offset}/{limit}")
-	@Produces("text/plain")
-	public String getAggregatedItems(@PathParam("group") String group, @PathParam("offset") int offset,
-			@PathParam("limit") int limit) {
-		return getAggregatedItems(group, offset, limit, null, null, null, null);
-	}
-
-	@GET
-	@Path("/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}")
-	@Produces("text/plain")
-	public String getAggregatedItems(@PathParam("group") String group, @PathParam("offset") int offset,
-			@PathParam("limit") int limit, @PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-		return getAggregatedItems(group, offset, limit, groupname1, groupvalue1, null, null);
-	}
-
-	@GET
-	@Path("/getAggregatedItems/{group}/{offset}/{limit}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
-	@Produces("text/plain")
-	public String getAggregatedItems(@PathParam("group") String group, @PathParam("offset") int offset,
-			@PathParam("limit") int limit, @PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
-			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
+	public String getAggregatedItems(@PathParam("group") String group, @DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("{}") @QueryParam("filter1") String filter1,
+			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
 		if (groupTriples.containsKey(group)) {
-			boolean existed1 = groupTriples.containsKey(groupname1);
-			boolean existed2 = groupTriples.containsKey(groupname2);
-			String query = createGroupQuery(group, offset, limit, existed1 ? groupname1 : null, groupvalue1,
-					existed2 ? groupname2 : null, groupvalue2);
+			Gson gson = new Gson();
+			KeyValuePair pair1 = null;
+			KeyValuePair pair2 = null;
+			try {
+				pair1 = gson.fromJson(filter1, KeyValuePair.class);
+			} catch (Exception e) {}
+			try {
+				pair2 = gson.fromJson(filter2, KeyValuePair.class);
+			} catch (Exception e) {}
+			boolean existed1 = pair1 != null && pair1.getGroupBy() != null && groupTriples.containsKey(pair1.getGroupBy());
+			boolean existed2 = pair2 != null && pair2.getGroupBy() != null && groupTriples.containsKey(pair2.getGroupBy());
+			String query = createGroupQuery(group, offset, limit, existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
+					existed2 ? pair2.getGroupBy() : null, pair2.getValue());
 			QueryManager qm = new QueryManager("false");
 			return executeQuery(null, qm, query, null);
 		}
@@ -97,82 +86,11 @@ public class QueryManagerServices {
 	@GET
 	@Path("/getItems")
 	@Produces("text/plain")
-	public String getItems() {
-		return getItems("false");
-	}
-
-	@GET
-	@Path("/getItems/{accessToken}")
-	@Produces("text/plain")
-	public String getItems(@PathParam("accessToken") String accessToken) {
-		return getItems(accessToken, null);
-	}
-	
-	@GET
-	@Path("/getItems/{accessToken}/{filter}")
-	@Produces("text/plain")
-	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter) {
-		return getItems(accessToken, 0, 20, filter);
-	}
-	
-	@GET
-	@Path("/getItems/{accessToken}/{offset}/{limit}/{filter}")
-	@Produces("text/plain")
-	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
-			@PathParam("limit") int limit, @PathParam("filter") String filter) {
-		return getItems(accessToken, offset, limit, filter, null, null, null, null);
-	}
-
-	@GET
-	@Path("/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}")
-	@Produces("text/plain")
-	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
-			@PathParam("limit") int limit, @PathParam("filter") String filter,
-			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-		return getItems(accessToken, offset, limit, filter, groupname1, groupvalue1, null, null);
-	}
-
-//	@GET
-//	@Path("/getItems/{accessToken}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
-//	@Produces("text/plain")
-//	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter,
-//			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
-//			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
-//		return getItems(accessToken, 0, 20, filter, groupname1, groupvalue1, groupname2, groupvalue2);
-//	}
-//
-//	@GET
-//	@Path("/getItems/{accessToken}/{filter}/{groupname1}/{groupvalue1}")
-//	@Produces("text/plain")
-//	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("filter") String filter,
-//			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-//		return getItems(accessToken, filter, groupname1, groupvalue1, null, null);
-//	}
-//
-//	@GET
-//	@Path("/getItems/{accessToken}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
-//	@Produces("text/plain")
-//	public String getItems(@PathParam("accessToken") String accessToken,
-//			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
-//			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
-//		return getItems(accessToken, 0, 20, null, groupname1, groupvalue1, groupname2, groupvalue2);
-//	}
-//
-//	@GET
-//	@Path("/getItems/{accessToken}/{groupname1}/{groupvalue1}")
-//	@Produces("text/plain")
-//	public String getItems(@PathParam("accessToken") String accessToken,
-//			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1) {
-//		return getItems(accessToken, groupname1, groupvalue1, null, null);
-//	}
-
-	@GET
-	@Path("/getItems/{accessToken}/{offset}/{limit}/{filter}/{groupname1}/{groupvalue1}/{groupname2}/{groupvalue2}")
-	@Produces("text/plain")
-	public String getItems(@PathParam("accessToken") String accessToken, @PathParam("offset") int offset,
-			@PathParam("limit") int limit, @PathParam("filter") String filter,
-			@PathParam("groupname1") String groupname1, @PathParam("groupvalue1") String groupvalue1,
-			@PathParam("groupname2") String groupname2, @PathParam("groupvalue2") String groupvalue2) {
+	public String getItems(@DefaultValue("false") @QueryParam("accessToken") String accessToken,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
+			@DefaultValue("{}") @QueryParam("filter1") String filter1,
+			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
 
 	    IProfiler profiler = null;
 		boolean isAccessTokenFalse = "false".equals(accessToken);
@@ -184,12 +102,26 @@ public class QueryManagerServices {
 		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 		} else {
+			Gson gson = new Gson();
+			KeyValuePair pair1 = null;
+			KeyValuePair pair2 = null;
+			try {
+				pair1 = gson.fromJson(filter1, KeyValuePair.class);
+			} catch (Exception e) {}
+			try {
+				pair2 = gson.fromJson(filter2, KeyValuePair.class);
+			} catch (Exception e) {}
+			
 			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
 			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
 
-			String query = createSelectSparqlQuery(offset, limit, groupname1, groupvalue1, groupname2, groupvalue2);
+			String query = createSelectSparqlQuery(offset, limit,
+					(pair1 == null ? null : pair1.getGroupBy()),
+					(pair1 == null ? null : pair1.getValue()),
+					(pair2 == null ? null : pair2.getGroupBy()),
+					(pair2 == null ? null : pair2.getValue()));
 
-			String result = executeQuery(profiler, qm, query, filter);
+			String result = executeQuery(profiler, qm, query, preference);
 			return result;
 		}
 	}
