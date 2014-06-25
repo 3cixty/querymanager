@@ -569,7 +569,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the object property AGENT.<p>
      * 
      */
-    public static final OWLObjectProperty OBJECT_PROPERTY_AGENT = factory.getOWLObjectProperty(IRI.create("http://purl.org/NET/c4dm/event.owl#agent"));
+//    public static final OWLObjectProperty OBJECT_PROPERTY_AGENT = factory.getOWLObjectProperty(IRI.create("http://purl.org/NET/c4dm/event.owl#agent"));
 
     /* ***************************************************
      * Object Property http://purl.org/NET/cidoc-crm/core#P11_had_participant
@@ -1759,7 +1759,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the object property ACCOUNT.<p>
      * 
      */
-    public static final OWLObjectProperty OBJECT_PROPERTY_ACCOUNT = factory.getOWLObjectProperty(IRI.create("http://xmlns.com/foaf/0.1/holdsAccount"));
+//    public static final OWLObjectProperty OBJECT_PROPERTY_ACCOUNT = factory.getOWLObjectProperty(IRI.create("http://xmlns.com/foaf/0.1/holdsAccount"));
 
     /* ***************************************************
      * Object Property http://xmlns.com/foaf/0.1/homepage
@@ -1839,7 +1839,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the object property LOGO.<p>
      * 
      */
-    public static final OWLObjectProperty OBJECT_PROPERTY_LOGO = factory.getOWLObjectProperty(IRI.create("http://xmlns.com/foaf/0.1/logo"));
+//    public static final OWLObjectProperty OBJECT_PROPERTY_LOGO = factory.getOWLObjectProperty(IRI.create("http://xmlns.com/foaf/0.1/logo"));
 
     /* ***************************************************
      * Object Property http://xmlns.com/foaf/0.1/made
@@ -2779,7 +2779,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the data property HASNUMBEROFTIMESVISITED.<p>
      * 
      */
-    public static final OWLDataProperty DATA_PROPERTY_HASNUMBEROFTIMESVISITED = factory.getOWLDataProperty(IRI.create("http://www.eu.3cixty.org/profile#hasNumberOfTimesVisited"));
+//    public static final OWLDataProperty DATA_PROPERTY_HASNUMBEROFTIMESVISITED = factory.getOWLDataProperty(IRI.create("http://www.eu.3cixty.org/profile#hasNumberOfTimesVisited"));
 
     /* ***************************************************
      * Data Property http://www.eu.3cixty.org/profile#hasNumberofTimesVisited
@@ -3949,7 +3949,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the data property FAMILY_NAME.<p>
      * 
      */
-    public static final OWLDataProperty DATA_PROPERTY_FAMILY_NAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/family_name"));
+//    public static final OWLDataProperty DATA_PROPERTY_FAMILY_NAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/family_name"));
 
     /* ***************************************************
      * Data Property http://xmlns.com/foaf/0.1/firstName
@@ -3989,7 +3989,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the data property GIVEN_NAME.<p>
      * 
      */
-    public static final OWLDataProperty DATA_PROPERTY_GIVEN_NAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/givenName"));
+//    public static final OWLDataProperty DATA_PROPERTY_GIVEN_NAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/givenName"));
 
     /* ***************************************************
      * Data Property http://xmlns.com/foaf/0.1/givenname
@@ -3999,7 +3999,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the data property GIVEN_NAME.<p>
      * 
      */
-    public static final OWLDataProperty DATA_PROPERTY_GIVEN_NAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/givenname"));
+//    public static final OWLDataProperty DATA_PROPERTY_GIVEN_NAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/givenname"));
 
     /* ***************************************************
      * Data Property http://xmlns.com/foaf/0.1/icqChatID
@@ -4079,7 +4079,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the data property NICKNAME.<p>
      * 
      */
-    public static final OWLDataProperty DATA_PROPERTY_NICKNAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/nick"));
+//    public static final OWLDataProperty DATA_PROPERTY_NICKNAME = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/nick"));
 
     /* ***************************************************
      * Data Property http://xmlns.com/foaf/0.1/plan
@@ -4099,7 +4099,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the data property SHA1SUM_(HEX).<p>
      * 
      */
-    public static final OWLDataProperty DATA_PROPERTY_SHA1SUM_(HEX) = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/sha1"));
+//    public static final OWLDataProperty DATA_PROPERTY_SHA1SUM_(HEX) = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/sha1"));
 
     /* ***************************************************
      * Data Property http://xmlns.com/foaf/0.1/skypeID
@@ -4139,7 +4139,7 @@ public class Vocabulary {
      * A constant to give access to the Manchester OWL API representation of the data property TITLE.<p>
      * 
      */
-    public static final OWLDataProperty DATA_PROPERTY_TITLE = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/title"));
+//    public static final OWLDataProperty DATA_PROPERTY_TITLE = factory.getOWLDataProperty(IRI.create("http://xmlns.com/foaf/0.1/title"));
 
     /* ***************************************************
      * Data Property http://xmlns.com/foaf/0.1/yahooChatID
