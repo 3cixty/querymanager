@@ -54,7 +54,10 @@ public class TrayServlet extends HttpServlet {
 				if (!addTrayElement(req)) {
 					resp.setStatus(ADD_ERROR);
 					out.write(ADD_EXCEPTION_MSG);
-				} else resp.setStatus(OK_CODE);
+				} else {
+					resp.setStatus(OK_CODE);
+					out.write("OK");
+				}
 			} else if (action.equals("get_tray_elements")) {
 				List <Tray> trays = getTrayElements(req);
 				if (trays == null) {
