@@ -26,12 +26,6 @@ public class TrayServlet extends HttpServlet {
 	private static final String TOKEN_PARAM = "token";
 	private static final String SOURCE_PARAM = "source";
 	
-	private static final int ADD_ERROR = 401;
-	private static final int LIST_ERROR = 402;
-	private static final int LOGIN_ERROR = 403;
-	private static final int CLEAN_ERROR = 404;
-	private static final int UPDATE_ERROR = 405;
-	
 	private static final String ADD_EXCEPTION_MSG = "Invalid parameters or duplicated tray items";
 	
 	private static final String LIST_EXCEPTION_MSG = "Invalid parameters";
@@ -52,7 +46,7 @@ public class TrayServlet extends HttpServlet {
 		if (action != null) {
 			if (action.equals("add_tray_element")) {
 				if (!addTrayElement(req)) {
-					resp.setStatus(ADD_ERROR);
+					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					out.write(ADD_EXCEPTION_MSG);
 				} else {
 					resp.setStatus(OK_CODE);
@@ -61,7 +55,7 @@ public class TrayServlet extends HttpServlet {
 			} else if (action.equals("get_tray_elements")) {
 				List <Tray> trays = getTrayElements(req);
 				if (trays == null) {
-					resp.setStatus(LIST_ERROR);
+					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					out.write(LIST_EXCEPTION_MSG);
 				} else {
 					resp.setStatus(OK_CODE);
@@ -72,7 +66,7 @@ public class TrayServlet extends HttpServlet {
 			} else if (action.equals("login_tray")) {
 				List <Tray> trays = loginTray(req);
 				if (trays == null) {
-					resp.setStatus(LOGIN_ERROR);
+					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				} else {
 					resp.setStatus(OK_CODE);
 					Gson gson = new Gson();
@@ -81,16 +75,22 @@ public class TrayServlet extends HttpServlet {
 				}
 			} else if (action.equals("empty_tray")) {
 				if (!cleanTrays(req)) {
-					resp.setStatus(CLEAN_ERROR);
+					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				} else resp.setStatus(OK_CODE);
 			} else if (action.equals("update_tray_element")) {
 				if (!updateTray(req)) {
-					resp.setStatus(UPDATE_ERROR);
+					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				} else resp.setStatus(OK_CODE);
 			}
 			
 		}
 		out.close();
+	}
+	
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		doPost(req, resp);
 	}
 	
 	private boolean updateTray(HttpServletRequest req) {
