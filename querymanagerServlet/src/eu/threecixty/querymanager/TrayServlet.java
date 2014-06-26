@@ -97,7 +97,7 @@ public class TrayServlet extends HttpServlet {
 		if (itemTypeStr == null || itemTypeStr.equals("")) return false;
 		ItemType itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
 		String token = req.getParameter("token");
-		String uid = GoogleAccountUtils.updateInfo(token);
+		String uid = GoogleAccountUtils.getUID(token);
 		String source = req.getParameter("source");
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
@@ -141,7 +141,7 @@ public class TrayServlet extends HttpServlet {
 	private boolean cleanTrays(HttpServletRequest req) {
 		String token = req.getParameter("token");
 		if (token == null || token.equals("")) return false;
-		String uid = GoogleAccountUtils.updateInfo(token);
+		String uid = GoogleAccountUtils.getUID(token);
 		if (uid == null || uid.equals("")) {
 			return TrayStorage.cleanTrays(token);
 		}
@@ -152,7 +152,7 @@ public class TrayServlet extends HttpServlet {
 		String junkToken = req.getParameter("junk_token");
 		if (junkToken == null || junkToken.equals("")) return null;
 		String googleToken = req.getParameter("google_token");
-		String uid = GoogleAccountUtils.updateInfo(googleToken);
+		String uid = GoogleAccountUtils.getUID(googleToken);
 		if (uid == null || uid.equals("")) return null;
 		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
 		return TrayStorage.getTrays(uid, 0, 100, OrderType.Desc, true);
@@ -160,7 +160,7 @@ public class TrayServlet extends HttpServlet {
 
 	private List<Tray> getTrayElements(HttpServletRequest req) {
 		String accessToken = req.getParameter("google_token");
-		String uid = GoogleAccountUtils.updateInfo(accessToken);
+		String uid = GoogleAccountUtils.getUID(accessToken);
 
 		String offsetStr = req.getParameter("offset");
 		int offset = (offsetStr == null) ? 0 : Integer.parseInt(offsetStr);
@@ -201,7 +201,7 @@ public class TrayServlet extends HttpServlet {
 		tray.setSource(source);
 		tray.setTimestamp(System.currentTimeMillis());
 		
-		String uid = GoogleAccountUtils.updateInfo(token);
+		String uid = GoogleAccountUtils.getUID(token);
 		if (uid == null || uid.equals("")) {
 			tray.setUid(token);
 		} else {

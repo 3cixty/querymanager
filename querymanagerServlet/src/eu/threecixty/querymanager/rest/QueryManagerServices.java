@@ -96,7 +96,7 @@ public class QueryManagerServices {
 		boolean isAccessTokenFalse = "false".equals(accessToken);
 		String user_id =  null;
 		if (!isAccessTokenFalse) {
-			user_id = GoogleAccountUtils.updateInfo(accessToken); // which corresponds with Google user_id (from Google account)
+			user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
 		}
 		
 		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {

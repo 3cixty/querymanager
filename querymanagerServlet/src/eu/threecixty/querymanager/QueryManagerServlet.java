@@ -60,7 +60,7 @@ public class QueryManagerServlet extends HttpServlet {
 		boolean isAccessTokenFalse = "false".equals(userkey);
 		String user_id =  null;
 		if (!isAccessTokenFalse) {
-			user_id = GoogleAccountUtils.updateInfo(userkey); // which corresponds with Google user_id (from Google account)
+			user_id = GoogleAccountUtils.getUID(userkey); // which corresponds with Google user_id (from Google account)
 		}
 		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

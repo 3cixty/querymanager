@@ -1,17 +1,18 @@
 package eu.threecixty.querymanager;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.SettingsStorage;
@@ -29,6 +30,8 @@ public class SettingsServlet extends HttpServlet {
 	private static final long serialVersionUID = -3598054909867424454L;
 	
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
+	private static final String FIRST_NAME_PARAM = "firstName";
+	private static final String LAST_NAME_PARAM = "lastName";
 	private static final String TOWN_NAME_PARAM = "townName";
 	private static final String COUNTRY_NAME_PARAM = "countryName";
 	private static final String LAT_PARAM = "lat";
@@ -40,22 +43,30 @@ public class SettingsServlet extends HttpServlet {
 	private static final String PROFILE_IDENTITIES_SOURCE_PARAM = "pi_source";
 	private static final String PROFILE_IDENTITIES_ACCOUNT_ID_PARAM = "pi_id";
 	private static final String PROFILE_IDENTITIES_ACCESS_TOKEN_PARAM = "pi_at";
-//	private static final String PROFILE_IDENTITIES_SERVICE_PROVIDER_PARAM = "pi_provider";
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		PrintWriter out = resp.getWriter();
-		
 		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
-		String uid = GoogleAccountUtils.updateInfo(userkey);
+		HttpSession session = req.getSession();
+		String uid = null;
+		if (session.getAttribute(userkey) != null) {
+			uid = (String) session.getAttribute("uid");
+		} else {
+			uid = GoogleAccountUtils.getUID(userkey);
+		}
 		if (!uid.equals("")) { // for a valid access token
-			
 			ThreeCixtySettings settings = SettingsStorage.load(uid);
 			if (settings == null) {
 				settings = new ThreeCixtySettings();
 				settings.setUid(uid);
 			}
+			
+			String firstName = req.getParameter(FIRST_NAME_PARAM);
+			if (isNotNullOrEmpty(firstName)) settings.setFirstName(firstName);
+
+			String lastName = req.getParameter(LAST_NAME_PARAM);
+			if (isNotNullOrEmpty(lastName)) settings.setLastName(lastName);
 			
 			String townName = req.getParameter(TOWN_NAME_PARAM);
 			if (isNotNullOrEmpty(townName)) settings.setTownName(townName);
@@ -69,9 +80,46 @@ public class SettingsServlet extends HttpServlet {
 			addProfileIdentities(req, settings);
 
 			SettingsStorage.save(settings);
+
+			resp.sendRedirect("./settingsServlet?accessToken=" + userkey);
+			
 		}
 		
-		out.close();
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
+		HttpSession session = req.getSession();
+		String uid = null;
+		if (session.getAttribute(userkey) != null) {
+			uid = (String) session.getAttribute("uid");
+		} else {
+			uid = GoogleAccountUtils.getUID(userkey);
+		}
+		if (!uid.equals("")) { // for a valid access token
+			session.setAttribute(userkey, true);
+			session.setAttribute("uid", uid);
+			ThreeCixtySettings settings = SettingsStorage.load(uid);
+			req.setAttribute("settings", settings);
+			req.setAttribute(ACCESS_TOKEN_PARAM, userkey);
+			
+            try {
+                RequestDispatcher rd = getServletContext().getRequestDispatcher("/settings.jsp");
+                rd.forward(req, resp);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+		} else {
+            try {
+                RequestDispatcher rd = getServletContext().getRequestDispatcher("/error.jsp");
+                rd.forward(req, resp);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+		}
 	}
 
 	/**
@@ -114,8 +162,7 @@ public class SettingsServlet extends HttpServlet {
 	 */
 	private void addProfileIdentities(String source, String accountId,
 			String accessToken, ThreeCixtySettings settings) {
-		if (!isNotNullOrEmpty(source) || !isNotNullOrEmpty(accountId)
-				|| !isNotNullOrEmpty(accessToken)) return;
+		if (!isNotNullOrEmpty(source) || !isNotNullOrEmpty(accountId)) return;
 		List <ProfileIdentities> profileIdentities = settings.getIdentities();
 		if (profileIdentities == null) profileIdentities = new ArrayList <ProfileIdentities>();
 		ProfileIdentities tmpProfile = new ProfileIdentities();
@@ -173,13 +220,6 @@ public class SettingsServlet extends HttpServlet {
 		}
 		
 		settings.setEventDetailPreference(edp);
-	}
-
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//doPost(req, resp);
 	}
 
 	/**
