@@ -1,0 +1,14 @@
+
+input[type="text"] {
+	width: 480px;
+	font-size: 13px;
+}
+
+input:required {
+  background: red;
+}
+
+span {
+	display: inline-block;
+	width: 150px;
+}
