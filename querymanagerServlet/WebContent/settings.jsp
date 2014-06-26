@@ -59,8 +59,28 @@ Disclaimer: The information marked by red star are required. For Mobidot account
 <div style="height: 10px;"></div>
 <div align="center" style="width: 630px;" >
     <input type="submit" value="Save">
-    <input type="button" value="Cancel">
+    <input type="button" value="Cancel" onclick="reset();">
 </div>
 </form>
+
+<script type="text/javascript">
+    function reset() {
+    	var firstName = document.getElementById("firstName");
+    	firstName.value = "<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>";
+    	var lastName = document.getElementById("lastName");
+    	lastName.value = "<%=settings.getLastName() == null ? "" : settings.getLastName()%>";
+    	var countryName = document.getElementById("countryName");
+    	countryName.value = "<%=settings.getCountryName() == null ? "" : settings.getCountryName()%>";
+    	var townName = document.getElementById("townName");
+    	townName.value = "<%=settings.getTownName() == null ? "" : settings.getTownName()%>";
+    	var lat = document.getElementById("lat");
+    	lat.value = "<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>";
+    	var lon = document.getElementById("lon");
+    	lon.value = "<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>";
+    	var pi_id = document.getElementById("pi_id");
+    	pi_id.value = "<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>";
+    }
+</script>
+
 </body>
 </html>

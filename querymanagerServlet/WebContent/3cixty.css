@@ -4,8 +4,11 @@ input[type="text"] {
 	font-size: 13px;
 }
 
-input:required {
-  background: red;
+input:valid {
+	background: white;
+}
+input:invalid {
+	background: red;
 }
 
 span {
