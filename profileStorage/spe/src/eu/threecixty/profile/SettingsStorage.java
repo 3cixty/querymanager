@@ -4,8 +4,10 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
+import org.protege.owl.codegeneration.WrappedIndividual;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -17,10 +19,12 @@ import org.semanticweb.owlapi.vocab.XSDVocabulary;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDatatypeImpl;
 
+
 import eu.threecixty.models.Address;
 import eu.threecixty.models.EventDetailPreference;
 import eu.threecixty.models.EventPreference;
 import eu.threecixty.models.MyFactory;
+import eu.threecixty.models.Name;
 import eu.threecixty.models.Preference;
 import eu.threecixty.models.ProfileIdentities;
 import eu.threecixty.models.UserProfile;
@@ -37,10 +41,12 @@ public class SettingsStorage {
 	 * Saves given settings information into KB.
 	 * @param settings
 	 */
-	public static void save(ThreeCixtySettings settings) {
+	public synchronized static void save(ThreeCixtySettings settings) {
 		if (settings == null) return;
 		try {
 
+//			addAddressInfoAndNameIntoUserProfile(settings);
+			
 			MyFactory mf = getMyFactory();
 			String uid = settings.getUid();
 			
@@ -48,9 +54,9 @@ public class SettingsStorage {
 
 			if (userProfile == null) return;
 			
+			saveNameInfoToKB(settings, userProfile, mf);
+			saveAddressInfoToKB(settings, userProfile, mf);
 			addProfileIdentitiesIntoUserProfile(settings, mf, userProfile);
-			
-			addAddressInfoIntoUserProfile(settings, mf, userProfile);
 
 			addEventPreferenceInfoIntoUserProfile(settings, mf, userProfile);
 
@@ -65,7 +71,7 @@ public class SettingsStorage {
 	 * @param uid
 	 * @return
 	 */
-	public static ThreeCixtySettings load(String uid) {
+	public synchronized static ThreeCixtySettings load(String uid) {
 		if (!isNotNullOrEmpty(uid)) return null;
 		try {
 			MyFactory mf = getMyFactory();
@@ -78,7 +84,9 @@ public class SettingsStorage {
 			
 			loadProfileIdentitiesFromUserProfile(userProfile, settings);
 			
-			loadAddressInfoFromUserProfile(userProfile, settings);
+			loadNameFromKBToPI(mf, uid, userProfile, settings);
+			loadAddressInfoFromKBToPI(mf, uid, userProfile, settings);
+			//loadAddressInfoAndNameFromUserProfile(uid, settings);
 
 			loadEventPreferenceFromUserProfile(userProfile, settings);
 			return settings;
@@ -112,6 +120,7 @@ public class SettingsStorage {
 				tmpProfile.setHasUserInteractionMode(eu.threecixty.profile.oldmodels.UserInteractionMode.valueOf(
 						pi.getHasUserInteractionMode().iterator().next().toString()));
 			}
+			oldProfiles.add(tmpProfile);
 		}
 	}
 
@@ -229,44 +238,142 @@ public class SettingsStorage {
 		settings.setEventDetailPreference(oldEdp);
 	}
 	
+//	/**
+//	 * Loads address information from KB (user profile).
+//	 * @param settings
+//	 * @param userProfile
+//	 */
+//	private static void loadAddressInfoAndNameFromUserProfile(String uid, ThreeCixtySettings settings) {
+//		ProfileInformation profileInformation = ProfileInformationStorage.loadProfile(uid);
+//		if (profileInformation == null) return;
+//		
+//		if (isNotNullOrEmpty(profileInformation.getFirstName())) settings.setFirstName(profileInformation.getFirstName());
+//		if (isNotNullOrEmpty(profileInformation.getLastName())) settings.setLastName(profileInformation.getLastName());
+//		
+//		if (isNotNullOrEmpty(profileInformation.getCountryName())) settings.setCountryName(profileInformation.getCountryName());
+//		if (isNotNullOrEmpty(profileInformation.getTownName())) settings.setTownName(profileInformation.getTownName());
+//		if (profileInformation.getLatitude() > 0) settings.setCurrentLatitude(profileInformation.getLatitude());
+//		if (profileInformation.getLongitude() > 0) settings.setCurrentLongitude(profileInformation.getLongitude());
+//	}
+//
+//	/**
+//	 * Adds address information into KB.
+//	 * @param settings
+//	 */
+//	private synchronized static void addAddressInfoAndNameIntoUserProfile(ThreeCixtySettings settings) {
+//		ProfileInformation profileInformation = new ProfileInformation();
+//		profileInformation.setUid(settings.getUid());
+//		
+//		if (isNotNullOrEmpty(settings.getFirstName())) profileInformation.setFirstName(settings.getFirstName());
+//		if (isNotNullOrEmpty(settings.getLastName())) profileInformation.setLastName(settings.getLastName());
+//		
+//		if (isNotNullOrEmpty(settings.getCountryName())) profileInformation.setCountryName(settings.getCountryName());
+//		if (isNotNullOrEmpty(settings.getTownName())) profileInformation.setTownName(settings.getTownName());
+//		if (settings.getCurrentLatitude() > 0) profileInformation.setLatitude(settings.getCurrentLatitude());
+//		if (settings.getCurrentLongitude() > 0) profileInformation.setLongitude(settings.getCurrentLongitude());
+//		ProfileInformationStorage.saveProfile(profileInformation);
+//	}
+	
+	/**
+	 * Loads first name and last name from KB to profile information.
+	 * @param from
+	 * @param to
+	 */
+	private static void loadNameFromKBToPI(MyFactory mf, String uid, UserProfile from,
+			ThreeCixtySettings to) {
+		if (from.hasHas_name()) {
+			Name name = mf.getName(PROFILE_URI + uid + "Name");
+			if (name.hasFamily_name()) {
+				to.setLastName(name.getFamily_name().iterator().next().toString());
+			}
+			if (name.hasGiven_name()) {
+				to.setFirstName(name.getGiven_name().iterator().next().toString());
+			}
+		}
+	}
+	
 	/**
 	 * Loads address information from KB (user profile).
-	 * @param settings
-	 * @param userProfile
+	 * @param from
+	 * @param to
 	 */
-	private static void loadAddressInfoFromUserProfile(UserProfile userProfile,
-			ThreeCixtySettings settings) {
-		if (!userProfile.hasHas_address()) return;
-		Address addr = (Address) userProfile.getHas_address().iterator().next();
+	private static void loadAddressInfoFromKBToPI(MyFactory mf, String uid, UserProfile from,
+			ThreeCixtySettings to) {
+		if (!from.hasHas_address()) return;
+		Address addr = mf.getAddress(PROFILE_URI + uid + "Address");
 		if (addr.hasCountry_name()) {
 			Object objCountryName = addr.getCountry_name().iterator().next();
-			settings.setCountryName(objCountryName.toString());
+			to.setCountryName(objCountryName.toString());
 		}
 		if (addr.hasTownName()) {
 			String objTownName = addr.getTownName().iterator().next();
-			settings.setTownName(objTownName.toString());
+			to.setTownName(objTownName.toString());
 		}
 		if (addr.hasLatitude()) {
 			Object objLatitude = addr.getLatitude().iterator().next();
-			settings.setCurrentLatitude((Double) objLatitude);
+			to.setCurrentLatitude(Double.parseDouble(objLatitude.toString()));
 		}
 		if (addr.hasLongitude()) {
 			Object objLongitude = addr.getLongitude().iterator().next();
-			settings.setCurrentLongitude((Double) objLongitude);
+			to.setCurrentLongitude(Double.parseDouble(objLongitude.toString()));
 		}
 	}
-
+	
 	/**
-	 * Adds address information into KB.
+	 * Saves name information into the KB.
 	 * @param settings
+	 * @param kbUserProfile
 	 * @param mf
-	 * @param userProfile
 	 */
-	private static void addAddressInfoIntoUserProfile(ThreeCixtySettings settings,
-			MyFactory mf, UserProfile userProfile) {
-		Address addr = null;
-		if (userProfile.hasHas_address()) addr = (Address) userProfile.getHas_address().iterator().next();
-		else addr = mf.createAddress(PROFILE_URI + settings.getUid() + "Address");
+	private static void saveNameInfoToKB(ThreeCixtySettings settings,
+			UserProfile kbUserProfile, MyFactory mf) {
+		if (kbUserProfile.hasHas_name()) {
+			WrappedIndividual obj = kbUserProfile.getHas_name().iterator().next();
+			kbUserProfile.removeHas_name(obj);
+		}
+		Name name = mf.createName(PROFILE_URI + settings.getUid() + "Name");
+		if (isNotNullOrEmpty(settings.getLastName())) {
+			Iterator <? extends Object> iterators = name.getFamily_name().iterator();
+			List <Object> list = new ArrayList <Object>();
+			for ( ; iterators.hasNext(); ) {
+				list.add(iterators.next());
+			}
+			for (Object obj: list) {
+				name.removeFamily_name(obj);
+			}
+			name.addFamily_name(settings.getLastName());
+			
+		}
+		if (isNotNullOrEmpty(settings.getFirstName())) {
+			
+			Iterator <? extends Object> iterators = name.getGiven_name().iterator();
+			List <Object> list = new ArrayList <Object>();
+			for ( ; iterators.hasNext(); ) {
+				list.add(iterators.next());
+			}
+			for (Object obj: list) {
+				name.removeGiven_name(obj);
+			}
+			
+			name.addGiven_name(settings.getFirstName());
+		}
+		kbUserProfile.addHas_name(name);
+	}
+	
+	/**
+	 * Saves address information into the KB.
+	 * @param settings
+	 * @param kbUserProfile
+	 */
+	private static void saveAddressInfoToKB(ThreeCixtySettings settings,
+			UserProfile kbUserProfile, MyFactory mf) {
+		if (kbUserProfile.hasHas_address()) {
+			WrappedIndividual addrObj = kbUserProfile.getHas_address().iterator().next();
+			kbUserProfile.removeHas_address(addrObj);
+		}
+
+		Address addr = mf.createAddress(PROFILE_URI + settings.getUid() + "Address");
+		kbUserProfile.addHas_address(addr);
 
 		if (isNotNullOrEmpty(settings.getCountryName())) {
 			if (addr.hasCountry_name()) {

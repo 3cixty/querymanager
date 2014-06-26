@@ -113,7 +113,6 @@ public class ProfileInformationStorage {
 			saveNameInfoToKB(profile, kbUserProfile, mf);
 			
 			saveAddressInfoToKB(profile, kbUserProfile, mf);
-			
 			if (profile.getPreference() != null) {
 				savePreferenceToKB(profile.getUid(), profile.getPreference(), kbUserProfile, mf);
 			}

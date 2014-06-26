@@ -1,9 +1,9 @@
 package eu.threecixty.profile;
 
+import java.io.Serializable;
 import java.util.List;
 
 import eu.threecixty.profile.oldmodels.EventDetailPreference;
-import eu.threecixty.profile.oldmodels.ModalityType;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 /**
@@ -11,12 +11,19 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
  * @author Cong-Kinh NGUYEN
  *
  */
-public class ThreeCixtySettings {
+public class ThreeCixtySettings implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4204058915242741613L;
 
 	private List <ProfileIdentities> identities;
 	
 	private String uid;
 
+	private String firstName;
+	private String lastName;
 	private String townName;
 	private String countryName;
 	
@@ -24,12 +31,6 @@ public class ThreeCixtySettings {
 	private double currentLongitude;
 
 	private EventDetailPreference eventDetailPreference;
-	
-	// TODO: need to persist this attribute
-	private boolean queryHistoryStored = false;
-	
-	// TODO: need to persist this attribute
-	private ModalityType preferredTripModality;
 
 	public List<ProfileIdentities> getIdentities() {
 		return identities;
@@ -45,6 +46,22 @@ public class ThreeCixtySettings {
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getTownName() {
@@ -87,19 +104,4 @@ public class ThreeCixtySettings {
 		this.eventDetailPreference = eventDetailPreference;
 	}
 
-	public boolean isQueryHistoryStored() {
-		return queryHistoryStored;
-	}
-
-	public void setQueryHistoryStored(boolean queryHistoryStored) {
-		this.queryHistoryStored = queryHistoryStored;
-	}
-
-	public ModalityType getPreferredTripModality() {
-		return preferredTripModality;
-	}
-
-	public void setPreferredTripModality(ModalityType preferredTripModality) {
-		this.preferredTripModality = preferredTripModality;
-	}
 }
