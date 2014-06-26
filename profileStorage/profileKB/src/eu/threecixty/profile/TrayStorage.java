@@ -25,7 +25,7 @@ import eu.threecixty.profile.Tray.OrderType;
  */
 public class TrayStorage {
 
-	private static final String TRAY_FILENAME = "temporaryTrayFile.xml";
+	private static final String TRAY_FILENAME = "temporaryTrayFile.json";
 	
 	private static String path;
 
