@@ -11,8 +11,11 @@
 <body>
 
 <%
-    ThreeCixtySettings settings = (ThreeCixtySettings) request.getAttribute("settings");
-    String accessToken = (String) request.getAttribute("accessToken");
+   if (session.getAttribute("uid") == null) {
+	   response.sendRedirect("./error.jsp");
+   } else  {
+        ThreeCixtySettings settings = (ThreeCixtySettings) request.getAttribute("settings");
+        String accessToken = (String) request.getAttribute("accessToken");
 %>
 
 <form action="settingsServlet" method="post">
@@ -82,5 +85,9 @@ Disclaimer: The information marked by red star are required. For Mobidot account
     }
 </script>
 
+<%
+
+   }
+%>
 </body>
 </html>
