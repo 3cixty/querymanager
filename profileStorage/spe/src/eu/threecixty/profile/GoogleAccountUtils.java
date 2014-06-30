@@ -26,13 +26,16 @@ public class GoogleAccountUtils {
 		if (accessToken == null) return "";
 		String user_id = null;
 		try {
+			// due to error asked by Christian
+//			String reqMsg = readUrl(
+//					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
 			String reqMsg = readUrl(
-					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
+					"https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken);
 			JSONObject json = new JSONObject(reqMsg);
 			user_id = json.getString("id");
-			JSONObject nameObj = json.getJSONObject("name");
-			String givenName = nameObj.getString("givenName");
-			String familyName = nameObj.getString("familyName");
+//			JSONObject nameObj = json.getJSONObject("name");
+			String givenName = json.getString("given_name");
+			String familyName = json.getString("family_name");
 			
 			if (ProfileInformationStorage.existUID(user_id)) return user_id; // no need to update info as it exists
 			
