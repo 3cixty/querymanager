@@ -17,10 +17,20 @@ import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
 
+/**
+ * The class is an end point for Rest ProfileAPI to expose to other components.
+ * @author Cong-Kinh Nguyen
+ *
+ */
 @Path("/spe")
 public class SPEServices {
 
-	
+	/**
+	 * Gets profile information in JSON format from a given Google access token and an App key.
+	 * @param accessToken
+	 * @param key
+	 * @return
+	 */
 	@GET
 	@Path("/getProfile")
 	@Produces("text/plain")
@@ -41,6 +51,13 @@ public class SPEServices {
 		throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 
+	/**
+	 * Saves profile information to the KB.
+	 * @param accessToken
+	 * @param profileStr
+	 * @param key
+	 * @return
+	 */
 	@POST
 	@Path("/saveProfile")
 	@Produces("text/plain")
@@ -62,6 +79,12 @@ public class SPEServices {
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
+	/**
+	 * Gets Google UID from a Google access token and an App key.
+	 * @param accessToken
+	 * @param key
+	 * @return
+	 */
 	@POST
 	@Path("/getUID")
 	@Produces("text/plain")
@@ -73,6 +96,12 @@ public class SPEServices {
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
+	/**
+	 * Checks whether or not a Google access token is valid.
+	 * @param accessToken
+	 * @param key
+	 * @return
+	 */
 	@POST
 	@Path("/validate")
 	@Produces("text/plain")

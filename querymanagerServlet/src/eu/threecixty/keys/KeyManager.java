@@ -118,11 +118,21 @@ public class KeyManager {
 		return appKeys.values();
 	}
 
+	/**
+	 * Gets an AppKey from a given UID.
+	 * @param uid
+	 * @return
+	 */
 	public AppKey getAppKeyFromUID(String uid) {
 		if (uid == null || uid.equals("")) return null;
 		return appKeys.get(uid);
 	}
 
+	/**
+	 * Gets an AppKey from a given user's email.
+	 * @param email
+	 * @return
+	 */
 	public AppKey getAppKeyFromEmail(String email) {
 		if (email == null || email.equals("")) return null;
 		for (AppKey appKey: appKeys.values()) {
@@ -131,6 +141,11 @@ public class KeyManager {
 		return null;
 	}
 
+	/**
+	 * Deletes a development key associated with a given UID.
+	 * @param uid
+	 * @return
+	 */
 	public synchronized boolean deleteAppKey(String uid) {
 		if (rootPath == null || rootPath.equals("")) return false;
 		if (uid == null || uid.equals("")) return false;
@@ -152,6 +167,15 @@ public class KeyManager {
 	
 	private  char [] availChars = null;
 
+	/**
+	 * Generates an AppKey from a given UID.
+	 * <br>
+	 * An AppKey is composed of three elements: the first element is UID, the second one is time in millisecond
+	 * when the key was generated, and last one is a random string. These information make sure that each user has
+	 * a unique key.  
+	 * @param uid
+	 * @return
+	 */
 	public String generateKey(String uid) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(uid).append(System.currentTimeMillis());

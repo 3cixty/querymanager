@@ -31,6 +31,11 @@ import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
 import eu.threecixty.querymanager.ThreeCixtyQuery;
 
+/**
+ * The class is an end point for QA RestAPIs to expose to other components.
+ * @author Cong-Kinh Nguyen
+ *
+ */
 @Path("/queryManager")
 public class QueryManagerServices {
 	private static final String LOCALITY_TRIPLES = "?event lode:atPlace ?place . \n ?place vcard:adr ?address . \n ?address vcard:locality ?locality .\n";
@@ -49,6 +54,11 @@ public class QueryManagerServices {
 	public static String realPath;
 	private static String allPrefixes;
 	
+	/**
+	 * Counts the number of items in the KB at EventMedia.
+	 * @param key
+	 * @return
+	 */
 	@GET
 	@Path("/countItems")
 	@Produces("text/plain")
@@ -60,6 +70,16 @@ public class QueryManagerServices {
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 
+	/**
+	 * Gets aggregated information of a given group in the KB at EventMedia.
+	 * @param group
+	 * @param offset
+	 * @param limit
+	 * @param filter1
+	 * @param filter2
+	 * @param key
+	 * @return
+	 */
 	@GET
 	@Path("/getAggregatedItems/{group}")
 	@Produces("text/plain")
@@ -88,6 +108,18 @@ public class QueryManagerServices {
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
+	/**
+	 * Gets items in details.
+	 *
+	 * @param accessToken
+	 * @param offset
+	 * @param limit
+	 * @param preference
+	 * @param filter1
+	 * @param filter2
+	 * @param key
+	 * @return
+	 */
 	@GET
 	@Path("/getItems")
 	@Produces("text/plain")

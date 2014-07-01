@@ -18,10 +18,22 @@ import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.TrayStorage;
 
-
+/**
+ * This class is an end point to expose Rest TrayAPIs to other components.
+ * @author Cong-Kinh NGUYEN
+ *
+ */
 @Path("/tray")
 public class TrayServices {
 	
+	/**
+	 * The method does some actions: add, update, and delete a tray item.
+	 * @param action
+	 * @param key
+	 * @param accessToken
+	 * @param tray
+	 * @return
+	 */
 	@POST
 	@Path("/{action}")
 	public String invokeTrayService(@PathParam("action") String action, @FormParam("key") String key,
@@ -47,6 +59,12 @@ public class TrayServices {
 		}
 	}
 	
+	/**
+	 * This method is to empty tray items associated with a given token.
+	 * @param accessToken
+	 * @param key
+	 * @return
+	 */
 	@POST
 	@Path("/empty")
 	public String empty(
@@ -61,6 +79,12 @@ public class TrayServices {
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
+	/**
+	 * This method is to create a list of Tray items in JSON format. 
+	 * @param accessToken
+	 * @param key
+	 * @return
+	 */
 	@POST
 	@Path("/list")
 	public String list(
@@ -74,6 +98,13 @@ public class TrayServices {
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
+	/**
+	 * This method is to change a junk token with a Google access token.
+	 * @param junkToken
+	 * @param googleToken
+	 * @param key
+	 * @return
+	 */
 	@POST
 	@Path("/login")
 	public String login(

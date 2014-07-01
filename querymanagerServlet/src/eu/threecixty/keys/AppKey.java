@@ -2,6 +2,12 @@ package eu.threecixty.keys;
 
 import java.io.Serializable;
 
+/**
+ * The class represents an AppKey information.
+ *
+ * @author Cong-Kinh Nguyen
+ *
+ */
 public class AppKey implements Serializable {
 
 	/**

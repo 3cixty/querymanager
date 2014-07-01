@@ -16,6 +16,11 @@ import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 
+/**
+ * This Servlet is to request a development key and add or update the key to the system. 
+ * @author Cong-Kinh Nguyen
+ *
+ */
 public class KeyRequestServlet extends HttpServlet {
 
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
@@ -67,6 +72,7 @@ public class KeyRequestServlet extends HttpServlet {
 		} else {
 			String email = req.getParameter("email");
 			String domain = req.getParameter("domain");
+			// generate an AppKey from Google UID
 			String rawKey = KeyManager.getInstance().generateKey(uid);
 			AppKey appKey = new AppKey();
 			appKey.setAppName(domain);
