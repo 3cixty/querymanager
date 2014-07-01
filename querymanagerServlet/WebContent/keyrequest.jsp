@@ -55,6 +55,7 @@ span {
 <div>
     <span>Application Type</span>
     <select name="domain">
+        <option <%=domain.equals("Crowdsourcing") ? "selected" : "" %>>Crowdsourcing</option>
         <option <%=domain.equals("Exploration") ? "selected" : "" %>>Exploration</option>
         <option <%=domain.equals("Mobile Application (TI)") ? "selected" : "" %>>Mobile Application (TI)</option>
         <option <%=domain.equals("App Challenge") ? "selected" : "" %>>App Challenge</option>
