@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import eu.threecixty.keys.KeyManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
@@ -47,79 +48,88 @@ public class SettingsServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
-		HttpSession session = req.getSession();
-		String uid = null;
-		if (session.getAttribute(userkey) != null) {
-			uid = (String) session.getAttribute("uid");
-		} else {
-			uid = GoogleAccountUtils.getUID(userkey);
-		}
-		if (!uid.equals("")) { // for a valid access token
-			ThreeCixtySettings settings = SettingsStorage.load(uid);
-			if (settings == null) {
-				settings = new ThreeCixtySettings();
-				settings.setUid(uid);
+		String key = req.getParameter("key");
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String accessToken = req.getParameter(ACCESS_TOKEN_PARAM);
+			HttpSession session = req.getSession();
+			String uid = null;
+			if (session.getAttribute(accessToken) != null) {
+				uid = (String) session.getAttribute("uid");
+			} else {
+				uid = GoogleAccountUtils.getUID(accessToken);
 			}
-			
-			String firstName = req.getParameter(FIRST_NAME_PARAM);
-			if (isNotNullOrEmpty(firstName)) settings.setFirstName(firstName);
+			if (!uid.equals("")) { // for a valid access token
+				ThreeCixtySettings settings = SettingsStorage.load(uid);
+				if (settings == null) {
+					settings = new ThreeCixtySettings();
+					settings.setUid(uid);
+				}
 
-			String lastName = req.getParameter(LAST_NAME_PARAM);
-			if (isNotNullOrEmpty(lastName)) settings.setLastName(lastName);
-			
-			String townName = req.getParameter(TOWN_NAME_PARAM);
-			if (isNotNullOrEmpty(townName)) settings.setTownName(townName);
+				String firstName = req.getParameter(FIRST_NAME_PARAM);
+				if (isNotNullOrEmpty(firstName)) settings.setFirstName(firstName);
 
-			String countryName = req.getParameter(COUNTRY_NAME_PARAM);
-			if (isNotNullOrEmpty(countryName)) settings.setCountryName(countryName);
-			
-			addGPSInfoIntoSettings(req, settings);
-			addEventDetailPreferenceIntoSettings(req, settings);
+				String lastName = req.getParameter(LAST_NAME_PARAM);
+				if (isNotNullOrEmpty(lastName)) settings.setLastName(lastName);
 
-			addProfileIdentities(req, settings);
+				String townName = req.getParameter(TOWN_NAME_PARAM);
+				if (isNotNullOrEmpty(townName)) settings.setTownName(townName);
 
-			SettingsStorage.save(settings);
+				String countryName = req.getParameter(COUNTRY_NAME_PARAM);
+				if (isNotNullOrEmpty(countryName)) settings.setCountryName(countryName);
 
-			resp.sendRedirect("./settingsServlet?accessToken=" + userkey);
-			
-		}
+				addGPSInfoIntoSettings(req, settings);
+				addEventDetailPreferenceIntoSettings(req, settings);
+
+				addProfileIdentities(req, settings);
+
+				SettingsStorage.save(settings);
+
+				session.setAttribute("successful", true);
+				
+				resp.sendRedirect("./settingsServlet?accessToken=" + accessToken + "&key=" + key);
+
+			}
+		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
-		HttpSession session = req.getSession();
-		String uid = null;
-		if (session.getAttribute(userkey) != null) {
-			uid = (String) session.getAttribute("uid");
-		} else {
-			uid = GoogleAccountUtils.getUID(userkey);
-		}
-		if (!uid.equals("")) { // for a valid access token
-			session.setAttribute(userkey, true);
-			session.setAttribute("uid", uid);
-			ThreeCixtySettings settings = SettingsStorage.load(uid);
-			req.setAttribute("settings", settings);
-			req.setAttribute(ACCESS_TOKEN_PARAM, userkey);
-			
-            try {
-                RequestDispatcher rd = getServletContext().getRequestDispatcher("/settings.jsp");
-                rd.forward(req, resp);
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-		} else {
-            try {
-                RequestDispatcher rd = getServletContext().getRequestDispatcher("/error.jsp");
-                rd.forward(req, resp);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-		}
+		String key = req.getParameter("key");
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String accessToken = req.getParameter(ACCESS_TOKEN_PARAM);
+			HttpSession session = req.getSession();
+			String uid = null;
+			if (session.getAttribute(accessToken) != null) {
+				uid = (String) session.getAttribute("uid");
+			} else {
+				uid = GoogleAccountUtils.getUID(accessToken);
+			}
+			if (!uid.equals("")) { // for a valid access token
+				session.setAttribute(accessToken, true);
+				session.setAttribute("uid", uid);
+				ThreeCixtySettings settings = SettingsStorage.load(uid);
+				req.setAttribute("settings", settings);
+				req.setAttribute("key", key);
+				req.setAttribute(ACCESS_TOKEN_PARAM, accessToken);
+
+				try {
+					RequestDispatcher rd = getServletContext().getRequestDispatcher("/settings.jsp");
+					rd.forward(req, resp);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					RequestDispatcher rd = getServletContext().getRequestDispatcher("/error.jsp");
+					rd.forward(req, resp);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	/**

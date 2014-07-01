@@ -13,6 +13,7 @@ import javax.ws.rs.WebApplicationException;
 
 import com.google.gson.Gson;
 
+import eu.threecixty.keys.KeyManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.TrayStorage;
@@ -23,20 +24,24 @@ public class TrayServices {
 	
 	@POST
 	@Path("/{action}")
-	public String invokeTrayService(@PathParam("action") String action,
+	public String invokeTrayService(@PathParam("action") String action, @FormParam("key") String key,
 			@FormParam("accessToken") String accessToken, @FormParam("tray") String tray) {
 		if (!isNotNullOrEmpty(action) || !isNotNullOrEmpty(accessToken) || !isNotNullOrEmpty(tray))
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		String uid = GoogleAccountUtils.getUID(accessToken);
-		if (uid == null || uid.equals("")) uid = accessToken;
-		Tray newTray = convertString2Tray(tray);
-		newTray.setUid(uid);
-		if (action.equalsIgnoreCase("add")) {
-			return addTray(uid, newTray);
-		} else if (action.equalsIgnoreCase("update")) {
-			return updateTray(uid, newTray);
-		} else if (action.equalsIgnoreCase("delete")) {
-			return deleteTray(uid, newTray);
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String uid = GoogleAccountUtils.getUID(accessToken);
+			if (uid == null || uid.equals("")) uid = accessToken;
+			Tray newTray = convertString2Tray(tray);
+			newTray.setUid(uid);
+			if (action.equalsIgnoreCase("add")) {
+				return addTray(uid, newTray);
+			} else if (action.equalsIgnoreCase("update")) {
+				return updateTray(uid, newTray);
+			} else if (action.equalsIgnoreCase("delete")) {
+				return deleteTray(uid, newTray);
+			} else {
+				throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			}
 		} else {
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 		}
@@ -45,37 +50,43 @@ public class TrayServices {
 	@POST
 	@Path("/empty")
 	public String empty(
-			@FormParam("accessToken") String accessToken) {
+			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
 		if (!isNotNullOrEmpty(accessToken))
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		String uid = GoogleAccountUtils.getUID(accessToken);
-		if (uid == null || uid.equals("")) uid = accessToken;
-		emptyTrays(uid);
-		return "";
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String uid = GoogleAccountUtils.getUID(accessToken);
+			if (uid == null || uid.equals("")) uid = accessToken;
+			emptyTrays(uid);
+			return "";
+		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
 	@POST
 	@Path("/list")
 	public String list(
-			@FormParam("accessToken") String accessToken) {
+			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
 		if (!isNotNullOrEmpty(accessToken))
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		String uid = GoogleAccountUtils.getUID(accessToken);
-		if (uid == null || uid.equals("")) uid = accessToken;
-		return listTrays(uid);
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String uid = GoogleAccountUtils.getUID(accessToken);
+			if (uid == null || uid.equals("")) uid = accessToken;
+		    return listTrays(uid);
+		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
 	@POST
 	@Path("/login")
 	public String login(
-			@FormParam("junkToken") String junkToken, @FormParam("googleToken") String googleToken) {
+			@FormParam("junkToken") String junkToken, @FormParam("googleToken") String googleToken, @FormParam("key") String key) {
 		if (!isNotNullOrEmpty(junkToken) || !isNotNullOrEmpty(googleToken))
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		String uid = GoogleAccountUtils.getUID(googleToken);
-		if (uid == null || uid.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		
-		if (TrayStorage.replaceUID(junkToken, uid)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		return "";
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String uid = GoogleAccountUtils.getUID(googleToken);
+			if (uid == null || uid.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+
+			if (TrayStorage.replaceUID(junkToken, uid)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			return "";
+		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 		
 	private String listTrays(String uid) {

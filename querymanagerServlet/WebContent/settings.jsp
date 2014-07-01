@@ -11,16 +11,19 @@
 <body>
 
 <%
-   if (session.getAttribute("uid") == null) {
+    String accessToken = (String) request.getAttribute("accessToken");
+    String key = (String) request.getAttribute("key");
+
+   if (session.getAttribute("uid") == null || accessToken == null || key == null) {
 	   response.sendRedirect("./error.jsp");
    } else  {
         ThreeCixtySettings settings = (ThreeCixtySettings) request.getAttribute("settings");
-        String accessToken = (String) request.getAttribute("accessToken");
 %>
 
 <form action="settingsServlet" method="post">
 <div>
     <input type="hidden" name="accessToken" value="<%=accessToken%>">
+    <input type="hidden" name="key" value="<%=key%>">
 </div>
 <div>
     <span >Google UID</span>
@@ -87,6 +90,16 @@ Disclaimer: The information marked by red star are required. For Mobidot account
 
 <%
 
+   }
+   
+   Boolean successful = (Boolean) session.getAttribute("successful");
+   if (successful != null && successful.booleanValue()) {
+	   session.removeAttribute("successful");
+	   %>
+	   <script type="text/javascript">
+	       alert("Successful to update your profile information");
+	   </script>
+	   <%
    }
 %>
 </body>

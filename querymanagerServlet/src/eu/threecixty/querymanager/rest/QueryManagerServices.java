@@ -21,6 +21,7 @@ import javax.ws.rs.WebApplicationException;
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 
+import eu.threecixty.keys.KeyManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
@@ -51,10 +52,12 @@ public class QueryManagerServices {
 	@GET
 	@Path("/countItems")
 	@Produces("text/plain")
-	public String countItems() {
-		String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
-		QueryManager qm = new QueryManager("false");
-		return executeQuery(null, qm, query, null);
+	public String countItems(@QueryParam("key") String key) {
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
+			QueryManager qm = new QueryManager("false");
+			return executeQuery(null, qm, query, null);
+		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 
 	@GET
@@ -62,25 +65,27 @@ public class QueryManagerServices {
 	@Produces("text/plain")
 	public String getAggregatedItems(@PathParam("group") String group, @DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
-		if (groupTriples.containsKey(group)) {
-			Gson gson = new Gson();
-			KeyValuePair pair1 = null;
-			KeyValuePair pair2 = null;
-			try {
-				pair1 = gson.fromJson(filter1, KeyValuePair.class);
-			} catch (Exception e) {}
-			try {
-				pair2 = gson.fromJson(filter2, KeyValuePair.class);
-			} catch (Exception e) {}
-			boolean existed1 = pair1 != null && pair1.getGroupBy() != null && groupTriples.containsKey(pair1.getGroupBy());
-			boolean existed2 = pair2 != null && pair2.getGroupBy() != null && groupTriples.containsKey(pair2.getGroupBy());
-			String query = createGroupQuery(group, offset, limit, existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
-					existed2 ? pair2.getGroupBy() : null, pair2.getValue());
-			QueryManager qm = new QueryManager("false");
-			return executeQuery(null, qm, query, null);
-		}
-		throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			@DefaultValue("{}") @QueryParam("filter2") String filter2, @QueryParam("key") String key) {
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			if (groupTriples.containsKey(group)) {
+				Gson gson = new Gson();
+				KeyValuePair pair1 = null;
+				KeyValuePair pair2 = null;
+				try {
+					pair1 = gson.fromJson(filter1, KeyValuePair.class);
+				} catch (Exception e) {}
+				try {
+					pair2 = gson.fromJson(filter2, KeyValuePair.class);
+				} catch (Exception e) {}
+				boolean existed1 = pair1 != null && pair1.getGroupBy() != null && groupTriples.containsKey(pair1.getGroupBy());
+				boolean existed2 = pair2 != null && pair2.getGroupBy() != null && groupTriples.containsKey(pair2.getGroupBy());
+				String query = createGroupQuery(group, offset, limit, existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
+						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
+				QueryManager qm = new QueryManager("false");
+				return executeQuery(null, qm, query, null);
+			}
+			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
 	@GET
@@ -90,40 +95,42 @@ public class QueryManagerServices {
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
+			@DefaultValue("{}") @QueryParam("filter2") String filter2, @QueryParam("key") String key) {
 
-	    IProfiler profiler = null;
-		boolean isAccessTokenFalse = "false".equals(accessToken);
-		String user_id =  null;
-		if (!isAccessTokenFalse) {
-			user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
-		}
-		
-		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		} else {
-			Gson gson = new Gson();
-			KeyValuePair pair1 = null;
-			KeyValuePair pair2 = null;
-			try {
-				pair1 = gson.fromJson(filter1, KeyValuePair.class);
-			} catch (Exception e) {}
-			try {
-				pair2 = gson.fromJson(filter2, KeyValuePair.class);
-			} catch (Exception e) {}
-			
-			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
-			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			IProfiler profiler = null;
+			boolean isAccessTokenFalse = "false".equals(accessToken);
+			String user_id =  null;
+			if (!isAccessTokenFalse) {
+				user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
+			}
 
-			String query = createSelectSparqlQuery(offset, limit,
-					(pair1 == null ? null : pair1.getGroupBy()),
-					(pair1 == null ? null : pair1.getValue()),
-					(pair2 == null ? null : pair2.getGroupBy()),
-					(pair2 == null ? null : pair2.getValue()));
+			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
+				throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			} else {
+				Gson gson = new Gson();
+				KeyValuePair pair1 = null;
+				KeyValuePair pair2 = null;
+				try {
+					pair1 = gson.fromJson(filter1, KeyValuePair.class);
+				} catch (Exception e) {}
+				try {
+					pair2 = gson.fromJson(filter2, KeyValuePair.class);
+				} catch (Exception e) {}
 
-			String result = executeQuery(profiler, qm, query, preference);
-			return result;
-		}
+				profiler = isAccessTokenFalse ? null : new Profiler(user_id);
+				QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
+
+				String query = createSelectSparqlQuery(offset, limit,
+						(pair1 == null ? null : pair1.getGroupBy()),
+						(pair1 == null ? null : pair1.getValue()),
+						(pair2 == null ? null : pair2.getGroupBy()),
+						(pair2 == null ? null : pair2.getValue()));
+
+				String result = executeQuery(profiler, qm, query, preference);
+				return result;
+			}
+		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,

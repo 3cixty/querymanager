@@ -19,7 +19,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 - Invoke the services by the following template:
 
   ```
-  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}
+  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}&key={key}
   ~baseUrl/trayServlet
   ~baseUrl/settingsServlet
   ```
@@ -30,7 +30,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - The template for calling query augmentation
   ```
-  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}
+  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}&key={key}
   ```
 
   Where:
@@ -42,9 +42,10 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{format}|requested result format (rdf or json)|
   |{query}|a sparql query|
   |{filter}|**location**, **enteredRating**, **preferred** or **friends**. QueryManager will take this value to augment a query|
+  |{key}|is an application key|
   
 - Example for a full URL to invoke the service on local Tomcat server:
-  [http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location](http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?userKey=kinh&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location)
+  [http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location](http://localhost:8080/querymanagerServlet-1.0/queryManagerServlet?userKey=kinh&isUsingPreferences=false&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location)&key=MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD
  
   Where:
   - [http://localhost:8080/querymanagerServlet-1.0](http://localhost:8080/querymanagerServlet-1.0) is the baseUrl
@@ -53,6 +54,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   - `json` is a `{format}`
   - `SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020` is a `{query}`.
   - `location` is a `{filter}`
+  - `MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD` is a `{key}`
   
   The query is URLEncoded
  
@@ -80,11 +82,20 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
 ####  Updating profile information
 
-  (Web Interface will soon be available)
+  Web link to update profile information:
+  ```
+  ~baseUrl/settingsServlet?accessToken={accessToken}&key={key}
+  ```
+  Where:
+  
+  |parameter|value|
+  |:---------|:-----|
+  |{accessToken}|is an access token which lasts for one hour or false. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description **Access token is incorrect or expired** |
+  |{key}|is an application key|
 
 - The template for updating profile information (take URL to show, but use `HTTP POST` in reality)
   ```
-  ~baseUrl/settingsServlet?accessToken={accessToken}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
+  ~baseUrl/settingsServlet?accessToken={accessToken}&key={key}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
   ```
 
   Where:
@@ -92,6 +103,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |parameter|required|value|
   |:---------|:-----|:-----|
   |{accessToken}| yes| is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description **Access token is incorrect or expired** |
+  |{key}|is an application key|
   |{townName}| no| is a town name, for example **Milano**, **Paris**, etc.|
   |{countryName}| no| is a country name, for example **Italy**, **France**, etc.|
   |{lat}| no| is latitude value|
@@ -106,5 +118,5 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - Example for the template to update profile information:
   ```
-  ~baseUrl/settingsServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&townName=Milano&countryName=Italy&lat=2.12345&lon=46.1234&startDate=18-06-2014&endDate=21-06-2013&pi_source[0]=Facebook&pi_id[0]=112233445566&pi_at[0]=facebookFakeAccessToken&pi_source[1]=Mobidot&pi_id[1]=nguyen&pi_at[1]=fakeMobidotAccessToken
+  ~baseUrl/settingsServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&key=MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD&townName=Milano&countryName=Italy&lat=2.12345&lon=46.1234&startDate=18-06-2014&endDate=21-06-2013&pi_source[0]=Facebook&pi_id[0]=112233445566&pi_at[0]=facebookFakeAccessToken&pi_source[1]=Mobidot&pi_id[1]=nguyen&pi_at[1]=fakeMobidotAccessToken
   ```

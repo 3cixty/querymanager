@@ -9,7 +9,7 @@
 <body>
 <p>
 <font size="20" color="red">
-You are forbidden to access to the settings page.
+You don't have access right to the page.
 </font>
 </p>
 </body>

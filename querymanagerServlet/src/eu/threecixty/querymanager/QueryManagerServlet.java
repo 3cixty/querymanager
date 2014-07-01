@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.hp.hpl.jena.query.Query;
 
+import eu.threecixty.keys.KeyManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
@@ -51,36 +52,39 @@ public class QueryManagerServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
-	    PrintWriter out = resp.getWriter();
-	    IProfiler profiler = null;
-		String userkey = req.getParameter(ACCESS_TOKEN_PARAM);
-		boolean isUsingPreferences = "true".equalsIgnoreCase(req.getParameter(IS_USING_PREFS_PARAM));
-		String format = req.getParameter(FORMAT_PARAM);
-		String query = req.getParameter(QUERY_PARAM);
-		boolean isAccessTokenFalse = "false".equals(userkey);
-		String user_id =  null;
-		if (!isAccessTokenFalse) {
-			user_id = GoogleAccountUtils.getUID(userkey); // which corresponds with Google user_id (from Google account)
-		}
-		if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			out.write("Access token is incorrect or expired");
-		} else {
-			resp.setContentType("text/plain");
-			profiler = isAccessTokenFalse ? null : new Profiler(user_id);
-			QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
-			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
-
-			if (eventMediaFormat != null && query != null) {
-				String result = executeQuery(profiler, qm, isAccessTokenFalse ? false : isUsingPreferences,
-						eventMediaFormat, query, req);
-				out.write(result);
-			} else {
-				out.write(PARAM_EXCEPTION);
+		String key = req.getParameter("key");
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			PrintWriter out = resp.getWriter();
+			IProfiler profiler = null;
+			String accessToken = req.getParameter(ACCESS_TOKEN_PARAM);
+			boolean isUsingPreferences = "true".equalsIgnoreCase(req.getParameter(IS_USING_PREFS_PARAM));
+			String format = req.getParameter(FORMAT_PARAM);
+			String query = req.getParameter(QUERY_PARAM);
+			boolean isAccessTokenFalse = "false".equals(accessToken);
+			String user_id =  null;
+			if (!isAccessTokenFalse) {
+				user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
 			}
-		}
-		
-		out.close();
+			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
+				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				out.write("Access token is incorrect or expired");
+			} else {
+				resp.setContentType("text/plain");
+				profiler = isAccessTokenFalse ? null : new Profiler(user_id);
+				QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
+				EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+
+				if (eventMediaFormat != null && query != null) {
+					String result = executeQuery(profiler, qm, isAccessTokenFalse ? false : isUsingPreferences,
+							eventMediaFormat, query, req);
+					out.write(result);
+				} else {
+					out.write(PARAM_EXCEPTION);
+				}
+			}
+
+			out.close();
+		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	/**

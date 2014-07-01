@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
+import eu.threecixty.keys.KeyManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.Tray.OrderType;
@@ -41,50 +42,53 @@ public class TrayServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		PrintWriter out = resp.getWriter();
-		String action = req.getParameter("action");
-		
-		if (action != null) {
-			if (action.equals("add_tray_element")) {
-				if (!addTrayElement(req)) {
-					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.write(ADD_EXCEPTION_MSG);
-				} else {
-					resp.setStatus(OK_CODE);
-					out.write("OK");
+		String key = req.getParameter("key");
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			String action = req.getParameter("action");
+
+			if (action != null) {
+				if (action.equals("add_tray_element")) {
+					if (!addTrayElement(req)) {
+						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						out.write(ADD_EXCEPTION_MSG);
+					} else {
+						resp.setStatus(OK_CODE);
+						out.write("OK");
+					}
+				} else if (action.equals("get_tray_elements")) {
+					List <Tray> trays = getTrayElements(req);
+					if (trays == null) {
+						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						out.write(LIST_EXCEPTION_MSG);
+					} else {
+						resp.setStatus(OK_CODE);
+						Gson gson = new Gson();
+						String content = gson.toJson(trays);
+						out.write(content);
+					}
+				} else if (action.equals("login_tray")) {
+					List <Tray> trays = loginTray(req);
+					if (trays == null) {
+						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					} else {
+						resp.setStatus(OK_CODE);
+						Gson gson = new Gson();
+						String content = gson.toJson(trays);
+						out.write(content);
+					}
+				} else if (action.equals("empty_tray")) {
+					if (!cleanTrays(req)) {
+						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					} else resp.setStatus(OK_CODE);
+				} else if (action.equals("update_tray_element")) {
+					if (!updateTray(req)) {
+						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					} else resp.setStatus(OK_CODE);
 				}
-			} else if (action.equals("get_tray_elements")) {
-				List <Tray> trays = getTrayElements(req);
-				if (trays == null) {
-					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.write(LIST_EXCEPTION_MSG);
-				} else {
-					resp.setStatus(OK_CODE);
-					Gson gson = new Gson();
-					String content = gson.toJson(trays);
-					out.write(content);
-				}
-			} else if (action.equals("login_tray")) {
-				List <Tray> trays = loginTray(req);
-				if (trays == null) {
-					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				} else {
-					resp.setStatus(OK_CODE);
-					Gson gson = new Gson();
-					String content = gson.toJson(trays);
-					out.write(content);
-				}
-			} else if (action.equals("empty_tray")) {
-				if (!cleanTrays(req)) {
-					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				} else resp.setStatus(OK_CODE);
-			} else if (action.equals("update_tray_element")) {
-				if (!updateTray(req)) {
-					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				} else resp.setStatus(OK_CODE);
+
 			}
-			
-		}
-		out.close();
+			out.close();
+		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 	
 	@Override
