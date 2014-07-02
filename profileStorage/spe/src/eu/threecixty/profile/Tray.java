@@ -12,7 +12,7 @@ public class Tray {
 	private ItemType element_type;
 	private long timestamp;
 	// real UID or junkID
-	private String uid;
+	private String token;
 	private String source;
 	
 	private boolean attend;
@@ -45,11 +45,11 @@ public class Tray {
 	}
 
 	public String getUid() {
-		return uid;
+		return token;
 	}
 
 	public void setUid(String uid) {
-		this.uid = uid;
+		this.token = uid;
 	}
 	
 	

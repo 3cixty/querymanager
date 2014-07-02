@@ -170,7 +170,7 @@ public class TrayStorage {
 		    tray.setItemId(jsonObj.getString("element_id"));
 		    tray.setItemType(ItemType.valueOf(jsonObj.getString("element_type")));
 		    tray.setTimestamp(jsonObj.getLong("timestamp"));
-		    tray.setUid(jsonObj.getString("uid"));
+		    tray.setUid(jsonObj.getString("token"));
 		    tray.setSource(jsonObj.getString("source"));
 		    
 		    if (jsonObj.has("attend")) tray.setAttended(jsonObj.getBoolean("attend"));
