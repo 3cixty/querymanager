@@ -11,15 +11,19 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - Go to the "querymanagerServlet" folder, copy the .war file in the "target" folder to your Web application server (Tomcat for example).
   
+- Go to http://3cixty.com:8080/querymanagerServlet-1.0/keyRequest?accessToken={YourAccessToken} where {YourAccessToken} is to be provided.
+ 
+
+**PS: EveryTime the Appkeys will be lost in the current scenario if the server is redeployed **
 
 ### How to make a remote query to QueryManager:
 
 - Suppose you deployed querymanagerServlet on your local server. Let the baseUrl point to the root path for querymanagerServlet you just deployed
 
-- Invoke the services by the following template:
+- There are 3 following services available:
 
   ```
-  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&key={key}
+  ~baseUrl/queryManagerServlet
   ~baseUrl/trayServlet
   ~baseUrl/settingsServlet
   ```
