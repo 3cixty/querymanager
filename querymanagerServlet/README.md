@@ -77,7 +77,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
 ####  Updating profile information
 
-  Web link to update profile information:
+-  Web link to update profile information:
   ```
   ~baseUrl/settingsServlet?accessToken={accessToken}&key={key}
   ```
