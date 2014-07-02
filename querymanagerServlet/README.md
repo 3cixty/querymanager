@@ -19,7 +19,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 - Invoke the services by the following template:
 
   ```
-  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}&key={key}
+  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&key={key}
   ~baseUrl/trayServlet
   ~baseUrl/settingsServlet
   ```
@@ -30,7 +30,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - The template for calling query augmentation
   ```
-  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&friends={friends}&key={key}
+  ~baseUrl/queryManagerServlet?accessToken={accessToken}&isUsingPreferences={isUsingPreferences}&format={format}&query={query}&filter={filter}&key={key}
   ```
 
   Where:
@@ -68,17 +68,10 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
  
 #### Tray services
 
-- The servlet to deal with Tray Items is called through HTTP POST at
-  ```
-  ~baseUrl/trayServlet
-  ```
+
   
   The parameters and actions to call the tray servlet follow the documentation on Google Drive at [https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web](https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web)
 
-  For example, if `querymanagerServlet.war` was deployed on local machine (Tomcat, port 8080), Tray services can be called at
-  ```
-  http://localhost:8080/querymanagerServlet-1.0/trayServlet
-  ```
   
 ####  Updating profile information
 
