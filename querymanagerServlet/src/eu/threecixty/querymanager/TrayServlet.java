@@ -63,8 +63,9 @@ public class TrayServlet extends HttpServlet {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						out.write(ADD_EXCEPTION_MSG);
 					} else {
+						resp.setContentType("application/json");
 						resp.setStatus(OK_CODE);
-						out.write("OK");
+						out.write("{\"response\": \"OK\"}");
 					}
 				} else if (action.equals("get_tray_elements")) {
 					List <Tray> trays = getTrayElements(jsonObj);
@@ -83,6 +84,7 @@ public class TrayServlet extends HttpServlet {
 					if (trays == null) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					} else {
+						resp.setContentType("application/json");
 						resp.setStatus(OK_CODE);
 						Gson gson = new Gson();
 						String content = gson.toJson(trays);
@@ -91,11 +93,18 @@ public class TrayServlet extends HttpServlet {
 				} else if (action.equals("empty_tray")) {
 					if (!cleanTrays(jsonObj)) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					} else resp.setStatus(OK_CODE);
+					} else {
+						resp.setContentType("application/json");
+						resp.setStatus(OK_CODE);
+						out.write("{\"response\": \"OK\"}");
+					}
 				} else if (action.equals("update_tray_element")) {
 					if (!updateTray(jsonObj)) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					} else resp.setStatus(OK_CODE);
+					} else {
+						resp.setContentType("application/json");
+						resp.setStatus(OK_CODE);
+						out.write("{\"response\": \"OK\"}");					}
 				}
 
 			}
