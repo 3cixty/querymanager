@@ -127,10 +127,12 @@ public class TrayServlet extends HttpServlet {
 		String token = req.getString("token");
 		String uid = GoogleAccountUtils.getUID(token);
 		String source = getKey(req, "source");
+		String element_title = getKey(req, "element_title");
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
 		tray.setItemType(itemType);
 		tray.setSource(source);
+		tray.setElement_title(element_title);
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setUid((uid == null || uid.equals("")) ? token : uid);
 		
@@ -224,11 +226,14 @@ public class TrayServlet extends HttpServlet {
 		String source = getKey(req, SOURCE_PARAM);
 		if (source == null) return false;
 		
+		String element_title = getKey(req, "element_title");
+		
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
 		tray.setItemType(itemType);
 		tray.setSource(source);
 		tray.setTimestamp(System.currentTimeMillis());
+		tray.setElement_title(element_title);
 		
 		String uid = GoogleAccountUtils.getUID(token);
 		if (uid == null || uid.equals("")) {
