@@ -100,56 +100,7 @@ public class TrayServlet extends HttpServlet {
 
 			}
 			out.close();
-		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		
-//		PrintWriter out = resp.getWriter();
-//		String key = req.getParameter("key");
-//		if (KeyManager.getInstance().checkAppKey(key)) {
-//			String action = req.getParameter("action");
-//
-//			if (action != null) {
-//				if (action.equals("add_tray_element")) {
-//					if (!addTrayElement(req)) {
-//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//						out.write(ADD_EXCEPTION_MSG);
-//					} else {
-//						resp.setStatus(OK_CODE);
-//						out.write("OK");
-//					}
-//				} else if (action.equals("get_tray_elements")) {
-//					List <Tray> trays = getTrayElements(req);
-//					if (trays == null) {
-//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//						out.write(LIST_EXCEPTION_MSG);
-//					} else {
-//						resp.setStatus(OK_CODE);
-//						Gson gson = new Gson();
-//						String content = gson.toJson(trays);
-//						out.write(content);
-//					}
-//				} else if (action.equals("login_tray")) {
-//					List <Tray> trays = loginTray(req);
-//					if (trays == null) {
-//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//					} else {
-//						resp.setStatus(OK_CODE);
-//						Gson gson = new Gson();
-//						String content = gson.toJson(trays);
-//						out.write(content);
-//					}
-//				} else if (action.equals("empty_tray")) {
-//					if (!cleanTrays(req)) {
-//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//					} else resp.setStatus(OK_CODE);
-//				} else if (action.equals("update_tray_element")) {
-//					if (!updateTray(req)) {
-//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//					} else resp.setStatus(OK_CODE);
-//				}
-//
-//			}
-//			out.close();
-//		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);		
 	}
 	
 	@Override
@@ -159,14 +110,14 @@ public class TrayServlet extends HttpServlet {
 	}
 	
 	private boolean updateTray(JSONObject req) {
-		String itemId = req.getString("element_id");
+		String itemId = getKey(req, "element_id");
 		if (itemId == null || itemId.equals("")) return false;
-		String itemTypeStr = req.getString("element_type");
+		String itemTypeStr = getKey(req, "element_type");
 		if (itemTypeStr == null || itemTypeStr.equals("")) return false;
 		ItemType itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
 		String token = req.getString("token");
 		String uid = GoogleAccountUtils.getUID(token);
-		String source = req.getString("source");
+		String source = getKey(req, "source");
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
 		tray.setItemType(itemType);
@@ -174,15 +125,15 @@ public class TrayServlet extends HttpServlet {
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setUid((uid == null || uid.equals("")) ? token : uid);
 		
-		String deleteStr = req.getString("delete");
+		String deleteStr = getKey(req, "delete");
 		if ("true".equals(deleteStr)) {
 			return TrayStorage.deleteTray(tray);
 		}
 		
-		String attendedStr = req.getString("attend");
+		String attendedStr = getKey(req, "attend");
 		boolean attended = "true".equals(attendedStr);
 		
-		String datetimeAttendedStr = req.getString("attend_datetime");
+		String datetimeAttendedStr = getKey(req, "attend_datetime");
 		if (datetimeAttendedStr != null && !datetimeAttendedStr.equals("")) {
 			boolean okDatetime = false;
 			try {
@@ -198,7 +149,7 @@ public class TrayServlet extends HttpServlet {
 		
 		tray.setAttended(attended);
 		
-		String ratingStr = req.getString("rating");
+		String ratingStr = getKey(req, "rating");
 		if (ratingStr != null && !ratingStr.equals("")) {
 			tray.setRating(Integer.parseInt(ratingStr));
 		}
@@ -207,7 +158,7 @@ public class TrayServlet extends HttpServlet {
 	}
 
 	private boolean cleanTrays(JSONObject req) {
-		String token = req.getString("token");
+		String token = getKey(req, "token");
 		if (token == null || token.equals("")) return false;
 		String uid = GoogleAccountUtils.getUID(token);
 		if (uid == null || uid.equals("")) {
@@ -217,9 +168,9 @@ public class TrayServlet extends HttpServlet {
 	}
 
 	private List<Tray> loginTray(JSONObject req) {
-		String junkToken = req.getString("junk_token");
+		String junkToken = getKey(req, "junk_token");
 		if (junkToken == null || junkToken.equals("")) return null;
-		String googleToken = req.getString("google_token");
+		String googleToken = getKey(req, "google_token");
 		String uid = GoogleAccountUtils.getUID(googleToken);
 		if (uid == null || uid.equals("")) return null;
 		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
@@ -227,17 +178,18 @@ public class TrayServlet extends HttpServlet {
 	}
 
 	private List<Tray> getTrayElements(JSONObject req) {
-		String accessToken = req.getString("token");
+		String accessToken = getKey(req, "token");
 		String uid = GoogleAccountUtils.getUID(accessToken);
 
-		String offsetStr = req.getString("offset");
-		int offset = (offsetStr == null) ? 0 : Integer.parseInt(offsetStr);
-		String limitStr = req.get("limit").toString();
-		int limit = (limitStr == null) ? 100 : Integer.parseInt(limitStr);
-		String orderStr = req.getString("order_type");
+		
+		int offset = (!req.has("offset")) ? 0 : Integer.parseInt(req.getString("offset"));
+		int limit = (!req.has("limit")) ? 100 : Integer.parseInt(req.getString("limit"));
+		String orderStr = null;
+		if (req.has("order_type")) orderStr = req.getString("order_type");
 		OrderType orderType = (orderStr == null) ? OrderType.Desc
 				: orderStr.equalsIgnoreCase("Desc") ? OrderType.Desc : OrderType.Asc;
-		String showPastEventsStr = req.getString("show_past_events");
+		String showPastEventsStr = null;
+		if (req.has("show_past_events")) showPastEventsStr = req.getString("show_past_events");
 		boolean showPastEvents = (showPastEventsStr == null) ? true : "true".equalsIgnoreCase(showPastEventsStr);
 		
 		return TrayStorage.getTrays((uid == null || uid.equals("")) ? accessToken : uid,
@@ -245,9 +197,9 @@ public class TrayServlet extends HttpServlet {
 	}
 
 	private boolean addTrayElement(JSONObject req) {
-		String itemId = req.getString(ITEM_ID_PARAM);
+		String itemId = getKey(req, ITEM_ID_PARAM);
 		if (itemId == null) return false;
-		String itemTypeStr = req.getString(ITEM_TYPE_PARAM);
+		String itemTypeStr = getKey(req, ITEM_TYPE_PARAM);
 		if (itemTypeStr == null) return false;
 		ItemType itemType = null;
 		try {
@@ -257,10 +209,10 @@ public class TrayServlet extends HttpServlet {
 			e.printStackTrace();
 			return false;
 		}
-		String token = req.getString(TOKEN_PARAM);
+		String token = getKey(req, TOKEN_PARAM);
 		if (token == null) return false;
 		
-		String source = req.getString(SOURCE_PARAM);
+		String source = getKey(req, SOURCE_PARAM);
 		if (source == null) return false;
 		
 		Tray tray = new Tray();
@@ -292,6 +244,11 @@ public class TrayServlet extends HttpServlet {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
+	}
+	
+	private String getKey(JSONObject json, String key) {
+		if (json.has(key)) return json.getString(key);
 		return null;
 	}
 }
