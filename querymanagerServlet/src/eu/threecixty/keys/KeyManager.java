@@ -47,9 +47,15 @@ public class KeyManager {
 	 * @param key
 	 * @return
 	 */
-	public boolean checkAppKey(String key) {
+	public synchronized boolean checkAppKey(String key) {
 		if (key == null || key.equals("")) return false;
 		if (rootPath == null || rootPath.equals("")) return false;
+		for (AppKey appKey: appKeys.values()) {
+			if (key.equals(appKey.getValue())) return true;
+		}
+		// initiate again as AppKeys can be copied from backup folder after deployment
+		initAllAppKeys();
+		// check again
 		for (AppKey appKey: appKeys.values()) {
 			if (key.equals(appKey.getValue())) return true;
 		}
