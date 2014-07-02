@@ -166,7 +166,7 @@ public class TrayServlet extends HttpServlet {
 	}
 
 	private List<Tray> getTrayElements(HttpServletRequest req) {
-		String accessToken = req.getParameter("google_token");
+		String accessToken = req.getParameter("token");
 		String uid = GoogleAccountUtils.getUID(accessToken);
 
 		String offsetStr = req.getParameter("offset");
