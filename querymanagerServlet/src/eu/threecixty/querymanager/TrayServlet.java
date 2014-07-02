@@ -1,6 +1,7 @@
 package eu.threecixty.querymanager;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,6 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
@@ -41,14 +44,22 @@ public class TrayServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		
+		String inputContent = getRequestContent(req);
+		if (inputContent == null) {
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		JSONObject jsonObj = new JSONObject(inputContent);
+		
 		PrintWriter out = resp.getWriter();
-		String key = req.getParameter("key");
+		String key = jsonObj.getString("key");
 		if (KeyManager.getInstance().checkAppKey(key)) {
-			String action = req.getParameter("action");
+			String action = jsonObj.getString("action");
 
 			if (action != null) {
 				if (action.equals("add_tray_element")) {
-					if (!addTrayElement(req)) {
+					if (!addTrayElement(jsonObj)) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						out.write(ADD_EXCEPTION_MSG);
 					} else {
@@ -56,7 +67,7 @@ public class TrayServlet extends HttpServlet {
 						out.write("OK");
 					}
 				} else if (action.equals("get_tray_elements")) {
-					List <Tray> trays = getTrayElements(req);
+					List <Tray> trays = getTrayElements(jsonObj);
 					if (trays == null) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						out.write(LIST_EXCEPTION_MSG);
@@ -67,7 +78,7 @@ public class TrayServlet extends HttpServlet {
 						out.write(content);
 					}
 				} else if (action.equals("login_tray")) {
-					List <Tray> trays = loginTray(req);
+					List <Tray> trays = loginTray(jsonObj);
 					if (trays == null) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					} else {
@@ -77,11 +88,11 @@ public class TrayServlet extends HttpServlet {
 						out.write(content);
 					}
 				} else if (action.equals("empty_tray")) {
-					if (!cleanTrays(req)) {
+					if (!cleanTrays(jsonObj)) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					} else resp.setStatus(OK_CODE);
 				} else if (action.equals("update_tray_element")) {
-					if (!updateTray(req)) {
+					if (!updateTray(jsonObj)) {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					} else resp.setStatus(OK_CODE);
 				}
@@ -89,6 +100,55 @@ public class TrayServlet extends HttpServlet {
 			}
 			out.close();
 		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		
+//		PrintWriter out = resp.getWriter();
+//		String key = req.getParameter("key");
+//		if (KeyManager.getInstance().checkAppKey(key)) {
+//			String action = req.getParameter("action");
+//
+//			if (action != null) {
+//				if (action.equals("add_tray_element")) {
+//					if (!addTrayElement(req)) {
+//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//						out.write(ADD_EXCEPTION_MSG);
+//					} else {
+//						resp.setStatus(OK_CODE);
+//						out.write("OK");
+//					}
+//				} else if (action.equals("get_tray_elements")) {
+//					List <Tray> trays = getTrayElements(req);
+//					if (trays == null) {
+//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//						out.write(LIST_EXCEPTION_MSG);
+//					} else {
+//						resp.setStatus(OK_CODE);
+//						Gson gson = new Gson();
+//						String content = gson.toJson(trays);
+//						out.write(content);
+//					}
+//				} else if (action.equals("login_tray")) {
+//					List <Tray> trays = loginTray(req);
+//					if (trays == null) {
+//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//					} else {
+//						resp.setStatus(OK_CODE);
+//						Gson gson = new Gson();
+//						String content = gson.toJson(trays);
+//						out.write(content);
+//					}
+//				} else if (action.equals("empty_tray")) {
+//					if (!cleanTrays(req)) {
+//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//					} else resp.setStatus(OK_CODE);
+//				} else if (action.equals("update_tray_element")) {
+//					if (!updateTray(req)) {
+//						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//					} else resp.setStatus(OK_CODE);
+//				}
+//
+//			}
+//			out.close();
+//		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 	
 	@Override
@@ -97,15 +157,15 @@ public class TrayServlet extends HttpServlet {
 		doPost(req, resp);
 	}
 	
-	private boolean updateTray(HttpServletRequest req) {
-		String itemId = req.getParameter("element_id");
+	private boolean updateTray(JSONObject req) {
+		String itemId = req.getString("element_id");
 		if (itemId == null || itemId.equals("")) return false;
-		String itemTypeStr = req.getParameter("element_type");
+		String itemTypeStr = req.getString("element_type");
 		if (itemTypeStr == null || itemTypeStr.equals("")) return false;
 		ItemType itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
-		String token = req.getParameter("token");
+		String token = req.getString("token");
 		String uid = GoogleAccountUtils.getUID(token);
-		String source = req.getParameter("source");
+		String source = req.getString("source");
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
 		tray.setItemType(itemType);
@@ -113,15 +173,15 @@ public class TrayServlet extends HttpServlet {
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setUid((uid == null || uid.equals("")) ? token : uid);
 		
-		String deleteStr = req.getParameter("delete");
+		String deleteStr = req.getString("delete");
 		if ("true".equals(deleteStr)) {
 			return TrayStorage.deleteTray(tray);
 		}
 		
-		String attendedStr = req.getParameter("attend");
+		String attendedStr = req.getString("attend");
 		boolean attended = "true".equals(attendedStr);
 		
-		String datetimeAttendedStr = req.getParameter("attend_datetime");
+		String datetimeAttendedStr = req.getString("attend_datetime");
 		if (datetimeAttendedStr != null && !datetimeAttendedStr.equals("")) {
 			boolean okDatetime = false;
 			try {
@@ -137,7 +197,7 @@ public class TrayServlet extends HttpServlet {
 		
 		tray.setAttended(attended);
 		
-		String ratingStr = req.getParameter("rating");
+		String ratingStr = req.getString("rating");
 		if (ratingStr != null && !ratingStr.equals("")) {
 			tray.setRating(Integer.parseInt(ratingStr));
 		}
@@ -145,8 +205,8 @@ public class TrayServlet extends HttpServlet {
 		return TrayStorage.update(tray);
 	}
 
-	private boolean cleanTrays(HttpServletRequest req) {
-		String token = req.getParameter("token");
+	private boolean cleanTrays(JSONObject req) {
+		String token = req.getString("token");
 		if (token == null || token.equals("")) return false;
 		String uid = GoogleAccountUtils.getUID(token);
 		if (uid == null || uid.equals("")) {
@@ -155,38 +215,38 @@ public class TrayServlet extends HttpServlet {
 		return TrayStorage.cleanTrays(uid);
 	}
 
-	private List<Tray> loginTray(HttpServletRequest req) {
-		String junkToken = req.getParameter("junk_token");
+	private List<Tray> loginTray(JSONObject req) {
+		String junkToken = req.getString("junk_token");
 		if (junkToken == null || junkToken.equals("")) return null;
-		String googleToken = req.getParameter("google_token");
+		String googleToken = req.getString("google_token");
 		String uid = GoogleAccountUtils.getUID(googleToken);
 		if (uid == null || uid.equals("")) return null;
 		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
 		return TrayStorage.getTrays(uid, 0, 100, OrderType.Desc, true);
 	}
 
-	private List<Tray> getTrayElements(HttpServletRequest req) {
-		String accessToken = req.getParameter("token");
+	private List<Tray> getTrayElements(JSONObject req) {
+		String accessToken = req.getString("token");
 		String uid = GoogleAccountUtils.getUID(accessToken);
 
-		String offsetStr = req.getParameter("offset");
+		String offsetStr = req.getString("offset");
 		int offset = (offsetStr == null) ? 0 : Integer.parseInt(offsetStr);
-		String limitStr = req.getParameter("limit");
+		String limitStr = req.get("limit").toString();
 		int limit = (limitStr == null) ? 100 : Integer.parseInt(limitStr);
-		String orderStr = req.getParameter("order_type");
+		String orderStr = req.getString("order_type");
 		OrderType orderType = (orderStr == null) ? OrderType.Desc
 				: orderStr.equalsIgnoreCase("Desc") ? OrderType.Desc : OrderType.Asc;
-		String showPastEventsStr = req.getParameter("show_past_events");
+		String showPastEventsStr = req.getString("show_past_events");
 		boolean showPastEvents = (showPastEventsStr == null) ? true : "true".equalsIgnoreCase(showPastEventsStr);
 		
 		return TrayStorage.getTrays((uid == null || uid.equals("")) ? accessToken : uid,
 				offset, limit, orderType, showPastEvents);
 	}
 
-	private boolean addTrayElement(HttpServletRequest req) {
-		String itemId = req.getParameter(ITEM_ID_PARAM);
+	private boolean addTrayElement(JSONObject req) {
+		String itemId = req.getString(ITEM_ID_PARAM);
 		if (itemId == null) return false;
-		String itemTypeStr = req.getParameter(ITEM_TYPE_PARAM);
+		String itemTypeStr = req.getString(ITEM_TYPE_PARAM);
 		if (itemTypeStr == null) return false;
 		ItemType itemType = null;
 		try {
@@ -196,10 +256,10 @@ public class TrayServlet extends HttpServlet {
 			e.printStackTrace();
 			return false;
 		}
-		String token = req.getParameter(TOKEN_PARAM);
+		String token = req.getString(TOKEN_PARAM);
 		if (token == null) return false;
 		
-		String source = req.getParameter(SOURCE_PARAM);
+		String source = req.getString(SOURCE_PARAM);
 		if (source == null) return false;
 		
 		Tray tray = new Tray();
@@ -215,5 +275,22 @@ public class TrayServlet extends HttpServlet {
 			tray.setUid(uid);
 		}
 		return TrayStorage.addTray(tray);
+	}
+	
+	private String getRequestContent(HttpServletRequest req) {
+		StringBuffer buffer = new StringBuffer();
+		byte[] b = new byte[1024];
+		int readBytes = 0;
+		try {
+			InputStream input = req.getInputStream();
+			while ((readBytes = input.read(b)) >= 0) {
+				buffer.append(new String(b, 0, readBytes));
+			}
+			input.close();
+			return buffer.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
