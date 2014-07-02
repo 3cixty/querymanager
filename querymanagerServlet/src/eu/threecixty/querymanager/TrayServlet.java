@@ -72,6 +72,7 @@ public class TrayServlet extends HttpServlet {
 						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						out.write(LIST_EXCEPTION_MSG);
 					} else {
+						resp.setContentType("application/json");
 						resp.setStatus(OK_CODE);
 						Gson gson = new Gson();
 						String content = gson.toJson(trays);
