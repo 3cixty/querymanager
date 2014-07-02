@@ -1,6 +1,6 @@
 
 input[type="text"] {
-	width: 480px;
+	width: 100%;
 	font-size: 13px;
 }
 
@@ -11,7 +11,3 @@ input:invalid {
 	background: red;
 }
 
-span {
-	display: inline-block;
-	width: 150px;
-}

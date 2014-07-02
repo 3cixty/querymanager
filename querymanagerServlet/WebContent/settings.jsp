@@ -26,44 +26,48 @@
     <input type="hidden" name="key" value="<%=key%>">
 </div>
 <div>
-    <span >Google UID</span>
+<span >Google UID</span>
+</div>
+<div>
     <input type="text" readonly="readonly" value="<%=settings.getUid()%>" name="uid">
 </div>
 <div>
-    <span >First Name<font color="red">*</font></span>
+ <span >First Name<font color="red">*</font></span>
+</div>
+<div>
     <input type="text" name="firstName" value="<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>" required>
 </div>
+<div><span >Last Name<font color="red">*</font></span></div>
 <div>
-    <span >Last Name<font color="red">*</font></span>
     <input type="text" name="lastName" value="<%=settings.getLastName() == null ? "" : settings.getLastName()%>" required>
 </div>
+<div><span >Country</span></div>
 <div>
-    <span >Country</span>
     <input type="text" name="countryName" value="<%=settings.getCountryName() == null ? "" : settings.getCountryName()%>">
 </div>
+<div><span >City</span></div>
 <div>
-    <span >City</span>
     <input type="text" name="townName" value="<%=settings.getTownName() == null ? "" : settings.getTownName()%>">
 </div>
+<div><span >Latitude</span></div>
 <div>
-    <span >Latitude</span>
     <input type="text" name="lat" value="<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>">
 </div>
+<div><span >Longitude</span></div>
 <div>
-    <span >Longitude</span>
     <input type="text" name="lon" value="<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>">
 </div>
+<div><span >Mobidot Account</span></div>
 <div>
 <input type="hidden" name="pi_source" value="Mobidot">
-    <span >Mobidot Account</span>
     <input type="text" name="pi_id" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
 </div>
 <div style="height: 10px;"></div>
-<div align="justify" style="width: 630px;font-size: 11px;"  >
+<div align="justify" style="font-size: 11px;"  >
 Disclaimer: The information marked by red star are required. For Mobidot account, if the user specifies it, it will help us crawl the mobility profile and associate mobility related preferences while augmenting the query. If the Mobidot account is not specified, we will not augment the query based on mobility preferences and we will not crawl the mobility profile of the user.
 </div>
 <div style="height: 10px;"></div>
-<div align="center" style="width: 630px;" >
+<div align="center"  >
     <input type="submit" value="Save">
     <input type="button" value="Cancel" onclick="reset();">
 </div>
