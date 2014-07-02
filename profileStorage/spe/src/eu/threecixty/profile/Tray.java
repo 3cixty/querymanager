@@ -10,6 +10,7 @@ public class Tray {
 	
 	private String element_id;
 	private ItemType element_type;
+	private String element_title;
 	private long timestamp;
 	// real UID or junkID
 	private String token;
@@ -84,6 +85,16 @@ public class Tray {
 	public void setRating(int rating) {
 		this.rating = rating;
 	}
+
+	public String getElement_title() {
+		return element_title;
+	}
+
+	public void setElement_title(String element_title) {
+		this.element_title = element_title;
+	}
+
+
 
 	public enum ItemType {
 		event, poi, transportation
