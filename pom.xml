@@ -13,8 +13,8 @@
     <module>profileKB</module>
 	<module>models</module>
 	<module>spe</module>
-<!-- 	<module>privacyManager</module> -->
     <module>ProfileStorage-api</module>
+    <module>ProfileStorage</module>
   </modules>
   
   <build>
