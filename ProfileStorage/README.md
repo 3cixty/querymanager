@@ -68,17 +68,38 @@ ProfileStorage.ontology.db.path=D:/Users/T0125851/Projets/3cixty/DB
 
 Set the property ```ProfileStorage.ontology.path``` in the configuration file to specify the path to the ontology.
 
+#### Main API interfaces
+
+The main interfaces are defined in *ProfileStorage API*
+* eu.threecixty.privacy.datastorage.ProfileManager
+* eu.threecixty.privacy.datastorage.ProfileManagerFactory
+* eu.threecixty.privacy.auth.Authenticator
+* eu.threecixty.privacy.auth.Service
+* eu.threecixty.privacy.auth.Session
+* eu.threecixty.privacy.auth.SessionManager
+
+#### Main implementation classes
+Implementation classes provided in ProfileStorage:
+* ```ProfileManagerFactory``` is implemented by ```com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleProfileManagerFactory```
+
+* ```SessionManager``` is implemented by ```com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleSessionManager```
+
+* Other implementations are hidden and are obtained using the factory and manager. They are specific to the general implementation of the privacy framework.
+
 #### Principles of use
 
-* The main operations are available through the interface ```eu.threecixty.privacy.datastorage.ProfileManager```.
+*The security model is yet to be defined and implemented. That's why the subject is openely discussed in this documentation*
 
-* Instances of this interface are obtained through the factory ```eu.threecixty.privacy.datastorage.ProfileManagerFactory```.
+The main operations are provided by the interface ```ProfileManager```. A ProfileManager is created using the factory ```ProfileManagerFactory```'s method ```getProfileManager(String)```. The method's argument is the path of the configuration file to be parsed.
 
-* ProfileStorage supplies an implementation of the factory: ```com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleProfileManagerFactory``` 
+Every method of ```ProfileManager``` requires a valid ```Session``` and sessions are requested from a ```SessionManager```. To open a session, you need to pass an ```Authenticator``` to ```ProfileManagerFactory```'s method ```getAuthenticator```. Each authenticator is tight to a requester service and user. Both of them are mandatory.
 
-* Every method of ```ProfileManager``` requires a valid ```Session``` object.
 
-* Services are identified and authentified through the interface ``````
+Services are represented by the interface ```Service``` and are addressed using ```ProfileManagerFactory.getService(String, String)```. The arguments are specific to the services security model implemented. They can be the service ID and an App Key.
+
+Before authentication, a user typicaly consists of a pair of user name and credential, whose representation also depends on the user security model implemented. After authentication, a user should be only referenced by a unique identifier, possibly specific to the session.
+
+A end-user can be anonymous. If the request is emanating from a software component or a service instead of a end-user (for example, a dataminer), the user specified for the sesssion must be specific to this component or be the system user (and cannot be anonymous)
 
 #### Examples
 
