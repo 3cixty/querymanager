@@ -19,6 +19,14 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.vocab.XSDVocabulary;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
+
 import uk.ac.manchester.cs.owl.owlapi.OWLDatatypeImpl;
 
 import eu.threecixty.models.Address;
@@ -946,17 +954,56 @@ public class ProfileInformationStorage {
 		return null;
 	}
 
+	// TODO: too slow
+//	public static boolean existUID(String uid) {
+//		if (uid == null) return false;
+//		try {
+//			MyFactory mf = getMyFactory();
+//			UserProfile userProfile = mf.getUserProfile(PROFILE_URI + uid);
+//
+//			if (userProfile == null) return false;
+//			return true;
+//		} catch (OWLOntologyCreationException e) {
+//			e.printStackTrace();
+//		}
+//		return false;
+//	}
+	
+	/**
+	 * Checks whether or not a given UID exists in the UserProfile.
+	 * @param uid
+	 * @return
+	 */
 	public static boolean existUID(String uid) {
 		if (uid == null) return false;
-		try {
-			MyFactory mf = getMyFactory();
-			UserProfile userProfile = mf.getUserProfile(PROFILE_URI + uid);
-
-			if (userProfile == null) return false;
-			return true;
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
+		Model model = RdfFileManager.getInstance().getRdfModel();
+		if (model == null) return false;
+	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
+	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
+	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
+	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
+	    qStr += "SELECT  DISTINCT  ?uid\n";
+	    qStr += "WHERE {\n\n";
+	    qStr += "?root a owl:NamedIndividual .\n";
+	    qStr += "?root profile:hasUID ?uid .\n";
+	    qStr += "FILTER (STR(?uid) = \"" + uid + "\") . \n\n";
+	    qStr += "}";
+	    Query query = QueryFactory.create(qStr);
+	    
+		QueryExecution qe = QueryExecutionFactory.create(query, model);
+		
+		
+		ResultSet rs = qe.execSelect();
+		
+		for ( ; rs.hasNext(); ) {
+			QuerySolution qs = rs.next();
+			String tmpuid = qs.getLiteral("uid").getString();
+			if (tmpuid != null && !tmpuid.equals("")) {
+				qe.close();
+				return true;
+			}
 		}
+		qe.close();
 		return false;
 	}
 	

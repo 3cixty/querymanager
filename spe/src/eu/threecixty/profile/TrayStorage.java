@@ -167,15 +167,16 @@ public class TrayStorage {
 		for(int i = 0 ; i < array.length(); i++){
 		    JSONObject jsonObj = (JSONObject)array.get(i);
 		    Tray tray = new Tray();
-		    tray.setItemId(jsonObj.getString("itemId"));
-		    tray.setItemType(ItemType.valueOf(jsonObj.getString("itemType")));
+		    tray.setItemId(jsonObj.getString("element_id"));
+		    tray.setItemType(ItemType.valueOf(jsonObj.getString("element_type")));
 		    tray.setTimestamp(jsonObj.getLong("timestamp"));
-		    tray.setUid(jsonObj.getString("uid"));
+		    tray.setUid(jsonObj.getString("token"));
 		    tray.setSource(jsonObj.getString("source"));
 		    
-		    if (jsonObj.has("attended")) tray.setAttended(jsonObj.getBoolean("attended"));
-		    if (jsonObj.has("dateTimeAttended")) tray.setDateTimeAttended(jsonObj.getString("dateTimeAttended"));
-		    if (jsonObj.has("dateTimeAttended")) tray.setRating(jsonObj.getInt("rating"));
+		    if (jsonObj.has("attend")) tray.setAttended(jsonObj.getBoolean("attend"));
+		    if (jsonObj.has("attend_datetime")) tray.setDateTimeAttended(jsonObj.getString("attend_datetime"));
+		    if (jsonObj.has("attend_datetime")) tray.setRating(jsonObj.getInt("rating"));
+		    if (jsonObj.has("element_title")) tray.setElement_title(jsonObj.getString("element_title"));
 		    trays.add(tray);
 		}
 		} catch (Exception e) {

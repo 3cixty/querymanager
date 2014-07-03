@@ -8,32 +8,33 @@ package eu.threecixty.profile;
  */
 public class Tray {
 	
-	private String itemId;
-	private ItemType itemType;
+	private String element_id;
+	private ItemType element_type;
+	private String element_title;
 	private long timestamp;
 	// real UID or junkID
-	private String uid;
+	private String token;
 	private String source;
 	
-	private boolean attended;
-	private String dateTimeAttended;
+	private boolean attend;
+	private String attend_datetime;
 	private int rating = -1;
 	
 	
 	public String getItemId() {
-		return itemId;
+		return element_id;
 	}
 
 	public void setItemId(String itemId) {
-		this.itemId = itemId;
+		this.element_id = itemId;
 	}
 
 	public ItemType getItemType() {
-		return itemType;
+		return element_type;
 	}
 
 	public void setItemType(ItemType itemType) {
-		this.itemType = itemType;
+		this.element_type = itemType;
 	}
 
 	public long getTimestamp() {
@@ -45,11 +46,11 @@ public class Tray {
 	}
 
 	public String getUid() {
-		return uid;
+		return token;
 	}
 
 	public void setUid(String uid) {
-		this.uid = uid;
+		this.token = uid;
 	}
 	
 	
@@ -62,19 +63,19 @@ public class Tray {
 	}
 
 	public boolean isAttended() {
-		return attended;
+		return attend;
 	}
 
 	public void setAttended(boolean attended) {
-		this.attended = attended;
+		this.attend = attended;
 	}
 
 	public String getDateTimeAttended() {
-		return dateTimeAttended;
+		return attend_datetime;
 	}
 
 	public void setDateTimeAttended(String dateTimeAttended) {
-		this.dateTimeAttended = dateTimeAttended;
+		this.attend_datetime = dateTimeAttended;
 	}
 
 	public int getRating() {
@@ -84,6 +85,16 @@ public class Tray {
 	public void setRating(int rating) {
 		this.rating = rating;
 	}
+
+	public String getElement_title() {
+		return element_title;
+	}
+
+	public void setElement_title(String element_title) {
+		this.element_title = element_title;
+	}
+
+
 
 	public enum ItemType {
 		event, poi, transportation
