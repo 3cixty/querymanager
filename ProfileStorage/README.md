@@ -19,7 +19,7 @@ Tech
 -----------
 ProfileStorage uses a number of open source projects to work properly:
 
-* [Jena] - awesome web-based text editor
+* [Jena] - A free and open source Java framework for building Semantic Web and Linked Data applications
 
 The module supports [JSON-LD] and [SPARQL] 1.1 [Property Path][1]
 
@@ -130,6 +130,7 @@ License
 
 Copyright (c) 2014 Thales Services, All rights Reserved.
 
+[jena]: https://jena.apache.org/
 [json-ld]: http://json-ld.org/
 [sparql]: http://www.w3.org/TR/rdf-sparql-query/
 [1]: http://www.w3.org/TR/sparql11-property-paths/
