@@ -61,13 +61,15 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/countItems")
-	@Produces("text/plain")
+	@Produces("application/json")
 	public String countItems(@QueryParam("key") String key) {
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			QueryManager qm = new QueryManager("false");
 			return executeQuery(null, qm, query, null);
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else
+			throw new WebApplicationException(
+					HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 
 	/**
@@ -82,10 +84,13 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/getAggregatedItems/{group}")
-	@Produces("text/plain")
-	public String getAggregatedItems(@PathParam("group") String group, @DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2, @QueryParam("key") String key) {
+	@Produces("application/json")
+	public String getAggregatedItems(@PathParam("group") String group,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("{}") @QueryParam("filter1") String filter1,
+			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@QueryParam("key") String key) {
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			if (groupTriples.containsKey(group)) {
 				Gson gson = new Gson();
@@ -93,19 +98,27 @@ public class QueryManagerServices {
 				KeyValuePair pair2 = null;
 				try {
 					pair1 = gson.fromJson(filter1, KeyValuePair.class);
-				} catch (Exception e) {}
+				} catch (Exception e) {
+				}
 				try {
 					pair2 = gson.fromJson(filter2, KeyValuePair.class);
-				} catch (Exception e) {}
-				boolean existed1 = pair1 != null && pair1.getGroupBy() != null && groupTriples.containsKey(pair1.getGroupBy());
-				boolean existed2 = pair2 != null && pair2.getGroupBy() != null && groupTriples.containsKey(pair2.getGroupBy());
-				String query = createGroupQuery(group, offset, limit, existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
+				} catch (Exception e) {
+				}
+				boolean existed1 = pair1 != null && pair1.getGroupBy() != null
+						&& groupTriples.containsKey(pair1.getGroupBy());
+				boolean existed2 = pair2 != null && pair2.getGroupBy() != null
+						&& groupTriples.containsKey(pair2.getGroupBy());
+				String query = createGroupQuery(group, offset, limit,
+						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
 				QueryManager qm = new QueryManager("false");
 				return executeQuery(null, qm, query, null);
 			}
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			throw new WebApplicationException(
+					HttpURLConnection.HTTP_BAD_REQUEST);
+		} else
+			throw new WebApplicationException(
+					HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
 	/**
@@ -122,7 +135,7 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/getItems")
-	@Produces("text/plain")
+	@Produces("application/json")
 	public String getItems(@DefaultValue("false") @QueryParam("accessToken") String accessToken,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,

@@ -69,11 +69,16 @@ public class QueryManagerServlet extends HttpServlet {
 				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				out.write("Access token is incorrect or expired");
 			} else {
-				resp.setContentType("text/plain");
 				profiler = isAccessTokenFalse ? null : new Profiler(user_id);
 				QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
 				EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 
+				if (eventMediaFormat == EventMediaFormat.JSON) {
+					resp.setContentType("application/json");
+				} else {
+					resp.setContentType("text/plain");
+				}
+				
 				if (eventMediaFormat != null && query != null) {
 					String result = executeQuery(profiler, qm, isAccessTokenFalse ? false : isUsingPreferences,
 							eventMediaFormat, query, req);

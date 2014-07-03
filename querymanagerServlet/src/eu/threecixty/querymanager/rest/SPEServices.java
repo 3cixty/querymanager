@@ -29,11 +29,13 @@ public class SPEServices {
 	 * Gets profile information in JSON format from a given Google access token and an App key.
 	 * @param accessToken
 	 * @param key
-	 * @return
+	 * @return a string in JSON format which represents the class ProfileInformation. Please check
+	 *         the document at https://docs.google.com/document/d/1RPlZJaCWbb6G9Ilf-nTMavU_AAkzIj8fKSDwSNvpXtg/edit
+	 *         for more information.
 	 */
 	@GET
 	@Path("/getProfile")
-	@Produces("text/plain")
+	@Produces("application/json")
 	public String getProfile(@QueryParam("accessToken") String accessToken, @QueryParam("key") String key) {
 		try {
 			if (KeyManager.getInstance().checkAppKey(key)) {
@@ -56,12 +58,13 @@ public class SPEServices {
 	 * @param accessToken
 	 * @param profileStr
 	 * @param key
-	 * @return
+	 * @return If successful, the message <code>{"save": "true"}</code> will be returned. Otherwise,
+	 *         the message <code>{"save": "false"}</code> will be returned.
 	 */
 	@POST
 	@Path("/saveProfile")
-	@Produces("text/plain")
-	public boolean saveProfile(@FormParam("accessToken") String accessToken, @FormParam("profile") String profileStr, @FormParam("key") String key) {
+	@Produces("application/json")
+	public String saveProfile(@FormParam("accessToken") String accessToken, @FormParam("profile") String profileStr, @FormParam("key") String key) {
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(accessToken);
 			if (uid == null || uid.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -71,7 +74,7 @@ public class SPEServices {
 				ProfileInformation profile = gson.fromJson(profileStr, ProfileInformation.class);
 				if (profile == null) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 				profile.setUid(uid);
-				return ProfileInformationStorage.saveProfile(profile);
+				return "{\"save\":\"" + ProfileInformationStorage.saveProfile(profile) + "\"}";
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -83,16 +86,17 @@ public class SPEServices {
 	 * Gets Google UID from a Google access token and an App key.
 	 * @param accessToken
 	 * @param key
-	 * @return
+	 * @return If a given access token is valid, a message <code>{"uid": "103918130978226832690"}</code> for example will be returned. Otherwise,
+	 *         the message <code>{"uid": ""}</code> will be returned.
 	 */
 	@POST
 	@Path("/getUID")
-	@Produces("text/plain")
+	@Produces("application/json")
 	public String getUID(@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(accessToken);
-			if (uid == null || uid.equals("")) return "";
-			return uid;
+			if (uid == null) uid = "";
+			return "{\"uid\":\"" + uid + "\"}";
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
@@ -100,16 +104,17 @@ public class SPEServices {
 	 * Checks whether or not a Google access token is valid.
 	 * @param accessToken
 	 * @param key
-	 * @return
+	 * @return If a given access token is valid, a message <code>{"validation": "true"}</code> for example will be returned. Otherwise,
+	 *         the message <code>{"validation": "false"}</code> will be returned.
 	 */
 	@POST
 	@Path("/validate")
-	@Produces("text/plain")
-	public boolean validate(@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
+	@Produces("application/json")
+	public String validate(@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(accessToken);
-			if (uid == null || uid.equals("")) return false;
-			return true;
+			boolean valid = (uid == null || uid.equals("")) ? false : true;
+			return "{\"validation\":\"" + valid + "\"}";
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 }

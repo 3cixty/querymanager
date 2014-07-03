@@ -7,6 +7,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 
 
@@ -36,6 +37,7 @@ public class TrayServices {
 	 */
 	@POST
 	@Path("/{action}")
+	@Produces("application/json")
 	public String invokeTrayService(@PathParam("action") String action, @FormParam("key") String key,
 			@FormParam("accessToken") String accessToken, @FormParam("tray") String tray) {
 		if (!isNotNullOrEmpty(action) || !isNotNullOrEmpty(accessToken) || !isNotNullOrEmpty(tray))
@@ -63,10 +65,12 @@ public class TrayServices {
 	 * This method is to empty tray items associated with a given token.
 	 * @param accessToken
 	 * @param key
-	 * @return
+	 * @return Returns the message <code>{"empty": "true"}</code> if a given access token and key are correct.
+	 *         Otherwise, returns an error with HTTP status code = 400.
 	 */
 	@POST
 	@Path("/empty")
+	@Produces("application/json")
 	public String empty(
 			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
 		if (!isNotNullOrEmpty(accessToken))
@@ -75,7 +79,7 @@ public class TrayServices {
 			String uid = GoogleAccountUtils.getUID(accessToken);
 			if (uid == null || uid.equals("")) uid = accessToken;
 			emptyTrays(uid);
-			return "";
+			return "{\"empty\":\"true\"}";
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 	
@@ -87,6 +91,7 @@ public class TrayServices {
 	 */
 	@POST
 	@Path("/list")
+	@Produces("application/json")
 	public String list(
 			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
 		if (!isNotNullOrEmpty(accessToken))
@@ -103,10 +108,12 @@ public class TrayServices {
 	 * @param junkToken
 	 * @param googleToken
 	 * @param key
-	 * @return
+	 * @return Returns the message <code>{"login": "true"}</code> if a given access token and key are correct.
+	 *         Otherwise, returns an error with HTTP status code = 400.
 	 */
 	@POST
 	@Path("/login")
+	@Produces("application/json")
 	public String login(
 			@FormParam("junkToken") String junkToken, @FormParam("googleToken") String googleToken, @FormParam("key") String key) {
 		if (!isNotNullOrEmpty(junkToken) || !isNotNullOrEmpty(googleToken))
@@ -116,7 +123,7 @@ public class TrayServices {
 			if (uid == null || uid.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 
 			if (TrayStorage.replaceUID(junkToken, uid)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-			return "";
+			return "{\"login\":\"true\"}";
 		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 		
@@ -126,31 +133,52 @@ public class TrayServices {
 		return gson.toJson(trays);
 	}
 
+	/**
+	 * 
+	 * @param uid
+	 * @param newTray
+	 * @return Returns the message <code>{"action": "true"}</code> if a given access token and key are correct.
+	 *         Otherwise, returns an error with HTTP status code = 400.
+	 */
 	private String addTray(String uid, Tray newTray) {
 		if (!isNotNullOrEmpty(newTray.getItemId()) || !isNotNullOrEmpty(newTray.getSource())
 				|| newTray.getItemType() == null) {
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 		}
 		if (!TrayStorage.addTray(newTray)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		return "";
+		return "{\"action\":\"true\"}";
 	}
 
+	/**
+	 * 
+	 * @param uid
+	 * @param newTray
+	 * @return Returns the message <code>{"action": "true"}</code> if a given access token and key are correct.
+	 *         Otherwise, returns an error with HTTP status code = 400.
+	 */
 	private String updateTray(String uid, Tray newTray) {
 		if (!isNotNullOrEmpty(newTray.getItemId()) || !isNotNullOrEmpty(newTray.getSource())
 				|| newTray.getItemType() == null) {
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 		}
 		if (!TrayStorage.update(newTray)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		return "";
+		return "{\"action\":\"true\"}";
 	}
 	
+	/**
+	 * 
+	 * @param uid
+	 * @param newTray
+	 * @return Returns the message <code>{"action": "true"}</code> if a given access token and key are correct.
+	 *         Otherwise, returns an error with HTTP status code = 400.
+	 */
 	private String deleteTray(String uid, Tray newTray) {
 		if (!isNotNullOrEmpty(newTray.getItemId())
 				|| newTray.getItemType() == null) {
 			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 		}
 		if (!TrayStorage.deleteTray(newTray)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-		return "";
+		return "{\"action\":\"true\"}";
 	}
 	
 	private void emptyTrays(String uid) {
