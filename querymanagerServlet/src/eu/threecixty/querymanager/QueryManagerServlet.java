@@ -89,7 +89,9 @@ public class QueryManagerServlet extends HttpServlet {
 			}
 
 			out.close();
-		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} else {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Your AppKey '" + key + "' is invalid. Please get a new key");
+		}
 	}
 
 	/**

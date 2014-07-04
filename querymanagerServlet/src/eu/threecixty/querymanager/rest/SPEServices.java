@@ -9,6 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
@@ -40,17 +42,35 @@ public class SPEServices {
 		try {
 			if (KeyManager.getInstance().checkAppKey(key)) {
 				String uid = GoogleAccountUtils.getUID(accessToken);
-				if (uid == null || uid.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+				if (uid == null || uid.equals("")) {
+					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity("The access token is invalid: '" + accessToken + "'")
+					        .type(MediaType.TEXT_PLAIN)
+					        .build());
+				}
 				ProfileInformation profile = ProfileInformationStorage.loadProfile(uid);
-				if (profile == null) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+				if (profile == null) {
+					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity("There is no information of your profile in the KB")
+					        .type(MediaType.TEXT_PLAIN)
+					        .build());
+				}
 				Gson gson = new Gson();
 				String ret = gson.toJson(profile);
 				return ret;
-			} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			} else {
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("The key is invalid '" + key + "'")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity(e.getMessage())
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
 		}
-		throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 
 	/**
@@ -67,19 +87,42 @@ public class SPEServices {
 	public String saveProfile(@FormParam("accessToken") String accessToken, @FormParam("profile") String profileStr, @FormParam("key") String key) {
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(accessToken);
-			if (uid == null || uid.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
-			if (profileStr == null || profileStr.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			if (uid == null || uid.equals("")) {
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("The access token is invalid: '" + accessToken + "'")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
+			}
+			if (profileStr == null || profileStr.equals("")) {
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("Invalid profile in JSON format: '" + profileStr + "'")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
+			}
 			Gson gson = new Gson();
 			try {
 				ProfileInformation profile = gson.fromJson(profileStr, ProfileInformation.class);
-				if (profile == null) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+				if (profile == null) {
+					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity("There is no information of your profile in the KB")
+					        .type(MediaType.TEXT_PLAIN)
+					        .build());
+				}
 				profile.setUid(uid);
 				return "{\"save\":\"" + ProfileInformationStorage.saveProfile(profile) + "\"}";
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
 			}
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 	
 	/**
@@ -97,7 +140,12 @@ public class SPEServices {
 			String uid = GoogleAccountUtils.getUID(accessToken);
 			if (uid == null) uid = "";
 			return "{\"uid\":\"" + uid + "\"}";
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 	
 	/**
@@ -115,6 +163,11 @@ public class SPEServices {
 			String uid = GoogleAccountUtils.getUID(accessToken);
 			boolean valid = (uid == null || uid.equals("")) ? false : true;
 			return "{\"validation\":\"" + valid + "\"}";
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 }

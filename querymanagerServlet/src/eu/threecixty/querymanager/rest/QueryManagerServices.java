@@ -17,6 +17,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
@@ -67,9 +69,12 @@ public class QueryManagerServices {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			QueryManager qm = new QueryManager("false");
 			return executeQuery(null, qm, query, null);
-		} else
-			throw new WebApplicationException(
-					HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 
 	/**
@@ -114,11 +119,16 @@ public class QueryManagerServices {
 				QueryManager qm = new QueryManager("false");
 				return executeQuery(null, qm, query, null);
 			}
-			throw new WebApplicationException(
-					HttpURLConnection.HTTP_BAD_REQUEST);
-		} else
-			throw new WebApplicationException(
-					HttpURLConnection.HTTP_BAD_REQUEST);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The group is invalid '" + group + "'. The group is one of locality, category, country, publishe, placeName, and artist")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 	
 	/**
@@ -151,7 +161,10 @@ public class QueryManagerServices {
 			}
 
 			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
-				throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("The access token is invalid: '" + accessToken + "'")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
 			} else {
 				Gson gson = new Gson();
 				KeyValuePair pair1 = null;
@@ -175,7 +188,12 @@ public class QueryManagerServices {
 				String result = executeQuery(profiler, qm, query, preference);
 				return result;
 			}
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,

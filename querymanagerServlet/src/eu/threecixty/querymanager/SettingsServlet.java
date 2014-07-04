@@ -89,7 +89,9 @@ public class SettingsServlet extends HttpServlet {
 				resp.sendRedirect("./settingsServlet?accessToken=" + accessToken + "&key=" + key);
 
 			}
-		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} else {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Your AppKey '" + key + "' is invalid. Please get a new key");
+		}
 		
 	}
 
@@ -129,7 +131,9 @@ public class SettingsServlet extends HttpServlet {
 					e.printStackTrace();
 				}
 			}
-		} else resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} else {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Your AppKey '" + key + "' is invalid. Please get a new key");
+		}
 	}
 
 	/**

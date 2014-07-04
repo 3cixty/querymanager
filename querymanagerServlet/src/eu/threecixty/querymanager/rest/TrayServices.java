@@ -9,6 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 
 
@@ -40,8 +42,12 @@ public class TrayServices {
 	@Produces("application/json")
 	public String invokeTrayService(@PathParam("action") String action, @FormParam("key") String key,
 			@FormParam("accessToken") String accessToken, @FormParam("tray") String tray) {
-		if (!isNotNullOrEmpty(action) || !isNotNullOrEmpty(accessToken) || !isNotNullOrEmpty(tray))
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!isNotNullOrEmpty(action) || !isNotNullOrEmpty(accessToken) || !isNotNullOrEmpty(tray)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("Please check your parameters: action = " + action + ", accessToken = " + accessToken + ", tray = " + tray)
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(accessToken);
 			if (uid == null || uid.equals("")) uid = accessToken;
@@ -54,10 +60,16 @@ public class TrayServices {
 			} else if (action.equalsIgnoreCase("delete")) {
 				return deleteTray(uid, newTray);
 			} else {
-				throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("The path /" + action + " is not supported. There are three paths supported: /add, /update and /delete")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
 			}
 		} else {
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
 		}
 	}
 	
@@ -73,14 +85,23 @@ public class TrayServices {
 	@Produces("application/json")
 	public String empty(
 			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
-		if (!isNotNullOrEmpty(accessToken))
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!isNotNullOrEmpty(accessToken)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("Please check your parameter:  accessToken = " + accessToken)
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(accessToken);
 			if (uid == null || uid.equals("")) uid = accessToken;
 			emptyTrays(uid);
 			return "{\"empty\":\"true\"}";
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 	
 	/**
@@ -94,13 +115,22 @@ public class TrayServices {
 	@Produces("application/json")
 	public String list(
 			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
-		if (!isNotNullOrEmpty(accessToken))
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!isNotNullOrEmpty(accessToken)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("Please check your parameter:  accessToken = " + accessToken)
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(accessToken);
 			if (uid == null || uid.equals("")) uid = accessToken;
 		    return listTrays(uid);
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 	
 	/**
@@ -116,15 +146,34 @@ public class TrayServices {
 	@Produces("application/json")
 	public String login(
 			@FormParam("junkToken") String junkToken, @FormParam("googleToken") String googleToken, @FormParam("key") String key) {
-		if (!isNotNullOrEmpty(junkToken) || !isNotNullOrEmpty(googleToken))
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!isNotNullOrEmpty(junkToken) || !isNotNullOrEmpty(googleToken)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("Please check your parameters:  junkToken = " + junkToken + ", googleToken = " + googleToken)
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String uid = GoogleAccountUtils.getUID(googleToken);
-			if (uid == null || uid.equals("")) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			if (uid == null || uid.equals("")) {
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("The googleToken is invalid '" + googleToken + "'")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
+			}
 
-			if (TrayStorage.replaceUID(junkToken, uid)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			if (TrayStorage.replaceUID(junkToken, uid)) {
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("Cannot replace the junkToken with googleToken")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
+			}
 			return "{\"login\":\"true\"}";
-		} else throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 		
 	private String listTrays(String uid) {
@@ -143,9 +192,17 @@ public class TrayServices {
 	private String addTray(String uid, Tray newTray) {
 		if (!isNotNullOrEmpty(newTray.getItemId()) || !isNotNullOrEmpty(newTray.getSource())
 				|| newTray.getItemType() == null) {
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("element_id, element_type and source must be not empty. They are: element_id = " + newTray.getItemId() + ", element_type = " + newTray.getItemType() + ", source = " + newTray.getSource())
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
 		}
-		if (!TrayStorage.addTray(newTray)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!TrayStorage.addTray(newTray)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The tray seems to be existed or there is a problem for storing the tray")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 		return "{\"action\":\"true\"}";
 	}
 
@@ -159,9 +216,17 @@ public class TrayServices {
 	private String updateTray(String uid, Tray newTray) {
 		if (!isNotNullOrEmpty(newTray.getItemId()) || !isNotNullOrEmpty(newTray.getSource())
 				|| newTray.getItemType() == null) {
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("element_id, element_type and source must be not empty. They are: element_id = " + newTray.getItemId() + ", element_type = " + newTray.getItemType() + ", source = " + newTray.getSource())
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
 		}
-		if (!TrayStorage.update(newTray)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!TrayStorage.update(newTray)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The tray seems not to be existed or there is a problem for storing the tray")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 		return "{\"action\":\"true\"}";
 	}
 	
@@ -173,16 +238,28 @@ public class TrayServices {
 	 *         Otherwise, returns an error with HTTP status code = 400.
 	 */
 	private String deleteTray(String uid, Tray newTray) {
-		if (!isNotNullOrEmpty(newTray.getItemId())
-				|| newTray.getItemType() == null) {
-			throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!isNotNullOrEmpty(newTray.getItemId())) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("element_id must be not empty: element_id = " + newTray.getItemId())
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
 		}
-		if (!TrayStorage.deleteTray(newTray)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!TrayStorage.deleteTray(newTray)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The tray seems not to be existed or there is a problem for deleting the tray")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 		return "{\"action\":\"true\"}";
 	}
 	
 	private void emptyTrays(String uid) {
-		if (!TrayStorage.cleanTrays(uid)) throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+		if (!TrayStorage.cleanTrays(uid)) {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("there is a problem for read/write the trays")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
 	}
 	
 	private Tray convertString2Tray(String trayStr) {
