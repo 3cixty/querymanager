@@ -1,5 +1,10 @@
 This document shows you how to deploy querymanagerServlet and how to make a remote query to QueryManager.
 
+### Requirements:
+- Install Mysql database, then create the database named `3cixty` and a user called `3cixty` with password `3cixtydatabase001`.
+- Set all permissions for the database `3cixty` to the user `3cixty`
+
+
 ### How to deploy querymanagerServlet:
 
 - Checkout the appkey repository <code>https://github.com/3cixty/appkey.git</code> and compile the module
