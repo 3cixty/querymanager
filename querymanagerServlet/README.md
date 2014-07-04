@@ -2,6 +2,8 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 ### How to deploy querymanagerServlet:
 
+- Checkout the appkey repository <code>https://github.com/3cixty/appkey.git</code> and compile the module
+
 - Checkout the storageProfile repository <code>https://github.com/3cixty/profileStorage.git</code> and compile the module
 
 - Go to the "querymanager" repository and execute the following command:
