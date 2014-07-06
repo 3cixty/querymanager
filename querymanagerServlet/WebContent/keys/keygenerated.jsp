@@ -4,14 +4,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Download your development key</title>
+<title>Key generated</title>
 
 
 </head>
 <body>
 <%
 	if (session.getAttribute("key") == null) {
-		   response.sendRedirect("./error.jsp");
+		   response.sendRedirect("../error.jsp");
 	} else  {
 %>
 

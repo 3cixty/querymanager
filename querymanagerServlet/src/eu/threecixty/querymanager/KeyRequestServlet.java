@@ -54,7 +54,7 @@ public class KeyRequestServlet extends HttpServlet {
 			ThreeCixtySettings settings = SettingsStorage.load(uid);
 			req.setAttribute("settings", settings);
 			try {
-				RequestDispatcher rd = getServletContext().getRequestDispatcher("/keyrequest.jsp");
+				RequestDispatcher rd = getServletContext().getRequestDispatcher("/keys/keyrequest.jsp");
 				rd.forward(req, resp);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -68,7 +68,7 @@ public class KeyRequestServlet extends HttpServlet {
 		HttpSession session = req.getSession();
 		String uid = (String) session.getAttribute("uid");
 		if (uid == null || uid.equals("")) {
-			resp.sendRedirect("./error.jsp");
+			resp.sendRedirect("/error.jsp");
 		} else {
 			String email = req.getParameter("email");
 			String domain = req.getParameter("domain");
@@ -83,9 +83,9 @@ public class KeyRequestServlet extends HttpServlet {
 			owner.setUid(uid);
 			if (KeyManager.getInstance().addOrUpdateAppKey(appKey)) {
 				session.setAttribute("key", rawKey);
-				resp.sendRedirect("./keyGenerated");
+				resp.sendRedirect("/keys/keyGenerated");
 			} else {
-				resp.sendRedirect("./unsuccessfulKeyRequest.jsp");
+				resp.sendRedirect("/keys/unsuccessfulKeyRequest.jsp");
 			}
 		}
 		

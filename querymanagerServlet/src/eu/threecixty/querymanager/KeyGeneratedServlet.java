@@ -30,7 +30,7 @@ public class KeyGeneratedServlet extends HttpServlet {
 			}
 		} else {
 			try {
-				RequestDispatcher rd = getServletContext().getRequestDispatcher("/keygenerated.jsp");
+				RequestDispatcher rd = getServletContext().getRequestDispatcher("/keys/keygenerated.jsp");
 				rd.forward(req, resp);
 			} catch (Exception e) {
 				e.printStackTrace();
