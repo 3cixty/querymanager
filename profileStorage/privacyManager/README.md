@@ -1,7 +1,6 @@
-ProfileStorage
+Privacy Manager
 =========
-
-ProfileStorage is a library holding the private knowledge base of user profiles and managing the access controls.
+Privacy Manager is the component holding the private knowledge base of user profiles and managing the access controls.
 
 Features:
   - User-centric privacy of profiles
@@ -11,13 +10,23 @@ Features:
 
 Version
 ----
-Alpha 0.1
+Privacy Manager version alpha 0.1.1
 
-This version implements [ProfileStorage-API] version 1.1
+#### Maven
+In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
+
+```
+<dependency>
+    <groupId>eu.3cixty.privacy</groupId>
+    <artifactId>privacymanager</artifactId>
+    <version>0.1.1</version>
+</dependency>
+
+```
 
 Tech
 -----------
-ProfileStorage uses a number of open source projects to work properly:
+Privacy Manager uses a number of open source projects to work properly:
 
 * [Jena] - A free and open source Java framework for building Semantic Web and Linked Data applications
 
@@ -25,25 +34,15 @@ The module supports [JSON-LD] and [SPARQL] 1.1 [Property Path][1]
 
 Installation
 -----------
-Installation is performed through Maven executed from the root directory of the ProfileStorage project:
 
-```mvn install```
+Installation of Privacy Manager in local Maven repository:
 
-You can also run it from Eclipse or an other Maven integrated IDE.
+```mvn install:install-file -Dfile=libs/privacymanager-0.1.1.jar -DpomFile=libs/privacymanager-0.1.1.pom```
+
+For more commands and install options see [Installing 3rd party library][2]
 
 Usage
 -----------
-#### Maven
-In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
-
-```
-<dependency>
-    <groupId>eu.3cixty.privacy</groupId>
-    <artifactId>profile-storage</artifactId>
-    <version>0.1</version>
-</dependency>
-
-```
 
 #### Configuration
 
@@ -53,7 +52,8 @@ The default file looks like this:
 
 ```
 # the path of the ontology that represents the user profile
-ProfileStorage.ontology.path=D:/Users/T0125851/Projets/3cixty/ontology/UserProfileKBmodel_V1_func.rdf
+ProfileStorage.ontology.path=./UserProfileKBmodel.rdf
+
 # the namespace of the previous ontology
 ProfileStorage.ontology.ns=http://www.eu.3cixty.org/profile#
 
@@ -63,14 +63,14 @@ ProfileStorage.ontology.profile.concept=UserProfile
 # the property that is the key for user profile
 ProfileStorage.ontology.profile.key=hasUID
 
-ProfileStorage.ontology.db.path=D:/Users/T0125851/Projets/3cixty/DB
+ProfileStorage.ontology.db.path=./3cixty-profiles.db
 ```
 
 Set the property ```ProfileStorage.ontology.path``` in the configuration file to specify the path to the ontology.
 
 #### Main API interfaces
 
-The main interfaces are defined in *ProfileStorage API*
+The main interfaces are:
 * eu.threecixty.privacy.datastorage.ProfileManager
 * eu.threecixty.privacy.datastorage.ProfileManagerFactory
 * eu.threecixty.privacy.auth.Authenticator
@@ -79,7 +79,7 @@ The main interfaces are defined in *ProfileStorage API*
 * eu.threecixty.privacy.auth.SessionManager
 
 #### Main implementation classes
-Implementation classes provided in ProfileStorage:
+Implementation classes provided in the distribution:
 * ```ProfileManagerFactory``` is implemented by ```com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleProfileManagerFactory```
 
 * ```SessionManager``` is implemented by ```com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleSessionManager```
@@ -155,4 +155,4 @@ Copyright (c) 2014 Thales Services, All rights Reserved.
 [json-ld]: http://json-ld.org/
 [sparql]: http://www.w3.org/TR/rdf-sparql-query/
 [1]: http://www.w3.org/TR/sparql11-property-paths/
-[profilestorage-api]: https://github.com/3cixty/profileStorage/tree/master/ProfileStorage-api
+[2]: http://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
