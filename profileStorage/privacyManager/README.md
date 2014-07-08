@@ -35,7 +35,9 @@ The module supports [JSON-LD] and [SPARQL] 1.1 [Property Path][1]
 Installation
 -----------
 
-Installation of Privacy Manager in local Maven repository:
+Installation is performed during the install Maven phase.
+
+The artifact can also be manually installed in local Maven repository:
 
 ```mvn install:install-file -Dfile=libs/privacymanager-0.1.1.jar -DpomFile=libs/privacymanager-0.1.1.pom```
 
