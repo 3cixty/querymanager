@@ -68,7 +68,17 @@ public class KeyManager {
 	 * @return
 	 */
 	public boolean checkEmailExisted(String email) {
-		return appKeys.containsKey(email);
+		AppKey appKey = getAppKeyFromEmail(email);
+		return appKey != null;
+	}
+
+	/**
+	 * Checks whether or not a given UID exists.
+	 * @param uid
+	 * @return
+	 */
+	public boolean checkUidExisted(String uid) {
+		return appKeys.containsKey(uid);
 	}
 
 	/**
