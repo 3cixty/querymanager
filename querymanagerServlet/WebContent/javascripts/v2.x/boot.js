@@ -13,7 +13,12 @@
 
   function addScript(srcUrl) {
     // Stupid IE:  http://www.guypo.com/technical/ies-premature-execution-problem/
-    document.write('<scr' + 'ipt type="text/javascript" src="' + srcUrl + '"></script>');
+	  if (typeof(parentScriptPath) == "undefined") {
+	  //if (null === parentScriptPath) {
+          document.write('<scr' + 'ipt type="text/javascript" src="' + srcUrl + '"></script>');
+	  } else {
+		  document.write('<scr' + 'ipt type="text/javascript" src="' + parentScriptPath + srcUrl + '"></script>');
+	  }
   }
 
 

@@ -80,10 +80,12 @@ public class KeyRequestServlet extends HttpServlet {
 			KeyOwner owner = new KeyOwner();
 			appKey.setOwner(owner);
 			owner.setEmail(email);
+			owner.setFirstName(req.getParameter("firstName"));
+			owner.setLastName(req.getParameter("lastName"));
 			owner.setUid(uid);
 			if (KeyManager.getInstance().addOrUpdateAppKey(appKey)) {
 				session.setAttribute("key", rawKey);
-				resp.sendRedirect("/keys/keyGenerated");
+				resp.sendRedirect("keyGenerated");
 			} else {
 				resp.sendRedirect("/keys/unsuccessfulKeyRequest.jsp");
 			}
