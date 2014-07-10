@@ -11,16 +11,16 @@
 <body>
 
 <%
-    String accessToken = (String) request.getAttribute("accessToken");
-    String key = (String) request.getAttribute("key");
+    String accessToken = (String) session.getAttribute("accessToken");
+    String key = (String) session.getAttribute("key");
 
    if (session.getAttribute("uid") == null || accessToken == null || key == null) {
 	   response.sendRedirect("./error.jsp");
    } else  {
-        ThreeCixtySettings settings = (ThreeCixtySettings) request.getAttribute("settings");
+        ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 %>
 
-<form action="settingsServlet" method="post">
+<form action="./services/settings/save" method="post">
 <div>
     <input type="hidden" name="accessToken" value="<%=accessToken%>">
     <input type="hidden" name="key" value="<%=key%>">
@@ -59,8 +59,9 @@
 </div>
 <div><span >Mobidot Account</span></div>
 <div>
-<input type="hidden" name="pi_source" value="Mobidot">
-    <input type="text" name="pi_id" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
+<input type="hidden" name="sources" value="Mobidot">
+<input type="hidden" name="pi_ats" value="">
+    <input type="text" name="pi_ids" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
 </div>
 <div style="height: 10px;"></div>
 <div align="justify" style="font-size: 11px;"  >

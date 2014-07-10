@@ -18,23 +18,8 @@
 	</servlet>
 	
 	<servlet>
-	  <servlet-name>settingsServlet</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.SettingsServlet</servlet-class>
-	</servlet>
-	
-	<servlet>
 	  <servlet-name>trayServlet</servlet-name>
 	  <servlet-class>eu.threecixty.querymanager.TrayServlet</servlet-class>
-	</servlet>
-
-	<servlet>
-	  <servlet-name>keyRequest</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.KeyRequestServlet</servlet-class>
-	</servlet>
-
-	<servlet>
-	  <servlet-name>keyGenerated</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.KeyGeneratedServlet</servlet-class>
 	</servlet>
 	
 	  <servlet-mapping>
@@ -42,20 +27,8 @@
 	    <url-pattern>/queryManagerServlet</url-pattern>
 	  </servlet-mapping>
 	  <servlet-mapping>
-	    <servlet-name>settingsServlet</servlet-name>
-	    <url-pattern>/settingsServlet</url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
 	    <servlet-name>trayServlet</servlet-name>
 	    <url-pattern>/trayServlet</url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	    <servlet-name>keyRequest</servlet-name>
-	    <url-pattern>/keyRequest</url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	    <servlet-name>keyGenerated</servlet-name>
-	    <url-pattern>/keyGenerated</url-pattern>
 	  </servlet-mapping>
 
 	<!-- Auto scan REST service -->
