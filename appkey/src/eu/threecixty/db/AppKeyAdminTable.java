@@ -1,6 +1,7 @@
 package eu.threecixty.db;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -56,10 +57,37 @@ public class AppKeyAdminTable {
 		if (!validateUserName(username)) {
 			return false;
 		}
-        String sql = "INSERT INTO " + TABLE_NAME +
-	            " VALUES ('" + username + "', '" + password + "', '"
-        		+ firstName +  "', '" + lastName + "')";
-		return executeQuery(sql);
+        
+		Connection conn = DBConnection.getInstance().getConnection();
+		PreparedStatement  preparedStmt = null;
+		try {
+			conn.setAutoCommit(false);
+			String sql = "INSERT INTO " + TABLE_NAME + " (username, password, firstName, lastName) VALUES (?, ?, ?, ?)";
+			preparedStmt = conn.prepareStatement(sql);
+			preparedStmt.setString(1, username);
+			preparedStmt.setString(2, password);
+			preparedStmt.setString(3, firstName);
+			preparedStmt.setString(4, lastName);
+		    preparedStmt.executeUpdate();
+			conn.commit();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+				DBConnection.getInstance().closeConnection();
+			}
+		} finally {
+			try {
+				if (preparedStmt != null) preparedStmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+        
+		return false;
 	}
 
 	/**
@@ -69,18 +97,33 @@ public class AppKeyAdminTable {
 	 */
 	public static String getPassword(String username) throws ThreeCixyDBException {
 		if (!validateUserName(username)) return "";
-		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE username LIKE '" + username + "'";
+		if (firstTime) {
+			createAppKeyAdminTable();
+			firstTime = false;
+		}
+		
 		Connection conn = DBConnection.getInstance().getConnection();
+		PreparedStatement  preparedStmt = null;
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE username = ? ";
+		String pwd = null;
 		try {
-			Statement stmt = conn.createStatement();
-		    ResultSet rs = stmt.executeQuery(sql);
-		    if (!rs.next()) return "";
-		    String pass = rs.getString("password");
-		    rs.close();
-		    stmt.close();
-		    return pass;
+			preparedStmt = conn.prepareStatement(sql);
+			preparedStmt.setString(1, username);
+			ResultSet rs = preparedStmt.executeQuery();
+			if (rs.next()) {
+				pwd = rs.getString("password");
+			}
+			rs.close();
+			preparedStmt.close();
+			return pwd == null ? "" : pwd;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			if (preparedStmt != null)
+				try {
+					preparedStmt.close();
+				} catch (SQLException e1) {
+					throw new ThreeCixyDBException(e1);
+				}
 		}
 		return "";
 	}
@@ -93,15 +136,25 @@ public class AppKeyAdminTable {
 	 */
 	public static boolean updatePassword(String username, String newPassword) throws ThreeCixyDBException {
 		if (!validateUserName(username)) return false;
-		String sql = "UPDATE " + TABLE_NAME + " SET password='" + newPassword + "' WHERE username = '" + username + "'";
+		
 		Connection conn = DBConnection.getInstance().getConnection();
+		PreparedStatement  preparedStmt = null;
 		try {
-			Statement stmt = conn.createStatement();
-		    int code = stmt.executeUpdate(sql);
-		    stmt.close();
-		    return code > 0;
+			conn.setAutoCommit(false);
+			String sql = "UPDATE " + TABLE_NAME + " SET password = ? WHERE username = ? ";
+			preparedStmt = conn.prepareStatement(sql);
+			preparedStmt.setString(1, newPassword);
+			preparedStmt.setString(2, username);
+		    preparedStmt.executeUpdate();
+			conn.commit();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			try {
+				if (preparedStmt != null) preparedStmt.close();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 		}
 		return false;
 	}
@@ -116,26 +169,6 @@ public class AppKeyAdminTable {
 		Pattern pattern = Pattern.compile(USERNAME_PATTERN);
 		Matcher matcher = pattern.matcher(username);
 		return matcher.matches();
-	}
-
-	private static boolean executeQuery(String query) throws ThreeCixyDBException {
-		Connection conn = DBConnection.getInstance().getConnection();
-		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-		    stmt.executeUpdate(query);
-		    stmt.close();
-		    return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			if (stmt != null)
-				try {
-					stmt.close();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-			return false;
-		}
 	}
 	
 	private AppKeyAdminTable() {
