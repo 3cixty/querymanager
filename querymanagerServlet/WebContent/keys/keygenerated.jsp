@@ -31,10 +31,12 @@
 	}
 %>
 
+        <script type="text/javascript">
+            var parentScriptPath = "../";
+        </script>
 
-
-    <script type="text/javascript" src="javascripts/vendor/jquery.min.js"></script>
-    <script type="text/javascript" src="javascripts/v2.x/boot.js"></script>
+    <script type="text/javascript" src="../javascripts/vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="../javascripts/v2.x/boot.js"></script>
 
 
 </body>

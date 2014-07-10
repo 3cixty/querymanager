@@ -22,12 +22,95 @@ import eu.threecixty.keys.AppKey;
 import eu.threecixty.keys.KeyManager;
 import eu.threecixty.keys.KeyOwner;
 import eu.threecixty.keys.management.AuthenticationManager;
+import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.profile.SettingsStorage;
+import eu.threecixty.profile.ThreeCixtySettings;
 
 @Path("/key")
 public class KeyServices {
 
 	@Context 
 	private HttpServletRequest httpRequest;
+	
+	@GET
+	@Path("/requestKey")
+	@Produces("text/plain")
+	public Response requestKey(@QueryParam("accessToken") String accessToken) {
+		String uid = null;
+		HttpSession session = httpRequest.getSession();
+		if (session.getAttribute(accessToken) != null) {
+			uid = (String) session.getAttribute("uid");
+		} else {
+			uid = GoogleAccountUtils.getUID(accessToken);
+		}
+		if (uid == null || uid.equals("")) {
+			session.setAttribute("errorMsg", "Your access token is incorrect or expired");
+			try {
+				return Response.temporaryRedirect(new URI("../keys/failed.jsp")).build();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		} else {
+			session.setAttribute(accessToken, true);
+			session.setAttribute("uid", uid);
+			AppKey appKey = KeyManager.getInstance().getAppKeyFromUID(uid);
+			if (appKey != null) {
+				session.setAttribute("appkey", appKey);
+			}
+			session.setAttribute("accessToken", accessToken);
+			ThreeCixtySettings settings = SettingsStorage.load(uid);
+			session.setAttribute("settings", settings);
+			try {
+				return Response.temporaryRedirect(new URI("../keys/keyrequest.jsp")).build();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+
+	@POST
+	@Path("/performKeyRequest")
+	@Produces("text/plain")
+	public Response performKeyRequest(@FormParam("email") String email, @FormParam("domain") String domain,
+			@FormParam("firstName") String firstName, @FormParam("lastName") String lastName) {
+		HttpSession session = httpRequest.getSession();
+		String uid = (String) session.getAttribute("uid");
+		if (uid == null || uid.equals("")) {
+			session.setAttribute("errorMsg", "Your access token is incorrect or expired");
+			try {
+				return Response.temporaryRedirect(new URI("../keys/failed.jsp")).build();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// generate an AppKey from Google UID
+			String rawKey = KeyManager.getInstance().generateKey(uid);
+			AppKey appKey = new AppKey();
+			appKey.setAppName(domain);
+			appKey.setValue(rawKey);
+			KeyOwner owner = new KeyOwner();
+			appKey.setOwner(owner);
+			owner.setEmail(email);
+			owner.setFirstName(firstName);
+			owner.setLastName(lastName);
+			owner.setUid(uid);
+			try {
+			if (KeyManager.getInstance().addOrUpdateAppKey(appKey)) {
+				session.setAttribute("key", rawKey);
+				session.setAttribute("appkey", appKey);
+				return Response.temporaryRedirect(new URI("../keys/keygenerated.jsp")).build();
+			} else {
+				return Response.temporaryRedirect(new URI("../keys/unsuccessfulKeyRequest.jsp")).build();
+			}
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
 	
 	@GET
 	@Path("/validate")
@@ -43,7 +126,6 @@ public class KeyServices {
 		}
 	}
 	
-//	@Produces("application/json")
 	@POST
 	@Path("/login")
 	public Response login(@FormParam("username") String username,
