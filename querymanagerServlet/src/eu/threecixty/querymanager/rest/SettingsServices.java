@@ -92,7 +92,7 @@ public class SettingsServices {
 			@DefaultValue("")@FormParam("countryName") String countryName,
 			@DefaultValue("")@FormParam("lat") String latStr,
 			@DefaultValue("")@FormParam("lon") String lonStr,
-			@DefaultValue("")@FormParam("sources") List<String> sources,
+			@DefaultValue("")@FormParam("pi_sources") List<String> sources,
 			@DefaultValue("")@FormParam("pi_ids") List<String> pi_ids,
 			@DefaultValue("")@FormParam("pi_ats") List<String> pi_ats) {
 		String uid = null;

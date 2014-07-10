@@ -59,7 +59,7 @@
 </div>
 <div><span >Mobidot Account</span></div>
 <div>
-<input type="hidden" name="sources" value="Mobidot">
+<input type="hidden" name="pi_sources" value="Mobidot">
 <input type="hidden" name="pi_ats" value="">
     <input type="text" name="pi_ids" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
 </div>
@@ -88,7 +88,7 @@ Disclaimer: The information marked by red star are required. For Mobidot account
     	lat.value = "<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>";
     	var lon = document.getElementById("lon");
     	lon.value = "<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>";
-    	var pi_id = document.getElementById("pi_id");
+    	var pi_id = document.getElementById("pi_ids");
     	pi_id.value = "<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>";
     }
 </script>
