@@ -32,7 +32,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   ```
   ~baseUrl/queryManagerServlet
   ~baseUrl/trayServlet
-  ~baseUrl/settingsServlet
+  ~baseUrl/services/settings
   ```
 
 ###  How to invoke the services will be discussed by the following sections.
@@ -90,7 +90,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 -  Web link to update profile information:
   ```
-  ~baseUrl/settingsServlet?accessToken={accessToken}&key={key}
+  ~baseUrl/services/settings/views?accessToken={accessToken}&key={key}
   ```
   Where:
   
@@ -101,7 +101,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - The template for updating profile information (take URL to show, but use `HTTP POST` in reality)
   ```
-  ~baseUrl/settingsServlet?accessToken={accessToken}&key={key}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&startDate={startDate}&endDate={endDate}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
+  ~baseUrl/services/settings/save?accessToken={accessToken}&key={key}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
   ```
 
   Where:
@@ -114,8 +114,6 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{countryName}| no| is a country name, for example **Italy**, **France**, etc.|
   |{lat}| no| is latitude value|
   |{lon}| no|is longitude|
-  |{startDate}| no| is a start date for an event which a user prefers to participate in. The start date format follows the pattern **dd-mm-yyyy**, for example **25-07-2015**|
-  |{endDate}| no| is an end date for an event which a user prefers to participate in. The end date format is the same with the start date format|
   |{pi_source}| no| is profile information source, for example **Mobidot**, **Google**, **Facebook**|
   |{pi_id}| no| is profile information UID, for example UID from **Mobidot**, **Facebook**|
   |{pi_at}| no| is access token to access to the source described by {pi_source}|
