@@ -120,13 +120,20 @@ public class AppKeyAdminTable {
 
 	private static boolean executeQuery(String query) throws ThreeCixyDBException {
 		Connection conn = DBConnection.getInstance().getConnection();
+		Statement stmt = null;
 		try {
-			Statement stmt = conn.createStatement();
+			stmt = conn.createStatement();
 		    stmt.executeUpdate(query);
 		    stmt.close();
 		    return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			if (stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 			return false;
 		}
 	}
