@@ -1,27 +1,27 @@
 This document shows you how to deploy querymanagerServlet and how to make a remote query to QueryManager.
 
 ### Requirements:
-- Install Mysql database, then create the database named `3cixty` and a user called `3cixty` with password `3cixtydatabase001`.
+- Install ```Mysql``` database, then create the database named `3cixty` and a user called `3cixty` with password `3cixtydatabase001`.
 - Set all permissions for the database `3cixty` to the user `3cixty`
 
 
 ### How to deploy querymanagerServlet:
 
-- Checkout the appkey repository <code>https://github.com/3cixty/appkey.git</code> and compile the module
+- Checkout the appkey repository ```https://github.com/3cixty/appkey.git``` and compile the module
 
-- Checkout the storageProfile repository <code>https://github.com/3cixty/profileStorage.git</code> and compile the module
+- Checkout the storageProfile repository ```https://github.com/3cixty/profileStorage.git``` and compile the module
 
-- Go to the "querymanager" repository and execute the following command:
+- Go to the ```querymanager``` repository and execute the following command:
   ```
   $ mvn clean install
   ```
 
-- Go to the "querymanagerServlet" folder, copy the .war file in the "target" folder to your Web application server (Tomcat for example).
+- Go to the ```querymanagerServlet``` folder, copy the .war file in the ```target``` folder to your Web application server (Tomcat for example).
   
-- Go to http://3cixty.com:8080/querymanagerServlet-1.0/keyRequest?accessToken={YourAccessToken} where {YourAccessToken} is to be provided.
+- Go to ```http://3cixty.com:8080/querymanagerServlet-1.0/keyRequest?accessToken={YourAccessToken}``` where `{YourAccessToken}` is to be provided.
  
 
-**PS: EveryTime the Appkeys will be lost in the current scenario if the server is redeployed **
+  **PS: EveryTime the Appkeys will be lost in the current scenario if the server is redeployed. Measures have been taken, as stated in `https://github.com/3cixty/querymanager/issues/23`, to fix this issue on the ExplorationApp temporarily.**
 
 ### How to make a remote query to QueryManager:
 
@@ -83,7 +83,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 
   
-  The parameters and actions to call the tray servlet follow the documentation on Google Drive at [https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web](https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web)
+  The parameters and actions to call the tray servlet follow the documentation on Google Drive at ```https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web```
 
   
 ####  Updating profile information
@@ -109,7 +109,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |parameter|required|value|
   |:---------|:-----|:-----|
   |{accessToken}| yes| is an access token which lasts for one hour. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description **Access token is incorrect or expired** |
-  |{key}|is an application key|
+  |{key}| yes|is an application key|
   |{townName}| no| is a town name, for example **Milano**, **Paris**, etc.|
   |{countryName}| no| is a country name, for example **Italy**, **France**, etc.|
   |{lat}| no| is latitude value|
