@@ -170,9 +170,10 @@ public class MobilityCrawlerCron extends TimerTask{
 	*/
 	@Override
 	public void run(){
-		URL resourceUrl = MobilityCrawlerCron.class.getResource("/UserProfileKBmodelWithIndividuals.rdf");
-		RdfFileManager.getInstance().setPathToRdfFile(resourceUrl.getPath());
-		Long currentTime=getDateTime();
+		// Kinh: should set path in which we run main method or initial Servlet
+		//URL resourceUrl = MobilityCrawlerCron.class.getResource("/UserProfileKBmodelWithIndividuals.rdf");
+		//RdfFileManager.getInstance().setPathToRdfFile(resourceUrl.getPath());
+		Long currentTime = getDateTime();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         File file = new File(RdfFileManager.getInstance().getPathToRdfFile());
         IRI iri= IRI.create(file);
