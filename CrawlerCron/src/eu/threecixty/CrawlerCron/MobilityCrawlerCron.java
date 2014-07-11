@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -56,7 +58,7 @@ import eu.threecixty.profile.RdfFileManager;
  *
  */
 
-public class MobilityCrawlerCron extends TimerTask{
+public class MobilityCrawlerCron {
 
 	private final static long fONCE_PER_DAY = 1000*60*60*24;
 
@@ -66,23 +68,43 @@ public class MobilityCrawlerCron extends TimerTask{
 
 	private final static String MOBIDOT_BASEURL="https://www.movesmarter.nl/external/";
 	private final static String MOBIDOT_URL="https://www.movesmarter.nl/portal";
-	private final static String MOBIDOT_API_KEY="";
 	
-	private final static String DOMAIN="";
+	// TODO: change this value to your key
+	private final static String MOBIDOT_API_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
+	// TODO: change this value to your domain at Mobidot
+	private final static String DOMAIN = "3cixty";
 	
 	/**
 	 * get the last successful runtime for the cronMobility  
 	 * @return time milli-sec after epoch in String format
 	 */
 	private static String getLastRuntime() {
+		BufferedReader br = null;
+		FileInputStream fis = null;
 		try{
-		FileInputStream fis=new FileInputStream("lastTime");
-		BufferedReader br= new BufferedReader(new InputStreamReader(fis));
-		String lastRuntime=br.readLine();
-		return lastRuntime;
+			fis = new FileInputStream("lastTime");
+			br = new BufferedReader(new InputStreamReader(fis));
+			String lastRuntime=br.readLine();
+			br.close();
+			fis.close();
+			return lastRuntime;
 		}catch(Exception e)
 		{
 			e.printStackTrace();
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 			return null;
 		}
 	}
@@ -146,30 +168,39 @@ public class MobilityCrawlerCron extends TimerTask{
 		return result.getTime();
 	}
 	
-	/**
-	 * Returns current Date 
-	 * to use in debug
-	 * @return Date
-	 */
-	private static Date getTime() {
-		return GregorianCalendar.getInstance().getTime();
-	}
-	
-	/** 
-	 * Construct and use a TimerTask and Timer. 
-	 */
-	public static void main (String... arguments ) {
-		TimerTask mobilityCrawlerCron = new MobilityCrawlerCron();
-	    Timer timer = new Timer();
-		//timer.scheduleAtFixedRate(userPerformedAction, getTime(), 1000*10);
-		timer.scheduleAtFixedRate(mobilityCrawlerCron, getTomorrowMorning3am(), getFoncePerDay());
-	}
+//	/** 
+//	 * Construct and use a TimerTask and Timer. 
+//	 */
+//	public static void main (String... arguments ) {
+//		TimerTask mobilityCrawlerCron = new MobilityCrawlerCron();
+//	    Timer timer = new Timer();
+//		//timer.scheduleAtFixedRate(userPerformedAction, getTime(), 1000*10);
+//		timer.scheduleAtFixedRate(mobilityCrawlerCron, getTomorrowMorning3am(), getFoncePerDay());
+//	}
 	
 	/**
-	* Implements TimerTask's abstract run method.
+	 * Crawls Mobidot info.
+	 */
+	public void run() {
+		TimerTask task = new TimerTask() {
+			
+			@Override
+			public void run() {
+				try {
+				    crawl();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(task, getTomorrowMorning3am(), getFoncePerDay());
+	}
+	
+	/**
+	* Main entry to crawl Mobidot info.
 	*/
-	@Override
-	public void run(){
+	private void crawl(){
 		// Kinh: should set path in which we run main method or initial Servlet
 		//URL resourceUrl = MobilityCrawlerCron.class.getResource("/UserProfileKBmodelWithIndividuals.rdf");
 		//RdfFileManager.getInstance().setPathToRdfFile(resourceUrl.getPath());
@@ -207,7 +238,7 @@ public class MobilityCrawlerCron extends TimerTask{
     			+ "\n"
     			+ "}";
         
-        Set<IDMapping> idMapping=getMobidotIDsForUsers(qStr,"/UserProfileKBmodelWithIndividuals.rdf","uid","mobidotID");
+        Set<IDMapping> idMapping=getMobidotIDsForUsers(qStr,"uid","mobidotID");
         
         try{
         	Iterator<IDMapping> iteratorMapping = idMapping.iterator();
@@ -218,7 +249,7 @@ public class MobilityCrawlerCron extends TimerTask{
         		int length=0;
         		UserProfile user= mf.getUserProfile("http://www.eu.3cixty.org/profile#"+map.getThreeCixtyID());
         		Transport transport = mf.createTransport("http://www.eu.3cixty.org/profile#"+map.getThreeCixtyID()+"Transport"+Long.toString(currentTime));
-        		
+        		if (map.getMobidotID() == null) continue;
         		String mID=Long.toString(map.getMobidotID());
         		
         		String urlStr=getMobidotBaseurl() +"personalmobility/RegularTrips/"+ mID+ "?key="+getMobidotApiKey();
@@ -255,7 +286,7 @@ public class MobilityCrawlerCron extends TimerTask{
 	        setLastRuntime(currentTime);	
     	}catch(Exception e){
     		e.printStackTrace();
-    		run();
+    		crawl();
     	}
 	}
 
@@ -267,27 +298,44 @@ public class MobilityCrawlerCron extends TimerTask{
 	 * @param extractLiteralMobidotUserName
 	 * @return
 	 */
-	private Set<IDMapping> getMobidotIDsForUsers(String queryString, String RDFresource, String extractLiteralUID, String extractLiteralMobidotUserName) {
+	private Set<IDMapping> getMobidotIDsForUsers(String queryString, String extractLiteralUID, String extractLiteralMobidotUserName) {
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		Query query = QueryFactory.create(queryString);
-	    
-	    InputStream input = MobilityCrawlerCron.class.getResourceAsStream(RDFresource);
-	    Model rdfModel=null;
-	    if (input != null) {
-		    rdfModel = ModelFactory.createDefaultModel().read(input, "UTF-8");
-		}
-		QueryExecution qe = QueryExecutionFactory.create(query, rdfModel);
-		ResultSet rs = qe.execSelect();
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String UID = qs.getLiteral(extractLiteralUID).getString();
-			String mobidotUserName = qs.getLiteral(extractLiteralMobidotUserName).getString();
-			Long mobidotID= getMobidotIDforUsername(mobidotUserName);
-			IDMapping mapper=new IDMapping();
-			mapper.setThreeCixtyID(UID);
-			mapper.setMobidotUserName(mobidotUserName);
-			mapper.setMobidotID(mobidotID);
-			idMapping.add(mapper);
+
+		InputStream input = null;
+		try {
+			input = new FileInputStream(new File(RdfFileManager.getInstance().getPathToRdfFile()));
+
+			Model rdfModel=null;
+			if (input != null) {
+				rdfModel = ModelFactory.createDefaultModel().read(input, "UTF-8");
+			}
+			QueryExecution qe = QueryExecutionFactory.create(query, rdfModel);
+			ResultSet rs = qe.execSelect();
+			for ( ; rs.hasNext(); ) {
+				QuerySolution qs = rs.next();
+				String UID = qs.getLiteral(extractLiteralUID).getString();
+				String mobidotUserName = qs.getLiteral(extractLiteralMobidotUserName).getString();
+				Long mobidotID= getMobidotIDforUsername(mobidotUserName);
+				IDMapping mapper=new IDMapping();
+				mapper.setThreeCixtyID(UID);
+				mapper.setMobidotUserName(mobidotUserName);
+				mapper.setMobidotID(mobidotID);
+				idMapping.add(mapper);
+			}
+			input.close();
+			return idMapping;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (input != null)
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 		}
 		return idMapping;
 	}
