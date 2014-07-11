@@ -447,6 +447,7 @@ public class MobilityCrawlerCron extends TimerTask{
 		try{
 		URL url = new URL("https://www.movesmarter.nl");
 		InputStream input = url.openStream();
+		if (input != null) input.close();
 		return true;
 		}catch(Exception e){
 			return false;
