@@ -201,9 +201,6 @@ public class MobilityCrawlerCron {
 	* Main entry to crawl Mobidot info.
 	*/
 	private void crawl(){
-		// Kinh: should set path in which we run main method or initial Servlet
-		//URL resourceUrl = MobilityCrawlerCron.class.getResource("/UserProfileKBmodelWithIndividuals.rdf");
-		//RdfFileManager.getInstance().setPathToRdfFile(resourceUrl.getPath());
 		Long currentTime = getDateTime();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         File file = new File(RdfFileManager.getInstance().getPathToRdfFile());
@@ -220,25 +217,7 @@ public class MobilityCrawlerCron {
         }
         
         //get all 3cixtyIDs, mobidotUserName and mobidotIDs
-        
-        String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-    			+"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
-    			+"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-    			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-    			+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n"
-    			+ "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n"
-    			+ "SELECT ?uid ?mobidotID\n"
-    			+ "WHERE {\n\n"
-    			+ "?root a owl:NamedIndividual .\n"
-    			+ "?root profile:hasUID ?uid .\n"
-    			+ "?root profile:hasProfileIdentities ?profileidentities .\n"
-    			+ "?profileidentities profile:hasUserAccountID ?mobidotID. \n"
-    			+ "?profileidentities profile:hasSource ?source. \n"
-    			+ "Filter(STR(?source) =\"" + getMobidotUrl() + "\"). \n"
-    			+ "\n"
-    			+ "}";
-        
-        Set<IDMapping> idMapping=getMobidotIDsForUsers(qStr,"uid","mobidotID");
+        Set<IDMapping> idMapping = getMobidotIDsForUsers();
         
         try{
         	Iterator<IDMapping> iteratorMapping = idMapping.iterator();
@@ -292,13 +271,25 @@ public class MobilityCrawlerCron {
 
 	/**
 	 * get MobidotIDs For the 3cixty Users
-	 * @param queryString
-	 * @param RDFresource
-	 * @param extractLiteralUID
-	 * @param extractLiteralMobidotUserName
 	 * @return
 	 */
-	private Set<IDMapping> getMobidotIDsForUsers(String queryString, String extractLiteralUID, String extractLiteralMobidotUserName) {
+	private Set<IDMapping> getMobidotIDsForUsers() {
+        String queryString = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+    			+"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
+    			+"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
+    			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+    			+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n"
+    			+ "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n"
+    			+ "SELECT ?uid ?mobidotID\n"
+    			+ "WHERE {\n\n"
+    			+ "?root a owl:NamedIndividual .\n"
+    			+ "?root profile:hasUID ?uid .\n"
+    			+ "?root profile:hasProfileIdentities ?profileidentities .\n"
+    			+ "?profileidentities profile:hasUserAccountID ?mobidotID. \n"
+    			+ "?profileidentities profile:hasSource ?source. \n"
+    			+ "Filter(STR(?source) =\"" + getMobidotUrl() + "\"). \n"
+    			+ "\n"
+    			+ "}";
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		Query query = QueryFactory.create(queryString);
 
@@ -314,8 +305,8 @@ public class MobilityCrawlerCron {
 			ResultSet rs = qe.execSelect();
 			for ( ; rs.hasNext(); ) {
 				QuerySolution qs = rs.next();
-				String UID = qs.getLiteral(extractLiteralUID).getString();
-				String mobidotUserName = qs.getLiteral(extractLiteralMobidotUserName).getString();
+				String UID = qs.getLiteral("uid").getString();
+				String mobidotUserName = qs.getLiteral("mobidotID").getString();
 				Long mobidotID= getMobidotIDforUsername(mobidotUserName);
 				IDMapping mapper=new IDMapping();
 				mapper.setThreeCixtyID(UID);
