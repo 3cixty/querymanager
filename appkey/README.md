@@ -5,7 +5,7 @@ appkey
 
 ### Getting an App Key by using Google access token 
 
-- please go to `http://3cixty.com:8080/querymanagerServlet-1.0/keyRequest?accessToken={YourGoogleAccessToken}` 
+- please go to `http://3cixty.com:8080/querymanagerServlet-1.0/services/key/requestKey?accessToken={YourGoogleAccessToken}` 
 - then please fill in the form and request an AppKey
 
 ### Getting an App Key by sending a message to `congkinh.nguyen@inria.fr` with your following information:
