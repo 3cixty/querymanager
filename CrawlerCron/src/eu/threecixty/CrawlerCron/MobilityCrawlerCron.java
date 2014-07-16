@@ -10,22 +10,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -36,13 +34,16 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import eu.threecixty.models.Accompanying;
-import eu.threecixty.models.MyFactory;
-import eu.threecixty.models.PersonalPlace;
-import eu.threecixty.models.RegularTrip;
-import eu.threecixty.models.Transport;
-import eu.threecixty.models.UserProfile;
+
 import eu.threecixty.profile.RdfFileManager;
+import eu.threecixty.profile.UserProfile;
+import eu.threecixty.profile.UserProfileStorage;
+import eu.threecixty.profile.oldmodels.Accompanying;
+import eu.threecixty.profile.oldmodels.ModalityType;
+import eu.threecixty.profile.oldmodels.PersonalPlace;
+import eu.threecixty.profile.oldmodels.Preference;
+import eu.threecixty.profile.oldmodels.RegularTrip;
+import eu.threecixty.profile.oldmodels.Transport;
 
 /**Features
  * Continuous run ever 3am
@@ -201,66 +202,63 @@ public class MobilityCrawlerCron {
 	* Main entry to crawl Mobidot info.
 	*/
 	private void crawl(){
-		Long currentTime = getDateTime();
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        File file = new File(RdfFileManager.getInstance().getPathToRdfFile());
-        IRI iri= IRI.create(file);
-
-        OWLOntology ontology=null;
-        MyFactory mf = null;
-        try{
-        	ontology= manager.loadOntologyFromOntologyDocument(iri);
-        	mf = new MyFactory(ontology);
-        }catch(Exception e){
-        	System.out.println("bad code");
-        	//run();
-        }
-        
         //get all 3cixtyIDs, mobidotUserName and mobidotIDs
         Set<IDMapping> idMapping = getMobidotIDsForUsers();
-        
+        long currentTime = getDateTime();
         try{
         	Iterator<IDMapping> iteratorMapping = idMapping.iterator();
         	
         	while (iteratorMapping.hasNext()){
         		IDMapping map=iteratorMapping.next();
-        		
         		int length=0;
-        		UserProfile user= mf.getUserProfile("http://www.eu.3cixty.org/profile#"+map.getThreeCixtyID());
-        		Transport transport = mf.createTransport("http://www.eu.3cixty.org/profile#"+map.getThreeCixtyID()+"Transport"+Long.toString(currentTime));
+        		UserProfile user = UserProfileStorage.loadProfile(map.getThreeCixtyID());
+        		if (user == null) continue;
+        		Transport transport = new Transport();
         		if (map.getMobidotID() == null) continue;
         		String mID=Long.toString(map.getMobidotID());
         		
         		String urlStr=getMobidotBaseurl() +"personalmobility/RegularTrips/"+ mID+ "?key="+getMobidotApiKey();
-    			JSONArray resultRegularTrip=getTravelInfoforMobiditID(urlStr);
+    			JSONArray resultRegularTrip = getTravelInfoforMobiditID(urlStr);
     			
-    			urlStr=getMobidotBaseurl() +"measurement/Accompanies/"+mID + "/modifiedSince/" + getLastRuntime()+"?key="+getMobidotApiKey();
-    			JSONArray resultAccompany=getTravelInfoforMobiditID(urlStr);
+    			urlStr=getMobidotBaseurl() + "measurement/Accompanies/" + mID + "/modifiedSince/" + getLastRuntime() + "?key=" + getMobidotApiKey();
+    			JSONArray resultAccompany = getTravelInfoforMobiditID(urlStr);
         		
     			length=resultRegularTrip.length();
-        				    	
-		    	for (int i=0;i<length;i++){
+        		Set <RegularTrip> regularTrips = new HashSet <RegularTrip>();	    	
+		    	for (int i = 0; i < length; i++){
 		    		JSONObject jsonobj = resultRegularTrip.getJSONObject(i);
 		    		
-		    		transport.addHasRegularTrip(storeRegularTripsInKB(map.getThreeCixtyID(),jsonobj,mf,user,currentTime,i));
+		    		regularTrips.add(storeRegularTripsInKB(map.getThreeCixtyID(),jsonobj, user));
 		    	}
+		    	transport.setHasRegularTrip(regularTrips);
+
 		    	length=resultAccompany.length();
 		    	
+		    	Set <Accompanying> accompanyings = new HashSet <Accompanying>();
 		    	for (int i=0;i<length;i++){
 		    	
 		    		JSONObject jsonobj = resultAccompany.getJSONObject(i);
-		    		Accompanying hasAccompany=storeAccompanyingDetailsInKB(map.getThreeCixtyID(),jsonobj,mf,user,currentTime,i,idMapping);
+		    		Accompanying hasAccompany = storeAccompanyingDetailsInKB(map.getThreeCixtyID(), jsonobj, idMapping);
 		    		if (hasAccompany!=null){
-		    			transport.addHasAccompany(hasAccompany);
+		    			accompanyings.add(hasAccompany);
 		    		}
 		    	}
 		    	
-				user.addHasTransport(transport);
-				try{		
-					mf.saveOwlOntology();
-				} catch(OWLOntologyStorageException e){
-					e.printStackTrace();
-				}
+		    	transport.setHasAccompanyings(accompanyings);
+		    	
+		    	Preference pref = user.getPreferences();
+		    	if (pref == null) {
+		    		pref = new Preference();
+		    		user.setPreferences(pref);
+		    	}
+		    	Set <Transport> transports = pref.getHasTransport();
+		    	if (transports == null) {
+		    		transports = new HashSet <Transport>();
+		    		pref.setHasTransport(transports);
+		    	}
+		    	transports.add(transport);
+		    	
+		    	UserProfileStorage.saveProfile(user);
         	}
 	        setLastRuntime(currentTime);	
     	}catch(Exception e){
@@ -314,6 +312,7 @@ public class MobilityCrawlerCron {
 				mapper.setMobidotID(mobidotID);
 				idMapping.add(mapper);
 			}
+			qe.close();
 			input.close();
 			return idMapping;
 		} catch (FileNotFoundException e) {
@@ -335,25 +334,21 @@ public class MobilityCrawlerCron {
 	 * create the accompany object to store in KB
 	 * @param uID
 	 * @param jsonobj
-	 * @param mf
-	 * @param user
-	 * @param currentTime
-	 * @param index
 	 * @param idMapping
 	 * @return accompany object
 	 */
-	private Accompanying storeAccompanyingDetailsInKB(String uID, JSONObject jsonobj, MyFactory mf, UserProfile user, Long currentTime, int index, Set<IDMapping> idMapping) {
+	private Accompanying storeAccompanyingDetailsInKB(String uID, JSONObject jsonobj, Set<IDMapping> idMapping) {
 		String ID=reverseMap(jsonobj.getLong("userid2"),idMapping);
 		if (ID!=null) {
-			Accompanying accompany=mf.createAccompanying("http://www.eu.3cixty.org/profile#"+uID+"AccompanyingDetails"+Long.toString(currentTime)+"_"+Integer.toString(index));
-			accompany.addHasAccompanyID(jsonobj.getLong("id"));
-			accompany.addHasAccompanyUserID2(ID);
-			accompany.addHasAccompanyUserID1(uID);
-			accompany.addHasAccompanyScore((float)jsonobj.getDouble("score"));
+			Accompanying accompany = new Accompanying();
+			accompany.setHasAccompanyId(jsonobj.getLong("id"));
+			accompany.setHasAccompanyUserid2(Long.valueOf(ID));
+			accompany.setHasAccompanyUserid1(Long.valueOf(uID));
+			accompany.setHasAccompanyScore(jsonobj.getDouble("score"));
 			//start time of the accompany
-			accompany.addHasAccompanyTime(jsonobj.getLong("time"));
+			accompany.setHasAccompanyTime(jsonobj.getLong("time"));
 			//duration of the accompany
-			accompany.addHasAccompanyValidity(jsonobj.getLong("validity"));
+			accompany.setHasAccompanyValidity(jsonobj.getLong("validity"));
 			return accompany;
 		}
 		return null;
@@ -365,7 +360,7 @@ public class MobilityCrawlerCron {
 	 * @param idMapping
 	 * @return 3cixty id in string
 	 */
-	private String reverseMap(Long mobidotID,Set<IDMapping> idMapping) {
+	private String reverseMap(Long mobidotID, Set<IDMapping> idMapping) {
 		Iterator<IDMapping> iteratorMapping = idMapping.iterator();
     	while (iteratorMapping.hasNext()){
     		IDMapping map=iteratorMapping.next();
@@ -380,58 +375,55 @@ public class MobilityCrawlerCron {
 	 * create the regular trip object to store in KB
 	 * @param uID
 	 * @param jsonobj
-	 * @param mf
 	 * @param user
-	 * @param currentTime
-	 * @param index
 	 * @return regularTrip object
 	 */
-	private RegularTrip storeRegularTripsInKB(String uID, JSONObject jsonobj, MyFactory mf, UserProfile user,Long currentTime, int index) {
-		RegularTrip regularTrip=mf.createRegularTrip("http://www.eu.3cixty.org/profile#"+uID+"RegularTrip"+Long.toString(currentTime)+"_"+Integer.toString(index));
-		regularTrip.addHasUID(Long.toString(jsonobj.getLong("id")));
-		regularTrip.addHasRegularTripName(jsonobj.getString("tripName"));
-		regularTrip.addHasRegularTripDepartureTime(jsonobj.getLong("departureTime"));
-		regularTrip.addHasRegularTripDepartureTimeSD(jsonobj.getLong("departureTimeSD"));
-		regularTrip.addHasRegularTripTravelTime(jsonobj.getLong("travelTime"));
-		regularTrip.addHasRegularTripTravelTimeSD(jsonobj.getLong("travelTimeSD"));
-		regularTrip.addHasRegularTripFastestTravelTime(jsonobj.getLong("fastestTravelTime"));
-		regularTrip.addHasRegularTripTotalDistance(jsonobj.getLong("totalDistance"));
-		regularTrip.addHasRegularTripTotalCount(jsonobj.getLong("totalCount"));
-		regularTrip.addHasModalityType(mapModality(jsonobj.getInt("tripModality")));
-		regularTrip.addHasRegularTripWeekdayPattern(jsonobj.getString("weekdayPattern"));
-		regularTrip.addHasRegularTripDayHourPattern(jsonobj.getString("dayhourPattern"));
-		regularTrip.addHasRegularTripLastChanged(jsonobj.getLong("lastChanged"));
+	private RegularTrip storeRegularTripsInKB(String uID, JSONObject jsonobj, UserProfile user) {
+		RegularTrip regularTrip = new RegularTrip();
+		regularTrip.setHasUID(jsonobj.getLong("id"));
+		regularTrip.setHasRegularTripName(jsonobj.getString("tripName"));
+		regularTrip.setHasRegularTripDepartureTime(jsonobj.getLong("departureTime"));
+		regularTrip.setHasRegularTripDepartureTimeSD(jsonobj.getLong("departureTimeSD"));
+		regularTrip.setHasRegularTripTravelTime(jsonobj.getLong("travelTime"));
+		regularTrip.setHasRegularTripTravelTimeSD(jsonobj.getLong("travelTimeSD"));
+		regularTrip.setHasRegularTripFastestTravelTime(jsonobj.getLong("fastestTravelTime"));
+		regularTrip.setHasRegularTripTotalDistance((double) jsonobj.getLong("totalDistance"));
+		regularTrip.setHasRegularTripTotalCount(jsonobj.getLong("totalCount"));
+		regularTrip.setHasModalityType(ModalityType.valueOf(mapModality(jsonobj.getInt("tripModality"))));
+		regularTrip.setHasRegularTripWeekdayPattern(jsonobj.getString("weekdayPattern"));
+		regularTrip.setHasRegularTripDayhourPattern(jsonobj.getString("dayhourPattern"));
+		regularTrip.setHasRegularTripLastChanged(jsonobj.getLong("lastChanged"));
 		if (jsonobj.has("travelTimePattern")==true){
-			regularTrip.addHasRegularTripTravelTimePattern(jsonobj.getString("travelTimePattern"));
+			regularTrip.setHasRegularTripTravelTimePattern(jsonobj.getString("travelTimePattern"));
 		}
-		
+		List <PersonalPlace> personalPlaces = new ArrayList<PersonalPlace>(); 
 		JSONArray arr=jsonobj.getJSONArray("tripPlaces");
 		for (int length=0;length<arr.length();length++)
 		{
 			JSONObject jsonarrobj = arr.getJSONObject(length);
-			PersonalPlace personalPlace=mf.createPersonalPlace("http://www.eu.3cixty.org/profile#"+uID+"RegularTrip"+Long.toString(currentTime)+"_"+Integer.toString(index)+"PersonalPlace"+Integer.toString(length));
+			PersonalPlace personalPlace = new PersonalPlace();
 			if (jsonarrobj.has("externalIds")==true){
-				personalPlace.addHasPersonalPlaceExternalIds(jsonarrobj.getString("externalIds"));
+				personalPlace.setHasPersonalPlaceexternalIds(jsonarrobj.getString("externalIds"));
 			}
-			personalPlace.addPostal_code(jsonarrobj.getString("postalcode"));
+			personalPlace.setPostalcode(jsonarrobj.getString("postalcode"));
 			if (jsonarrobj.has("weekdayPattern")==true){
-				personalPlace.addHasPersonalPlaceWeekDayPattern(jsonarrobj.getString("weekdayPattern"));
+				personalPlace.setHasPersonalPlaceWeekdayPattern(jsonarrobj.getString("weekdayPattern"));
 			}
-			personalPlace.addHasPersonalPlaceStayPercentage((float)jsonarrobj.getDouble("stayPercentage"));
-			personalPlace.addHasPersonalPlaceType(jsonarrobj.getString("type"));
-			personalPlace.addHasUID(Long.toString(jsonarrobj.getLong("id")));
+			personalPlace.setHasPersonalPlaceStayPercentage(jsonarrobj.getDouble("stayPercentage"));
+			personalPlace.setHasPersonalPlaceType(jsonarrobj.getString("type"));
+			personalPlace.setHasUID(jsonarrobj.getLong("id"));
 			if (jsonarrobj.has("dayhourPattern")==true){
-				personalPlace.addHasPersonalPlaceDayHourPattern(jsonarrobj.getString("dayhourPattern"));
+				personalPlace.setHasPersonalPlaceDayhourPattern(jsonarrobj.getString("dayhourPattern"));
 			}
-			personalPlace.addHasPersonalPlaceName(jsonarrobj.getString("name"));
-			personalPlace.addLatitude((float)jsonarrobj.getDouble("latitude"));
-			personalPlace.addLongitude((float)jsonarrobj.getDouble("longitude"));
-			personalPlace.addHasPersonalPlaceStayDuration(jsonarrobj.getLong("stayDuration"));
-			personalPlace.addHasPersonalPlaceAccuracy((float)jsonarrobj.getDouble("accuracy"));
+			personalPlace.setHasPersonalPlaceName(jsonarrobj.getString("name"));
+			personalPlace.setLatitude(jsonarrobj.getDouble("latitude"));
+			personalPlace.setLongitude(jsonarrobj.getDouble("longitude"));
+			personalPlace.setHasPersonalPlaceStayDuration(jsonarrobj.getLong("stayDuration"));
+			personalPlace.setHasPersonalPlaceAccuracy(jsonarrobj.getDouble("accuracy"));
 			
-			regularTrip.addHasPersonalPlace(personalPlace);
+			personalPlaces.add(personalPlace);
 		}
-		
+		regularTrip.setHasPersonalPlaces(personalPlaces.toArray(new PersonalPlace[personalPlaces.size()]));
 		return regularTrip;
 	}
 
