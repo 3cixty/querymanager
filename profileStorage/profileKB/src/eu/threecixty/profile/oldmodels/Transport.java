@@ -20,6 +20,12 @@ public class Transport {
 			+ " and filtered or aggregated on request, e.g. make a difference between rush hour and non rush hour trips,"
 			+ " or between trips while it is raining and trips while it is dry.")    
 	private Set <ModalityStatistic> hasModalityStatistics;
+	
+	private Set <Accompanying> hasAccompanyings;
+	
+	// data is new 
+	private Boolean newForKB = null;
+	
 	public Set<TripMeasurement> getHasTripMeasurement() {
 		return hasTripMeasurement;
 	}
@@ -45,7 +51,18 @@ public class Transport {
 			Set<ModalityStatistic> hasModalityStatistics) {
 		this.hasModalityStatistics = hasModalityStatistics;
 	}
-	
+	public Set<Accompanying> getHasAccompanyings() {
+		return hasAccompanyings;
+	}
+	public void setHasAccompanyings(Set<Accompanying> hasAccompanyings) {
+		this.hasAccompanyings = hasAccompanyings;
+	}
+	public Boolean getNewForKB() {
+		return newForKB;
+	}
+	public void setNewForKB(Boolean newForKB) {
+		this.newForKB = newForKB;
+	}
 	
 	
 }

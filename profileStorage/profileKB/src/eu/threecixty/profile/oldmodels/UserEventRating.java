@@ -14,6 +14,10 @@ public class UserEventRating {
 	private Rating hasRating;
 	@Description(hasText="Number of times user visited the event")
 	private int hasNumberOfTimesVisited;
+	
+	// data is new 
+	private Boolean newForKB = null;
+	
 	public EventDetail getHasEventDetail() {
 		return hasEventDetail;
 	}
@@ -32,5 +36,12 @@ public class UserEventRating {
 	public void setHasNumberOfTimesVisited(int hasNumberOfTimesVisited) {
 		this.hasNumberOfTimesVisited = hasNumberOfTimesVisited;
 	}
+	public Boolean getNewForKB() {
+		return newForKB;
+	}
+	public void setNewForKB(Boolean newForKB) {
+		this.newForKB = newForKB;
+	}
+	
 	
 }

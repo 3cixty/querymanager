@@ -1,5 +1,7 @@
 package eu.threecixty.profile;
 
+import eu.threecixty.profile.oldmodels.Preference;
+
 /**
  * This class is to represent information which is provided at SPE API.
  * @author Cong-Kinh NGUYEN
@@ -15,7 +17,7 @@ public class ProfileInformation {
 	private double latitude;
 	private double longitude;
 
-	private SpePreference preference;
+	private Preference preference;
 
 	public String getUid() {
 		return uid;
@@ -73,11 +75,11 @@ public class ProfileInformation {
 		this.longitude = longitude;
 	}
 
-	public SpePreference getPreference() {
+	public Preference getPreference() {
 		return preference;
 	}
 
-	public void setPreference(SpePreference preference) {
+	public void setPreference(Preference preference) {
 		this.preference = preference;
 	}
 }

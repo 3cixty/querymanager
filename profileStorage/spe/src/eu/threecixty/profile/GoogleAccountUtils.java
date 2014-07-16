@@ -6,6 +6,8 @@ import java.net.URL;
 
 import org.json.JSONObject;
 
+import eu.threecixty.profile.oldmodels.Name;
+
 /**
  * Utility class to update account info.
  *
@@ -37,14 +39,16 @@ public class GoogleAccountUtils {
 			String givenName = json.getString("given_name");
 			String familyName = json.getString("family_name");
 			
-			if (ProfileInformationStorage.existUID(user_id)) return user_id; // no need to update info as it exists
+			if (UserProfileStorage.existUID(user_id)) return user_id; // no need to update info as it exists
 			
-			ProfileInformation profile = new ProfileInformation();
-			profile.setUid(user_id);
-			profile.setFirstName(givenName);
-			profile.setLastName(familyName);
+			UserProfile profile = new UserProfile();
+			profile.setHasUID(user_id);
+			Name name = new Name();
+			profile.setHasName(name);
+			name.setGivenName(givenName);
+			name.setFamilyName(familyName);
 
-			ProfileInformationStorage.saveProfile(profile);
+			UserProfileStorage.saveProfile(profile);
 			
 		} catch (Exception e) {
 			//e.printStackTrace();

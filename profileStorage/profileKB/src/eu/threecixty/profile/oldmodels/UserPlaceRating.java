@@ -14,6 +14,10 @@ public class UserPlaceRating {
 	private Rating hasRating;
 	@Description(hasText="Number of times User visited the place")
 	private int hasNumberOfTimesVisited;
+	
+	// data is new 
+	private Boolean newForKB = null;
+	
 	public PlaceDetail getHasPlaceDetail() {
 		return hasPlaceDetail;
 	}
@@ -31,6 +35,12 @@ public class UserPlaceRating {
 	}
 	public void setHasNumberOfTimesVisited(int hasNumberOfTimesVisited) {
 		this.hasNumberOfTimesVisited = hasNumberOfTimesVisited;
+	}
+	public Boolean getNewForKB() {
+		return newForKB;
+	}
+	public void setNewForKB(Boolean newForKB) {
+		this.newForKB = newForKB;
 	}
 	
 }

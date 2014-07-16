@@ -2,6 +2,7 @@ package eu.threecixty.profile;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -55,9 +56,9 @@ public class RdfFileManager {
 	 * @return
 	 */
 	public Model getRdfModel() {
-//		if (model == null) {
-//			synchronized (_sync) {
-//				if (model == null) {
+		if (model == null) {
+			synchronized (_sync) {
+				if (model == null) {
 					if (absolutePath == null || "".equals(absolutePath)) {
 						throw new RuntimeException(NULLPATH_EXCEPTION);
 					}
@@ -66,13 +67,16 @@ public class RdfFileManager {
 						InputStream input = new FileInputStream(absolutePath);
 						if (input != null) {
 						    model = ModelFactory.createDefaultModel().read(input, "UTF-8");
+						    input.close();
 						}
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-//				}
-//			}
-//		}
+				}
+			}
+		}
 		return model;
 	}
 
