@@ -3,34 +3,38 @@
 
 <!DOCTYPE rdf:RDF [
     <!ENTITY foaf "http://xmlns.com/foaf/0.1/" >
+    <!ENTITY dcmitype "http://purl.org/dc/dcmitype/" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY vcard "http://www.w3.org/2006/vcard/ns#" >
-    <!ENTITY profile "http://www.eu.3cixty.org/profile#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY lode "http://linkedevents.org/ontology/" >
     <!ENTITY relationship "http://purl.org/vocab/relationship/" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY profile "http://www.eu.3cixty.org/profile#100900047095598983805" >
+    <!ENTITY profile2 "http://www.eu.3cixty.org/profile#110248277616794929135" >
 ]>
 
 
 <rdf:RDF xmlns="http://www.eu.3cixty.org/profile#"
      xml:base="http://www.eu.3cixty.org/profile"
-     xmlns:relationship="http://purl.org/vocab/relationship/"
      xmlns:lode="http://linkedevents.org/ontology/"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:foaf="http://xmlns.com/foaf/0.1/"
+     xmlns:dcmitype="http://purl.org/dc/dcmitype/"
+     xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
+     xmlns:relationship="http://purl.org/vocab/relationship/"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
-     xmlns:profile="http://www.eu.3cixty.org/profile#">
+     xmlns:profile2="http://www.eu.3cixty.org/profile#110248277616794929135"
+     xmlns:profile="http://www.eu.3cixty.org/profile#100900047095598983805">
     <owl:Ontology rdf:about="http://www.eu.3cixty.org/profile">
         <author>Rachit Agarwal (Inria)</author>
         <author>Mihaela Brut (Thales)</author>
+        <owl:versionInfo>1.1.0</owl:versionInfo>
         <author>Johan Koolwaaij (Mobidot)</author>
         <author>Animesh Pathak (Inria)</author>
-        <owl:versionInfo>1.0.0</owl:versionInfo>
         <owl:imports rdf:resource="http://linkedevents.org/ontology/"/>
         <owl:imports rdf:resource="http://www.w3.org/2006/vcard/ns"/>
         <owl:imports rdf:resource="http://xmlns.com/foaf/0.1/"/>
@@ -46,18 +50,74 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    <owl:AnnotationProperty rdf:about="&lode;atPlace"/>
+    <owl:AnnotationProperty rdf:about="&vcard;nickname">
+        <rdfs:domain rdf:resource="&vcard;Name"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;hasAddress">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Employer"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#School"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;bday">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;longitude">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
+        <rdfs:domain rdf:resource="&vcard;Address"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;latitude">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
+        <rdfs:domain rdf:resource="&vcard;Address"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;family-name">
+        <rdfs:domain rdf:resource="&vcard;Name"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;country-name">
+        <rdfs:domain rdf:resource="&vcard;Address"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="http://www.eu.3cixty.org/profile#isSameAs"/>
+    <owl:AnnotationProperty rdf:about="&vcard;additional-name">
+        <rdfs:domain rdf:resource="&vcard;Name"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;given-name">
+        <rdfs:domain rdf:resource="&vcard;Name"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;street-address">
+        <rdfs:domain rdf:resource="&vcard;Address"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="http://www.eu.3cixty.org/profile#author"/>
+    <owl:AnnotationProperty rdf:about="&foaf;knows"/>
+    <owl:AnnotationProperty rdf:about="&vcard;hasName">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;honorific-suffix">
+        <rdfs:domain rdf:resource="&vcard;Name"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;honorific-prefix">
+        <rdfs:domain rdf:resource="&vcard;Name"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;post-office-box">
+        <rdfs:domain rdf:resource="&vcard;Address"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&vcard;postal-code">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
+        <rdfs:domain rdf:resource="&vcard;Address"/>
+    </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.eu.3cixty.org/profile#author -->
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
 
-    <owl:AnnotationProperty rdf:about="&profile;author"/>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#isSameAs -->
-
-    <owl:AnnotationProperty rdf:about="&profile;isSameAs"/>
     
 
 
@@ -74,120 +134,127 @@
 
     <!-- http://linkedevents.org/ontology/atPlace -->
 
-    <rdf:Description rdf:about="&lode;atPlace">
-        <rdfs:domain rdf:resource="&profile;EventDetails"/>
+    <owl:ObjectProperty rdf:about="&lode;atPlace">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
         <rdfs:range rdf:resource="&vcard;Address"/>
-    </rdf:Description>
+    </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompany -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasAccompany">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompany">
         <rdfs:comment>object of Accompanying details</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Accompanying"/>
-        <rdfs:domain rdf:resource="&profile;SocialPreference"/>
-        <rdfs:domain rdf:resource="&profile;Transport"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#SocialPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Transport"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyTrip1 -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasAccompanyTrip1">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyTrip1">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Existing trip of user 1, with trip id of user 1 smaller than trip id of user 2, to avoid double accompanies</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
-        <rdfs:range rdf:resource="&profile;TripMeasurement"/>
-        <owl:equivalentProperty rdf:resource="&profile;hasTripMeasurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#TripMeasurement"/>
+        <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#hasTripMeasurement"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyTrip2 -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasAccompanyTrip2">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyTrip2">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Existing trip of user 2</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
-        <rdfs:range rdf:resource="&profile;TripMeasurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#TripMeasurement"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasEducation -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasEducation">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEducation">
         <rdfs:comment>object of Education</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Education"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Education"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasEmployer -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasEmployer">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEmployer">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of Employer</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Employer"/>
-        <rdfs:domain rdf:resource="&profile;EmployerInformation"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Employer"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EmployerInformation"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasEmployerInformation -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasEmployerInformation">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEmployerInformation">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of Employer Information</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;EmployerInformation"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#EmployerInformation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasEventDetail -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasEventDetail">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEventDetail">
         <rdfs:comment>object of EventDetails</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;EventDetails"/>
-        <rdfs:domain rdf:resource="&profile;UserEventRating"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserEventRating"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasEventDetailPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasEventDetailPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEventDetailPreference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of EventDetailPreferences</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;EventDetailPreference"/>
-        <rdfs:domain rdf:resource="&profile;EventPreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#EventDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasEventPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasEventPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEventPreference">
         <rdfs:comment>object of EventPreferences</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;EventPreference"/>
-        <rdfs:domain rdf:resource="&profile;Preference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#EventPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasEventRatingPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasEventRatingPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEventRatingPreference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of EventRatingPreferences</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;EventPreference"/>
-        <rdfs:range rdf:resource="&profile;RatingPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventPreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#RatingPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelChains -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasHotelChains">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelChains">
         <rdfs:comment>chain of hotel</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
         <rdfs:range rdf:resource="&vcard;Address"/>
     </owl:ObjectProperty>
     
@@ -195,162 +262,165 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelDetail -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasHotelDetail">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelDetail">
         <rdfs:comment>object of HotelDetails</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;HotelDetail"/>
-        <rdfs:domain rdf:resource="&profile;UserHotelRating"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserHotelRating"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelDetailPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasHotelDetailPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelDetailPreference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of HotelDetailPreferences</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;HotelDetailPreference"/>
-        <rdfs:domain rdf:resource="&profile;HotelPreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasHotelPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelPreference">
         <rdfs:comment>object of HotelPreferences</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;HotelPreference"/>
-        <rdfs:domain rdf:resource="&profile;Preference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#HotelPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRoute -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasInfraRoute">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRoute">
         <rdfs:comment>object of InfraRoute</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;InfraRoute"/>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasLanguage -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasLanguage">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasLanguage">
         <rdfs:comment>object of Language</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Language"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Language"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasLike -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasLike">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasLike">
         <rdfs:comment>object of Likes</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Like"/>
-        <rdfs:domain rdf:resource="&profile;Preference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Like"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocation -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasMappedLocation">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocation">
         <rdfs:comment>object of MappedLocations</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;MappedLocation"/>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasMeasurement -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasMeasurement">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasMeasurement">
         <rdfs:comment>object of Measurement</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Measurement"/>
-        <rdfs:domain rdf:resource="&profile;TripMeasurement"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasModalityStatistics -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasModalityStatistics">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasModalityStatistics">
         <rdfs:comment>object of ModalityStatistics</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;ModalityStatistics"/>
-        <rdfs:domain rdf:resource="&profile;Transport"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Transport"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlace -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPersonalPlace">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlace">
         <rdfs:comment>Important personal places along the trip route. In the simplest form this could be start and end place only, but later also a school drop-off.</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;PersonalPlace"/>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
-        <rdfs:domain rdf:resource="&profile;Transport"/>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Transport"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPlaceDetail -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPlaceDetail">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPlaceDetail">
         <rdfs:comment>object of PlaceDetails</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;PlaceDetail"/>
-        <rdfs:domain rdf:resource="&profile;UserPlaceRating"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserPlaceRating"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPlaceDetailPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPlaceDetailPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPlaceDetailPreference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of PlaceDetailPreferences</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;PlaceDetailPreference"/>
-        <rdfs:domain rdf:resource="&profile;PlacePreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlacePreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPlacePreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPlacePreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPlacePreference">
         <rdfs:comment>object of PlacePreferences</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;PlacePreference"/>
-        <rdfs:domain rdf:resource="&profile;Preference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#PlacePreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPlaceRatingPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPlaceRatingPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPlaceRatingPreference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object for PlaceRatingPreferences</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PlacePreference"/>
-        <rdfs:range rdf:resource="&profile;RatingPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlacePreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#RatingPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:isDefinedBy>Preference object</rdfs:isDefinedBy>
-        <rdfs:range rdf:resource="&profile;Preference"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredApproximateAddress -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPreferredApproximateAddress">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredApproximateAddress">
         <rdfs:comment>object of Address. Holds address of preferred hotels and places</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PlaceDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
         <rdfs:range rdf:resource="&vcard;Address"/>
     </owl:ObjectProperty>
     
@@ -358,9 +428,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredChains -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPreferredChains">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredChains">
         <rdfs:comment>object of address class. Holds address of preferred hotel chains</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range rdf:resource="&vcard;Address"/>
     </owl:ObjectProperty>
     
@@ -368,260 +438,241 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredHotelRating -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPreferredHotelRating">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredHotelRating">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of Preferred hotel rating</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelPreference"/>
-        <rdfs:range rdf:resource="&profile;RatingPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelPreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#RatingPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredTripWeather -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasPreferredTripWeather">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredTripWeather">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Preferred weather at the start of the trip</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
-        <rdfs:range rdf:resource="&profile;Weather"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Weather"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasProfileIdentities -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasProfileIdentities">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasProfileIdentities">
         <rdfs:isDefinedBy>Object of profile identities.</rdfs:isDefinedBy>
-        <rdfs:range rdf:resource="&profile;ProfileIdentities"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasQueryHistory -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasQueryHistory">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasQueryHistory">
         <rdfs:comment>object of queryHistory</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;QueryHistory"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#QueryHistory"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasRating -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasRating">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasRating">
         <rdfs:comment>Object for rating</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Rating"/>
-        <rdfs:domain rdf:resource="&profile;UserEventRating"/>
-        <rdfs:domain rdf:resource="&profile;UserHotelRating"/>
-        <rdfs:domain rdf:resource="&profile;UserPlaceRating"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Rating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserEventRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserHotelRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserPlaceRating"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTrip -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasRegularTrip">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTrip">
         <rdfs:comment>object of Regular Trips</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;RegularTrip"/>
-        <rdfs:domain rdf:resource="&profile;Transport"/>
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Transport"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasSchool -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasSchool">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasSchool">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Object of School</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;School"/>
-        <rdfs:domain rdf:resource="&profile;SchoolAttended"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#School"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#SchoolAttended"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasSchoolAttended -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasSchoolAttended">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasSchoolAttended">
         <rdfs:comment>object of School Attended</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Education"/>
-        <rdfs:range rdf:resource="&profile;SchoolAttended"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Education"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#SchoolAttended"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasSkill -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasSkill">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasSkill">
         <rdfs:comment>object of the skill</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Skill"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Skill"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasSocialPreference -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasSocialPreference">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasSocialPreference">
         <rdfs:comment>Object of Social Preferences</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Preference"/>
-        <rdfs:range rdf:resource="&profile;SocialPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#SocialPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasTakenCourse -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasTakenCourse">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasTakenCourse">
         <rdfs:comment>object of course class</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Course"/>
-        <rdfs:domain rdf:resource="&profile;Education"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Education"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasTemporalDetails -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasTemporalDetails">
-        <rdfs:domain rdf:resource="&profile;EventDetails"/>
-        <rdfs:range rdf:resource="&profile;TemporalDetails"/>
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasTemporalDetails">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#TemporalDetails"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasTransport -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasTransport">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasTransport">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Object of transport</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Transport"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#hasTrayItem -->
-
-    <owl:ObjectProperty rdf:about="&profile;hasTrayItem">
-        <rdfs:range rdf:resource="&profile;Tray"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Transport"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasTrip -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasTrip">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasTrip">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of trip</rdfs:comment>
-        <rdfs:range rdf:resource="&profile;Trip"/>
-        <rdfs:domain rdf:resource="&profile;TripMeasurement"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripMeasurement"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasTripMeasurement -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasTripMeasurement">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripMeasurement">
         <rdfs:comment>Object of TripMeasurement</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Transport"/>
-        <rdfs:range rdf:resource="&profile;TripMeasurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Transport"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#TripMeasurement"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasTripPrefernce -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasTripPrefernce">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripPrefernce">
         <rdfs:comment>object of Trip Preferences</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Preference"/>
-        <rdfs:range rdf:resource="&profile;TripPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasUserEnteredRatings -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasUserEnteredRatings">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasUserEnteredRatings">
         <rdfs:comment>object of user entered Ratings</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Preference"/>
-        <rdfs:range rdf:resource="&profile;UserEnteredRatings"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#UserEnteredRatings"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasUserEventRating -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasUserEventRating">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasUserEventRating">
         <rdfs:comment>object for User defined spectific Event Rating</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;UserEnteredRatings"/>
-        <rdfs:range rdf:resource="&profile;UserEventRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserEnteredRatings"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#UserEventRating"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasUserHotelRating -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasUserHotelRating">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasUserHotelRating">
         <rdfs:comment>Object of user Hotel Rating</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;UserEnteredRatings"/>
-        <rdfs:range rdf:resource="&profile;UserHotelRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserEnteredRatings"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#UserHotelRating"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasUserPlaceRating -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasUserPlaceRating">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasUserPlaceRating">
         <rdfs:comment>object of User Place Rating</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;UserEnteredRatings"/>
-        <rdfs:range rdf:resource="&profile;UserPlaceRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserEnteredRatings"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#UserPlaceRating"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasWeather -->
 
-    <owl:ObjectProperty rdf:about="&profile;hasWeather">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasWeather">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>object of Weather Class</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
-        <rdfs:range rdf:resource="&profile;Weather"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#Weather"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#isOfferedBy -->
 
-    <owl:ObjectProperty rdf:about="&profile;isOfferedBy">
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#isOfferedBy">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>course is offered by </rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Course"/>
-        <rdfs:range rdf:resource="&profile;School"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#School"/>
     </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#hasAddress -->
-
-    <rdf:Description rdf:about="&vcard;hasAddress">
-        <rdfs:domain rdf:resource="&profile;Employer"/>
-        <rdfs:domain rdf:resource="&profile;PlaceDetail"/>
-        <rdfs:domain rdf:resource="&profile;School"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#hasName -->
-
-    <rdf:Description rdf:about="&vcard;hasName">
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
-    </rdf:Description>
     
 
 
     <!-- http://xmlns.com/foaf/0.1/knows -->
 
-    <rdf:Description rdf:about="&foaf;knows">
-        <rdfs:range rdf:resource="&profile;UserProfile"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
-    </rdf:Description>
+    <owl:ObjectProperty rdf:about="&foaf;knows">
+        <rdf:type rdf:resource="&owl;SymmetricProperty"/>
+        <rdfs:range rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+    </owl:ObjectProperty>
     
 
 
@@ -636,31 +687,12 @@
     
 
 
-    <!-- http://www.eu.3cixty.org/profile#attended -->
-
-    <owl:DatatypeProperty rdf:about="&profile;attended">
-        <rdfs:comment>whether or not the item was attended</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
-        <rdfs:range rdf:resource="&xsd;boolean"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#dateTimeAttended -->
-
-    <owl:DatatypeProperty rdf:about="&profile;dateTimeAttended">
-        <rdfs:comment>time when the item was attended</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
-        <rdfs:range rdf:resource="&xsd;long"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyDomainName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyDomainName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyDomainName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Accompany domain or group</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -668,9 +700,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Unique accompany ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -678,9 +711,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyScore -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyScore">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyScore">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Matching score between trip 1 and trip 2</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -688,9 +722,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Start time of the accompany</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -698,9 +733,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyTimeZone -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyTimeZone">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyTimeZone">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>In seconds, GMT+1 equals 3600</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -708,31 +744,34 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyUserID1 -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyUserID1">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyUserID1">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>User 1</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
-        <owl:equivalentProperty rdf:resource="&profile;hasUID"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
+        <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#hasUID"/>
+        <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyUserID2 -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyUserID2">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyUserID2">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>User 2</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
-        <owl:equivalentProperty rdf:resource="&profile;hasUID"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
+        <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#hasUID"/>
+        <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#hasAccompanyValidity -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAccompanyValidity">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAccompanyValidity">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Duration of the accompany in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -740,9 +779,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasAverageSpeed -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasAverageSpeed">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasAverageSpeed">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Average speed, in meter per second</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -750,9 +790,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasCondition -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasCondition">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasCondition">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Most prominent weather condition during the validity of the measurement</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Weather"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Weather"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -760,9 +801,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasCourseDuration -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasCourseDuration">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasCourseDuration">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>duration of the course</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Course"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -770,9 +812,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasCourseInstructor -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasCourseInstructor">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasCourseInstructor">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Name of Course Instructor</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Course"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -780,9 +823,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasCourseName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasCourseName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasCourseName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Name of the course</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Course"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -790,9 +834,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasCourseType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasCourseType">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasCourseType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Type of the course (Graduate level course, distance learning, online course etc)</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Course"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -840,9 +885,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasDataQuality -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasDataQuality">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasDataQuality">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Data quality, default is good</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Measurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.DataQuality"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -909,9 +955,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasDateFrom -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasDateFrom">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasDateFrom">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Start Date</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;TemporalDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TemporalDetails"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -919,9 +966,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasDateUntil -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasDateUntil">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasDateUntil">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>end date</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;TemporalDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TemporalDetails"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -929,11 +977,12 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasDecisionLevel -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasDecisionLevel">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasDecisionLevel">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Modality selection level: none if the modality is not set, manual if a user decided the modality,  automatic if modality was derived by an automated recognizer, override if the user chose to override or correct the automatically derived modality</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Accompanying"/>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.DecisionLevel"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -970,12 +1019,13 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasDetail -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasDetail">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasDetail">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>other details or comments</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Course"/>
-        <rdfs:domain rdf:resource="&profile;Employer"/>
-        <rdfs:domain rdf:resource="&profile;School"/>
-        <rdfs:domain rdf:resource="&profile;TemporalDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Employer"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#School"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TemporalDetails"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -983,9 +1033,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasEmail -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasEmail">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasEmail">
         <rdfs:comment>has email</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -993,9 +1043,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasEmployerName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasEmployerName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasEmployerName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Name of Employer</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Employer"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Employer"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1003,9 +1054,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasEventName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasEventName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasEventName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>name of event</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;EventDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1013,8 +1065,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasGender -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasGender">
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasGender">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
         <isSameAs rdf:resource="&vcard;hasGender"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -1057,9 +1110,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasHigestLevelOfAquiredEducation -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasHigestLevelOfAquiredEducation">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasHigestLevelOfAquiredEducation">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Highest level of education aquired by the user</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Education"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Education"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -1143,9 +1197,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasHobbies -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasHobbies">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasHobbies">
         <rdfs:comment>hobbies of a user</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1153,8 +1207,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelPriceHigh -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasHotelPriceHigh">
-        <rdfs:domain rdf:resource="&profile;HotelDetail"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelPriceHigh">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -1162,8 +1216,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelPriceLow -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasHotelPriceLow">
-        <rdfs:domain rdf:resource="&profile;HotelDetail"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelPriceLow">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -1171,8 +1225,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelRoomType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasHotelRoomType">
-        <rdfs:domain rdf:resource="&profile;HotelDetail"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelRoomType">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -1226,8 +1280,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasHotelStarCategory -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasHotelStarCategory">
-        <rdfs:domain rdf:resource="&profile;HotelDetail"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasHotelStarCategory">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -1281,9 +1335,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInRushHour -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInRushHour">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInRushHour">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Indicates whether this trip was during rush hour</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;boolean"/>
     </owl:DatatypeProperty>
     
@@ -1291,9 +1346,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRouteID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInfraRouteID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRouteID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>ID in terms of OSM, O if unknown</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
         <rdfs:range rdf:resource="&xsd;int"/>
     </owl:DatatypeProperty>
     
@@ -1301,9 +1357,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRouteName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInfraRouteName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRouteName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>route name</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1311,9 +1368,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRouteNetwork -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInfraRouteNetwork">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRouteNetwork">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>A wider network of routes of which this is an example</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1321,9 +1379,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRouteOperator -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInfraRouteOperator">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRouteOperator">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>the route is operated by this company</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1331,9 +1390,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRouteReference -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInfraRouteReference">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRouteReference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>route reference</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1341,9 +1401,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRouteSymbol -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInfraRouteSymbol">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRouteSymbol">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>describes the symbol that is used to mark the way along the route e.g. Red Cross</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1351,9 +1412,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasInfraRouteType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasInfraRouteType">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasInfraRouteType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>route type</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1361,16 +1423,16 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasKeyTags -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasKeyTags">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasKeyTags">
         <rdfs:comment>various Comments</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Course"/>
-        <rdfs:domain rdf:resource="&profile;Education"/>
-        <rdfs:domain rdf:resource="&profile;Language"/>
-        <rdfs:domain rdf:resource="&profile;PlaceDetail"/>
-        <rdfs:domain rdf:resource="&profile;Rating"/>
-        <rdfs:domain rdf:resource="&profile;School"/>
-        <rdfs:domain rdf:resource="&profile;Skill"/>
-        <rdfs:domain rdf:resource="&profile;TemporalDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Course"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Education"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Language"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Rating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#School"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Skill"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TemporalDetails"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1378,9 +1440,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasLanguageName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasLanguageName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasLanguageName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Language name</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;LanguageDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#LanguageDetails"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1388,10 +1451,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasLanguageState -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasLanguageState">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasLanguageState">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>User knowledge state with the language</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Language"/>
-        <owl:equivalentProperty rdf:resource="&profile;wantsLanguageState"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Language"/>
+        <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#wantsLanguageState"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -1457,9 +1521,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasLikeName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasLikeName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasLikeName">
         <rdfs:comment>Name of the like</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Like"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Like"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1467,9 +1531,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasLikeType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasLikeType">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasLikeType">
         <rdfs:comment>Type of entity liked</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Like"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Like"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -1583,9 +1647,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationAerialway -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationAerialway">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationAerialway">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Aerialway classification</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1593,9 +1658,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationDeviation -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationDeviation">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationDeviation">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Measure for the accuracy of the mapping</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1603,9 +1669,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationDistance -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationDistance">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationDistance">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Distance between this node and the previous one</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -1613,9 +1680,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationHighway -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationHighway">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationHighway">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Highway classification</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1623,9 +1691,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Local ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -1633,9 +1702,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Name of the way</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1643,9 +1713,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationNodeID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationNodeID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationNodeID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>OSM node ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -1653,9 +1724,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationRailway -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationRailway">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationRailway">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Railway classification</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1663,9 +1735,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationServiceRoadway -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationServiceRoadway">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationServiceRoadway">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Service road classification</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1673,9 +1746,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Time stamp, interpolated to this node ID, in UTC. Time zone information can be copied from the TripMeasurement. In case of a RegularTrip, time is relative to trip start time</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -1683,9 +1757,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationWaterway -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationWaterway">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationWaterway">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Waterway classification</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -1693,9 +1768,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMappedLocationWayID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMappedLocationWayID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMappedLocationWayID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>OSM way ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#MappedLocation"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -1703,9 +1779,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMaturityLevel -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMaturityLevel">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMaturityLevel">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>User Maturity level in a skill</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Skill"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Skill"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -1759,9 +1836,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMaxLastRatingTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMaxLastRatingTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMaxLastRatingTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>maximal date of the newest rating</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RatingPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RatingPreference"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -1769,9 +1847,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMaxPriceLow -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMaxPriceLow">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMaxPriceLow">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>maximal accepted lowest Price</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -1779,9 +1858,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMeasurementID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMeasurementID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMeasurementID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Unique ID of a measurement or derived value, IDs are unique per reading type (location, vri, weather, ...)</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Measurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -1789,9 +1869,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMeasurementTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMeasurementTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMeasurementTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>In seconds since epoch, in UTC</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Measurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -1799,9 +1880,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMeasurementTimeZone -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMeasurementTimeZone">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMeasurementTimeZone">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>n seconds, GMT+1 equals 3600</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Measurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -1809,9 +1891,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMeasurementValidity -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMeasurementValidity">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMeasurementValidity">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>In seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Measurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -1819,9 +1902,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMinPriceHigh -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMinPriceHigh">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMinPriceHigh">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>minimal accepted highest Price</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -1829,9 +1913,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasMinRating -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasMinRating">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasMinRating">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>minimal average rating accepted for the place, on scale of 1 to 10</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RatingPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RatingPreference"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -1839,10 +1924,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasModalityRole -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasModalityRole">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasModalityRole">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Role of the user on this specific trip, e.g. driver or passenger in the back seat</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.ModalityRole"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -1909,14 +1995,15 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasModalityType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasModalityType">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasModalityType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Modality used during trip (foot, bike, car, bus, ...) as automatically derived or user corrected</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;InfraRoute"/>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
-        <owl:equivalentProperty rdf:resource="&profile;hasTripModalityAutomatic"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#InfraRoute"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
+        <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#hasTripModalityAutomatic"/>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.ModalityType"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -2115,10 +2202,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasNatureOfEvent -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasNatureOfEvent">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasNatureOfEvent">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Nature of the event</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;EventDetailPreference"/>
-        <rdfs:domain rdf:resource="&profile;EventDetails"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -2238,10 +2326,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasNatureOfPlace -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasNatureOfPlace">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasNatureOfPlace">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Nature of place</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PlaceDetail"/>
-        <rdfs:domain rdf:resource="&profile;PlaceDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -2355,9 +2444,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasNatureOfWork -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasNatureOfWork">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasNatureOfWork">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>nature of work</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;EmployerInformation"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EmployerInformation"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -2471,9 +2561,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasNearByTransportMode -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasNearByTransportMode">
-        <rdfs:domain rdf:resource="&profile;HotelDetail"/>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasNearByTransportMode">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2481,10 +2572,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasNumberOfTimesVisited -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasNumberOfTimesVisited">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasNumberOfTimesVisited">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>minimal times the User himself visited the hotel</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelPreference"/>
-        <rdfs:domain rdf:resource="&profile;UserHotelRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserHotelRating"/>
         <rdfs:range rdf:resource="&xsd;int"/>
     </owl:DatatypeProperty>
     
@@ -2492,10 +2584,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasNumberofTimesVisited -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasNumberofTimesVisited">
-        <rdfs:domain rdf:resource="&profile;UserEventRating"/>
-        <rdfs:domain rdf:resource="&profile;UserHotelRating"/>
-        <rdfs:domain rdf:resource="&profile;UserPlaceRating"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasNumberofTimesVisited">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserEventRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserHotelRating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserPlaceRating"/>
         <rdfs:range rdf:resource="&xsd;integer"/>
     </owl:DatatypeProperty>
     
@@ -2503,9 +2595,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasOriginDestinationPair -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasOriginDestinationPair">
-        <rdfs:comment>Origin destination on name of type level, e.g. &apos;home-office&apos;,&apos;office-home&apos;</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasOriginDestinationPair">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment>Origin destination on name of type level, e.g. &#39;home-office&#39;,&#39;office-home&#39;</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2513,9 +2606,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceAccuracy -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceAccuracy">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceAccuracy">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Place location accuracy, in meters</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -2523,9 +2617,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceDayHourPattern -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceDayHourPattern">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceDayHourPattern">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Duration of stay per day hour</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2533,9 +2628,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceExternalIds -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceExternalIds">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceExternalIds">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>External IDs of this place, as a + concatenated string, with e.g. FourSquare and FaceBook identities: 4sq:43432+fb:8348734</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2543,9 +2639,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Place ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -2553,9 +2650,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Place name</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2563,9 +2661,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceStayDuration -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceStayDuration">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceStayDuration">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total duration of stay of the user in this place, in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -2573,9 +2672,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceStayPercentage -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceStayPercentage">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceStayPercentage">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total duration of stay of the user in this place, relatively with respect to the observed time period for place detection</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -2583,9 +2683,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceType">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Place type</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2593,9 +2694,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPersonalPlaceWeekDayPattern -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPersonalPlaceWeekDayPattern">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPersonalPlaceWeekDayPattern">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Duration of stay per week day&quot;</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2603,9 +2705,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPlaceName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPlaceName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPlaceName">
         <rdfs:comment>Name of the place</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PlaceDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetail"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2613,9 +2715,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredEndDate -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredEndDate">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredEndDate">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>preferred end date. can be empty</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;EventDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -2623,9 +2726,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredEventKeyTags -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredEventKeyTags">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredEventKeyTags">
         <rdfs:comment>preferred tags associated with the event</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;EventDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2633,9 +2736,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredFacilities -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredFacilities">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredFacilities">
         <rdfs:comment>preferred Facilities to be available</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2643,9 +2746,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredMaxTotalCost -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredMaxTotalCost">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredMaxTotalCost">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>The maximal accepted cost for the trip</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -2653,9 +2757,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredMaxTotalDistance -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredMaxTotalDistance">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredMaxTotalDistance">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>The maximal total distance for the current trip, in meters</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -2663,9 +2768,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredMinAverageSpeed -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredMinAverageSpeed">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredMinAverageSpeed">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>The minimal preferred average speed for the current trip, in meter per second</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -2673,9 +2779,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredPlaceKeyTags -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredPlaceKeyTags">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredPlaceKeyTags">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>preferred tags associated with the hotel or place</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;PlaceDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2683,9 +2790,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredRoomType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredRoomType">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredRoomType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>preferred Room Types to be available eg. single, double, triple, quad, dorm</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -2727,9 +2835,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredStarCategory -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredStarCategory">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredStarCategory">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>preferred Star information, from 1 to 7</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -2783,9 +2892,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredStartDate -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredStartDate">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredStartDate">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>preferred start date</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;EventDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#EventDetailPreference"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -2793,9 +2903,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasPreferredTripObjective -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasPreferredTripObjective">
-        <rdfs:domain rdf:resource="&profile;TripPreference"/>
-        <owl:equivalentProperty rdf:resource="&profile;hasTravelObjectiveType"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasPreferredTripObjective">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#TripPreference"/>
+        <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#hasTravelObjectiveType"/>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.TravelObjectiveType"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -2904,9 +3014,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasQueryTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasQueryTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasQueryTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>time at which the user queried the KB</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;QueryHistory"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#QueryHistory"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -2914,9 +3025,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRain -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRain">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRain">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total amount of rain, in mm, over the validity of the measurement</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Weather"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Weather"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -2924,9 +3036,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripDayHourPattern -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripDayHourPattern">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripDayHourPattern">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Departure time per day hour</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2934,9 +3047,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripDepartureTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripDepartureTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripDepartureTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Average departure time, in seconds since 0:00</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -2944,9 +3058,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripDepartureTimeSD -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripDepartureTimeSD">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripDepartureTimeSD">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Standard deviation in the departure time, in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -2954,9 +3069,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripFastestTravelTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripFastestTravelTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripFastestTravelTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Fastest travel time, in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -2964,9 +3080,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Unique Regular trip ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -2974,9 +3091,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripLastChanged -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripLastChanged">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripLastChanged">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Timestamp of the last modification of this regular trip</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -2984,9 +3102,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Trip name, formatted as [start street - end street, city] or [start street, start city - end street, end city] or [place name 1 - place name 2], to distinguish between trips</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -2994,9 +3113,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripRouteName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripRouteName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripRouteName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Concatenated string of street names</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3004,9 +3124,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripTotalCount -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripTotalCount">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripTotalCount">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Number of times the user took this route for this particular trip (e.g. Staringlaan-Brouwerijstraat), within the totalTravelTime of the mobility profile</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3014,9 +3135,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripTotalDistance -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripTotalDistance">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripTotalDistance">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Distance of the regular trip</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3024,9 +3146,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripTravelTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripTravelTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripTravelTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Average travel time, in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3034,9 +3157,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripTravelTimePattern -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripTravelTimePattern">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripTravelTimePattern">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total travel time as function of the departure time</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3044,9 +3168,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripTravelTimeSD -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripTravelTimeSD">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripTravelTimeSD">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Standard deviation in the travel time, in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3054,9 +3179,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripViaName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripViaName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripViaName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Names of the most important via roads of this regular trip</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3064,9 +3190,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasRegularTripWeekdayPattern -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasRegularTripWeekdayPattern">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasRegularTripWeekdayPattern">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Usage pattern per week day</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3074,9 +3201,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasSchoolName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasSchoolName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasSchoolName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Name of the school</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;School"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#School"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3084,9 +3212,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasSkillName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasSkillName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasSkillName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Name of the skill</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Skill"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Skill"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3094,10 +3223,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasSource -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasSource">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasSource">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>has source url</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ProfileIdentities"/>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3105,9 +3234,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTemperature -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTemperature">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTemperature">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Average temperature, in Celsius, over the validity of the measurement</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Weather"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Weather"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3115,9 +3245,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTotalCalories -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTotalCalories">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTotalCalories">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total calories spent travelling</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3125,9 +3256,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTotalCost -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTotalCost">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTotalCost">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total cost of the travels, in Euros</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3135,9 +3267,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTotalCount -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTotalCount">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTotalCount">
         <rdfs:comment>Total count of trips in this category</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3145,9 +3277,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTotalDistance -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTotalDistance">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTotalDistance">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total distance, in meter</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3155,9 +3288,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTotalLostTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTotalLostTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTotalLostTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total time lost relative to fastest time for a trip, in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3165,9 +3299,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTotalTime -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTotalTime">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTotalTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total time, in seconds</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3175,10 +3310,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTravelObjectiveType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTravelObjectiveType">
-        <rdfs:comment>Travel Objective. The individual&apos;s travel objective with this trip. Indicate the main objective, e.g. GoingToWork and EnjoyingTheView can be combined in one trip, but the first is the main objective.</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTravelObjectiveType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment>Travel Objective. The individual&#39;s travel objective with this trip. Indicate the main objective, e.g. GoingToWork and EnjoyingTheView can be combined in one trip, but the first is the main objective.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.TravelObjectiveType"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -3287,9 +3423,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripAverageSpeed -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripAverageSpeed">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripAverageSpeed">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Average speed of a trip, in meter per second</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3297,9 +3434,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripGroupID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripGroupID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripGroupID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Unique trip group ID. All single-modality trips with the same group ID constitute a door-to-door trip, in chronological trip order</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3307,9 +3445,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripID">
         <rdfs:comment>Unique trip ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3317,9 +3455,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripLastAnalyzed -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripLastAnalyzed">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripLastAnalyzed">
         <rdfs:comment>Timestamp of the last automatic trip analysis</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3327,9 +3465,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripModalityAutomatic -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripModalityAutomatic">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripModalityAutomatic">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Modality used during trip (foot, bike, car, bus, ...) as originally automatically derived, to be able to generate a confusion or correction matrix</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -3527,9 +3666,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripNumberOfPassengers -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripNumberOfPassengers">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripNumberOfPassengers">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Number Of Passengers</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;int"/>
     </owl:DatatypeProperty>
     
@@ -3537,9 +3677,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripRegularTripId -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripRegularTripId">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripRegularTripId">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>ID of the regular trip this trip matches with, 0 if no match</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
@@ -3547,9 +3688,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripTotalCalories -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripTotalCalories">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripTotalCalories">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total calories spent on this trip</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3557,9 +3699,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripTotalCost -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripTotalCost">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripTotalCost">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Costs of a trip, in Euros</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3567,9 +3710,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripTotalDistance -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripTotalDistance">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripTotalDistance">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total distance of a trip, in meter</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3577,9 +3721,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripTotalInfraSegmentDistance -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripTotalInfraSegmentDistance">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripTotalInfraSegmentDistance">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Total distance of a trip, measured along map matched route</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3587,9 +3732,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTripType -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTripType">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTripType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Type of the trip, identifies a.o. whether or not the user is moving, e.g. static or enroute</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Trip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Trip"/>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.TripType"/>
         <rdfs:range>
             <rdfs:Datatype>
@@ -3632,10 +3778,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasTypeOfFood -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasTypeOfFood">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasTypeOfFood">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>preferred Type of food served</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;HotelDetail"/>
-        <rdfs:domain rdf:resource="&profile;HotelDetailPreference"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#HotelDetailPreference"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -3677,15 +3824,15 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasUID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasUID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasUID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>ID of the user</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource="http://www.eu.3cixty.org/profile"/>
-        <rdfs:domain rdf:resource="&profile;Measurement"/>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
-        <rdfs:domain rdf:resource="&profile;QueryHistory"/>
-        <rdfs:domain rdf:resource="&profile;RegularTrip"/>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#PersonalPlace"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#QueryHistory"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#RegularTrip"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3693,9 +3840,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasUserAccountID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasUserAccountID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasUserAccountID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>user account ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ProfileIdentities"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3703,10 +3851,9 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasUserDefinedRating -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasUserDefinedRating">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasUserDefinedRating">
         <rdfs:comment>Rating given by User  on scale of 1 to 10</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Rating"/>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Rating"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
     
@@ -3714,10 +3861,11 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasUserInteractionMode -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasUserInteractionMode">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasUserInteractionMode">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Interaction mode of the user</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ProfileIdentities"/>
-        <rdfs:domain rdf:resource="&profile;Rating"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Rating"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -3831,9 +3979,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasWeatherConditions -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasWeatherConditions">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasWeatherConditions">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Standardized weather condition string, based on the trip weather</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;ModalityStatistics"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#ModalityStatistics"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -3841,59 +3990,18 @@
 
     <!-- http://www.eu.3cixty.org/profile#hasWeatherID -->
 
-    <owl:DatatypeProperty rdf:about="&profile;hasWeatherID">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasWeatherID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>Weather ID</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Weather"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Weather"/>
         <rdfs:range rdf:resource="&xsd;int"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#itemID -->
-
-    <owl:DatatypeProperty rdf:about="&profile;itemID">
-        <rdfs:comment>item id of the item in the tray</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#itemType -->
-
-    <owl:DatatypeProperty rdf:about="&profile;itemType">
-        <rdfs:comment>type of the item</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
-        <rdfs:range>
-            <rdfs:Datatype>
-                <owl:oneOf>
-                    <rdf:Description>
-                        <rdf:type rdf:resource="&rdf;List"/>
-                        <rdf:first>event</rdf:first>
-                        <rdf:rest>
-                            <rdf:Description>
-                                <rdf:type rdf:resource="&rdf;List"/>
-                                <rdf:first>poi</rdf:first>
-                                <rdf:rest>
-                                    <rdf:Description>
-                                        <rdf:type rdf:resource="&rdf;List"/>
-                                        <rdf:first>transportation</rdf:first>
-                                        <rdf:rest rdf:resource="&rdf;nil"/>
-                                    </rdf:Description>
-                                </rdf:rest>
-                            </rdf:Description>
-                        </rdf:rest>
-                    </rdf:Description>
-                </owl:oneOf>
-            </rdfs:Datatype>
-        </rdfs:range>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#middleName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;middleName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#middleName">
         <rdfs:comment>middle name</rdfs:comment>
         <rdfs:range rdf:resource="&xsd;string"/>
         <rdfs:domain rdf:resource="&vcard;Name"/>
@@ -3903,27 +4011,18 @@
 
     <!-- http://www.eu.3cixty.org/profile#query -->
 
-    <owl:DatatypeProperty rdf:about="&profile;query">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#query">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>user Input query</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;QueryHistory"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#QueryHistory"/>
         <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#timestamp -->
-
-    <owl:DatatypeProperty rdf:about="&profile;timestamp">
-        <rdfs:comment>time when the item is stored</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Tray"/>
-        <rdfs:range rdf:resource="&xsd;long"/>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#townName -->
 
-    <owl:DatatypeProperty rdf:about="&profile;townName">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#townName">
         <rdfs:comment>Town name</rdfs:comment>
         <rdfs:range rdf:resource="&xsd;string"/>
         <rdfs:domain rdf:resource="&vcard;Address"/>
@@ -3933,9 +4032,10 @@
 
     <!-- http://www.eu.3cixty.org/profile#wantsLanguageState -->
 
-    <owl:DatatypeProperty rdf:about="&profile;wantsLanguageState">
+    <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#wantsLanguageState">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>user would like to gather what knowledge about the language</rdfs:comment>
-        <rdfs:domain rdf:resource="&profile;Language"/>
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Language"/>
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:oneOf>
@@ -3999,115 +4099,27 @@
     
 
 
-    <!-- http://www.w3.org/2006/vcard/ns#additional-name -->
-
-    <rdf:Description rdf:about="&vcard;additional-name">
-        <rdfs:domain rdf:resource="&vcard;Name"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#bday -->
-
-    <rdf:Description rdf:about="&vcard;bday">
-        <rdfs:domain rdf:resource="&profile;UserProfile"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#country-name -->
-
-    <rdf:Description rdf:about="&vcard;country-name">
-        <rdfs:domain rdf:resource="&vcard;Address"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#family-name -->
-
-    <rdf:Description rdf:about="&vcard;family-name">
-        <rdfs:domain rdf:resource="&vcard;Name"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#given-name -->
-
-    <rdf:Description rdf:about="&vcard;given-name">
-        <rdfs:domain rdf:resource="&vcard;Name"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#honorific-prefix -->
-
-    <rdf:Description rdf:about="&vcard;honorific-prefix">
-        <rdfs:domain rdf:resource="&vcard;Name"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#honorific-suffix -->
-
-    <rdf:Description rdf:about="&vcard;honorific-suffix">
-        <rdfs:domain rdf:resource="&vcard;Name"/>
-    </rdf:Description>
-    
-
-
     <!-- http://www.w3.org/2006/vcard/ns#latitude -->
 
-    <rdf:Description rdf:about="&vcard;latitude">
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+    <owl:DatatypeProperty rdf:about="&vcard;latitude">
         <rdfs:range rdf:resource="&xsd;double"/>
-        <rdfs:domain rdf:resource="&vcard;Address"/>
-    </rdf:Description>
+    </owl:DatatypeProperty>
     
 
 
     <!-- http://www.w3.org/2006/vcard/ns#longitude -->
 
-    <rdf:Description rdf:about="&vcard;longitude">
-        <rdfs:domain rdf:resource="&profile;MappedLocation"/>
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
+    <owl:DatatypeProperty rdf:about="&vcard;longitude">
         <rdfs:range rdf:resource="&xsd;double"/>
-        <rdfs:domain rdf:resource="&vcard;Address"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#nickname -->
-
-    <rdf:Description rdf:about="&vcard;nickname">
-        <rdfs:domain rdf:resource="&vcard;Name"/>
-    </rdf:Description>
+    </owl:DatatypeProperty>
     
 
 
     <!-- http://www.w3.org/2006/vcard/ns#post-office-box -->
 
-    <rdf:Description rdf:about="&vcard;post-office-box">
+    <owl:DatatypeProperty rdf:about="&vcard;post-office-box">
         <rdfs:range rdf:resource="&xsd;string"/>
-        <rdfs:domain rdf:resource="&vcard;Address"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#postal-code -->
-
-    <rdf:Description rdf:about="&vcard;postal-code">
-        <rdfs:domain rdf:resource="&profile;PersonalPlace"/>
-        <rdfs:domain rdf:resource="&vcard;Address"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://www.w3.org/2006/vcard/ns#street-address -->
-
-    <rdf:Description rdf:about="&vcard;street-address">
-        <rdfs:domain rdf:resource="&vcard;Address"/>
-    </rdf:Description>
+    </owl:DatatypeProperty>
     
 
 
@@ -4124,15 +4136,15 @@
 
     <!-- http://purl.org/dc/dcmitype/Event -->
 
-    <owl:Class rdf:about="http://purl.org/dc/dcmitype/Event">
-        <owl:equivalentClass rdf:resource="&profile;EventDetails"/>
+    <owl:Class rdf:about="&dcmitype;Event">
+        <owl:equivalentClass rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
     </owl:Class>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#Accompanying -->
 
-    <owl:Class rdf:about="&profile;Accompanying">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Accompanying">
         <rdfs:comment>Description of two users accompanying each other on a trip or staying together in a place</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.Accompany"/>
     </owl:Class>
@@ -4141,8 +4153,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#Course -->
 
-    <owl:Class rdf:about="&profile;Course">
-        <rdfs:subClassOf rdf:resource="&profile;EventDetails"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Course">
+        <rdfs:subClassOf rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
         <rdfs:comment>Course Class</rdfs:comment>
     </owl:Class>
     
@@ -4150,7 +4162,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#Education -->
 
-    <owl:Class rdf:about="&profile;Education">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Education">
         <rdfs:comment>The Education information about the user. This collection holds the level of education user has completed or is currently enroled in.</rdfs:comment>
     </owl:Class>
     
@@ -4158,7 +4170,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#Employer -->
 
-    <owl:Class rdf:about="&profile;Employer">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Employer">
         <rdfs:comment>The Employer information about the user. This collection holds the employers user has worked or is currently working with.</rdfs:comment>
     </owl:Class>
     
@@ -4166,8 +4178,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#EmployerInformation -->
 
-    <owl:Class rdf:about="&profile;EmployerInformation">
-        <rdfs:subClassOf rdf:resource="&profile;EventDetails"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#EmployerInformation">
+        <rdfs:subClassOf rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
         <rdfs:comment>Information about the employer.</rdfs:comment>
     </owl:Class>
     
@@ -4175,7 +4187,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#EventDetailPreference -->
 
-    <owl:Class rdf:about="&profile;EventDetailPreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#EventDetailPreference">
         <rdfs:comment>preferred event details</rdfs:comment>
     </owl:Class>
     
@@ -4183,7 +4195,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#EventDetails -->
 
-    <owl:Class rdf:about="&profile;EventDetails">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#EventDetails">
         <rdfs:comment>Details about an event</rdfs:comment>
     </owl:Class>
     
@@ -4191,7 +4203,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#EventPreference -->
 
-    <owl:Class rdf:about="&profile;EventPreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#EventPreference">
         <rdfs:comment>Collection of event characteristics the user prefers to book</rdfs:comment>
     </owl:Class>
     
@@ -4199,8 +4211,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#HotelDetail -->
 
-    <owl:Class rdf:about="&profile;HotelDetail">
-        <rdfs:subClassOf rdf:resource="&profile;PlaceDetail"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#HotelDetail">
+        <rdfs:subClassOf rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetail"/>
         <rdfs:comment>extends place details</rdfs:comment>
     </owl:Class>
     
@@ -4208,8 +4220,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#HotelDetailPreference -->
 
-    <owl:Class rdf:about="&profile;HotelDetailPreference">
-        <rdfs:subClassOf rdf:resource="&profile;PlaceDetailPreference"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#HotelDetailPreference">
+        <rdfs:subClassOf rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
         <rdfs:comment>Hotel details preferred by user for his booking</rdfs:comment>
     </owl:Class>
     
@@ -4217,7 +4229,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#HotelPreference -->
 
-    <owl:Class rdf:about="&profile;HotelPreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#HotelPreference">
         <rdfs:comment>Collection of hotel characteristics the user prefers for his booking</rdfs:comment>
     </owl:Class>
     
@@ -4225,7 +4237,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#InfraRoute -->
 
-    <owl:Class rdf:about="&profile;InfraRoute">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#InfraRoute">
         <rdfs:comment>Routes associated with this trip</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.InfraRoute"/>
     </owl:Class>
@@ -4234,8 +4246,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#Language -->
 
-    <owl:Class rdf:about="&profile;Language">
-        <rdfs:subClassOf rdf:resource="&profile;LanguageDetails"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Language">
+        <rdfs:subClassOf rdf:resource="http://www.eu.3cixty.org/profile#LanguageDetails"/>
         <rdfs:comment>Language class</rdfs:comment>
     </owl:Class>
     
@@ -4243,7 +4255,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#LanguageDetails -->
 
-    <owl:Class rdf:about="&profile;LanguageDetails">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#LanguageDetails">
         <rdfs:comment>Details about a language</rdfs:comment>
     </owl:Class>
     
@@ -4251,7 +4263,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#Like -->
 
-    <owl:Class rdf:about="&profile;Like">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Like">
         <rdfs:comment>User Likes</rdfs:comment>
     </owl:Class>
     
@@ -4259,7 +4271,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#MappedLocation -->
 
-    <owl:Class rdf:about="&profile;MappedLocation">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#MappedLocation">
         <rdfs:comment>Trip route, mapped and interpolated on the OSM network</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.MappedLocation"/>
     </owl:Class>
@@ -4268,7 +4280,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#Measurement -->
 
-    <owl:Class rdf:about="&profile;Measurement">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Measurement">
         <rdfs:comment>Meta data for each top level context type. Allows to specify that user x is in context c in period p. Measurements can also be used for predictions, indicated by a time period in the future.</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.Measurement"/>
     </owl:Class>
@@ -4277,7 +4289,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#ModalityStatistics -->
 
-    <owl:Class rdf:about="&profile;ModalityStatistics">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#ModalityStatistics">
         <rdfs:comment>Modality statistic of a trip, a number of trips, or a time period, extended with a number of context variables such as travel objective or weather condition</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.ModalityStatistic"/>
     </owl:Class>
@@ -4286,7 +4298,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#PersonalPlace -->
 
-    <owl:Class rdf:about="&profile;PersonalPlace">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#PersonalPlace">
         <rdfs:comment>Important personal place, often used static location, derived and defined on the server</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.PersonalPlace"/>
     </owl:Class>
@@ -4295,7 +4307,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#PlaceDetail -->
 
-    <owl:Class rdf:about="&profile;PlaceDetail">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#PlaceDetail">
         <isSameAs rdf:resource="&vcard;Location"/>
     </owl:Class>
     
@@ -4303,7 +4315,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#PlaceDetailPreference -->
 
-    <owl:Class rdf:about="&profile;PlaceDetailPreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#PlaceDetailPreference">
         <rdfs:comment>preferred place details</rdfs:comment>
     </owl:Class>
     
@@ -4311,7 +4323,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#PlacePreference -->
 
-    <owl:Class rdf:about="&profile;PlacePreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#PlacePreference">
         <rdfs:comment>Collection of place characteristics the user prefers to visit.</rdfs:comment>
     </owl:Class>
     
@@ -4319,7 +4331,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#Preference -->
 
-    <owl:Class rdf:about="&profile;Preference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Preference">
         <rdfs:comment>preferences of the user.</rdfs:comment>
     </owl:Class>
     
@@ -4327,7 +4339,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#ProfileIdentities -->
 
-    <owl:Class rdf:about="&profile;ProfileIdentities">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#ProfileIdentities">
         <rdfs:comment>Collection hold the various identities that the user has holds other than 3cixty ID. These identities are the source from where user data is gathered. some sample identities are user’s facebook identity, user’s twitter identity etc.</rdfs:comment>
     </owl:Class>
     
@@ -4335,7 +4347,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#QueryHistory -->
 
-    <owl:Class rdf:about="&profile;QueryHistory">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#QueryHistory">
         <rdfs:comment>Query History class</rdfs:comment>
     </owl:Class>
     
@@ -4343,7 +4355,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#Rating -->
 
-    <owl:Class rdf:about="&profile;Rating">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Rating">
         <rdfs:comment>Rating provided by the user</rdfs:comment>
     </owl:Class>
     
@@ -4351,7 +4363,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#RatingPreference -->
 
-    <owl:Class rdf:about="&profile;RatingPreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#RatingPreference">
         <rdfs:comment>the preferred rating</rdfs:comment>
     </owl:Class>
     
@@ -4359,7 +4371,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#RegularTrip -->
 
-    <owl:Class rdf:about="&profile;RegularTrip">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#RegularTrip">
         <rdfs:comment>Description of a regular, weekly trip of a user between the point of departure and the point of arrival, derived on the server</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.RegularTrip"/>
     </owl:Class>
@@ -4368,7 +4380,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#School -->
 
-    <owl:Class rdf:about="&profile;School">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#School">
         <rdfs:comment>School Information</rdfs:comment>
     </owl:Class>
     
@@ -4376,8 +4388,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#SchoolAttended -->
 
-    <owl:Class rdf:about="&profile;SchoolAttended">
-        <rdfs:subClassOf rdf:resource="&profile;EventDetails"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#SchoolAttended">
+        <rdfs:subClassOf rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
         <rdfs:comment>School attended by a user</rdfs:comment>
     </owl:Class>
     
@@ -4385,7 +4397,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#Skill -->
 
-    <owl:Class rdf:about="&profile;Skill">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Skill">
         <rdfs:comment>skills of a user</rdfs:comment>
     </owl:Class>
     
@@ -4393,7 +4405,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#SocialPreference -->
 
-    <owl:Class rdf:about="&profile;SocialPreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#SocialPreference">
         <rdfs:comment>Social Preferences of a user. Collection of characteristics related to the user friends involvement or to the number of ratings available</rdfs:comment>
     </owl:Class>
     
@@ -4401,7 +4413,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#TemporalDetails -->
 
-    <owl:Class rdf:about="&profile;TemporalDetails">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#TemporalDetails">
         <rdfs:comment>Temporal Information about an event</rdfs:comment>
     </owl:Class>
     
@@ -4409,21 +4421,15 @@
 
     <!-- http://www.eu.3cixty.org/profile#Transport -->
 
-    <owl:Class rdf:about="&profile;Transport">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Transport">
         <rdfs:comment>Using this class one can request for example a list of trip (including rich details) made by a user, a list of the modalities frequently used by a user (including usage statistics), or favorite places of a user (including visit statistics).</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- http://www.eu.3cixty.org/profile#Tray -->
-
-    <owl:Class rdf:about="&profile;Tray"/>
-    
-
-
     <!-- http://www.eu.3cixty.org/profile#Trip -->
 
-    <owl:Class rdf:about="&profile;Trip">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Trip">
         <rdfs:comment>Description of a trip of a user between the point of departure and the point of arrival, derived on the server</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.Trip"/>
     </owl:Class>
@@ -4432,8 +4438,8 @@
 
     <!-- http://www.eu.3cixty.org/profile#TripMeasurement -->
 
-    <owl:Class rdf:about="&profile;TripMeasurement">
-        <rdfs:subClassOf rdf:resource="&profile;Measurement"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#TripMeasurement">
+        <rdfs:subClassOf rdf:resource="http://www.eu.3cixty.org/profile#Measurement"/>
         <rdfs:comment>Trip Measurement. Collection of actual trips made by the user. This collection can be requested from the MoveSmarter API for a given period of time</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.TripMeasurement"/>
     </owl:Class>
@@ -4442,7 +4448,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#TripPreference -->
 
-    <owl:Class rdf:about="&profile;TripPreference">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#TripPreference">
         <rdfs:comment>Trip Preferences of a user. Collection of travel conditions the user prefers to consider in trip planning.</rdfs:comment>
     </owl:Class>
     
@@ -4450,7 +4456,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#UserEnteredRatings -->
 
-    <owl:Class rdf:about="&profile;UserEnteredRatings">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#UserEnteredRatings">
         <rdfs:comment>user entered ratings</rdfs:comment>
     </owl:Class>
     
@@ -4458,7 +4464,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#UserEventRating -->
 
-    <owl:Class rdf:about="&profile;UserEventRating">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#UserEventRating">
         <rdfs:comment>User defined specific Event Rating</rdfs:comment>
     </owl:Class>
     
@@ -4466,7 +4472,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#UserHotelRating -->
 
-    <owl:Class rdf:about="&profile;UserHotelRating">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#UserHotelRating">
         <rdfs:comment>user defined specific hotel rating</rdfs:comment>
     </owl:Class>
     
@@ -4474,7 +4480,7 @@
 
     <!-- http://www.eu.3cixty.org/profile#UserPlaceRating -->
 
-    <owl:Class rdf:about="&profile;UserPlaceRating">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#UserPlaceRating">
         <rdfs:comment>User specified Rating about a place</rdfs:comment>
     </owl:Class>
     
@@ -4482,16 +4488,28 @@
 
     <!-- http://www.eu.3cixty.org/profile#UserProfile -->
 
-    <owl:Class rdf:about="&profile;UserProfile"/>
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#UserProfile"/>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#Weather -->
 
-    <owl:Class rdf:about="&profile;Weather">
+    <owl:Class rdf:about="http://www.eu.3cixty.org/profile#Weather">
         <rdfs:comment>Weather at the start of the trip</rdfs:comment>
         <isSameAs rdf:resource="https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.Weather"/>
     </owl:Class>
+    
+
+
+    <!-- http://www.w3.org/2006/vcard/ns#Address -->
+
+    <owl:Class rdf:about="&vcard;Address"/>
+    
+
+
+    <!-- http://www.w3.org/2006/vcard/ns#Name -->
+
+    <owl:Class rdf:about="&vcard;Name"/>
     
 
 
@@ -4503,48 +4521,362 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805 -->
+
+    <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#100900047095598983805">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+        <hasUID>100900047095598983805</hasUID>
+        <hasGender>Female</hasGender>
+        <vcard:hasAddress rdf:resource="&profile;Address"/>
+        <hasEventDetail rdf:resource="&profile;EventDetail"/>
+        <vcard:hasName rdf:resource="&profile;Name"/>
+        <hasPreference rdf:resource="&profile;Preference"/>
+        <hasProfileIdentities rdf:resource="&profile;googleProfileIdentities"/>
+        <hasProfileIdentities rdf:resource="&profile;mobidotProfileIdentities"/>
+        <foaf:knows rdf:resource="http://www.eu.3cixty.org/profile#110248277616794929135"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Address -->
+
+    <vcard:Address rdf:about="&profile;Address">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <vcard:longitude rdf:datatype="&xsd;double">-2.598761</vcard:longitude>
+        <vcard:latitude rdf:datatype="&xsd;double">51.452745</vcard:latitude>
+        <vcard:country-name>Italy</vcard:country-name>
+        <townName>Milano</townName>
+    </vcard:Address>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EnglandPlaceDetailPreference -->
+
+    <owl:NamedIndividual rdf:about="&profile;EnglandPlaceDetailPreference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
+        <hasNatureOfPlace>Country</hasNatureOfPlace>
+        <hasPreferredApproximateAddress rdf:resource="&profile;EnglandPreferredAddress"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EnglandPlacePreference -->
+
+    <owl:NamedIndividual rdf:about="&profile;EnglandPlacePreference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#PlacePreference"/>
+        <hasPlaceDetailPreference rdf:resource="&profile;EnglandPlaceDetailPreference"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EnglandPreferredAddress -->
+
+    <vcard:Address rdf:about="&profile;EnglandPreferredAddress">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <vcard:country-name>Italy</vcard:country-name>
+    </vcard:Address>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EventDetail -->
+
+    <owl:NamedIndividual rdf:about="&profile;EventDetail">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
+        <hasNatureOfEvent>Concert</hasNatureOfEvent>
+        <hasDateFrom>20/05/2014</hasDateFrom>
+        <hasEventName>Brand New</hasEventName>
+        <hasDateUntil>24/5/2014</hasDateUntil>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EventPreference -->
+
+    <owl:NamedIndividual rdf:about="&profile;EventPreference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#EventPreference"/>
+        <hasEventDetailPreference rdf:resource="&profile;EventPreferenceDetail"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EventPreferenceDetail -->
+
+    <owl:NamedIndividual rdf:about="&profile;EventPreferenceDetail">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#EventDetailPreference"/>
+        <hasPreferredEndDate>22/05/2014</hasPreferredEndDate>
+        <hasNatureOfEvent>Music</hasNatureOfEvent>
+        <hasPreferredStartDate>19/05/2014</hasPreferredStartDate>
+        <hasEventName>Toy</hasEventName>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805HiltonMilanHotelRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelRating">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserHotelRating"/>
+        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">3</hasNumberofTimesVisited>
+        <hasHotelDetail rdf:resource="http://www.eu.3cixty.org/profile#HiltonMilanHotelDetail"/>
+        <hasRating rdf:resource="http://www.eu.3cixty.org/profile#Rating5Visited"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Likes -->
+
+    <owl:NamedIndividual rdf:about="&profile;Likes">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#Like"/>
+        <hasLikeType>Event</hasLikeType>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805MusicDefinedRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;MusicDefinedRating">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#Rating"/>
+        <hasUserDefinedRating rdf:datatype="&xsd;double">4</hasUserDefinedRating>
+        <hasUserInteractionMode>Visited</hasUserInteractionMode>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805MusicRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;MusicRating">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserEventRating"/>
+        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">3</hasNumberofTimesVisited>
+        <hasEventDetail rdf:resource="&profile;EventDetail"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Name -->
+
+    <vcard:Name rdf:about="&profile;Name">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <vcard:given-name>Ellwita</vcard:given-name>
+        <vcard:family-name>Boyle</vcard:family-name>
+    </vcard:Name>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPlaceDetailPreference -->
+
+    <owl:NamedIndividual rdf:about="&profile;ParisPlaceDetailPreference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
+        <hasPreferredApproximateAddress rdf:resource="&profile;ParisPreferredAddress"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPlaceReference -->
+
+    <owl:NamedIndividual rdf:about="&profile;ParisPlaceReference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#PlacePreference"/>
+        <hasPlaceDetailPreference rdf:resource="&profile;ParisPlaceDetailPreference"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPreferredAddress -->
+
+    <vcard:Address rdf:about="&profile;ParisPreferredAddress">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <townName>Milano</townName>
+    </vcard:Address>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Preference -->
+
+    <owl:NamedIndividual rdf:about="&profile;Preference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
+        <hasPlacePreference rdf:resource="&profile;EnglandPlacePreference"/>
+        <hasEventPreference rdf:resource="&profile;EventPreference"/>
+        <hasLike rdf:resource="&profile;Likes"/>
+        <hasPlacePreference rdf:resource="&profile;ParisPlaceReference"/>
+        <hasUserEnteredRatings rdf:resource="&profile;UserEnteredRating"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805UserEnteredRating -->
+
+    <owl:NamedIndividual rdf:about="&profile;UserEnteredRating">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserEnteredRatings"/>
+        <hasUserHotelRating rdf:resource="&profile;HiltonMilanHotelRating"/>
+        <hasUserEventRating rdf:resource="&profile;MusicRating"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805googleProfileIdentities -->
+
+    <owl:NamedIndividual rdf:about="&profile;googleProfileIdentities">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
+        <hasSource>https://plus.google.com</hasSource>
+        <hasUserInteractionMode>Active</hasUserInteractionMode>
+        <hasUserAccountID>100900047095598983805</hasUserAccountID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#100900047095598983805mobidotProfileIdentities -->
+
+    <owl:NamedIndividual rdf:about="&profile;mobidotProfileIdentities">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
+        <hasSource>https://www.movesmarter.nl/portal</hasSource>
+        <hasUserAccountID>junk2</hasUserAccountID>
+        <hasUserInteractionMode>Active</hasUserInteractionMode>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135 -->
+
+    <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#110248277616794929135">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+        <hasGender>Male</hasGender>
+        <hasUID>110248277616794929135</hasUID>
+        <foaf:knows rdf:resource="http://www.eu.3cixty.org/profile#100900047095598983805"/>
+        <vcard:hasName rdf:resource="&profile2;Name"/>
+        <hasPreference rdf:resource="&profile2;Preference"/>
+        <hasProfileIdentities rdf:resource="&profile2;googleProfileIdentities"/>
+        <hasProfileIdentities rdf:resource="&profile2;mobidotProfileIdentities"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135HiltonMilanHotelRating -->
+
+    <owl:NamedIndividual rdf:about="&profile2;HiltonMilanHotelRating">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserHotelRating"/>
+        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">2</hasNumberofTimesVisited>
+        <hasHotelDetail rdf:resource="http://www.eu.3cixty.org/profile#HiltonMilanHotelDetail"/>
+        <hasRating rdf:resource="http://www.eu.3cixty.org/profile#Rating4Visited"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPlaceDetailPreference -->
+
+    <owl:NamedIndividual rdf:about="&profile2;ItalyPlaceDetailPreference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetailPreference"/>
+        <hasNatureOfPlace>Country</hasNatureOfPlace>
+        <hasPreferredApproximateAddress rdf:resource="&profile2;ItalyPlaceDetailPreference"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPlacePreference -->
+
+    <owl:NamedIndividual rdf:about="&profile2;ItalyPlacePreference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#PlacePreference"/>
+        <hasPlaceDetailPreference rdf:resource="&profile2;ItalyPlaceDetailPreference"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPreferedAddress -->
+
+    <vcard:Address rdf:about="&profile2;ItalyPreferedAddress">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <vcard:country-name>Italy</vcard:country-name>
+    </vcard:Address>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135Name -->
+
+    <vcard:Name rdf:about="&profile2;Name">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <vcard:given-name>Samira</vcard:given-name>
+        <vcard:family-name>Kochbati</vcard:family-name>
+    </vcard:Name>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135Preference -->
+
+    <owl:NamedIndividual rdf:about="&profile2;Preference">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#Preference"/>
+        <hasPlacePreference rdf:resource="&profile2;ItalyPlacePreference"/>
+        <hasUserEnteredRatings rdf:resource="&profile2;UserEnteredRating"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135UserEnteredRating -->
+
+    <owl:NamedIndividual rdf:about="&profile2;UserEnteredRating">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserEnteredRatings"/>
+        <hasUserHotelRating rdf:resource="&profile2;HiltonMilanHotelRating"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135googleProfileIdentities -->
+
+    <owl:NamedIndividual rdf:about="&profile2;googleProfileIdentities">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
+        <hasUserInteractionMode>Active</hasUserInteractionMode>
+        <hasUserAccountID>110248277616794929135</hasUserAccountID>
+        <hasSource>https://plus.google.com</hasSource>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.eu.3cixty.org/profile#110248277616794929135mobidotProfileIdentities -->
+
+    <owl:NamedIndividual rdf:about="&profile2;mobidotProfileIdentities">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#ProfileIdentities"/>
+        <hasUserAccountID>junk</hasUserAccountID>
+        <hasUserInteractionMode>Active</hasUserInteractionMode>
+        <hasSource>https://www.movesmarter.nl/portal</hasSource>
+    </owl:NamedIndividual>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress -->
 
-    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelAddress">
-        <rdf:type rdf:resource="&vcard;Address"/>
+    <vcard:Address rdf:about="http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
         <townName>Milan</townName>
         <vcard:country-name>Italy</vcard:country-name>
         <vcard:street-address>Via Luigi Galvani, 12</vcard:street-address>
         <vcard:postal-code>20124</vcard:postal-code>
-    </owl:NamedIndividual>
+    </vcard:Address>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelDetail -->
 
-    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelDetail">
-        <rdf:type rdf:resource="&profile;HotelDetail"/>
+    <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#HiltonMilanHotelDetail">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
         <hasHotelStarCategory rdf:datatype="&xsd;int">4</hasHotelStarCategory>
         <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
         <hasNatureOfPlace>Hotel</hasNatureOfPlace>
-        <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
+        <vcard:hasAddress rdf:resource="http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress"/>
     </owl:NamedIndividual>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#HiltonMilanHotelPlaceDetail -->
 
-    <owl:NamedIndividual rdf:about="&profile;HiltonMilanHotelPlaceDetail">
-        <rdf:type rdf:resource="&profile;PlaceDetail"/>
+    <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#HiltonMilanHotelPlaceDetail">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#PlaceDetail"/>
         <hasNatureOfPlace>Hotel</hasNatureOfPlace>
         <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
-        <vcard:hasAddress rdf:resource="&profile;HiltonMilanHotelAddress"/>
+        <vcard:hasAddress rdf:resource="http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress"/>
     </owl:NamedIndividual>
     
 
 
     <!-- http://www.eu.3cixty.org/profile#Rating4Visited -->
 
-    <owl:NamedIndividual rdf:about="&profile;Rating4Visited">
-        <rdf:type rdf:resource="&profile;Rating"/>
+    <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#Rating4Visited">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#Rating"/>
         <hasUserDefinedRating rdf:datatype="&xsd;double">4.0</hasUserDefinedRating>
         <hasUserInteractionMode>Visited</hasUserInteractionMode>
     </owl:NamedIndividual>
@@ -4553,305 +4885,14 @@
 
     <!-- http://www.eu.3cixty.org/profile#Rating5Visited -->
 
-    <owl:NamedIndividual rdf:about="&profile;Rating5Visited">
-        <rdf:type rdf:resource="&profile;Rating"/>
+    <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#Rating5Visited">
+        <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#Rating"/>
         <hasUserDefinedRating rdf:datatype="&xsd;double">5.0</hasUserDefinedRating>
         <hasUserInteractionMode>Visited</hasUserInteractionMode>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805 -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805">
-        <rdf:type rdf:resource="&profile;UserProfile"/>
-        <hasUID>100900047095598983805</hasUID>
-        <vcard:hasAddress rdf:resource="&profile;100900047095598983805Address"/>
-        <hasEventDetail rdf:resource="&profile;100900047095598983805EventDetail"/>
-        <vcard:hasName rdf:resource="&profile;100900047095598983805Name"/>
-        <hasPreference rdf:resource="&profile;100900047095598983805Preference"/>
-        <hasProfileIdentities rdf:resource="&profile;100900047095598983805ProfileIdentities"/>
-        <foaf:knows rdf:resource="&profile;110248277616794929135"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Address -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805Address">
-        <rdf:type rdf:resource="&vcard;Address"/>
-        <vcard:longitude rdf:datatype="&xsd;double">-2.598761</vcard:longitude>
-        <vcard:latitude rdf:datatype="&xsd;double">51.452745</vcard:latitude>
-        <vcard:country-name>Italy</vcard:country-name>
-        <townName>Milano</townName>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EnglandPlaceDetailPreference -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805EnglandPlaceDetailPreference">
-        <rdf:type rdf:resource="&profile;PlaceDetailPreference"/>
-        <hasNatureOfPlace>Country</hasNatureOfPlace>
-        <hasPreferredApproximateAddress rdf:resource="&profile;100900047095598983805EnglandPreferredAddress"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EnglandPlacePreference -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805EnglandPlacePreference">
-        <rdf:type rdf:resource="&profile;PlacePreference"/>
-        <hasPlaceDetailPreference rdf:resource="&profile;100900047095598983805EnglandPlaceDetailPreference"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EnglandPreferredAddress -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805EnglandPreferredAddress">
-        <rdf:type rdf:resource="&vcard;Address"/>
-        <vcard:country-name>Italy</vcard:country-name>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EventDetail -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805EventDetail">
-        <rdf:type rdf:resource="&profile;EventDetails"/>
-        <hasDateUntil>24/5/2014</hasDateUntil>
-        <hasDateFrom>20/05/2014</hasDateFrom>
-        <hasNatureOfEvent>Concert</hasNatureOfEvent>
-        <hasEventName>Brand New</hasEventName>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EventPreference -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805EventPreference">
-        <rdf:type rdf:resource="&profile;EventPreference"/>
-        <hasEventDetailPreference rdf:resource="&profile;100900047095598983805EventPreferenceDetail"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805EventPreferenceDetail -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805EventPreferenceDetail">
-        <rdf:type rdf:resource="&profile;EventDetailPreference"/>
-        <hasEventName>Toy</hasEventName>
-        <hasNatureOfEvent>Music</hasNatureOfEvent>
-        <hasPreferredEndDate>22/05/2014</hasPreferredEndDate>
-        <hasPreferredStartDate>19/05/2014</hasPreferredStartDate>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805HiltonMilanHotelRating -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805HiltonMilanHotelRating">
-        <rdf:type rdf:resource="&profile;UserHotelRating"/>
-        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">3</hasNumberofTimesVisited>
-        <hasHotelDetail rdf:resource="&profile;HiltonMilanHotelDetail"/>
-        <hasRating rdf:resource="&profile;Rating5Visited"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Likes -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805Likes">
-        <rdf:type rdf:resource="&profile;Like"/>
-        <hasLikeType>Event</hasLikeType>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805MusicDefinedRating -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805MusicDefinedRating">
-        <rdf:type rdf:resource="&profile;Rating"/>
-        <hasUserDefinedRating rdf:datatype="&xsd;double">4.0</hasUserDefinedRating>
-        <hasUserInteractionMode>Visited</hasUserInteractionMode>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805MusicRating -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805MusicRating">
-        <rdf:type rdf:resource="&profile;UserEventRating"/>
-        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">3</hasNumberofTimesVisited>
-        <hasEventDetail rdf:resource="&profile;100900047095598983805EventDetail"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Name -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805Name">
-        <rdf:type rdf:resource="&vcard;Name"/>
-        <vcard:given-name>Ellwita</vcard:given-name>
-        <vcard:family-name>Boyle</vcard:family-name>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPlaceDetailPreference -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805ParisPlaceDetailPreference">
-        <rdf:type rdf:resource="&profile;PlaceDetailPreference"/>
-        <hasPreferredApproximateAddress rdf:resource="&profile;100900047095598983805ParisPreferredAddress"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPlaceReference -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805ParisPlaceReference">
-        <rdf:type rdf:resource="&profile;PlacePreference"/>
-        <hasPlaceDetailPreference rdf:resource="&profile;100900047095598983805ParisPlaceDetailPreference"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ParisPreferredAddress -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805ParisPreferredAddress">
-        <rdf:type rdf:resource="&vcard;Address"/>
-        <townName>Milano</townName>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805Preference -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805Preference">
-        <rdf:type rdf:resource="&profile;Preference"/>
-        <hasPlacePreference rdf:resource="&profile;100900047095598983805EnglandPlacePreference"/>
-        <hasEventPreference rdf:resource="&profile;100900047095598983805EventPreference"/>
-        <hasLike rdf:resource="&profile;100900047095598983805Likes"/>
-        <hasPlacePreference rdf:resource="&profile;100900047095598983805ParisPlaceReference"/>
-        <hasUserEnteredRatings rdf:resource="&profile;100900047095598983805UserEnteredRating"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805ProfileIdentities -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805ProfileIdentities">
-        <rdf:type rdf:resource="&profile;ProfileIdentities"/>
-        <hasUserAccountID>100900047095598983805</hasUserAccountID>
-        <hasUserInteractionMode>Active</hasUserInteractionMode>
-        <hasSource>https://plus.google.com</hasSource>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#100900047095598983805UserEnteredRating -->
-
-    <owl:NamedIndividual rdf:about="&profile;100900047095598983805UserEnteredRating">
-        <rdf:type rdf:resource="&profile;UserEnteredRatings"/>
-        <hasUserHotelRating rdf:resource="&profile;100900047095598983805HiltonMilanHotelRating"/>
-        <hasUserEventRating rdf:resource="&profile;100900047095598983805MusicRating"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135 -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135">
-        <rdf:type rdf:resource="&profile;UserProfile"/>
-        <hasUID>110248277616794929135</hasUID>
-        <foaf:knows rdf:resource="&profile;100900047095598983805"/>
-        <vcard:hasName rdf:resource="&profile;110248277616794929135Name"/>
-        <hasPreference rdf:resource="&profile;110248277616794929135Preference"/>
-        <hasProfileIdentities rdf:resource="&profile;110248277616794929135ProfileIdentities"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135HiltonMilanHotelRating -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135HiltonMilanHotelRating">
-        <rdf:type rdf:resource="&profile;UserHotelRating"/>
-        <hasNumberofTimesVisited rdf:datatype="&xsd;integer">2</hasNumberofTimesVisited>
-        <hasHotelDetail rdf:resource="&profile;HiltonMilanHotelDetail"/>
-        <hasRating rdf:resource="&profile;Rating4Visited"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPlaceDetailPreference -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ItalyPlaceDetailPreference">
-        <rdf:type rdf:resource="&profile;PlaceDetailPreference"/>
-        <hasNatureOfPlace>Country</hasNatureOfPlace>
-        <hasPreferredApproximateAddress rdf:resource="&profile;110248277616794929135ItalyPlaceDetailPreference"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPlacePreference -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ItalyPlacePreference">
-        <rdf:type rdf:resource="&profile;PlacePreference"/>
-        <hasPlaceDetailPreference rdf:resource="&profile;110248277616794929135ItalyPlaceDetailPreference"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ItalyPreferedAddress -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ItalyPreferedAddress">
-        <rdf:type rdf:resource="&vcard;Address"/>
-        <vcard:country-name>Italy</vcard:country-name>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135Name -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135Name">
-        <rdf:type rdf:resource="&vcard;Name"/>
-        <vcard:family-name>Kochbati</vcard:family-name>
-        <vcard:given-name>Samira</vcard:given-name>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135Preference -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135Preference">
-        <rdf:type rdf:resource="&profile;Preference"/>
-        <hasPlacePreference rdf:resource="&profile;110248277616794929135ItalyPlacePreference"/>
-        <hasUserEnteredRatings rdf:resource="&profile;110248277616794929135UserEnteredRating"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135ProfileIdentities -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135ProfileIdentities">
-        <rdf:type rdf:resource="&profile;ProfileIdentities"/>
-        <hasUserAccountID>110248277616794929135</hasUserAccountID>
-        <hasUserInteractionMode>Active</hasUserInteractionMode>
-        <hasSource>https://plus.google.com</hasSource>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.eu.3cixty.org/profile#110248277616794929135UserEnteredRating -->
-
-    <owl:NamedIndividual rdf:about="&profile;110248277616794929135UserEnteredRating">
-        <rdf:type rdf:resource="&profile;UserEnteredRatings"/>
-        <hasUserHotelRating rdf:resource="&profile;110248277616794929135HiltonMilanHotelRating"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 
 
 
-<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+<!-- Generated by the OWL API (version 3.2.3.22702) http://owlapi.sourceforge.net -->
 

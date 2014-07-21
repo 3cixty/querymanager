@@ -1,6 +1,6 @@
 Privacy Manager
 =========
-Privacy Manager is the component holding the private knowledge base of user profiles and managing the access controls.
+Privacy Manager is the 3cixty infrastructure component holding the private knowledge base of user profiles and managing the access controls.
 
 Features:
   - User-centric privacy of profiles
@@ -10,7 +10,8 @@ Features:
 
 Version
 ----
-Privacy Manager version alpha 0.1.1
+#### Identification
+Privacy Manager version alpha 0.2
 
 #### Maven
 In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
@@ -19,10 +20,29 @@ In order to use the module in other Maven projects add the following dependency 
 <dependency>
     <groupId>eu.3cixty.privacy</groupId>
     <artifactId>privacymanager</artifactId>
-    <version>0.1.1</version>
+    <version>0.2</version>
 </dependency>
 
 ```
+
+Changes log
+----
+#### version alpha 0.2
+
+* Implements the get profile with property path method, ```getProfileProperties```, defined by interface ```ProfileManager```
+* Renamed package names pertaining to products issued by Theresis. As a consequence, the package ```eu.threecixty.privacy``` is now known as ```org.theresis.humanization```
+* [Issue #18][3] : Modification of the JSON-LD output format in order to do not compact property values.
+All property values are provided as arrays. 
+
+#### version alpha 0.1.1
+* repackaging
+
+#### version alpha 0.1
+
+* This initial release supports only full reading and writing of user profiles in memory.
+* Property paths based interfaces are not implemented.
+* No privacy management at all
+* No security
 
 Tech
 -----------
@@ -39,7 +59,7 @@ Installation is performed during the install Maven phase.
 
 The artifact can also be manually installed in local Maven repository:
 
-```mvn install:install-file -Dfile=libs/privacymanager-0.1.1.jar -DpomFile=libs/privacymanager-0.1.1.pom```
+```mvn install:install-file -Dfile=libs/privacymanager-0.2.jar -DpomFile=libs/privacymanager-0.2.pom```
 
 For more commands and install options see [Installing 3rd party library][2]
 
@@ -73,18 +93,18 @@ Set the property ```ProfileStorage.ontology.path``` in the configuration file to
 #### Main API interfaces
 
 The main interfaces are:
-* eu.threecixty.privacy.datastorage.ProfileManager
-* eu.threecixty.privacy.datastorage.ProfileManagerFactory
-* eu.threecixty.privacy.auth.Authenticator
-* eu.threecixty.privacy.auth.Service
-* eu.threecixty.privacy.auth.Session
-* eu.threecixty.privacy.auth.SessionManager
+* org.theresis.humanization.datastorage.ProfileManager
+* org.theresis.humanization.datastorage.ProfileManagerFactory
+* org.theresis.humanization.auth.Authenticator
+* org.theresis.humanization.auth.Service
+* org.theresis.humanization.auth.Session
+* org.theresis.humanization.auth.SessionManager
 
 #### Main implementation classes
 Implementation classes provided in the distribution:
-* ```ProfileManagerFactory``` is implemented by ```com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleProfileManagerFactory```
+* ```ProfileManagerFactory``` is implemented by ```org.theresis.humanization.profilestore.SimpleProfileManagerFactory```
 
-* ```SessionManager``` is implemented by ```com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleSessionManager```
+* ```SessionManager``` is implemented by ```org.theresis.humanization.auth.simple.SimpleSessionManager```
 
 * Other implementations are hidden and are obtained using the factory and manager. They are specific to the general implementation of the privacy framework.
 
@@ -105,48 +125,75 @@ A end-user can be anonymous. If the request is emanating from a software compone
 
 #### Examples
 
+##### Access to user Profile
 The following code shows how to query all of the User identifiers from the KB:
 
-```
-import java.util.Set;
 
-import com.thalesgroup.theresis.perso.authen.impl.simple.SimpleSessionManager;
-import com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleProfileManagerFactory;
-
-import eu.threecixty.privacy.authen.Authenticator;
-import eu.threecixty.privacy.authen.Service;
-import eu.threecixty.privacy.authen.Session;
-import eu.threecixty.privacy.datastorage.ProfileManager;
-import eu.threecixty.privacy.datastorage.ProfileManagerFactory;
-```
-```
-try {
+    import java.util.Set;
+    
+    import org.theresis.humanization.authen.simple.SimpleSessionManager;
+    import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
+    
+    import org.theresis.humanization.authen.*;
+    import org.theresis.humanization.datastorage.*;
+    
+    try {
     ProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
     String propertyPath = "C:/3cixty/config/3CixtyProfileStorage.properties";
     ProfileManager profileMgr = profileFactory.getProfileManager( propertyPath );
-
+    
     // Get a reference on the dataminer service
     Service service = profileFactory.getService( "http://3cixty/dataminer",
-        "kACAH-1Ng1MImB85QDSJQSxhqbAA7acjdY9pTD9M" );
-
+    												"kACAH-1Ng1MImB85QDSJQSxhqbAA7acjdY9pTD9M" );
+    
     // Get an authentication token
-    Authenticator auth = profileFactory.getAuthenticator(service,
-        "root",
-        "admin",
-        null ); // no additional security/protocol option
-
+    Authenticator 
+		auth = profileFactory.getAuthenticator(service,
+    											"root",
+												"admin",
+												null ); // no additional security/protocol option
+    
     // Open a session for the dataminer.
     // In this particular case, the requesting user is the system and not an end-user thus the
     // need for the user 'root'.
     Session session = SimpleSessionManager.getInstance().getSession( auth );
-
+    
     // Get the list of users
     Set<String> userIDS = profileMgr.getAllUsersIDs( session );
     
-} catch (Exception e ) {
-    e.printStackTrace();
-}
-```
+    } catch (Exception e ) {
+    	e.printStackTrace();
+    }
+
+
+##### Access to user profile properties
+The following code shows how to format a property path to get the gender of the user
+
+		String hasGenderPath = ":hasGender";
+		List<StringpropertyPaths = new ArrayList<String>();
+		propertyPaths.add( hasGenderPath );
+			
+		Collection<ValuedProperty
+			propertyValues =  profileMgr.getProfileProperties(	currentSession, 
+																userID, 
+																propertyPaths);	
+	
+The following code shows how to format a property path to get the user account ID of all relations of the user
+
+		String knowsPath = "foaf:knows/:hasProfileIdentities*/:hasUserAccountID";
+		List<StringpropertyPaths = new ArrayList<String>();
+		propertyPaths.add( knowsPath );
+			
+		Collection<ValuedProperty
+			propertyValues =  profileMgr.getProfileProperties(	currentSession, 
+																userID, 
+																propertyPaths);	
+
+**Advice**  
+Property path use the SPARQL1.1 Property Path format with some restrictions :
+ 
+- do not specify variables at the beginning and end of the property path (?x)
+- Only use namespaces defined in the ontology (for default prefix use ':propertyName') 
 
 License
 ----
@@ -158,3 +205,4 @@ Copyright (c) 2014 Thales Services, All rights Reserved.
 [sparql]: http://www.w3.org/TR/rdf-sparql-query/
 [1]: http://www.w3.org/TR/sparql11-property-paths/
 [2]: http://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
+[3]: https://github.com/3cixty/profileStorage/issues/18
