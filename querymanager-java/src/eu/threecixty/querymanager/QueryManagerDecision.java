@@ -9,7 +9,7 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
-import eu.threecixty.profile.PreferencesUtils;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.oldmodels.Period;
 
 /**
@@ -123,11 +123,11 @@ public class QueryManagerDecision {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireScoreRatedAtLeast(PreferencesUtils.getMinimumScoreRated(profiler));
+		profiler.requireScoreRatedAtLeast(ProfileManagerImpl.getInstance().getMinimumScoreRated(profiler.getUID()));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 		
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireNumberOfTimesVisitedAtLeast(PreferencesUtils.getMinimumNumberOfTimesVisited(profiler));
+		profiler.requireNumberOfTimesVisitedAtLeast(ProfileManagerImpl.getInstance().getMinimumNumberOfTimesVisited(profiler.getUID()));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 
 		QueryUtils.removeDoubleExpressions(exprs);
@@ -149,12 +149,12 @@ public class QueryManagerDecision {
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireScoreRatedForFriendsAtLeast(
-				PreferencesUtils.getMinimumScoreRatedForFriends(profiler));
+				ProfileManagerImpl.getInstance().getMinimumScoreRatedForFriends(profiler.getUID()));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireNumberOfTimesVisitedForFriendsAtLeast(
-				PreferencesUtils.getMinimumNumberOfTimesVisitedForFriends(profiler));
+				ProfileManagerImpl.getInstance().getMinimumNumberOfTimesVisitedForFriends(profiler.getUID()));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 
 		profiler.initDefaultParametersForAugmentation();
