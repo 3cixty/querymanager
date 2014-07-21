@@ -19,7 +19,7 @@ public class ProfileInformationStorage {
 	public static ProfileInformation loadProfile(String uid) {
 		if (uid == null || uid.equals("")) return null;
 		try {
-			UserProfile userProfile = UserProfileStorage.loadProfile(uid);
+			UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
 
 			if (userProfile == null) return null;
 			
@@ -49,12 +49,8 @@ public class ProfileInformationStorage {
 	public synchronized static boolean saveProfile(ProfileInformation profile) {
 		if (profile == null) return false;
 		try {
-			UserProfile kbUserProfile = UserProfileStorage.loadProfile(profile.getUid());
-
-			if (kbUserProfile == null) {
-				kbUserProfile = new UserProfile();
-				kbUserProfile.setHasUID(profile.getUid());
-			}
+			UserProfile kbUserProfile = new UserProfile();
+			kbUserProfile.setHasUID(profile.getUid());
 			
 			saveNameInfoToKB(profile, kbUserProfile);
 			
@@ -64,7 +60,7 @@ public class ProfileInformationStorage {
 			}
 			
 			
-			UserProfileStorage.saveProfile(kbUserProfile);
+			ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

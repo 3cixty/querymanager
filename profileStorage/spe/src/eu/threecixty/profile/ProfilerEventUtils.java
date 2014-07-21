@@ -1,9 +1,9 @@
 package eu.threecixty.profile;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -13,10 +13,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
-import eu.threecixty.profile.oldmodels.Event;
-import eu.threecixty.profile.oldmodels.EventDetail;
-import eu.threecixty.profile.oldmodels.Preference;
-import eu.threecixty.profile.oldmodels.TemporalDetails;
+import eu.threecixty.profile.ProfileManager.StartAndEndDate;
 
 /**
  * Utility class for populating event information.
@@ -29,11 +26,11 @@ public class ProfilerEventUtils {
 	/**
 	 * Adds event name into a given preference.
 	 *
-	 * @param pref
 	 * @param model
 	 * @param uID
 	 */
-	public static void addEventName(Preference pref, Model model, String uID) {
+	public static List <String> getEventNamesFromEventPreference(Model model, String uID) {
+		if (model == null || uID == null || uID.equals("")) return null;
 		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 	    buffer.append("SELECT  DISTINCT  ?eventname\n");
@@ -56,36 +53,29 @@ public class ProfilerEventUtils {
 		
 		ResultSet rs = qe.execSelect();
 		
-	    Set <Event> events = pref.getHasEvents();
-	    if (events == null) events = new HashSet <Event>();
+		List <String> eventNames = new ArrayList <String>();
 		
 		String eventname = null;
 		for ( ; rs.hasNext(); ) {
 			QuerySolution qs = rs.next();
 			eventname = qs.getLiteral("eventname").getString();
 			if (eventname != null && !eventname.equals("")) {
-				Event event = new Event();
-				EventDetail ed = new EventDetail();
-				ed.setHasEventName(eventname);
-				
-				event.setHasEventDetail(ed);
-
-			    events.add(event);
+				eventNames.add(eventname);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasEvents(events);
+		return eventNames;
 	}
 
 	/**
 	 * Adds preferred event StartDate and EndDate found in UserProfile to user preferences.
-	 * @param pref
 	 * @param model
 	 * @param uID
 	 */
-	public static void addPreferredStartAndEndDate(Preference pref, Model model, String uID) {
+	public static List <StartAndEndDate> getPreferredStartAndEndDates(Model model, String uID) {
+		if (model == null || uID == null || uID.equals("")) return null;
 		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 	    buffer.append("SELECT  DISTINCT  ?startDate ?endDate \n");
@@ -106,8 +96,7 @@ public class ProfilerEventUtils {
 		
 		ResultSet rs = qe.execSelect();
 		
-	    Set <Event> events = pref.getHasEvents();
-	    if (events == null) events = new HashSet <Event>();
+		List <StartAndEndDate> startAndEndDates = new ArrayList<StartAndEndDate>();
 		
 	    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
 	    
@@ -117,18 +106,9 @@ public class ProfilerEventUtils {
 			Date startDate = sdf.parse(qs.getLiteral("startDate").toString());
 			Date endDate = sdf.parse(qs.getLiteral("endDate").toString());
 
-			Event event = new Event();
-			EventDetail ed = new EventDetail();
-
-			TemporalDetails td = new TemporalDetails();
-			td.setHasDateFrom(startDate);
-			td.setHasDateUntil(endDate);
-
-			ed.setHasTemporalDetails(td);
-
-			event.setHasEventDetail(ed);
-
-			events.add(event);
+			StartAndEndDate startAndEndDate = new StartAndEndDate(startDate, endDate);
+			startAndEndDates.add(startAndEndDate);
+			
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -136,18 +116,18 @@ public class ProfilerEventUtils {
 		
 		qe.close();
 
-		pref.setHasEvents(events);
+		return startAndEndDates;
 	}
 
 
 	/**
 	 * Adds event names which were rated with a score more than a given <b>rating</b> into user preferences.
-	 * @param pref
 	 * @param model
 	 * @param uID
 	 * @param rating
 	 */
-	public static void addEventNameFromRating(Preference pref, Model model, String uID, float rating) {
+	public static List<String> getEventNamesFromRating(Model model, String uID, float rating) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
@@ -172,8 +152,7 @@ public class ProfilerEventUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Event> events = pref.getHasEvents();
-	    if (events == null) events = new HashSet <Event>();
+		List <String> eventNames = new ArrayList<String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -181,29 +160,23 @@ public class ProfilerEventUtils {
 			QuerySolution qs = rs.next();
 			String eventname = qs.getLiteral("eventname").getString();
 			if (eventname != null && !eventname.equals("")) {
-				Event event = new Event();
-				EventDetail ed = new EventDetail();
-				ed.setHasEventName(eventname);
-				
-				event.setHasEventDetail(ed);
-
-			    events.add(event);
+				eventNames.add(eventname);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasEvents(events);
+		return eventNames;
 	}
 
 	/**
 	 * Adds event names which were visited with number of times more than a given <b>numberOfTimesVisited</b> into user preferences.
-	 * @param pref
 	 * @param model
 	 * @param uID
 	 * @param numberOfTimesVisited
 	 */
-	public static void addEventNameFromNumberOfTimesVisited(Preference pref, Model model, String uID, int numberOfTimesVisited) {
+	public static List <String> getEventNamesFromNumberOfTimesVisited(Model model, String uID, int numberOfTimesVisited) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -226,8 +199,7 @@ public class ProfilerEventUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Event> events = pref.getHasEvents();
-	    if (events == null) events = new HashSet <Event>();
+		List <String> eventNames = new ArrayList <String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -235,24 +207,19 @@ public class ProfilerEventUtils {
 			QuerySolution qs = rs.next();
 			String eventname = qs.getLiteral("eventname").getString();
 			if (eventname != null && !eventname.equals("")) {
-				Event event = new Event();
-				EventDetail ed = new EventDetail();
-				ed.setHasEventName(eventname);
-				
-				event.setHasEventDetail(ed);
-
-			    events.add(event);
+				eventNames.add(eventname);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasEvents(events);
+		return eventNames;
 	}
 
 	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
 	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
-	public static void addEventNameFromRatingOfFriends(Preference pref, Model model, String uID, float rating) {
+	public static List <String> getEventNamesFromRatingOfFriends(Model model, String uID, float rating) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -280,8 +247,7 @@ public class ProfilerEventUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Event> events = pref.getHasEvents();
-	    if (events == null) events = new HashSet <Event>();
+		List <String> eventNames = new ArrayList <String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -289,24 +255,19 @@ public class ProfilerEventUtils {
 			QuerySolution qs = rs.next();
 			String eventname = qs.getLiteral("eventname").getString();
 			if (eventname != null && !eventname.equals("")) {
-				Event event = new Event();
-				EventDetail ed = new EventDetail();
-				ed.setHasEventName(eventname);
-				
-				event.setHasEventDetail(ed);
-
-			    events.add(event);
+				eventNames.add(eventname);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasEvents(events);
+		return eventNames;
 	}
 
 	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
 	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
-	public static void addEventNameFromNumberOfTimesVisitedOfFriends(Preference pref, Model model, String uID, int numberOfTimesVisited) {
+	public static List <String> getEventNamesFromNumberOfTimesVisitedOfFriends(Model model, String uID, int numberOfTimesVisited) {
+		if (model == null || uID == null || uID.equals("")) return null;
 		StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 	    buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
@@ -331,8 +292,7 @@ public class ProfilerEventUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Event> events = pref.getHasEvents();
-	    if (events == null) events = new HashSet <Event>();
+		List <String> eventNames = new ArrayList <String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -340,28 +300,22 @@ public class ProfilerEventUtils {
 			QuerySolution qs = rs.next();
 			String eventname = qs.getLiteral("eventname").getString();
 			if (eventname != null && !eventname.equals("")) {
-				Event event = new Event();
-				EventDetail ed = new EventDetail();
-				ed.setHasEventName(eventname);
-				
-				event.setHasEventDetail(ed);
-
-			    events.add(event);
+				eventNames.add(eventname);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasEvents(events);
+		return eventNames;
 	}
 
 	/**
 	 * Adds event names which friends like to visit
-	 * @param pref
 	 * @param model
 	 * @param uID
 	 */
-	public static void addEventNamesWhichFriendsLikeToVisit(Preference pref, Model model, String uID) {
+	public static List <String> getEventNamesWhichFriendsLikeToVisit(Model model, String uID) {
+		if (model == null || uID == null || uID.equals("")) return null;
 		StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 	    buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
@@ -388,8 +342,7 @@ public class ProfilerEventUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Event> events = pref.getHasEvents();
-	    if (events == null) events = new HashSet <Event>();
+		List <String> eventNames = new ArrayList<String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -397,19 +350,13 @@ public class ProfilerEventUtils {
 			QuerySolution qs = rs.next();
 			String eventname = qs.getLiteral("eventname").getString();
 			if (eventname != null && !eventname.equals("")) {
-				Event event = new Event();
-				EventDetail ed = new EventDetail();
-				ed.setHasEventName(eventname);
-				
-				event.setHasEventDetail(ed);
-
-			    events.add(event);
+				eventNames.add(eventname);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasEvents(events);
+		return eventNames;
 	}
 
 	

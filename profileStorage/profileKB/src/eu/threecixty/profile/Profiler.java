@@ -1,24 +1,26 @@
 package eu.threecixty.profile;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
 
+import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
+import eu.threecixty.profile.ProfileManager.StartAndEndDate;
+import eu.threecixty.profile.oldmodels.Area;
+import eu.threecixty.profile.oldmodels.Event;
+import eu.threecixty.profile.oldmodels.EventDetail;
+import eu.threecixty.profile.oldmodels.NatureOfPlace;
 import eu.threecixty.profile.oldmodels.Period;
+import eu.threecixty.profile.oldmodels.Place;
+import eu.threecixty.profile.oldmodels.PlaceDetail;
 import eu.threecixty.profile.oldmodels.Preference;
+import eu.threecixty.profile.oldmodels.TemporalDetails;
 
 public class Profiler implements IProfiler {
 
-	private Model rdfModel = null;
 	
 	private ProfilingTechniques profilingTechnique;
-	
-	private UserProfile kbUserProfile;
 	
 	private String uID;
 
@@ -33,14 +35,14 @@ public class Profiler implements IProfiler {
 	private double distanceFromCurrentPosition = -1;
 	private Period period = null;
 
-	private boolean eventNameRequired = false;
+	private boolean eventNamesFromEventPreferenceRequired = false;
 	private boolean preferredEventDatesRequired = false;
 	
 	private boolean friendsLikeVisitRequired = false;
 	
+	private Preference pref;
+	
 	public Profiler(String uid) {
-
-		rdfModel = RdfFileManager.getInstance().getRdfModel();
 		this.uID = uid;
 		
 		initDefaultParametersForAugmentation();
@@ -48,63 +50,26 @@ public class Profiler implements IProfiler {
 	
 	@Override
 	public void PopulateProfile() {
-		// TODO: set kbUserProfile here....
-		if (kbUserProfile == null) {
-		    kbUserProfile = new UserProfile();
-		}
 		
-		Preference pref = new Preference();
-		kbUserProfile.setPreferences(pref); // set preferences
+		pref = new Preference();
 		
-
-		if (currentCountryRequired) {
-			ProfilerPlaceUtils.addCountryName(pref, rdfModel, uID);
-		}
-		if (currentTownRequired) {
-			ProfilerPlaceUtils.addTownName(pref, rdfModel, uID);
-		}
-
-		if (scoreRatedAtLeast != -1) {
-			ProfilerPlaceUtils.addPlaceNameFromRating(pref, rdfModel, uID, scoreRatedAtLeast);
-			ProfilerEventUtils.addEventNameFromRating(pref, rdfModel, uID, scoreRatedAtLeast);
-		}
-		if (numberOfTimeVisitedAtLeast != -1) {
-			ProfilerPlaceUtils.addPlaceNameFromNumberOfTimesVisited(pref, rdfModel, uID, numberOfTimeVisitedAtLeast);
-			ProfilerEventUtils.addEventNameFromNumberOfTimesVisited(pref, rdfModel, uID, numberOfTimeVisitedAtLeast);
-		}
-		if (scoreRatedForFriendsAtLeast != -1) {
-			ProfilerPlaceUtils.addPlaceNameFromRatingOfFriends(pref, rdfModel, uID, scoreRatedForFriendsAtLeast);
-			ProfilerEventUtils.addEventNameFromRatingOfFriends(pref, rdfModel, uID, scoreRatedForFriendsAtLeast);
-		}
-		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
-			ProfilerPlaceUtils.addPlaceNameFromNumberOfTimesVisitedOfFriends(pref, rdfModel, uID, numberOfTimeVisitedForFriendsAtLeast);
-			ProfilerEventUtils.addEventNameFromNumberOfTimesVisitedOfFriends(pref, rdfModel, uID, numberOfTimeVisitedForFriendsAtLeast);
-		}
-		if (distanceFromCurrentPosition != -1) {
-			ProfilerPlaceUtils.addGPSCoordinates(pref, rdfModel, uID, distanceFromCurrentPosition);
-		}
+		addPlaces();
+		
 		if (period != null) {
-			ProfilerPlaceUtils.addDays(pref, period);
+			addPeriod(period, pref);
 		}
-		if (eventNameRequired) {
-			ProfilerEventUtils.addEventName(pref, rdfModel, uID);
-		}
-		if (preferredEventDatesRequired) {
-			ProfilerEventUtils.addPreferredStartAndEndDate(pref, rdfModel, uID);
-		}
-		if (friendsLikeVisitRequired) {
-			ProfilerEventUtils.addEventNamesWhichFriendsLikeToVisit(pref, rdfModel, uID);
-		}
+
+		addEvents();
 	}
 
 	@Override
 	public String getUID() {
 		return uID;
 	}
-	@Override
-	public UserProfile getKBUserProfile() {
-		return kbUserProfile;
-	}
+//	@Override
+//	public UserProfile getKBUserProfile() {
+//		return kbUserProfile;
+//	}
 
 	
 	public ProfilingTechniques getProfilingTechnique() {
@@ -116,16 +81,7 @@ public class Profiler implements IProfiler {
 
 	@Override
 	public Preference getPreference() {
-		if (kbUserProfile != null && kbUserProfile.getPreferences() != null) {
-			return kbUserProfile.getPreferences();
-		} else {
-			if (kbUserProfile == null) {
-			    kbUserProfile = new UserProfile();
-			}
-			Preference pref = new Preference();
-			kbUserProfile.setPreferences(pref); 
-			return pref;
-		}
+		return pref;
 	}
 
 	@Override
@@ -149,7 +105,7 @@ public class Profiler implements IProfiler {
 		currentTownRequired = false;
 		distanceFromCurrentPosition = -1;
 		period = null;
-		eventNameRequired = false;
+		eventNamesFromEventPreferenceRequired = false;
 		preferredEventDatesRequired = false;
 		friendsLikeVisitRequired = false;
 	}
@@ -187,7 +143,7 @@ public class Profiler implements IProfiler {
 
 	@Override
 	public void requireEventName(boolean eventNameRequired) {
-		this.eventNameRequired = eventNameRequired;
+		this.eventNamesFromEventPreferenceRequired = eventNameRequired;
 	}
 
 	@Override
@@ -198,43 +154,186 @@ public class Profiler implements IProfiler {
 	public void requireFriendsLikeVisit(boolean friendsLikeVisitRequired) {
 		this.friendsLikeVisitRequired = friendsLikeVisitRequired;
 	}
+
+	private void addEvents() {
+		Set <Event> events = new HashSet <Event>();
+		if (scoreRatedAtLeast != -1) {
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRating(uID, scoreRatedAtLeast);
+			addEvents(eventNames, events);
+		}
+		if (numberOfTimeVisitedAtLeast != -1) {
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisited(uID, numberOfTimeVisitedAtLeast);
+			addEvents(eventNames, events);
+		}
+		if (scoreRatedForFriendsAtLeast != -1) {
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
+			addEvents(eventNames, events);
+		}
+		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisitedOfFriends(uID, numberOfTimeVisitedForFriendsAtLeast);
+			addEvents(eventNames, events);
+		}
+		
+		if (eventNamesFromEventPreferenceRequired) {
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromEventPreferences(uID);
+			addEvents(eventNames, events);
+		}
+		if (preferredEventDatesRequired) {
+			List <StartAndEndDate> startAndEndDates = ProfileManagerImpl.getInstance().getPreferredStartAndEndDates(uID);
+			if (startAndEndDates != null) {
+				for (StartAndEndDate startAndEndDate: startAndEndDates) {
+
+					Event event = new Event();
+					EventDetail ed = new EventDetail();
+
+					TemporalDetails td = new TemporalDetails();
+					td.setHasDateFrom(startAndEndDate.getStartDate());
+					td.setHasDateUntil(startAndEndDate.getEndDate());
+
+					ed.setHasTemporalDetails(td);
+
+					event.setHasEventDetail(ed);
+					events.add(event);
+				}
+			}
+		}
+		if (friendsLikeVisitRequired) {
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesWhichFriendsLikeToVisit(uID);
+			addEvents(eventNames, events);
+		}
+		
+		if (events.size() > 0) {
+			pref.setHasEvents(events);
+		}
+	}
 	
-	/**
-	 * Checks whether or not a given UID exists in the UserProfile.
-	 * @param uid
-	 * @return
-	 */
-	public static boolean existUID(String uid) {
-		if (uid == null) return false;
-		Model model = RdfFileManager.getInstance().getRdfModel();
-		if (model == null) return false;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "SELECT  DISTINCT  ?uid\n";
-	    qStr += "WHERE {\n\n";
-	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root profile:hasUID ?uid .\n";
-	    qStr += "FILTER (STR(?uid) = \"" + uid + "\") . \n\n";
-	    qStr += "}";
-	    Query query = QueryFactory.create(qStr);
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String tmpuid = qs.getLiteral("uid").getString();
-			if (tmpuid != null && !tmpuid.equals("")) {
-				qe.close();
-				return true;
+	private void addEvents(List <String> eventNames, Set <Event> events) {
+		if (eventNames != null) {
+			for (String eventName: eventNames) {
+				Event event = createEvent(eventName);
+				if (event != null) events.add(event);
+			}
+		}
+	}
+	
+	private Event createEvent(String eventName) {
+		if (eventName != null && !eventName.equals("")) {
+			Event event = new Event();
+			EventDetail ed = new EventDetail();
+			ed.setHasEventName(eventName);
+			
+			event.setHasEventDetail(ed);
+
+		    return event;
+		}
+		return null;
+	}
+
+	private void addPlaces() {
+		Set <Place> places = new HashSet <Place>();
+		if (currentCountryRequired) {
+			Place place = createPlace(ProfileManagerImpl.getInstance().getCountryName(uID), NatureOfPlace.Country);
+			if (place != null) places.add(place);
+		}
+		if (currentTownRequired) {
+			Place place = createPlace(ProfileManagerImpl.getInstance().getTownName(uID), NatureOfPlace.City);
+			if (place != null) places.add(place);
+		}
+
+		if (scoreRatedAtLeast != -1) {
+			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromRating(uID, scoreRatedAtLeast);
+			addPlaces(placeNames, places);
+		}
+		if (numberOfTimeVisitedAtLeast != -1) {
+			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisited(uID, numberOfTimeVisitedAtLeast);
+			addPlaces(placeNames, places);
+		}
+		if (scoreRatedForFriendsAtLeast != -1) {
+			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
+			addPlaces(placeNames, places);
+		}
+		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
+			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisitedOfFriends(uID, numberOfTimeVisitedForFriendsAtLeast);
+			addPlaces(placeNames, places);
+		}
+
+		if (distanceFromCurrentPosition != -1) {
+			GpsCoordinate coordinate = ProfileManagerImpl.getInstance().getCoordinate(uID);
+			if (coordinate != null) {
+			    addPlace(coordinate.getLatitude(), coordinate.getLongitude(), distanceFromCurrentPosition, places);
 			}
 		}
 		
-		qe.close();
-		return false;
+		if (places.size() > 0) {
+			pref.setHasPlaces(places);
+		}
+	}
+
+	/**
+	 * Adds a period to preference.
+	 * @param period
+	 * @param pref
+	 */
+	private void addPeriod(Period period, Preference pref) {
+		Set <Period> periods = pref.getHasPeriods();
+		if (periods == null) periods = new HashSet <Period>();
+		periods.add(period);
+		pref.setHasPeriods(periods);
+	}
+
+	/**
+	 * Adds place from GPS information.
+	 * @param lat
+	 * @param lon
+	 * @param distanceFromCurrentPosition
+	 * @param places
+	 */
+	private void addPlace(double lat, double lon,
+			double distanceFromCurrentPosition, Set<Place> places) {
+		GpsCoordinate originalPoint = GpsCoordinateUtils.convert(lat, lon);
+		GpsCoordinate leftPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 270);
+		GpsCoordinate rightPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 90);
+		GpsCoordinate topPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 0);
+		GpsCoordinate bottomPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 180);
+
+		double maxLat = GpsCoordinateUtils.getLatitudeInDegree(topPoint);
+		double minLat = GpsCoordinateUtils.getLatitudeInDegree(bottomPoint);
+		double minLon = GpsCoordinateUtils.getLogitudeInDegree(leftPoint);
+		double maxLon = GpsCoordinateUtils.getLogitudeInDegree(rightPoint);
+
+		Area area = new Area(minLat, minLon, maxLat, maxLon);
+
+		Place place = new Place();
+		PlaceDetail pd = new PlaceDetail();
+		pd.setArea(area);
+		place.setHasPlaceDetail(pd);
+		
+		places.add(place);
+	}
+
+	/**
+	 * Add places with 'Others' for NatureOfPlace.
+	 * @param placeNames
+	 * @param places
+	 */
+	private void addPlaces(List<String> placeNames, Set<Place> places) {
+		if (placeNames != null) {
+			for (String placeName: placeNames) {
+				Place place = createPlace(placeName, NatureOfPlace.Others);
+				if (place != null) places.add(place);
+			}
+		}
+	}
+
+	private Place createPlace(String placeName, NatureOfPlace nop) {
+		if (placeName != null) {
+		    Place place = new Place();
+		    PlaceDetail pd = new PlaceDetail();
+		    pd.setHasPlaceName(placeName);
+		    pd.setHasNatureOfPlace(NatureOfPlace.Country);
+		    place.setHasPlaceDetail(pd);
+		    return place;
+		}
+		return null;
 	}
 }

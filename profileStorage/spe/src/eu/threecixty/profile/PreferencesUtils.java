@@ -24,11 +24,11 @@ public class PreferencesUtils {
 	/**
 	 * Gets minimum number of times visited.
 	 *
-	 * @param profiler
+	 * @param uid
 	 * @return
 	 */
-	public static int getMinimumNumberOfTimesVisited(IProfiler profiler) {
-		if (profiler == null) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
+	public static int getMinimumNumberOfTimesVisited(String uid) {
+		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
@@ -40,7 +40,7 @@ public class PreferencesUtils {
 		buffer.append("?p1 profile:hasUserEnteredRatings ?u1 . \n");
 		buffer.append("?u1 ?predicate ?s1 . \n");
 		buffer.append("?s1 profile:hasNumberofTimesVisited ?numberOfTimes  . \n");
-		buffer.append("FILTER (STR(?uid) = \"" + profiler.getUID() + "\") . \n\n");
+		buffer.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
 		buffer.append("}");
 		
 		int minNumberOfTimes = (int) findMinimumValue(buffer.toString(), "numberOfTimes");
@@ -55,11 +55,11 @@ public class PreferencesUtils {
 	/**
 	 * Gets minimum score rated.
 	 *
-	 * @param profiler
+	 * @param uid
 	 * @return
 	 */
-	public static float getMinimumScoreRated(IProfiler profiler) {
-		if (profiler == null) return DEFAULT_MINIMUM_SCORE_RATED;
+	public static float getMinimumScoreRated(String uid) {
+		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_SCORE_RATED;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
@@ -72,7 +72,7 @@ public class PreferencesUtils {
 		buffer.append("?u1 ?predicate ?s1 . \n");
 		buffer.append("?s1 profile:hasRating ?r1 .\n");
 		buffer.append("?r1 profile:hasUserDefinedRating ?scoreRated .\n");
-		buffer.append("FILTER (STR(?uid) = \"" + profiler.getUID() + "\") . \n\n");
+		buffer.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
 		buffer.append("}");
 		
 		float minRated = (float) findMinimumValue(buffer.toString(), "scoreRated");
@@ -87,11 +87,11 @@ public class PreferencesUtils {
 	/**
 	 * Gets minimum number of times visited for friends.
 	 *
-	 * @param profiler
+	 * @param uid
 	 * @return
 	 */
-	public static int getMinimumNumberOfTimesVisitedForFriends(IProfiler profiler) {
-		if (profiler == null) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
+	public static int getMinimumNumberOfTimesVisitedForFriends(String uid) {
+		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
@@ -105,7 +105,7 @@ public class PreferencesUtils {
 		buffer.append("?p1 profile:hasUserEnteredRatings ?u1 . \n");
 		buffer.append("?u1 ?predicate ?s1 . \n");
 		buffer.append("?s1 profile:hasNumberofTimesVisited ?numberOfTimes  . \n");
-		buffer.append("FILTER (STR(?uid) = \"" + profiler.getUID() + "\") . \n\n");
+		buffer.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
 		buffer.append("}");
 		
 		int minNumberOfTimes = (int) findMinimumValue(buffer.toString(), "numberOfTimes");
@@ -120,11 +120,11 @@ public class PreferencesUtils {
 	/**
 	 * Gets minimum score rated for friends.
 	 *
-	 * @param profiler
+	 * @param uid
 	 * @return
 	 */
-	public static float getMinimumScoreRatedForFriends(IProfiler profiler) {
-		if (profiler == null) return DEFAULT_MINIMUM_SCORE_RATED;
+	public static float getMinimumScoreRatedForFriends(String uid) {
+		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_SCORE_RATED;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
@@ -139,7 +139,7 @@ public class PreferencesUtils {
 		buffer.append("?u1 ?predicate ?s1 . \n");
 		buffer.append("?s1 profile:hasRating ?r1 .\n");
 		buffer.append("?r1 profile:hasUserDefinedRating ?scoreRated .\n");
-		buffer.append("FILTER (STR(?uid) = \"" + profiler.getUID() + "\") . \n\n");
+		buffer.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
 		buffer.append("}");
 		
 		float minRated = (float) findMinimumValue(buffer.toString(), "scoreRated");

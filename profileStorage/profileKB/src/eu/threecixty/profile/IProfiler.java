@@ -84,11 +84,11 @@ public interface IProfiler {
 	 */
 	String getUID();
 
-	/**
-	 * Gets KB of UserProfile.
-	 * @return
-	 */
-	UserProfile getKBUserProfile();
+//	/**
+//	 * Gets KB of UserProfile.
+//	 * @return
+//	 */
+//	UserProfile getKBUserProfile();
 
 	/**
 	 * Gets preferences.

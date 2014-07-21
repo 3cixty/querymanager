@@ -39,7 +39,7 @@ public class GoogleAccountUtils {
 			String givenName = json.getString("given_name");
 			String familyName = json.getString("family_name");
 			
-			if (UserProfileStorage.existUID(user_id)) return user_id; // no need to update info as it exists
+			if (ProfileManagerImpl.getInstance().existUID(user_id)) return user_id; // no need to update info as it exists
 			
 			UserProfile profile = new UserProfile();
 			profile.setHasUID(user_id);
@@ -48,7 +48,7 @@ public class GoogleAccountUtils {
 			name.setGivenName(givenName);
 			name.setFamilyName(familyName);
 
-			UserProfileStorage.saveProfile(profile);
+			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 		} catch (Exception e) {
 			//e.printStackTrace();

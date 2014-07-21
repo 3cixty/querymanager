@@ -24,14 +24,14 @@ public class SettingsStorage {
 	public synchronized static void save(ThreeCixtySettings settings) {
 		if (settings == null) return;
 		try {
-			UserProfile userProfile = UserProfileStorage.loadProfile(settings.getUid());
-			if (userProfile == null) return;
+			UserProfile userProfile = new UserProfile();
+			userProfile.setHasUID(settings.getUid());
 			
 			saveNameInfoToKB(settings, userProfile);
 			saveAddressInfoToKB(settings, userProfile);
 			addProfileIdentitiesIntoUserProfile(settings, userProfile);
 
-			UserProfileStorage.saveProfile(userProfile);
+			ProfileManagerImpl.getInstance().saveProfile(userProfile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -46,7 +46,7 @@ public class SettingsStorage {
 		if (!isNotNullOrEmpty(uid)) return null;
 		try {
 
-			UserProfile userProfile = UserProfileStorage.loadProfile(uid);
+			UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
 			if (userProfile == null) return null;
 
 			ThreeCixtySettings settings = new ThreeCixtySettings();

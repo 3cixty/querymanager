@@ -1,6 +1,8 @@
 package eu.threecixty.profile;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.hp.hpl.jena.query.Query;
@@ -12,11 +14,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
-import eu.threecixty.profile.oldmodels.Area;
-import eu.threecixty.profile.oldmodels.NatureOfPlace;
 import eu.threecixty.profile.oldmodels.Period;
-import eu.threecixty.profile.oldmodels.Place;
-import eu.threecixty.profile.oldmodels.PlaceDetail;
 import eu.threecixty.profile.oldmodels.Preference;
 
 /**
@@ -30,14 +28,13 @@ public class ProfilerPlaceUtils {
 	/**
 	 * Adds country name into preference.
 	 *
-	 * @param pref
-	 * 				The preference
 	 * @param model
 	 * 				RDF model.
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static void addCountryName(Preference pref, Model model, String uID) {
+	public static String getCountryName(Model model, String uID) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -59,39 +56,29 @@ public class ProfilerPlaceUtils {
 		
 		ResultSet rs = qe.execSelect();
 		
-	    Set <Place> places = pref.getHasPlaces();
-	    if (places == null) places = new HashSet <Place>();
-		
 		String countryName = null;
 		for ( ; rs.hasNext(); ) {
 			QuerySolution qs = rs.next();
 			countryName = qs.getLiteral("countryname").getString();
 			if (countryName != null) {
-			    Place place = new Place();
-			    PlaceDetail pd = new PlaceDetail();
-			    pd.setHasPlaceName(countryName);
-			    pd.setHasNatureOfPlace(NatureOfPlace.Country);
-			    place.setHasPlaceDetail(pd);
-			    places.add(place);
+			    break;
 			}
 		}
 		
 		qe.close();
-
-		pref.setHasPlaces(places);
+		return countryName;
 	}
 
 	/**
 	 * Adds town name into preference.
 	 *
-	 * @param pref
-	 * 				The preference.
 	 * @param model
 	 * 				The RDF model.
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static void addTownName(Preference pref, Model model, String uID) {
+	public static String getTownName(Model model, String uID) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -113,40 +100,29 @@ public class ProfilerPlaceUtils {
 		
 		ResultSet rs = qe.execSelect();
 		
-	    Set <Place> places = pref.getHasPlaces();
-	    if (places == null) places = new HashSet <Place>();
-		
 		String townName = null;
 		for ( ; rs.hasNext(); ) {
 			QuerySolution qs = rs.next();
 			townName = qs.getLiteral("locality").getString();
 			if (townName != null) {
-			    Place place = new Place();
-			    PlaceDetail pd = new PlaceDetail();
-			    pd.setHasPlaceName(townName);
-			    pd.setHasNatureOfPlace(NatureOfPlace.City);
-			    place.setHasPlaceDetail(pd);
-			    places.add(place);
+			    break;
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasPlaces(places);
+		return townName;
 	}
 
 	/**
 	 * Adds GPS coordinates into preference.
-	 *
-	 * @param pref
-	 * 				The preference.
 	 * @param model
 	 * 				The RDF model.
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static void addGPSCoordinates(Preference pref, Model model, String uID, double distanceFromCurrentPosition) {
-		
+	public static GpsCoordinate getCoordinates(Model model, String uID) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -170,44 +146,26 @@ public class ProfilerPlaceUtils {
 		
 		ResultSet rs = qe.execSelect();
 		
-	    Set <Place> places = pref.getHasPlaces();
-	    if (places == null) places = new HashSet <Place>();
-		
+		GpsCoordinate coordinate = null;
 		for ( ; rs.hasNext(); ) {
 			QuerySolution qs = rs.next();
 			double lon = qs.getLiteral("lon").getDouble();
 			double lat = qs.getLiteral("lat").getDouble();
 			
-			GpsCoordinate originalPoint = GpsCoordinateUtils.convert(lat, lon);
-			GpsCoordinate leftPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 270);
-			GpsCoordinate rightPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 90);
-			GpsCoordinate topPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 0);
-			GpsCoordinate bottomPoint = GpsCoordinateUtils.calc(originalPoint, distanceFromCurrentPosition, 180);
-
-			double maxLat = GpsCoordinateUtils.getLatitudeInDegree(topPoint);
-			double minLat = GpsCoordinateUtils.getLatitudeInDegree(bottomPoint);
-			double minLon = GpsCoordinateUtils.getLogitudeInDegree(leftPoint);
-			double maxLon = GpsCoordinateUtils.getLogitudeInDegree(rightPoint);
-
-			Area area = new Area(minLat, minLon, maxLat, maxLon);
-
-			Place place = new Place();
-			PlaceDetail pd = new PlaceDetail();
-			pd.setArea(area);
-			place.setHasPlaceDetail(pd);
-			
-			places.add(place);
+			coordinate = GpsCoordinateUtils.convert(lat, lon);
+			if (coordinate != null) break;
 
 		}
 		
 		qe.close();
 
-		pref.setHasPlaces(places);
+		return coordinate;
 	}
 
 	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
 	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
-	public static void addPlaceNameFromRating(Preference pref, Model model, String uID, float rating) {
+	public static List <String> getPlaceNamesFromRating(Model model, String uID, float rating) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -235,8 +193,7 @@ public class ProfilerPlaceUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Place> places = pref.getHasPlaces();
-	    if (places == null) places = new HashSet <Place>();
+		List <String> placeNames = new ArrayList <String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -244,23 +201,19 @@ public class ProfilerPlaceUtils {
 			QuerySolution qs = rs.next();
 			String placename = qs.getLiteral("placename").getString();
 			if (placename != null) {
-			    Place place = new Place();
-			    PlaceDetail pd = new PlaceDetail();
-			    pd.setHasPlaceName(placename);
-			    pd.setHasNatureOfPlace(NatureOfPlace.Others);
-			    place.setHasPlaceDetail(pd);
-			    places.add(place);
+				placeNames.add(placename);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasPlaces(places);
+		return placeNames;
 	}
 
 	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
 	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
-	public static void addPlaceNameFromNumberOfTimesVisited(Preference pref, Model model, String uID, int numberOfTimesVisited) {
+	public static List <String> getPlaceNamesFromNumberOfTimesVisited(Model model, String uID, int numberOfTimesVisited) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -285,8 +238,7 @@ public class ProfilerPlaceUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Place> places = pref.getHasPlaces();
-	    if (places == null) places = new HashSet <Place>();
+		List <String> placeNames = new ArrayList <String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -294,24 +246,20 @@ public class ProfilerPlaceUtils {
 			QuerySolution qs = rs.next();
 			String placename = qs.getLiteral("placename").getString();
 			if (placename != null) {
-			    Place place = new Place();
-			    PlaceDetail pd = new PlaceDetail();
-			    pd.setHasPlaceName(placename);
-			    pd.setHasNatureOfPlace(NatureOfPlace.Others);
-			    place.setHasPlaceDetail(pd);
-			    places.add(place);
+				placeNames.add(placename);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasPlaces(places);
+		return placeNames;
 	}
 
 
 	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
 	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
-	public static void addPlaceNameFromRatingOfFriends(Preference pref, Model model, String uID, float rating) {
+	public static List <String> getPlaceNamesFromRatingOfFriends(Model model, String uID, float rating) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -341,8 +289,7 @@ public class ProfilerPlaceUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Place> places = pref.getHasPlaces();
-	    if (places == null) places = new HashSet <Place>();
+		List <String> placeNames = new ArrayList <String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -350,23 +297,19 @@ public class ProfilerPlaceUtils {
 			QuerySolution qs = rs.next();
 			String placename = qs.getLiteral("placename").getString();
 			if (placename != null) {
-			    Place place = new Place();
-			    PlaceDetail pd = new PlaceDetail();
-			    pd.setHasPlaceName(placename);
-			    pd.setHasNatureOfPlace(NatureOfPlace.Others);
-			    place.setHasPlaceDetail(pd);
-			    places.add(place);
+				placeNames.add(placename);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasPlaces(places);
+		return placeNames;
 	}
 
 	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
 	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
-	public static void addPlaceNameFromNumberOfTimesVisitedOfFriends(Preference pref, Model model, String uID, int numberOfTimesVisited) {
+	public static List <String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(Model model, String uID, int numberOfTimesVisited) {
+		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -393,8 +336,7 @@ public class ProfilerPlaceUtils {
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
-	    Set <Place> places = pref.getHasPlaces();
-	    if (places == null) places = new HashSet <Place>();
+		List <String> placeNames = new ArrayList <String>();
 		
 		ResultSet rs = qe.execSelect();
 		
@@ -402,18 +344,13 @@ public class ProfilerPlaceUtils {
 			QuerySolution qs = rs.next();
 			String placename = qs.getLiteral("placename").getString();
 			if (placename != null) {
-			    Place place = new Place();
-			    PlaceDetail pd = new PlaceDetail();
-			    pd.setHasPlaceName(placename);
-			    pd.setHasNatureOfPlace(NatureOfPlace.Others);
-			    place.setHasPlaceDetail(pd);
-			    places.add(place);
+				placeNames.add(placename);
 			}
 		}
 		
 		qe.close();
 
-		pref.setHasPlaces(places);
+		return placeNames;
 	}
 
 	public static void addDays(Preference pref, Period period) {
