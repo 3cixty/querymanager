@@ -2,9 +2,7 @@ package eu.threecixty.CrawlerCron;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,19 +23,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
-import eu.threecixty.profile.RdfFileManager;
+import eu.threecixty.profile.IDMapping;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.UserProfile;
-import eu.threecixty.profile.UserProfileStorage;
 import eu.threecixty.profile.oldmodels.Accompanying;
 import eu.threecixty.profile.oldmodels.ModalityType;
 import eu.threecixty.profile.oldmodels.PersonalPlace;
@@ -68,7 +58,7 @@ public class MobilityCrawlerCron {
 	private final static int fZERO_MINUTES = 0;
 
 	private final static String MOBIDOT_BASEURL="https://www.movesmarter.nl/external/";
-	private final static String MOBIDOT_URL="https://www.movesmarter.nl/portal";
+//	private final static String MOBIDOT_URL="https://www.movesmarter.nl/portal";
 	
 	// TODO: change this value to your key
 	private final static String MOBIDOT_API_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
@@ -145,10 +135,6 @@ public class MobilityCrawlerCron {
 		return MOBIDOT_BASEURL;
 	}
 
-	private static String getMobidotUrl() {
-		return MOBIDOT_URL;
-	}
-
 	private static String getMobidotApiKey() {
 		return MOBIDOT_API_KEY;
 	}
@@ -202,33 +188,34 @@ public class MobilityCrawlerCron {
 	* Main entry to crawl Mobidot info.
 	*/
 	private void crawl(){
-        //get all 3cixtyIDs, mobidotUserName and mobidotIDs
-        Set<IDMapping> idMapping = getMobidotIDsForUsers();
+        //get all 3cixtyIDs and mobidotUserNames
+        Set<IDMapping> idMapping = ProfileManagerImpl.getInstance().getIDMappings();
         long currentTime = getDateTime();
         try{
         	Iterator<IDMapping> iteratorMapping = idMapping.iterator();
         	
         	while (iteratorMapping.hasNext()){
-        		IDMapping map=iteratorMapping.next();
+        		IDMapping map = iteratorMapping.next();
         		int length=0;
-        		UserProfile user = UserProfileStorage.loadProfile(map.getThreeCixtyID());
-        		if (user == null) continue;
+        		UserProfile user = new UserProfile();
+        		user.setHasUID(map.getThreeCixtyID());
+        		Long mobidotID = getMobidotIDforUsername(map.getMobidotUserName());
+        		map.setMobidotID(mobidotID);
         		Transport transport = new Transport();
-        		if (map.getMobidotID() == null) continue;
-        		String mID=Long.toString(map.getMobidotID());
+        		if (mobidotID == null) continue;
         		
-        		String urlStr=getMobidotBaseurl() +"personalmobility/RegularTrips/"+ mID+ "?key="+getMobidotApiKey();
+        		String urlStr=getMobidotBaseurl() +"personalmobility/RegularTrips/"+ mobidotID + "?key=" + getMobidotApiKey();
     			JSONArray resultRegularTrip = getTravelInfoforMobiditID(urlStr);
     			
-    			urlStr=getMobidotBaseurl() + "measurement/Accompanies/" + mID + "/modifiedSince/" + getLastRuntime() + "?key=" + getMobidotApiKey();
+    			urlStr=getMobidotBaseurl() + "measurement/Accompanies/" + mobidotID + "/modifiedSince/" + getLastRuntime() + "?key=" + getMobidotApiKey();
     			JSONArray resultAccompany = getTravelInfoforMobiditID(urlStr);
         		
     			length=resultRegularTrip.length();
         		Set <RegularTrip> regularTrips = new HashSet <RegularTrip>();	    	
-		    	for (int i = 0; i < length; i++){
+		    	for (int i = 0; i < length; i++) {
 		    		JSONObject jsonobj = resultRegularTrip.getJSONObject(i);
 		    		
-		    		regularTrips.add(storeRegularTripsInKB(map.getThreeCixtyID(),jsonobj, user));
+		    		regularTrips.add(storeRegularTripsInKB(map.getThreeCixtyID(), jsonobj, user));
 		    	}
 		    	transport.setHasRegularTrip(regularTrips);
 
@@ -258,76 +245,13 @@ public class MobilityCrawlerCron {
 		    	}
 		    	transports.add(transport);
 		    	
-		    	UserProfileStorage.saveProfile(user);
+		    	ProfileManagerImpl.getInstance().saveProfile(user);
         	}
 	        setLastRuntime(currentTime);	
     	}catch(Exception e){
     		e.printStackTrace();
     		crawl();
     	}
-	}
-
-	/**
-	 * get MobidotIDs For the 3cixty Users
-	 * @return
-	 */
-	private Set<IDMapping> getMobidotIDsForUsers() {
-        String queryString = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-    			+"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
-    			+"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-    			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-    			+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n"
-    			+ "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n"
-    			+ "SELECT ?uid ?mobidotID\n"
-    			+ "WHERE {\n\n"
-    			+ "?root a owl:NamedIndividual .\n"
-    			+ "?root profile:hasUID ?uid .\n"
-    			+ "?root profile:hasProfileIdentities ?profileidentities .\n"
-    			+ "?profileidentities profile:hasUserAccountID ?mobidotID. \n"
-    			+ "?profileidentities profile:hasSource ?source. \n"
-    			+ "Filter(STR(?source) =\"" + getMobidotUrl() + "\"). \n"
-    			+ "\n"
-    			+ "}";
-		Set<IDMapping> idMapping=new HashSet<IDMapping>();
-		Query query = QueryFactory.create(queryString);
-
-		InputStream input = null;
-		try {
-			input = new FileInputStream(new File(RdfFileManager.getInstance().getPathToRdfFile()));
-
-			Model rdfModel=null;
-			if (input != null) {
-				rdfModel = ModelFactory.createDefaultModel().read(input, "UTF-8");
-			}
-			QueryExecution qe = QueryExecutionFactory.create(query, rdfModel);
-			ResultSet rs = qe.execSelect();
-			for ( ; rs.hasNext(); ) {
-				QuerySolution qs = rs.next();
-				String UID = qs.getLiteral("uid").getString();
-				String mobidotUserName = qs.getLiteral("mobidotID").getString();
-				Long mobidotID= getMobidotIDforUsername(mobidotUserName);
-				IDMapping mapper=new IDMapping();
-				mapper.setThreeCixtyID(UID);
-				mapper.setMobidotUserName(mobidotUserName);
-				mapper.setMobidotID(mobidotID);
-				idMapping.add(mapper);
-			}
-			qe.close();
-			input.close();
-			return idMapping;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (input != null)
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		}
-		return idMapping;
 	}
 
 	/**
