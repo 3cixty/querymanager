@@ -1,7 +1,13 @@
 package eu.threecixty.profile;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import org.theresis.humanization.datastorage.ProfileException;
+import org.theresis.humanization.datastorage.ValuedProperty;
+import org.theresis.humanization.datastorage.ProfileManager.ProfileStatus;
 
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
@@ -18,7 +24,13 @@ public class ThalesProfileManagerImpl implements ProfileManager {
 	}
 
 	public boolean existUID(String uid) {
-		// TODO Auto-generated method stub
+		ThalesProfileManagerAndSession profileMngAndSession = new ThalesProfileManagerAndSession(uid);
+		try {
+			ProfileStatus status =  profileMngAndSession.profileMgr.getProfileStatus(profileMngAndSession.session, uid);
+			if (status == ProfileStatus.ACTIVE) return true;
+		} catch (ProfileException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
@@ -43,7 +55,19 @@ public class ThalesProfileManagerImpl implements ProfileManager {
 	}
 
 	public String getCountryName(String uid) {
-		// TODO Auto-generated method stub
+		// TODO: from 100900047095598983805Address, need to get countryname
+		ThalesProfileManagerAndSession profileMngAndSession = new ThalesProfileManagerAndSession(uid);
+		String vcardAddr = "vcard:hasAddress";
+		List<String> propertyPaths = new ArrayList<String>();
+		propertyPaths.add(vcardAddr);
+		try {
+			Collection<ValuedProperty> propertyValues =  profileMngAndSession.profileMgr.getProfileProperties(
+					profileMngAndSession.session, uid, propertyPaths);
+			if (propertyValues == null || propertyValues.size() == 0) return null;
+			return propertyValues.iterator().next().getValue(0); //  TODO: from 100900047095598983805Address, need to get countryname 
+		} catch (ProfileException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
