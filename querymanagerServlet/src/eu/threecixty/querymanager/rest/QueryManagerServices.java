@@ -57,6 +57,63 @@ public class QueryManagerServices {
 	private static String allPrefixes;
 	
 	/**
+	 * This method firstly augments a given query, then sends to Eurecom to execute and receives data back.
+	 *
+	 * @param key
+	 * 				Application key
+	 * @param accessToken
+	 * 				Google access token
+	 * @param format
+	 * 				JSON or RDF format
+	 * @param query
+	 * 				Sparql query
+	 * @param filter
+	 * 				Filter to augment the query
+	 * @return Data received from Eurecom when executing a query augmented. 
+	 */
+	@GET
+	@Path("/execute")
+	public Response executeQuery(@QueryParam("key") String key, @QueryParam("accessToken") String accessToken,
+			@QueryParam("format") String format, @QueryParam("query") String query,
+			@QueryParam("filter") String filter) {
+		if (KeyManager.getInstance().checkAppKey(key)) {
+			boolean isAccessTokenFalse = "false".equals(accessToken);
+			String user_id =  null;
+			if (!isAccessTokenFalse) {
+				user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
+			}
+			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("Access token is incorrect or expired")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
+			} else {
+				EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+				if (eventMediaFormat == null || query == null) {
+					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity("The format is not supported or query is null")
+					        .type(MediaType.TEXT_PLAIN)
+					        .build());
+				} else {
+				    IProfiler profiler = isAccessTokenFalse ? null : new Profiler(user_id);
+				    QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
+
+					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true);
+					return Response.status(HttpURLConnection.HTTP_OK)
+			        .entity(result)
+			        .type(MediaType.APPLICATION_JSON)
+			        .build();
+				}
+			}
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+	
+	/**
 	 * Counts the number of items in the KB at EventMedia.
 	 * @param key
 	 * @return
@@ -68,7 +125,7 @@ public class QueryManagerServices {
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			QueryManager qm = new QueryManager("false");
-			return executeQuery(null, qm, query, null);
+			return executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
 		} else {
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
@@ -117,7 +174,7 @@ public class QueryManagerServices {
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
 				QueryManager qm = new QueryManager("false");
-				return executeQuery(null, qm, query, null);
+				return executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
 			}
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The group is invalid '" + group + "'. The group is one of locality, category, country, publishe, placeName, and artist")
@@ -185,7 +242,7 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getGroupBy()),
 						(pair2 == null ? null : pair2.getValue()));
 
-				String result = executeQuery(profiler, qm, query, preference);
+				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
 				return result;
 			}
 		} else {
@@ -197,7 +254,7 @@ public class QueryManagerServices {
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter) {
+			String query, String filter, EventMediaFormat eventMediaFormat, boolean augmentedQueryIncluded) {
 
 		if (allPrefixes == null) {
 			allPrefixes = getAllPrefixes() + " ";
@@ -211,7 +268,7 @@ public class QueryManagerServices {
 
 		qm.setQuery(placeQuery);
 		
-		String result = QueryManagerDecision.run(profiler, qm, filter, EventMediaFormat.JSON, false);
+		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat, augmentedQueryIncluded);
 		return  result;
 	}
 
