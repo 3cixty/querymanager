@@ -35,23 +35,51 @@ public class ThalesProfileManagerImpl implements ProfileManager {
 	}
 
 	public int getMinimumNumberOfTimesVisited(String uid) {
-		// TODO Auto-generated method stub
-		return 0;
+		List <Integer> numbers = new ArrayList <Integer>();
+		findNumberOfTimes(uid, "hasUserHotelRating", numbers);
+		findNumberOfTimes(uid, "hasUserPlaceRating", numbers);
+		findNumberOfTimes(uid, "hasUserEventRating", numbers);
+		int min = Integer.MAX_VALUE;
+		for (Integer number: numbers) {
+			if (min > number) min = number;
+		}
+		return min;
 	}
 
 	public float getMinimumScoreRated(String uid) {
-		// TODO Auto-generated method stub
-		return 0;
+		List <Double> scores = new ArrayList <Double>();
+		findScoresRated(uid, "hasUserHotelRating", scores);
+		findScoresRated(uid, "hasUserPlaceRating", scores);
+		findScoresRated(uid, "hasUserEventRating", scores);
+		double min = Double.MAX_VALUE;
+		for (Double score: scores) {
+			if (min > score) min = score;
+		}
+		return (float) min;
 	}
 
 	public int getMinimumNumberOfTimesVisitedForFriends(String uid) {
-		// TODO Auto-generated method stub
-		return 0;
+		List <Integer> numbers = new ArrayList <Integer>();
+		findNumberOfTimesVisitedByFriends(uid, "hasUserHotelRating", numbers);
+		findNumberOfTimesVisitedByFriends(uid, "hasUserPlaceRating", numbers);
+		findNumberOfTimesVisitedByFriends(uid, "hasUserEventRating", numbers);
+		int min = Integer.MAX_VALUE;
+		for (Integer number: numbers) {
+			if (min > number) min = number;
+		}
+		return min;
 	}
 
 	public float getMinimumScoreRatedForFriends(String uid) {
-		// TODO Auto-generated method stub
-		return 0;
+		List <Double> scores = new ArrayList <Double>();
+		findScoresRatedByFriends(uid, "hasUserHotelRating", scores);
+		findScoresRatedByFriends(uid, "hasUserPlaceRating", scores);
+		findScoresRatedByFriends(uid, "hasUserEventRating", scores);
+		double min = Double.MAX_VALUE;
+		for (Double score: scores) {
+			if (min > score) min = score;
+		}
+		return (float) min;
 	}
 
 	public String getCountryName(String uid) {
@@ -150,6 +178,110 @@ public class ThalesProfileManagerImpl implements ProfileManager {
 	}
 
 	/**
+	 * Find scores rated by user and store in a given list.
+	 * @param uid
+	 * 				Google UID
+	 * @param predicate
+	 * 				Predicate, for example <code>hasUserHotelRating, hasUserPlaceRating, hasUserEventRating</code>
+	 * @param scores
+	 * 				List of scores
+	 */
+	private void findScoresRated(String uid, String predicate, List <Double> scores) {
+		//String ratingPath = ":hasPreference/:hasUserEnteredRatings/:hasUserHotelRating/:hasRating/:hasUserDefinedRating";
+		String ratingPath = ":hasPreference/:hasUserEnteredRatings/" + predicate + "/:hasRating/:hasUserDefinedRating";
+		findScoresRatedFromPath(uid, ratingPath, scores);
+	}
+
+	/**
+	 * Find scores rated by friends and store in a given list.
+	 * @param uid
+	 * 				Google UID
+	 * @param predicate
+	 * 				Predicate, for example <code>hasUserHotelRating, hasUserPlaceRating, hasUserEventRating</code>
+	 * @param scores
+	 * 				List of scores
+	 */
+	private void findScoresRatedByFriends(String uid, String predicate, List <Double> scores) {
+		//String ratingPath = "foaf:knows/:hasPreference/:hasUserEnteredRatings/:hasUserHotelRating/:hasRating/:hasUserDefinedRating";
+		String ratingPath = "foaf:knows/:hasPreference/:hasUserEnteredRatings/" + predicate + "/:hasRating/:hasUserDefinedRating";
+		findScoresRatedFromPath(uid, ratingPath, scores);
+	}
+	
+	/**
+	 * Find number of times visited by friends and store in a given list.
+	 * @param uid
+	 * 				Google UID
+	 * @param predicate
+	 * 				Predicate, for example <code>hasUserHotelRating, hasUserPlaceRating, hasUserEventRating</code>
+	 * @param scores
+	 * 				List of scores
+	 */
+	private void findNumberOfTimesVisitedByFriends(String uid, String predicate, List <Integer> numbers) {
+		String numberOfTimesVisitedPath = "foaf:knows/:hasPreference/:hasUserEnteredRatings/" + predicate + "/:hasNumberofTimesVisited";
+		findNumberOfTimesFromPath(uid, numberOfTimesVisitedPath, numbers);
+	}
+	
+	/**
+	 * Find number of times visited by user and store in a given list.
+	 * @param uid
+	 * 				Google UID
+	 * @param predicate
+	 * 				Predicate, for example <code>hasUserHotelRating, hasUserPlaceRating, hasUserEventRating</code>
+	 * @param numbers
+	 */
+	private void findNumberOfTimes(String uid, String predicate, List <Integer> numbers) {
+		//String ratingPath = ":hasPreference/:hasUserEnteredRatings/:hasUserHotelRating/:hasNumberofTimesVisited";
+		String numberOfTimesVisitedPath = ":hasPreference/:hasUserEnteredRatings/" + predicate + "/:hasNumberofTimesVisited";
+		findNumberOfTimesFromPath(uid, numberOfTimesVisitedPath, numbers);
+	}
+
+	/**
+	 * Finds scores rated from a given path and stores in a list.
+	 * @param uid
+	 * @param path
+	 * @param scores
+	 */
+	private void findScoresRatedFromPath(String uid, String path, List <Double> scores) {
+		ThalesProfileManagerAndSession profileMngAndSession = new ThalesProfileManagerAndSession(uid);
+		List<String> propertyPaths = new ArrayList<String>();
+		propertyPaths.add(path);
+		try {
+			Collection<ValuedProperty> propertyValues =  profileMngAndSession.profileMgr.getProfileProperties(
+					profileMngAndSession.session, uid, propertyPaths);
+			if (propertyValues == null || propertyValues.size() == 0) return;
+			for (ValuedProperty vp: propertyValues) {
+				double score = getDoubleFromXSDValue(vp.getValue(0));
+				scores.add(score);
+			}
+		} catch (ProfileException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Finds scores rated from a given path and stores in a list.
+	 * @param uid
+	 * @param path
+	 * @param numbers
+	 */
+	private void findNumberOfTimesFromPath(String uid, String path, List <Integer> numbers) {
+		ThalesProfileManagerAndSession profileMngAndSession = new ThalesProfileManagerAndSession(uid);
+		List<String> propertyPaths = new ArrayList<String>();
+		propertyPaths.add(path);
+		try {
+			Collection<ValuedProperty> propertyValues =  profileMngAndSession.profileMgr.getProfileProperties(
+					profileMngAndSession.session, uid, propertyPaths);
+			if (propertyValues == null || propertyValues.size() == 0) return;
+			for (ValuedProperty vp: propertyValues) {
+				int number = getIntegerFromXSDValue(vp.getValue(0));
+				numbers.add(number);
+			}
+		} catch (ProfileException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Gets address information.
 	 * @param uid
 	 * 				Google UID
@@ -173,10 +305,27 @@ public class ThalesProfileManagerImpl implements ProfileManager {
 		return null;
 	}
 
+	/**
+	 * Extract double value from the following format <code>4.0^^http://www.w3.org/2001/XMLSchema#double</code>
+	 * @param doubleInXSDValue
+	 * @return
+	 */
 	private double getDoubleFromXSDValue(String doubleInXSDValue) {
 		int index = doubleInXSDValue.indexOf("^^");
 		if (index < 0) throw new RuntimeException("Invalid value");
 		String str = doubleInXSDValue.substring(0, index);
 		return Double.parseDouble(str);
+	}
+
+	/**
+	 * Extract double value from the following format <code>4^^http://www.w3.org/2001/XMLSchema#integer</code>
+	 * @param doubleInXSDValue
+	 * @return
+	 */
+	private int getIntegerFromXSDValue(String integerInXSDValue) {
+		int index = integerInXSDValue.indexOf("^^");
+		if (index < 0) throw new RuntimeException("Invalid value");
+		String str = integerInXSDValue.substring(0, index);
+		return Integer.parseInt(str);
 	}
 }
