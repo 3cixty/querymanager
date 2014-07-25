@@ -31,7 +31,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
   ```
   ~baseUrl/services/queryManager
-  ~baseUrl/trayServlet
+  ~baseUrl/services/tray
   ~baseUrl/services/settings
   ```
 
