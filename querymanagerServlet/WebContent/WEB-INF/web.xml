@@ -11,16 +11,6 @@
 	<listener>
 		<listener-class>eu.threecixty.querymanager.ThreeCixtyContextListener</listener-class>
 	</listener>
-	
-	<servlet>
-	  <servlet-name>trayServlet</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.TrayServlet</servlet-class>
-	</servlet>
-
-	  <servlet-mapping>
-	    <servlet-name>trayServlet</servlet-name>
-	    <url-pattern>/trayServlet</url-pattern>
-	  </servlet-mapping>
 
 	<!-- Auto scan REST service -->
 	<context-param>
