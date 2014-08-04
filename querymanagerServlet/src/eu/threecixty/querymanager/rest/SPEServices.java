@@ -2,6 +2,8 @@ package eu.threecixty.querymanager.rest;
 
 import java.net.HttpURLConnection;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -9,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -27,6 +30,11 @@ import eu.threecixty.profile.ProfileInformationStorage;
 @Path("/spe")
 public class SPEServices {
 
+	private static final String ACCESS_TOKEN_PARAM = "accessToken";
+	
+	@Context 
+	private HttpServletRequest httpRequest;
+	
 	/**
 	 * Gets profile information in JSON format from a given Google access token and an App key.
 	 * @param accessToken
@@ -41,13 +49,21 @@ public class SPEServices {
 	public String getProfile(@QueryParam("accessToken") String accessToken, @QueryParam("key") String key) {
 		try {
 			if (KeyManager.getInstance().checkAppKey(key)) {
-				String uid = GoogleAccountUtils.getUID(accessToken);
+				String uid = null;
+				HttpSession session = httpRequest.getSession();
+				if (session.getAttribute(ACCESS_TOKEN_PARAM) != null) {
+					uid = (String) session.getAttribute("uid");
+				} else {
+					uid = GoogleAccountUtils.getUID(accessToken);
+					session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
+				}
 				if (uid == null || uid.equals("")) {
 					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 					        .entity("The access token is invalid: '" + accessToken + "'")
 					        .type(MediaType.TEXT_PLAIN)
 					        .build());
 				}
+				session.setAttribute("uid", uid);
 				ProfileInformation profile = ProfileInformationStorage.loadProfile(uid);
 				if (profile == null) {
 					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -86,13 +102,21 @@ public class SPEServices {
 	@Produces("application/json")
 	public String saveProfile(@FormParam("accessToken") String accessToken, @FormParam("profile") String profileStr, @FormParam("key") String key) {
 		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = GoogleAccountUtils.getUID(accessToken);
+			String uid = null;
+			HttpSession session = httpRequest.getSession();
+			if (session.getAttribute(ACCESS_TOKEN_PARAM) != null) {
+				uid = (String) session.getAttribute("uid");
+			} else {
+				uid = GoogleAccountUtils.getUID(accessToken);
+				session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
+			}
 			if (uid == null || uid.equals("")) {
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("The access token is invalid: '" + accessToken + "'")
 				        .type(MediaType.TEXT_PLAIN)
 				        .build());
 			}
+			session.setAttribute("uid", uid);
 			if (profileStr == null || profileStr.equals("")) {
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("Invalid profile in JSON format: '" + profileStr + "'")

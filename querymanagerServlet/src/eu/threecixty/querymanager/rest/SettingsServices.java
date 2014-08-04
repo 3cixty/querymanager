@@ -51,6 +51,7 @@ public class SettingsServices {
 				uid = (String) session.getAttribute("uid");
 			} else {
 				uid = GoogleAccountUtils.getUID(accessToken);
+				session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
 			}
 			if (uid == null || uid.equals("")) {
 				return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
@@ -103,6 +104,7 @@ public class SettingsServices {
 				uid = (String) session.getAttribute("uid");
 			} else {
 				uid = GoogleAccountUtils.getUID(accessToken);
+				session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
 			}
 			if (uid == null || uid.equals("")) {
 				return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)

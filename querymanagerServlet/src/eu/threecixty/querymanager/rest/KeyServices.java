@@ -38,10 +38,11 @@ public class KeyServices {
 	public Response requestKey(@QueryParam("accessToken") String accessToken) {
 		String uid = null;
 		HttpSession session = httpRequest.getSession();
-		if (session.getAttribute(accessToken) != null) {
+		if (session.getAttribute("uid") != null) {
 			uid = (String) session.getAttribute("uid");
 		} else {
 			uid = GoogleAccountUtils.getUID(accessToken);
+			session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
 		}
 		if (uid == null || uid.equals("")) {
 			session.setAttribute("errorMsg", "Your access token is incorrect or expired");
@@ -51,7 +52,6 @@ public class KeyServices {
 				e.printStackTrace();
 			}
 		} else {
-			session.setAttribute(accessToken, true);
 			session.setAttribute("uid", uid);
 			AppKey appKey = KeyManager.getInstance().getAppKeyFromUID(uid);
 			if (appKey != null) {

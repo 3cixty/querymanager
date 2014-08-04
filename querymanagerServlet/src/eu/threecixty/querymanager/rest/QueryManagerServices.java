@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,6 +19,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -56,6 +59,9 @@ public class QueryManagerServices {
 	public static String realPath;
 	private static String allPrefixes;
 	
+	@Context 
+	private HttpServletRequest httpRequest;
+	
 	/**
 	 * This method firstly augments a given query, then sends to Eurecom to execute and receives data back.
 	 *
@@ -80,7 +86,14 @@ public class QueryManagerServices {
 			boolean isAccessTokenFalse = "false".equals(accessToken);
 			String user_id =  null;
 			if (!isAccessTokenFalse) {
-				user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
+				HttpSession session = httpRequest.getSession();
+				if (session.getAttribute("uid") == null) {
+				    user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
+				    session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
+				    session.setAttribute("uid", user_id);
+				} else {
+					user_id = (String) session.getAttribute("uid"); 
+				}
 			}
 			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -214,7 +227,14 @@ public class QueryManagerServices {
 			boolean isAccessTokenFalse = "false".equals(accessToken);
 			String user_id =  null;
 			if (!isAccessTokenFalse) {
-				user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
+				HttpSession session = httpRequest.getSession();
+				if (session.getAttribute("uid") == null) {
+				    user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
+				    session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
+				    session.setAttribute("uid", user_id);
+				} else {
+					user_id = (String) session.getAttribute("uid"); 
+				}
 			}
 
 			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
