@@ -56,6 +56,20 @@ public class GoogleAccountUtils {
 		if (user_id == null) return "";
 		return user_id;
 	}
+	
+	public static int getValidationTime(String accessToken) {
+		try {
+			String reqMsg = readUrl(
+					"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken);
+			JSONObject json = new JSONObject(reqMsg);
+			int time = json.getInt("expires_in");
+			return time;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
 
 	/**
 	 * Gets content from a given URL string.
