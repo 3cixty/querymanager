@@ -10,10 +10,8 @@
   <version>1.0</version>
   
   <modules>
+    <module>stats</module>
     <module>querymanager-java</module>
-	<!--
-	<module>privacyManager</module>
-	-->
 	<module>querymanagerServlet</module>
   </modules>
   
