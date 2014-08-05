@@ -22,6 +22,8 @@ import eu.threecixty.keys.AppKey;
 import eu.threecixty.keys.KeyManager;
 import eu.threecixty.keys.KeyOwner;
 import eu.threecixty.keys.management.AuthenticationManager;
+import eu.threecixty.logs.CallLoggingConstants;
+import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
@@ -116,9 +118,15 @@ public class KeyServices {
 	@Path("/validate")
 	@Produces("text/plain")
 	public String validate(@QueryParam("key") String key) {
-		if (KeyManager.getInstance().checkAppKey(key)) {
+		long starttime = System.currentTimeMillis();
+		boolean ok = KeyManager.getInstance().checkAppKey(key);
+		
+		if (ok) {
+			// log call for validating an app key
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.KEY_VALIDATE_SERVICE, CallLoggingConstants.KEY_VALIDATE_DESC_SUCCESSFUL);
 			return "ok";
 		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.KEY_VALIDATE_SERVICE, CallLoggingConstants.KEY_VALIDATE_DESC_FAILED);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)

@@ -21,6 +21,8 @@ import javax.ws.rs.core.Response;
 
 
 import eu.threecixty.keys.KeyManager;
+import eu.threecixty.logs.CallLoggingConstants;
+import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
@@ -44,6 +46,7 @@ public class SettingsServices {
 	@Path("/view")
 	@Produces("text/plain")
 	public Response view(@QueryParam("accessToken") String accessToken, @QueryParam("key") String key) {
+		long starttime = System.currentTimeMillis();
 		String uid = null;
 		HttpSession session = httpRequest.getSession();
 		if (KeyManager.getInstance().checkAppKey(key)) {
@@ -54,11 +57,13 @@ public class SettingsServices {
 				session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
 			}
 			if (uid == null || uid.equals("")) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.UNAUTHORIZED);
 				return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
 						.entity("Your access token is incorrect or expired")
 						.type(MediaType.TEXT_PLAIN)
 						.build();
 			} else {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				session.setAttribute("uid", uid);
 
 				ThreeCixtySettings settings = SettingsStorage.load(uid);
@@ -73,6 +78,7 @@ public class SettingsServices {
 				}
 			}
 		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				    .entity("Your AppKey '" + key + "' is invalid. Please get a new key")
 				    .type(MediaType.TEXT_PLAIN)
@@ -96,6 +102,7 @@ public class SettingsServices {
 			@DefaultValue("")@FormParam("pi_sources") List<String> sources,
 			@DefaultValue("")@FormParam("pi_ids") List<String> pi_ids,
 			@DefaultValue("")@FormParam("pi_ats") List<String> pi_ats) {
+		long starttime = System.currentTimeMillis();
 		String uid = null;
 		HttpSession session = httpRequest.getSession();
 		if (key == null || key.equals("")) key = (String) session.getAttribute("key");
@@ -107,12 +114,13 @@ public class SettingsServices {
 				session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
 			}
 			if (uid == null || uid.equals("")) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.UNAUTHORIZED);
 				return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
 						.entity("Your access token is incorrect or expired")
 						.type(MediaType.TEXT_PLAIN)
 						.build();
 			} else {
-				
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 				if (settings == null) {
 					settings = SettingsStorage.load(uid);
@@ -153,6 +161,7 @@ public class SettingsServices {
 				}
 			}
 		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				    .entity("Your AppKey '" + key + "' is invalid. Please get a new key")
 				    .type(MediaType.TEXT_PLAIN)

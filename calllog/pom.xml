@@ -10,8 +10,8 @@
   </parent>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>stats</artifactId>
-  <name>Statistics</name>
+  <artifactId>calllog</artifactId>
+  <name>Call Logging</name>
   <packaging>jar</packaging>
   <version>1.0</version>
   

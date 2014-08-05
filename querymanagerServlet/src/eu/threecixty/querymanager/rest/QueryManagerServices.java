@@ -27,6 +27,8 @@ import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 
 import eu.threecixty.keys.KeyManager;
+import eu.threecixty.logs.CallLoggingConstants;
+import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
@@ -82,6 +84,7 @@ public class QueryManagerServices {
 	public Response executeQuery(@QueryParam("key") String key, @QueryParam("accessToken") String accessToken,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter) {
+		long starttime = System.currentTimeMillis();
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			boolean isAccessTokenFalse = "false".equals(accessToken);
 			String user_id =  null;
@@ -96,6 +99,7 @@ public class QueryManagerServices {
 				}
 			}
 			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNAUTHORIZED);
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("Access token is incorrect or expired")
 				        .type(MediaType.TEXT_PLAIN)
@@ -103,6 +107,7 @@ public class QueryManagerServices {
 			} else {
 				EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 				if (eventMediaFormat == null || query == null) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
 					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 					        .entity("The format is not supported or query is null")
 					        .type(MediaType.TEXT_PLAIN)
@@ -110,8 +115,29 @@ public class QueryManagerServices {
 				} else {
 				    IProfiler profiler = isAccessTokenFalse ? null : new Profiler(user_id);
 				    QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
-
+				    				    
 					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true);
+					
+				    // log calls
+				    if (isAccessTokenFalse) {
+				    	CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				    } else {
+				    	if (filter == null) {
+				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				    	} else if (filter.equals("location")) {
+				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				    	} else if (filter.equals("enteredrating")) {
+				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				    	} else if (filter.equals("preferred")) {
+				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				    	} else if (filter.equals("friends")) {
+				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				    	} else {
+				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				    	}
+				    }
+
+					
 					return Response.status(HttpURLConnection.HTTP_OK)
 			        .entity(result)
 			        .type(MediaType.APPLICATION_JSON)
@@ -119,6 +145,7 @@ public class QueryManagerServices {
 				}
 			}
 		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)
@@ -135,11 +162,15 @@ public class QueryManagerServices {
 	@Path("/countItems")
 	@Produces("application/json")
 	public String countItems(@QueryParam("key") String key) {
+		long starttime = System.currentTimeMillis();
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			QueryManager qm = new QueryManager("false");
-			return executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
+			String ret = executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+			return ret;
 		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)
@@ -166,6 +197,7 @@ public class QueryManagerServices {
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2,
 			@QueryParam("key") String key) {
+		long starttime = System.currentTimeMillis();
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			if (groupTriples.containsKey(group)) {
 				Gson gson = new Gson();
@@ -187,13 +219,17 @@ public class QueryManagerServices {
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
 				QueryManager qm = new QueryManager("false");
-				return executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
+				String ret = executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return ret;
 			}
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_PARAMS + group);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The group is invalid '" + group + "'. The group is one of locality, category, country, publishe, placeName, and artist")
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)
@@ -221,6 +257,8 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2, @QueryParam("key") String key) {
+		
+		long starttime = System.currentTimeMillis();
 
 		if (KeyManager.getInstance().checkAppKey(key)) {
 			IProfiler profiler = null;
@@ -238,6 +276,7 @@ public class QueryManagerServices {
 			}
 
 			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.UNAUTHORIZED);
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("The access token is invalid: '" + accessToken + "'")
 				        .type(MediaType.TEXT_PLAIN)
@@ -263,9 +302,11 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getValue()));
 
 				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return result;
 			}
 		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)

@@ -18,6 +18,8 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 
 import eu.threecixty.keys.KeyManager;
+import eu.threecixty.logs.CallLoggingConstants;
+import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.Tray;
@@ -46,25 +48,38 @@ public class TrayServices {
     @POST
     @Path("/")
     public Response createProductInJSON(InputStream input) {
-    	RestTrayObject restTray = getRestTrayObject(input);
+    	long starttime = System.currentTimeMillis();
+    	String restTrayStr = getRestTrayString(input);
+		Gson gson = new Gson();
+		RestTrayObject restTray = null;
+		if (restTrayStr != null) {
+			try {
+				restTray = gson.fromJson(restTrayStr, RestTrayObject.class);
+			} catch (Exception e) {}
+		}
     	if (input == null || restTray == null) {
+    		CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
 			return createResponseException("Failed to understand your tray request");
     	} else {
     		if (!KeyManager.getInstance().checkAppKey(restTray.getKey())) {
+    			CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_APP_KEY + restTray.getKey());
     			return createResponseException("The key is invalid '" + restTray.getKey() + "'");
     		} else {
     			String action = restTray.getAction();
     			if (ADD_ACTION.equalsIgnoreCase(action)) {
     				if (!addTrayElement(restTray)) {
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.FAILED);
     	    			return createResponseException(ADD_EXCEPTION_MSG);
     				}
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.SUCCESSFUL);
     			} else if (GET_ACTION.equalsIgnoreCase(action)) {
 					List <Tray> trays = getTrayElements(restTray);
 					if (trays == null) {
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
     	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
 					} else {
-						Gson gson = new Gson();
 						String content = gson.toJson(trays);
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 						return Response.status(Response.Status.OK)
 								.entity(content)
 								.type(MediaType.APPLICATION_JSON_TYPE)
@@ -73,10 +88,11 @@ public class TrayServices {
     			} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
     				List <Tray> trays = loginTray(restTray);
 					if (trays == null) {
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.FAILED);
     	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
 					} else {
-						Gson gson = new Gson();
 						String content = gson.toJson(trays);
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.SUCCESSFUL);
 						return Response.status(Response.Status.OK)
 								.entity(content)
 								.type(MediaType.APPLICATION_JSON_TYPE)
@@ -84,13 +100,18 @@ public class TrayServices {
 					}
     			} else if (EMPTY_ACTION.equalsIgnoreCase(action)) {
     				if (!cleanTrays(restTray)) {
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.FAILED);
     	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
     				}
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.SUCCESSFUL);
     			} else if (UPDATE_ACTION.equalsIgnoreCase(action)) {
     				if (!updateTray(restTray)) {
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.FAILED);
     	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
     				}
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.SUCCESSFUL);
     			} else {
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
     				return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
     			}
     		}
@@ -99,7 +120,7 @@ public class TrayServices {
 
     }
 	
-    private RestTrayObject getRestTrayObject(InputStream input) {
+    private String getRestTrayString(InputStream input) {
     	if (input == null) return null;
     	StringBuffer buffer = new StringBuffer();
     	byte[] b = new byte[1024];
@@ -108,8 +129,7 @@ public class TrayServices {
 			while ((readBytes = input.read(b)) >= 0) {
 				buffer.append(new String(b, 0, readBytes));
 			}
-			Gson gson = new Gson();
-			return gson.fromJson(buffer.toString(), RestTrayObject.class);
+			return buffer.toString();
 		} catch (IOException e) {
 		}
 		return null;

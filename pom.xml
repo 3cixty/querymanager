@@ -10,7 +10,7 @@
   <version>1.0</version>
   
   <modules>
-    <module>stats</module>
+    <module>calllog</module>
     <module>querymanager-java</module>
 	<module>querymanagerServlet</module>
   </modules>

@@ -1,4 +1,4 @@
-package eu.threecixty.stats;
+package eu.threecixty.logs;
 
 import eu.threecixty.keys.AppKey;
 
@@ -7,7 +7,7 @@ import eu.threecixty.keys.AppKey;
  * @author Cong-Kinh Nguyen
  *
  */
-public class Stats {
+public class CallLogging {
 
 	private AppKey appKey;
 
@@ -16,8 +16,11 @@ public class Stats {
 	private int timeConsumed;
 
 	private String serviceName;
+	
+	private String description;
+	
 
-	public Stats() {
+	protected CallLogging() {
 		startTime = System.currentTimeMillis();
 	}
 	
@@ -51,5 +54,13 @@ public class Stats {
 
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }
