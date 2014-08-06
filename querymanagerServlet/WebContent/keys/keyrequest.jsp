@@ -33,7 +33,7 @@ span {
 <%
     ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
     if (session.getAttribute("uid") == null || settings == null) {
-	    response.sendRedirect("../error.jsp");
+    	response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
     } else {
         AppKey appKey = (AppKey) session.getAttribute("appkey");
         String accessToken = (String) session.getAttribute("accessToken");

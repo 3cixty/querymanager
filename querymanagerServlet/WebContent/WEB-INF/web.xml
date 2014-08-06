@@ -21,7 +21,7 @@
 	<!-- this need same with resteasy servlet url-pattern -->
 	<context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
-		<param-value>/v1</param-value>
+		<param-value>/</param-value>
 	</context-param>
  
 	<listener>
@@ -40,8 +40,14 @@
 	<servlet-mapping>
 		<servlet-name>resteasy-servlet</servlet-name>
 		<url-pattern>/v1/*</url-pattern>
+	</servlet-mapping>
+	<!--
+	we can map many url-patterns 
+	<servlet-mapping>
+		<servlet-name>resteasy-servlet</servlet-name>
+		<url-pattern>/v2/*</url-pattern>
 	</servlet-mapping>  
-
+     -->
   
     <filter>
             <!-- The CORS filter with parameters -->

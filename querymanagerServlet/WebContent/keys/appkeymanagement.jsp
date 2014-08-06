@@ -30,7 +30,7 @@ input:invalid {
 <%
     Boolean permission = (Boolean) session.getAttribute("permission");
     if (permission == null || permission.booleanValue() == false) {
-    	response.sendRedirect("../error.jsp");
+    	response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
     } else {
     %>
         <form action="../<%=Constants.PREFIX_NAME %>/key/addappkey" method="post">

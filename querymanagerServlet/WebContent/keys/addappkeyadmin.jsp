@@ -18,7 +18,7 @@ input:invalid {
 <%
     Boolean admin = (Boolean) session.getAttribute("admin");
     if (admin == null || admin.booleanValue() == false) {
-    	response.sendRedirect("../error.jsp");
+    	response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
     } else {
     	%>
     	

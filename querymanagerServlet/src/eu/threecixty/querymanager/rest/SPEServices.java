@@ -29,7 +29,7 @@ import eu.threecixty.profile.ProfileInformationStorage;
  * @author Cong-Kinh Nguyen
  *
  */
-@Path("/spe")
+@Path("/" + Constants.PREFIX_NAME + "/spe")
 public class SPEServices {
 
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";

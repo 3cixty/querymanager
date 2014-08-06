@@ -33,7 +33,7 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
  * @author Cong-Kinh NGUYEN
  *
  */
-@Path("/settings")
+@Path("/" + Constants.PREFIX_NAME + "/settings")
 public class SettingsServices {
 
 	
@@ -72,7 +72,7 @@ public class SettingsServices {
 				session.setAttribute(ACCESS_TOKEN_PARAM, accessToken);
 
 				try {
-					return Response.temporaryRedirect(new URI("../settings.jsp")).build();
+					return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp")).build();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -155,7 +155,7 @@ public class SettingsServices {
 				session.setAttribute("successful", true);
 
 				try {
-					return Response.temporaryRedirect(new URI("../settings.jsp")).build();
+					return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp")).build();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

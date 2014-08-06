@@ -1,3 +1,4 @@
+<%@page import="eu.threecixty.querymanager.rest.Constants" %>
 <%@ page language="java" import="eu.threecixty.profile.ThreeCixtySettings" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 
@@ -15,12 +16,12 @@
     String key = (String) session.getAttribute("key");
 
    if (session.getAttribute("uid") == null || accessToken == null || key == null) {
-	   response.sendRedirect("./error.jsp");
+	   response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
    } else  {
         ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 %>
 
-<form action="./services/settings/save" method="post">
+<form action="../<%=Constants.PREFIX_NAME %>/settings/save" method="post">
 <div>
     <input type="hidden" name="accessToken" value="<%=accessToken%>">
     <input type="hidden" name="key" value="<%=key%>">

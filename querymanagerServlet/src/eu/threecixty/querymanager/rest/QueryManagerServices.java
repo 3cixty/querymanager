@@ -43,7 +43,7 @@ import eu.threecixty.querymanager.ThreeCixtyQuery;
  * @author Cong-Kinh Nguyen
  *
  */
-@Path("/queryManager")
+@Path("/" + Constants.PREFIX_NAME + "/queryManager")
 public class QueryManagerServices {
 	private static final String LOCALITY_TRIPLES = "?event lode:atPlace ?place . \n ?place vcard:adr ?address . \n ?address vcard:locality ?locality .\n";
 	

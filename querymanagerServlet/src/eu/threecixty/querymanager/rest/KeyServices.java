@@ -28,7 +28,7 @@ import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 
-@Path("/key")
+@Path("/" + Constants.PREFIX_NAME + "/key")
 public class KeyServices {
 
 	@Context 
@@ -49,7 +49,7 @@ public class KeyServices {
 		if (uid == null || uid.equals("")) {
 			session.setAttribute("errorMsg", "Your access token is incorrect or expired");
 			try {
-				return Response.temporaryRedirect(new URI("../keys/failed.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "failed.jsp")).build();
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
@@ -63,7 +63,7 @@ public class KeyServices {
 			ThreeCixtySettings settings = SettingsStorage.load(uid);
 			session.setAttribute("settings", settings);
 			try {
-				return Response.temporaryRedirect(new URI("../keys/keyrequest.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "keyrequest.jsp")).build();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -82,7 +82,7 @@ public class KeyServices {
 		if (uid == null || uid.equals("")) {
 			session.setAttribute("errorMsg", "Your access token is incorrect or expired");
 			try {
-				return Response.temporaryRedirect(new URI("../keys/failed.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "failed.jsp")).build();
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
@@ -102,9 +102,9 @@ public class KeyServices {
 			if (KeyManager.getInstance().addOrUpdateAppKey(appKey)) {
 				session.setAttribute("key", rawKey);
 				session.setAttribute("appkey", appKey);
-				return Response.temporaryRedirect(new URI("../keys/keygenerated.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "keygenerated.jsp")).build();
 			} else {
-				return Response.temporaryRedirect(new URI("../keys/unsuccessfulKeyRequest.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "unsuccessfulKeyRequest.jsp")).build();
 			}
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
@@ -144,12 +144,12 @@ public class KeyServices {
 				session.setAttribute("permission", true);
 				if (AuthenticationManager.ADMIN_USER.equals(username)) {
 					session.setAttribute("admin", true);
-					return Response.temporaryRedirect(new URI("../keys/addappkeyadmin.jsp")).build();
+					return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "addappkeyadmin.jsp")).build();
 				} else {
-					return Response.temporaryRedirect(new URI("../keys/appkeymanagement.jsp")).build();
+					return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "appkeymanagement.jsp")).build();
 				}
 			} else {
-				return Response.temporaryRedirect(new URI("../error.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp")).build();
 			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -165,22 +165,22 @@ public class KeyServices {
 		HttpSession session = httpRequest.getSession();
 		try {
 			if (session.getAttribute("admin") == null) {
-				return Response.temporaryRedirect(new URI("../error.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp")).build();
 			}
 			if (password == null || password2 == null || password.equals("")
 					|| !password.equals(password2)) {
 				session.setAttribute("errorMsg", "Password is invalid!!!");
-				return Response.temporaryRedirect(new URI("../keys/failed.jsp")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "failed.jsp")).build();
 			} else {
 				boolean ok = AuthenticationManager.getInstance().createAppKeyAdmin(username,
 						password, firstName, lastName);
 				if (!ok) {
 					session.setAttribute("errorMsg", "Error to create a user in MySQL");
-					return Response.temporaryRedirect(new URI("../keys/failed.jsp")).build();
+					return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "failed.jsp")).build();
 				} else {
 					session.setAttribute("successful", true);
 					session.setAttribute("username", username);
-					return Response.temporaryRedirect(new URI("../keys/addappkeyadmin.jsp")).build();
+					return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_KEYS_FOLDER + "addappkeyadmin.jsp")).build();
 				}
 			}
 		} catch (URISyntaxException e) {
