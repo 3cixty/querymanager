@@ -1,4 +1,5 @@
 <%@page import="eu.threecixty.profile.ThreeCixtySettings"%>
+<%@page import="eu.threecixty.querymanager.rest.Constants" %>
 <%@ page language="java" import="eu.threecixty.keys.*"  contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -39,7 +40,7 @@ span {
         String domain = (appKey == null ? "" : appKey.getAppName());
 %>
 
-<form action="../services/key/performKeyRequest" method="post">
+<form action="../<%=Constants.PREFIX_NAME %>/key/performKeyRequest" method="post">
 <div>
     <span>First Name</span>
     <input type="text" name="firstName" value="<%=settings.getFirstName()%>" readonly="readonly">

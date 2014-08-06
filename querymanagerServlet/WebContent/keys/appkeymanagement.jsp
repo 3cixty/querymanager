@@ -2,6 +2,7 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="eu.threecixty.keys.AppKey"%>
 <%@page import="eu.threecixty.keys.KeyManager"%>
+<%@page import="eu.threecixty.querymanager.rest.Constants" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -32,7 +33,7 @@ input:invalid {
     	response.sendRedirect("../error.jsp");
     } else {
     %>
-        <form action="../services/key/addappkey" method="post">
+        <form action="../<%=Constants.PREFIX_NAME %>/key/addappkey" method="post">
             <div>First Name</div>
             <div><input type="text" name="firstName" id="firstName" required></div>
             
@@ -99,7 +100,7 @@ input:invalid {
         	+ "&email=" + document.getElementById("email").value
         	+ "&domain=" + yourSelect.options[yourSelect.selectedIndex].value;
         	$.ajax({
-        		  url: "../services/key/addappkey",
+        		  url: "../<%=Constants.PREFIX_NAME %>/key/addappkey",
         		  type: "POST",
         		  cache: false,
         		  data: dataForm,
@@ -165,7 +166,7 @@ input:invalid {
             function clickRevoke(index) {
             	var dataForm = "uid=" + document.getElementById("uid_" + index).innerHTML;
             	$.ajax({
-            		  url: "../services/key/revokeappkey",
+            		  url: "../<%=Constants.PREFIX_NAME %>/key/revokeappkey",
             		  type: "POST",
             		  cache: false,
             		  data: dataForm,
@@ -183,7 +184,7 @@ input:invalid {
         
         <div>List AppKeys <span style="width: 10px;" ></span><input type="button" data-clipboard-target="key_1" value="Copy Selected Key" id="d_clip_button"  ></div>
         <div style="height: 10px;"></div>
-        <form action="../services/key/revokeappkey" method="post" id="revokeform">
+        <form action="../<%=Constants.PREFIX_NAME %>/key/revokeappkey" method="post" id="revokeform">
         <%
             Collection <AppKey> collections = KeyManager.getInstance().getAppKeys();
             Iterator <AppKey> appKeys = collections.iterator();

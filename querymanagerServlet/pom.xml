@@ -96,6 +96,7 @@
   </dependencies>
   
   <build>
+    <finalName>qm</finalName>
     <sourceDirectory>src</sourceDirectory>
 
 	
