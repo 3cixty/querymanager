@@ -136,6 +136,35 @@ public class AppKeyTable {
 		}
 		return null;
 	}
+
+	public static AppKey getAppKeyFromKey(String key) throws ThreeCixyDBException {
+		if (key == null || key.equals("")) return null;
+		createAppKeyTableWhenNecessary();
+		Connection conn = DBConnection.getInstance().getConnection();
+		PreparedStatement  preparedStmt = null;
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE appkey = ? ";
+		try {
+			preparedStmt = conn.prepareStatement(sql);
+			preparedStmt.setString(1, key);
+			ResultSet rs = preparedStmt.executeQuery();
+			AppKey appKey = null;
+			if (rs.next()) {
+				appKey = createAppKeyFromCurrentRecord(rs);
+			}
+			rs.close();
+			preparedStmt.close();
+			return appKey;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			if (preparedStmt != null)
+				try {
+					preparedStmt.close();
+				} catch (SQLException e1) {
+					throw new ThreeCixyDBException(e1);
+				}
+		}
+		return null;
+	}
 	
 	public static List<AppKey> getAppKeys() throws ThreeCixyDBException {
 		createAppKeyTableWhenNecessary();

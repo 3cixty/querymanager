@@ -96,6 +96,16 @@ public class KeyManager {
 	}
 
 	/**
+	 * Gets an AppKey from a given key.
+	 * @param uid
+	 * @return returns AppKey associated with a given key, and null if there is no App key associated with the key
+	 */
+	public AppKey getAppKeyFromKey(String key) {
+		if (key == null || key.equals("")) return null;
+		return AppKeyStorage.getAppKeyFromKey(key);
+	}
+
+	/**
 	 * Deletes a development key associated with a given UID.
 	 * @param uid
 	 * @return

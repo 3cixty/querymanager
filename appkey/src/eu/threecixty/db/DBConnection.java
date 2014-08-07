@@ -1,8 +1,11 @@
 package eu.threecixty.db;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 
 public class DBConnection {
@@ -11,6 +14,9 @@ public class DBConnection {
 	private static DBConnection singleton;
 
 	private Connection conn;
+	
+	private String dbPwd = null;
+	private String pathToPwdPropertyFile = null;
 	
 	public static DBConnection getInstance() {
 		if (singleton == null) {
@@ -21,6 +27,10 @@ public class DBConnection {
 		return singleton;
 	}
 
+	public void setPath(String pathToPwdPropertyFile) {
+		this.pathToPwdPropertyFile = pathToPwdPropertyFile;
+	}
+
 	public Connection getConnection() throws ThreeCixyDBException {
 		if (conn != null) return conn;
 		try{
@@ -29,7 +39,7 @@ public class DBConnection {
 
 			//STEP 3: Open a connection
 			//System.out.println("Connecting to a selected database...");
-			conn = DriverManager.getConnection(Constants.DB_URL, Constants.DB_USER, Constants.DB_PWD);
+			conn = DriverManager.getConnection(Constants.DB_URL, Constants.DB_USER, getDbPassword());
 			//System.out.println("Connected database successfully...");
 			return conn;
 		}catch(SQLException se){
@@ -53,6 +63,23 @@ public class DBConnection {
 				conn = null;
 			}
 		}
+	}
+
+	/**
+	 * Gets DB password from property file located in querymanagerServlet/WebContent/WEB-INF folder. 
+	 * @return
+	 */
+	private String getDbPassword() {
+		if (pathToPwdPropertyFile == null) return null;
+		if (dbPwd != null) return dbPwd;
+		try {
+			Scanner scanner = new Scanner(new File(pathToPwdPropertyFile + "password.property"));
+			dbPwd = scanner.nextLine();
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return dbPwd;
 	}
 	
 	private DBConnection() {

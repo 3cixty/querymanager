@@ -31,6 +31,15 @@ public class AppKeyStorage {
 		return null;
 	}
 
+	public static AppKey getAppKeyFromKey(String key) {
+		try {
+			return AppKeyTable.getAppKeyFromKey(key);
+		} catch (ThreeCixyDBException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static List<AppKey> getAppKeys() {
 		try {
 			return AppKeyTable.getAppKeys();
