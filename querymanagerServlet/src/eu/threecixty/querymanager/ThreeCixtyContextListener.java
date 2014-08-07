@@ -25,6 +25,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    TrayStorage.setPath(realPath);
 	    QueryManagerServices.realPath = realPath;
 	    KeyManager.getInstance().setPath(realPath + File.separatorChar + "keyapps" + File.separatorChar);
+	    DBConnection.getInstance().setPath(realPath);
 	}
 
 }
