@@ -2,45 +2,38 @@ package eu.threecixty.CrawlerCron;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import eu.threecixty.models.Accompanying;
-import eu.threecixty.models.MyFactory;
-import eu.threecixty.models.PersonalPlace;
-import eu.threecixty.models.RegularTrip;
-import eu.threecixty.models.Transport;
-import eu.threecixty.models.UserProfile;
-import eu.threecixty.profile.RdfFileManager;
+
+
+import eu.threecixty.profile.IDMapping;
+import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.UserProfile;
+import eu.threecixty.profile.oldmodels.Accompanying;
+import eu.threecixty.profile.oldmodels.ModalityType;
+import eu.threecixty.profile.oldmodels.PersonalPlace;
+import eu.threecixty.profile.oldmodels.Preference;
+import eu.threecixty.profile.oldmodels.RegularTrip;
+import eu.threecixty.profile.oldmodels.Transport;
 
 /**Features
  * Continuous run ever 3am
@@ -56,7 +49,7 @@ import eu.threecixty.profile.RdfFileManager;
  *
  */
 
-public class MobilityCrawlerCron extends TimerTask{
+public class MobilityCrawlerCron {
 
 	private final static long fONCE_PER_DAY = 1000*60*60*24;
 
@@ -65,24 +58,44 @@ public class MobilityCrawlerCron extends TimerTask{
 	private final static int fZERO_MINUTES = 0;
 
 	private final static String MOBIDOT_BASEURL="https://www.movesmarter.nl/external/";
-	private final static String MOBIDOT_URL="https://www.movesmarter.nl/portal";
-	private final static String MOBIDOT_API_KEY="";
+//	private final static String MOBIDOT_URL="https://www.movesmarter.nl/portal";
 	
-	private final static String DOMAIN="";
+	// TODO: change this value to your key
+	private final static String MOBIDOT_API_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
+	// TODO: change this value to your domain at Mobidot
+	private final static String DOMAIN = "3cixty";
 	
 	/**
 	 * get the last successful runtime for the cronMobility  
 	 * @return time milli-sec after epoch in String format
 	 */
 	private static String getLastRuntime() {
+		BufferedReader br = null;
+		FileInputStream fis = null;
 		try{
-		FileInputStream fis=new FileInputStream("lastTime");
-		BufferedReader br= new BufferedReader(new InputStreamReader(fis));
-		String lastRuntime=br.readLine();
-		return lastRuntime;
+			fis = new FileInputStream("lastTime");
+			br = new BufferedReader(new InputStreamReader(fis));
+			String lastRuntime=br.readLine();
+			br.close();
+			fis.close();
+			return lastRuntime;
 		}catch(Exception e)
 		{
 			e.printStackTrace();
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 			return null;
 		}
 	}
@@ -122,10 +135,6 @@ public class MobilityCrawlerCron extends TimerTask{
 		return MOBIDOT_BASEURL;
 	}
 
-	private static String getMobidotUrl() {
-		return MOBIDOT_URL;
-	}
-
 	private static String getMobidotApiKey() {
 		return MOBIDOT_API_KEY;
 	}
@@ -146,174 +155,124 @@ public class MobilityCrawlerCron extends TimerTask{
 		return result.getTime();
 	}
 	
-	/**
-	 * Returns current Date 
-	 * to use in debug
-	 * @return Date
-	 */
-	private static Date getTime() {
-		return GregorianCalendar.getInstance().getTime();
-	}
-	
-	/** 
-	 * Construct and use a TimerTask and Timer. 
-	 */
-	public static void main (String... arguments ) {
-		TimerTask mobilityCrawlerCron = new MobilityCrawlerCron();
-	    Timer timer = new Timer();
-		//timer.scheduleAtFixedRate(userPerformedAction, getTime(), 1000*10);
-		timer.scheduleAtFixedRate(mobilityCrawlerCron, getTomorrowMorning3am(), getFoncePerDay());
-	}
+//	/** 
+//	 * Construct and use a TimerTask and Timer. 
+//	 */
+//	public static void main (String... arguments ) {
+//		TimerTask mobilityCrawlerCron = new MobilityCrawlerCron();
+//	    Timer timer = new Timer();
+//		//timer.scheduleAtFixedRate(userPerformedAction, getTime(), 1000*10);
+//		timer.scheduleAtFixedRate(mobilityCrawlerCron, getTomorrowMorning3am(), getFoncePerDay());
+//	}
 	
 	/**
-	* Implements TimerTask's abstract run method.
+	 * Crawls Mobidot info.
+	 */
+	public void run() {
+		TimerTask task = new TimerTask() {
+			
+			@Override
+			public void run() {
+				try {
+				    crawl();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(task, getTomorrowMorning3am(), getFoncePerDay());
+	}
+	
+	/**
+	* Main entry to crawl Mobidot info.
 	*/
-	@Override
-	public void run(){
-		URL resourceUrl = MobilityCrawlerCron.class.getResource("/UserProfileKBmodelWithIndividuals.rdf");
-		RdfFileManager.getInstance().setPathToRdfFile(resourceUrl.getPath());
-		Long currentTime=getDateTime();
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        File file = new File(RdfFileManager.getInstance().getPathToRdfFile());
-        IRI iri= IRI.create(file);
-
-        OWLOntology ontology=null;
-        MyFactory mf = null;
-        try{
-        	ontology= manager.loadOntologyFromOntologyDocument(iri);
-        	mf = new MyFactory(ontology);
-        }catch(Exception e){
-        	System.out.println("bad code");
-        	//run();
-        }
-        
-        //get all 3cixtyIDs, mobidotUserName and mobidotIDs
-        
-        String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-    			+"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
-    			+"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-    			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-    			+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n"
-    			+ "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n"
-    			+ "SELECT ?uid ?mobidotID\n"
-    			+ "WHERE {\n\n"
-    			+ "?root a owl:NamedIndividual .\n"
-    			+ "?root profile:hasUID ?uid .\n"
-    			+ "?root profile:hasProfileIdentities ?profileidentities .\n"
-    			+ "?profileidentities profile:hasUserAccountID ?mobidotID. \n"
-    			+ "?profileidentities profile:hasSource ?source. \n"
-    			+ "Filter(STR(?source) =\"" + getMobidotUrl() + "\"). \n"
-    			+ "\n"
-    			+ "}";
-        
-        Set<IDMapping> idMapping=getMobidotIDsForUsers(qStr,"/UserProfileKBmodelWithIndividuals.rdf","uid","mobidotID");
-        
+	private void crawl(){
+        //get all 3cixtyIDs and mobidotUserNames
+        Set<IDMapping> idMapping = ProfileManagerImpl.getInstance().getIDMappings();
+        long currentTime = getDateTime();
         try{
         	Iterator<IDMapping> iteratorMapping = idMapping.iterator();
         	
         	while (iteratorMapping.hasNext()){
-        		IDMapping map=iteratorMapping.next();
-        		
+        		IDMapping map = iteratorMapping.next();
         		int length=0;
-        		UserProfile user= mf.getUserProfile("http://www.eu.3cixty.org/profile#"+map.getThreeCixtyID());
-        		Transport transport = mf.createTransport("http://www.eu.3cixty.org/profile#"+map.getThreeCixtyID()+"Transport"+Long.toString(currentTime));
+        		UserProfile user = new UserProfile();
+        		user.setHasUID(map.getThreeCixtyID());
+        		Long mobidotID = getMobidotIDforUsername(map.getMobidotUserName());
+        		map.setMobidotID(mobidotID);
+        		Transport transport = new Transport();
+        		if (mobidotID == null) continue;
         		
-        		String mID=Long.toString(map.getMobidotID());
-        		
-        		String urlStr=getMobidotBaseurl() +"personalmobility/RegularTrips/"+ mID+ "?key="+getMobidotApiKey();
-    			JSONArray resultRegularTrip=getTravelInfoforMobiditID(urlStr);
+        		String urlStr=getMobidotBaseurl() +"personalmobility/RegularTrips/"+ mobidotID + "?key=" + getMobidotApiKey();
+    			JSONArray resultRegularTrip = getTravelInfoforMobiditID(urlStr);
     			
-    			urlStr=getMobidotBaseurl() +"measurement/Accompanies/"+mID + "/modifiedSince/" + getLastRuntime()+"?key="+getMobidotApiKey();
-    			JSONArray resultAccompany=getTravelInfoforMobiditID(urlStr);
+    			urlStr=getMobidotBaseurl() + "measurement/Accompanies/" + mobidotID + "/modifiedSince/" + getLastRuntime() + "?key=" + getMobidotApiKey();
+    			JSONArray resultAccompany = getTravelInfoforMobiditID(urlStr);
         		
     			length=resultRegularTrip.length();
-        				    	
-		    	for (int i=0;i<length;i++){
+        		Set <RegularTrip> regularTrips = new HashSet <RegularTrip>();	    	
+		    	for (int i = 0; i < length; i++) {
 		    		JSONObject jsonobj = resultRegularTrip.getJSONObject(i);
 		    		
-		    		transport.addHasRegularTrip(storeRegularTripsInKB(map.getThreeCixtyID(),jsonobj,mf,user,currentTime,i));
+		    		regularTrips.add(storeRegularTripsInKB(map.getThreeCixtyID(), jsonobj, user));
 		    	}
+		    	transport.setHasRegularTrip(regularTrips);
+
 		    	length=resultAccompany.length();
 		    	
+		    	Set <Accompanying> accompanyings = new HashSet <Accompanying>();
 		    	for (int i=0;i<length;i++){
 		    	
 		    		JSONObject jsonobj = resultAccompany.getJSONObject(i);
-		    		Accompanying hasAccompany=storeAccompanyingDetailsInKB(map.getThreeCixtyID(),jsonobj,mf,user,currentTime,i,idMapping);
+		    		Accompanying hasAccompany = storeAccompanyingDetailsInKB(map.getThreeCixtyID(), jsonobj, idMapping);
 		    		if (hasAccompany!=null){
-		    			transport.addHasAccompany(hasAccompany);
+		    			accompanyings.add(hasAccompany);
 		    		}
 		    	}
 		    	
-				user.addHasTransport(transport);
-				try{		
-					mf.saveOwlOntology();
-				} catch(OWLOntologyStorageException e){
-					e.printStackTrace();
-				}
+		    	transport.setHasAccompanyings(accompanyings);
+		    	
+		    	Preference pref = user.getPreferences();
+		    	if (pref == null) {
+		    		pref = new Preference();
+		    		user.setPreferences(pref);
+		    	}
+		    	Set <Transport> transports = pref.getHasTransport();
+		    	if (transports == null) {
+		    		transports = new HashSet <Transport>();
+		    		pref.setHasTransport(transports);
+		    	}
+		    	transports.add(transport);
+		    	
+		    	ProfileManagerImpl.getInstance().saveProfile(user);
         	}
 	        setLastRuntime(currentTime);	
     	}catch(Exception e){
     		e.printStackTrace();
-    		run();
+    		crawl();
     	}
-	}
-
-	/**
-	 * get MobidotIDs For the 3cixty Users
-	 * @param queryString
-	 * @param RDFresource
-	 * @param extractLiteralUID
-	 * @param extractLiteralMobidotUserName
-	 * @return
-	 */
-	private Set<IDMapping> getMobidotIDsForUsers(String queryString, String RDFresource, String extractLiteralUID, String extractLiteralMobidotUserName) {
-		Set<IDMapping> idMapping=new HashSet<IDMapping>();
-		Query query = QueryFactory.create(queryString);
-	    
-	    InputStream input = MobilityCrawlerCron.class.getResourceAsStream(RDFresource);
-	    Model rdfModel=null;
-	    if (input != null) {
-		    rdfModel = ModelFactory.createDefaultModel().read(input, "UTF-8");
-		}
-		QueryExecution qe = QueryExecutionFactory.create(query, rdfModel);
-		ResultSet rs = qe.execSelect();
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String UID = qs.getLiteral(extractLiteralUID).getString();
-			String mobidotUserName = qs.getLiteral(extractLiteralMobidotUserName).getString();
-			Long mobidotID= getMobidotIDforUsername(mobidotUserName);
-			IDMapping mapper=new IDMapping();
-			mapper.setThreeCixtyID(UID);
-			mapper.setMobidotUserName(mobidotUserName);
-			mapper.setMobidotID(mobidotID);
-			idMapping.add(mapper);
-		}
-		return idMapping;
 	}
 
 	/**
 	 * create the accompany object to store in KB
 	 * @param uID
 	 * @param jsonobj
-	 * @param mf
-	 * @param user
-	 * @param currentTime
-	 * @param index
 	 * @param idMapping
 	 * @return accompany object
 	 */
-	private Accompanying storeAccompanyingDetailsInKB(String uID, JSONObject jsonobj, MyFactory mf, UserProfile user, Long currentTime, int index, Set<IDMapping> idMapping) {
+	private Accompanying storeAccompanyingDetailsInKB(String uID, JSONObject jsonobj, Set<IDMapping> idMapping) {
 		String ID=reverseMap(jsonobj.getLong("userid2"),idMapping);
 		if (ID!=null) {
-			Accompanying accompany=mf.createAccompanying("http://www.eu.3cixty.org/profile#"+uID+"AccompanyingDetails"+Long.toString(currentTime)+"_"+Integer.toString(index));
-			accompany.addHasAccompanyID(jsonobj.getLong("id"));
-			accompany.addHasAccompanyUserID2(ID);
-			accompany.addHasAccompanyUserID1(uID);
-			accompany.addHasAccompanyScore((float)jsonobj.getDouble("score"));
+			Accompanying accompany = new Accompanying();
+			accompany.setHasAccompanyId(jsonobj.getLong("id"));
+			accompany.setHasAccompanyUserid2(Long.valueOf(ID));
+			accompany.setHasAccompanyUserid1(Long.valueOf(uID));
+			accompany.setHasAccompanyScore(jsonobj.getDouble("score"));
 			//start time of the accompany
-			accompany.addHasAccompanyTime(jsonobj.getLong("time"));
+			accompany.setHasAccompanyTime(jsonobj.getLong("time"));
 			//duration of the accompany
-			accompany.addHasAccompanyValidity(jsonobj.getLong("validity"));
+			accompany.setHasAccompanyValidity(jsonobj.getLong("validity"));
 			return accompany;
 		}
 		return null;
@@ -325,7 +284,7 @@ public class MobilityCrawlerCron extends TimerTask{
 	 * @param idMapping
 	 * @return 3cixty id in string
 	 */
-	private String reverseMap(Long mobidotID,Set<IDMapping> idMapping) {
+	private String reverseMap(Long mobidotID, Set<IDMapping> idMapping) {
 		Iterator<IDMapping> iteratorMapping = idMapping.iterator();
     	while (iteratorMapping.hasNext()){
     		IDMapping map=iteratorMapping.next();
@@ -340,58 +299,55 @@ public class MobilityCrawlerCron extends TimerTask{
 	 * create the regular trip object to store in KB
 	 * @param uID
 	 * @param jsonobj
-	 * @param mf
 	 * @param user
-	 * @param currentTime
-	 * @param index
 	 * @return regularTrip object
 	 */
-	private RegularTrip storeRegularTripsInKB(String uID, JSONObject jsonobj, MyFactory mf, UserProfile user,Long currentTime, int index) {
-		RegularTrip regularTrip=mf.createRegularTrip("http://www.eu.3cixty.org/profile#"+uID+"RegularTrip"+Long.toString(currentTime)+"_"+Integer.toString(index));
-		regularTrip.addHasUID(Long.toString(jsonobj.getLong("id")));
-		regularTrip.addHasRegularTripName(jsonobj.getString("tripName"));
-		regularTrip.addHasRegularTripDepartureTime(jsonobj.getLong("departureTime"));
-		regularTrip.addHasRegularTripDepartureTimeSD(jsonobj.getLong("departureTimeSD"));
-		regularTrip.addHasRegularTripTravelTime(jsonobj.getLong("travelTime"));
-		regularTrip.addHasRegularTripTravelTimeSD(jsonobj.getLong("travelTimeSD"));
-		regularTrip.addHasRegularTripFastestTravelTime(jsonobj.getLong("fastestTravelTime"));
-		regularTrip.addHasRegularTripTotalDistance(jsonobj.getLong("totalDistance"));
-		regularTrip.addHasRegularTripTotalCount(jsonobj.getLong("totalCount"));
-		regularTrip.addHasModalityType(mapModality(jsonobj.getInt("tripModality")));
-		regularTrip.addHasRegularTripWeekdayPattern(jsonobj.getString("weekdayPattern"));
-		regularTrip.addHasRegularTripDayHourPattern(jsonobj.getString("dayhourPattern"));
-		regularTrip.addHasRegularTripLastChanged(jsonobj.getLong("lastChanged"));
+	private RegularTrip storeRegularTripsInKB(String uID, JSONObject jsonobj, UserProfile user) {
+		RegularTrip regularTrip = new RegularTrip();
+		regularTrip.setHasUID(jsonobj.getLong("id"));
+		regularTrip.setHasRegularTripName(jsonobj.getString("tripName"));
+		regularTrip.setHasRegularTripDepartureTime(jsonobj.getLong("departureTime"));
+		regularTrip.setHasRegularTripDepartureTimeSD(jsonobj.getLong("departureTimeSD"));
+		regularTrip.setHasRegularTripTravelTime(jsonobj.getLong("travelTime"));
+		regularTrip.setHasRegularTripTravelTimeSD(jsonobj.getLong("travelTimeSD"));
+		regularTrip.setHasRegularTripFastestTravelTime(jsonobj.getLong("fastestTravelTime"));
+		regularTrip.setHasRegularTripTotalDistance((double) jsonobj.getLong("totalDistance"));
+		regularTrip.setHasRegularTripTotalCount(jsonobj.getLong("totalCount"));
+		regularTrip.setHasModalityType(ModalityType.valueOf(mapModality(jsonobj.getInt("tripModality"))));
+		regularTrip.setHasRegularTripWeekdayPattern(jsonobj.getString("weekdayPattern"));
+		regularTrip.setHasRegularTripDayhourPattern(jsonobj.getString("dayhourPattern"));
+		regularTrip.setHasRegularTripLastChanged(jsonobj.getLong("lastChanged"));
 		if (jsonobj.has("travelTimePattern")==true){
-			regularTrip.addHasRegularTripTravelTimePattern(jsonobj.getString("travelTimePattern"));
+			regularTrip.setHasRegularTripTravelTimePattern(jsonobj.getString("travelTimePattern"));
 		}
-		
+		List <PersonalPlace> personalPlaces = new ArrayList<PersonalPlace>(); 
 		JSONArray arr=jsonobj.getJSONArray("tripPlaces");
 		for (int length=0;length<arr.length();length++)
 		{
 			JSONObject jsonarrobj = arr.getJSONObject(length);
-			PersonalPlace personalPlace=mf.createPersonalPlace("http://www.eu.3cixty.org/profile#"+uID+"RegularTrip"+Long.toString(currentTime)+"_"+Integer.toString(index)+"PersonalPlace"+Integer.toString(length));
+			PersonalPlace personalPlace = new PersonalPlace();
 			if (jsonarrobj.has("externalIds")==true){
-				personalPlace.addHasPersonalPlaceExternalIds(jsonarrobj.getString("externalIds"));
+				personalPlace.setHasPersonalPlaceexternalIds(jsonarrobj.getString("externalIds"));
 			}
-			personalPlace.addPostal_code(jsonarrobj.getString("postalcode"));
+			personalPlace.setPostalcode(jsonarrobj.getString("postalcode"));
 			if (jsonarrobj.has("weekdayPattern")==true){
-				personalPlace.addHasPersonalPlaceWeekDayPattern(jsonarrobj.getString("weekdayPattern"));
+				personalPlace.setHasPersonalPlaceWeekdayPattern(jsonarrobj.getString("weekdayPattern"));
 			}
-			personalPlace.addHasPersonalPlaceStayPercentage((float)jsonarrobj.getDouble("stayPercentage"));
-			personalPlace.addHasPersonalPlaceType(jsonarrobj.getString("type"));
-			personalPlace.addHasUID(Long.toString(jsonarrobj.getLong("id")));
+			personalPlace.setHasPersonalPlaceStayPercentage(jsonarrobj.getDouble("stayPercentage"));
+			personalPlace.setHasPersonalPlaceType(jsonarrobj.getString("type"));
+			personalPlace.setHasUID(jsonarrobj.getLong("id"));
 			if (jsonarrobj.has("dayhourPattern")==true){
-				personalPlace.addHasPersonalPlaceDayHourPattern(jsonarrobj.getString("dayhourPattern"));
+				personalPlace.setHasPersonalPlaceDayhourPattern(jsonarrobj.getString("dayhourPattern"));
 			}
-			personalPlace.addHasPersonalPlaceName(jsonarrobj.getString("name"));
-			personalPlace.addLatitude((float)jsonarrobj.getDouble("latitude"));
-			personalPlace.addLongitude((float)jsonarrobj.getDouble("longitude"));
-			personalPlace.addHasPersonalPlaceStayDuration(jsonarrobj.getLong("stayDuration"));
-			personalPlace.addHasPersonalPlaceAccuracy((float)jsonarrobj.getDouble("accuracy"));
+			personalPlace.setHasPersonalPlaceName(jsonarrobj.getString("name"));
+			personalPlace.setLatitude(jsonarrobj.getDouble("latitude"));
+			personalPlace.setLongitude(jsonarrobj.getDouble("longitude"));
+			personalPlace.setHasPersonalPlaceStayDuration(jsonarrobj.getLong("stayDuration"));
+			personalPlace.setHasPersonalPlaceAccuracy(jsonarrobj.getDouble("accuracy"));
 			
-			regularTrip.addHasPersonalPlace(personalPlace);
+			personalPlaces.add(personalPlace);
 		}
-		
+		regularTrip.setHasPersonalPlaces(personalPlaces.toArray(new PersonalPlace[personalPlaces.size()]));
 		return regularTrip;
 	}
 
@@ -447,6 +403,7 @@ public class MobilityCrawlerCron extends TimerTask{
 		try{
 		URL url = new URL("https://www.movesmarter.nl");
 		InputStream input = url.openStream();
+		if (input != null) input.close();
 		return true;
 		}catch(Exception e){
 			return false;
