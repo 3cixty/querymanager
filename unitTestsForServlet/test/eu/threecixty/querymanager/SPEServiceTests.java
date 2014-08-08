@@ -11,13 +11,13 @@ import org.junit.Test;
 import com.google.gson.Gson;
 
 import eu.threecixty.profile.ProfileInformation;
-import eu.threecixty.profile.SpePreference;
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.EventDetail;
 import eu.threecixty.profile.oldmodels.HotelDetail;
 import eu.threecixty.profile.oldmodels.NatureOfEvent;
 import eu.threecixty.profile.oldmodels.NatureOfPlace;
 import eu.threecixty.profile.oldmodels.PlaceDetail;
+import eu.threecixty.profile.oldmodels.Preference;
 import eu.threecixty.profile.oldmodels.Rating;
 import eu.threecixty.profile.oldmodels.TemporalDetails;
 import eu.threecixty.profile.oldmodels.TypeOfFood;
@@ -52,7 +52,7 @@ public class SPEServiceTests extends HTTPCall {
 		profileInformation.setLatitude(latitude);
 		profileInformation.setLongitude(longitude);
 		
-		SpePreference pref = new SpePreference();
+		Preference pref = new Preference();
 		profileInformation.setPreference(pref);
 		
 		Set <UserEnteredRating> userEnteredRatings = new HashSet <UserEnteredRating>();
@@ -113,7 +113,7 @@ public class SPEServiceTests extends HTTPCall {
 		Assert.assertTrue(latitude == profileInformation.getLatitude());
 		Assert.assertTrue(longitude == loadedProfileInformation.getLongitude());
 		
-		SpePreference loadedPref = loadedProfileInformation.getPreference();
+		Preference loadedPref = loadedProfileInformation.getPreference();
 		
 		Assert.assertTrue(loadedPref != null);
 		Assert.assertTrue(loadedPref.getHasUserEnteredRating() != null);

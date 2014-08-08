@@ -1,275 +1,289 @@
 package eu.threecixty.querymanager.rest;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 
 
 
 import com.google.gson.Gson;
 
 import eu.threecixty.keys.KeyManager;
+import eu.threecixty.logs.CallLoggingConstants;
+import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.TrayStorage;
+import eu.threecixty.profile.Tray.ItemType;
+import eu.threecixty.profile.Tray.OrderType;
 
 /**
  * This class is an end point to expose Rest TrayAPIs to other components.
  * @author Cong-Kinh NGUYEN
  *
  */
-@Path("/tray")
+@Path("/" + Constants.PREFIX_NAME)
 public class TrayServices {
-	
-	/**
-	 * The method does some actions: add, update, and delete a tray item.
-	 * @param action
-	 * @param key
-	 * @param accessToken
-	 * @param tray
-	 * @return
-	 */
-	@POST
-	@Path("/{action}")
-	@Produces("application/json")
-	public String invokeTrayService(@PathParam("action") String action, @FormParam("key") String key,
-			@FormParam("accessToken") String accessToken, @FormParam("tray") String tray) {
-		if (!isNotNullOrEmpty(action) || !isNotNullOrEmpty(accessToken) || !isNotNullOrEmpty(tray)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("Please check your parameters: action = " + action + ", accessToken = " + accessToken + ", tray = " + tray)
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = GoogleAccountUtils.getUID(accessToken);
-			if (uid == null || uid.equals("")) uid = accessToken;
-			Tray newTray = convertString2Tray(tray);
-			newTray.setUid(uid);
-			if (action.equalsIgnoreCase("add")) {
-				return addTray(uid, newTray);
-			} else if (action.equalsIgnoreCase("update")) {
-				return updateTray(uid, newTray);
-			} else if (action.equalsIgnoreCase("delete")) {
-				return deleteTray(uid, newTray);
-			} else {
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("The path /" + action + " is not supported. There are three paths supported: /add, /update and /delete")
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
-			}
-		} else {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-	}
-	
-	/**
-	 * This method is to empty tray items associated with a given token.
-	 * @param accessToken
-	 * @param key
-	 * @return Returns the message <code>{"empty": "true"}</code> if a given access token and key are correct.
-	 *         Otherwise, returns an error with HTTP status code = 400.
-	 */
-	@POST
-	@Path("/empty")
-	@Produces("application/json")
-	public String empty(
-			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
-		if (!isNotNullOrEmpty(accessToken)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("Please check your parameter:  accessToken = " + accessToken)
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = GoogleAccountUtils.getUID(accessToken);
-			if (uid == null || uid.equals("")) uid = accessToken;
-			emptyTrays(uid);
-			return "{\"empty\":\"true\"}";
-		} else {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-	}
-	
-	/**
-	 * This method is to create a list of Tray items in JSON format. 
-	 * @param accessToken
-	 * @param key
-	 * @return
-	 */
-	@POST
-	@Path("/list")
-	@Produces("application/json")
-	public String list(
-			@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
-		if (!isNotNullOrEmpty(accessToken)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("Please check your parameter:  accessToken = " + accessToken)
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = GoogleAccountUtils.getUID(accessToken);
-			if (uid == null || uid.equals("")) uid = accessToken;
-		    return listTrays(uid);
-		} else {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-	}
-	
-	/**
-	 * This method is to change a junk token with a Google access token.
-	 * @param junkToken
-	 * @param googleToken
-	 * @param key
-	 * @return Returns the message <code>{"login": "true"}</code> if a given access token and key are correct.
-	 *         Otherwise, returns an error with HTTP status code = 400.
-	 */
-	@POST
-	@Path("/login")
-	@Produces("application/json")
-	public String login(
-			@FormParam("junkToken") String junkToken, @FormParam("googleToken") String googleToken, @FormParam("key") String key) {
-		if (!isNotNullOrEmpty(junkToken) || !isNotNullOrEmpty(googleToken)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("Please check your parameters:  junkToken = " + junkToken + ", googleToken = " + googleToken)
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = GoogleAccountUtils.getUID(googleToken);
-			if (uid == null || uid.equals("")) {
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("The googleToken is invalid '" + googleToken + "'")
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
-			}
+	private static final String ADD_ACTION = "add_tray_element";
+	private static final String GET_ACTION = "get_tray_elements";
+	private static final String LOGIN_ACTION = "login_tray";
+	private static final String EMPTY_ACTION = "empty_tray";
+	private static final String UPDATE_ACTION = "update_tray_element";
 
-			if (TrayStorage.replaceUID(junkToken, uid)) {
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("Cannot replace the junkToken with googleToken")
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
-			}
-			return "{\"login\":\"true\"}";
-		} else {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+	
+	private static final String ADD_EXCEPTION_MSG = "Invalid parameters or duplicated tray items";
+	private static final String INVALID_PARAMS_EXCEPTION_MSG = "Invalid parameters";
+	
+	
+    @POST
+    @Path("/")
+    public Response createProductInJSON(InputStream input) {
+    	long starttime = System.currentTimeMillis();
+    	String restTrayStr = getRestTrayString(input);
+		Gson gson = new Gson();
+		RestTrayObject restTray = null;
+		if (restTrayStr != null) {
+			try {
+				restTray = gson.fromJson(restTrayStr, RestTrayObject.class);
+			} catch (Exception e) {}
 		}
+    	if (input == null || restTray == null) {
+    		CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
+			return createResponseException("Failed to understand your tray request");
+    	} else {
+    		if (!KeyManager.getInstance().checkAppKey(restTray.getKey())) {
+    			CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_APP_KEY + restTray.getKey());
+    			return createResponseException("The key is invalid '" + restTray.getKey() + "'");
+    		} else {
+    			String action = restTray.getAction();
+    			if (ADD_ACTION.equalsIgnoreCase(action)) {
+    				if (!addTrayElement(restTray)) {
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.FAILED);
+    	    			return createResponseException(ADD_EXCEPTION_MSG);
+    				}
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    			} else if (GET_ACTION.equalsIgnoreCase(action)) {
+					List <Tray> trays = getTrayElements(restTray);
+					if (trays == null) {
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
+    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+					} else {
+						String content = gson.toJson(trays);
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
+						return Response.status(Response.Status.OK)
+								.entity(content)
+								.type(MediaType.APPLICATION_JSON_TYPE)
+								.build();
+					}
+    			} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
+    				List <Tray> trays = loginTray(restTray);
+					if (trays == null) {
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.FAILED);
+    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+					} else {
+						String content = gson.toJson(trays);
+						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.SUCCESSFUL);
+						return Response.status(Response.Status.OK)
+								.entity(content)
+								.type(MediaType.APPLICATION_JSON_TYPE)
+								.build();
+					}
+    			} else if (EMPTY_ACTION.equalsIgnoreCase(action)) {
+    				if (!cleanTrays(restTray)) {
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.FAILED);
+    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    				}
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    			} else if (UPDATE_ACTION.equalsIgnoreCase(action)) {
+    				if (!updateTray(restTray)) {
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.FAILED);
+    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    				}
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    			} else {
+    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
+    				return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    			}
+    		}
+    	}
+	    return Response.status(Response.Status.OK).build();
+
+    }
+	
+    private String getRestTrayString(InputStream input) {
+    	if (input == null) return null;
+    	StringBuffer buffer = new StringBuffer();
+    	byte[] b = new byte[1024];
+    	int readBytes = 0;
+    	try {
+			while ((readBytes = input.read(b)) >= 0) {
+				buffer.append(new String(b, 0, readBytes));
+			}
+			return buffer.toString();
+		} catch (IOException e) {
+		}
+		return null;
 	}
+
+	/**
+     * Add tray into the KB.
+     * @param restTray
+     * @return
+     */
+	private boolean addTrayElement(RestTrayObject restTray) {
+		String itemId = restTray.getElement_id();
+		if (itemId == null) return false;
+		String itemTypeStr = restTray.getElement_type();
+		if (itemTypeStr == null) return false;
+		ItemType itemType = null;
+		try {
+			itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
+			if (itemType == null) return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		String token = restTray.getToken();
+		if (token == null) return false;
 		
-	private String listTrays(String uid) {
-		List <Tray> trays = TrayStorage.getTrays(uid);
-		Gson gson = new Gson();
-		return gson.toJson(trays);
-	}
-
-	/**
-	 * 
-	 * @param uid
-	 * @param newTray
-	 * @return Returns the message <code>{"action": "true"}</code> if a given access token and key are correct.
-	 *         Otherwise, returns an error with HTTP status code = 400.
-	 */
-	private String addTray(String uid, Tray newTray) {
-		if (!isNotNullOrEmpty(newTray.getItemId()) || !isNotNullOrEmpty(newTray.getSource())
-				|| newTray.getItemType() == null) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("element_id, element_type and source must be not empty. They are: element_id = " + newTray.getItemId() + ", element_type = " + newTray.getItemType() + ", source = " + newTray.getSource())
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+		String source = restTray.getSource();
+		if (source == null) return false;
+		
+		String element_title = restTray.getElement_title();
+		
+		Tray tray = new Tray();
+		tray.setItemId(itemId);
+		tray.setItemType(itemType);
+		tray.setSource(source);
+		tray.setTimestamp(System.currentTimeMillis());
+		tray.setElement_title(element_title);
+		
+		String uid = GoogleAccountUtils.getUID(token);
+		if (uid == null || uid.equals("")) {
+			tray.setUid(token);
+		} else {
+			tray.setUid(uid);
 		}
-		if (!TrayStorage.addTray(newTray)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The tray seems to be existed or there is a problem for storing the tray")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		return "{\"action\":\"true\"}";
-	}
-
-	/**
-	 * 
-	 * @param uid
-	 * @param newTray
-	 * @return Returns the message <code>{"action": "true"}</code> if a given access token and key are correct.
-	 *         Otherwise, returns an error with HTTP status code = 400.
-	 */
-	private String updateTray(String uid, Tray newTray) {
-		if (!isNotNullOrEmpty(newTray.getItemId()) || !isNotNullOrEmpty(newTray.getSource())
-				|| newTray.getItemType() == null) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("element_id, element_type and source must be not empty. They are: element_id = " + newTray.getItemId() + ", element_type = " + newTray.getItemType() + ", source = " + newTray.getSource())
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		if (!TrayStorage.update(newTray)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The tray seems not to be existed or there is a problem for storing the tray")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		return "{\"action\":\"true\"}";
+		return TrayStorage.addTray(tray);
 	}
 	
 	/**
-	 * 
-	 * @param uid
-	 * @param newTray
-	 * @return Returns the message <code>{"action": "true"}</code> if a given access token and key are correct.
-	 *         Otherwise, returns an error with HTTP status code = 400.
+	 * Lists tray elements.
+	 * @param restTray
+	 * @return
 	 */
-	private String deleteTray(String uid, Tray newTray) {
-		if (!isNotNullOrEmpty(newTray.getItemId())) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("element_id must be not empty: element_id = " + newTray.getItemId())
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		if (!TrayStorage.deleteTray(newTray)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The tray seems not to be existed or there is a problem for deleting the tray")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-		return "{\"action\":\"true\"}";
+	private List<Tray> getTrayElements(RestTrayObject restTray) {
+		String accessToken = restTray.getToken();
+		String uid = GoogleAccountUtils.getUID(accessToken);
+
+		
+		int offset = (restTray.getOffset() == null ? 0 : restTray.getOffset());
+		int limit = (restTray.getLimit() == null ? 100 : restTray.getLimit());
+		String orderStr = restTray.getOrderType();
+		OrderType orderType = (orderStr == null) ? OrderType.Desc
+				: orderStr.equalsIgnoreCase("Desc") ? OrderType.Desc : OrderType.Asc;
+		boolean showPastEvents = (restTray.getShow_past_events() == null) ? true : restTray.getShow_past_events();
+		
+		return TrayStorage.getTrays((uid == null || uid.equals("")) ? accessToken : uid,
+				offset, limit, orderType, showPastEvents);
 	}
 	
-	private void emptyTrays(String uid) {
-		if (!TrayStorage.cleanTrays(uid)) {
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("there is a problem for read/write the trays")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-	}
-	
-	private Tray convertString2Tray(String trayStr) {
-		Gson gson = new Gson();
-		Tray tray = gson.fromJson(trayStr, Tray.class);
-		return tray;
+	/**
+	 * Login
+	 * @param restTray
+	 * @return List of trays associated with a given junk token
+	 */
+	private List<Tray> loginTray(RestTrayObject restTray) {
+		String junkToken = restTray.getJunk_token();
+		if (junkToken == null || junkToken.equals("")) return null;
+		String googleToken = restTray.getGoogle_token();
+		String uid = GoogleAccountUtils.getUID(googleToken);
+		if (uid == null || uid.equals("")) return null;
+		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
+		return TrayStorage.getTrays(uid, 0, -1, OrderType.Desc, true);
 	}
 
-	private boolean isNotNullOrEmpty(String str) {
-		if (str == null || str.equals("")) return false;
-		return true;
+	/**
+	 * Empties tray list.
+	 * @param restTray
+	 * @return
+	 */
+	private boolean cleanTrays(RestTrayObject restTray) {
+		String token = restTray.getToken();
+		if (token == null || token.equals("")) return false;
+		String uid = GoogleAccountUtils.getUID(token);
+		if (uid == null || uid.equals("")) {
+			return TrayStorage.cleanTrays(token);
+		}
+		return TrayStorage.cleanTrays(uid);
+	}
+
+	/**
+	 * Updates tray item;
+	 * @param restTray
+	 * @return
+	 */
+	private boolean updateTray(RestTrayObject restTray) {
+		String itemId = restTray.getElement_id();
+		if (itemId == null || itemId.equals("")) return false;
+		String itemTypeStr = restTray.getElement_type();
+		if (itemTypeStr == null || itemTypeStr.equals("")) return false;
+		ItemType itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
+		String token = restTray.getToken();
+		String uid = GoogleAccountUtils.getUID(token);
+		String source = restTray.getSource();
+		String element_title = restTray.getElement_title();
+		Tray tray = new Tray();
+		tray.setItemId(itemId);
+		tray.setItemType(itemType);
+		tray.setSource(source);
+		tray.setElement_title(element_title);
+		tray.setTimestamp(System.currentTimeMillis());
+		tray.setUid((uid == null || uid.equals("")) ? token : uid);
+		
+		if (restTray.getDelete() != null && restTray.getDelete().booleanValue()) {
+			return TrayStorage.deleteTray(tray);
+		}
+		
+		boolean attended = (restTray.getAttend() == Boolean.TRUE);
+		
+		String datetimeAttendedStr = restTray.getAttend_datetime();
+		if (datetimeAttendedStr != null && !datetimeAttendedStr.equals("")) {
+			boolean okDatetime = false;
+			try {
+				SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+				Date d = format.parse(datetimeAttendedStr);
+				if (d != null) okDatetime = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (!okDatetime) return false;
+			tray.setDateTimeAttended(datetimeAttendedStr);
+		}
+		
+		tray.setAttended(attended);
+		
+		if (restTray.getRating() > 0) {
+			tray.setRating(restTray.getRating());
+		}
+		
+		return TrayStorage.update(tray);
+	}
+
+	private Response createResponseException(String msg) {
+		return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity(msg)
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
 	}
 }

@@ -12,52 +12,6 @@
 		<listener-class>eu.threecixty.querymanager.ThreeCixtyContextListener</listener-class>
 	</listener>
 
-	<servlet>
-	  <servlet-name>queryManagerServlet</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.QueryManagerServlet</servlet-class>
-	</servlet>
-	
-	<servlet>
-	  <servlet-name>settingsServlet</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.SettingsServlet</servlet-class>
-	</servlet>
-	
-	<servlet>
-	  <servlet-name>trayServlet</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.TrayServlet</servlet-class>
-	</servlet>
-
-	<servlet>
-	  <servlet-name>keyRequest</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.KeyRequestServlet</servlet-class>
-	</servlet>
-
-	<servlet>
-	  <servlet-name>keyGenerated</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.KeyGeneratedServlet</servlet-class>
-	</servlet>
-	
-	  <servlet-mapping>
-	    <servlet-name>queryManagerServlet</servlet-name>
-	    <url-pattern>/queryManagerServlet</url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	    <servlet-name>settingsServlet</servlet-name>
-	    <url-pattern>/settingsServlet</url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	    <servlet-name>trayServlet</servlet-name>
-	    <url-pattern>/trayServlet</url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	    <servlet-name>keyRequest</servlet-name>
-	    <url-pattern>/keyRequest</url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	    <servlet-name>keyGenerated</servlet-name>
-	    <url-pattern>/keyGenerated</url-pattern>
-	  </servlet-mapping>
-
 	<!-- Auto scan REST service -->
 	<context-param>
 		<param-name>resteasy.scan</param-name>
@@ -67,7 +21,7 @@
 	<!-- this need same with resteasy servlet url-pattern -->
 	<context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
-		<param-value>/services</param-value>
+		<param-value>/</param-value>
 	</context-param>
  
 	<listener>
@@ -85,9 +39,15 @@
  
 	<servlet-mapping>
 		<servlet-name>resteasy-servlet</servlet-name>
-		<url-pattern>/services/*</url-pattern>
+		<url-pattern>/v1/*</url-pattern>
+	</servlet-mapping>
+	<!--
+	we can map many url-patterns 
+	<servlet-mapping>
+		<servlet-name>resteasy-servlet</servlet-name>
+		<url-pattern>/v2/*</url-pattern>
 	</servlet-mapping>  
-
+     -->
   
     <filter>
             <!-- The CORS filter with parameters -->

@@ -32,7 +32,7 @@
 
     <dependency>
       <groupId>eu.3cixty</groupId>
-      <artifactId>appkey</artifactId>
+      <artifactId>calllog</artifactId>
 	  <version>1.0</version>
     </dependency>
 
@@ -96,6 +96,7 @@
   </dependencies>
   
   <build>
+    <finalName>qm</finalName>
     <sourceDirectory>src</sourceDirectory>
 
 	

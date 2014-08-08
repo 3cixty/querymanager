@@ -1,3 +1,4 @@
+<%@page import="eu.threecixty.querymanager.rest.Constants" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -11,7 +12,7 @@
 <body>
 <%
 	if (session.getAttribute("key") == null) {
-		   response.sendRedirect("../error.jsp");
+		response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
 	} else  {
 %>
 
@@ -31,10 +32,12 @@
 	}
 %>
 
+        <script type="text/javascript">
+            var parentScriptPath = "../";
+        </script>
 
-
-    <script type="text/javascript" src="javascripts/vendor/jquery.min.js"></script>
-    <script type="text/javascript" src="javascripts/v2.x/boot.js"></script>
+    <script type="text/javascript" src="../javascripts/vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="../javascripts/v2.x/boot.js"></script>
 
 
 </body>

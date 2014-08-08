@@ -1,3 +1,4 @@
+<%@page import="eu.threecixty.querymanager.rest.Constants" %>
 <%@ page language="java" import="eu.threecixty.profile.ThreeCixtySettings" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 
@@ -11,16 +12,16 @@
 <body>
 
 <%
-    String accessToken = (String) request.getAttribute("accessToken");
-    String key = (String) request.getAttribute("key");
+    String accessToken = (String) session.getAttribute("accessToken");
+    String key = (String) session.getAttribute("key");
 
    if (session.getAttribute("uid") == null || accessToken == null || key == null) {
-	   response.sendRedirect("./error.jsp");
+	   response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
    } else  {
-        ThreeCixtySettings settings = (ThreeCixtySettings) request.getAttribute("settings");
+        ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 %>
 
-<form action="settingsServlet" method="post">
+<form action="../<%=Constants.PREFIX_NAME %>/settings/save" method="post">
 <div>
     <input type="hidden" name="accessToken" value="<%=accessToken%>">
     <input type="hidden" name="key" value="<%=key%>">
@@ -59,8 +60,9 @@
 </div>
 <div><span >Mobidot Account</span></div>
 <div>
-<input type="hidden" name="pi_source" value="Mobidot">
-    <input type="text" name="pi_id" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
+<input type="hidden" name="pi_sources" value="Mobidot">
+<input type="hidden" name="pi_ats" value="">
+    <input type="text" name="pi_ids" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
 </div>
 <div style="height: 10px;"></div>
 <div align="justify" style="font-size: 11px;"  >
@@ -87,7 +89,7 @@ Disclaimer: The information marked by red star are required. For Mobidot account
     	lat.value = "<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>";
     	var lon = document.getElementById("lon");
     	lon.value = "<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>";
-    	var pi_id = document.getElementById("pi_id");
+    	var pi_id = document.getElementById("pi_ids");
     	pi_id.value = "<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>";
     }
 </script>
