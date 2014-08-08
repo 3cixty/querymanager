@@ -47,7 +47,7 @@ public class TrayServices {
 	
     @POST
     @Path("/")
-    public Response createProductInJSON(InputStream input) {
+    public Response invokeTrayServices(InputStream input) {
     	long starttime = System.currentTimeMillis();
     	String restTrayStr = getRestTrayString(input);
 		Gson gson = new Gson();
