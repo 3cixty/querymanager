@@ -73,7 +73,8 @@ public class DBConnection {
 		if (pathToPwdPropertyFile == null) return null;
 		if (dbPwd != null) return dbPwd;
 		try {
-			Scanner scanner = new Scanner(new File(pathToPwdPropertyFile + "password.property"));
+			Scanner scanner = new Scanner(new File(pathToPwdPropertyFile + File.separatorChar 
+					+ "WEB-INF" + File.separatorChar + "password.property"));
 			dbPwd = scanner.nextLine();
 			scanner.close();
 		} catch (FileNotFoundException e) {
