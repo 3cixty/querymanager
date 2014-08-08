@@ -1,10 +1,18 @@
-appkey
+appkey: current version `v1`
 ======
 
 ## This document describes how to get an AppKey:
 
-### Getting an App Key by using Google access token 
+APIs changed for version v1:
 
+### Getting an App Key by using Google access token
+
+- please go to `http://3cixty.com:8080/qm/requestKey?accessToken={YourGoogleAccessToken}` 
+- then please fill in the form and request an AppKey
+
+
+### Getting an App Key by using Google access token 
+ (This end point will soon be disabled as we evolve our APIs)
 - please go to `http://3cixty.com:8080/querymanagerServlet-1.0/services/key/requestKey?accessToken={YourGoogleAccessToken}` 
 - then please fill in the form and request an AppKey
 
