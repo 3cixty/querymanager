@@ -183,22 +183,22 @@ public class ProfileManagerImpl implements ProfileManager {
 			profileManager = (ProfileManager) Class.forName(VIRTUOSO_PM_IMPL).newInstance();
 			found = true;
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		if (!found) {
 			try {
 				profileManager = (ProfileManager) Class.forName(THALES_PM_IMPL).newInstance();
 				found = true;
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (InstantiationException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 		if (!found) {
