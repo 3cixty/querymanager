@@ -33,7 +33,7 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
  * @author Cong-Kinh NGUYEN
  *
  */
-@Path("/" + Constants.PREFIX_NAME + "/settings")
+@Path("/" + Constants.PREFIX_NAME)
 public class SettingsServices {
 
 	
@@ -43,7 +43,7 @@ public class SettingsServices {
 	private HttpServletRequest httpRequest;
 
 	@GET
-	@Path("/view")
+	@Path("/viewSettings")
 	@Produces("text/plain")
 	public Response view(@QueryParam("accessToken") String accessToken, @QueryParam("key") String key) {
 		long starttime = System.currentTimeMillis();
@@ -89,7 +89,7 @@ public class SettingsServices {
 	}
 
 	@POST
-	@Path("/save")
+	@Path("/saveSettings")
 	@Produces("text/plain")
 	public Response save(@DefaultValue("")@FormParam("accessToken") String accessToken,
 			@DefaultValue("")@FormParam("key") String key,

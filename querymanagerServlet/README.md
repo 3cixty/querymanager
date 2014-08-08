@@ -1,9 +1,10 @@
 This document shows you how to deploy querymanagerServlet and how to make a remote query to QueryManager.
 
 ### Requirements:
-- Install ```Mysql``` database, then create the database named `3cixty` and a user called `3cixty` with password `3cixtydatabase001`.
+- Install ```Mysql``` database, then create the database named `3cixty` and a user called `3cixty`.
+  Please change the password defined in the querymanagerServlet/WebContent/WEB-INF/password.property to
+  the `3cixty` user's password.
 - Set all permissions for the database `3cixty` to the user `3cixty`
-
 
 ### How to deploy querymanagerServlet:
 
@@ -17,31 +18,25 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   ```
 
 - Go to the ```querymanagerServlet``` folder, copy the .war file in the ```target``` folder to your Web application server (Tomcat for example).
-  
-- Go to ```http://3cixty.com:8080/querymanagerServlet-1.0/keyRequest?accessToken={YourAccessToken}``` where `{YourAccessToken}` is to be provided.
+
+### How to invoke 3cixty's services
  
+#### How to get an App key
 
-  **PS: EveryTime the Appkeys will be lost in the current scenario if the server is redeployed. Measures have been taken, as stated in `https://github.com/3cixty/querymanager/issues/23`, to fix this issue on the ExplorationApp temporarily.**
+- Go to ```http://3cixty.com:8080/qm/v1/requestKey?accessToken={YourAccessToken}``` where `{YourAccessToken}` is to be provided.
 
-### How to make a remote query to QueryManager:
+#### How to validate an App key
 
-- Suppose you deployed querymanagerServlet on your local server. Let the baseUrl point to the root path for querymanagerServlet you just deployed
-
-- There are 3 following services available:
-
-  ```
-  ~baseUrl/services/queryManager
-  ~baseUrl/services/tray
-  ~baseUrl/services/settings
-  ```
-
-###  How to invoke the services will be discussed by the following sections.
+- The template for validating an App key:
+ `http://3cixty.com:8080/qm/v1/validateKey?key={AnAppKey}` where `AnAppKey` is an App key.
+ 
+  The HTTP code status of invoking Key validation is `200` if the key is valid, `400` otherwise.
   
-####  Query augmentation
+#### How to invoke Query augmentation
 
 - The template for calling query augmentation
   ```
-  ~baseUrl/services/queryManager/execute?accessToken={accessToken}&format={format}&query={query}&filter={filter}&key={key}
+  http://3cixty.com:8080/qm/v1/augmentAndExecute?accessToken={accessToken}&format={format}&query={query}&filter={filter}&key={key}
   ```
 
   Where:
@@ -59,11 +54,10 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
 - Example for a full URL to invoke the service on local Tomcat server:
 
-`http://localhost:8080/querymanagerServlet-1.0/services/queryManager/execute?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location&key=MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD
+` http://3cixty.com:8080/qm/v1/augmentAndExecute?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location&key=MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD
 `
  
   Where:
-  - `http://localhost:8080/querymanagerServlet-1.0` is the baseUrl
   - `ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA` is a `{accessToken}`
   - `json` is a `{format}`
   - `SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020` is a `{query}`.
@@ -80,18 +74,18 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   { "head": { "link": [], "vars": ["category", "count"] }, ..., "AugmentedQueries": [{"AugmentedQuery":"SELECT DISTINCT  ?category (count(*) AS ?count)\nWHERE\n  { ?event rdf:type lode:Event .\n    ?event lode:hasCategory ?category . \n    ?event    lode:atPlace        ?_augplace .\n    ?_augplace  vcard:adr         ?_augaddress .\n    ?_augaddress  vcard:country-name  ?_augcountryname .\n    FILTER ( ?_augcountryname = \"Italy\" )\n  }\nGROUP BY ?category\nORDER BY DESC(?count)\nLIMIT   20\n"}]}
   ```
  
-#### Tray services
+#### How to invoke tray services
 
 
   
   The parameters and actions to call the tray servlet follow the documentation on Google Drive at ```https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web```
 
   
-####  Updating profile information
+#### How to update settings page from web form
 
--  Web link to update profile information:
+-  Web link to go to:
   ```
-  ~baseUrl/services/settings/views?accessToken={accessToken}&key={key}
+  http://3cixty.com:8080/qm/v1/viewSettings?accessToken={accessToken}&key={key}
   ```
   Where:
   
@@ -100,9 +94,10 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   |{accessToken}|is an access token which lasts for one hour or false. When accessToken equaling to false, the query isn't augmented. When the accessToken is invalid (incorrect or expired), the servlet returns the code 400 for HTTP request with the message description **Access token is incorrect or expired** |
   |{key}|is an application key|
 
+#### How to update settings page without using web form
 - The template for updating profile information (take URL to show, but use `HTTP POST` in reality)
   ```
-  ~baseUrl/services/settings/save?accessToken={accessToken}&key={key}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
+  http://3cixty.com:8080/qm/v1/saveSettings?accessToken={accessToken}&key={key}&townName={townName}&countryName={countryName}&lat={latitude}&lon={longitude}&pi_source[0]={pi_source[0]}&pi_id[0]={pi_id[0]}&pi_at[0]={pi_at[0]}&pi_source[1]={pi_source[1]}&pi_id[1]={pi_id[1]}&pi_at[1]={pi_at[1]}&...
   ```
 
   Where:
@@ -123,5 +118,5 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
 
 - Example for the template to update profile information:
   ```
-  ~baseUrl/settingsServlet?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&key=MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD&townName=Milano&countryName=Italy&lat=2.12345&lon=46.1234&startDate=18-06-2014&endDate=21-06-2013&pi_source[0]=Facebook&pi_id[0]=112233445566&pi_at[0]=facebookFakeAccessToken&pi_source[1]=Mobidot&pi_id[1]=nguyen&pi_at[1]=fakeMobidotAccessToken
+  http://3cixty.com:8080/qm/v1/saveSettings?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&key=MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD&townName=Milano&countryName=Italy&lat=2.12345&lon=46.1234&startDate=18-06-2014&endDate=21-06-2013&pi_source[0]=Facebook&pi_id[0]=112233445566&pi_at[0]=facebookFakeAccessToken&pi_source[1]=Mobidot&pi_id[1]=nguyen&pi_at[1]=fakeMobidotAccessToken
   ```

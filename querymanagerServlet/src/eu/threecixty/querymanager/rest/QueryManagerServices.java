@@ -43,7 +43,7 @@ import eu.threecixty.querymanager.ThreeCixtyQuery;
  * @author Cong-Kinh Nguyen
  *
  */
-@Path("/" + Constants.PREFIX_NAME + "/queryManager")
+@Path("/" + Constants.PREFIX_NAME)
 public class QueryManagerServices {
 	private static final String LOCALITY_TRIPLES = "?event lode:atPlace ?place . \n ?place vcard:adr ?address . \n ?address vcard:locality ?locality .\n";
 	
@@ -80,7 +80,7 @@ public class QueryManagerServices {
 	 * @return Data received from Eurecom when executing a query augmented. 
 	 */
 	@GET
-	@Path("/execute")
+	@Path("/augmentAndExecute")
 	public Response executeQuery(@QueryParam("key") String key, @QueryParam("accessToken") String accessToken,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter) {

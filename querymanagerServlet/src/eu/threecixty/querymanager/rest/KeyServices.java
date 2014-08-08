@@ -28,7 +28,7 @@ import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 
-@Path("/" + Constants.PREFIX_NAME + "/key")
+@Path("/" + Constants.PREFIX_NAME)
 public class KeyServices {
 
 	@Context 
@@ -115,7 +115,7 @@ public class KeyServices {
 	}
 	
 	@GET
-	@Path("/validate")
+	@Path("/validateKey")
 	@Produces("text/plain")
 	public String validate(@QueryParam("key") String key) {
 		long starttime = System.currentTimeMillis();

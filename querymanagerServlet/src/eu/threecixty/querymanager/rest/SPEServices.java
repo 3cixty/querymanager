@@ -29,7 +29,7 @@ import eu.threecixty.profile.ProfileInformationStorage;
  * @author Cong-Kinh Nguyen
  *
  */
-@Path("/" + Constants.PREFIX_NAME + "/spe")
+@Path("/" + Constants.PREFIX_NAME)
 public class SPEServices {
 
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
@@ -200,7 +200,7 @@ public class SPEServices {
 	 *         the message <code>{"validation": "false"}</code> will be returned.
 	 */
 	@POST
-	@Path("/validate")
+	@Path("/validateAccessToken")
 	@Produces("application/json")
 	public String validate(@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
 		long starttime = System.currentTimeMillis();
