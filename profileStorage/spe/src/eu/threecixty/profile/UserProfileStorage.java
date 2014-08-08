@@ -313,7 +313,7 @@ public class UserProfileStorage {
 		if (fromRegularTrip.getHasRegularTripTravelTime() > 0) regularTrip.addHasRegularTripTravelTime(fromRegularTrip.getHasRegularTripTravelTime());
 		if (fromRegularTrip.getHasRegularTripTravelTimeSD() > 0) regularTrip.addHasRegularTripTravelTimeSD(fromRegularTrip.getHasRegularTripTravelTimeSD());
 		if (fromRegularTrip.getHasRegularTripFastestTravelTime() > 0) regularTrip.addHasRegularTripFastestTravelTime(fromRegularTrip.getHasRegularTripFastestTravelTime());
-		if (fromRegularTrip.getHasRegularTripTotalDistance() > 0) regularTrip.addHasRegularTripTotalDistance(Long.parseLong(fromRegularTrip.getHasRegularTripTotalDistance().toString()));
+		if (fromRegularTrip.getHasRegularTripTotalDistance() > 0) regularTrip.addHasRegularTripTotalDistance(Float.parseFloat(fromRegularTrip.getHasRegularTripTotalDistance().toString()));
 		if (fromRegularTrip.getHasRegularTripTotalCount() > 0) regularTrip.addHasRegularTripTotalCount(fromRegularTrip.getHasRegularTripTotalCount());
 		if (fromRegularTrip.getHasModalityType() != null) regularTrip.addHasModalityType(fromRegularTrip.getHasModalityType().toString());
 		if (fromRegularTrip.getHasRegularTripWeekdayPattern() != null) regularTrip.addHasRegularTripWeekdayPattern(fromRegularTrip.getHasRegularTripWeekdayPattern());
