@@ -158,8 +158,11 @@ public class UserProfileStorage {
 		if (knowsSets == null) return;
 		for (String knows: knowsSets) {
 			UserProfile tmpUserProfile = mf.getUserProfile(PROFILE_URI + knows);
-			if (tmpUserProfile == null) continue;
-			if (kbUserProfile.getKnows().contains(tmpUserProfile)) continue;
+			if (tmpUserProfile == null) {
+				tmpUserProfile = mf.createUserProfile(PROFILE_URI + knows);
+			} else {
+			    if (kbUserProfile.getKnows().contains(tmpUserProfile)) continue;
+			}
 			kbUserProfile.addKnows(tmpUserProfile);
 		}
 	}
