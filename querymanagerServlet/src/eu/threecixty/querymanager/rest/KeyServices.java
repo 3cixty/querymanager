@@ -257,7 +257,7 @@ public class KeyServices {
 			        .type(MediaType.TEXT_PLAIN)
 			        .build();
 		} else {
-			if (!KeyManager.getInstance().checkUidExisted(uid)) {
+			if (!(KeyManager.getInstance().checkUidExisted(uid) || KeyManager.getInstance().checkEmailExisted(uid))) {
 				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("UID " + uid + " is not found")
 				        .type(MediaType.TEXT_PLAIN)
