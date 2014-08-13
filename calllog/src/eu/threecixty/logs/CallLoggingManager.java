@@ -72,16 +72,16 @@ public class CallLoggingManager {
 	 * @param appkey
 	 * @return
 	 */
-	public List<CallLogging> getStats(String appkey) {
-		return getStats(appkey, 0, System.currentTimeMillis());
+	public List<CallLogging> getCalls(String appkey) {
+		return getCalls(appkey, 0, System.currentTimeMillis());
 	}
 
-	public List<CallLogging> getStats(String appkey, long from, long to) {
-		return getStats(appkey, from, to, 0, Integer.MAX_VALUE);
+	public List<CallLogging> getCalls(String appkey, long from, long to) {
+		return getCalls(appkey, from, to, 0, Integer.MAX_VALUE);
 	}
 
-	public List<CallLogging> getStats(String appkey, long from, long to, int minTimeConsumed, int maxTimeConsumed) {
-		return storage.getStats(appkey, from, to, minTimeConsumed, maxTimeConsumed);
+	public List<CallLogging> getCalls(String appkey, long from, long to, int minTimeConsumed, int maxTimeConsumed) {
+		return storage.getCalls(appkey, from, to, minTimeConsumed, maxTimeConsumed);
 	}
 
 	
