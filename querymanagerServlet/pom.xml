@@ -83,7 +83,7 @@
       <artifactId>cors-filter</artifactId>
       <version>1.8</version>
     </dependency>
-    
+    <!-- 
     <dependency>
         <groupId>ch.kerbtier</groupId>
         <artifactId>jj</artifactId>
@@ -95,7 +95,7 @@
         <artifactId>stringtree-json</artifactId>
         <version>2.0.5</version>
     </dependency>
-    
+     -->
     <dependency>
 	  <groupId>javax.servlet</groupId>
 	  <artifactId>servlet-api</artifactId>
