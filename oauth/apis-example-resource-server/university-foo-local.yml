@@ -1,0 +1,15 @@
+http:
+  port: 8180
+  adminPort: 8181
+
+logging:
+  level: info
+  loggers:
+    "org.surfnet": debug
+    "openjpa": error
+    
+auth:
+  authorizationServerUrl: http://localhost:8080/v1/tokeninfo
+  secret: 58b749f7-acb3-44b7-a38c-53d5ad740cf6
+  key: university-foo
+   
