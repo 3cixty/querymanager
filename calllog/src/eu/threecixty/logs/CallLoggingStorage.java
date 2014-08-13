@@ -25,6 +25,6 @@ public interface CallLoggingStorage {
 	 * @param maxTimeConsumed
 	 * @return
 	 */
-	List<CallLogging> getStats(String appkey, long from, long to,
+	List<CallLogging> getCalls(String appkey, long from, long to,
 			int minTimeConsumed, int maxTimeConsumed);
 }

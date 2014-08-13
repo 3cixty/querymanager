@@ -67,7 +67,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		return false;
 	}
 
-	public List<CallLogging> getStats(String appkey, long from, long to,
+	public List<CallLogging> getCalls(String appkey, long from, long to,
 			int minTimeConsumed, int maxTimeConsumed) {
 		List <CallLogging> loggings = new ArrayList<CallLogging>();
 		try {
