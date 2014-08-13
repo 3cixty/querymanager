@@ -48,7 +48,20 @@
 		<url-pattern>/v2/*</url-pattern>
 	</servlet-mapping>  
      -->
-  
+  <!-- 
+<servlet>
+		<servlet-name>AsciiText</servlet-name>
+		<servlet-class>com.googlecode.jj1.server.Jj1Servlet</servlet-class>
+		<init-param>
+			<param-name>services</param-name>
+			<param-value>root=eu.threecixty.querymanager.jsonrpc.TrayServices</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AsciiText</servlet-name>
+		<url-pattern>/ascii/*</url-pattern>
+	</servlet-mapping>
+   -->
     <filter>
             <!-- The CORS filter with parameters -->
             <filter-name>CORS</filter-name>

@@ -33,7 +33,7 @@ input:invalid {
     	response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
     } else {
     %>
-        <form action="../<%=Constants.PREFIX_NAME %>/key/addappkey" method="post">
+        <form action="../<%=Constants.PREFIX_NAME %>/addappkey" method="post">
             <div>First Name</div>
             <div><input type="text" name="firstName" id="firstName" required></div>
             
@@ -166,7 +166,7 @@ input:invalid {
             function clickRevoke(index) {
             	var dataForm = "uid=" + document.getElementById("uid_" + index).innerHTML;
             	$.ajax({
-            		  url: "../<%=Constants.PREFIX_NAME %>/key/revokeappkey",
+            		  url: "../<%=Constants.PREFIX_NAME %>/revokeappkey",
             		  type: "POST",
             		  cache: false,
             		  data: dataForm,

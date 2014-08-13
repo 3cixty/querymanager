@@ -22,7 +22,7 @@ input:invalid {
     } else {
     	%>
     	
-    	<form action="../<%=Constants.PREFIX_NAME %>/key/addappkeyadmin" method="post">
+    	<form action="../<%=Constants.PREFIX_NAME %>/addappkeyadmin" method="post">
     	    <div>
     	        Username
     	    </div>

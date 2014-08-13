@@ -40,7 +40,7 @@ span {
         String domain = (appKey == null ? "" : appKey.getAppName());
 %>
 
-<form action="../<%=Constants.PREFIX_NAME %>/key/performKeyRequest" method="post">
+<form action="../<%=Constants.PREFIX_NAME %>/performKeyRequest" method="post">
 <div>
     <span>First Name</span>
     <input type="text" name="firstName" value="<%=settings.getFirstName()%>" readonly="readonly">

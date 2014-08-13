@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<form action="../<%=Constants.PREFIX_NAME %>/key/login" method="post">
+<form action="../<%=Constants.PREFIX_NAME %>/login" method="post">
 
 <div>
     Username
