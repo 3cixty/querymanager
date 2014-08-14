@@ -22,6 +22,7 @@ import eu.threecixty.keys.KeyManager;
 public class CallLoggingStorageImpl implements CallLoggingStorage {
 
 	private static final String TABLE_NAME = "logcall";
+	private static final String APPKEY_TABLE_NAME = "app_key";
 
 	private boolean firstTime = true;
 	
@@ -101,6 +102,54 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 			    	loggings.add(logging);
 			    }
 			} catch (SQLException e) {
+			} finally {
+				try {
+					if (preparedStmt != null) preparedStmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (ThreeCixyDBException e) {
+			e.printStackTrace();
+		}
+		return loggings;
+	}
+	
+	public List<CallLoggingDisplay> getCallsWithCount(long from, long to,
+			int minTimeConsumed, int maxTimeConsumed) {
+		List <CallLoggingDisplay> loggings = new ArrayList<CallLoggingDisplay>();
+		try {
+			createTableWhenNecessary();
+			Connection conn = DBConnection.getInstance().getConnection();
+			PreparedStatement  preparedStmt = null;
+			try {
+				String sql = "SELECT " + TABLE_NAME +".appkey, "
+						+ "COUNT(" + TABLE_NAME +".appkey) AS numberOfCalls "
+						+ "FROM " + TABLE_NAME
+						+ " WHERE " + TABLE_NAME +".appkey IN ( SELECT appkey FROM "+ APPKEY_TABLE_NAME + " ) AND "
+								+ TABLE_NAME +".starttime >=? AND "
+								+ TABLE_NAME +".starttime <= ? AND "
+								+ TABLE_NAME +".timeConsumed >= ? AND "
+								+ TABLE_NAME +".timeConsumed <= ? "
+						+ "GROUP BY " + TABLE_NAME +".appkey "
+						+ "DESC";
+				preparedStmt = conn.prepareStatement(sql);
+				preparedStmt.setTimestamp(1, new Timestamp(from));
+				preparedStmt.setTimestamp(2, new Timestamp(to));
+				preparedStmt.setInt(3, minTimeConsumed);
+				preparedStmt.setInt(4, maxTimeConsumed);
+			    ResultSet rs = preparedStmt.executeQuery();
+
+			    while (rs.next()) {
+			    	CallLoggingDisplay loggingDisplay = new CallLoggingDisplay();
+			    	CallLogging logging = new CallLogging();
+			    	AppKey tmpAppKey = KeyManager.getInstance().getAppKeyFromKey(rs.getString("appkey"));
+			    	logging.setAppKey(tmpAppKey);
+			    	loggingDisplay.setCallLogging(logging);
+			    	loggingDisplay.setNumberOfCalls(rs.getInt("numberOfCalls"));
+			    	loggings.add(loggingDisplay);
+			    }
+			} catch (SQLException e) { e.printStackTrace();
 			} finally {
 				try {
 					if (preparedStmt != null) preparedStmt.close();

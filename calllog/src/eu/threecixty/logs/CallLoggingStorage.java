@@ -27,4 +27,8 @@ public interface CallLoggingStorage {
 	 */
 	List<CallLogging> getCalls(String appkey, long from, long to,
 			int minTimeConsumed, int maxTimeConsumed);
+	
+	List<CallLoggingDisplay> getCallsWithCount(long from, long to,
+			int minTimeConsumed, int maxTimeConsumed);
+	
 }
