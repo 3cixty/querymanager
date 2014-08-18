@@ -54,7 +54,7 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
   
   Note that in the case you don't want to augment the query, you just don't provide the `filter` parameter information.
   
-- Example for a full URL to invoke the service on local Tomcat server:
+- Example for a full URL to invoke the service:
 
 ` http://3cixty.com:8080/qm/v1/augmentAndExecute?accessToken=ya29.1.AADtN_VLpeIK2WSwQp69sfyiGCyhbfsfgT2j_8aEFAx3JEN66f3MK-8FhP7cVd-XkHxENjA&format=json&query=SELECT%20%3Fcategory%20(COUNT(*)%20AS%20%3Fcount)%09%09%09WHERE%20%7B%09%09%09%09%3Fevent%20a%20lode%3AEvent%3B%09%09%09%09lode%3AhasCategory%20%3Fcategory%20.%7D%09%09%09GROUP%20BY%20%3Fcategory%20ORDER%20BY%20DESC%20(%3Fcount)%20LIMIT%2020&filter=location&key=MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDIwMzM4NDgxMgF6Z3VpAG5qY2Itc2sD
 `
@@ -78,9 +78,12 @@ This document shows you how to deploy querymanagerServlet and how to make a remo
  
 #### How to invoke tray services
 
+- The Api call is:
+ ```
+ http://3cixty.com:8080/qm/v1/tray
+ ```
 
-  
-  The parameters and actions to call the tray servlet follow the documentation on Google Drive at ```https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web```
+The inputStream parameters are mentioned in the following document. ```https://docs.google.com/document/d/1jb9d1Kh63twbcWJry62rTHuqQaBIxq9LP9WTtcsXShg/edit?usp=drive_web```
 
   
 #### How to update settings page from web form
