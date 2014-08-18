@@ -2,6 +2,8 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="eu.threecixty.keys.AppKey"%>
 <%@page import="eu.threecixty.keys.KeyManager"%>
+<%@page import="eu.threecixty.logs.CallLoggingDisplay"%>
+<%@page import="eu.threecixty.logs.CallLoggingManager"%>
 <%@page import="eu.threecixty.querymanager.rest.Constants" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -100,7 +102,7 @@ input:invalid {
         	+ "&email=" + document.getElementById("email").value
         	+ "&domain=" + yourSelect.options[yourSelect.selectedIndex].value;
         	$.ajax({
-        		  url: "../<%=Constants.PREFIX_NAME %>/key/addappkey",
+        		  url: "../<%=Constants.PREFIX_NAME %>/addappkey",
         		  type: "POST",
         		  cache: false,
         		  data: dataForm,
@@ -182,9 +184,11 @@ input:invalid {
             }
         </script>
         
-        <div>List AppKeys <span style="width: 10px;" ></span><input type="button" data-clipboard-target="key_1" value="Copy Selected Key" id="d_clip_button"  ></div>
+        <div>List AppKeys <span style="width: 10px;" ></span>
+        	<input type="button" data-clipboard-target="key_1" value="Copy Selected Key" id="d_clip_button"  >
+        </div>
         <div style="height: 10px;"></div>
-        <form action="../<%=Constants.PREFIX_NAME %>/key/revokeappkey" method="post" id="revokeform">
+        <form action="../<%=Constants.PREFIX_NAME %>/revokeappkey" method="post" id="revokeform">
         <%
             Collection <AppKey> collections = KeyManager.getInstance().getAppKeys();
             Iterator <AppKey> appKeys = collections.iterator();
@@ -216,9 +220,27 @@ input:invalid {
             	<%
             }
         %>
-
         </form>
-    <%
+		<div>Show Statistics <span style="width: 10px;" ></span></div>
+		<%
+			Collection <CallLoggingDisplay> collectionslog = CallLoggingManager.getInstance().getCallsWithCount();
+        	Iterator <CallLoggingDisplay> callLoggingDisplays = collectionslog.iterator();
+        	index = 0;
+            len = collectionslog.size();
+            for ( ; callLoggingDisplays.hasNext(); ) {
+            	CallLoggingDisplay callLoggingDisplay = callLoggingDisplays.next();
+            	index++;
+            	%>
+        	    
+        	    <div id = "div_<%=index%>">
+        	        <label style="width: 50px;display: inline-block;"><%=index %>.</label>
+        	        <label style="width: 250px;display: inline-block;"><%=callLoggingDisplay.getCallLogging().getAppKey().getOwner().getFirstName() + " " + callLoggingDisplay.getCallLogging().getAppKey().getOwner().getLastName() %></label>
+        	        <label style="width: 750px;display: inline-block;"><%=callLoggingDisplay.getCallLogging().getAppKey().getValue() %>.</label>
+        	        <label style="width: 50px;display: inline-block;"><%=callLoggingDisplay.getNumberOfCalls() %>.</label>
+        	    </div>
+        	    
+        	<%
+            }
     }
 %>
 </body>

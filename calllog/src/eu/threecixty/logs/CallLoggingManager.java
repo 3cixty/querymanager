@@ -85,6 +85,17 @@ public class CallLoggingManager {
 	}
 
 	
+	public List<CallLoggingDisplay> getCallsWithCount() {
+		return getCallsWithCount( 0, System.currentTimeMillis());
+	}
+
+	public List<CallLoggingDisplay> getCallsWithCount(long from, long to) {
+		return getCallsWithCount(from, to, 0, Integer.MAX_VALUE);
+	}
+
+	public List<CallLoggingDisplay> getCallsWithCount(long from, long to, int minTimeConsumed, int maxTimeConsumed) {
+		return storage.getCallsWithCount(from, to, minTimeConsumed, maxTimeConsumed);
+	}
 
 	private CallLoggingManager() {
 		storage = new CallLoggingStorageImpl();
