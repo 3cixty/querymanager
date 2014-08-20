@@ -38,6 +38,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -75,38 +76,13 @@ public class ClientController {
     this.env = env;
   }
 
-  @RequestMapping(value = {"test"}, method = RequestMethod.GET)
-  public String start(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response)
-          throws IOException {
-    modelMap.addAttribute(SETTINGS, createDefaultSettings(false));
-    return "oauth-client";
-  }
-
-  @RequestMapping(value = "/test", method = RequestMethod.POST, params = "reset")
-  public String reset(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    return start(modelMap, request, response);
-  }
-
-
-  @RequestMapping(value = "test", method = RequestMethod.POST, params = "step1")
-  public String step1(ModelMap modelMap, @ModelAttribute("settings")
-  ClientSettings settings, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    settings.setStep("step2");
-    modelMap.addAttribute(SETTINGS, settings);
-    return "oauth-client";
-  }
-
-  @RequestMapping(value = "test", method = RequestMethod.POST, params = "step2")
-  public void step2(ModelMap modelMap, @ModelAttribute("settings")
-  ClientSettings settings, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.sendRedirect(settings.getAuthorizationURLComplete());
-  }
-
   @RequestMapping(value = "redirect", method = RequestMethod.GET)
-  public String redirect(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response)
+  public String redirect(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response, @RequestParam("clientId") String clientId,
+		  @RequestParam("clientSecret") String clientSecret)
           throws JsonParseException, JsonMappingException, IOException {
     String code = request.getParameter("code");
-    ClientSettings settings = createDefaultSettings(false);
+    ClientSettings settings = createDefaultSettings(false, clientId, clientSecret);
+
 
     MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
     formData.add("grant_type", "authorization_code");
@@ -117,77 +93,39 @@ public class ClientController {
             .concat(settings.getOauthSecret()).getBytes())));
     Builder builder = client.resource(settings.getAccessTokenEndPoint()).header(AUTHORIZATION, auth)
             .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-    OutBoundHeaders headers = getHeadersCopy(builder);
     ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
     String json = IOUtils.toString(clientResponse.getEntityInputStream());
-    HashMap map = mapper.readValue(json, HashMap.class);
-    settings.setStep("step3");
+    HashMap<?, ?> map = mapper.readValue(json, HashMap.class);
     settings.setAccessToken((String) map.get("access_token"));
     modelMap.put(SETTINGS, settings);
-    modelMap.put(
-            "requestInfo",
-            "Method: POST".concat(BR).concat("URL: ").concat(settings.getAccessTokenEndPoint()).concat(BR)
-                    .concat("Headers: ").concat(headers.toString()).concat(BR).concat("Body: ").concat(formData.toString()));
-    addResponseInfo(modelMap, clientResponse);
-    modelMap.put("rawResponseInfo", json);
-    return "oauth-client";
+    return "accesstoken";
   }
 
-  @RequestMapping(value = "test", method = RequestMethod.POST, params = "step3")
-  public String step3(ModelMap modelMap, @ModelAttribute("settings")
-  ClientSettings settings, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Builder builder = client.resource(settings.getRequestURL())
-            .header(AUTHORIZATION, "bearer ".concat(settings.getAccessToken()))
-            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-    OutBoundHeaders headers = getHeadersCopy(builder);
-    ClientResponse clientResponse = builder.get(ClientResponse.class);
-    String json = IOUtils.toString(clientResponse.getEntityInputStream());
-    settings.setStep("step3");
-    modelMap.put(SETTINGS, settings);
-    modelMap.put("requestInfo", "Method: GET".concat(BR).concat("URL: ").concat(settings.getRequestURL()).concat(BR)
-            .concat("Headers: ").concat(headers.toString()));
-    addResponseInfo(modelMap, clientResponse);
-    modelMap.put("rawResponseInfo", json);
-    return "oauth-client";
-  }
+  @RequestMapping(value = {"/getAccessToken"}, method = RequestMethod.GET)
+  public String getAccessToken(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response, @RequestParam("clientId") String clientId,
+		  @RequestParam("clientSecret") String clientSecret)
+          throws IOException {
 
-
-  private void addResponseInfo(ModelMap modelMap, ClientResponse clientResponse) {
-    modelMap.put(
-            "responseInfo",
-            "Status: ".concat(String.valueOf(clientResponse.getStatus()).concat(BR).concat("Headers:")
-                    .concat(clientResponse.getHeaders().toString())));
-  }
-
-  /*
-   * Nasty trick to be able to print out the headers after the POST is done
-   */
-  private OutBoundHeaders getHeadersCopy(Builder builder) {
-    Field metaData;
-    try {
-      metaData = PartialRequestBuilder.class.getDeclaredField("metadata");
-      metaData.setAccessible(true);
-      return new OutBoundHeaders((OutBoundHeaders) metaData.get(builder));
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+	  ClientSettings settings = createDefaultSettings(false, clientId, clientSecret);
+	  modelMap.put(SETTINGS, settings);
+	  request.setAttribute(SETTINGS, settings);
+	  response.sendRedirect(settings.getAuthorizationURLComplete());
+	   return "accesstoken";
   }
 
   /**
    * See /apis-authorization-server/src/main/resources/db/migration/hsqldb/V1__auth-server-admin.sql
    */
-  protected ClientSettings createDefaultSettings(boolean implicitGrant) {
+  protected ClientSettings createDefaultSettings(boolean implicitGrant, String clientId, String clientSecret) {
     String responseType = implicitGrant ? "token" : "code";
     String redirectUri = env.getProperty("redirect_uri");
     String tokenUri = env.getProperty("token_uri");
-    String clientId = env.getProperty("client_id");
-    String clientSecret = env.getProperty("client_secret");
     String authorizeUrl = env.getProperty("authorize_url");
     String resourceServerApiUrl = env.getProperty("resource_server_api_url");
     ClientSettings settings = new ClientSettings(tokenUri, clientId, clientSecret, authorizeUrl, "step1", resourceServerApiUrl);
     settings.setAuthorizationURLComplete(String.format(
             settings.getAuthorizationURL()
-                    .concat("?response_type=%s&client_id=%s&redirect_uri=%s&scope=read&state=example"), responseType, settings
+                    .concat("?response_type=%s&client_id=%s&redirect_uri=%s&scope=read&state=example" + "&clientSecret=" + clientSecret), responseType, settings
             .getOauthKey(), redirectUri));
     return settings;
 
