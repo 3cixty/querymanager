@@ -80,7 +80,8 @@ public class AuthenticationFilter implements Filter {
   protected AuthorizationRequest extractAuthorizationRequest(HttpServletRequest request) {
     String responseType = request.getParameter("response_type");
     String clientId = request.getParameter("client_id");
-    String redirectUri = request.getParameter("redirect_uri");
+    String clientSecret = request.getParameter("clientSecret");
+    String redirectUri = request.getParameter("redirect_uri") + "?clientId=" + clientId + "&clientSecret=" + clientSecret;
 
     List<String> requestedScopes = null;
     if (StringUtils.isNotBlank(request.getParameter("scope"))) {
