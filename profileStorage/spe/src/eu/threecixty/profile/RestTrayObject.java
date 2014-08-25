@@ -23,6 +23,7 @@ public class RestTrayObject {
 	private Boolean attend;
 	private String attend_datetime;
 	private int rating = -1;
+	private String image_url;
 	
 	public String getAction() {
 		return action;
@@ -131,5 +132,11 @@ public class RestTrayObject {
 	}
 	public void setRating(int rating) {
 		this.rating = rating;
+	}
+	public String getImage_url() {
+		return image_url;
+	}
+	public void setImage_url(String image_url) {
+		this.image_url = image_url;
 	}
 }

@@ -20,6 +20,7 @@ public class Tray {
 	private String attend_datetime;
 	private int rating = -1;
 	
+	private String image_url;
 	
 	public String getItemId() {
 		return element_id;
@@ -92,6 +93,14 @@ public class Tray {
 
 	public void setElement_title(String element_title) {
 		this.element_title = element_title;
+	}
+
+	public String getImage_url() {
+		return image_url;
+	}
+
+	public void setImage_url(String image_url) {
+		this.image_url = image_url;
 	}
 
 

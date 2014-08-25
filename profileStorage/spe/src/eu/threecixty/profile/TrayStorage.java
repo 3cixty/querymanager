@@ -177,6 +177,7 @@ public class TrayStorage {
 		    if (jsonObj.has("attend_datetime")) tray.setDateTimeAttended(jsonObj.getString("attend_datetime"));
 		    if (jsonObj.has("attend_datetime")) tray.setRating(jsonObj.getInt("rating"));
 		    if (jsonObj.has("element_title")) tray.setElement_title(jsonObj.getString("element_title"));
+		    if (jsonObj.has("image_url")) tray.setImage_url(jsonObj.getString("image_url"));
 		    trays.add(tray);
 		}
 		} catch (Exception e) {
