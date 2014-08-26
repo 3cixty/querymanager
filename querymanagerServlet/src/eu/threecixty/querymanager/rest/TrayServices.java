@@ -116,7 +116,7 @@ public class TrayServices {
     			}
     		}
     	}
-	    return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON_TYPE).build();
+	    return Response.status(Response.Status.OK).entity("{\"response\": \"OK\" }").type(MediaType.APPLICATION_JSON_TYPE).build();
 
     }
 	
