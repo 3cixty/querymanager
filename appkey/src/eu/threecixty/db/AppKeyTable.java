@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import org.apache.commons.validator.routines.EmailValidator;
 
 import eu.threecixty.keys.AppKey;
 import eu.threecixty.keys.KeyOwner;
@@ -16,10 +16,6 @@ import eu.threecixty.keys.KeyOwner;
 public class AppKeyTable {
 
 	private static final String TABLE_NAME = "app_key";
-	
-	private static final String EMAIL_PATTERN = 
-			"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	
 	private static boolean firstTime = true;
 	
@@ -280,9 +276,7 @@ public class AppKeyTable {
 
 	private static boolean validateEmail(String email) {
 		if (email == null || email.equals("")) return false;
-		Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-		Matcher matcher = pattern.matcher(email);
-		return matcher.matches();
+		return EmailValidator.getInstance().isValid(email);
 	}
 	
 	
