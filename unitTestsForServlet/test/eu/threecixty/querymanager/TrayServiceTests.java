@@ -7,9 +7,9 @@ import org.junit.Test;
 
 public class TrayServiceTests extends HTTPCall {
 
-//	private static final String TRAY_SERVLET = "http://3cixty.com:8080/querymanagerServlet-1.0/trayServlet";
+	private static final String TRAY_SERVLET = "http://beta.3cixty.com:8080/querymanagerServlet-1.0/trayServlet";
 //	private static final String APP_KEY="MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDMxMTM5Nzg3MikoZXMJaWxfd3BxZAVs";
-	private static final String TRAY_SERVLET = "http://localhost:8080/querymanagerServlet-1.0/services/tray";
+//	private static final String TRAY_SERVLET = "http://localhost:8080/querymanagerServlet-1.0/services/tray";
 	private static final String APP_KEY="Y29uZy1raW5oLm5ndXllbkBpbnJpYS5mcjE0MDQ5ODQ2NTcwMTMAZW11XWEDKGdj";
 	
 	
