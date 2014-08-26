@@ -41,6 +41,16 @@
 		<servlet-name>resteasy-servlet</servlet-name>
 		<url-pattern>/v1/*</url-pattern>
 	</servlet-mapping>
+
+    <servlet>
+	  <servlet-name>json-nospring</servlet-name>
+	  <servlet-class>eu.threecixty.querymanager.jsonrpc.TrayServicesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+	  <servlet-name>json-nospring</servlet-name>
+	  <url-pattern>/v1/json-nospring/*</url-pattern>
+    </servlet-mapping>
+
 	<!--
 	we can map many url-patterns 
 	<servlet-mapping>
@@ -48,20 +58,6 @@
 		<url-pattern>/v2/*</url-pattern>
 	</servlet-mapping>  
      -->
-  <!-- 
-<servlet>
-		<servlet-name>AsciiText</servlet-name>
-		<servlet-class>com.googlecode.jj1.server.Jj1Servlet</servlet-class>
-		<init-param>
-			<param-name>services</param-name>
-			<param-value>root=eu.threecixty.querymanager.jsonrpc.TrayServices</param-value>
-		</init-param>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>AsciiText</servlet-name>
-		<url-pattern>/ascii/*</url-pattern>
-	</servlet-mapping>
-   -->
     <filter>
             <!-- The CORS filter with parameters -->
             <filter-name>CORS</filter-name>

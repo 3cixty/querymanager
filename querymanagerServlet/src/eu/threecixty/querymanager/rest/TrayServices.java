@@ -159,6 +159,8 @@ public class TrayServices {
 		String source = restTray.getSource();
 		if (source == null) return false;
 		
+		String image_url = restTray.getImage_url();
+		
 		String element_title = restTray.getElement_title();
 		
 		Tray tray = new Tray();
@@ -167,6 +169,7 @@ public class TrayServices {
 		tray.setSource(source);
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setElement_title(element_title);
+		tray.setImage_url(image_url);
 		
 		String uid = GoogleAccountUtils.getUID(token);
 		if (uid == null || uid.equals("")) {
