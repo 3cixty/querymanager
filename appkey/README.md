@@ -7,7 +7,7 @@ appkey: current version `v1`
 
 ### Getting an App Key by using Google access token
 
-- Go to `http://3cixty.com:8080/qm/requestKey?accessToken={YourGoogleAccessToken}` 
+- Go to `http://3cixty.com:8080/qm/v1/requestKey?accessToken={YourGoogleAccessToken}` 
 - Then fill in the form and request an AppKey
 
 ## APIs
