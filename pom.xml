@@ -10,8 +10,10 @@
   <version>1.0</version>
   
   <modules>
-    <module>appkey</module>
-    <module>oauth</module>
+    <module>dbconnection</module>
+    <module>oauth-wrapper</module>
+	<module>appkey</module>
+    <!--module>oauth</module-->
   </modules>
   
   <build>
