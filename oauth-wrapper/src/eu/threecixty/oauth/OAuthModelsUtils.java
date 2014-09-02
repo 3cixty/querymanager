@@ -15,7 +15,7 @@ import eu.threecixty.oauth.model.UserAccessToken;
 
 public class OAuthModelsUtils {
 	
-	public static boolean addUser(String uid) {
+	protected static boolean addUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -34,7 +34,7 @@ public class OAuthModelsUtils {
 		}
 	}
 	
-	public static boolean existUser(String uid) {
+	protected static boolean existUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -48,7 +48,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static User getUser(String uid) {
+	protected static User getUser(String uid) {
 		if (isNullOrEmpty(uid)) return null;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -63,7 +63,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean saveOrUpdate(User user) {
+	protected static boolean saveOrUpdate(User user) {
 		if (user == null) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -79,7 +79,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean addDeveloper(String uid) {
+	protected static boolean addDeveloper(String uid) {
 		if (isNullOrEmpty(uid)) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -98,7 +98,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean existDeveloper(String uid) {
+	protected static boolean existDeveloper(String uid) {
 		if (isNullOrEmpty(uid)) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -112,7 +112,7 @@ public class OAuthModelsUtils {
 		}
 	}
 	
-	public static Developer getDeveloper(String uid) {
+	protected static Developer getDeveloper(String uid) {
 		if (isNullOrEmpty(uid)) return null;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -127,7 +127,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean saveOrUpdate(Developer developer) {
+	protected static boolean saveOrUpdate(Developer developer) {
 		if (developer == null) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -143,7 +143,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean addApp(String accessToken, String title, String description,
+	protected static boolean addApp(String accessToken, String title, String description,
 			String category, Developer developer) {
 		if (isNullOrEmpty(accessToken) || isNullOrEmpty(title)
 				|| isNullOrEmpty(category) || developer == null) return false;
@@ -168,7 +168,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean existApp(String accessToken) {
+	protected static boolean existApp(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -182,7 +182,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static App getApp(String accessToken) {
+	protected static App getApp(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return null;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -196,7 +196,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean addUserAccessToken(String accessToken, User user, App app) {
+	protected static boolean addUserAccessToken(String accessToken, User user, App app) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -217,7 +217,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean deleteUserAccessToken(UserAccessToken userAccessToken) {
+	protected static boolean deleteUserAccessToken(UserAccessToken userAccessToken) {
 		if (userAccessToken == null) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -233,7 +233,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static boolean existUserAccessToken(String accessToken) {
+	protected static boolean existUserAccessToken(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();

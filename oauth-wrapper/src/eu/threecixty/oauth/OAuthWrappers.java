@@ -21,16 +21,16 @@ import eu.threecixty.oauth.model.UserAccessToken;
 
 public class OAuthWrappers {
 
-	private static final String ENDPOINT_TO_GET_ACCESS_TOKEN = "http://localhost:8080/oauth2/token";
-	private static final String ENDPOINT_TO_VALIDATE_ACCESS_TOKEN = "http://localhost:8080/v1/tokeninfo?access_token=";
+	private static final String ENDPOINT_TO_GET_ACCESS_TOKEN = "http://localhost:8080/apis-authorization-server-war-1.3.5/oauth2/token";
+	private static final String ENDPOINT_TO_VALIDATE_ACCESS_TOKEN = "http://localhost:8080/apis-authorization-server-war-1.3.5/v1/tokeninfo?access_token=";
 	
 	private static final String ACCES_TOKEN_KEY = "access_token";
 	
 	private static final String AUTHORIZATION = "Authorization";
 
 	// client id and client secret to communicate with OAuth server
-	private static final String clientId = "";
-	private static final String clientSecret = "";
+	private static final String clientId = "cool_app_id";
+	private static final String clientSecret = "secret";
 	
 	/**
 	 * Gets user access token.
@@ -43,7 +43,12 @@ public class OAuthWrappers {
 	 */
 	public static String getAccessToken(String uid, String appkey) {
 		User user = OAuthModelsUtils.getUser(uid);
-		if (user == null) return null;
+		if (user == null) {
+			// create user in database to map with access tokens created by oauth server
+			if (!OAuthModelsUtils.addUser(uid)) return null;
+			user = OAuthModelsUtils.getUser(uid);
+			if (user == null) return null;
+		}
 		App app = OAuthModelsUtils.getApp(appkey);
 		if (app == null) return null;
 		UserAccessToken tmpUserAccessToken = null;
@@ -74,14 +79,20 @@ public class OAuthWrappers {
 	 * @param title
 	 * @param description
 	 * @param category
-	 * @param developer
+	 * @param uid
 	 * @return
 	 */
 	public static String getAppKey(String title, String description,
-			String category, Developer developer) {
+			String category, String uid) {
 		String tmpTitle = (title == null) ? "" : title;
 		String tmpCategory = (category == null) ? "" : category;
-		if (developer == null) return null;
+		if (uid == null) return null;
+		Developer developer = OAuthModelsUtils.getDeveloper(uid);
+		if (developer == null) {
+			if (!OAuthModelsUtils.addDeveloper(uid)) return null;
+			developer = OAuthModelsUtils.getDeveloper(uid);
+			if (developer == null) return null;
+		}
 		String accessToken = createAccessTokenUsingOAuthServer();
 		if (accessToken == null || accessToken.equals("")) return null;
 		boolean ok = OAuthModelsUtils.addApp(accessToken, tmpTitle, description, tmpCategory, developer);
@@ -152,6 +163,7 @@ public class OAuthWrappers {
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has(ACCES_TOKEN_KEY)) {
 				return jsonObj.getString(ACCES_TOKEN_KEY);
