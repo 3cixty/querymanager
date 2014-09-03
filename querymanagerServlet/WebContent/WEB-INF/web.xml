@@ -41,6 +41,10 @@
 		<servlet-name>resteasy-servlet</servlet-name>
 		<url-pattern>/v1/*</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>resteasy-servlet</servlet-name>
+		<url-pattern>/v2/*</url-pattern>
+	</servlet-mapping>
 
     <servlet>
 	  <servlet-name>json-nospring</servlet-name>
