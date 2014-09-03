@@ -1,6 +1,7 @@
 package eu.threecixty.oauth;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -10,6 +11,7 @@ import org.hibernate.Session;
 import eu.threecixty.db.HibernateUtil;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Developer;
+import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.model.User;
 import eu.threecixty.oauth.model.UserAccessToken;
 
@@ -142,9 +144,78 @@ public class OAuthModelsUtils {
 			return false;
 		}
 	}
+	
+	protected static boolean addScope(String scopeName, String description, int scopeLevel) {
+		if (isNullOrEmpty(scopeName) || isNullOrEmpty(description)) return false;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			Scope scope = new Scope();
+
+			scope.setScopeName(scopeName);
+			scope.setDescription(description);
+			scope.setScopeLevel(scopeLevel);
+
+			session.save(scope);
+
+			session.getTransaction().commit();
+			return true;
+		} catch (HibernateException e) {
+			return false;
+		}
+	}
+
+	protected static boolean deleteScope(String scopeName) {
+		if (isNullOrEmpty(scopeName)) return false;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM Scope S WHERE S.scopeName = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, scopeName).list();
+			if (results.size() == 0) return false;
+			Scope scope = (Scope) results.get(0);
+			session.delete(scope);
+			return true;
+		} catch (HibernateException e) {
+			return false;
+		}
+	}
+
+	protected static List <Scope> listScopes() {
+		List <Scope> scopes = new ArrayList <Scope>();
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM Scope";
+			Query query = session.createQuery(hql);
+			List <?> results = query.list();
+			for (Object obj: results) {
+				Scope scope = (Scope) obj;
+				scopes.add(scope);
+			}
+		} catch (HibernateException e) {
+		}
+		return scopes;
+	}
+
+	protected static Scope getScope(String scopeName) {
+		if (isNullOrEmpty(scopeName)) return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM Scope S WHERE S.scopeName = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, scopeName).list();
+			return (Scope) results.get(0);
+		} catch (HibernateException e) {
+			return null;
+		}
+	}
 
 	protected static boolean addApp(String key, String appId, String description,
-			String category, Developer developer) {
+			String category, Developer developer, Scope scope) {
 		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
 		try {
@@ -158,7 +229,7 @@ public class OAuthModelsUtils {
 			app.setCategory(category);
 			app.setDescription(description);
 			app.setDeveloper(developer);
-
+			app.setScope(scope);
 			session.save(app);
 
 			session.getTransaction().commit();

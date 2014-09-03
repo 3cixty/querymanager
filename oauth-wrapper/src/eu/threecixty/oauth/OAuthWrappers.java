@@ -1,6 +1,7 @@
 package eu.threecixty.oauth;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -16,6 +17,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Developer;
+import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.model.User;
 import eu.threecixty.oauth.model.UserAccessToken;
 
@@ -73,6 +75,34 @@ public class OAuthWrappers {
 		if (ok) return accessToken;
 		return null;
 	}
+	
+	/**
+	 * Add scope.
+	 * @param scopeName
+	 * @param description
+	 * @param scopeLevel
+	 * @return
+	 */
+	public static boolean addScope(String scopeName, String description, int scopeLevel) {
+		return OAuthModelsUtils.addScope(scopeName, description, scopeLevel);
+	}
+	
+	/**
+	 * Deletes scope from a given scope name
+	 * @param scopeName
+	 * @return
+	 */
+	public static boolean deleteScope(String scopeName) {
+		return OAuthModelsUtils.deleteScope(scopeName);
+	}
+	
+	/**
+	 * Gets all the scopes.
+	 * @return
+	 */
+	public static List <Scope> getScopes() {
+		return OAuthModelsUtils.listScopes();
+	}
 
 	/**
 	 * Note that a developer can have more than one app key.
@@ -83,7 +113,7 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static String getAppKey(String appId, String description,
-			String category, String uid) {
+			String category, String uid, String scopeName) {
 		String tmpAppId = (appId == null) ? "" : appId;
 		String tmpCategory = (category == null) ? "" : category;
 		if (uid == null) return null;
@@ -93,9 +123,11 @@ public class OAuthWrappers {
 			developer = OAuthModelsUtils.getDeveloper(uid);
 			if (developer == null) return null;
 		}
+		Scope scope = OAuthModelsUtils.getScope(scopeName);
+		if (scope == null) return null;
 		String appkey = createAccessTokenUsingOAuthServer();
 		if (appkey == null || appkey.equals("")) return null;
-		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, description, tmpCategory, developer);
+		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, description, tmpCategory, developer, scope);
 		if (ok) return appkey;
 		return null;
 	}

@@ -31,6 +31,7 @@ public class App implements java.io.Serializable {
 	private String key;
 	private Set <UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 	private Developer developer;
+	private Scope scope;
 
 	private String appNameSpace;
 	private String description;
@@ -100,5 +101,15 @@ public class App implements java.io.Serializable {
 
 	public void setAppNameSpace(String appNameSpace) {
 		this.appNameSpace = appNameSpace;
+	}
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "3cixty_scope_id", nullable = false)
+	public Scope getScope() {
+		return scope;
+	}
+
+	public void setScope(Scope scope) {
+		this.scope = scope;
 	}
 }
