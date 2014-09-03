@@ -143,9 +143,9 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	protected static boolean addApp(String accessToken, String title, String description,
+	protected static boolean addApp(String key, String appId, String description,
 			String category, Developer developer) {
-		if (isNullOrEmpty(accessToken) || isNullOrEmpty(title)
+		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -153,8 +153,8 @@ public class OAuthModelsUtils {
 			session.beginTransaction();
 
 			App app = new App();
-			app.setAccessToken(accessToken);
-			app.setTitle(title);
+			app.setKey(key);
+			app.setAppNameSpace(appId);
 			app.setCategory(category);
 			app.setDescription(description);
 			app.setDeveloper(developer);
@@ -168,28 +168,44 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	protected static boolean existApp(String accessToken) {
-		if (isNullOrEmpty(accessToken)) return false;
+	protected static boolean existApp(String key) {
+		if (isNullOrEmpty(key)) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM App A WHERE A.accessToken = ?";
+			String hql = "FROM App A WHERE A.key = ?";
 			Query query = session.createQuery(hql);
-			List <?> results = query.setString(0, accessToken).list();
+			List <?> results = query.setString(0, key).list();
 			return results.size() > 0;
 		} catch (HibernateException e) {
 			return false;
 		}
 	}
 
-	protected static App getApp(String accessToken) {
-		if (isNullOrEmpty(accessToken)) return null;
+	protected static App getApp(String key) {
+		if (isNullOrEmpty(key)) return null;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM App A WHERE A.accessToken = ?";
+			String hql = "FROM App A WHERE A.key = ?";
 			Query query = session.createQuery(hql);
-			List <?> results = query.setString(0, accessToken).list();
+			List <?> results = query.setString(0, key).list();
+			return (App) results.get(0);
+		} catch (HibernateException e) {
+			return null;
+		}
+	}
+
+	protected static App retrieveApp(String uid, String appid) {
+		if (isNullOrEmpty(appid)) return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			Developer developer = OAuthModelsUtils.getDeveloper(uid);
+			if (developer == null) return null;
+			String hql = "FROM App A WHERE A.developer = ? AND A.appNameSpace = ?";
+			Query query = session.createQuery(hql);
+			
+			List <?> results = query.setEntity(0, developer).setString(1, appid).list();
 			return (App) results.get(0);
 		} catch (HibernateException e) {
 			return null;

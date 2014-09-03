@@ -18,7 +18,8 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "3cixty_app", uniqueConstraints = {
-		@UniqueConstraint(columnNames = "access_token")})
+		@UniqueConstraint(columnNames = "app_key"),
+		@UniqueConstraint(columnNames = "name_space")})
 public class App implements java.io.Serializable {
 
 	/**
@@ -27,11 +28,11 @@ public class App implements java.io.Serializable {
 	private static final long serialVersionUID = 52823901759062535L;
 	
 	private Integer id;
-	private String accessToken;
+	private String key;
 	private Set <UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 	private Developer developer;
 
-	private String title;
+	private String appNameSpace;
 	private String description;
 	private String category;
 
@@ -55,13 +56,13 @@ public class App implements java.io.Serializable {
 		this.userAccessTokens = userAccessTokens;
 	}
 
-	@Column(name = "access_token", unique = true, nullable = false, length = 64)
-	public String getAccessToken() {
-		return accessToken;
+	@Column(name = "app_key", unique = true, nullable = false, length = 64)
+	public String getKey() {
+		return key;
 	}
 
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -72,15 +73,6 @@ public class App implements java.io.Serializable {
 
 	public void setDeveloper(Developer developer) {
 		this.developer = developer;
-	}
-
-	@Column(name = "title", unique = false, nullable = false, length = 256)
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	@Column(name = "description", unique = false, nullable = true, length = 4000)
@@ -99,5 +91,14 @@ public class App implements java.io.Serializable {
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	@Column(name = "name_space", unique = true, nullable = false, length = 255)
+	public String getAppNameSpace() {
+		return appNameSpace;
+	}
+
+	public void setAppNameSpace(String appNameSpace) {
+		this.appNameSpace = appNameSpace;
 	}
 }

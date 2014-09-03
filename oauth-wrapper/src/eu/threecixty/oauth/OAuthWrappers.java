@@ -76,15 +76,15 @@ public class OAuthWrappers {
 
 	/**
 	 * Note that a developer can have more than one app key.
-	 * @param title
+	 * @param appId
 	 * @param description
 	 * @param category
 	 * @param uid
 	 * @return
 	 */
-	public static String getAppKey(String title, String description,
+	public static String getAppKey(String appId, String description,
 			String category, String uid) {
-		String tmpTitle = (title == null) ? "" : title;
+		String tmpAppId = (appId == null) ? "" : appId;
 		String tmpCategory = (category == null) ? "" : category;
 		if (uid == null) return null;
 		Developer developer = OAuthModelsUtils.getDeveloper(uid);
@@ -93,11 +93,22 @@ public class OAuthWrappers {
 			developer = OAuthModelsUtils.getDeveloper(uid);
 			if (developer == null) return null;
 		}
-		String accessToken = createAccessTokenUsingOAuthServer();
-		if (accessToken == null || accessToken.equals("")) return null;
-		boolean ok = OAuthModelsUtils.addApp(accessToken, tmpTitle, description, tmpCategory, developer);
-		if (ok) return accessToken;
+		String appkey = createAccessTokenUsingOAuthServer();
+		if (appkey == null || appkey.equals("")) return null;
+		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, description, tmpCategory, developer);
+		if (ok) return appkey;
 		return null;
+	}
+
+	/**
+	 * Retrieves app key from a given UID and appID.
+	 * @param appid
+	 * @param uid
+	 * @return
+	 */
+	public static String retrieveAppKey(String appid, String uid) {
+		App app = OAuthModelsUtils.retrieveApp(uid, appid);
+		return app == null ? null : app.getKey();
 	}
 
 	/**
@@ -163,7 +174,6 @@ public class OAuthWrappers {
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
-			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has(ACCES_TOKEN_KEY)) {
 				return jsonObj.getString(ACCES_TOKEN_KEY);
