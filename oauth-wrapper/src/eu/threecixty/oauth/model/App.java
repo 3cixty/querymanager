@@ -36,6 +36,7 @@ public class App implements java.io.Serializable {
 	private String appNameSpace;
 	private String description;
 	private String category;
+	private String redirectUri;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -111,5 +112,14 @@ public class App implements java.io.Serializable {
 
 	public void setScope(Scope scope) {
 		this.scope = scope;
+	}
+
+	@Column(name = "redirect_uri", unique = false, nullable = true, length = 255)
+	public String getRedirectUri() {
+		return redirectUri;
+	}
+
+	public void setRedirectUri(String redirectUri) {
+		this.redirectUri = redirectUri;
 	}
 }

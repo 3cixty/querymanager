@@ -215,7 +215,7 @@ public class OAuthModelsUtils {
 	}
 
 	protected static boolean addApp(String key, String appId, String description,
-			String category, Developer developer, Scope scope) {
+			String category, Developer developer, Scope scope, String redirect_uri) {
 		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
 		try {
@@ -230,7 +230,26 @@ public class OAuthModelsUtils {
 			app.setDescription(description);
 			app.setDeveloper(developer);
 			app.setScope(scope);
+			app.setRedirectUri(redirect_uri);
+			
 			session.save(app);
+
+			session.getTransaction().commit();
+			return true;
+		} catch (HibernateException e) {
+			return false;
+		}
+	}
+
+	protected static boolean updateApp(App app) {
+		if (app == null) return false;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+
+			
+			session.update(app);
 
 			session.getTransaction().commit();
 			return true;

@@ -119,7 +119,7 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static String getAppKey(String appId, String description,
-			String category, String uid, String scopeName) {
+			String category, String uid, String scopeName, String redirect_uri) {
 		String tmpAppId = (appId == null) ? "" : appId;
 		String tmpCategory = (category == null) ? "" : category;
 		if (uid == null) return null;
@@ -133,9 +133,28 @@ public class OAuthWrappers {
 		if (scope == null) return null;
 		String appkey = createAccessTokenUsingOAuthServer();
 		if (appkey == null || appkey.equals("")) return null;
-		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, description, tmpCategory, developer, scope);
+		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, description, tmpCategory, developer, scope, redirect_uri);
 		if (ok) return appkey;
 		return null;
+	}
+
+	public static boolean updateAppKey(App app,  String description,
+			String category, String scopeName, String redirect_uri) {
+		if (description != null && !description.equals("")) {
+			app.setDescription(description);
+		}
+		if (category != null && !category.equals("")) {
+			app.setCategory(category);
+		}
+		if (scopeName != null && !scopeName.equals("")) {
+			Scope scope = OAuthModelsUtils.getScope(scopeName);
+			if (scope == null) return false;
+			app.setScope(scope);
+		}
+		if (redirect_uri != null && !redirect_uri.equals("")) {
+			app.setRedirectUri(redirect_uri);
+		}
+		return OAuthModelsUtils.updateApp(app);
 	}
 
 	/**
@@ -147,6 +166,15 @@ public class OAuthWrappers {
 	public static String retrieveAppKey(String appid, String uid) {
 		App app = OAuthModelsUtils.retrieveApp(uid, appid);
 		return app == null ? null : app.getKey();
+	}
+
+	/**
+	 * Retrieves app from a given UID and appID.
+	 * @param appkey
+	 * @return
+	 */
+	public static App retrieveApp(String appkey) {
+		return OAuthModelsUtils.getApp(appkey);
 	}
 
 	/**
