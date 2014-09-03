@@ -30,9 +30,15 @@ public class OAuthWrappers {
 	
 	private static final String AUTHORIZATION = "Authorization";
 
-	// client id and client secret to communicate with OAuth server
+	// TODO: client id and client secret to communicate with OAuth server
+	// make sure that this user exists in the database (the client table)
 	private static final String clientId = "cool_app_id";
 	private static final String clientSecret = "secret";
+
+	// TODO: resourceServer Name and secret to communicate with OAuth server
+	// make sure that this user exists in the database (the resourceserver table)
+	private static final String resourceServerKey = "university-foo";
+	private static final String resourceServerSecret = "58b749f7-acb3-44b7-a38c-53d5ad740cf6";
 	
 	/**
 	 * Gets user access token.
@@ -177,8 +183,8 @@ public class OAuthWrappers {
 	private static boolean validateAccessToken(String accessToken) {
 		Client client = Client.create();
 
-	    String auth = "Basic ".concat(new String(Base64.encodeBase64(clientId.concat(":")
-	            .concat(clientSecret).getBytes())));
+	    String auth = "Basic ".concat(new String(Base64.encodeBase64(resourceServerKey.concat(":")
+	            .concat(resourceServerSecret).getBytes())));
 	    Builder builder = client.resource(ENDPOINT_TO_VALIDATE_ACCESS_TOKEN + accessToken).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 	    ClientResponse clientResponse = builder.get(ClientResponse.class);
