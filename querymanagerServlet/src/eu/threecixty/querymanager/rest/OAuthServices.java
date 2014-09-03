@@ -1,26 +1,38 @@
 package eu.threecixty.querymanager.rest;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.profile.GoogleAccountUtils;
 
 @Path("/" + Constants.VERSION_2)
 public class OAuthServices {
+	
+	public static final String APP_KEY = "appObj";
+	private static final String GOOGLE_AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/auth";
+
+	@Context 
+	private HttpServletRequest httpRequest;
 
 	@GET
 	@Path("/validateAccessToken")
@@ -62,14 +74,15 @@ public class OAuthServices {
 	@GET
 	@Path("/getAppKey")
 	public Response getAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid,
-			@DefaultValue("") @QueryParam("description") String desc, @QueryParam("category") String cat, @QueryParam("scopeName") String scopeName) {
+			@DefaultValue("") @QueryParam("description") String desc, @QueryParam("category") String cat,
+			@QueryParam("scopeName") String scopeName, @QueryParam("redirect_uri") String redirect_uri) {
 		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		String appKey = OAuthWrappers.getAppKey(appid, desc, cat, uid, scopeName);
+		String appKey = OAuthWrappers.getAppKey(appid, desc, cat, uid, scopeName, redirect_uri);
 		if (appKey != null && !appKey.equals("")) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"key\": \"" + appKey + "\"} ")
@@ -78,6 +91,30 @@ public class OAuthServices {
 		}
 		return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"appId already existed or scopeName doesn't exist\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+	}
+
+	@GET
+	@Path("/updateAppKey")
+	public Response updateAppKey(@QueryParam("key") String key, 
+			@DefaultValue("") @QueryParam("description") String desc, @DefaultValue("") @QueryParam("category") String cat,
+			@DefaultValue("") @QueryParam("scopeName") String scopeName, @DefaultValue("") @QueryParam("redirect_uri") String redirect_uri) {
+		App app = OAuthWrappers.retrieveApp(key);
+		if (app == null)
+			return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		boolean ok = OAuthWrappers.updateAppKey(app, desc, cat, scopeName, redirect_uri);
+		if (ok) {
+			return Response.status(Response.Status.OK)
+	        .entity(" {\"response\": \"successful\"} ")
+	        .type(MediaType.APPLICATION_JSON_TYPE)
+	        .build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 	}
@@ -166,6 +203,24 @@ public class OAuthServices {
 				.build();
 	}
 
+	@GET
+	@Path("/auth")
+	public Response auth(@QueryParam("key") String appkey) {
+		App app = OAuthWrappers.retrieveApp(appkey);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		HttpSession session = httpRequest.getSession();
+		session.setAttribute(APP_KEY, app);
+		try {
+			return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private boolean checkUserForScope(String username, String password) {
 		// TODO: FIXME 
 		return ("3cixty".equals(username) && "3cixty".equals(password));
@@ -177,7 +232,10 @@ public class OAuthServices {
 			this.scopeName = scopeName;
 			this.description = desc;
 		}
+		// used by gson
+		@SuppressWarnings("unused")
 		private String scopeName;
+		@SuppressWarnings("unused")
 		private String description;
 	}
 }
