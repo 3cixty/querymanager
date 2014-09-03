@@ -43,7 +43,7 @@ public class OAuthServices {
 		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\"} ")
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		String accessToken = OAuthWrappers.getAccessToken(uid, appkey);
