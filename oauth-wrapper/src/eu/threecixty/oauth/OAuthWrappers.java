@@ -181,7 +181,7 @@ public class OAuthWrappers {
 	            .concat(clientSecret).getBytes())));
 	    Builder builder = client.resource(ENDPOINT_TO_VALIDATE_ACCESS_TOKEN + accessToken).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-	    ClientResponse clientResponse = builder.post(ClientResponse.class);
+	    ClientResponse clientResponse = builder.get(ClientResponse.class);
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
 			JSONObject jsonObj = new JSONObject(jsonStr);
