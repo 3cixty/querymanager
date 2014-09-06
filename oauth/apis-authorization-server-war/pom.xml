@@ -193,7 +193,7 @@
             <configuration>
               <scanIntervalSeconds>0</scanIntervalSeconds>
               <webAppConfig>
-                <contextPath>/</contextPath>
+                <contextPath>/apis-authorization-server-war-1.3.5</contextPath>
                 <extraClasspath>${basedir}/src/test/resources/</extraClasspath>
               </webAppConfig>
               <connectors>
@@ -271,7 +271,7 @@
         <configuration>
           <contextHandlers>
             <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
-              <contextPath>/mujina-idp</contextPath>
+              <contextPath>/mujina-idp-3.1.0</contextPath>
               <war>
                 ${settings.localRepository}/org/surfnet/coin/mujina-idp/${mujina-idp.version}/mujina-idp-${mujina-idp.version}.war
               </war>

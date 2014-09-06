@@ -17,10 +17,11 @@
 </head>
 <body>
 
-
+<!-- 
 <div class="head">
   <img src="${pageContext.request.contextPath}/client/img/surf-oauth.png"/>
 </div>
+ -->
 <div class="main">
   <div class="full">
 
@@ -68,9 +69,10 @@
     </form>
   </div>
 </div>
-
+<!-- 
 <div class="foot">
   <p>Powered by <a href="http://www.surfnet.nl/">SURFnet</a>. Fork me on <a href="https://github.com/OpenConextApps/oa-aas/">Github</a>. Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</p>
 </div>
+ -->
 </body>
 </html>

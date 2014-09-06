@@ -15,54 +15,75 @@
 </head>
 
 <body>
-
+<!-- 
 <div class="head">
   <img src="${pageContext.request.contextPath}/client/img/surf-oauth.png"/>
 </div>
-
+ -->
 <div class="main">
   <div class="full">
+  <!-- 
     <div class="page-header">
       <h1>Login</h1>
     </div>
+ -->
+<%
+    String sessionId = System.currentTimeMillis() + "";
+%>
 
     <form class="form-horizontal" id="registerHere" method="post"
       action="${actionUri}">
       <fieldset>
         <div class="control-group">
+        <!-- 
           <label class="control-label">Identifier</label>
+           -->
           <div class="controls">
-            <input type="text" class="input-xlarge" id="username"
+            <input type="hidden" class="input-xlarge" id="username"
               name="j_username" rel="popover"
               data-content="Enter your identifier."
-              data-original-title="Identifier" />
+              data-original-title="Identifier" value="<%=sessionId %>" />
+              <!-- 
             <p class="help-block">Hint: can be anything</p>
+             -->
           </div>
         </div>
 
         <div class="control-group">
+        <!-- 
           <label class="control-label">Password</label>
+           -->
           <div class="controls">
-            <input type="password" class="input-xlarge" id="password"
+            <input type="hidden" class="input-xlarge" id="password"
               name="j_password" rel="popover"
               data-content="What's your password?"
-              data-original-title="Password" />
+              data-original-title="Password" value="<%=sessionId %>" />
+              <!-- 
             <p class="help-block">Hint: can be anything</p>
+             -->
           </div>
         </div>
         <input type="hidden" name="AUTH_STATE" value="${AUTH_STATE}" />
       </fieldset>
-
+<!-- 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">Login</button>
       </div>
+       -->
     </form>
   </div>
 </div>
-
+<!-- 
 <div class="foot">
   <p>Powered by <a href="http://www.surfnet.nl/">SURFnet</a>. Fork me on <a href="https://github.com/OpenConextApps/oa-aas/">Github</a>. Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</p>
 </div>
-
+ -->
+    <script type="text/javascript">
+        function performLogin() {
+        	var f = document.getElementById("registerHere");
+        	f.submit();
+        }
+        performLogin();
+    </script>
 </body>
 </html>
