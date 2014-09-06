@@ -4,17 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>eu.3cixty</groupId>
-  <artifactId>appkey-parent</artifactId>
-  <name>App Key-Parent</name>
+  <artifactId>3cixty-oauth-integration</artifactId>
+  <name>3Cixty OAuth Integration</name>
   <packaging>pom</packaging>
   <version>1.0</version>
   
   <modules>
-    <module>dbconnection</module>
-    <module>oauth-wrapper</module>
-	<module>appkey</module>
-	<module>3cixty-oauth-integration</module>
-    <!--module>oauth</module-->
+    <module>appkey-generation</module>
   </modules>
   
   <build>
