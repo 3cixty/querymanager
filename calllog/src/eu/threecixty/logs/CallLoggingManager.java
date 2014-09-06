@@ -2,8 +2,6 @@ package eu.threecixty.logs;
 
 import java.util.List;
 
-import eu.threecixty.keys.KeyManager;
-
 public class CallLoggingManager {
 
 	private static final Object _sync = new Object();
@@ -38,7 +36,7 @@ public class CallLoggingManager {
 	 */
 	public boolean save(String appkey, long starttime, long endtime, String serviceName) {
 		CallLogging logging = new CallLogging();
-		logging.setAppKey(KeyManager.getInstance().getAppKeyFromKey(appkey));
+		logging.setKey(appkey);
 		logging.setServiceName(serviceName);
 		logging.setStartTime(starttime);
 		int timeConsumed = (int) ((endtime - starttime) / 1000); // in second
@@ -58,7 +56,7 @@ public class CallLoggingManager {
 	public boolean save(String appkey, long starttime, String serviceName, String description) {
 		long endtime = System.currentTimeMillis();
 		CallLogging logging = new CallLogging();
-		logging.setAppKey(KeyManager.getInstance().getAppKeyFromKey(appkey));
+		logging.setKey(appkey);
 		logging.setServiceName(serviceName);
 		logging.setStartTime(starttime);
 		int timeConsumed = (int) ((endtime - starttime) / 1000); // in second
