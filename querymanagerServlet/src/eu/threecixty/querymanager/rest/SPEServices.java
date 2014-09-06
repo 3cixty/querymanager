@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -20,6 +21,8 @@ import com.google.gson.Gson;
 import eu.threecixty.keys.KeyManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.oauth.model.UserAccessToken;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
@@ -46,7 +49,7 @@ public class SPEServices {
 	 *         for more information.
 	 */
 	@GET
-	@Path("/getProfile")
+	@Path("/getProfile1")
 	@Produces("application/json")
 	public String getProfile(@QueryParam("accessToken") String accessToken, @QueryParam("key") String key) {
 		try {
@@ -96,6 +99,46 @@ public class SPEServices {
 		}
 	}
 
+	@GET
+	@Path("/getProfile")
+	@Produces("application/json")
+	public String getProfile(@HeaderParam("accessToken") String accessToken) {
+		try {
+			UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
+			long starttime = System.currentTimeMillis();
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+				String uid = null;
+				HttpSession session = httpRequest.getSession();
+				uid = userAccessToken.getUser().getUid();
+				session.setAttribute("uid", uid);
+				ProfileInformation profile = ProfileInformationStorage.loadProfile(uid);
+				if (profile == null) {
+//					CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.FAILED);
+					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity("There is no information of your profile in the KB")
+					        .type(MediaType.TEXT_PLAIN)
+					        .build());
+				}
+				Gson gson = new Gson();
+				String ret = gson.toJson(profile);
+//				CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				return ret;
+			} else {
+//				CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity("The access token is invalid '" + accessToken + "'")
+				        .type(MediaType.TEXT_PLAIN)
+				        .build());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity(e.getMessage())
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+	
 	/**
 	 * Saves profile information to the KB.
 	 * @param accessToken
