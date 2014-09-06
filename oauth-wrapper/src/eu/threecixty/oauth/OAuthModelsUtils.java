@@ -41,7 +41,7 @@ public class OAuthModelsUtils {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM User U WHERE U.uid = ?";
+			String hql = "FROM User U WHERE U.uid = ? AND U.class = '" + User.class.getSimpleName() + "'";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
 			return results.size() > 0;
@@ -55,7 +55,7 @@ public class OAuthModelsUtils {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM User U WHERE U.uid = ?";
+			String hql = "FROM User U WHERE U.uid = ? AND U.class ='" + User.class.getSimpleName() + "'";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
 			if (results.size() == 0) return null;
@@ -105,7 +105,8 @@ public class OAuthModelsUtils {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM Developer D WHERE D.uid  = ?";
+			String hql = "FROM Developer D WHERE D.uid  = ? AND D.class = '"
+			        + Developer.class.getSimpleName() + "' ";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
 			return results.size() > 0;
@@ -119,7 +120,8 @@ public class OAuthModelsUtils {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM Developer D WHERE D.uid = ? ";
+			String hql = "FROM Developer D WHERE D.uid = ? AND D.class = '"
+			        + Developer.class.getSimpleName() + "' ";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
 			if (results.size() == 0) return null;
@@ -208,13 +210,14 @@ public class OAuthModelsUtils {
 			String hql = "FROM Scope S WHERE S.scopeName = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, scopeName).list();
+			if (results.size() == 0) return null;
 			return (Scope) results.get(0);
 		} catch (HibernateException e) {
 			return null;
 		}
 	}
 
-	protected static boolean addApp(String key, String appId, String description,
+	protected static boolean addApp(String key, String appId, String appName, String clientId, String description,
 			String category, Developer developer, Scope scope, String redirect_uri) {
 		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
@@ -231,6 +234,8 @@ public class OAuthModelsUtils {
 			app.setDeveloper(developer);
 			app.setScope(scope);
 			app.setRedirectUri(redirect_uri);
+			app.setClientId(clientId);
+			app.setAppName(appName);
 			
 			session.save(app);
 
@@ -250,6 +255,23 @@ public class OAuthModelsUtils {
 
 			
 			session.update(app);
+
+			session.getTransaction().commit();
+			return true;
+		} catch (HibernateException e) {
+			return false;
+		}
+	}
+
+	protected static boolean deleteApp(App app) {
+		if (app == null) return false;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+
+			
+			session.delete(app);
 
 			session.getTransaction().commit();
 			return true;
@@ -280,6 +302,7 @@ public class OAuthModelsUtils {
 			String hql = "FROM App A WHERE A.key = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, key).list();
+			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {
 			return null;
@@ -296,6 +319,7 @@ public class OAuthModelsUtils {
 			Query query = session.createQuery(hql);
 			
 			List <?> results = query.setEntity(0, developer).setString(1, appid).list();
+			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {
 			return null;
@@ -350,6 +374,21 @@ public class OAuthModelsUtils {
 			return results.size() > 0;
 		} catch (HibernateException e) {
 			return false;
+		}
+	}
+	
+	protected static UserAccessToken retrieveUserAccessToken(String accessToken) {
+		if (isNullOrEmpty(accessToken)) return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, accessToken).list();
+			if (results.size() == 0) return null;
+			return (UserAccessToken) results.get(0);
+		} catch (HibernateException e) {
+			return null;
 		}
 	}
 

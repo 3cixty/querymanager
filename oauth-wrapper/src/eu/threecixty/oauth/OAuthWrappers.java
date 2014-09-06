@@ -1,6 +1,7 @@
 package eu.threecixty.oauth;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -21,14 +22,25 @@ import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.model.User;
 import eu.threecixty.oauth.model.UserAccessToken;
 
-public class OAuthWrappers {
+public class OAuthWrappers { 
+	
+	private static final String ROOT_LOCALHOST = "http://localhost:8080/";
+	private static final String ROOT_3CIXTY = "http://3cixty.com:8080/";
+	
+	public static final String ROOT_SERVER = ROOT_LOCALHOST;
+	
+	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5";
 
-	private static final String ENDPOINT_TO_GET_ACCESS_TOKEN = "http://localhost:8080/apis-authorization-server-war-1.3.5/oauth2/token";
-	private static final String ENDPOINT_TO_VALIDATE_ACCESS_TOKEN = "http://localhost:8080/apis-authorization-server-war-1.3.5/v1/tokeninfo?access_token=";
+	public static final String ENDPOINT_AUTHORIZATION = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/authorize";
+	
+	public static final String ENDPOINT_TO_POST_ACCESS_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/token";
+	private static final String ENDPOINT_TO_VALIDATE_ACCESS_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/v1/tokeninfo?access_token=";
+	
+	private static final String ENDPOINT_TO_CREATE_CLIENT_FOR_APP = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/3cixty/createClientIdForApp";
 	
 	private static final String ACCES_TOKEN_KEY = "access_token";
 	
-	private static final String AUTHORIZATION = "Authorization";
+	public static final String AUTHORIZATION = "Authorization";
 
 	// TODO: client id and client secret to communicate with OAuth server
 	// make sure that this user exists in the database (the client table)
@@ -37,8 +49,8 @@ public class OAuthWrappers {
 
 	// TODO: resourceServer Name and secret to communicate with OAuth server
 	// make sure that this user exists in the database (the resourceserver table)
-	private static final String resourceServerKey = "university-foo";
-	private static final String resourceServerSecret = "58b749f7-acb3-44b7-a38c-53d5ad740cf6";
+	private static final String resourceServerKey = "3cixty-res-admin";
+	private static final String resourceServerSecret = "(3cixty)InMiLano!+-:";
 	
 	/**
 	 * Gets user access token.
@@ -76,10 +88,52 @@ public class OAuthWrappers {
 		}
 		// create a new access token
 		String accessToken = createAccessTokenUsingOAuthServer();
-		if (accessToken == null || accessToken.equals("")) return null;
-		boolean ok = OAuthModelsUtils.addUserAccessToken(accessToken, user, app);
-		if (ok) return accessToken;
+		if (storeAccessTokenWithUID(uid, accessToken, app)) return accessToken;
 		return null;
+	}
+
+	public static String findAccessToken(String uid, String appkey) {
+		User user = OAuthModelsUtils.getUser(uid);
+		if (user == null) {
+			// create user in database to map with access tokens created by oauth server
+			if (!OAuthModelsUtils.addUser(uid)) return null;
+			user = OAuthModelsUtils.getUser(uid);
+			if (user == null) return null;
+		}
+		App app = OAuthModelsUtils.getApp(appkey);
+		if (app == null) return null;
+		UserAccessToken tmpUserAccessToken = null;
+		for (UserAccessToken userAccessToken: user.getUserAccessTokens()) {
+			if (userAccessToken.getApp().getId().intValue() == app.getId().intValue()) { // found in DB
+				// check if this access token is still available on oauth server to delete
+				if (!validateAccessToken(userAccessToken.getAccessToken())) {
+					tmpUserAccessToken = userAccessToken;
+				} else {
+				    return userAccessToken.getAccessToken();
+				}
+			}
+		}
+		// delete UserAccessToken as this access token is not available on OAuth server
+		if (tmpUserAccessToken != null) {
+			OAuthModelsUtils.deleteUserAccessToken(tmpUserAccessToken);
+		}
+		return null;
+	}
+
+	public static boolean storeAccessTokenWithUID(String uid, String accessToken, App app) {
+		User user = OAuthModelsUtils.getUser(uid);
+		if (user == null) {
+			// create user in database to map with access tokens created by oauth server
+			if (!OAuthModelsUtils.addUser(uid)) return false;
+			user = OAuthModelsUtils.getUser(uid);
+			if (user == null) return false;
+		}
+		if (accessToken == null || accessToken.equals("")) return false;
+		return OAuthModelsUtils.addUserAccessToken(accessToken, user, app);
+	}
+	
+	public static UserAccessToken retrieveUserAccessToken(String accessToken) {
+		return OAuthModelsUtils.retrieveUserAccessToken(accessToken);
 	}
 	
 	/**
@@ -118,8 +172,8 @@ public class OAuthWrappers {
 	 * @param uid
 	 * @return
 	 */
-	public static String getAppKey(String appId, String description,
-			String category, String uid, String scopeName, String redirect_uri) {
+	public static String getAppKey(String appId, String appName, String description,
+			String category, String uid, String scopeName, String redirect_uri, String thumbNailUrl) {
 		String tmpAppId = (appId == null) ? "" : appId;
 		String tmpCategory = (category == null) ? "" : category;
 		if (uid == null) return null;
@@ -133,9 +187,17 @@ public class OAuthWrappers {
 		if (scope == null) return null;
 		String appkey = createAccessTokenUsingOAuthServer();
 		if (appkey == null || appkey.equals("")) return null;
-		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, description, tmpCategory, developer, scope, redirect_uri);
-		if (ok) return appkey;
-		return null;
+		String clientId = tmpAppId + System.currentTimeMillis();
+		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, appName, clientId, description, tmpCategory,
+				developer, scope, redirect_uri);
+		if (!ok) return null;
+		// create clientId in the client table
+		if (!createClientIdForApp(clientId, appName, scopeName, thumbNailUrl)) {
+			App app = OAuthModelsUtils.getApp(appkey);
+			OAuthModelsUtils.deleteApp(app);
+			return null;
+		}
+		return appkey;
 	}
 
 	public static boolean updateAppKey(App app,  String description,
@@ -199,8 +261,13 @@ public class OAuthWrappers {
 	 */
 	public static boolean validateUserAccessToken(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return false;
-		if (!OAuthModelsUtils.existUserAccessToken(accessToken)) return false;
 		return validateAccessToken(accessToken);
+	}
+
+	public static String getBasicAuth() {
+		String basicAuth = "Basic ".concat(new String(Base64.encodeBase64(clientId.concat(":")
+				.concat(clientSecret).getBytes())));
+		return basicAuth;
 	}
 
 	/**
@@ -235,7 +302,7 @@ public class OAuthWrappers {
 
 	    String auth = "Basic ".concat(new String(Base64.encodeBase64(clientId.concat(":")
 	            .concat(clientSecret).getBytes())));
-	    Builder builder = client.resource(ENDPOINT_TO_GET_ACCESS_TOKEN).header(AUTHORIZATION, auth)
+	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
@@ -248,6 +315,33 @@ public class OAuthWrappers {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private static boolean createClientIdForApp(String clientId,
+			String app_name, String scopeName, String thumbNailUrl) {
+		Client client = Client.create();
+	    Builder builder;
+		try {
+			builder = client.resource(ENDPOINT_TO_CREATE_CLIENT_FOR_APP + "?clientId=" + clientId
+					+ "&app_name=" + URLEncoder.encode(app_name, "UTF-8")
+					+ "&scope=" + URLEncoder.encode(scopeName, "UTF-8")
+					+ "&thumbNailUrl=" + URLEncoder.encode(thumbNailUrl, "UTF-8"))
+					.header(AUTHORIZATION, getBasicAuth());
+			
+	        ClientResponse clientResponse = builder.get(ClientResponse.class);
+
+			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			JSONObject jsonObj = new JSONObject(jsonStr);
+			if (jsonObj.has("response")) {
+				String res = jsonObj.getString("response");
+				return res.equalsIgnoreCase("successful");
+			} else {
+				return false;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	private OAuthWrappers() {

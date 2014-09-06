@@ -19,7 +19,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(name = "3cixty_app", uniqueConstraints = {
 		@UniqueConstraint(columnNames = "app_key"),
-		@UniqueConstraint(columnNames = "name_space")})
+		@UniqueConstraint(columnNames = "name_space"), @UniqueConstraint(columnNames = "clientId")})
 public class App implements java.io.Serializable {
 
 	/**
@@ -33,10 +33,16 @@ public class App implements java.io.Serializable {
 	private Developer developer;
 	private Scope scope;
 
+	// appid
 	private String appNameSpace;
 	private String description;
+	private String appName;
 	private String category;
 	private String redirectUri;
+	
+	
+	// also check clientId in the 'client' table
+	private String clientId;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -121,5 +127,23 @@ public class App implements java.io.Serializable {
 
 	public void setRedirectUri(String redirectUri) {
 		this.redirectUri = redirectUri;
+	}
+
+	@Column(name = "clientId", unique = true, nullable = false, length = 255)
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	@Column(name = "app_name", unique = false, nullable = false, length = 255)
+	public String getAppName() {
+		return appName;
+	}
+
+	public void setAppName(String appName) {
+		this.appName = appName;
 	}
 }
