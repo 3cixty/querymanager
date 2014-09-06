@@ -39,6 +39,8 @@ public class CallLoggingConstants {
 	
 	public static final String INVALID_APP_KEY = "Invalid app key: ";
 	
+	public static final String INVALID_ACCESS_TOKEN = "Invalid access token: ";
+	
 	public static final String INVALID_PARAMS = "Invalid params: ";
 	
 	public static final String UNSUPPORTED_FORMAT = "Unsupported format";
