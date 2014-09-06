@@ -17,9 +17,9 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
-import eu.threecixty.keys.KeyManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.Tray;
@@ -61,7 +61,7 @@ public class TrayServices {
     		CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
 			return createResponseException("Failed to understand your tray request");
     	} else {
-    		if (!KeyManager.getInstance().checkAppKey(restTray.getKey())) {
+    		if (!OAuthWrappers.validateAppKey(restTray.getKey())) {
     			CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_APP_KEY + restTray.getKey());
     			return createResponseException("The key is invalid '" + restTray.getKey() + "'");
     		} else {
