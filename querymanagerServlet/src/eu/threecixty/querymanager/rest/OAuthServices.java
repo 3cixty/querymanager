@@ -29,7 +29,15 @@ import eu.threecixty.profile.GoogleAccountUtils;
 public class OAuthServices {
 	
 	public static final String APP_KEY = "appObj";
-	private static final String GOOGLE_AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/auth";
+	public static final String UID_KEY = "uid";
+	
+	private static final String V2_ROOT = OAuthWrappers.ROOT_SERVER + "v2/";
+	
+	public static final String GOOGLE_CALLBACK = V2_ROOT + "googlecallback.jsp";
+	public static final String THREECIXTY_CALLBACK = V2_ROOT + "3cixtycallback.jsp";
+	public static final String REDIRECT_URI = V2_ROOT + "redirect_uri";
+	
+	public static final String REDIRECT_URI_CLIENT = V2_ROOT + "redirect_uri_client";
 
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -74,15 +82,19 @@ public class OAuthServices {
 	@GET
 	@Path("/getAppKey")
 	public Response getAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid,
+			@QueryParam("appname") String appname,
 			@DefaultValue("") @QueryParam("description") String desc, @QueryParam("category") String cat,
-			@QueryParam("scopeName") String scopeName, @QueryParam("redirect_uri") String redirect_uri) {
+			@QueryParam("scopeName") String scopeName,
+			@QueryParam("redirect_uri") String redirect_uri,
+			@QueryParam("thumbNailUrl") String thumbNailUrl) {
+		//thumbNailUrl
 		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		String appKey = OAuthWrappers.getAppKey(appid, desc, cat, uid, scopeName, redirect_uri);
+		String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, scopeName, redirect_uri, thumbNailUrl);
 		if (appKey != null && !appKey.equals("")) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"key\": \"" + appKey + "\"} ")
@@ -145,8 +157,6 @@ public class OAuthServices {
 	@Path("/addScope")
 	public Response addScope(@QueryParam("username") String username, @QueryParam("password") String password,
 			@QueryParam("description") String desc, @QueryParam("scopeName") String scopeName, @QueryParam("scopeLevel") int scopeLevel) {
-		System.out.println(username);
-		System.out.println(password);
 		if (!checkUserForScope(username, password))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
@@ -214,7 +224,80 @@ public class OAuthServices {
 		HttpSession session = httpRequest.getSession();
 		session.setAttribute(APP_KEY, app);
 		try {
-			return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
+			//return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
+			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=email%20profile&state=%2Fprofile&redirect_uri="
+			+ OAuthServices.GOOGLE_CALLBACK
+			+"&response_type=token&client_id=239679915676-j58smonkigkh26rugnbsja3pon7bkvbv.apps.googleusercontent.com"))
+			.header("Access-Control-Allow-Origin", "*").build();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@GET
+	@Path("/redirect_uri")
+	public Response redirect_uri(@QueryParam("google_access_token") String google_access_token) {
+		HttpSession session = httpRequest.getSession();
+		App app = (App) session.getAttribute(APP_KEY);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Session is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		
+		String uid = GoogleAccountUtils.getUID(google_access_token);
+		
+		if (uid == null || uid.equals(""))
+			return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		
+		session.setAttribute(UID_KEY, uid);
+		
+		String accessToken = OAuthWrappers.findAccessToken(uid, app.getKey());
+		if (accessToken != null && !accessToken.equals("")) {
+			return redirect_uri_client2(accessToken, app);
+		}
+		
+		try {
+			return Response.temporaryRedirect(new URI(
+					OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
+			+ app.getScope().getScopeName() + "&client_id="
+			+ app.getClientId() + "&redirect_uri="
+		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
+		    		OAuthWrappers.getBasicAuth()).build();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	@GET
+	@Path("/redirect_uri_client")
+	public Response redirect_uri_client(@QueryParam("accessToken") String accessToken) {
+		HttpSession session = httpRequest.getSession();
+		App app = (App) session.getAttribute(APP_KEY);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Session is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		String uid = (String) session.getAttribute(UID_KEY);
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, app)) {
+			return Response.status(Response.Status.BAD_REQUEST)
+			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
+			        .type(MediaType.APPLICATION_JSON_TYPE)
+			        .build();
+		}
+		
+		return redirect_uri_client2(accessToken, app);
+	}
+	
+	private Response redirect_uri_client2(String accessToken, App app) {
+		try {
+			
+			return Response.temporaryRedirect(new URI(app.getRedirectUri() + "#accessToken=" + accessToken)).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
