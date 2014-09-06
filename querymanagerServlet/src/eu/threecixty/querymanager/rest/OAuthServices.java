@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -44,17 +45,26 @@ public class OAuthServices {
 
 	@GET
 	@Path("/validateAccessToken")
-	public Response validateAccessToken(@QueryParam("accessToken") String accessToken) {
-		if (OAuthWrappers.validateUserAccessToken(accessToken)) {
-			return Response.status(Response.Status.OK)
-	        .entity(" {\"response\": \"ok\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
+	public Response validateAccessToken(@HeaderParam("accessToken") String accessToken,
+			@HeaderParam("key") String key) {
+		if (OAuthWrappers.validateAppKey(key)) {
+			if (OAuthWrappers.validateUserAccessToken(accessToken)) {
+				// TODO: add callLog
+				return Response.status(Response.Status.OK)
+						.entity(" {\"response\": \"ok\"} ")
+						.type(MediaType.APPLICATION_JSON_TYPE)
+						.build();
+			}
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(" {\"response\": \"failed\"} ")
+					.type(MediaType.APPLICATION_JSON_TYPE)
+					.build();
+		} else {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid: " + key + "\"} ")
+					.type(MediaType.APPLICATION_JSON_TYPE)
+					.build();
 		}
-		return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
 	}
 
 	@GET
