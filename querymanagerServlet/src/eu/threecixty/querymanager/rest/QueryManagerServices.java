@@ -10,26 +10,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 
-import eu.threecixty.keys.KeyManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
-import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.oauth.model.UserAccessToken;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.querymanager.EventMediaFormat;
@@ -61,9 +59,6 @@ public class QueryManagerServices {
 	public static String realPath;
 	private static String allPrefixes;
 	
-	@Context 
-	private HttpServletRequest httpRequest;
-	
 	/**
 	 * This method firstly augments a given query, then sends to Eurecom to execute and receives data back.
 	 *
@@ -81,68 +76,94 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/augmentAndExecute")
-	public Response executeQuery(@QueryParam("key") String key, @QueryParam("accessToken") String accessToken,
+	public Response executeQuery(@HeaderParam("accessToken") String accessToken,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter) {
 		long starttime = System.currentTimeMillis();
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			boolean isAccessTokenFalse = "false".equals(accessToken);
-			String user_id =  null;
-			if (!isAccessTokenFalse) {
-				HttpSession session = httpRequest.getSession();
-				if (session.getAttribute("uid") == null) {
-				    user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
-				    session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
-				    session.setAttribute("uid", user_id);
-				} else {
-					user_id = (String) session.getAttribute("uid"); 
-				}
-			}
-			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNAUTHORIZED);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("Access token is incorrect or expired")
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
-			} else {
-				EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
-				if (eventMediaFormat == null || query == null) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
-					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity("The format is not supported or query is null")
-					        .type(MediaType.TEXT_PLAIN)
-					        .build());
-				} else {
-				    IProfiler profiler = isAccessTokenFalse ? null : new Profiler(user_id);
-				    QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
-				    				    
-					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true);
-					
-				    // log calls
-				    if (isAccessTokenFalse) {
-				    	CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				    } else {
-				    	if (filter == null) {
-				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				    	} else if (filter.equals("location")) {
-				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				    	} else if (filter.equals("enteredrating")) {
-				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				    	} else if (filter.equals("preferred")) {
-				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				    	} else if (filter.equals("friends")) {
-				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				    	} else {
-				    		CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				    	}
-				    }
+		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			String user_id =  userAccessToken.getUser().getUid();
+			String key = userAccessToken.getApp().getKey();
 
-					
-					return Response.status(HttpURLConnection.HTTP_OK)
-			        .entity(result)
-			        .type(MediaType.APPLICATION_JSON)
-			        .build();
+			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+			if (eventMediaFormat == null || query == null) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("The format is not supported or query is null")
+						.type(MediaType.TEXT_PLAIN)
+						.build());
+			} else {
+				IProfiler profiler = new Profiler(user_id);
+				QueryManager qm = new QueryManager(user_id);
+
+				String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true);
+
+				// log calls
+
+				if (filter == null) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("location")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("enteredrating")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("preferred")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("friends")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				}
+
+
+				return Response.status(HttpURLConnection.HTTP_OK)
+						.entity(result)
+						.type(MediaType.APPLICATION_JSON)
+						.build();
+			}
+		} else {
+			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The access token is invalid '" + accessToken + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+
+	/**
+	 * Make query without information about 3cixty access token
+	 * @param key
+	 * @param format
+	 * @param query
+	 * @param filter
+	 * @return
+	 */
+	@GET
+	@Path("/makeNoAccessTokenQuery")
+	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
+			@QueryParam("format") String format, @QueryParam("query") String query,
+			@QueryParam("filter") String filter) {
+		long starttime = System.currentTimeMillis();
+		if (OAuthWrappers.validateAppKey(key)) {
+			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+			if (eventMediaFormat == null || query == null) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("The format is not supported or query is null")
+						.type(MediaType.TEXT_PLAIN)
+						.build());
+			} else {
+				IProfiler profiler = null;
+				QueryManager qm = new QueryManager("false");
+
+				String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true);
+
+				// log calls
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+
+				return Response.status(HttpURLConnection.HTTP_OK)
+						.entity(result)
+						.type(MediaType.APPLICATION_JSON)
+						.build();
 			}
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
@@ -161,9 +182,9 @@ public class QueryManagerServices {
 	@GET
 	@Path("/countItems")
 	@Produces("application/json")
-	public String countItems(@QueryParam("key") String key) {
+	public String countItems(@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
-		if (KeyManager.getInstance().checkAppKey(key)) {
+		if (OAuthWrappers.validateAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			QueryManager qm = new QueryManager("false");
 			String ret = executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
@@ -196,9 +217,9 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2,
-			@QueryParam("key") String key) {
+			@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
-		if (KeyManager.getInstance().checkAppKey(key)) {
+		if (OAuthWrappers.validateAppKey(key)) {
 			if (groupTriples.containsKey(group)) {
 				Gson gson = new Gson();
 				KeyValuePair pair1 = null;
@@ -252,36 +273,64 @@ public class QueryManagerServices {
 	@GET
 	@Path("/getItems")
 	@Produces("application/json")
-	public String getItems(@DefaultValue("false") @QueryParam("accessToken") String accessToken,
+	public String getItems(@HeaderParam("accessToken") String accessToken,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2, @QueryParam("key") String key) {
+			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
 		
 		long starttime = System.currentTimeMillis();
 
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			IProfiler profiler = null;
-			boolean isAccessTokenFalse = "false".equals(accessToken);
-			String user_id =  null;
-			if (!isAccessTokenFalse) {
-				HttpSession session = httpRequest.getSession();
-				if (session.getAttribute("uid") == null) {
-				    user_id = GoogleAccountUtils.getUID(accessToken); // which corresponds with Google user_id (from Google account)
-				    session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
-				    session.setAttribute("uid", user_id);
-				} else {
-					user_id = (String) session.getAttribute("uid"); 
-				}
-			}
+		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			String user_id =  userAccessToken.getUser().getUid();
+			String key = userAccessToken.getApp().getKey();
 
-			if ((user_id == null || user_id.equals("")) && (!isAccessTokenFalse)) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.UNAUTHORIZED);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("The access token is invalid: '" + accessToken + "'")
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
-			} else {
+			Gson gson = new Gson();
+			KeyValuePair pair1 = null;
+			KeyValuePair pair2 = null;
+			try {
+				pair1 = gson.fromJson(filter1, KeyValuePair.class);
+			} catch (Exception e) {}
+			try {
+				pair2 = gson.fromJson(filter2, KeyValuePair.class);
+			} catch (Exception e) {}
+
+			IProfiler profiler = new Profiler(user_id);
+			QueryManager qm = new QueryManager(user_id);
+
+			String query = createSelectSparqlQuery(offset, limit,
+					(pair1 == null ? null : pair1.getGroupBy()),
+					(pair1 == null ? null : pair1.getValue()),
+					(pair2 == null ? null : pair2.getGroupBy()),
+					(pair2 == null ? null : pair2.getValue()));
+
+			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+			return result;
+		} else {
+			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The access token is invalid '" + accessToken + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+	
+	@GET
+	@Path("/getItemsWithoutAccessToken")
+	@Produces("application/json")
+	public String getItemsWithoutUserInfo(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
+			@DefaultValue("{}") @QueryParam("filter1") String filter1,
+			@DefaultValue("{}") @QueryParam("filter2") String filter2, @HeaderParam("key") String key) {
+		
+		long starttime = System.currentTimeMillis();
+
+		if (OAuthWrappers.validateAppKey(key)) {
+			IProfiler profiler = null;
+
 				Gson gson = new Gson();
 				KeyValuePair pair1 = null;
 				KeyValuePair pair2 = null;
@@ -292,8 +341,8 @@ public class QueryManagerServices {
 					pair2 = gson.fromJson(filter2, KeyValuePair.class);
 				} catch (Exception e) {}
 
-				profiler = isAccessTokenFalse ? null : new Profiler(user_id);
-				QueryManager qm = isAccessTokenFalse ? new QueryManager("false") : new QueryManager(user_id);
+				profiler = null;
+				QueryManager qm = new QueryManager("false");
 
 				String query = createSelectSparqlQuery(offset, limit,
 						(pair1 == null ? null : pair1.getGroupBy()),
@@ -304,7 +353,6 @@ public class QueryManagerServices {
 				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return result;
-			}
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
