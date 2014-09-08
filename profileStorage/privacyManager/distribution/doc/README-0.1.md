@@ -3,6 +3,7 @@ Privacy Manager
 Privacy Manager is the component holding the private knowledge base of user profiles and managing the access controls.
 
 Features:
+
   - User-centric privacy of profiles
   - Fully semantical
   - Semi-opened privacy framework for service providers
@@ -10,19 +11,18 @@ Features:
 
 Version
 ----
-Privacy Manager version alpha 0.1.1
+Privacy Manager version 0.3
 
 #### Maven
 In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
 
-```
-<dependency>
-    <groupId>eu.3cixty.privacy</groupId>
-    <artifactId>privacymanager</artifactId>
-    <version>0.1.1</version>
-</dependency>
 
-```
+    <dependency>
+    	<groupId>eu.3cixty.privacy</groupId>
+    	<artifactId>privacymanager</artifactId>
+    	<version>0.3</version>
+    </dependency>
+
 
 Tech
 -----------
@@ -39,7 +39,7 @@ Installation is performed during the install Maven phase.
 
 The artifact can also be manually installed in local Maven repository:
 
-```mvn install:install-file -Dfile=libs/privacymanager-0.1.1.jar -DpomFile=libs/privacymanager-0.1.1.pom```
+```mvn install:install-file -Dfile=libs/privacymanager-0.3.jar -DpomFile=libs/privacymanager-0.3.pom```
 
 For more commands and install options see [Installing 3rd party library][2]
 
@@ -52,33 +52,42 @@ Copy the file ```res/3CixtyProfileStorage.properties``` and edit the copy in ord
 
 The default file looks like this:
 
-```
-# the path of the ontology that represents the user profile
-ProfileStorage.ontology.path=./UserProfileKBmodel.rdf
 
-# the namespace of the previous ontology
-ProfileStorage.ontology.ns=http://www.eu.3cixty.org/profile#
+    # the path of the ontology that represents the user profile
+    ProfileStorage.ontology.path=src/test/resources/UserProfileKBmodelWithIndividuals.rdf
+    
+    # the namespace of the previous ontology
+    ProfileStorage.ontology.ns=http://www.eu.3cixty.org/profile#
+    
+    # Concept that is the user profile in the ontology (with no namespace)
+    ProfileStorage.ontology.profile.concept=UserProfile
+    
+    # the property that is the key for user profile
+    ProfileStorage.ontology.profile.key=hasUID
+    
+    # JSON-LD Option for property values. If true, when a property has only one value, the output is not an array
+    # example : "hasGender" : "Male" versus "hasGender" : ["Male"]
+    # valid values are : true | false 
+    ProfileStorage.jsonld.option.compact=false
+    
+    #JSON-LD Option for individual writting : If false, only direct statements of the individual 
+    # are written. Otherwise, a recursive parsing is done to  output all linked individuals
+    # valid values are : true | false 
+    ProfileStorage.jsonld.option.recursive=true
 
-# Concept that is the user profile in the ontology (with no namespace)
-ProfileStorage.ontology.profile.concept=UserProfile
-
-# the property that is the key for user profile
-ProfileStorage.ontology.profile.key=hasUID
-
-ProfileStorage.ontology.db.path=./3cixty-profiles.db
-```
 
 Set the property ```ProfileStorage.ontology.path``` in the configuration file to specify the path to the ontology.
 
 #### Main API interfaces
 
-The main interfaces are:
-* eu.threecixty.privacy.datastorage.ProfileManager
-* eu.threecixty.privacy.datastorage.ProfileManagerFactory
-* eu.threecixty.privacy.auth.Authenticator
-* eu.threecixty.privacy.auth.Service
-* eu.threecixty.privacy.auth.Session
-* eu.threecixty.privacy.auth.SessionManager
+The main interfaces are:  
+
+- eu.threecixty.privacy.datastorage.ProfileManager
+- eu.threecixty.privacy.datastorage.ProfileManagerFactory
+- eu.threecixty.privacy.auth.Authenticator
+- eu.threecixty.privacy.auth.Service
+- eu.threecixty.privacy.auth.Session
+- eu.threecixty.privacy.auth.SessionManager
 
 #### Main implementation classes
 Implementation classes provided in the distribution:
@@ -107,46 +116,44 @@ A end-user can be anonymous. If the request is emanating from a software compone
 
 The following code shows how to query all of the User identifiers from the KB:
 
-```
-import java.util.Set;
 
-import com.thalesgroup.theresis.perso.authen.impl.simple.SimpleSessionManager;
-import com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleProfileManagerFactory;
-
-import eu.threecixty.privacy.authen.Authenticator;
-import eu.threecixty.privacy.authen.Service;
-import eu.threecixty.privacy.authen.Session;
-import eu.threecixty.privacy.datastorage.ProfileManager;
-import eu.threecixty.privacy.datastorage.ProfileManagerFactory;
-```
-```
-try {
-    ProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-    String propertyPath = "C:/3cixty/config/3CixtyProfileStorage.properties";
-    ProfileManager profileMgr = profileFactory.getProfileManager( propertyPath );
-
-    // Get a reference on the dataminer service
-    Service service = profileFactory.getService( "http://3cixty/dataminer",
-        "kACAH-1Ng1MImB85QDSJQSxhqbAA7acjdY9pTD9M" );
-
-    // Get an authentication token
-    Authenticator auth = profileFactory.getAuthenticator(service,
-        "root",
-        "admin",
-        null ); // no additional security/protocol option
-
-    // Open a session for the dataminer.
-    // In this particular case, the requesting user is the system and not an end-user thus the
-    // need for the user 'root'.
-    Session session = SimpleSessionManager.getInstance().getSession( auth );
-
-    // Get the list of users
-    Set<String> userIDS = profileMgr.getAllUsersIDs( session );
+    import java.util.Set;
     
-} catch (Exception e ) {
-    e.printStackTrace();
-}
-```
+    import com.thalesgroup.theresis.perso.authen.impl.simple.SimpleSessionManager;
+    import com.thalesgroup.theresis.perso.datastorage.impl.simple.SimpleProfileManagerFactory;
+    
+    import eu.threecixty.privacy.authen.Authenticator;
+    import eu.threecixty.privacy.authen.Service;
+    import eu.threecixty.privacy.authen.Session;
+    import eu.threecixty.privacy.datastorage.ProfileManager;
+    import eu.threecixty.privacy.datastorage.ProfileManagerFactory;
+    ```
+    ```
+    try {
+   		
+		SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+		String propertyPath = "C:/3cixty/config/3CixtyProfileStorage.properties";
+		ProfileManager profileMgr = profileFactory.getProfileManager( propertyPath );
+	  
+	    // Get a reference on the dataminer service
+	    Service service = profileFactory.getService( "http://3cixty/dataminer",
+	    "kACAH-1Ng1MImB85QDSJQSxhqbAA7acjdY9pTD9M" );
+	    
+	    // Get an authentication token
+	    Authenticator auth = profileFactory.getAuthenticator(service,"root","admin", null ); // no additional security/protocol option
+	    
+	    // Open a session for the dataminer.
+	    // In this particular case, the requesting user is the system and not an end-user thus the
+	    // need for the user 'root'.
+	    Session session = SimpleSessionManager.getInstance().getSession( auth );
+	    
+	    // Get the list of users
+	    Set<String> userIDS = profileMgr.getAllUsersIDs( session );
+    
+    } catch (Exception e ) {
+    	e.printStackTrace();
+    }
+
 
 License
 ----

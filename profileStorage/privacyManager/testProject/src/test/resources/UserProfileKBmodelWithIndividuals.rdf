@@ -89,6 +89,7 @@
     <owl:AnnotationProperty rdf:about="&vcard;street-address">
         <rdfs:domain rdf:resource="&vcard;Address"/>
     </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="http://www.eu.3cixty.org/profile#hasEmail2"/>
     <owl:AnnotationProperty rdf:about="http://www.eu.3cixty.org/profile#author"/>
     <owl:AnnotationProperty rdf:about="&foaf;knows"/>
     <owl:AnnotationProperty rdf:about="&vcard;hasName">
@@ -185,6 +186,20 @@
     </owl:ObjectProperty>
     
 
+
+    <!-- http://www.eu.3cixty.org/profile#hasEmail2 -->
+
+    <owl:ObjectProperty rdf:about="http://www.eu.3cixty.org/profile#hasEmail2">
+        <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
+        <rdfs:range>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.eu.3cixty.org/profile#hasEmail"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
 
     <!-- http://www.eu.3cixty.org/profile#hasEmployer -->
 
@@ -749,7 +764,7 @@
         <rdfs:comment>User 1</rdfs:comment>
         <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#hasUID"/>
-        <rdfs:range rdf:resource="&xsd;long"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -761,7 +776,7 @@
         <rdfs:comment>User 2</rdfs:comment>
         <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#Accompanying"/>
         <owl:equivalentProperty rdf:resource="http://www.eu.3cixty.org/profile#hasUID"/>
-        <rdfs:range rdf:resource="&xsd;long"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -1034,6 +1049,7 @@
     <!-- http://www.eu.3cixty.org/profile#hasEmail -->
 
     <owl:DatatypeProperty rdf:about="http://www.eu.3cixty.org/profile#hasEmail">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment>has email</rdfs:comment>
         <rdfs:domain rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
         <rdfs:range rdf:resource="&xsd;string"/>
@@ -4521,12 +4537,17 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
     <!-- http://www.eu.3cixty.org/profile#100900047095598983805 -->
 
     <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#100900047095598983805">
         <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#UserProfile"/>
-        <hasUID>100900047095598983805</hasUID>
+        <hasEmail2>Boyle@yahoo.com</hasEmail2>
         <hasGender>Female</hasGender>
+        <hasUID>100900047095598983805</hasUID>
+        <hasEmail>1009@gmail.com</hasEmail>
         <vcard:hasAddress rdf:resource="&profile;Address"/>
         <hasEventDetail rdf:resource="&profile;EventDetail"/>
         <vcard:hasName rdf:resource="&profile;Name"/>
@@ -4582,7 +4603,7 @@
 
     <owl:NamedIndividual rdf:about="&profile;EventDetail">
         <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#EventDetails"/>
-        <hasNatureOfEvent>Concert</hasNatureOfEvent>
+        <hasNatureOfEvent>"Concert"</hasNatureOfEvent>
         <hasDateFrom>20/05/2014</hasDateFrom>
         <hasEventName>Brand New</hasEventName>
         <hasDateUntil>24/5/2014</hasDateUntil>
@@ -4603,9 +4624,9 @@
 
     <owl:NamedIndividual rdf:about="&profile;EventPreferenceDetail">
         <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#EventDetailPreference"/>
-        <hasPreferredEndDate>22/05/2014</hasPreferredEndDate>
+        <hasPreferredEndDate>2014-05-22T08:00:00</hasPreferredEndDate>
         <hasNatureOfEvent>Music</hasNatureOfEvent>
-        <hasPreferredStartDate>19/05/2014</hasPreferredStartDate>
+        <hasPreferredStartDate>2014-05-19T08:00:00</hasPreferredStartDate>
         <hasEventName>Toy</hasEventName>
     </owl:NamedIndividual>
     
@@ -4626,7 +4647,7 @@
 
     <owl:NamedIndividual rdf:about="&profile;Likes">
         <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#Like"/>
-        <hasLikeType>Event</hasLikeType>
+        <hasLikeType>"Event"</hasLikeType>
     </owl:NamedIndividual>
     
 
@@ -4854,7 +4875,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.eu.3cixty.org/profile#HiltonMilanHotelDetail">
         <rdf:type rdf:resource="http://www.eu.3cixty.org/profile#HotelDetail"/>
-        <hasHotelStarCategory rdf:datatype="&xsd;int">4</hasHotelStarCategory>
+        <hasHotelStarCategory>4</hasHotelStarCategory>
         <hasPlaceName>Hilton Milan Hotel</hasPlaceName>
         <hasNatureOfPlace>Hotel</hasNatureOfPlace>
         <vcard:hasAddress rdf:resource="http://www.eu.3cixty.org/profile#HiltonMilanHotelAddress"/>
