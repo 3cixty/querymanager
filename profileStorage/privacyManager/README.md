@@ -3,30 +3,39 @@ Privacy Manager
 Privacy Manager is the 3cixty infrastructure component holding the private knowledge base of user profiles and managing the access controls.
 
 Features:
-  - User-centric privacy of profiles
-  - Fully semantical
-  - Semi-opened privacy framework for service providers
-  - Security management
+
+  * User-centric privacy of profiles
+  * Fully semantical
+  * Semi-opened privacy framework for service providers
+  * Security management
 
 Version
 ----
 #### Identification
-Privacy Manager version alpha 0.2
+Privacy Manager version 0.3
 
 #### Maven
 In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
 
-```
-<dependency>
-    <groupId>eu.3cixty.privacy</groupId>
-    <artifactId>privacymanager</artifactId>
-    <version>0.2</version>
-</dependency>
-
-```
+     <dependency>
+    	<groupId>eu.3cixty.privacy</groupId>
+    	<artifactId>privacymanager</artifactId>
+    	<version>0.3</version>
+     </dependency>
 
 Changes log
 ----
+#### version 0.3
+
+* Implements the merge/replace/delete profile with property path methods :
+  *  mergeProfileProperties
+  *  replaceProfileProperties
+  *  deleteProfileProperties
+* Improvement of the model validity : now a check is done on input data for merge or replace profile
+* Modification of the getProfile behavior : previously, the method only returns the properties directly defined on the userProfile. Now, the subtree is returned.  
+This behavior could be disabled by setting the option   ```ProfileStorage.jsonld.option.recursive``` to ```false``` in the configuration file
+* [Issue #21][4] : the configuration option ```ProfileStorage.jsonld.option.compact``` was not taken into account. 
+
 #### version alpha 0.2
 
 * Implements the get profile with property path method, ```getProfileProperties```, defined by interface ```ProfileManager```
@@ -41,7 +50,7 @@ All property values are provided as arrays.
 
 * This initial release supports only full reading and writing of user profiles in memory.
 * Property paths based interfaces are not implemented.
-* No privacy management at all
+* No provacy management at all
 * No security
 
 Tech
@@ -59,7 +68,7 @@ Installation is performed during the install Maven phase.
 
 The artifact can also be manually installed in local Maven repository:
 
-```mvn install:install-file -Dfile=libs/privacymanager-0.2.jar -DpomFile=libs/privacymanager-0.2.pom```
+```mvn install:install-file -Dfile=libs/privacymanager-0.3.jar -DpomFile=libs/privacymanager-0.3.pom```
 
 For more commands and install options see [Installing 3rd party library][2]
 
@@ -72,22 +81,30 @@ Copy the file ```res/3CixtyProfileStorage.properties``` and edit the copy in ord
 
 The default file looks like this:
 
-```
-# the path of the ontology that represents the user profile
-ProfileStorage.ontology.path=./UserProfileKBmodel.rdf
-
-# the namespace of the previous ontology
-ProfileStorage.ontology.ns=http://www.eu.3cixty.org/profile#
-
-# Concept that is the user profile in the ontology (with no namespace)
-ProfileStorage.ontology.profile.concept=UserProfile
-
-# the property that is the key for user profile
-ProfileStorage.ontology.profile.key=hasUID
-
-ProfileStorage.ontology.db.path=./3cixty-profiles.db
-```
-
+    # the path of the ontology that represents the user profile
+    ProfileStorage.ontology.path=./UserProfileKBmodel.rdf
+    
+    # the namespace of the previous ontology
+    ProfileStorage.ontology.ns=http://www.eu.3cixty.org/profile#
+    
+    # Concept that is the user profile in the ontology (with no namespace)
+    ProfileStorage.ontology.profile.concept=UserProfile
+    
+    # the property that is the key for user profile
+    ProfileStorage.ontology.profile.key=hasUID
+    
+    # JSON-LD Option for property values. If true, when a property has 
+	# only one value, the output is not an array
+    # example : "hasGender" : "Male" versus "hasGender" : ["Male"]
+    # Valid values are : true | false 
+    ProfileStorage.jsonld.option.compact=false
+    
+    # JSON-LD Option for individual writting : If false, only direct statements 
+	# of the individual are written. Otherwise, a recursive parsing is done to 
+	# output all linked individuals
+    # Valid values are : true | false 
+    ProfileStorage.jsonld.option.recursive=true
+    
 Set the property ```ProfileStorage.ontology.path``` in the configuration file to specify the path to the ontology.
 
 #### Main API interfaces
@@ -193,7 +210,7 @@ The following code shows how to format a property path to get the user account I
 Property path use the SPARQL1.1 Property Path format with some restrictions :
  
 - do not specify variables at the beginning and end of the property path (?x)
-- Only use namespaces defined in the ontology (for default prefix use ':propertyName') 
+- Only use namespaces defined in the ontology (for default prefix use ```:propertyName``` ) 
 
 License
 ----
@@ -206,3 +223,4 @@ Copyright (c) 2014 Thales Services, All rights Reserved.
 [1]: http://www.w3.org/TR/sparql11-property-paths/
 [2]: http://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
 [3]: https://github.com/3cixty/profileStorage/issues/18
+[4]: https://github.com/3cixty/profileStorage/issues/21
