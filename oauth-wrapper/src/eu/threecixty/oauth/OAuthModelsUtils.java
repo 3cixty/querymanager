@@ -299,9 +299,9 @@ public class OAuthModelsUtils {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM App A WHERE A.key = ?";
+			String hql = "FROM App A WHERE A.key = :key";
 			Query query = session.createQuery(hql);
-			List <?> results = query.setString(0, key).list();
+			List<?> results = query.setString("key", key).list();
 			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {

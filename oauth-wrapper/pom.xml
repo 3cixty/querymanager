@@ -12,7 +12,7 @@
  <repositories>
     <repository>
       <id>JBoss repository</id>
-      <url>http://repository.jboss.com/maven2/</url>
+      <url>https://repository.jboss.org/nexus/content/repositories/root_repository/maven2/</url>
     </repository>
   </repositories>
   

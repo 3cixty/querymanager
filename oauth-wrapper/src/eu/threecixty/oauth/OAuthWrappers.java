@@ -38,14 +38,19 @@ public class OAuthWrappers {
 	
 	private static final String ENDPOINT_TO_CREATE_CLIENT_FOR_APP = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/3cixty/createClientIdForApp";
 	
+	private static final String ENDPOINT_TO_CREATE_CLIENT_FOR_ASKING_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/3cixty/createClientForAskingAccessToken";
+	
 	private static final String ACCES_TOKEN_KEY = "access_token";
 	
 	public static final String AUTHORIZATION = "Authorization";
 
 	// TODO: client id and client secret to communicate with OAuth server
 	// make sure that this user exists in the database (the client table)
-	private static final String clientId = "cool_app_id";
-	private static final String clientSecret = "secret";
+	private static final String clientId = "cool_app_id1";
+	private static final String clientSecret = "secret2";
+	private static final String CLIENT_REDIRECT_URI = "http://localhost:8080/v2/3cixtycallback.jsp";
+	
+	private static boolean firstTimeForClientCoolApp = false;
 
 	// TODO: resourceServer Name and secret to communicate with OAuth server
 	// make sure that this user exists in the database (the resourceserver table)
@@ -265,6 +270,31 @@ public class OAuthWrappers {
 	}
 
 	public static String getBasicAuth() {
+		if (firstTimeForClientCoolApp) {
+			try {
+				Client client = Client.create();
+
+				String auth = "Basic ".concat(new String(Base64.encodeBase64(resourceServerKey.concat(":")
+						.concat(resourceServerSecret).getBytes())));
+				Builder builder = client.resource(ENDPOINT_TO_CREATE_CLIENT_FOR_ASKING_TOKEN
+						+ "?clientId=" + clientId
+						+ "&clientSecret=" + URLEncoder.encode(clientSecret, "UTF-8")
+						+ "&scope=Read&redirect_uri=" + URLEncoder.encode(CLIENT_REDIRECT_URI, "UTF-8"))
+						.header(AUTHORIZATION, auth)
+						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+				ClientResponse clientResponse = builder.get(ClientResponse.class);
+
+				String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+				JSONObject jsonObj = new JSONObject(jsonStr);
+				if (jsonObj.has("response")) {
+					if (jsonObj.getString("response").equals("successful")) {
+						firstTimeForClientCoolApp = false;
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		String basicAuth = "Basic ".concat(new String(Base64.encodeBase64(clientId.concat(":")
 				.concat(clientSecret).getBytes())));
 		return basicAuth;
@@ -300,8 +330,7 @@ public class OAuthWrappers {
 	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
 	    formData.add("grant_type", "client_credentials");
 
-	    String auth = "Basic ".concat(new String(Base64.encodeBase64(clientId.concat(":")
-	            .concat(clientSecret).getBytes())));
+	    String auth = getBasicAuth();
 	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
