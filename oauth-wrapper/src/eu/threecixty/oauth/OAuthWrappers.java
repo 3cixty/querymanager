@@ -46,11 +46,11 @@ public class OAuthWrappers {
 
 	// TODO: client id and client secret to communicate with OAuth server
 	// make sure that this user exists in the database (the client table)
-	private static final String clientId = "cool_app_id1";
-	private static final String clientSecret = "secret2";
+	private static final String clientId = "cool_app_id2";
+	private static final String clientSecret = "secret3";
 	private static final String CLIENT_REDIRECT_URI = "http://localhost:8080/v2/3cixtycallback.jsp";
 	
-	private static boolean firstTimeForClientCoolApp = false;
+	private static boolean firstTimeForClientCoolApp = true;
 
 	// TODO: resourceServer Name and secret to communicate with OAuth server
 	// make sure that this user exists in the database (the resourceserver table)
