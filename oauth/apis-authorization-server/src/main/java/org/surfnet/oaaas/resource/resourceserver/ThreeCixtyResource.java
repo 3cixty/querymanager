@@ -72,6 +72,52 @@ public class ThreeCixtyResource extends AbstractResource {
     				.entity("{\"response\": \"error\"}").build();
     	}
     }
+    
+    @GET
+    @Path("/createClientForAskingAccessToken")
+    public Response createClientForAskingAccessToken(@QueryParam("clientId") String clientId,
+    		@QueryParam("clientSecret") String clientSecret, @QueryParam("scope") String scope,
+    		@QueryParam("redirect_uri") String redirect_uri) {
+    	boolean ok = false;
+    	if (isNullOrEmpty(clientId) || isNullOrEmpty(clientSecret) || isNullOrEmpty(scope)) {
+    		ok = false;
+    	} else {
+    		Client client = clientRepository.findByClientId(clientId);
+    		if (client != null) {
+    			ok = true;
+    		} else {
+    			create3CixtyResServerWhenNecessary();
+    			ResourceServer resourceServer = resourceServerRepository.findByKey(THREE_CIXTY_RES_SERVER_KEY);
+    			client = new Client();
+    			client.setClientId(clientId); // unique info
+    			client.setName(clientId);
+    			client.setIncludePrincipal(true);
+    			client.setAllowedClientCredentials(true);
+    			client.setSecret(clientSecret);
+    			client.setResourceServer(resourceServer);
+    			client.setExpireDuration(0);
+    			
+    			List <String> redirect_uris = new ArrayList <String>();
+    			redirect_uris.add(redirect_uri);
+    			client.setRedirectUris(redirect_uris);
+
+    			List <String> scopes = new ArrayList <String>();
+    			scopes.add(scope);
+    			client.setScopes(scopes);
+    			
+    			clientRepository.save(client);
+    			ok = true;
+    		}
+    	}
+    	
+    	if (ok) {
+    		return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON_TYPE)
+    				.entity("{\"response\": \"successful\"}").build();
+    	} else {
+    		return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE)
+    				.entity("{\"response\": \"error\"}").build();
+    	}
+    }
 
     private void create3CixtyResServerWhenNecessary() {
     	if (firstTime) {
