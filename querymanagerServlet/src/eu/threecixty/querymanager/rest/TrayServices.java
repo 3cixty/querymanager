@@ -24,7 +24,6 @@ import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.TrayStorage;
-import eu.threecixty.profile.Tray.ItemType;
 import eu.threecixty.profile.Tray.OrderType;
 
 /**
@@ -145,14 +144,7 @@ public class TrayServices {
 		if (itemId == null) return false;
 		String itemTypeStr = restTray.getElement_type();
 		if (itemTypeStr == null) return false;
-		ItemType itemType = null;
-		try {
-			itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
-			if (itemType == null) return false;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+
 		String token = restTray.getToken();
 		if (token == null) return false;
 		
@@ -165,7 +157,7 @@ public class TrayServices {
 		
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
-		tray.setItemType(itemType);
+		tray.setItemType(itemTypeStr);
 		tray.setSource(source);
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setElement_title(element_title);
@@ -241,14 +233,13 @@ public class TrayServices {
 		if (itemId == null || itemId.equals("")) return false;
 		String itemTypeStr = restTray.getElement_type();
 		if (itemTypeStr == null || itemTypeStr.equals("")) return false;
-		ItemType itemType = ItemType.valueOf(itemTypeStr.toLowerCase());
 		String token = restTray.getToken();
 		String uid = GoogleAccountUtils.getUID(token);
 		String source = restTray.getSource();
 		String element_title = restTray.getElement_title();
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
-		tray.setItemType(itemType);
+		tray.setItemType(itemTypeStr);
 		tray.setSource(source);
 		tray.setElement_title(element_title);
 		tray.setTimestamp(System.currentTimeMillis());
