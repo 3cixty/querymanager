@@ -17,7 +17,6 @@ import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.TrayStorage;
-import eu.threecixty.profile.Tray.ItemType;
 import eu.threecixty.profile.Tray.OrderType;
 
 public class TrayServices implements TrayServicesIntf {
@@ -44,16 +43,9 @@ public class TrayServices implements TrayServicesIntf {
 
     	long starttime = System.currentTimeMillis();
 
-		ItemType itemType = null;
-		try {
-			itemType = ItemType.valueOf(element_type);
-			if (itemType == null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		Tray tray = new Tray();
 		tray.setItemId(element_id);
-		tray.setItemType(itemType);
+		tray.setItemType(element_type);
 		tray.setSource(source);
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setElement_title(element_title);
@@ -142,11 +134,7 @@ public class TrayServices implements TrayServicesIntf {
 
 		Tray tray = new Tray();
 		tray.setItemId(element_id);
-		ItemType itemType = null;
-		try {
-			itemType = ItemType.valueOf(element_type);
-		} catch (Exception e) {}
-		tray.setItemType(itemType);
+		tray.setItemType(element_type);
 		tray.setSource(source);
 		tray.setTimestamp(System.currentTimeMillis());
 		String uid = GoogleAccountUtils.getUID(token);
