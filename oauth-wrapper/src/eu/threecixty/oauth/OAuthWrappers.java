@@ -151,6 +151,11 @@ public class OAuthWrappers {
 	public static boolean addScope(String scopeName, String description, int scopeLevel) {
 		return OAuthModelsUtils.addScope(scopeName, description, scopeLevel);
 	}
+
+	public static void addScopesByDefault() {
+		OAuthModelsUtils.addScope("Read", "Description for READ scope", 99);
+		OAuthModelsUtils.addScope("Write", "Description for WRITE scope", 100);
+	}
 	
 	/**
 	 * Deletes scope from a given scope name
@@ -203,6 +208,15 @@ public class OAuthWrappers {
 			return null;
 		}
 		return appkey;
+	}
+	
+	public static String refreshAccessToken(String accessToken) {
+		UserAccessToken userAccessToken = OAuthModelsUtils.retrieveUserAccessToken(accessToken);
+		if (userAccessToken == null) return null;
+		String refreshedToken = refreshAccessTokenUsingOAuthServer(userAccessToken);
+		if (refreshedToken == null) return null;
+		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(userAccessToken)) return null;
+		return refreshedToken;
 	}
 
 	public static boolean updateAppKey(App app,  String description,
@@ -329,6 +343,28 @@ public class OAuthWrappers {
 		Client client = Client.create();
 	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
 	    formData.add("grant_type", "client_credentials");
+
+	    String auth = getBasicAuth();
+	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
+	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
+	    try {
+			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			JSONObject jsonObj = new JSONObject(jsonStr);
+			if (jsonObj.has(ACCES_TOKEN_KEY)) {
+				return jsonObj.getString(ACCES_TOKEN_KEY);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private static String refreshAccessTokenUsingOAuthServer(UserAccessToken userAccessToken) {
+		Client client = Client.create();
+	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
+	    formData.add("grant_type", "refresh_token");
+	    formData.add("refresh_token", userAccessToken.getAccessToken());
 
 	    String auth = getBasicAuth();
 	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)

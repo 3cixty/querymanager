@@ -346,6 +346,22 @@ public class OAuthModelsUtils {
 			return false;
 		}
 	}
+	
+	protected static boolean saveOrUpdateUserAccessToken(UserAccessToken userAccessToken) {
+		if (userAccessToken == null) return false;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+
+			session.saveOrUpdate(userAccessToken);
+
+			session.getTransaction().commit();
+			return true;
+		} catch (HibernateException e) {
+			return false;
+		}
+	}
 
 	protected static boolean deleteUserAccessToken(UserAccessToken userAccessToken) {
 		if (userAccessToken == null) return false;
