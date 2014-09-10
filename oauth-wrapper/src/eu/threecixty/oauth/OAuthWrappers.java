@@ -153,8 +153,12 @@ public class OAuthWrappers {
 	}
 
 	public static void addScopesByDefault() {
-		OAuthModelsUtils.addScope("Read", "Description for READ scope", 99);
-		OAuthModelsUtils.addScope("Write", "Description for WRITE scope", 100);
+		try {
+		    OAuthModelsUtils.addScope("Read", "Description for READ scope", 99);
+		    OAuthModelsUtils.addScope("Write", "Description for WRITE scope", 100);
+		} catch (Exception e) {
+			
+		}
 	}
 	
 	/**
