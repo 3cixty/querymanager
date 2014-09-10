@@ -53,7 +53,8 @@ public class ThreeCixtyResource extends AbstractResource {
     			client.setIncludePrincipal(true);
     			client.setAllowedImplicitGrant(true);
     			client.setResourceServer(resourceServer);
-    			client.setExpireDuration(0);
+    			client.setExpireDuration(60 * 60 * 24); // last for a day
+    			client.setUseRefreshTokens(true); // TODO: test for refresh token
     			client.setThumbNailUrl(thumbNailUrl);
     			List <String> scopes = new ArrayList <String>();
     			scopes.add(scope);
@@ -95,7 +96,7 @@ public class ThreeCixtyResource extends AbstractResource {
     			client.setAllowedClientCredentials(true);
     			client.setSecret(clientSecret);
     			client.setResourceServer(resourceServer);
-    			client.setExpireDuration(0);
+    			client.setExpireDuration(0); // lifetime app key
     			
     			List <String> redirect_uris = new ArrayList <String>();
     			redirect_uris.add(redirect_uri);
