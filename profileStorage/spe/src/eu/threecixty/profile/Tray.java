@@ -9,7 +9,7 @@ package eu.threecixty.profile;
 public class Tray {
 	
 	private String element_id;
-	private ItemType element_type;
+	private String element_type;
 	private String element_title;
 	private long timestamp;
 	// real UID or junkID
@@ -30,11 +30,11 @@ public class Tray {
 		this.element_id = itemId;
 	}
 
-	public ItemType getItemType() {
+	public String getItemType() {
 		return element_type;
 	}
 
-	public void setItemType(ItemType itemType) {
+	public void setItemType(String itemType) {
 		this.element_type = itemType;
 	}
 
@@ -102,12 +102,6 @@ public class Tray {
 	public void setImage_url(String image_url) {
 		this.image_url = image_url;
 	}
-
-
-
-	public enum ItemType {
-		event, poi, transportation
-	};
 	
 	public enum OrderType {
 		Desc, Asc

@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
-import eu.threecixty.profile.Tray.ItemType;
 import eu.threecixty.profile.Tray.OrderType;
 
 /**
@@ -168,7 +167,7 @@ public class TrayStorage {
 		    JSONObject jsonObj = (JSONObject)array.get(i);
 		    Tray tray = new Tray();
 		    tray.setItemId(jsonObj.getString("element_id"));
-		    tray.setItemType(ItemType.valueOf(jsonObj.getString("element_type")));
+		    tray.setItemType(jsonObj.getString("element_type"));
 		    tray.setTimestamp(jsonObj.getLong("timestamp"));
 		    tray.setUid(jsonObj.getString("token"));
 		    tray.setSource(jsonObj.getString("source"));
