@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
+import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Scope;
@@ -67,27 +68,27 @@ public class OAuthServices {
 		}
 	}
 
-	@GET
-	@Path("/getAccessToken")
-	public Response getAccessToken(@QueryParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey) {
-		String uid = GoogleAccountUtils.getUID(g_access_token);
-		if (uid == null || uid.equals(""))
-			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-		String accessToken = OAuthWrappers.getAccessToken(uid, appkey);
-		if (accessToken != null && !accessToken.equals("")) {
-			return Response.status(Response.Status.OK)
-	        .entity(" {\"accessToken\": \"" + accessToken + "\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
-		}
-		return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-	}
+//	@GET
+//	@Path("/getAccessToken")
+//	public Response getAccessToken(@QueryParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey) {
+//		String uid = GoogleAccountUtils.getUID(g_access_token);
+//		if (uid == null || uid.equals(""))
+//			return Response.status(Response.Status.BAD_REQUEST)
+//		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
+//		        .type(MediaType.APPLICATION_JSON_TYPE)
+//		        .build();
+//		String accessToken = OAuthWrappers.getAccessToken(uid, appkey);
+//		if (accessToken != null && !accessToken.equals("")) {
+//			return Response.status(Response.Status.OK)
+//	        .entity(" {\"accessToken\": \"" + accessToken + "\"} ")
+//	        .type(MediaType.APPLICATION_JSON_TYPE)
+//	        .build();
+//		}
+//		return Response.status(Response.Status.BAD_REQUEST)
+//		        .entity(" {\"response\": \"failed\"} ")
+//		        .type(MediaType.APPLICATION_JSON_TYPE)
+//		        .build();
+//	}
 
 	@GET
 	@Path("/getAppKey")
@@ -265,8 +266,8 @@ public class OAuthServices {
 		
 		session.setAttribute(UID_KEY, uid);
 		
-		String accessToken = OAuthWrappers.findAccessToken(uid, app.getKey());
-		if (accessToken != null && !accessToken.equals("")) {
+		AccessToken accessToken = OAuthWrappers.findAccessToken(uid, app);
+		if (accessToken != null) {
 			return redirect_uri_client2(accessToken, app);
 		}
 		
@@ -300,14 +301,29 @@ public class OAuthServices {
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		
-		return redirect_uri_client2(accessToken, app);
+		AccessToken infoToken = OAuthWrappers.findAccessToken(uid, app);
+		return redirect_uri_client2(infoToken, app);
 	}
 	
-	private Response redirect_uri_client2(String accessToken, App app) {
+	// TODO
+	@GET
+	@Path("/token")
+	public Response token(@QueryParam("refresh_token") String refresh_token) {
+		if (refresh_token == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"refresh_token is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+
+		Gson gson = new Gson();
+		AccessToken refreshedToken = OAuthWrappers.refreshAccessToken(refresh_token);
+		return Response.status(Response.Status.OK).entity(
+				gson.toJson(refreshedToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
+	}
+	
+	private Response redirect_uri_client2(AccessToken accessToken, App app) {
 		try {
 			
-			return Response.temporaryRedirect(new URI(app.getRedirectUri() + "#accessToken=" + accessToken)).build();
+			return Response.temporaryRedirect(new URI(app.getRedirectUri() + "#access_token=" + accessToken.getAccess_token())).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
