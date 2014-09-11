@@ -25,6 +25,7 @@ public class UserAccessToken implements java.io.Serializable {
 	private Integer id;
 	
 	private String accessToken;
+	private String refreshToken;
 	private User user;
 	private App app;
 
@@ -56,8 +57,17 @@ public class UserAccessToken implements java.io.Serializable {
 
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
-	}	
+	}
 	
+//	@Column(name = "refresh_token", unique = true, nullable = false, length = 64)
+//	public String getRefreshToken() {
+//		return refreshToken;
+//	}
+//
+//	public void setRefreshToken(String refreshToken) {
+//		this.refreshToken = refreshToken;
+//	}
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "3cixty_user_id", nullable = false)
 	public User getUser() {

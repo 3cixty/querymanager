@@ -9,6 +9,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.hibernate.transform.ToListResultTransformer;
 import org.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
@@ -57,16 +58,53 @@ public class OAuthWrappers {
 	private static final String resourceServerKey = "3cixty-res-admin";
 	private static final String resourceServerSecret = "(3cixty)InMiLano!+-:";
 	
+//	/**
+//	 * Gets user access token.
+//	 * <br>
+//	 * When a given user does not have his access token, the method asks OAuth server to give him one ;
+//	 * otherwise, the method picks that information from 3cixty database.
+//	 * @param uid
+//	 * @param appkey
+//	 * @return
+//	 */
+//	public static String getAccessToken(String uid, String appkey) {
+//		User user = OAuthModelsUtils.getUser(uid);
+//		if (user == null) {
+//			// create user in database to map with access tokens created by oauth server
+//			if (!OAuthModelsUtils.addUser(uid)) return null;
+//			user = OAuthModelsUtils.getUser(uid);
+//			if (user == null) return null;
+//		}
+//		App app = OAuthModelsUtils.getApp(appkey);
+//		if (app == null) return null;
+//		UserAccessToken tmpUserAccessToken = null;
+//		for (UserAccessToken userAccessToken: user.getUserAccessTokens()) {
+//			if (userAccessToken.getApp().getId().intValue() == app.getId().intValue()) { // found in DB
+//				// check if this access token is still available on oauth server to delete
+//				if (!validateAccessToken(userAccessToken.getAccessToken())) {
+//					tmpUserAccessToken = userAccessToken;
+//				} else {
+//				    return userAccessToken.getAccessToken();
+//				}
+//			}
+//		}
+//		// delete UserAccessToken as this access token is not available on OAuth server
+//		if (tmpUserAccessToken != null) {
+//			OAuthModelsUtils.deleteUserAccessToken(tmpUserAccessToken);
+//		}
+//		// create a new access token
+//		String accessToken = createAccessTokenUsingOAuthServer();
+//		if (storeAccessTokenWithUID(uid, accessToken, app)) return accessToken;
+//		return null;
+//	}
+
 	/**
-	 * Gets user access token.
-	 * <br>
-	 * When a given user does not have his access token, the method asks OAuth server to give him one ;
-	 * otherwise, the method picks that information from 3cixty database.
+	 * Return access token with info about expiration.
 	 * @param uid
-	 * @param appkey
+	 * @param app
 	 * @return
 	 */
-	public static String getAccessToken(String uid, String appkey) {
+	public static AccessToken findAccessToken(String uid, App app) {
 		User user = OAuthModelsUtils.getUser(uid);
 		if (user == null) {
 			// create user in database to map with access tokens created by oauth server
@@ -74,47 +112,16 @@ public class OAuthWrappers {
 			user = OAuthModelsUtils.getUser(uid);
 			if (user == null) return null;
 		}
-		App app = OAuthModelsUtils.getApp(appkey);
 		if (app == null) return null;
 		UserAccessToken tmpUserAccessToken = null;
 		for (UserAccessToken userAccessToken: user.getUserAccessTokens()) {
 			if (userAccessToken.getApp().getId().intValue() == app.getId().intValue()) { // found in DB
 				// check if this access token is still available on oauth server to delete
-				if (!validateAccessToken(userAccessToken.getAccessToken())) {
+				AccessToken tokenInfo = tokenInfo(userAccessToken.getAccessToken());
+				if (tokenInfo == null) {
 					tmpUserAccessToken = userAccessToken;
 				} else {
-				    return userAccessToken.getAccessToken();
-				}
-			}
-		}
-		// delete UserAccessToken as this access token is not available on OAuth server
-		if (tmpUserAccessToken != null) {
-			OAuthModelsUtils.deleteUserAccessToken(tmpUserAccessToken);
-		}
-		// create a new access token
-		String accessToken = createAccessTokenUsingOAuthServer();
-		if (storeAccessTokenWithUID(uid, accessToken, app)) return accessToken;
-		return null;
-	}
-
-	public static String findAccessToken(String uid, String appkey) {
-		User user = OAuthModelsUtils.getUser(uid);
-		if (user == null) {
-			// create user in database to map with access tokens created by oauth server
-			if (!OAuthModelsUtils.addUser(uid)) return null;
-			user = OAuthModelsUtils.getUser(uid);
-			if (user == null) return null;
-		}
-		App app = OAuthModelsUtils.getApp(appkey);
-		if (app == null) return null;
-		UserAccessToken tmpUserAccessToken = null;
-		for (UserAccessToken userAccessToken: user.getUserAccessTokens()) {
-			if (userAccessToken.getApp().getId().intValue() == app.getId().intValue()) { // found in DB
-				// check if this access token is still available on oauth server to delete
-				if (!validateAccessToken(userAccessToken.getAccessToken())) {
-					tmpUserAccessToken = userAccessToken;
-				} else {
-				    return userAccessToken.getAccessToken();
+				    return tokenInfo;
 				}
 			}
 		}
@@ -214,11 +221,13 @@ public class OAuthWrappers {
 		return appkey;
 	}
 	
-	public static String refreshAccessToken(String accessToken) {
+	public static AccessToken refreshAccessToken(String accessToken) {
 		UserAccessToken userAccessToken = OAuthModelsUtils.retrieveUserAccessToken(accessToken);
+		System.out.println(userAccessToken);
 		if (userAccessToken == null) return null;
-		String refreshedToken = refreshAccessTokenUsingOAuthServer(userAccessToken);
+		AccessToken refreshedToken = refreshAccessTokenUsingOAuthServer(userAccessToken);
 		if (refreshedToken == null) return null;
+		userAccessToken.setAccessToken(refreshedToken.getAccess_token());
 		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(userAccessToken)) return null;
 		return refreshedToken;
 	}
@@ -274,7 +283,7 @@ public class OAuthWrappers {
 	public static boolean validateAppKey(String appKey) {
 		if (appKey == null || appKey.equals("")) return false;
 		if (!OAuthModelsUtils.existApp(appKey)) return false;
-		return validateAccessToken(appKey);
+		return tokenInfo(appKey) != null;
 	}
 
 	/**
@@ -284,7 +293,7 @@ public class OAuthWrappers {
 	 */
 	public static boolean validateUserAccessToken(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return false;
-		return validateAccessToken(accessToken);
+		return tokenInfo(accessToken) != null;
 	}
 
 	public static String getBasicAuth() {
@@ -323,7 +332,7 @@ public class OAuthWrappers {
 	 * @param accessToken
 	 * @return
 	 */
-	private static boolean validateAccessToken(String accessToken) {
+	private static AccessToken tokenInfo(String accessToken) {
 		Client client = Client.create();
 
 	    String auth = "Basic ".concat(new String(Base64.encodeBase64(resourceServerKey.concat(":")
@@ -334,13 +343,17 @@ public class OAuthWrappers {
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
 			JSONObject jsonObj = new JSONObject(jsonStr);
-			if (jsonObj.has("expires_in")) {
-				if (jsonObj.getInt("expires_in") == 0) return true; // lifetime access token
+			if (!jsonObj.has("expires_in")) {
+				return null;
 			}
+			AccessToken tokenInfo = new AccessToken();
+			tokenInfo.setExpires_in(jsonObj.getInt("expires_in"));
+			tokenInfo.setAccess_token(accessToken);
+			return tokenInfo;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return null;
 	}
 	
 	private static String createAccessTokenUsingOAuthServer() {
@@ -364,26 +377,36 @@ public class OAuthWrappers {
 		return null;
 	}
 	
-	private static String refreshAccessTokenUsingOAuthServer(UserAccessToken userAccessToken) {
+	private static AccessToken refreshAccessTokenUsingOAuthServer(UserAccessToken userAccessToken) {
 		Client client = Client.create();
 	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
 	    formData.add("grant_type", "refresh_token");
 	    formData.add("refresh_token", userAccessToken.getAccessToken());
 
 	    String auth = getBasicAuth();
+	    System.out.println(auth);
 	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
-			if (jsonObj.has(ACCES_TOKEN_KEY)) {
-				return jsonObj.getString(ACCES_TOKEN_KEY);
-			}
+			return getAccessToken(jsonObj);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	private static AccessToken getAccessToken(JSONObject jsonObj) {
+		if (!jsonObj.has(ACCES_TOKEN_KEY)) {
+			return null;
+		}
+		AccessToken accessToken = new AccessToken();
+		accessToken.setAccess_token(jsonObj.getString(ACCES_TOKEN_KEY));
+		accessToken.setExpires_in(jsonObj.getInt("expires_in"));
+		return accessToken;
 	}
 
 	private static boolean createClientIdForApp(String clientId,
