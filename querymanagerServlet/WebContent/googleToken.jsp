@@ -9,13 +9,22 @@
 <body>
 
 <form >
-    <input type=button value="Login to Google to get access token" onclick="openWindowToLoginGoogle();">
     
     <script type="text/javascript">
         function openWindowToLoginGoogle() {
         	window.open("./getGoogleAccessToken", "_blank",
         			"toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
         }
+        
+     	var accessTokenKey = "#access_token=";
+    	var loc = window.location.href.toString();
+    	var tokenIndex1 = loc.indexOf(accessTokenKey);
+    	if (tokenIndex1 < 0) {
+    		document.write('<input type=button value="Login to Google to get access token" onclick="openWindowToLoginGoogle();">');
+    	} else {
+		    document.write(loc.substring(tokenIndex1 + accessTokenKey.length));
+		}
+        
     </script>
     
 </form>
