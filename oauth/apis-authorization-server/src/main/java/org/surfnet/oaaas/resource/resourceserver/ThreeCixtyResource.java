@@ -22,6 +22,8 @@ import org.surfnet.oaaas.repository.ResourceServerRepository;
 @Produces(MediaType.APPLICATION_JSON)
 public class ThreeCixtyResource extends AbstractResource {
 
+	//TODO: change this link to 3cixty server
+	private static final String ROOT_URL = "http://localhost:8080/";
 	//private static final Long THREE_CIXTY_RES_SERVER_ID = 11111L;
 	private static final String THREE_CIXTY_RES_SERVER_KEY = "3cixty-res-admin";
 	private static boolean firstTime = true;
@@ -53,7 +55,8 @@ public class ThreeCixtyResource extends AbstractResource {
     			client.setIncludePrincipal(true);
     			client.setAllowedImplicitGrant(true);
     			client.setResourceServer(resourceServer);
-    			client.setExpireDuration(60 * 60 * 24); // last for a day
+    			//client.setExpireDuration(60 * 60 * 24); // last for a day
+    			client.setExpireDuration(60 * 5); // last for a day
     			client.setUseRefreshTokens(true); // TODO: test for refresh token
     			client.setThumbNailUrl(thumbNailUrl);
     			List <String> scopes = new ArrayList <String>();
@@ -145,7 +148,10 @@ public class ThreeCixtyResource extends AbstractResource {
 		resourceServer.setContactName("3cixty RES");
 		resourceServer.setName("3Cixty Platform");
 		resourceServer.setSecret("(3cixty)InMiLano!+-:");
+		resourceServer.setThumbNailUrl(ROOT_URL + "apis-authorization-server-war-1.3.5"
+				+ "/3cixty-logo-transparent.png");
 		List <String> scopes = new ArrayList <String>();
+		// TODO: need to synchronize with 3cixty_scope table info
 		scopes.add("Read");
 		scopes.add("Write");
 		scopes.add("Write 1");

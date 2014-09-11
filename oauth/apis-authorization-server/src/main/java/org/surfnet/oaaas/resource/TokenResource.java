@@ -157,6 +157,7 @@ public class TokenResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes("application/x-www-form-urlencoded")
   public Response token(@HeaderParam("Authorization") String authorization, final MultivaluedMap<String, String> formParameters) {
+	  System.out.println(formParameters);
     AccessTokenRequest accessTokenRequest = AccessTokenRequest.fromMultiValuedFormParameters(formParameters);
     UserPassCredentials credentials = getUserPassCredentials(authorization, accessTokenRequest);
     String grantType = accessTokenRequest.getGrantType();
@@ -165,6 +166,7 @@ public class TokenResource {
     }
     ValidationResponse vr = oAuth2Validator.validate(accessTokenRequest);
     if (!vr.valid()) {
+    	System.out.println("ValidationResponse");
       return sendErrorResponse(vr);
     }
     AuthorizationRequest request;
@@ -224,8 +226,12 @@ public class TokenResource {
   }
 
   private AuthorizationRequest refreshTokenToken(AccessTokenRequest accessTokenRequest) {
+	  System.out.println(accessTokenRequest);
+	  System.out.println(accessTokenRequest.getRefreshToken());
+	  
     AccessToken accessToken = accessTokenRepository.findByRefreshToken(accessTokenRequest.getRefreshToken());
     if (accessToken == null) {
+    	System.out.println("Come here !!!!!!!!!!!!!!!!!!!!!!");
       throw new ValidationResponseException(ValidationResponse.INVALID_GRANT_REFRESH_TOKEN);
     }
     AuthorizationRequest request = new AuthorizationRequest();
