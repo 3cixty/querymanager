@@ -31,7 +31,7 @@ import eu.threecixty.profile.Tray.OrderType;
  * @author Cong-Kinh NGUYEN
  *
  */
-@Path("/" + Constants.PREFIX_NAME + "/tray")
+@Path("/" + Constants.PREFIX_NAME)
 public class TrayServices {
 	private static final String ADD_ACTION = "add_tray_element";
 	private static final String GET_ACTION = "get_tray_elements";
@@ -45,7 +45,7 @@ public class TrayServices {
 	
 	
     @POST
-    @Path("/")
+    @Path("/tray")
     public Response invokeTrayServices(InputStream input) {
     	long starttime = System.currentTimeMillis();
     	String restTrayStr = getRestTrayString(input);
