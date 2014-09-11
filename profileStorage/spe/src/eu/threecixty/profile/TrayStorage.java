@@ -256,7 +256,7 @@ public class TrayStorage {
 	private static boolean checkTrayExisted(Tray tray, List<Tray> allTrays) {
 		for (Tray tmpTray: allTrays) {
 			if (checkEquality(tray.getItemId(), tmpTray.getItemId()) &&
-					(tray.getItemType() == tmpTray.getItemType())) {
+					(tray.getItemType().equals(tmpTray.getItemType()))) {
 				if (tray.getUid() != null && !tray.getUid().equals("")) {
 					if (tray.getUid().equals(tmpTray.getUid())) return true;
 				}
