@@ -40,6 +40,7 @@ public class OAuthServices {
 	public static final String REDIRECT_URI = V2_ROOT + "redirect_uri";
 	
 	public static final String REDIRECT_URI_CLIENT = V2_ROOT + "redirect_uri_client";
+	public static final String ONLY_GOOGLE_ACCESS_TOKEN = "only_google_access_token";
 
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -247,6 +248,23 @@ public class OAuthServices {
 	}
 	
 	@GET
+	@Path("/getGoogleAccessToken")
+	public Response getGoogleAccessToken() {
+		HttpSession session = httpRequest.getSession();
+		session.setAttribute(ONLY_GOOGLE_ACCESS_TOKEN, true);
+		try {
+			//return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
+			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=email%20profile&state=%2Fprofile&redirect_uri="
+			+ OAuthServices.GOOGLE_CALLBACK
+			+"&response_type=token&client_id=239679915676-j58smonkigkh26rugnbsja3pon7bkvbv.apps.googleusercontent.com"))
+			.header("Access-Control-Allow-Origin", "*").build();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@GET
 	@Path("/redirect_uri")
 	public Response redirect_uri(@QueryParam("google_access_token") String google_access_token) {
 		HttpSession session = httpRequest.getSession();
@@ -309,13 +327,14 @@ public class OAuthServices {
 	@GET
 	@Path("/token")
 	public Response token(@QueryParam("refresh_token") String refresh_token) {
-		if (refresh_token == null) return Response.status(Response.Status.BAD_REQUEST)
+		AccessToken refreshedToken = OAuthWrappers.refreshAccessToken(refresh_token);
+		if (refreshedToken == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"refresh_token is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 
 		Gson gson = new Gson();
-		AccessToken refreshedToken = OAuthWrappers.refreshAccessToken(refresh_token);
+		
 		return Response.status(Response.Status.OK).entity(
 				gson.toJson(refreshedToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
