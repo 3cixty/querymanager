@@ -10,25 +10,45 @@
 <body>
 
 <script type="text/javascript">
-    function redirect() {
+    
+    function getAccessToken() {
     	var accessTokenKey = "&access_token=";
     	var loc = window.location.href.toString();
     	var tokenIndex1 = loc.indexOf(accessTokenKey);
     	if (tokenIndex1 < 0) {
-    		window.location = "./error.jsp";
+    		return null;
     	} else {
     		var tokenIndex2 = loc.indexOf("&", tokenIndex1 + accessTokenKey.length);
         	if (tokenIndex2 < 0) {
-        		window.location.href = "./error.jsp";
+        		return null;
         	} else {
         		var token = loc.substring(tokenIndex1 + accessTokenKey.length,  tokenIndex2);
-        		window.location = '<%=OAuthServices.REDIRECT_URI%>?google_access_token=' + token;
+        		return token;
         	}
     	}
     }
     
-    redirect();
+    function redirect() {
+    	var token = getAccessToken();
+    	if (token == null) {
+    		window.location = "./error.jsp";
+    	} else {
+        	window.location = '<%=OAuthServices.REDIRECT_URI%>?google_access_token=' + token;
+    	}
+    }    
 </script>
+
+<%
+    if (session.getAttribute(OAuthServices.ONLY_GOOGLE_ACCESS_TOKEN) == null) {
+    	%>
+    	<script type="text/javascript">
+    	    redirect();
+    	</script>
+    	<%
+    } else {
+    	session.removeAttribute(OAuthServices.ONLY_GOOGLE_ACCESS_TOKEN);
+    }
+%>
 
 </body>
 </html>
