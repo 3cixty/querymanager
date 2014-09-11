@@ -8,8 +8,16 @@
 </head>
 <body>
 
-<form action="./getGoogleAccessToken">
-    <input type=submit value="Login to Google to get access token">
+<form >
+    <input type=button value="Login to Google to get access token" onclick="openWindowToLoginGoogle();">
+    
+    <script type="text/javascript">
+        function openWindowToLoginGoogle() {
+        	window.open("./getGoogleAccessToken", "_blank",
+        			"toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
+        }
+    </script>
+    
 </form>
 </body>
 </html>

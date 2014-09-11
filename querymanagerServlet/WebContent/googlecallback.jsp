@@ -35,7 +35,18 @@
     	} else {
         	window.location = '<%=OAuthServices.REDIRECT_URI%>?google_access_token=' + token;
     	}
-    }    
+    }
+    
+    function showAccessToken() {
+    	var token = getAccessToken();
+    	if (token == null) {
+    		window.location = "./error.jsp";
+    	} else {
+		    window.opener.location=window.opener.location + "#access_token=" + token;
+		    window.opener.location.reload();
+		    window.close();
+    	}
+    }
 </script>
 
 <%
@@ -47,6 +58,11 @@
     	<%
     } else {
     	session.removeAttribute(OAuthServices.ONLY_GOOGLE_ACCESS_TOKEN);
+    	%>
+    	<script type="text/javascript">
+    	    showAccessToken();
+    	</script>
+    	<%
     }
 %>
 
