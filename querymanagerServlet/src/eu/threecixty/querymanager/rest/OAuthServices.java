@@ -286,7 +286,7 @@ public class OAuthServices {
 		
 		AccessToken accessToken = OAuthWrappers.findAccessToken(uid, app);
 		if (accessToken != null) {
-			return redirect_uri_client2(accessToken, app);
+			return redirect_uri_client2(accessToken, accessToken.getExpires_in(), app);
 		}
 		
 		try {
@@ -305,7 +305,9 @@ public class OAuthServices {
 
 	@GET
 	@Path("/redirect_uri_client")
-	public Response redirect_uri_client(@QueryParam("accessToken") String accessToken) {
+	public Response redirect_uri_client(@QueryParam("access_token") String accessToken,
+			@QueryParam("refresh_token") String refreshToken,
+			@QueryParam("expires_in") int expires_in) {
 		HttpSession session = httpRequest.getSession();
 		App app = (App) session.getAttribute(APP_KEY);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
@@ -313,14 +315,14 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		String uid = (String) session.getAttribute(UID_KEY);
-		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, app)) {
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, app)) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
 		AccessToken infoToken = OAuthWrappers.findAccessToken(uid, app);
-		return redirect_uri_client2(infoToken, app);
+		return redirect_uri_client2(infoToken, expires_in, app);
 	}
 	
 	// TODO
@@ -339,10 +341,13 @@ public class OAuthServices {
 				gson.toJson(refreshedToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
-	private Response redirect_uri_client2(AccessToken accessToken, App app) {
+	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, App app) {
 		try {
 			
-			return Response.temporaryRedirect(new URI(app.getRedirectUri() + "#access_token=" + accessToken.getAccess_token())).build();
+			return Response.temporaryRedirect(new URI(app.getRedirectUri()
+					+ "#access_token=" + accessToken.getAccess_token()
+					+ "&refresh_token=" + accessToken.getRefresh_token()
+					+ "&expires_in=" + expires_in)).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

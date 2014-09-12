@@ -29,6 +29,32 @@
         		window.location = '<%=OAuthServices.REDIRECT_URI_CLIENT%>?accessToken=' + token;
         	}
     	}
+    	
+    	var token = getParam("#access_token=");
+    	var refresh_token = getParam("&refresh_token=");
+    	var expires_in = getParam("&expires_in=");
+    	if (token == null || refresh_token == null || expires_in == null) {
+    		window.location = "./error.jsp";
+    	} else {
+    		window.location = '<%=OAuthServices.REDIRECT_URI_CLIENT%>?access_token=' + token 
+    				+ "&refresh_token=" + refresh_token + "&expires_in=" + expires_in;
+    	}
+    }
+    
+    function getParam(paramKey) {
+    	var loc = window.location.href.toString();
+    	var tokenIndex1 = loc.indexOf(paramKey);
+    	if (tokenIndex1 < 0) {
+    		return null;
+    	} else {
+    		var tokenIndex2 = loc.indexOf("&", tokenIndex1 + paramKey.length);
+        	if (tokenIndex2 < 0) {
+        		return loc.substring(tokenIndex1 + paramKey.length);
+        	} else {
+        		var token = loc.substring(tokenIndex1 + paramKey.length,  tokenIndex2);
+        		return token;
+        	}
+    	}
     }
     
     redirect();
