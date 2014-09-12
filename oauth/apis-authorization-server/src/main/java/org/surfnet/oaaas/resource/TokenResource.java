@@ -141,7 +141,9 @@ public class TokenResource {
     Client client = request.getClient();
     long expireDuration = client.getExpireDuration();
     long expires = (expireDuration == 0L ? 0L : (System.currentTimeMillis() + (1000 * expireDuration)));
-    String refreshToken = (client.isUseRefreshTokens() && !isImplicitGrant) ? getTokenValue(true) : null;
+    //String refreshToken = (client.isUseRefreshTokens() && !isImplicitGrant) ? getTokenValue(true) : null;
+    // TODO: Kinh changed this line
+    String refreshToken = (client.isUseRefreshTokens()) ? getTokenValue(true) : null;
     AuthenticatedPrincipal principal = request.getPrincipal();
     AccessToken token = new AccessToken(getTokenValue(false), principal, client, expires, request.getGrantedScopes(), refreshToken);
     return accessTokenRepository.save(token);
@@ -288,6 +290,11 @@ public class TokenResource {
     String uri = authReq.getRedirectUri();
     String fragment = String.format("access_token=%s&token_type=bearer&expires_in=%s&scope=%s"
         + appendStateParameter(authReq), accessToken.getToken(), accessToken.getExpiresIn(), StringUtils.join(authReq.getGrantedScopes(), ','));
+    
+    if (accessToken.getRefreshToken() != null && !accessToken.getRefreshToken().equals("")) {
+    	fragment += String.format("&refresh_token=%s", accessToken.getRefreshToken()) ;
+    }
+    
     if (authReq.getClient().isIncludePrincipal()) {
       fragment += String.format("&principal=%s", authReq.getPrincipal().getDisplayName()) ;
     }
