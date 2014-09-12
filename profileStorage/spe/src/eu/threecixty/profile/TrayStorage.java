@@ -45,8 +45,7 @@ public class TrayStorage {
 		int index = -1;
 		for (int i = 0; i < allTrays.size(); i++) {
 			Tray tmpTray = allTrays.get(i);
-			if (checkEquality(tray.getItemId(), tmpTray.getItemId()) &&
-					(tray.getItemType() == tmpTray.getItemType())) {
+			if (checkEquality(tray.getItemId(), tmpTray.getItemId())) {
 				if (tray.getUid() != null && !tray.getUid().equals("")) {
 					if (tray.getUid().equals(tmpTray.getUid())) {
 						index = i;
@@ -81,8 +80,7 @@ public class TrayStorage {
 		int index = -1;
 		for (int i = 0; i < allTrays.size(); i++) {
 			Tray tmpTray = allTrays.get(i);
-			if (checkEquality(tray.getItemId(), tmpTray.getItemId()) &&
-					(tray.getItemType() == tmpTray.getItemType())) {
+			if (checkEquality(tray.getItemId(), tmpTray.getItemId())) {
 				if (tray.getUid() != null && !tray.getUid().equals("")) {
 					if (tray.getUid().equals(tmpTray.getUid())) {
 						index = i;
