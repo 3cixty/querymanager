@@ -14,7 +14,8 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "3cixty_user_accessToken", uniqueConstraints = {
-		@UniqueConstraint(columnNames = "access_token")})
+		@UniqueConstraint(columnNames = "access_token"),
+		@UniqueConstraint(columnNames = "refresh_token")})
 public class UserAccessToken implements java.io.Serializable {
 
 	/**
@@ -59,14 +60,14 @@ public class UserAccessToken implements java.io.Serializable {
 		this.accessToken = accessToken;
 	}
 	
-//	@Column(name = "refresh_token", unique = true, nullable = false, length = 64)
-//	public String getRefreshToken() {
-//		return refreshToken;
-//	}
-//
-//	public void setRefreshToken(String refreshToken) {
-//		this.refreshToken = refreshToken;
-//	}
+	@Column(name = "refresh_token", unique = true, nullable = false, length = 64)
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "3cixty_user_id", nullable = false)

@@ -2,6 +2,7 @@ package eu.threecixty.oauth;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -132,7 +133,7 @@ public class OAuthWrappers {
 		return null;
 	}
 
-	public static boolean storeAccessTokenWithUID(String uid, String accessToken, App app) {
+	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken, App app) {
 		User user = OAuthModelsUtils.getUser(uid);
 		if (user == null) {
 			// create user in database to map with access tokens created by oauth server
@@ -141,7 +142,7 @@ public class OAuthWrappers {
 			if (user == null) return false;
 		}
 		if (accessToken == null || accessToken.equals("")) return false;
-		return OAuthModelsUtils.addUserAccessToken(accessToken, user, app);
+		return OAuthModelsUtils.addUserAccessToken(accessToken, refreshToken, user, app);
 	}
 	
 	public static UserAccessToken retrieveUserAccessToken(String accessToken) {
@@ -346,9 +347,14 @@ public class OAuthWrappers {
 			if (!jsonObj.has("expires_in")) {
 				return null;
 			}
+			long currentTime = Calendar.getInstance().getTimeInMillis();
+			long expiredTime = jsonObj.getLong("expires_in");
+			if (currentTime > expiredTime) return null;
 			AccessToken tokenInfo = new AccessToken();
-			tokenInfo.setExpires_in(jsonObj.getInt("expires_in"));
+			tokenInfo.setExpires_in((int)((expiredTime - currentTime) / 1000));
 			tokenInfo.setAccess_token(accessToken);
+			UserAccessToken userAccessToken = OAuthModelsUtils.retrieveUserAccessToken(accessToken);
+			tokenInfo.setRefresh_token(userAccessToken.getRefreshToken());
 			return tokenInfo;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -367,6 +373,7 @@ public class OAuthWrappers {
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has(ACCES_TOKEN_KEY)) {
 				return jsonObj.getString(ACCES_TOKEN_KEY);

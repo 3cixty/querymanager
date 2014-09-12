@@ -326,7 +326,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	protected static boolean addUserAccessToken(String accessToken, User user, App app) {
+	protected static boolean addUserAccessToken(String accessToken, String refreshToken, User user, App app) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -337,6 +337,7 @@ public class OAuthModelsUtils {
 			userAccessToken.setAccessToken(accessToken);
 			userAccessToken.setUser(user);
 			userAccessToken.setApp(app);
+			userAccessToken.setRefreshToken(refreshToken);
 
 			session.save(userAccessToken);
 
