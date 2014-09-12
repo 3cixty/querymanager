@@ -231,17 +231,21 @@ public class TrayServices {
 	private boolean updateTray(RestTrayObject restTray) {
 		String itemId = restTray.getElement_id();
 		if (itemId == null || itemId.equals("")) return false;
-		String itemTypeStr = restTray.getElement_type();
-		if (itemTypeStr == null || itemTypeStr.equals("")) return false;
 		String token = restTray.getToken();
 		String uid = GoogleAccountUtils.getUID(token);
-		String source = restTray.getSource();
-		String element_title = restTray.getElement_title();
+		
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
-		tray.setItemType(itemTypeStr);
-		tray.setSource(source);
-		tray.setElement_title(element_title);
+		
+		String itemTypeStr = restTray.getElement_type();
+		if (itemTypeStr != null) tray.setItemType(itemTypeStr);
+		
+		String source = restTray.getSource();
+		if (source != null) tray.setSource(source);
+		
+		String element_title = restTray.getElement_title();
+		if (element_title != null) tray.setElement_title(element_title);
+
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setUid((uid == null || uid.equals("")) ? token : uid);
 		
