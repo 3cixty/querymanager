@@ -12,8 +12,7 @@ import org.json.JSONObject;
 
 public class Main {
 	
-	private static final String GOOGLE_ACCESS_TOKEN_KEY = "google_access_token";
-	private static final String APP_ID_KEY = "appid";
+	private static final String APP_KEY = "key";
 	private static final String DESCRIPTION_KEY = "description";
 	private static final String CATEGORY_KEY = "category";
 	private static final String SCOPE_KEY = "scopeName";
@@ -25,15 +24,14 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		InputStream input = Main.class.getResourceAsStream("/appkeygeneration.properties");
+		InputStream input = Main.class.getResourceAsStream("/appkeyupdate.properties");
 		if (input == null) {
-			System.out.println("Please check the appkeygeneration.properties in the resources folder");
+			System.out.println("Please check the appkeyupdate.properties in the resources folder");
 		} else {
 			Properties props = new Properties();
 			try {
 				props.load(input);
-				String googleAccessToken = props.getProperty(GOOGLE_ACCESS_TOKEN_KEY);
-				String appid = props.getProperty(APP_ID_KEY);
+				String key = props.getProperty(APP_KEY);
 				String appname = props.getProperty(APP_NAME_KEY);
 				String desc = props.getProperty(DESCRIPTION_KEY);
 				String cat = props.getProperty(CATEGORY_KEY);
@@ -53,8 +51,7 @@ public class Main {
 				 */
 				
 				StringBuffer buffer = new StringBuffer();
-				buffer.append("http://localhost:8080/v2/getAppKey?google_access_token=" + encode(googleAccessToken));
-				append(buffer, "appid", encode(appid));
+				buffer.append("http://localhost:8080/v2/updateAppKey?key=" + encode(key));
 				append(buffer, "description", encode(desc));
 				append(buffer, "category", encode(cat));
 				append(buffer, "scopeName", encode(scopeName));
