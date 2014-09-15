@@ -66,10 +66,12 @@ public class Main {
 					System.out.println("Please check your server");
 				} else {
 					JSONObject json = new JSONObject(content);
-					if (json.has("key")) {
-						System.out.println("Your app secret is: " + json.getString("key"));
+					if (json.has("response")) {
+						if (json.getString("response").equals("successful")) {
+						    System.out.println("Successful to update appkey's info");
+						} else System.out.println("Failed to update app key: " + json);
 					} else {
-						System.out.println("Failed to get app key: " + json);
+						System.out.println("Failed to update app key: " + json);
 					}
 				}
 			} catch (IOException e) {
