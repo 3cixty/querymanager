@@ -1104,6 +1104,7 @@ public class UserProfileStorage {
 			Object objLongitude = addr.getLongitude().iterator().next();
 			toAddress.setLongitute(Double.parseDouble(objLongitude.toString()));
 		}
+		to.setHasAddress(toAddress);
 	}
 	
 	/**
