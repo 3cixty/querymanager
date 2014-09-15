@@ -171,10 +171,10 @@ public class ProfileInformationStorage {
 			ProfileInformation to) {
 		if (from.getHasAddress() == null) return;
 		Address addr = from.getHasAddress();
-		if (addr.getCountryName() != null) {
+		if (!isNullOrEmpty(addr.getCountryName())) {
 			to.setCountryName(addr.getCountryName());
 		}
-		if (addr.getTownName() != null) {
+		if (!isNullOrEmpty(addr.getTownName())) {
 			to.setTownName(addr.getTownName());
 		}
 		if (addr.getLatitude() > 0) {
