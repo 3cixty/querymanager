@@ -222,9 +222,9 @@ public class OAuthWrappers {
 		return appkey;
 	}
 	
-	public static AccessToken refreshAccessToken(String accessToken) {
-		UserAccessToken userAccessToken = OAuthModelsUtils.retrieveUserAccessToken(accessToken);
-		System.out.println(userAccessToken);
+	public static AccessToken refreshAccessToken(String refreshToken) {
+		UserAccessToken userAccessToken = OAuthModelsUtils.retrieveUserAccessTokenViaRefreshToken(
+				refreshToken);
 		if (userAccessToken == null) return null;
 		AccessToken refreshedToken = refreshAccessTokenUsingOAuthServer(userAccessToken);
 		if (refreshedToken == null) return null;
@@ -233,8 +233,11 @@ public class OAuthWrappers {
 		return refreshedToken;
 	}
 
-	public static boolean updateAppKey(App app,  String description,
-			String category, String scopeName, String redirect_uri) {
+	public static boolean updateAppKey(App app, String appname, String description,
+			String category, String scopeName, String redirect_uri, String thumbNailUrl) {
+		if (appname != null && !appname.equals("")) {
+			app.setAppName(appname);
+		}
 		if (description != null && !description.equals("")) {
 			app.setDescription(description);
 		}
@@ -248,6 +251,9 @@ public class OAuthWrappers {
 		}
 		if (redirect_uri != null && !redirect_uri.equals("")) {
 			app.setRedirectUri(redirect_uri);
+		}
+		if (thumbNailUrl != null && !thumbNailUrl.equals("")) {
+			
 		}
 		return OAuthModelsUtils.updateApp(app);
 	}
@@ -373,7 +379,6 @@ public class OAuthWrappers {
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
-			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has(ACCES_TOKEN_KEY)) {
 				return jsonObj.getString(ACCES_TOKEN_KEY);
@@ -388,18 +393,28 @@ public class OAuthWrappers {
 		Client client = Client.create();
 	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
 	    formData.add("grant_type", "refresh_token");
-	    formData.add("refresh_token", userAccessToken.getAccessToken());
-
-	    String auth = getBasicAuth();
-	    System.out.println(auth);
+	    formData.add("refresh_token", userAccessToken.getRefreshToken());
+	    
+	    // check ThreeCixtyResourceServer
+		String auth = "Basic ".concat(new String(Base64.encodeBase64(
+				userAccessToken.getApp().getClientId().concat(":")
+				.concat("fixedPwdMilano").getBytes())));
+	    
 	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+	    
+	    
 	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
-			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
-			return getAccessToken(jsonObj);
+			AccessToken newAccessToken = getAccessToken(jsonObj);
+			if (newAccessToken == null) return null;
+			// update user access token as OAuth server already deleted old one
+			userAccessToken.setAccessToken(newAccessToken.getAccess_token());
+			if (newAccessToken.getRefresh_token() != null)
+				    userAccessToken.setRefreshToken(newAccessToken.getRefresh_token());
+			if (OAuthModelsUtils.saveOrUpdateUserAccessToken(userAccessToken)) return newAccessToken;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -413,6 +428,9 @@ public class OAuthWrappers {
 		AccessToken accessToken = new AccessToken();
 		accessToken.setAccess_token(jsonObj.getString(ACCES_TOKEN_KEY));
 		accessToken.setExpires_in(jsonObj.getInt("expires_in"));
+		if (jsonObj.has("refresh_token")) {
+			accessToken.setRefresh_token(jsonObj.getString("refresh_token"));
+		}
 		return accessToken;
 	}
 

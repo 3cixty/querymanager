@@ -409,6 +409,21 @@ public class OAuthModelsUtils {
 		}
 	}
 
+	protected static UserAccessToken retrieveUserAccessTokenViaRefreshToken(String refreshToken) {
+		if (isNullOrEmpty(refreshToken)) return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, refreshToken).list();
+			if (results.size() == 0) return null;
+			return (UserAccessToken) results.get(0);
+		} catch (HibernateException e) {
+			return null;
+		}
+	}
+
 	
 	private static boolean isNullOrEmpty(String str) {
 		return str == null || str.equals("");
