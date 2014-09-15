@@ -97,8 +97,8 @@ public class OAuthServices {
 			@QueryParam("appname") String appname,
 			@DefaultValue("") @QueryParam("description") String desc, @QueryParam("category") String cat,
 			@QueryParam("scopeName") String scopeName,
-			@QueryParam("redirect_uri") String redirect_uri,
-			@QueryParam("thumbNailUrl") String thumbNailUrl) {
+			@DefaultValue("")@QueryParam("redirect_uri") String redirect_uri,
+			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
 		//thumbNailUrl
 		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
@@ -122,15 +122,17 @@ public class OAuthServices {
 	@GET
 	@Path("/updateAppKey")
 	public Response updateAppKey(@QueryParam("key") String key, 
+			@DefaultValue("") @QueryParam("appname") String appname,
 			@DefaultValue("") @QueryParam("description") String desc, @DefaultValue("") @QueryParam("category") String cat,
-			@DefaultValue("") @QueryParam("scopeName") String scopeName, @DefaultValue("") @QueryParam("redirect_uri") String redirect_uri) {
+			@DefaultValue("") @QueryParam("scopeName") String scopeName, @DefaultValue("") @QueryParam("redirect_uri") String redirect_uri,
+			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
 		App app = OAuthWrappers.retrieveApp(key);
 		if (app == null)
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		boolean ok = OAuthWrappers.updateAppKey(app, desc, cat, scopeName, redirect_uri);
+		boolean ok = OAuthWrappers.updateAppKey(app, appname, desc, cat, scopeName, redirect_uri);
 		if (ok) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"response\": \"successful\"} ")
