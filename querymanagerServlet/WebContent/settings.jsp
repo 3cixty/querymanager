@@ -13,14 +13,19 @@
 
 <%
     String accessToken = (String) session.getAttribute("accessToken");
+    String key = (String) session.getAttribute("key");
 
-   if (session.getAttribute("uid") == null || accessToken == null) {
+   if (session.getAttribute("uid") == null || accessToken == null || key == null) {
 	   response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
    } else  {
         ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 %>
 
-<form action="../<%=Constants.PREFIX_NAME %>/settings/save" method="post">
+<form action="./<%=Constants.PREFIX_NAME %>/saveSettings" method="post">
+<div>
+    <input type="hidden" name="accessToken" value="<%=accessToken%>">
+    <input type="hidden" name="key" value="<%=key%>">
+</div>
 <div>
 <span >Google UID</span>
 </div>
