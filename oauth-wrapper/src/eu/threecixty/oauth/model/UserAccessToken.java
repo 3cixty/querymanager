@@ -29,6 +29,7 @@ public class UserAccessToken implements java.io.Serializable {
 	private String refreshToken;
 	private User user;
 	private App app;
+	
 
 	public UserAccessToken() {
 	}

@@ -10,7 +10,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.transform.ToListResultTransformer;
 import org.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
@@ -233,29 +232,12 @@ public class OAuthWrappers {
 		return refreshedToken;
 	}
 
-	public static boolean updateAppKey(App app, String appname, String description,
+	public static boolean updateAppKey(String key, String appname, String description,
 			String category, String scopeName, String redirect_uri, String thumbNailUrl) {
-		if (appname != null && !appname.equals("")) {
-			app.setAppName(appname);
-		}
-		if (description != null && !description.equals("")) {
-			app.setDescription(description);
-		}
-		if (category != null && !category.equals("")) {
-			app.setCategory(category);
-		}
-		if (scopeName != null && !scopeName.equals("")) {
-			Scope scope = OAuthModelsUtils.getScope(scopeName);
-			if (scope == null) return false;
-			app.setScope(scope);
-		}
-		if (redirect_uri != null && !redirect_uri.equals("")) {
-			app.setRedirectUri(redirect_uri);
-		}
 		if (thumbNailUrl != null && !thumbNailUrl.equals("")) {
 			
 		}
-		return OAuthModelsUtils.updateApp(app);
+		return OAuthModelsUtils.updateApp(key, appname, description, category, scopeName, redirect_uri);
 	}
 
 	/**
