@@ -21,7 +21,7 @@
         ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 %>
 
-<form action="../<%=Constants.PREFIX_NAME %>/settings/save" method="post">
+<form action="../<%=Constants.PREFIX_NAME %>/saveSettings" method="post">
 <div>
     <input type="hidden" name="accessToken" value="<%=accessToken%>">
     <input type="hidden" name="key" value="<%=key%>">
