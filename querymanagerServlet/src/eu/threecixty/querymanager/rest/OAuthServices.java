@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -96,7 +97,7 @@ public class OAuthServices {
 	public Response getAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid,
 			@QueryParam("appname") String appname,
 			@DefaultValue("") @QueryParam("description") String desc, @QueryParam("category") String cat,
-			@QueryParam("scopeName") String scopeName,
+			@QueryParam("scopeName") List<String> scopeNames,
 			@DefaultValue("")@QueryParam("redirect_uri") String redirect_uri,
 			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
 		//thumbNailUrl
@@ -106,7 +107,7 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, scopeName, redirect_uri, thumbNailUrl);
+		String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, scopeNames, redirect_uri, thumbNailUrl);
 		if (appKey != null && !appKey.equals("")) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"key\": \"" + appKey + "\"} ")
@@ -124,15 +125,9 @@ public class OAuthServices {
 	public Response updateAppKey(@QueryParam("key") String key, 
 			@DefaultValue("") @QueryParam("appname") String appname,
 			@DefaultValue("") @QueryParam("description") String desc, @DefaultValue("") @QueryParam("category") String cat,
-			@DefaultValue("") @QueryParam("scopeName") String scopeName, @DefaultValue("") @QueryParam("redirect_uri") String redirect_uri,
+			@DefaultValue("") @QueryParam("scopeName") List<String> scopeNames, @DefaultValue("") @QueryParam("redirect_uri") String redirect_uri,
 			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
-		App app = OAuthWrappers.retrieveApp(key);
-		if (app == null)
-			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"Key is invalid\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-		boolean ok = OAuthWrappers.updateAppKey(app, appname, desc, cat, scopeName, redirect_uri);
+		boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, scopeNames, redirect_uri, thumbNailUrl);
 		if (ok) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"response\": \"successful\"} ")
@@ -140,7 +135,7 @@ public class OAuthServices {
 	        .build();
 		}
 		return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name is invalid\"} ")
+		        .entity(" {\"response\": \"failed\", \"reason\": \"app key or scope name is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 	}
@@ -294,7 +289,7 @@ public class OAuthServices {
 		try {
 			return Response.temporaryRedirect(new URI(
 					OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
-			+ app.getScope().getScopeName() + "&client_id="
+			+ join(app.getScopes()) + "&client_id="
 			+ app.getClientId() + "&redirect_uri="
 		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
 		    		OAuthWrappers.getBasicAuth()).build();
@@ -354,6 +349,17 @@ public class OAuthServices {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private String join(Set<Scope> scopes) {
+		StringBuilder builder = new StringBuilder();
+		for (Scope scope: scopes) {
+			if (builder.length() == 0) builder.append(scope.getScopeName());
+			else {
+				builder.append(',').append(scope.getScopeName());
+			}
+		}
+		return builder.toString();
 	}
 
 	private boolean checkUserForScope(String username, String password) {
