@@ -15,29 +15,15 @@
 <body>
 <script type="text/javascript">
     function redirect() {
-    	var accessTokenKey = "#access_token=";
-    	var loc = window.location.href.toString();
-    	var tokenIndex1 = loc.indexOf(accessTokenKey);
-    	if (tokenIndex1 < 0) {
-    		window.location = "./error.jsp";
-    	} else {
-    		var tokenIndex2 = loc.indexOf("&", tokenIndex1 + accessTokenKey.length);
-        	if (tokenIndex2 < 0) {
-        		window.location.href = "./error.jsp";
-        	} else {
-        		var token = loc.substring(tokenIndex1 + accessTokenKey.length,  tokenIndex2);
-        		window.location = '<%=OAuthServices.REDIRECT_URI_CLIENT%>?accessToken=' + token;
-        	}
-    	}
-    	
     	var token = getParam("#access_token=");
     	var refresh_token = getParam("&refresh_token=");
     	var expires_in = getParam("&expires_in=");
+    	var scope = getParam("&scope=");
     	if (token == null || refresh_token == null || expires_in == null) {
     		window.location = "./error.jsp";
     	} else {
     		window.location = '<%=OAuthServices.REDIRECT_URI_CLIENT%>?access_token=' + token 
-    				+ "&refresh_token=" + refresh_token + "&expires_in=" + expires_in;
+    				+ "&refresh_token=" + refresh_token + "&expires_in=" + expires_in + "&scope=" + scope;
     	}
     }
     
@@ -57,7 +43,7 @@
     	}
     }
     
-    redirect();
+   redirect();
 </script>
 
 

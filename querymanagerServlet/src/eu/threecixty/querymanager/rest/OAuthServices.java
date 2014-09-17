@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -165,13 +164,13 @@ public class OAuthServices {
 	@POST
 	@Path("/addScope")
 	public Response addScope(@QueryParam("username") String username, @QueryParam("password") String password,
-			@QueryParam("description") String desc, @QueryParam("scopeName") String scopeName, @QueryParam("scopeLevel") int scopeLevel) {
+			@QueryParam("description") String desc, @QueryParam("scopeName") String scopeName) {
 		if (!checkUserForScope(username, password))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		boolean ok = OAuthWrappers.addScope(scopeName, desc, scopeLevel);
+		boolean ok = OAuthWrappers.addScope(scopeName, desc);
 		if (ok) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"response\": \"successful\"} ")
@@ -304,7 +303,7 @@ public class OAuthServices {
 	@Path("/redirect_uri_client")
 	public Response redirect_uri_client(@QueryParam("access_token") String accessToken,
 			@QueryParam("refresh_token") String refreshToken,
-			@QueryParam("expires_in") int expires_in) {
+			@QueryParam("expires_in") int expires_in, @QueryParam("scope") String scope) {
 		HttpSession session = httpRequest.getSession();
 		App app = (App) session.getAttribute(APP_KEY);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
@@ -312,14 +311,18 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		String uid = (String) session.getAttribute(UID_KEY);
-		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, app)) {
+		// scope can be a 'null' string as its result is found in 3cixtycallback
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app)) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		AccessToken infoToken = OAuthWrappers.findAccessToken(uid, app);
-		return redirect_uri_client2(infoToken, expires_in, app);
+		AccessToken tokenInfo = new AccessToken();
+		tokenInfo.setExpires_in(expires_in);
+		tokenInfo.setAccess_token(accessToken);
+		tokenInfo.setRefresh_token(refreshToken);
+		return redirect_uri_client2(tokenInfo, expires_in, app);
 	}
 	
 	// TODO
