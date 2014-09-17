@@ -1,13 +1,19 @@
 package eu.threecixty.oauth.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 
+import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -29,6 +35,8 @@ public class UserAccessToken implements java.io.Serializable {
 	private String refreshToken;
 	private User user;
 	private App app;
+	
+	private Set <Scope> scopes = new HashSet <Scope>();
 	
 
 	public UserAccessToken() {
@@ -88,5 +96,18 @@ public class UserAccessToken implements java.io.Serializable {
 
 	public void setApp(App app) {
 		this.app = app;
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "user_accessToken_scope", joinColumns = { 
+			@JoinColumn(name = "user_accessToken_id", nullable = false, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "scope_id", 
+					nullable = false, updatable = false) })
+	public Set<Scope> getScopes() {
+		return scopes;
+	}
+
+	public void setScopes(Set<Scope> scopes) {
+		this.scopes = scopes;
 	}
 }

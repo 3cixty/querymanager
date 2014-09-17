@@ -22,6 +22,8 @@ import eu.threecixty.oauth.model.Developer;
 import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.model.User;
 import eu.threecixty.oauth.model.UserAccessToken;
+import eu.threecixty.oauth.utils.ResourceServerUtils;
+import eu.threecixty.oauth.utils.ScopeUtils;
 
 public class OAuthWrappers { 
 	
@@ -48,15 +50,13 @@ public class OAuthWrappers {
 	// TODO: client id and client secret to communicate with OAuth server
 	// make sure that this user exists in the database (the client table)
 	private static final String clientId = "cool_app_id2";
-	private static final String clientSecret = "secret3";
-	private static final String CLIENT_REDIRECT_URI = "http://localhost:8080/v2/3cixtycallback.jsp";
+	private static final String clientSecret = "secret*+-!S3";
+	private static final String CLIENT_REDIRECT_URI = ROOT_SERVER  + "v2/3cixtycallback.jsp";
 	
 	private static boolean firstTimeForClientCoolApp = true;
 
-	// TODO: resourceServer Name and secret to communicate with OAuth server
-	// make sure that this user exists in the database (the resourceserver table)
-	private static final String resourceServerKey = "3cixty-res-admin";
-	private static final String resourceServerSecret = "(3cixty)InMiLano!+-:";
+	private static final String resourceServerKey = ResourceServerUtils.getResourceServerKey();
+	private static final String resourceServerSecret = ResourceServerUtils.getResourceServerSecret();
 	
 //	/**
 //	 * Gets user access token.
@@ -132,7 +132,8 @@ public class OAuthWrappers {
 		return null;
 	}
 
-	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken, App app) {
+	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken,
+			String scope, App app) {
 		User user = OAuthModelsUtils.getUser(uid);
 		if (user == null) {
 			// create user in database to map with access tokens created by oauth server
@@ -141,7 +142,7 @@ public class OAuthWrappers {
 			if (user == null) return false;
 		}
 		if (accessToken == null || accessToken.equals("")) return false;
-		return OAuthModelsUtils.addUserAccessToken(accessToken, refreshToken, user, app);
+		return OAuthModelsUtils.addUserAccessToken(accessToken, refreshToken, scope, user, app);
 	}
 	
 	public static UserAccessToken retrieveUserAccessToken(String accessToken) {
@@ -155,14 +156,18 @@ public class OAuthWrappers {
 	 * @param scopeLevel
 	 * @return
 	 */
-	public static boolean addScope(String scopeName, String description, int scopeLevel) {
-		return OAuthModelsUtils.addScope(scopeName, description, scopeLevel);
+	public static boolean addScope(String scopeName, String description) {
+		return OAuthModelsUtils.addScope(scopeName, description);
 	}
 
 	public static void addScopesByDefault() {
 		try {
-		    OAuthModelsUtils.addScope("Read", "Description for READ scope", 99);
-		    OAuthModelsUtils.addScope("Write", "Description for WRITE scope", 100);
+			List <String> scopeNames = ScopeUtils.getScopeNames();
+			for (String scopeName: scopeNames) {
+				if (!OAuthModelsUtils.existScope(scopeName)) {
+		            OAuthModelsUtils.addScope(scopeName, "Description for " + scopeName + " scope");
+				}
+			}
 		} catch (Exception e) {
 			
 		}
@@ -194,7 +199,7 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static String getAppKey(String appId, String appName, String description,
-			String category, String uid, String scopeName, String redirect_uri, String thumbNailUrl) {
+			String category, String uid, List<String> scopeNames, String redirect_uri, String thumbNailUrl) {
 		String tmpAppId = (appId == null) ? "" : appId;
 		String tmpCategory = (category == null) ? "" : category;
 		if (uid == null) return null;
@@ -204,16 +209,14 @@ public class OAuthWrappers {
 			developer = OAuthModelsUtils.getDeveloper(uid);
 			if (developer == null) return null;
 		}
-		Scope scope = OAuthModelsUtils.getScope(scopeName);
-		if (scope == null) return null;
 		String appkey = createAccessTokenUsingOAuthServer();
 		if (appkey == null || appkey.equals("")) return null;
 		String clientId = tmpAppId + System.currentTimeMillis();
 		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, appName, clientId, description, tmpCategory,
-				developer, scope, redirect_uri);
+				developer, scopeNames, redirect_uri);
 		if (!ok) return null;
 		// create clientId in the client table
-		if (!createClientIdForApp(clientId, appName, scopeName, thumbNailUrl)) {
+		if (!createClientIdForApp(clientId, appName, scopeNames, thumbNailUrl)) {
 			App app = OAuthModelsUtils.getApp(appkey);
 			OAuthModelsUtils.deleteApp(app);
 			return null;
@@ -233,11 +236,11 @@ public class OAuthWrappers {
 	}
 
 	public static boolean updateAppKey(String key, String appname, String description,
-			String category, String scopeName, String redirect_uri, String thumbNailUrl) {
+			String category, List<String> scopeNames, String redirect_uri, String thumbNailUrl) {
 		if (thumbNailUrl != null && !thumbNailUrl.equals("")) {
 			
 		}
-		return OAuthModelsUtils.updateApp(key, appname, description, category, scopeName, redirect_uri);
+		return OAuthModelsUtils.updateApp(key, appname, description, category, scopeNames, redirect_uri);
 	}
 
 	/**
@@ -295,7 +298,7 @@ public class OAuthWrappers {
 				Builder builder = client.resource(ENDPOINT_TO_CREATE_CLIENT_FOR_ASKING_TOKEN
 						+ "?clientId=" + clientId
 						+ "&clientSecret=" + URLEncoder.encode(clientSecret, "UTF-8")
-						+ "&scope=Read&redirect_uri=" + URLEncoder.encode(CLIENT_REDIRECT_URI, "UTF-8"))
+						+ "&redirect_uri=" + URLEncoder.encode(CLIENT_REDIRECT_URI, "UTF-8"))
 						.header(AUTHORIZATION, auth)
 						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 				ClientResponse clientResponse = builder.get(ClientResponse.class);
@@ -417,19 +420,20 @@ public class OAuthWrappers {
 	}
 
 	private static boolean createClientIdForApp(String clientId,
-			String app_name, String scopeName, String thumbNailUrl) {
+			String app_name, List<String> scopeNames, String thumbNailUrl) {
 		Client client = Client.create();
 	    Builder builder;
 		try {
 			builder = client.resource(ENDPOINT_TO_CREATE_CLIENT_FOR_APP + "?clientId=" + clientId
 					+ "&app_name=" + URLEncoder.encode(app_name, "UTF-8")
-					+ "&scope=" + URLEncoder.encode(scopeName, "UTF-8")
+					+ "&scope=" + URLEncoder.encode(join(scopeNames), "UTF-8")
 					+ "&thumbNailUrl=" + URLEncoder.encode(thumbNailUrl, "UTF-8"))
 					.header(AUTHORIZATION, getBasicAuth());
 			
 	        ClientResponse clientResponse = builder.get(ClientResponse.class);
 
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has("response")) {
 				String res = jsonObj.getString("response");
@@ -443,6 +447,17 @@ public class OAuthWrappers {
 		return false;
 	}
 
+	private static String join(List<String> scopeNames) {
+		StringBuilder builder = new StringBuilder();
+		for (String scopeName: scopeNames) {
+			if (builder.length() == 0) builder.append(scopeName);
+			else {
+				builder.append(',').append(scopeName);
+			}
+		}
+		return builder.toString();
+	}
+	
 	private OAuthWrappers() {
 	}
 }

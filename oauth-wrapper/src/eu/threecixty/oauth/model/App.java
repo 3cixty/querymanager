@@ -5,13 +5,16 @@ import static javax.persistence.GenerationType.IDENTITY;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -31,7 +34,8 @@ public class App implements java.io.Serializable {
 	private String key;
 	private Set <UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 	private Developer developer;
-	private Scope scope;
+	private Set <Scope> scopes = new HashSet<Scope>();
+	//private Scope scope;
 
 	// appid
 	private String appNameSpace;
@@ -110,14 +114,17 @@ public class App implements java.io.Serializable {
 		this.appNameSpace = appNameSpace;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "3cixty_scope_id", nullable = false)
-	public Scope getScope() {
-		return scope;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "app_scope", joinColumns = { 
+			@JoinColumn(name = "app_id", nullable = false, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "scope_id", 
+					nullable = false, updatable = false) })
+	public Set<Scope> getScopes() {
+		return scopes;
 	}
 
-	public void setScope(Scope scope) {
-		this.scope = scope;
+	public void setScopes(Set<Scope> scopes) {
+		this.scopes = scopes;
 	}
 
 	@Column(name = "redirect_uri", unique = false, nullable = true, length = 255)

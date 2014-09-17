@@ -10,14 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "3cixty_scope", uniqueConstraints = {
-		@UniqueConstraint(columnNames = "scope_name"),
-		@UniqueConstraint(columnNames = "scope_level")})
+		@UniqueConstraint(columnNames = "scope_name")})
 public class Scope implements java.io.Serializable {
 
 	/**
@@ -28,9 +27,9 @@ public class Scope implements java.io.Serializable {
 	private Integer id;
 	private String scopeName;
 	private String description;
-	private Integer scopeLevel;
 	
 	private Set<App> apps = new HashSet <App>();
+	private Set<UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -61,21 +60,21 @@ public class Scope implements java.io.Serializable {
 		this.description = description;
 	}
 
-	@Column(name = "scope_level", unique = true, nullable = false)
-	public Integer getScopeLevel() {
-		return scopeLevel;
-	}
-
-	public void setScopeLevel(Integer scopeLevel) {
-		this.scopeLevel = scopeLevel;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "scope")
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "scopes")
 	public Set<App> getApps() {
 		return apps;
 	}
 
 	public void setApps(Set<App> apps) {
 		this.apps = apps;
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "scopes")
+	public Set<UserAccessToken> getUserAccessTokens() {
+		return userAccessTokens;
+	}
+
+	public void setUserAccessTokens(Set<UserAccessToken> userAccessTokens) {
+		this.userAccessTokens = userAccessTokens;
 	}
 }
