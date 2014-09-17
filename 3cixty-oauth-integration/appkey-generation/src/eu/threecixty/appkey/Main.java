@@ -41,8 +41,10 @@ public class Main {
 				String redirect_uri = props.getProperty(REDIRECT_URI_KEY);
 				String thumbNailUrl = props.getProperty(THUMB_NAIL_URL);
 				
-				// TODO: note that 'redirect_uri' and 'thumbNailUrl' are optional, don't provide 
-				// these information if you don't have, for example:
+				// XXX:
+				// 1) repeat the 'scopeName' param if you have more than one scope 
+				// 2) 'redirect_uri' and 'thumbNailUrl' are optional, don't provide 
+				//    these information if you don't have, for example:
 				/*
 				 * http://localhost:8080/v2/getAppKey?google_access_token=" + encode(googleAccessToken)
 						+ "&appid=" + encode(appid)
@@ -57,7 +59,16 @@ public class Main {
 				append(buffer, "appid", encode(appid));
 				append(buffer, "description", encode(desc));
 				append(buffer, "category", encode(cat));
-				append(buffer, "scopeName", encode(scopeName));
+				if (scopeName != null) {
+					if (scopeName.contains(",")) { // more than one scope
+						String [] tmpScopeNames = scopeName.split(",");
+						for (String tmpScopeName: tmpScopeNames) {
+							append(buffer, "scopeName", encode(tmpScopeName));
+						}
+					} else {
+						append(buffer, "scopeName", encode(scopeName));
+					}
+				}
 				append(buffer, "appname", encode(appname));
 				append(buffer, "redirect_uri", encode(redirect_uri));
 				append(buffer, "thumbNailUrl", encode(thumbNailUrl));

@@ -54,7 +54,16 @@ public class Main {
 				buffer.append("http://localhost:8080/v2/updateAppKey?key=" + encode(key));
 				append(buffer, "description", encode(desc));
 				append(buffer, "category", encode(cat));
-				append(buffer, "scopeName", encode(scopeName));
+				if (scopeName != null) {
+					if (scopeName.contains(",")) { // more than one scope
+						String [] tmpScopeNames = scopeName.split(",");
+						for (String tmpScopeName: tmpScopeNames) {
+							append(buffer, "scopeName", encode(tmpScopeName));
+						}
+					} else {
+						append(buffer, "scopeName", encode(scopeName));
+					}
+				}
 				append(buffer, "appname", encode(appname));
 				append(buffer, "redirect_uri", encode(redirect_uri));
 				append(buffer, "thumbNailUrl", encode(thumbNailUrl));
