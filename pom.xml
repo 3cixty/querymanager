@@ -11,6 +11,7 @@
   
   <modules>
     <module>dbconnection</module>
+	<module>oauth-common</module>
     <module>oauth-wrapper</module>
 	<module>appkey</module>
 	<module>3cixty-oauth-integration</module>
