@@ -17,15 +17,15 @@ import org.surfnet.oaaas.model.ResourceServer;
 import org.surfnet.oaaas.repository.ClientRepository;
 import org.surfnet.oaaas.repository.ResourceServerRepository;
 
+import eu.threecixty.oauth.utils.ResourceServerUtils;
+import eu.threecixty.oauth.utils.ScopeUtils;
+
 @Named
 @Path("/3cixty")
 @Produces(MediaType.APPLICATION_JSON)
 public class ThreeCixtyResource extends AbstractResource {
 
-	//TODO: change this link to 3cixty server
-	private static final String ROOT_URL = "http://localhost:8080/";
-	//private static final Long THREE_CIXTY_RES_SERVER_ID = 11111L;
-	private static final String THREE_CIXTY_RES_SERVER_KEY = "3cixty-res-admin";
+	private static final String THREE_CIXTY_RES_SERVER_KEY = ResourceServerUtils.getResourceServerKey();
 	private static boolean firstTime = true;
 	
     @Inject
@@ -60,7 +60,14 @@ public class ThreeCixtyResource extends AbstractResource {
     			client.setSecret("fixedPwdMilano");
     			client.setThumbNailUrl(thumbNailUrl);
     			List <String> scopes = new ArrayList <String>();
-    			scopes.add(scope);
+    			if (scope.indexOf(',') >= 0) {
+    				String [] tmpScopeNames = scope.split(",");
+    				for (String tmpScopeName: tmpScopeNames) {
+    					scopes.add(tmpScopeName.trim());
+    				}
+    			} else {
+    			    scopes.add(scope);
+    			}
     			client.setScopes(scopes);
     			
     			clientRepository.save(client);
@@ -80,10 +87,10 @@ public class ThreeCixtyResource extends AbstractResource {
     @GET
     @Path("/createClientForAskingAccessToken")
     public Response createClientForAskingAccessToken(@QueryParam("clientId") String clientId,
-    		@QueryParam("clientSecret") String clientSecret, @QueryParam("scope") String scope,
+    		@QueryParam("clientSecret") String clientSecret,
     		@QueryParam("redirect_uri") String redirect_uri) {
     	boolean ok = false;
-    	if (isNullOrEmpty(clientId) || isNullOrEmpty(clientSecret) || isNullOrEmpty(scope)) {
+    	if (isNullOrEmpty(clientId) || isNullOrEmpty(clientSecret)) {
     		ok = false;
     	} else {
     		Client client = clientRepository.findByClientId(clientId);
@@ -105,9 +112,7 @@ public class ThreeCixtyResource extends AbstractResource {
     			redirect_uris.add(redirect_uri);
     			client.setRedirectUris(redirect_uris);
 
-    			List <String> scopes = new ArrayList <String>();
-    			scopes.add(scope);
-    			client.setScopes(scopes);
+    			client.setScopes(ScopeUtils.getScopeNames());
     			
     			clientRepository.save(client);
     			ok = true;
@@ -136,26 +141,21 @@ public class ThreeCixtyResource extends AbstractResource {
     			firstTime = false;
     		} catch (Exception e) {
     			e.printStackTrace();
+    			e.printStackTrace();
     		}
     	}
     }
 
 	private ResourceServer create3CixtyResServer() {
 		ResourceServer resourceServer = new ResourceServer();
-		//resourceServer.setId(THREE_CIXTY_RES_SERVER_ID);
 		resourceServer.setKey(THREE_CIXTY_RES_SERVER_KEY);
 		resourceServer.setContactEmail("res@3cixty.com");
 		resourceServer.setContactName("3cixty RES");
 		resourceServer.setName("3Cixty Platform");
-		resourceServer.setSecret("(3cixty)InMiLano!+-:");
-		resourceServer.setThumbNailUrl(ROOT_URL + "apis-authorization-server-war-1.3.5"
-				+ "/3cixty-logo-transparent.png");
-		List <String> scopes = new ArrayList <String>();
-		// TODO: need to synchronize with 3cixty_scope table info
-		scopes.add("Read");
-		scopes.add("Write");
-		scopes.add("Write 1");
-		scopes.add("Write 2");
+		resourceServer.setSecret(ResourceServerUtils.getResourceServerSecret());
+		resourceServer.setThumbNailUrl(ResourceServerUtils.getResourceServerThumbNailUrl());
+
+		List <String> scopes = ScopeUtils.getScopeNames();
 		resourceServer.setScopes(scopes);
 		return resourceServer;
 	}

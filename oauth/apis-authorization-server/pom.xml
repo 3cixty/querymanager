@@ -134,6 +134,13 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>eu.3cixty</groupId>
+      <artifactId>oauth-utils</artifactId>
+      <version>1.0</version>
+    </dependency>
+    
   </dependencies>
 
   <build>
