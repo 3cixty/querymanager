@@ -1,18 +1,17 @@
 package eu.threecixty.oauth;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AccessToken {
 
 	private String access_token;
 	private String refresh_token;
 	private int expires_in;
 	private String token_type = "Bearer";
+	private List <String> scopeNames = new ArrayList <String>();
 	
 	public AccessToken() {
-	}
-	
-	public AccessToken(String access_token, int expires_in) {
-		this.access_token = access_token;
-		this.expires_in = expires_in;
 	}
 	
 	public String getAccess_token() {
@@ -40,5 +39,13 @@ public class AccessToken {
 
 	public void setRefresh_token(String refresh_token) {
 		this.refresh_token = refresh_token;
+	}
+
+	public List<String> getScopeNames() {
+		return scopeNames;
+	}
+
+	public void setScopeNames(List<String> scopeNames) {
+		this.scopeNames = scopeNames;
 	}
 }

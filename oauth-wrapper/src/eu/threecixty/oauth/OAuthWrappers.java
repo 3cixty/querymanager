@@ -28,9 +28,9 @@ import eu.threecixty.oauth.utils.ScopeUtils;
 public class OAuthWrappers { 
 	
 	private static final String ROOT_LOCALHOST = "http://localhost:8080/";
-	private static final String ROOT_3CIXTY = "http://3cixty.com:8080/";
+	private static final String ROOT_3CIXTY = "http://dev.3cixty.com:8080/";
 	
-	public static final String ROOT_SERVER = ROOT_LOCALHOST;
+	public static final String ROOT_SERVER = ROOT_3CIXTY;
 	
 	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5";
 
@@ -121,6 +121,13 @@ public class OAuthWrappers {
 				if (tokenInfo == null) {
 					tmpUserAccessToken = userAccessToken;
 				} else {
+					// find refresh access token and scope names
+					tokenInfo.setRefresh_token(userAccessToken.getRefreshToken());
+					if (userAccessToken.getScopes().size() > 0) {
+						for (Scope scope: userAccessToken.getScopes()) {
+							tokenInfo.getScopeNames().add(scope.getScopeName());
+						}
+					}
 				    return tokenInfo;
 				}
 			}
@@ -321,6 +328,8 @@ public class OAuthWrappers {
 
 	/**
 	 * Validates a given access token with OAuth server.
+	 * <br><br>
+	 * This method only returns access token and expires_in.
 	 * @param accessToken
 	 * @return
 	 */
@@ -344,8 +353,6 @@ public class OAuthWrappers {
 			AccessToken tokenInfo = new AccessToken();
 			tokenInfo.setExpires_in((int)((expiredTime - currentTime) / 1000));
 			tokenInfo.setAccess_token(accessToken);
-			UserAccessToken userAccessToken = OAuthModelsUtils.retrieveUserAccessToken(accessToken);
-			tokenInfo.setRefresh_token(userAccessToken.getRefreshToken());
 			return tokenInfo;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -433,7 +440,6 @@ public class OAuthWrappers {
 	        ClientResponse clientResponse = builder.get(ClientResponse.class);
 
 			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
-			System.out.println(jsonStr);
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has("response")) {
 				String res = jsonObj.getString("response");
