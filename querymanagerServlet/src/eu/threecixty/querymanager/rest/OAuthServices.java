@@ -12,7 +12,6 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -25,6 +24,7 @@ import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Scope;
+import eu.threecixty.oauth.utils.ScopeUtils;
 import eu.threecixty.profile.GoogleAccountUtils;
 
 @Path("/" + Constants.VERSION_2)
@@ -106,7 +106,9 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, scopeNames, redirect_uri, thumbNailUrl);
+		// TODO: there is only one scope by default
+		//String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, scopeNames, redirect_uri, thumbNailUrl);
+		String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
 		if (appKey != null && !appKey.equals("")) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"key\": \"" + appKey + "\"} ")
@@ -126,7 +128,9 @@ public class OAuthServices {
 			@DefaultValue("") @QueryParam("description") String desc, @DefaultValue("") @QueryParam("category") String cat,
 			@DefaultValue("") @QueryParam("scopeName") List<String> scopeNames, @DefaultValue("") @QueryParam("redirect_uri") String redirect_uri,
 			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
-		boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, scopeNames, redirect_uri, thumbNailUrl);
+		// TODO: there is only one scope by default
+		//boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, scopeNames, redirect_uri, thumbNailUrl);
+		boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
 		if (ok) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"response\": \"successful\"} ")
@@ -161,49 +165,49 @@ public class OAuthServices {
 		        .build();
 	}
 
-	@POST
-	@Path("/addScope")
-	public Response addScope(@QueryParam("username") String username, @QueryParam("password") String password,
-			@QueryParam("description") String desc, @QueryParam("scopeName") String scopeName) {
-		if (!checkUserForScope(username, password))
-			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-		boolean ok = OAuthWrappers.addScope(scopeName, desc);
-		if (ok) {
-			return Response.status(Response.Status.OK)
-	        .entity(" {\"response\": \"successful\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
-		}
-		return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name or scope level already existed\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-	}
-
-	@POST
-	@Path("/deleteScope")
-	public Response deleteScope(@QueryParam("username") String username, @QueryParam("password") String password,
-			@QueryParam("scopeName") String scopeName) {
-		if (!checkUserForScope(username, password))
-			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-		boolean ok = OAuthWrappers.deleteScope(scopeName);
-		if (ok) {
-			return Response.status(Response.Status.OK)
-	        .entity(" {\"response\": \"successful\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
-		}
-		return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name doesn't exist\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-	}
+//	@POST
+//	@Path("/addScope")
+//	public Response addScope(@QueryParam("username") String username, @QueryParam("password") String password,
+//			@QueryParam("description") String desc, @QueryParam("scopeName") String scopeName) {
+//		if (!checkUserForScope(username, password))
+//			return Response.status(Response.Status.BAD_REQUEST)
+//		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
+//		        .type(MediaType.APPLICATION_JSON_TYPE)
+//		        .build();
+//		boolean ok = OAuthWrappers.addScope(scopeName, desc);
+//		if (ok) {
+//			return Response.status(Response.Status.OK)
+//	        .entity(" {\"response\": \"successful\"} ")
+//	        .type(MediaType.APPLICATION_JSON_TYPE)
+//	        .build();
+//		}
+//		return Response.status(Response.Status.BAD_REQUEST)
+//		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name or scope level already existed\"} ")
+//		        .type(MediaType.APPLICATION_JSON_TYPE)
+//		        .build();
+//	}
+//
+//	@POST
+//	@Path("/deleteScope")
+//	public Response deleteScope(@QueryParam("username") String username, @QueryParam("password") String password,
+//			@QueryParam("scopeName") String scopeName) {
+//		if (!checkUserForScope(username, password))
+//			return Response.status(Response.Status.BAD_REQUEST)
+//		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
+//		        .type(MediaType.APPLICATION_JSON_TYPE)
+//		        .build();
+//		boolean ok = OAuthWrappers.deleteScope(scopeName);
+//		if (ok) {
+//			return Response.status(Response.Status.OK)
+//	        .entity(" {\"response\": \"successful\"} ")
+//	        .type(MediaType.APPLICATION_JSON_TYPE)
+//	        .build();
+//		}
+//		return Response.status(Response.Status.BAD_REQUEST)
+//		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name doesn't exist\"} ")
+//		        .type(MediaType.APPLICATION_JSON_TYPE)
+//		        .build();
+//	}
 
 	@GET
 	@Path("/getScopes")
@@ -322,6 +326,12 @@ public class OAuthServices {
 		tokenInfo.setExpires_in(expires_in);
 		tokenInfo.setAccess_token(accessToken);
 		tokenInfo.setRefresh_token(refreshToken);
+		if (scope != null && !scope.equals("") && !scope.equals("null")) {
+			if (scope.indexOf(',') > 0) { // more than one scope
+				String[] tmpScopeNames = scope.split(",");
+				for (String tmpScopeName: tmpScopeNames) tokenInfo.getScopeNames().add(tmpScopeName.trim());
+			} else tokenInfo.getScopeNames().add(scope.trim());
+		}
 		return redirect_uri_client2(tokenInfo, expires_in, app);
 	}
 	
@@ -343,15 +353,27 @@ public class OAuthServices {
 	
 	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, App app) {
 		try {
-			
 			return Response.temporaryRedirect(new URI(app.getRedirectUri()
 					+ "#access_token=" + accessToken.getAccess_token()
 					+ "&refresh_token=" + accessToken.getRefresh_token()
-					+ "&expires_in=" + expires_in)).build();
+					+ "&expires_in=" + expires_in
+					+ "&scope=" + join(accessToken.getScopeNames(), ",") )).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private String join(List<String> scopeNames, String strJoined) {
+		if (scopeNames.size() == 0) return "null";
+		StringBuilder builder = new StringBuilder();
+		for (String scopeName: scopeNames) {
+			if (builder.length() == 0) builder.append(scopeName);
+			else {
+				builder.append(strJoined).append(scopeName);
+			}
+		}
+		return builder.toString();
 	}
 
 	private String join(Set<Scope> scopes) {
