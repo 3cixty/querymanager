@@ -64,7 +64,7 @@ public class QueryManagerServices {
 	 *
 	 * @param key
 	 * 				Application key
-	 * @param accessToken
+	 * @param access_token
 	 * 				Google access token
 	 * @param format
 	 * 				JSON or RDF format
@@ -76,12 +76,12 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/augmentAndExecute")
-	public Response executeQuery(@HeaderParam("accessToken") String accessToken,
+	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter) {
 		long starttime = System.currentTimeMillis();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			String user_id =  userAccessToken.getUser().getUid();
 			String key = userAccessToken.getApp().getKey();
 
@@ -121,9 +121,9 @@ public class QueryManagerServices {
 						.build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + accessToken + "'")
+			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}
@@ -261,7 +261,7 @@ public class QueryManagerServices {
 	/**
 	 * Gets items in details.
 	 *
-	 * @param accessToken
+	 * @param access_token
 	 * @param offset
 	 * @param limit
 	 * @param preference
@@ -273,7 +273,7 @@ public class QueryManagerServices {
 	@GET
 	@Path("/getItems")
 	@Produces("application/json")
-	public String getItems(@HeaderParam("accessToken") String accessToken,
+	public String getItems(@HeaderParam("access_token") String access_token,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
@@ -281,8 +281,8 @@ public class QueryManagerServices {
 		
 		long starttime = System.currentTimeMillis();
 
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			String user_id =  userAccessToken.getUser().getUid();
 			String key = userAccessToken.getApp().getKey();
 
@@ -309,9 +309,9 @@ public class QueryManagerServices {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return result;
 		} else {
-			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + accessToken + "'")
+			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}
