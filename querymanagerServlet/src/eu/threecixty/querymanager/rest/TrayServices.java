@@ -193,7 +193,7 @@ public class TrayServices {
 		if (uid != null && !"".equals(uid)) {
 			AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			if (!accessToken.getScopeNames().contains(WISH_LIST_SCOPE_NAME)) {
-			    throw new ThreeCixtyPermissionException("{\"error\": \"You are not allowed to access to WishList\"}");
+			    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
 			}
 		}
 		
