@@ -45,11 +45,11 @@ public class SettingsServices {
 	@GET
 	@Path("/viewSettings")
 	@Produces("text/plain")
-	public Response view(@HeaderParam("accessToken") String accessToken) {
+	public Response view(@HeaderParam("access_token") String access_token) {
 		long starttime = System.currentTimeMillis();
 		HttpSession session = httpRequest.getSession();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			String uid = userAccessToken.getUser().getUid();
 			String key = userAccessToken.getApp().getKey();
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -57,7 +57,7 @@ public class SettingsServices {
 
 			ThreeCixtySettings settings = SettingsStorage.load(uid);
 			session.setAttribute("settings", settings);
-			session.setAttribute(ACCESS_TOKEN_PARAM, accessToken);
+			session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
 
 			try {
 				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp")).build();
@@ -65,9 +65,9 @@ public class SettingsServices {
 				e.printStackTrace();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				    .entity("Your access token '" + accessToken + "' is invalid.")
+				    .entity("Your access token '" + access_token + "' is invalid.")
 				    .type(MediaType.TEXT_PLAIN)
 				    .build();
 		}

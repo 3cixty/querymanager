@@ -37,7 +37,7 @@ public class SPEServices {
 	
 	/**
 	 * Gets profile information in JSON format from a given 3cixt access token.
-	 * @param accessToken
+	 * @param access_token
 	 * @return a string in JSON format which represents the class ProfileInformation. Please check
 	 *         the document at https://docs.google.com/document/d/1RPlZJaCWbb6G9Ilf-nTMavU_AAkzIj8fKSDwSNvpXtg/edit
 	 *         for more information.
@@ -45,11 +45,11 @@ public class SPEServices {
 	@GET
 	@Path("/getProfile")
 	@Produces("application/json")
-	public String getProfile(@HeaderParam("accessToken") String accessToken) {
+	public String getProfile(@HeaderParam("access_token") String access_token) {
 		try {
-			UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
+			UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
 			long starttime = System.currentTimeMillis();
-			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 				String uid = null;
 				HttpSession session = httpRequest.getSession();
 				uid = userAccessToken.getUser().getUid();
@@ -68,9 +68,9 @@ public class SPEServices {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				return ret;
 			} else {
-				CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("The access token is invalid '" + accessToken + "'")
+				        .entity("The access token is invalid '" + access_token + "'")
 				        .type(MediaType.TEXT_PLAIN)
 				        .build());
 			}
@@ -85,7 +85,7 @@ public class SPEServices {
 	
 	/**
 	 * Saves profile information to the KB.
-	 * @param accessToken
+	 * @param access_token
 	 * @param profileStr
 	 * @param key
 	 * @return If successful, the message <code>{"save": "true"}</code> will be returned. Otherwise,
@@ -94,10 +94,10 @@ public class SPEServices {
 	@POST
 	@Path("/saveProfile")
 	@Produces("application/json")
-	public String saveProfile(@HeaderParam("accessToken") String accessToken, @FormParam("profile") String profileStr) {
+	public String saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
 		long starttime = System.currentTimeMillis();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			HttpSession session = httpRequest.getSession();
 			String uid = userAccessToken.getUser().getUid();
 			session.setAttribute("uid", uid);
@@ -130,9 +130,9 @@ public class SPEServices {
 				        .build());
 			}
 		} else {
-			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + accessToken + "'")
+			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}
@@ -140,7 +140,7 @@ public class SPEServices {
 	
 	/**
 	 * Gets Google UID from a Google access token and an App key.
-	 * @param accessToken
+	 * @param access_token
 	 * @param key
 	 * @return If a given access token is valid, a message <code>{"uid": "103918130978226832690"}</code> for example will be returned. Otherwise,
 	 *         the message <code>{"uid": ""}</code> will be returned.
@@ -148,16 +148,16 @@ public class SPEServices {
 	@POST
 	@Path("/getUID")
 	@Produces("application/json")
-	public String getUID(@HeaderParam("accessToken") String accessToken) {
+	public String getUID(@HeaderParam("access_token") String access_token) {
 		long starttime = System.currentTimeMillis();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			CallLoggingManager.getInstance().save(userAccessToken.getApp().getKey(), starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.SUCCESSFUL);
 			return "{\"uid\":\"" + userAccessToken.getUser().getUid() + "\"}";
 		} else {
-			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + accessToken + "'")
+			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}

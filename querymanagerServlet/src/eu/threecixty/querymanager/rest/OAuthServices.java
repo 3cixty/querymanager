@@ -47,10 +47,10 @@ public class OAuthServices {
 
 	@GET
 	@Path("/validateAccessToken")
-	public Response validateAccessToken(@HeaderParam("accessToken") String accessToken,
+	public Response validateAccessToken(@HeaderParam("access_token") String access_token,
 			@HeaderParam("key") String key) {
 		if (OAuthWrappers.validateAppKey(key)) {
-			if (OAuthWrappers.validateUserAccessToken(accessToken)) {
+			if (OAuthWrappers.validateUserAccessToken(access_token)) {
 				// TODO: add callLog
 				return Response.status(Response.Status.OK)
 						.entity(" {\"response\": \"ok\"} ")
@@ -164,50 +164,6 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 	}
-
-//	@POST
-//	@Path("/addScope")
-//	public Response addScope(@QueryParam("username") String username, @QueryParam("password") String password,
-//			@QueryParam("description") String desc, @QueryParam("scopeName") String scopeName) {
-//		if (!checkUserForScope(username, password))
-//			return Response.status(Response.Status.BAD_REQUEST)
-//		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
-//		        .type(MediaType.APPLICATION_JSON_TYPE)
-//		        .build();
-//		boolean ok = OAuthWrappers.addScope(scopeName, desc);
-//		if (ok) {
-//			return Response.status(Response.Status.OK)
-//	        .entity(" {\"response\": \"successful\"} ")
-//	        .type(MediaType.APPLICATION_JSON_TYPE)
-//	        .build();
-//		}
-//		return Response.status(Response.Status.BAD_REQUEST)
-//		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name or scope level already existed\"} ")
-//		        .type(MediaType.APPLICATION_JSON_TYPE)
-//		        .build();
-//	}
-//
-//	@POST
-//	@Path("/deleteScope")
-//	public Response deleteScope(@QueryParam("username") String username, @QueryParam("password") String password,
-//			@QueryParam("scopeName") String scopeName) {
-//		if (!checkUserForScope(username, password))
-//			return Response.status(Response.Status.BAD_REQUEST)
-//		        .entity(" {\"response\": \"failed\", \"reason\": \"username or password is incorrect\"} ")
-//		        .type(MediaType.APPLICATION_JSON_TYPE)
-//		        .build();
-//		boolean ok = OAuthWrappers.deleteScope(scopeName);
-//		if (ok) {
-//			return Response.status(Response.Status.OK)
-//	        .entity(" {\"response\": \"successful\"} ")
-//	        .type(MediaType.APPLICATION_JSON_TYPE)
-//	        .build();
-//		}
-//		return Response.status(Response.Status.BAD_REQUEST)
-//		        .entity(" {\"response\": \"failed\", \"reason\": \"scope name doesn't exist\"} ")
-//		        .type(MediaType.APPLICATION_JSON_TYPE)
-//		        .build();
-//	}
 
 	@GET
 	@Path("/getScopes")
@@ -349,6 +305,19 @@ public class OAuthServices {
 		
 		return Response.status(Response.Status.OK).entity(
 				gson.toJson(refreshedToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
+	}
+	
+	@GET
+	@Path("/revoke")
+	public Response revoke(@QueryParam("access_token") String access_token) {
+		boolean ok = OAuthWrappers.revokeAccessToken(access_token);
+		if (!ok) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"an invalid access token or internal errors\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		
+		return Response.status(Response.Status.OK).entity(
+				" {\"response\": \"successful\" ").type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
 	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, App app) {
