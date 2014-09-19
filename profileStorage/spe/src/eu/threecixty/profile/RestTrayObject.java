@@ -10,7 +10,7 @@ public class RestTrayObject {
 	private String orderType;
 	private Boolean show_past_events;
 	private String junk_token;
-	private String google_token;
+	private String three_cixty_token;
 	
 	private String element_id;
 	private String element_type;
@@ -73,11 +73,12 @@ public class RestTrayObject {
 	public void setJunk_token(String junk_token) {
 		this.junk_token = junk_token;
 	}
-	public String getGoogle_token() {
-		return google_token;
+
+	public String getThree_cixty_token() {
+		return three_cixty_token;
 	}
-	public void setGoogle_token(String google_token) {
-		this.google_token = google_token;
+	public void setThree_cixty_token(String three_cixty_token) {
+		this.three_cixty_token = three_cixty_token;
 	}
 	public String getElement_id() {
 		return element_id;
