@@ -9,7 +9,12 @@ public class AccessToken {
 	private String refresh_token;
 	private int expires_in;
 	private String token_type = "Bearer";
+	// This attribute is used to avoid making two queries to DB.
+	private String appClientKey;
 	private List <String> scopeNames = new ArrayList <String>();
+	
+	private String uid; // Google UID
+	private String appkey; // App Key
 	
 	public AccessToken() {
 	}
@@ -48,4 +53,30 @@ public class AccessToken {
 	public void setScopeNames(List<String> scopeNames) {
 		this.scopeNames = scopeNames;
 	}
+
+	public String getAppClientKey() {
+		return appClientKey;
+	}
+
+	public void setAppClientKey(String appClientKey) {
+		this.appClientKey = appClientKey;
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	public String getAppkey() {
+		return appkey;
+	}
+
+	public void setAppkey(String appkey) {
+		this.appkey = appkey;
+	}
+
+
 }

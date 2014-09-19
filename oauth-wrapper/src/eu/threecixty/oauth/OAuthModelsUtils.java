@@ -363,6 +363,7 @@ public class OAuthModelsUtils {
 			
 			return results.size() > 0;
 		} catch (HibernateException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -378,6 +379,7 @@ public class OAuthModelsUtils {
 			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -406,8 +408,6 @@ public class OAuthModelsUtils {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			session.beginTransaction();
-
 			UserAccessToken userAccessToken = new UserAccessToken();
 			userAccessToken.setAccessToken(accessToken);
 			userAccessToken.setUser(user);
@@ -429,6 +429,8 @@ public class OAuthModelsUtils {
 				}
 			}
 
+			session.beginTransaction();
+
 			session.save(userAccessToken);
 
 			session.getTransaction().commit();
@@ -440,30 +442,52 @@ public class OAuthModelsUtils {
 		}
 	}
 	
-	protected static boolean saveOrUpdateUserAccessToken(UserAccessToken userAccessToken) {
-		if (userAccessToken == null) return false;
+	protected static boolean saveOrUpdateUserAccessToken(AccessToken lastAccessToken, AccessToken newAccessToken) {
+		if (lastAccessToken == null || newAccessToken == null) return false;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			session.beginTransaction();
+			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, lastAccessToken.getRefresh_token()).list();
 
+			
+			if (results.size() == 0) {
+				session.close();
+				return false;
+			}
+			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
+			userAccessToken.setAccessToken(newAccessToken.getAccess_token());
+			userAccessToken.setRefreshToken(newAccessToken.getRefresh_token());
+			
+			session.beginTransaction();
+			
 			session.saveOrUpdate(userAccessToken);
 
 			session.getTransaction().commit();
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
-
-	protected static boolean deleteUserAccessToken(UserAccessToken userAccessToken) {
-		if (userAccessToken == null) return false;
+	
+	protected static boolean deleteUserAccessToken(String accessToken) {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
+			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, accessToken).list();
+			if (results.size() == 0) {
+				session.close();
+				return false;
+			}
+			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
+			userAccessToken.getScopes().clear();
+			userAccessToken.getUser().getUserAccessTokens().remove(userAccessToken);
 			session.beginTransaction();
-
 			session.delete(userAccessToken);
 
 			session.getTransaction().commit();
@@ -488,8 +512,8 @@ public class OAuthModelsUtils {
 			return false;
 		}
 	}
-	
-	protected static UserAccessToken retrieveUserAccessToken(String accessToken) {
+
+	protected static String findGoogleUIDFromAccessToken(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return null;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -497,15 +521,64 @@ public class OAuthModelsUtils {
 			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, accessToken).list();
-			if (results.size() == 0) return null;
-			return (UserAccessToken) results.get(0);
+			String uid = null;
+			if (results.size() > 0) {
+				UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
+				uid = userAccessToken.getUser().getUid();
+			}
+			session.close();
+			return uid;
+		} catch (HibernateException e) {
+			return null;
+		}
+	}
+	
+	protected static AccessToken findTokenInfoFromDB(User user, App app) {
+		if (user == null || app == null) return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM UserAccessToken U WHERE U.user = ? AND U.app = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setEntity(0, user).setEntity(1, app).list();
+			if (results.size() == 0) {
+				session.close();
+				return null;
+			}
+			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
+			AccessToken ac = new AccessToken();
+			for (Scope scope: userAccessToken.getScopes()) {
+				ac.getScopeNames().add(scope.getScopeName());
+			}
+			ac.setAppClientKey(userAccessToken.getApp().getClientId());
+			ac.setAccess_token(userAccessToken.getAccessToken());
+			ac.setRefresh_token(userAccessToken.getRefreshToken());
+			session.close();
+			return ac;
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	protected static UserAccessToken retrieveUserAccessTokenViaRefreshToken(String refreshToken) {
+	protected static boolean retrieveUserAccessTokenViaRefreshToken(String refreshToken) {
+		if (isNullOrEmpty(refreshToken)) return false;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, refreshToken).list();
+			if (results.size() == 0) return false;
+			session.close();
+			return true;
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	protected static AccessToken findTokenInfoFromRefreshToken(String refreshToken) {
 		if (isNullOrEmpty(refreshToken)) return null;
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
@@ -513,9 +586,51 @@ public class OAuthModelsUtils {
 			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, refreshToken).list();
-			if (results.size() == 0) return null;
-			return (UserAccessToken) results.get(0);
+			if (results.size() == 0) {
+				session.close();
+				return null;
+			}
+			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
+			AccessToken ac = new AccessToken();
+			for (Scope scope: userAccessToken.getScopes()) {
+				ac.getScopeNames().add(scope.getScopeName());
+			}
+			ac.setAppClientKey(userAccessToken.getApp().getClientId());
+			ac.setRefresh_token(refreshToken);
+			session.close();
+			return ac;
 		} catch (HibernateException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	protected static AccessToken findTokenInfoFromAccessToken(String accessToken) {
+		if (isNullOrEmpty(accessToken)) return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, accessToken).list();
+			if (results.size() == 0) {
+				session.close();
+				return null;
+			}
+			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
+			AccessToken ac = new AccessToken();
+			for (Scope scope: userAccessToken.getScopes()) {
+				ac.getScopeNames().add(scope.getScopeName());
+			}
+			ac.setAppClientKey(userAccessToken.getApp().getClientId());
+			ac.setAccess_token(accessToken);
+			ac.setRefresh_token(userAccessToken.getRefreshToken());
+			ac.setUid(userAccessToken.getUser().getUid());
+			ac.setAppkey(userAccessToken.getApp().getKey());
+			session.close();
+			return ac;
+		} catch (HibernateException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

@@ -100,9 +100,9 @@ public class UserAccessToken implements java.io.Serializable {
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "user_accessToken_scope", joinColumns = { 
-			@JoinColumn(name = "user_accessToken_id", nullable = false, updatable = false) }, 
+			@JoinColumn(name = "user_accessToken_id", nullable = false, updatable = true) }, 
 			inverseJoinColumns = { @JoinColumn(name = "scope_id", 
-					nullable = false, updatable = false) })
+					nullable = false, updatable = true) })
 	public Set<Scope> getScopes() {
 		return scopes;
 	}

@@ -21,7 +21,6 @@ import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Developer;
 import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.model.User;
-import eu.threecixty.oauth.model.UserAccessToken;
 import eu.threecixty.oauth.utils.ResourceServerUtils;
 import eu.threecixty.oauth.utils.ScopeUtils;
 
@@ -113,28 +112,19 @@ public class OAuthWrappers {
 			if (user == null) return null;
 		}
 		if (app == null) return null;
-		UserAccessToken tmpUserAccessToken = null;
-		for (UserAccessToken userAccessToken: user.getUserAccessTokens()) {
-			if (userAccessToken.getApp().getId().intValue() == app.getId().intValue()) { // found in DB
-				// check if this access token is still available on oauth server to delete
-				AccessToken tokenInfo = tokenInfo(userAccessToken.getAccessToken());
-				if (tokenInfo == null) {
-					tmpUserAccessToken = userAccessToken;
-				} else {
-					// find refresh access token and scope names
-					tokenInfo.setRefresh_token(userAccessToken.getRefreshToken());
-					if (userAccessToken.getScopes().size() > 0) {
-						for (Scope scope: userAccessToken.getScopes()) {
-							tokenInfo.getScopeNames().add(scope.getScopeName());
-						}
-					}
-				    return tokenInfo;
-				}
+		AccessToken foundInDB = OAuthModelsUtils.findTokenInfoFromDB(user, app);
+		if (foundInDB != null) {
+			// check if this access token is still available on oauth server to delete
+			AccessToken tokenInfo = tokenInfo(foundInDB.getAccess_token());
+			if (tokenInfo != null) {
+				// update expires_in
+				foundInDB.setExpires_in(tokenInfo.getExpires_in());
+			    return foundInDB;
 			}
 		}
 		// delete UserAccessToken as this access token is not available on OAuth server
-		if (tmpUserAccessToken != null) {
-			OAuthModelsUtils.deleteUserAccessToken(tmpUserAccessToken);
+		if (foundInDB != null) {
+			OAuthModelsUtils.deleteUserAccessToken(foundInDB.getAccess_token());
 		}
 		return null;
 	}
@@ -150,10 +140,6 @@ public class OAuthWrappers {
 		}
 		if (accessToken == null || accessToken.equals("")) return false;
 		return OAuthModelsUtils.addUserAccessToken(accessToken, refreshToken, scope, user, app);
-	}
-	
-	public static UserAccessToken retrieveUserAccessToken(String accessToken) {
-		return OAuthModelsUtils.retrieveUserAccessToken(accessToken);
 	}
 	
 	/**
@@ -231,15 +217,28 @@ public class OAuthWrappers {
 		return appkey;
 	}
 	
-	public static AccessToken refreshAccessToken(String refreshToken) {
-		UserAccessToken userAccessToken = OAuthModelsUtils.retrieveUserAccessTokenViaRefreshToken(
-				refreshToken);
-		if (userAccessToken == null) return null;
-		AccessToken refreshedToken = refreshAccessTokenUsingOAuthServer(userAccessToken);
-		if (refreshedToken == null) return null;
-		userAccessToken.setAccessToken(refreshedToken.getAccess_token());
-		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(userAccessToken)) return null;
-		return refreshedToken;
+	public static AccessToken refreshAccessToken(String lastRefreshToken) {
+		AccessToken lastAccessToken = OAuthModelsUtils.findTokenInfoFromRefreshToken(lastRefreshToken);
+		if (lastAccessToken == null) return null;
+		AccessToken newAccessToken = refreshAccessTokenUsingOAuthServer(lastAccessToken);
+		if (newAccessToken == null) return null;
+		// update user access token as OAuth server already deleted old one
+		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(lastAccessToken, newAccessToken)) return null;
+		return newAccessToken;
+	}
+
+	public static AccessToken findAccessTokenFromDB(String accessToken) {
+		return OAuthModelsUtils.findTokenInfoFromAccessToken(accessToken);
+	}
+	
+	public static boolean revokeAccessToken(String accessToken) {
+		if (accessToken == null || accessToken.equals("")) return false;
+		return OAuthModelsUtils.deleteUserAccessToken(accessToken);
+	}
+
+	public static String findGoogleUIDFrom(String accessToken) {
+		if (accessToken == null || accessToken.equals("")) return null;
+		return OAuthModelsUtils.findGoogleUIDFromAccessToken(accessToken);
 	}
 
 	public static boolean updateAppKey(String key, String appname, String description,
@@ -349,7 +348,9 @@ public class OAuthWrappers {
 			}
 			long currentTime = Calendar.getInstance().getTimeInMillis();
 			long expiredTime = jsonObj.getLong("expires_in");
-			if (currentTime > expiredTime) return null;
+			if (expiredTime != 0) { // 0 means infinity
+			    if (currentTime > expiredTime) return null;
+			}
 			AccessToken tokenInfo = new AccessToken();
 			tokenInfo.setExpires_in((int)((expiredTime - currentTime) / 1000));
 			tokenInfo.setAccess_token(accessToken);
@@ -381,15 +382,15 @@ public class OAuthWrappers {
 		return null;
 	}
 	
-	private static AccessToken refreshAccessTokenUsingOAuthServer(UserAccessToken userAccessToken) {
+	private static AccessToken refreshAccessTokenUsingOAuthServer(AccessToken lastAccessToken) {
 		Client client = Client.create();
 	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
 	    formData.add("grant_type", "refresh_token");
-	    formData.add("refresh_token", userAccessToken.getRefreshToken());
+	    formData.add("refresh_token", lastAccessToken.getRefresh_token());
 	    
 	    // check ThreeCixtyResourceServer
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
-				userAccessToken.getApp().getClientId().concat(":")
+				lastAccessToken.getAppClientKey().concat(":")
 				.concat("fixedPwdMilano").getBytes())));
 	    
 	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
@@ -402,11 +403,9 @@ public class OAuthWrappers {
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			AccessToken newAccessToken = getAccessToken(jsonObj);
 			if (newAccessToken == null) return null;
-			// update user access token as OAuth server already deleted old one
-			userAccessToken.setAccessToken(newAccessToken.getAccess_token());
-			if (newAccessToken.getRefresh_token() != null)
-				    userAccessToken.setRefreshToken(newAccessToken.getRefresh_token());
-			if (OAuthModelsUtils.saveOrUpdateUserAccessToken(userAccessToken)) return newAccessToken;
+			// keep the same scopes
+			newAccessToken.getScopeNames().addAll(lastAccessToken.getScopeNames());
+			return newAccessToken;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
