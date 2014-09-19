@@ -145,7 +145,7 @@ public class SPEServices {
 	 * @return If a given access token is valid, a message <code>{"uid": "103918130978226832690"}</code> for example will be returned. Otherwise,
 	 *         the message <code>{"uid": ""}</code> will be returned.
 	 */
-	@POST
+	@GET
 	@Path("/getUID")
 	@Produces("application/json")
 	public String getUID(@HeaderParam("access_token") String access_token) {
