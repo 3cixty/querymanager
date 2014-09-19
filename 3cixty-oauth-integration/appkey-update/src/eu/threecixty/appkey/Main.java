@@ -15,7 +15,6 @@ public class Main {
 	private static final String APP_KEY = "key";
 	private static final String DESCRIPTION_KEY = "description";
 	private static final String CATEGORY_KEY = "category";
-	private static final String SCOPE_KEY = "scopeName";
 	private static final String REDIRECT_URI_KEY = "redirect_uri";
 	private static final String APP_NAME_KEY = "appname";
 	private static final String THUMB_NAIL_URL = "thumbNailUrl";
@@ -35,7 +34,6 @@ public class Main {
 				String appname = props.getProperty(APP_NAME_KEY);
 				String desc = props.getProperty(DESCRIPTION_KEY);
 				String cat = props.getProperty(CATEGORY_KEY);
-				String scopeName = props.getProperty(SCOPE_KEY);
 				String redirect_uri = props.getProperty(REDIRECT_URI_KEY);
 				String thumbNailUrl = props.getProperty(THUMB_NAIL_URL);
 				
@@ -54,16 +52,6 @@ public class Main {
 				buffer.append("http://localhost:8080/v2/updateAppKey?key=" + encode(key));
 				append(buffer, "description", encode(desc));
 				append(buffer, "category", encode(cat));
-				if (scopeName != null) {
-					if (scopeName.contains(",")) { // more than one scope
-						String [] tmpScopeNames = scopeName.split(",");
-						for (String tmpScopeName: tmpScopeNames) {
-							append(buffer, "scopeName", encode(tmpScopeName));
-						}
-					} else {
-						append(buffer, "scopeName", encode(scopeName));
-					}
-				}
 				append(buffer, "appname", encode(appname));
 				append(buffer, "redirect_uri", encode(redirect_uri));
 				append(buffer, "thumbNailUrl", encode(thumbNailUrl));
