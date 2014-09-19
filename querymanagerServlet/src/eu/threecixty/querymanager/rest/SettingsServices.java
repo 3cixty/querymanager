@@ -22,8 +22,8 @@ import javax.ws.rs.core.Response;
 
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.oauth.model.UserAccessToken;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
@@ -48,10 +48,10 @@ public class SettingsServices {
 	public Response view(@HeaderParam("access_token") String access_token) {
 		long starttime = System.currentTimeMillis();
 		HttpSession session = httpRequest.getSession();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String uid = userAccessToken.getUser().getUid();
-			String key = userAccessToken.getApp().getKey();
+			String uid =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.SUCCESSFUL);
 			session.setAttribute("uid", uid);
 
@@ -91,10 +91,10 @@ public class SettingsServices {
 		
 		HttpSession session = httpRequest.getSession();
 		String accessToken = (String) session.getAttribute(ACCESS_TOKEN_PARAM);
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(accessToken);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
-			String key = userAccessToken.getApp().getKey();
-			String uid = userAccessToken.getUser().getUid();
+			String uid =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.SUCCESSFUL);
 			ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 			if (settings == null) {

@@ -19,8 +19,8 @@ import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.TrayStorage;
@@ -33,6 +33,8 @@ import eu.threecixty.profile.Tray.OrderType;
  */
 @Path("/" + Constants.PREFIX_NAME)
 public class TrayServices {
+	private static final String WISH_LIST_SCOPE_NAME = "WishList";
+	
 	private static final String ADD_ACTION = "add_tray_element";
 	private static final String GET_ACTION = "get_tray_elements";
 	private static final String LOGIN_ACTION = "login_tray";
@@ -64,54 +66,61 @@ public class TrayServices {
     			CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_APP_KEY + restTray.getKey());
     			return createResponseException("The key is invalid '" + restTray.getKey() + "'");
     		} else {
-    			String action = restTray.getAction();
-    			if (ADD_ACTION.equalsIgnoreCase(action)) {
-    				if (!addTrayElement(restTray)) {
-    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.FAILED);
-    	    			return createResponseException(ADD_EXCEPTION_MSG);
+    			try {
+    				String action = restTray.getAction();
+    				if (ADD_ACTION.equalsIgnoreCase(action)) {
+    					if (!addTrayElement(restTray)) {
+    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.FAILED);
+    						return createResponseException(ADD_EXCEPTION_MSG);
+    					}
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    				} else if (GET_ACTION.equalsIgnoreCase(action)) {
+    					List <Tray> trays = getTrayElements(restTray);
+    					if (trays == null) {
+    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
+    						return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    					} else {
+    						String content = gson.toJson(trays);
+    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    						return Response.status(Response.Status.OK)
+    								.entity(content)
+    								.type(MediaType.APPLICATION_JSON_TYPE)
+    								.build();
+    					}
+    				} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
+    					List <Tray> trays = loginTray(restTray);
+    					if (trays == null) {
+    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.FAILED);
+    						return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    					} else {
+    						String content = gson.toJson(trays);
+    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    						return Response.status(Response.Status.OK)
+    								.entity(content)
+    								.type(MediaType.APPLICATION_JSON_TYPE)
+    								.build();
+    					}
+    				} else if (EMPTY_ACTION.equalsIgnoreCase(action)) {
+    					if (!cleanTrays(restTray)) {
+    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.FAILED);
+    						return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    					}
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    				} else if (UPDATE_ACTION.equalsIgnoreCase(action)) {
+    					if (!updateTray(restTray)) {
+    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.FAILED);
+    						return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    					}
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    				} else {
+    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
+    					return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
     				}
-    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.SUCCESSFUL);
-    			} else if (GET_ACTION.equalsIgnoreCase(action)) {
-					List <Tray> trays = getTrayElements(restTray);
-					if (trays == null) {
-						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
-    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
-					} else {
-						String content = gson.toJson(trays);
-						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
-						return Response.status(Response.Status.OK)
-								.entity(content)
-								.type(MediaType.APPLICATION_JSON_TYPE)
-								.build();
-					}
-    			} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
-    				List <Tray> trays = loginTray(restTray);
-					if (trays == null) {
-						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.FAILED);
-    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
-					} else {
-						String content = gson.toJson(trays);
-						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.SUCCESSFUL);
-						return Response.status(Response.Status.OK)
-								.entity(content)
-								.type(MediaType.APPLICATION_JSON_TYPE)
-								.build();
-					}
-    			} else if (EMPTY_ACTION.equalsIgnoreCase(action)) {
-    				if (!cleanTrays(restTray)) {
-    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.FAILED);
-    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
-    				}
-    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_EMPTY_SERVICE, CallLoggingConstants.SUCCESSFUL);
-    			} else if (UPDATE_ACTION.equalsIgnoreCase(action)) {
-    				if (!updateTray(restTray)) {
-    					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.FAILED);
-    	    			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
-    				}
-    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.SUCCESSFUL);
-    			} else {
-    				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
-    				return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+    			} catch (ThreeCixtyPermissionException e) {
+    				return Response.status(Response.Status.FORBIDDEN)
+    						.entity(e.getMessage())
+    						.type(MediaType.APPLICATION_JSON_TYPE)
+    						.build();
     			}
     		}
     	}
@@ -162,7 +171,7 @@ public class TrayServices {
 		tray.setElement_title(element_title);
 		tray.setImage_url(image_url);
 		
-		String uid = GoogleAccountUtils.getUID(token);
+		String uid = OAuthWrappers.findGoogleUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			tray.setUid(token);
 		} else {
@@ -176,10 +185,17 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private List<Tray> getTrayElements(RestTrayObject restTray) {
-		String accessToken = restTray.getToken();
-		String uid = GoogleAccountUtils.getUID(accessToken);
+	private List<Tray> getTrayElements(RestTrayObject restTray) throws ThreeCixtyPermissionException {
+		String access_token = restTray.getToken();
+		String uid = OAuthWrappers.findGoogleUIDFrom(access_token);
 
+		// XXX: check user permission
+		if (uid != null && !"".equals(uid)) {
+			AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+			if (!accessToken.getScopeNames().contains(WISH_LIST_SCOPE_NAME)) {
+			    throw new ThreeCixtyPermissionException("{\"error\": \"You are not allowed to access to WishList\"}");
+			}
+		}
 		
 		int offset = (restTray.getOffset() == null ? 0 : restTray.getOffset());
 		int limit = (restTray.getLimit() == null ? 100 : restTray.getLimit());
@@ -188,7 +204,7 @@ public class TrayServices {
 				: orderStr.equalsIgnoreCase("Desc") ? OrderType.Desc : OrderType.Asc;
 		boolean showPastEvents = (restTray.getShow_past_events() == null) ? true : restTray.getShow_past_events();
 		
-		return TrayStorage.getTrays((uid == null || uid.equals("")) ? accessToken : uid,
+		return TrayStorage.getTrays((uid == null || uid.equals("")) ? access_token : uid,
 				offset, limit, orderType, showPastEvents);
 	}
 	
@@ -200,8 +216,8 @@ public class TrayServices {
 	private List<Tray> loginTray(RestTrayObject restTray) {
 		String junkToken = restTray.getJunk_token();
 		if (junkToken == null || junkToken.equals("")) return null;
-		String googleToken = restTray.getGoogle_token();
-		String uid = GoogleAccountUtils.getUID(googleToken);
+		String threeCixtyToken = restTray.getThree_cixty_token();
+		String uid = OAuthWrappers.findGoogleUIDFrom(threeCixtyToken);
 		if (uid == null || uid.equals("")) return null;
 		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
 		return TrayStorage.getTrays(uid, 0, -1, OrderType.Desc, true);
@@ -215,7 +231,7 @@ public class TrayServices {
 	private boolean cleanTrays(RestTrayObject restTray) {
 		String token = restTray.getToken();
 		if (token == null || token.equals("")) return false;
-		String uid = GoogleAccountUtils.getUID(token);
+		String uid = OAuthWrappers.findGoogleUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			return TrayStorage.cleanTrays(token);
 		}
@@ -231,7 +247,7 @@ public class TrayServices {
 		String itemId = restTray.getElement_id();
 		if (itemId == null || itemId.equals("")) return false;
 		String token = restTray.getToken();
-		String uid = GoogleAccountUtils.getUID(token);
+		String uid = OAuthWrappers.findGoogleUIDFrom(token);
 		
 		Tray tray = new Tray();
 		tray.setItemId(itemId);

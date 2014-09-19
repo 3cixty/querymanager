@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -294,7 +295,7 @@ public class OAuthServices {
 	// TODO
 	@GET
 	@Path("/token")
-	public Response token(@QueryParam("refresh_token") String refresh_token) {
+	public Response token(@HeaderParam("refresh_token") String refresh_token) {
 		AccessToken refreshedToken = OAuthWrappers.refreshAccessToken(refresh_token);
 		if (refreshedToken == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"refresh_token is invalid\"} ")
@@ -307,9 +308,9 @@ public class OAuthServices {
 				gson.toJson(refreshedToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
-	@GET
+	@POST
 	@Path("/revoke")
-	public Response revoke(@QueryParam("access_token") String access_token) {
+	public Response revoke(@HeaderParam("access_token") String access_token) {
 		boolean ok = OAuthWrappers.revokeAccessToken(access_token);
 		if (!ok) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"an invalid access token or internal errors\"} ")

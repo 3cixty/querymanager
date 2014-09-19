@@ -19,8 +19,8 @@ import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.oauth.model.UserAccessToken;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
 
@@ -47,14 +47,14 @@ public class SPEServices {
 	@Produces("application/json")
 	public String getProfile(@HeaderParam("access_token") String access_token) {
 		try {
-			UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			long starttime = System.currentTimeMillis();
 			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 				String uid = null;
 				HttpSession session = httpRequest.getSession();
-				uid = userAccessToken.getUser().getUid();
+				uid = userAccessToken.getUid();
 				session.setAttribute("uid", uid);
-				String key = userAccessToken.getApp().getKey();
+				String key = userAccessToken.getAppkey();
 				ProfileInformation profile = ProfileInformationStorage.loadProfile(uid);
 				if (profile == null) {
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.FAILED);
@@ -96,12 +96,12 @@ public class SPEServices {
 	@Produces("application/json")
 	public String saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
 		long starttime = System.currentTimeMillis();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			HttpSession session = httpRequest.getSession();
-			String uid = userAccessToken.getUser().getUid();
+			String uid = userAccessToken.getUid();
 			session.setAttribute("uid", uid);
-			String key = userAccessToken.getApp().getKey();
+			String key = userAccessToken.getAppkey();
 			if (profileStr == null || profileStr.equals("")) {
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("Invalid profile in JSON format: '" + profileStr + "'")
@@ -150,10 +150,10 @@ public class SPEServices {
 	@Produces("application/json")
 	public String getUID(@HeaderParam("access_token") String access_token) {
 		long starttime = System.currentTimeMillis();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			CallLoggingManager.getInstance().save(userAccessToken.getApp().getKey(), starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			return "{\"uid\":\"" + userAccessToken.getUser().getUid() + "\"}";
+			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.SUCCESSFUL);
+			return "{\"uid\":\"" + userAccessToken.getUid() + "\"}";
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)

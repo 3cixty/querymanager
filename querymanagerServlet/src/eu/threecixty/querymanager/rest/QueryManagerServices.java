@@ -26,8 +26,8 @@ import com.hp.hpl.jena.query.Query;
 
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.oauth.model.UserAccessToken;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.querymanager.EventMediaFormat;
@@ -80,10 +80,10 @@ public class QueryManagerServices {
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter) {
 		long starttime = System.currentTimeMillis();
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String user_id =  userAccessToken.getUser().getUid();
-			String key = userAccessToken.getApp().getKey();
+			String user_id =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
 
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 			if (eventMediaFormat == null || query == null) {
@@ -281,10 +281,10 @@ public class QueryManagerServices {
 		
 		long starttime = System.currentTimeMillis();
 
-		UserAccessToken userAccessToken = OAuthWrappers.retrieveUserAccessToken(access_token);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String user_id =  userAccessToken.getUser().getUid();
-			String key = userAccessToken.getApp().getKey();
+			String user_id =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
 
 			Gson gson = new Gson();
 			KeyValuePair pair1 = null;
