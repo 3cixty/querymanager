@@ -148,7 +148,7 @@ public class TrayServices {
      * @param restTray
      * @return
      */
-	private boolean addTrayElement(RestTrayObject restTray) {
+	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException {
 		String itemId = restTray.getElement_id();
 		if (itemId == null) return false;
 		String itemTypeStr = restTray.getElement_type();
@@ -175,6 +175,10 @@ public class TrayServices {
 		if (uid == null || uid.equals("")) {
 			tray.setUid(token);
 		} else {
+			if (uid != null && !"".equals(uid)) {
+				// check user permission
+				checkPermission(token);
+			}
 			tray.setUid(uid);
 		}
 		return TrayStorage.addTray(tray);
@@ -191,10 +195,7 @@ public class TrayServices {
 
 		// XXX: check user permission
 		if (uid != null && !"".equals(uid)) {
-			AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-			if (!accessToken.getScopeNames().contains(WISH_LIST_SCOPE_NAME)) {
-			    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
-			}
+			checkPermission(access_token);
 		}
 		
 		int offset = (restTray.getOffset() == null ? 0 : restTray.getOffset());
@@ -213,13 +214,14 @@ public class TrayServices {
 	 * @param restTray
 	 * @return List of trays associated with a given junk token
 	 */
-	private List<Tray> loginTray(RestTrayObject restTray) {
+	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException {
 		String junkToken = restTray.getJunk_token();
 		if (junkToken == null || junkToken.equals("")) return null;
 		String threeCixtyToken = restTray.getThree_cixty_token();
 		String uid = OAuthWrappers.findGoogleUIDFrom(threeCixtyToken);
 		if (uid == null || uid.equals("")) return null;
 		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
+		checkPermission(threeCixtyToken);
 		return TrayStorage.getTrays(uid, 0, -1, OrderType.Desc, true);
 	}
 
@@ -228,13 +230,14 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private boolean cleanTrays(RestTrayObject restTray) {
+	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException {
 		String token = restTray.getToken();
 		if (token == null || token.equals("")) return false;
 		String uid = OAuthWrappers.findGoogleUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			return TrayStorage.cleanTrays(token);
 		}
+		checkPermission(token);
 		return TrayStorage.cleanTrays(uid);
 	}
 
@@ -243,11 +246,16 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private boolean updateTray(RestTrayObject restTray) {
+	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException {
 		String itemId = restTray.getElement_id();
 		if (itemId == null || itemId.equals("")) return false;
 		String token = restTray.getToken();
 		String uid = OAuthWrappers.findGoogleUIDFrom(token);
+		
+		// check user permission
+		if (uid != null && !uid.equals("")) {
+		    checkPermission(token);
+		}
 		
 		Tray tray = new Tray();
 		tray.setItemId(itemId);
@@ -291,6 +299,13 @@ public class TrayServices {
 		}
 		
 		return TrayStorage.update(tray);
+	}
+	
+	private void checkPermission(String token) throws ThreeCixtyPermissionException {
+		AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(token);
+		if (!accessToken.getScopeNames().contains(WISH_LIST_SCOPE_NAME)) {
+		    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
+		}
 	}
 
 	private Response createResponseException(String msg) {
