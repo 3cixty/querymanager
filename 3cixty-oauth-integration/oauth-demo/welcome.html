@@ -10,28 +10,19 @@
 
 <script type="text/javascript">
      function performLogin() {
-    	var token = getAccessToken();
-    	if (token == null) return;
+	    var loc = window.location.href.toString();
+		var index = loc.indexOf("#");
+		if (index < 0) return;
 		
-		window.opener.location=window.opener.location + "#accessToken=" + token;
+		window.opener.location = window.opener.location + loc.substring(index);
+
 		window.opener.location.reload();
 
 		window.close();
     }
 	
 	performLogin();
-     
-     function getAccessToken() {
-     	var accessTokenKey = "#accessToken=";
-    	var loc = window.location.href.toString();
-    	var tokenIndex1 = loc.indexOf(accessTokenKey);
-    	if (tokenIndex1 < 0) {
-    		return null;
-    	} else {
-        	var token = loc.substring(tokenIndex1 + accessTokenKey.length);
-        	return token;
-    	}
-     }
+	 
 </script>
 
 </body>
