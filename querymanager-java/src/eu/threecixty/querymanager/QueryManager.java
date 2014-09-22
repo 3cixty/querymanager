@@ -93,8 +93,8 @@ import eu.threecixty.profile.oldmodels.Preference;
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQueryStr = "";
 		try {
-			augmentedQueryStr = getAugmentedQueryWithoutPrefixes(augmentedQuery);
-			
+			augmentedQueryStr = "PREFIX schema: <http://schema.org/> " + getAugmentedQueryWithoutPrefixes(augmentedQuery);
+
 			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 

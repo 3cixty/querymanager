@@ -34,7 +34,6 @@ public class QueryManagerDecision {
 	 */
 	public static String run(IProfiler profiler, IQueryManager qm, String filter,
 			EventMediaFormat format, boolean augmentedQueryIncluded) {
-		
 		if (profiler != null && filter != null) {
 			if (!filter.equals(FRIENDS)) {
 				if (filter.equalsIgnoreCase(LOCATION)) {
