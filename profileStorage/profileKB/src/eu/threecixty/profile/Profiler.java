@@ -330,7 +330,7 @@ public class Profiler implements IProfiler {
 		    Place place = new Place();
 		    PlaceDetail pd = new PlaceDetail();
 		    pd.setHasPlaceName(placeName);
-		    pd.setHasNatureOfPlace(NatureOfPlace.Country);
+		    pd.setHasNatureOfPlace(nop);
 		    place.setHasPlaceDetail(pd);
 		    return place;
 		}
