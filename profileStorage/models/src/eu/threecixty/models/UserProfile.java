@@ -524,7 +524,7 @@ public interface UserProfile extends WrappedIndividual {
      * 
      * @returns a collection of values for the hasUID property.
      */
-    Collection<? extends String> getHasUID();
+    Collection<? extends Object> getHasUID();
 
     /**
      * Checks if the class has a hasUID property value.<p>
@@ -538,14 +538,14 @@ public interface UserProfile extends WrappedIndividual {
      * 
      * @param newHasUID the hasUID property value to be added
      */
-    void addHasUID(String newHasUID);
+    void addHasUID(Object newHasUID);
 
     /**
      * Removes a hasUID property value.<p>
      * 
      * @param oldHasUID the hasUID property value to be removed.
      */
-    void removeHasUID(String oldHasUID);
+    void removeHasUID(Object oldHasUID);
 
 
 
