@@ -39,13 +39,15 @@ public class ThreeCixtyQuery {
 		return new ThreeCixtyQuery(tmpQuery);
 	}
 
-	public void addExpressionsAndTriples(Object object, List <Expr> exprs, List <Triple> triples) {
+	public void addExpressionsAndTriples(Object object, List <Expr> exprs, List <Triple> triples, boolean isForEvents) {
 		if (query == null || object == null) return;
 		
 		if (object instanceof Event) {
-			addExpressionsAndTriples((Event) object, exprs, triples);
+			addExpressionsAndTriples((Event) object, exprs, triples, isForEvents);
 		} else if (object instanceof Place) {
-			addExpressionsAndTriples((Place) object, exprs, triples);
+			addExpressionsAndTriples((Place) object, exprs, triples, isForEvents);
+		} else if (object instanceof Rating) {
+			addExpressionsAndTriples((Rating) object, exprs, triples, isForEvents);
 		}
 	}
 
@@ -71,8 +73,8 @@ public class ThreeCixtyQuery {
 	 * 
 	 * @param object
 	 */
-	protected void addExprsAndTriples(Object object, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
-		QueryUtils.addExprsAndTriples(query, object, exprs, triples, threeCixyExpr);
+	protected void addExprsAndTriples(Object object, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr, boolean isForEvents) {
+		QueryUtils.addExprsAndTriples(query, object, exprs, triples, threeCixyExpr, isForEvents);
 	}
 
 	/**
@@ -106,8 +108,10 @@ public class ThreeCixtyQuery {
 	 * 				The expression which is used for filtering results.
 	 */
 	protected void addExprsAndTriplesFromAttributeNameAndPropertyName(Object object,
-			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
-		QueryUtils.addExprsAndTriplesFromAttributeNameAndPropertyName(query, object, attrName, propertyName, exprs, triples, threeCixyExpr);
+			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr,
+			boolean isForEvents) {
+		QueryUtils.addExprsAndTriplesFromAttributeNameAndPropertyName(query, object, attrName, propertyName, exprs, triples,
+				threeCixyExpr, isForEvents);
 	}
 
 	/**
@@ -115,24 +119,22 @@ public class ThreeCixtyQuery {
 	 * @param event
 	 * @return
 	 */
-	private void addExpressionsAndTriples(Event event, List <Expr> exprs, List <Triple> triples) {
+	private void addExpressionsAndTriples(Event event, List <Expr> exprs, List <Triple> triples, boolean isForEvents) {
 		
 		Rating rating = event.getHasRating();
-		if (rating != null) {
-			addExprsAndTriples(rating, exprs, triples, ThreeCixtyExpression.Equal);
-		}
-
+		addExpressionsAndTriples(rating, exprs, triples, isForEvents);
+		
 		EventDetail eventDetail = event.getHasEventDetail();
 		if (eventDetail != null) {
 			if (eventDetail.getHasEventName() != null && !eventDetail.getHasEventName().equals("")) {
 			    addExprsAndTriplesFromAttributeNameAndPropertyName(eventDetail, "hasEventName",
-					    "hasEventName", exprs, triples, ThreeCixtyExpression.StringEqual);
+					    "hasEventName", exprs, triples, ThreeCixtyExpression.StringEqual, isForEvents);
 			}
 			if (eventDetail.getHasTemporalDetails() != null) {
 			    addExprsAndTriplesFromAttributeNameAndPropertyName(eventDetail.getHasTemporalDetails(), "hasDateFrom",
-					    "datetime", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+					    "datetime", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
 			    addExprsAndTriplesFromAttributeNameAndPropertyName(eventDetail.getHasTemporalDetails(), "hasDateUntil",
-					    "datetime", exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+					    "datetime", exprs, triples, ThreeCixtyExpression.LessThanOrEqual, isForEvents);
 			}
 		}
 	}
@@ -142,13 +144,14 @@ public class ThreeCixtyQuery {
 	 *
 	 * @param place
 	 */
-	private void addExpressionsAndTriples(Place place, List <Expr> exprs, List <Triple> triples) {
+	private void addExpressionsAndTriples(Place place, List <Expr> exprs, List <Triple> triples, boolean isForEvents) {
 
 		PlaceDetail placeDetail = place.getHasPlaceDetail();
 		if (placeDetail != null) {
 			if (placeDetail.getHasNatureOfPlace() != null) {
 				addExprsAndTriplesFromAttributeNameAndPropertyName(placeDetail, "hasPlaceName",
-						placeDetail.getHasNatureOfPlace().toString().toLowerCase(), exprs, triples, ThreeCixtyExpression.Equal);
+						placeDetail.getHasNatureOfPlace().toString().toLowerCase(), exprs, triples,
+						ThreeCixtyExpression.StringEqual, isForEvents);
 			}
 
 			Address address = placeDetail.getHasAddress();
@@ -159,18 +162,27 @@ public class ThreeCixtyQuery {
 			Area area = placeDetail.getArea();
 			if (area != null) {
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "minLat",
-						"latitude", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+						"latitude", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "maxLat",
-						"latitude", exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+						"latitude", exprs, triples, ThreeCixtyExpression.LessThanOrEqual, isForEvents);
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "minLon",
-						"longitute", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+						"longitute", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
 				addExprsAndTriplesFromAttributeNameAndPropertyName(area, "maxLon",
-						"longitute", exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+						"longitute", exprs, triples, ThreeCixtyExpression.LessThanOrEqual, isForEvents);
 			}
 		}
 		Rating rating = place.getHasRating();
+
+		addExpressionsAndTriples(rating, exprs, triples, isForEvents);
+	}
+
+	private void addExpressionsAndTriples(Rating rating, List <Expr> exprs, List <Triple> triples, boolean isForEvents) {
+
 		if (rating != null) {
-			addExprsAndTriples(rating, exprs, triples, ThreeCixtyExpression.Equal);
+			//addExprsAndTriples(rating, exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
+			
+			addExprsAndTriplesFromAttributeNameAndPropertyName(rating, "hasUseDefinedRating",
+					"rating", exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
 		}
 	}
 }

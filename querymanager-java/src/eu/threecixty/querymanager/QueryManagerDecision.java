@@ -80,9 +80,11 @@ public class QueryManagerDecision {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		Period period = createPeriod(); // two days
-		profiler.requirePeriod(period);
-		findTriplesAndExprs(profiler, qm, triples, exprs);
+		if (qm.isForEvents()) {
+			Period period = createPeriod(); // two days
+			profiler.requirePeriod(period);
+			findTriplesAndExprs(profiler, qm, triples, exprs);
+		}
 		
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireAreaWithin(2); // within 2 km

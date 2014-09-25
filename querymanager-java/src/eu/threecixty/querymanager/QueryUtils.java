@@ -14,11 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.TriplePath;
 import com.hp.hpl.jena.sparql.core.Var;
+
 import com.hp.hpl.jena.sparql.expr.E_Equals;
 import com.hp.hpl.jena.sparql.expr.E_GreaterThan;
 import com.hp.hpl.jena.sparql.expr.E_GreaterThanOrEqual;
@@ -35,6 +37,7 @@ import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
+import com.hp.hpl.jena.sparql.util.ExprUtils;
 
 import eu.threecixty.ThreeCixtyExpression;
 
@@ -47,7 +50,7 @@ import eu.threecixty.ThreeCixtyExpression;
 public class QueryUtils {
 
 	/**Attribute which contains properties files*/
-	private static Map<Class<?>, Properties> clazzProperties = new HashMap<Class<?>, Properties>();
+	private static Map<String, Properties> clazzProperties = new HashMap<String, Properties>();
 
 	/**Attribute which maps between a class name and a static method name to create an instance of NodeValue from
 	 * an instance of the class name*/
@@ -200,14 +203,16 @@ public class QueryUtils {
 	 * 
 	 * @param object
 	 */
-	public static void addExprsAndTriples(Query query, Object object, List <Expr> exprs, List<Triple> triples, ThreeCixtyExpression threeCixyExpr) {
+	public static void addExprsAndTriples(Query query, Object object, List <Expr> exprs, List<Triple> triples,
+			ThreeCixtyExpression threeCixyExpr, boolean isForEvents) {
 		if (object == null) return;
 		Class <?> clazz = object.getClass();
-		Properties props = clazzProperties.get(clazz);
+		String keyName = getNameFromClass(clazz, isForEvents);
+		Properties props = clazzProperties.get(keyName);
 		if (props == null) {
-			props = loadProperties(clazz);
+			props = loadProperties(clazz, isForEvents);
 			if (props == null) return;
-			clazzProperties.put(clazz, props);
+			clazzProperties.put(keyName, props);
 		}
 		// For a pair in properties, Key must be the same with a class' attribute,
 		// Value must follow the expression [subject,predicate,object]*,filterVariable
@@ -232,14 +237,15 @@ public class QueryUtils {
 	 * 			The property name in the property file.
 	 */
 	public static void addExprsAndTriplesFromAttributeNameAndPropertyName(Query query, Object object,
-			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr) {
+			String attrName, String propertyName, List <Expr> exprs, List <Triple> triples, ThreeCixtyExpression threeCixyExpr, boolean isForEvents) {
 		if (object == null || query == null || attrName == null || propertyName == null) return;
 		Class <?> clazz = object.getClass();
-		Properties props = clazzProperties.get(clazz);
+		String keyName = getNameFromClass(clazz, isForEvents);
+		Properties props = clazzProperties.get(keyName);
 		if (props == null) {
-			props = loadProperties(clazz);
+			props = loadProperties(clazz, isForEvents);
 			if (props == null) return;
-			clazzProperties.put(clazz, props);
+			clazzProperties.put(keyName, props);
 		}
 		// Property Value must follow the regular expression [subject,predicate,object]*,filterVariableName
 		String property = (String) props.get(propertyName);
@@ -336,10 +342,12 @@ public class QueryUtils {
 			String subject = configStrs[i * 3];
 			String predicate = configStrs[i * 3 + 1];
 			String predicateURI = replacePrefix(query, predicate);
-			if (predicateURI == null) continue;
+			//if (predicateURI == null) continue;
 			String object = configStrs[i * 3 + 2];
+			String objUri = replacePrefix(query, object);
 			Triple pattern = Triple.create(Var.alloc(subject),
-			        NodeFactory.createURI(predicateURI), Var.alloc(object));
+					predicateURI != null ? NodeFactory.createURI(predicateURI) : Var.alloc(predicate),
+			        objUri == null ? Var.alloc(object) : NodeFactory.createURI(objUri));
 			if (result.contains(pattern)) continue;
 			result.add(pattern);
 		}
@@ -488,21 +496,26 @@ public class QueryUtils {
 	private static Expr createExprForFilter(String filtervarName, NodeValue node, ThreeCixtyExpression threeCixyExpr) {
 
 		if (threeCixyExpr == null) return null;
+		
+		Expr exprVar = null;
+		if (filtervarName.contains("?")) { // is an expression
+			exprVar = ExprUtils.parse(filtervarName);
+		}
 
 		if (threeCixyExpr == ThreeCixtyExpression.Equal) {
-			return new E_Equals(new ExprVar(filtervarName), node);
+			return new E_Equals(exprVar == null ? new ExprVar(filtervarName) : exprVar, node);
 		} else if (threeCixyExpr == ThreeCixtyExpression.GreaterThan) {
-			return new E_GreaterThan(new ExprVar(filtervarName), node);
+			return new E_GreaterThan(exprVar == null ? new ExprVar(filtervarName) : exprVar, node);
 		} else if (threeCixyExpr == ThreeCixtyExpression.GreaterThanOrEqual) {
-			return new E_GreaterThanOrEqual(new ExprVar(filtervarName), node);
+			return new E_GreaterThanOrEqual(exprVar == null ? new ExprVar(filtervarName) : exprVar, node);
 		} else if (threeCixyExpr == ThreeCixtyExpression.LessThan) {
-			return new E_LessThan(new ExprVar(filtervarName), node);
+			return new E_LessThan(exprVar == null ? new ExprVar(filtervarName) : exprVar, node);
 		} else if (threeCixyExpr == ThreeCixtyExpression.LessThanOrEqual) {
-			return new E_LessThanOrEqual(new ExprVar(filtervarName), node);
+			return new E_LessThanOrEqual(exprVar == null ? new ExprVar(filtervarName) : exprVar, node);
 		} else if (threeCixyExpr == ThreeCixtyExpression.StringEqual) {
 			return new E_Equals(new E_Str(new ExprVar(filtervarName)), node);
 		} else {
-			return new E_NotEquals(new ExprVar(filtervarName), node);
+			return new E_NotEquals(exprVar == null ? new ExprVar(filtervarName) : exprVar, node);
 		}
 	}
 
@@ -527,9 +540,8 @@ public class QueryUtils {
 	 * @param clazz
 	 * @return
 	 */
-	private static Properties loadProperties(Class<?> clazz) {
-		String simpleName = clazz.getSimpleName();
-		InputStream input = clazz.getResourceAsStream("/" + simpleName + ".properties");
+	private static Properties loadProperties(Class<?> clazz, boolean isForEvents) {
+		InputStream input = clazz.getResourceAsStream("/" + getNameFromClass(clazz, isForEvents));
 		if (input != null) {
 			try {
 				Properties props = new Properties();
@@ -541,6 +553,11 @@ public class QueryUtils {
 			}
 		}
 		return null;
+	}
+
+	private static String getNameFromClass(Class<?> clazz, boolean isForEvents) {
+		String simpleName = clazz.getSimpleName();
+		return (isForEvents ? simpleName + "_events" : simpleName + "_pois") + ".properties";
 	}
 	
 	private QueryUtils() {

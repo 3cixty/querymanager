@@ -30,11 +30,15 @@ import eu.threecixty.profile.oldmodels.Event;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Place;
 import eu.threecixty.profile.oldmodels.Preference;
+import eu.threecixty.profile.oldmodels.Rating;
 
  public class QueryManager implements IQueryManager {
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
 	 private static final String EVENTMEDIA_URL_PREFIX = "http://3cixty.eurecom.fr/sparql?default-graph-uri=&query=";
 
+	 /**Original query*/
+	 private ThreeCixtyQuery originalQuery;
+	 
 	 /**Current query*/
 	private ThreeCixtyQuery query;
 
@@ -51,6 +55,7 @@ import eu.threecixty.profile.oldmodels.Preference;
 	private Preference preference;
 	
 	private String augmentedQueryStr;
+	private boolean isForEvents;
 	
 	public QueryManager(String uid) {
 		this(uid, null);
@@ -83,6 +88,7 @@ import eu.threecixty.profile.oldmodels.Preference;
 	public void setQuery(ThreeCixtyQuery query){
 		if (query == null) return;
 		this.query = query;
+		this.originalQuery = query.cloneQuery();
 		augmentedQuery = new AugmentedQuery(query);
 	}
 	
@@ -92,35 +98,25 @@ import eu.threecixty.profile.oldmodels.Preference;
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQueryStr = "";
+		String originalQueryStr = originalQuery.convert2String();
 		try {
-			augmentedQueryStr = "PREFIX schema: <http://schema.org/> " + getAugmentedQueryWithoutPrefixes(augmentedQuery);
-
-			String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(augmentedQueryStr, "UTF-8");
-			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
-
-			URL url = new URL(urlStr);
-
-			InputStream input = url.openStream();
+			if (originalQuery != null && originalQueryStr.contains("http://schema.org/")) {
+			    augmentedQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
+			            + getAugmentedQueryWithoutPrefixes(augmentedQuery);
+			    originalQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
+			    		+ removePrefixes(originalQueryStr);
+			} else {
+				augmentedQueryStr = getAugmentedQueryWithoutPrefixes(augmentedQuery);
+				originalQueryStr = removePrefixes(originalQueryStr);
+			}
+			
 			StringBuilder sb = new StringBuilder();
-			byte [] b = new byte[1024];
-			int readBytes = 0;
-			while ((readBytes = input.read(b)) >= 0) {
-				sb.append(new String(b, 0, readBytes));
-			}
-			input.close();
-			if (augmentedQueryIncluded) {
-				if (EventMediaFormat.JSON == format) {
-					int lastIndex = sb.lastIndexOf("}");
-					if (lastIndex >= 0) {
-						JSONArray jsonArr = new JSONArray();
-						JSONObject jsonObj = new JSONObject();
-						jsonObj.put("AugmentedQuery", augmentedQueryStr);
-						jsonArr.put(jsonObj);
-						String augmentedQueryJson = ", " + "\"AugmentedQueries\": " + jsonArr.toString();
-						sb.insert(lastIndex, augmentedQueryJson);
-					}
-				}
-			}
+			
+			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, augmentedQueryIncluded, sb);
+			if (ok) return sb.toString();
+			
+			hasElementsForBindings(originalQueryStr, format, formatType, augmentedQueryIncluded, sb);
+			
 			return sb.toString();
 
 		} catch (UnsupportedEncodingException e) {
@@ -133,6 +129,51 @@ import eu.threecixty.profile.oldmodels.Preference;
 			e.printStackTrace();
 			return "ERROR:" + e.getMessage();
 		}
+	}
+
+	/**
+	 * Checks whether or not there is one element at least for result.
+	 * @param query
+	 * @param buffer
+	 * @return
+	 * @throws IOException 
+	 */
+	private boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
+			boolean augmentedQueryIncluded, StringBuilder sb) throws IOException {
+		sb.setLength(0);
+		String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(query, "UTF-8");
+		urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
+
+		URL url = new URL(urlStr);
+
+		InputStream input = url.openStream();
+		byte [] b = new byte[1024];
+		int readBytes = 0;
+		while ((readBytes = input.read(b)) >= 0) {
+			sb.append(new String(b, 0, readBytes));
+		}
+		input.close();
+		boolean ok = true;
+		if (augmentedQueryIncluded) {
+			if (EventMediaFormat.JSON == format) {
+				// check if there is one element at least
+				JSONObject json = new JSONObject(sb.toString());
+				if (json.getJSONObject("results").getJSONArray("bindings").length() < 1) {
+					ok = false;
+				}
+				
+				int lastIndex = sb.lastIndexOf("}");
+				if (lastIndex >= 0) {
+					JSONArray jsonArr = new JSONArray();
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("AugmentedQuery", query);
+					jsonArr.put(jsonObj);
+					String augmentedQueryJson = ", " + "\"AugmentedQueries\": " + jsonArr.toString();
+					sb.insert(lastIndex, augmentedQueryJson);
+				}
+			}
+		}
+		return ok;
 	}
 
 	@Override
@@ -190,20 +231,29 @@ import eu.threecixty.profile.oldmodels.Preference;
 		Set <Place> places = preference.getHasPlaces();
 		if (places != null) {
 			for (Place place: places) {
-				query.addExpressionsAndTriples(place, exprs, triples);
+				query.addExpressionsAndTriples(place, exprs, triples, isForEvents);
 			}
 		}
 
 		Set <Event> events = preference.getHasEvents();
 		if (events != null) {
 			for (Event event: events) {
-				query.addExpressionsAndTriples(event, exprs, triples);
+				query.addExpressionsAndTriples(event, exprs, triples, isForEvents);
 			}
 		}
 
 		Set <Period> periods = preference.getHasPeriods();
 		if (periods != null) {
-			addPeriodsToTriplesAndExprsList(periods, query, triples, exprs);
+			addPeriodsToTriplesAndExprsList(periods, query, triples, exprs, isForEvents);
+		}
+
+		Set <Double> scoresRequired = preference.getScoresRequired();
+		if (scoresRequired != null && scoresRequired.size() > 0) {
+			for (Double score: scoresRequired) {
+				Rating rating = new Rating();
+				rating.setHasUseDefinedRating(score);
+				query.addExpressionsAndTriples(rating, exprs, triples, isForEvents);
+			}
 		}
 	}
 
@@ -265,12 +315,20 @@ import eu.threecixty.profile.oldmodels.Preference;
 		return executeQuery(augmentedQuery);
 	}
 
-	private void addPeriodsToTriplesAndExprsList(Set<Period> periods, ThreeCixtyQuery query, List <Triple> triples, List <Expr> exprs) {
+	public boolean isForEvents() {
+		return isForEvents;
+	}
+
+	public void setForEvents(boolean isForEvents) {
+		this.isForEvents = isForEvents;
+	}
+
+	private void addPeriodsToTriplesAndExprsList(Set<Period> periods, ThreeCixtyQuery query, List <Triple> triples, List <Expr> exprs, boolean isForEvents) {
 		for (Period period: periods) {
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "startDate", "datetime",
-					exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual);
+					exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "endDate", "datetime",
-					exprs, triples, ThreeCixtyExpression.LessThanOrEqual);
+					exprs, triples, ThreeCixtyExpression.LessThanOrEqual, isForEvents);
 		}
 	}
 

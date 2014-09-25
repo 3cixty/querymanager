@@ -178,4 +178,7 @@ public interface IQueryManager {
 	 * @return an instance of QResult which contains results by executing an augmented query.
 	 */
 	QResult executeAugmentedQuery();
+
+	boolean isForEvents();
+	void setForEvents(boolean isForEvents);
 }
