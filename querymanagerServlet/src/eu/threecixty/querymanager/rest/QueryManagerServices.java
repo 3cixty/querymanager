@@ -322,10 +322,15 @@ public class QueryManagerServices {
 		}
 
 		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
+		
+		// XXX: is for events
+		boolean isForEvents = (query.indexOf("lode:Event") > 0);
+		qm.setForEvents(isForEvents);
 
 		// TODO: correct the following line by exactly recognizing query's type
 		// suppose that we recognize that the query is for places
 		ThreeCixtyQuery placeQuery = new ThreeCixtyQuery(jenaQuery);
+
 
 		qm.setQuery(placeQuery);
 		
