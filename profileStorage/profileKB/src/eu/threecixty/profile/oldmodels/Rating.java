@@ -10,14 +10,14 @@ import eu.threecixty.profile.annotations.Description;
  */
 public class Rating {
 	@Description(hasText="rating given by the user on scale of 1 to 10")
-	private Double hasUseDefinedRating;
+	private double hasUseDefinedRating;
 	@Description(hasText="user interaction mode")
     private UserInteractionMode hasUserInteractionMode;
 //	@Description(hasText="time at which the user rated")
 //    private Date hasRatingTime;
 	@Description(hasText="comments by the user")
     private Set <String> hasKeyTags;
-	public Double getHasUseDefinedRating() {
+	public double getHasUseDefinedRating() {
 		return hasUseDefinedRating;
 	}
 	public void setHasUseDefinedRating(Double hasUseDefinedRating) {

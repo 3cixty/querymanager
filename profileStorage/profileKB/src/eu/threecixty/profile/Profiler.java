@@ -160,6 +160,7 @@ public class Profiler implements IProfiler {
 		if (scoreRatedAtLeast != -1) {
 			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRating(uID, scoreRatedAtLeast);
 			addEvents(eventNames, events);
+			addScoreRequired(scoreRatedAtLeast);
 		}
 		if (numberOfTimeVisitedAtLeast != -1) {
 			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisited(uID, numberOfTimeVisitedAtLeast);
@@ -168,6 +169,7 @@ public class Profiler implements IProfiler {
 		if (scoreRatedForFriendsAtLeast != -1) {
 			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
 			addEvents(eventNames, events);
+			addScoreRequired(scoreRatedForFriendsAtLeast);
 		}
 		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
 			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisitedOfFriends(uID, numberOfTimeVisitedForFriendsAtLeast);
@@ -243,6 +245,7 @@ public class Profiler implements IProfiler {
 		if (scoreRatedAtLeast != -1) {
 			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromRating(uID, scoreRatedAtLeast);
 			addPlaces(placeNames, places);
+			addScoreRequired(scoreRatedAtLeast);
 		}
 		if (numberOfTimeVisitedAtLeast != -1) {
 			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisited(uID, numberOfTimeVisitedAtLeast);
@@ -251,6 +254,7 @@ public class Profiler implements IProfiler {
 		if (scoreRatedForFriendsAtLeast != -1) {
 			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
 			addPlaces(placeNames, places);
+			addScoreRequired(scoreRatedForFriendsAtLeast);
 		}
 		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
 			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisitedOfFriends(uID, numberOfTimeVisitedForFriendsAtLeast);
@@ -335,5 +339,15 @@ public class Profiler implements IProfiler {
 		    return place;
 		}
 		return null;
+	}
+
+	private void addScoreRequired(double score) {
+		if (pref == null) return;
+		Set <Double> scores = pref.getScoresRequired();
+		if (scores == null) {
+			scores = new HashSet <Double>();
+			pref.setScoresRequired(scores);
+		}
+		if (!scores.contains(score)) scores.add(score);
 	}
 }
