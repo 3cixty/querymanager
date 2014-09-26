@@ -234,8 +234,8 @@ public class TrayServices {
 		String token = restTray.getToken();
 		String uid = GoogleAccountUtils.getUID(token);
 		
-		Tray tray = new Tray();
-		tray.setItemId(itemId);
+		Tray tray = TrayStorage.getTray((uid == null || uid.equals("")) ? token : uid, itemId);
+		if (tray == null) return false;
 		
 		String itemTypeStr = restTray.getElement_type();
 		if (itemTypeStr != null) tray.setItemType(itemTypeStr);
@@ -245,9 +245,6 @@ public class TrayServices {
 		
 		String element_title = restTray.getElement_title();
 		if (element_title != null) tray.setElement_title(element_title);
-
-		tray.setTimestamp(System.currentTimeMillis());
-		tray.setUid((uid == null || uid.equals("")) ? token : uid);
 		
 		if (restTray.getDelete() != null && restTray.getDelete().booleanValue()) {
 			return TrayStorage.deleteTray(tray);
