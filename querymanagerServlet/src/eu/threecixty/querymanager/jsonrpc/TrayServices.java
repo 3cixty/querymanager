@@ -131,14 +131,16 @@ public class TrayServices implements TrayServicesIntf {
     	long starttime = System.currentTimeMillis();
     	
 		checkAppKey(key);
-
-		Tray tray = new Tray();
-		tray.setItemId(element_id);
-		tray.setItemType(element_type);
-		tray.setSource(source);
-		tray.setTimestamp(System.currentTimeMillis());
+		
 		String uid = GoogleAccountUtils.getUID(token);
-		tray.setUid((uid == null || uid.equals("")) ? token : uid);
+
+		Tray tray = TrayStorage.getTray((uid == null || uid.equals("")) ? token : uid, element_id);
+		if (tray == null) throw new Throwable();
+		
+		if (element_type != null && !element_type.equals("")) tray.setItemType(element_type);
+		
+		if (source != null && !source.equals("")) tray.setSource(source);
+		
 		
 		if (delete) {
 			if (!TrayStorage.deleteTray(tray)) {
