@@ -155,6 +155,17 @@ public class TrayStorage {
 		return getTrays(allTrays, uid);
 	}
 
+	public static Tray getTray(String uid, String trayId) {
+		if (uid == null || trayId == null) return null;
+		List <Tray> trays = getTrays(uid);
+		for (Tray tmp: trays) {
+			if (trayId.equals(tmp.getItemId())) {
+				return tmp;
+			}
+		}
+		return null;
+	}
+
 
 	public synchronized static List <Tray> getAllTrays() {
 		List <Tray> trays = new ArrayList <Tray>();

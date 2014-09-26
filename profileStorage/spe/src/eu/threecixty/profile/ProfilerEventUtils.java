@@ -216,8 +216,13 @@ public class ProfilerEventUtils {
 		return eventNames;
 	}
 
-	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
-	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+	/**
+	 * Gets event names.
+	 * @param model
+	 * @param uID
+	 * @param rating
+	 * @return
+	 */
 	public static List <String> getEventNamesFromRatingOfFriends(Model model, String uID, float rating) {
 		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
@@ -264,8 +269,13 @@ public class ProfilerEventUtils {
 		return eventNames;
 	}
 
-	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
-	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+	/**
+	 * Gets event names.
+	 * @param model
+	 * @param uID
+	 * @param numberOfTimesVisited
+	 * @return
+	 */
 	public static List <String> getEventNamesFromNumberOfTimesVisitedOfFriends(Model model, String uID, int numberOfTimesVisited) {
 		if (model == null || uID == null || uID.equals("")) return null;
 		StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");

@@ -162,8 +162,14 @@ public class ProfilerPlaceUtils {
 		return coordinate;
 	}
 
-	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
-	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+
+	/**
+	 * Gets both Hotel and Place Names.
+	 * @param model
+	 * @param uID
+	 * @param rating
+	 * @return
+	 */
 	public static List <String> getPlaceNamesFromRating(Model model, String uID, float rating) {
 		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
@@ -178,17 +184,16 @@ public class ProfilerPlaceUtils {
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "?root profile:hasPreference ?p1 .\n";
 	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    qStr += "?u1 ?userRating ?s1 .\n";
 	    qStr += "?s1 profile:hasRating ?r1 .\n";
 	    qStr += "?r1 profile:hasUserDefinedRating ?r2 .\n";
 	    qStr += "?r1 profile:hasUserInteractionMode ?mode .\n";
-	    qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    qStr += "?s1 ?ratingDetail ?h1 .\n";
 	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
-	    qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
+	   // qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
-	    
 	    Query query = QueryFactory.create(qStr);
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
@@ -210,8 +215,14 @@ public class ProfilerPlaceUtils {
 		return placeNames;
 	}
 
-	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
-	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+
+	/**
+	 * Gets both hotel and place names
+	 * @param model
+	 * @param uID
+	 * @param numberOfTimesVisited
+	 * @return
+	 */
 	public static List <String> getPlaceNamesFromNumberOfTimesVisited(Model model, String uID, int numberOfTimesVisited) {
 		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
@@ -226,9 +237,11 @@ public class ProfilerPlaceUtils {
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "?root profile:hasPreference ?p1 .\n";
 	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    //qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    qStr += "?u1 ?userRating ?s1 .\n";
 	    qStr += "?s1 profile:hasNumberofTimesVisited ?n1  .\n";
-	    qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    //qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    qStr += "?s1 ?ratingDetail ?h1 .\n";
 	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
@@ -255,9 +268,13 @@ public class ProfilerPlaceUtils {
 		return placeNames;
 	}
 
-
-	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
-	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+	/**
+	 * Gets both hotel and place names.
+	 * @param model
+	 * @param uID
+	 * @param rating
+	 * @return
+	 */
 	public static List <String> getPlaceNamesFromRatingOfFriends(Model model, String uID, float rating) {
 		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
@@ -274,17 +291,17 @@ public class ProfilerPlaceUtils {
 	    qStr += "?meroot foaf:knows ?root .\n";
 	    qStr += "?root profile:hasPreference ?p1 .\n";
 	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    qStr += "?u1 ?userRating ?s1 .\n";
 	    qStr += "?s1 profile:hasRating ?r1 .\n";
 	    qStr += "?r1 profile:hasUserDefinedRating ?r2 .\n";
 	    qStr += "?r1 profile:hasUserInteractionMode ?mode .\n";
-	    qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    qStr += "?s1 ?ratingDetail ?h1 .\n";
 	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
-	    qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
+	    //qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
-	    
+
 	    Query query = QueryFactory.create(qStr);
 	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
@@ -306,8 +323,13 @@ public class ProfilerPlaceUtils {
 		return placeNames;
 	}
 
-	// TODO: this query only works with HotelPlace. Need to update RDF UserProfile Model so that
-	// we only use something generic, for example instead of using hasHotelDetail, we use hasPlaceDetail, ...
+	/**
+	 * Gets both hotel and place names.
+	 * @param model
+	 * @param uID
+	 * @param numberOfTimesVisited
+	 * @return
+	 */
 	public static List <String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(Model model, String uID, int numberOfTimesVisited) {
 		if (model == null || uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
@@ -324,9 +346,11 @@ public class ProfilerPlaceUtils {
 	    qStr += "?meroot foaf:knows ?root .\n";
 	    qStr += "?root profile:hasPreference ?p1 .\n";
 	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    //qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
+	    qStr += "?u1 ?userRating ?s1 .\n";
 	    qStr += "?s1 profile:hasNumberofTimesVisited ?n1  .\n";
-	    qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    //qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
+	    qStr += "?s1 ?ratingDetail ?h1 .\n";
 	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
