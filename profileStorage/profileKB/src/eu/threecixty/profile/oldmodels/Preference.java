@@ -27,6 +27,8 @@ public class Preference {
 
 	/**Attribute which stores information about periods which events take place*/
 	private Set <Period> hasPeriods;
+	
+	private Set <Double> scoresRequired;
 
 	@ThalesInputs
 	private Set<SmartPhoneSensorData> hasSmartPhoneSensorData;
@@ -193,5 +195,13 @@ public class Preference {
 
 	public void setHasPeriods(Set<Period> hasPeriods) {
 		this.hasPeriods = hasPeriods;
+	}
+
+	public Set<Double> getScoresRequired() {
+		return scoresRequired;
+	}
+
+	public void setScoresRequired(Set<Double> scoresRequired) {
+		this.scoresRequired = scoresRequired;
 	}
 }

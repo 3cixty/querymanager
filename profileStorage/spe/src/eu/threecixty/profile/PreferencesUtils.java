@@ -143,7 +143,7 @@ public class PreferencesUtils {
 		buffer.append("}");
 		
 		float minRated = (float) findMinimumValue(buffer.toString(), "scoreRated");
-		
+
 		if (minRated == Integer.MAX_VALUE) {
 			return DEFAULT_MINIMUM_SCORE_RATED;
 		}

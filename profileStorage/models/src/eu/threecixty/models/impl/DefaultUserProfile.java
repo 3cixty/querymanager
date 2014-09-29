@@ -10,7 +10,6 @@ import org.protege.owl.codegeneration.impl.WrappedIndividualImpl;
 import org.protege.owl.codegeneration.inference.CodeGenerationInference;
 
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 
 /**
@@ -419,19 +418,19 @@ public class DefaultUserProfile extends WrappedIndividualImpl implements UserPro
      * Data Property http://www.eu.3cixty.org/profile#hasUID
      */
      
-    public Collection<? extends String> getHasUID() {
-		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUID, String.class);
+    public Collection<? extends Object> getHasUID() {
+		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUID, Object.class);
     }
 
     public boolean hasHasUID() {
 		return !getHasUID().isEmpty();
     }
 
-    public void addHasUID(String newHasUID) {
+    public void addHasUID(Object newHasUID) {
 	    getDelegate().addPropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUID, newHasUID);
     }
 
-    public void removeHasUID(String oldHasUID) {
+    public void removeHasUID(Object oldHasUID) {
 		getDelegate().removePropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUID, oldHasUID);
     }
 

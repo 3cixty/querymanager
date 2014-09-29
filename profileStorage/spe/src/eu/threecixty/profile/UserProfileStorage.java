@@ -554,7 +554,7 @@ public class UserProfileStorage {
 			eu.threecixty.profile.oldmodels.Rating rating, Rating kbRating,
 			MyFactory mf) {
 		if (rating.getHasUseDefinedRating() > 0) {
-			kbRating.addHasUserDefinedRating(rating.getHasUseDefinedRating().floatValue());
+			kbRating.addHasUserDefinedRating((float) rating.getHasUseDefinedRating());
 		}
 		if (rating.getHasUserInteractionMode() != null) {
 			kbRating.addHasUserInteractionMode(rating.getHasUserInteractionMode().toString());
@@ -1146,7 +1146,7 @@ public class UserProfileStorage {
 		toUserProfile.setKnows(uids);
 		for (UserProfile tmpUP: fromUserProfile.getKnows()) {
 			if (!tmpUP.hasHasUID()) continue;
-			uids.add(tmpUP.getHasUID().iterator().next());
+			uids.add(tmpUP.getHasUID().iterator().next().toString());
 		}
 	}
 
