@@ -182,7 +182,21 @@ public class TokenResource {
         request.setPrincipal(new AuthenticatedPrincipal(request.getClient().getClientId()));
         // Apply all client scopes to the access token.
         // TODO: take into account given scopes from the request
-        request.setGrantedScopes(request.getClient().getScopes());
+        // XXX: Kinh added following lines to get scopes from request
+        if (accessTokenRequest.getScope() != null && !accessTokenRequest.getScope().equalsIgnoreCase("null")) {
+        	if (!accessTokenRequest.getScope().equals("")) {
+        		if (accessTokenRequest.getScope().indexOf(",") < 0) { // one scope
+        			request.getGrantedScopes().add(accessTokenRequest.getScope());
+        		} else { // more than one scope
+        			String[] tmpScopes = accessTokenRequest.getScope().split(",");
+        			for (String tmpScope: tmpScopes) {
+        				request.getGrantedScopes().add(tmpScope);
+        			}
+        		}
+        	}
+        } else {
+            request.setGrantedScopes(request.getClient().getScopes());
+        }
       }
       else {
         return sendErrorResponse(ValidationResponse.UNSUPPORTED_GRANT_TYPE);

@@ -26,6 +26,7 @@ import eu.threecixty.oauth.utils.ScopeUtils;
 public class ThreeCixtyResource extends AbstractResource {
 
 	private static final String THREE_CIXTY_RES_SERVER_KEY = ResourceServerUtils.getResourceServerKey();
+	private static final String FIXED_PASSWORD = "fixedPwdMilano";
 	private static boolean firstTime = true;
 	
     @Inject
@@ -54,10 +55,11 @@ public class ThreeCixtyResource extends AbstractResource {
     			client.setName(app_name);
     			client.setIncludePrincipal(true);
     			client.setAllowedImplicitGrant(true);
+    			client.setAllowedClientCredentials(true);
     			client.setResourceServer(resourceServer);
     			client.setExpireDuration(60 * 60 * 24); // last for a day
     			client.setUseRefreshTokens(true);
-    			client.setSecret("fixedPwdMilano");
+    			client.setSecret(FIXED_PASSWORD);
     			client.setThumbNailUrl(thumbNailUrl);
     			List <String> scopes = new ArrayList <String>();
     			if (scope.indexOf(',') >= 0) {
