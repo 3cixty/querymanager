@@ -70,27 +70,39 @@ public class OAuthServices {
 		}
 	}
 
-//	@GET
-//	@Path("/getAccessToken")
-//	public Response getAccessToken(@QueryParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey) {
-//		String uid = GoogleAccountUtils.getUID(g_access_token);
-//		if (uid == null || uid.equals(""))
-//			return Response.status(Response.Status.BAD_REQUEST)
-//		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
-//		        .type(MediaType.APPLICATION_JSON_TYPE)
-//		        .build();
-//		String accessToken = OAuthWrappers.getAccessToken(uid, appkey);
-//		if (accessToken != null && !accessToken.equals("")) {
-//			return Response.status(Response.Status.OK)
-//	        .entity(" {\"accessToken\": \"" + accessToken + "\"} ")
-//	        .type(MediaType.APPLICATION_JSON_TYPE)
-//	        .build();
-//		}
-//		return Response.status(Response.Status.BAD_REQUEST)
-//		        .entity(" {\"response\": \"failed\"} ")
-//		        .type(MediaType.APPLICATION_JSON_TYPE)
-//		        .build();
-//	}
+	@GET
+	@Path("/getAccessToken")
+	public Response getAccessToken(@HeaderParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey,
+			@DefaultValue("") @HeaderParam("scope") String scope) {
+		String uid = GoogleAccountUtils.getUID(g_access_token);
+		if (uid == null || uid.equals(""))
+			return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		App app = OAuthWrappers.retrieveApp(appkey);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		AccessToken accessToken = OAuthWrappers.createAccessTokenForMobileApp(app, scope);
+		if (accessToken == null) {
+			return Response.status(Response.Status.BAD_REQUEST)
+	        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
+	        .type(MediaType.APPLICATION_JSON_TYPE)
+	        .build();
+		}
+		// scope can be a 'null' string as its result is found in 3cixtycallback
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken.getAccess_token(), accessToken.getRefresh_token(), scope, app)) {
+			return Response.status(Response.Status.BAD_REQUEST)
+			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
+			        .type(MediaType.APPLICATION_JSON_TYPE)
+			        .build();
+		}
+		Gson gson = new Gson();
+		return Response.status(Response.Status.OK).entity(
+				gson.toJson(accessToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
+	}
 
 	@GET
 	@Path("/getAppKey")
@@ -256,7 +268,6 @@ public class OAuthServices {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		
 		return null;
 	}
 
@@ -318,7 +329,7 @@ public class OAuthServices {
 		        .build();
 		
 		return Response.status(Response.Status.OK).entity(
-				" {\"response\": \"successful\" ").type(MediaType.APPLICATION_JSON_TYPE).build();
+				" {\"response\": \"successful\" }").type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
 	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, App app) {
@@ -355,11 +366,6 @@ public class OAuthServices {
 			}
 		}
 		return builder.toString();
-	}
-
-	private boolean checkUserForScope(String username, String password) {
-		// TODO: FIXME 
-		return ("3cixty".equals(username) && "3cixty".equals(password));
 	}
 
 	private class DeveloperScope {
