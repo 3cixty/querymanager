@@ -29,7 +29,7 @@ public class OAuthWrappers {
 	private static final String ROOT_LOCALHOST = "http://localhost:8080/";
 	private static final String ROOT_3CIXTY = "http://dev.3cixty.com:8080/";
 	
-	public static final String ROOT_SERVER = ROOT_3CIXTY;
+	public static final String ROOT_SERVER = ROOT_LOCALHOST;
 	
 	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5";
 
@@ -381,6 +381,35 @@ public class OAuthWrappers {
 		}
 		return null;
 	}
+
+	public static AccessToken createAccessTokenForMobileApp(App app, String scope) {
+		Client client = Client.create();
+	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
+	    formData.add("grant_type", "client_credentials");
+	    formData.add("scope", scope);
+	    
+	    // check ThreeCixtyResourceServer
+		String auth = "Basic ".concat(new String(Base64.encodeBase64(
+				app.getClientId().concat(":")
+				.concat("fixedPwdMilano").getBytes())));
+	    
+	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
+	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+	    
+	    
+	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
+	    try {
+			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			JSONObject jsonObj = new JSONObject(jsonStr);
+			AccessToken newAccessToken = getAccessToken(jsonObj);
+			if (newAccessToken == null) return null;
+			addScopeNames(scope, newAccessToken.getScopeNames());
+			return newAccessToken;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	private static AccessToken refreshAccessTokenUsingOAuthServer(AccessToken lastAccessToken) {
 		Client client = Client.create();
@@ -412,6 +441,11 @@ public class OAuthWrappers {
 		return null;
 	}
 	
+	/**
+	 * Only gets information from access token, expires_in and refresh_token.
+	 * @param jsonObj
+	 * @return
+	 */
 	private static AccessToken getAccessToken(JSONObject jsonObj) {
 		if (!jsonObj.has(ACCES_TOKEN_KEY)) {
 			return null;
@@ -450,6 +484,19 @@ public class OAuthWrappers {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	private static void addScopeNames(String scope, List<String> results) {
+		if (scope != null && !scope.equalsIgnoreCase("null") && !scope.equals("")) {
+			if (scope.indexOf(",") < 0) { // one scope
+				results.add(scope);
+			} else { // more than one scope
+				String [] tmpScopes = scope.split(",");
+				for (String tmpScope: tmpScopes) {
+					results.add(tmpScope);
+				}
+			}
+		}
 	}
 
 	private static String join(List<String> scopeNames) {
