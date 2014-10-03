@@ -29,7 +29,7 @@ public class OAuthWrappers {
 	private static final String ROOT_LOCALHOST = "http://localhost:8080/";
 	private static final String ROOT_3CIXTY = "http://dev.3cixty.com:8080/";
 	
-	public static final String ROOT_SERVER = ROOT_LOCALHOST;
+	public static final String ROOT_SERVER = ROOT_3CIXTY;
 	
 	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5";
 
