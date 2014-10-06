@@ -1,4 +1,4 @@
-package eu.threecixty.oauth.android;
+package com.threecixty.auth;
 
 import java.io.IOException;
 import java.io.InputStream;

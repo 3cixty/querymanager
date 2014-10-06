@@ -1,4 +1,4 @@
-package eu.threecixty.oauth.android;
+package com.threecixty.auth;
 
 import android.content.Context;
 

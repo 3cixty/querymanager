@@ -1,4 +1,4 @@
-package eu.threecixty.oauth.android;
+package com.threecixty.auth;
 
 import java.io.InputStream;
 import java.net.URLConnection;

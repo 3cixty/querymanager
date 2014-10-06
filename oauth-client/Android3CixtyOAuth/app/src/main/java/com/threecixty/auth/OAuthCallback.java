@@ -1,4 +1,4 @@
-package eu.threecixty.oauth.android;
+package com.threecixty.auth;
 
 /**
  * Callback to notify about responses received from 3Cixty OAuth server.

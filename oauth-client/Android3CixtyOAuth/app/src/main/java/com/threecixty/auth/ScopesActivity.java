@@ -1,4 +1,4 @@
-package eu.threecixty.oauth.android;
+package com.threecixty.auth;
 
 
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import eu.threecixty.oauth.android.R;
 
 public class ScopesActivity extends Activity {
 

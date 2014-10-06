@@ -1,4 +1,4 @@
-package eu.threecixty.oauth.android;
+package com.threecixty.auth;
 
 import org.json.JSONException;
 
@@ -13,6 +13,8 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import eu.threecixty.oauth.android.R;
 
 public class MainActivity extends Activity {
 
