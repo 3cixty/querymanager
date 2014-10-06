@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.threecixty.auth"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    >
 
     <uses-sdk
         android:minSdkVersion="9"
         android:targetSdkVersion="19" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
 
         <activity
             android:name="com.threecixty.auth.MainActivity"
-            android:label="@string/app_name" >
-  <!-- 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:label="@string/app_name">
+            <!--
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+           -->
+            <intent-filter>
+                <action android:name="com.threecixty.oauth.OAUTH" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+
             </intent-filter>
- -->
-    <intent-filter>
-        <action android:name="eu.threecixty.oauth.OAUTH"/>
-        <category android:name="android.intent.category.DEFAULT"/>
-        <data android:mimeType="text/plain"/>
-        
-    </intent-filter>
 
         </activity>
 
@@ -43,8 +43,7 @@
 
         <activity
             android:name="com.threecixty.auth.ScopesActivity"
-            android:label="@string/title_activity_scopes" >
-        </activity>
+            android:label="@string/title_activity_scopes"></activity>
     </application>
 
 </manifest>
