@@ -1,4 +1,4 @@
-package eu.threecixty.oauthsample;
+package com.threecixty.oauthsample;
 
 
 import org.json.JSONException;
@@ -16,7 +16,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 	
 	private static final int OAUTH_REQUEST_ID = 101; // any number you want
-	private static final String OAUTH_ACTION = "eu.threecixty.oauth.OAUTH";
+	private static final String OAUTH_ACTION = "com.threecixty.oauth.OAUTH";
 	
 	private String token;
 	
