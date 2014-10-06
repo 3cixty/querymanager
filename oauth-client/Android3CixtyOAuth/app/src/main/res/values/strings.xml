@@ -3,6 +3,7 @@
 
     <string name="app_name">3Cixty Auth</string>
     <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello World!</string>
     <string name="title_activity_scopes">3Cixty scopes</string>
     <string name="title_activity_main">3Cixty Auth</string>
 

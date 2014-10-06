@@ -9,8 +9,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import eu.threecixty.oauth.android.R;
-
 public class ScopesActivity extends Activity {
 
 	private static String appkey;
