@@ -352,10 +352,11 @@ public class Client extends AbstractEntity {
       isValid = false;
     }
 
-    if (isAllowedClientCredentials() && isAllowedImplicitGrant()) {
-      violation(context, "A Client can not be issued the client credentials grant AND the implicit grant as client credentials requires a secret.");
-      isValid = false;
-    }
+    // XXX: Kinh commented these lines to avoid validation issues
+//    if (isAllowedClientCredentials() && isAllowedImplicitGrant()) {
+//      violation(context, "A Client can not be issued the client credentials grant AND the implicit grant as client credentials requires a secret.");
+//      isValid = false;
+//    }
 
     if (scopes != null && !resourceServer.getScopes().containsAll(scopes)) {
       String message = "Client should only contain scopes that its resource server defines. " +
