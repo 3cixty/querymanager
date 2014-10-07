@@ -15,7 +15,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -115,10 +114,8 @@ public class QueryManagerServices {
 				}
 
 
-				return Response.status(HttpURLConnection.HTTP_OK)
-						.entity(result)
-						.type(MediaType.APPLICATION_JSON)
-						.build();
+				return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 			}
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
@@ -138,10 +135,9 @@ public class QueryManagerServices {
 	 * @return
 	 */
 	@GET
-	@Path("/makeNoAccessTokenQuery")
+	@Path("/executeQuery")
 	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
-			@QueryParam("format") String format, @QueryParam("query") String query,
-			@QueryParam("filter") String filter) {
+			@QueryParam("format") String format, @QueryParam("query") String query) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
@@ -155,15 +151,13 @@ public class QueryManagerServices {
 				IProfiler profiler = null;
 				QueryManager qm = new QueryManager("false");
 
-				String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true);
+				String result = executeQuery(profiler, qm, query, null, eventMediaFormat, false);
 
 				// log calls
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 
-				return Response.status(HttpURLConnection.HTTP_OK)
-						.entity(result)
-						.type(MediaType.APPLICATION_JSON)
-						.build();
+				return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 			}
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
@@ -181,15 +175,14 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/countItems")
-	@Produces("application/json")
-	public String countItems(@HeaderParam("key") String key) {
+	public Response countItems(@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			QueryManager qm = new QueryManager("false");
 			String ret = executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return ret;
+			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -211,8 +204,7 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/getAggregatedItems/{group}")
-	@Produces("application/json")
-	public String getAggregatedItems(@PathParam("group") String group,
+	public Response getAggregatedItems(@PathParam("group") String group,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
@@ -242,7 +234,7 @@ public class QueryManagerServices {
 				QueryManager qm = new QueryManager("false");
 				String ret = executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				return ret;
+				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			}
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_PARAMS + group);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -272,8 +264,7 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/getItems")
-	@Produces("application/json")
-	public String getItems(@HeaderParam("access_token") String access_token,
+	public Response getItems(@HeaderParam("access_token") String access_token,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
@@ -307,7 +298,7 @@ public class QueryManagerServices {
 
 			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return result;
+			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -319,10 +310,9 @@ public class QueryManagerServices {
 	
 	@GET
 	@Path("/getItemsWithoutAccessToken")
-	@Produces("application/json")
-	public String getItemsWithoutUserInfo(
+	public Response getItemsWithoutUserInfo(
 			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
+			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2, @HeaderParam("key") String key) {
 		
@@ -350,9 +340,9 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getGroupBy()),
 						(pair2 == null ? null : pair2.getValue()));
 
-				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
+				String result = executeQuery(profiler, qm, query, null, EventMediaFormat.JSON, false);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				return result;
+				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)

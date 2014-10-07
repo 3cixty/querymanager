@@ -30,6 +30,8 @@ public class CallLoggingConstants {
 	
 	public static final String KEY_VALIDATE_SERVICE = "Key validate service";
 	
+	public static final String MOBIDOT_EXIST_USER_SERVICE = "Mobidot exist account service";
+	
 	public static final String KEY_VALIDATE_DESC_SUCCESSFUL = "Successful";
 	public static final String KEY_VALIDATE_DESC_FAILED = "Failed";
 	

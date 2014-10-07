@@ -134,7 +134,7 @@ public class OAuthServices {
 		        .build();
 	}
 
-	@GET
+	@POST
 	@Path("/updateAppKey")
 	public Response updateAppKey(@QueryParam("key") String key, 
 			@DefaultValue("") @QueryParam("appname") String appname,
