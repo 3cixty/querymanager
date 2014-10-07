@@ -141,6 +141,11 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	public Set<IDMapping> getIDMappings() {
 		return getMobidotIDsForUsers();
 	}
+	
+	@Override
+	public Mobidot getMobidot() {
+		return MobidotImpl.getInstance();
+	}
 
 	/**
 	 * get MobidotIDs For the 3cixty Users

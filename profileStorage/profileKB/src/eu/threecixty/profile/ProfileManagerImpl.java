@@ -176,6 +176,12 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (profileManager != null) return profileManager.getIDMappings();
 		return new HashSet <IDMapping>();
 	}
+	
+	@Override
+	public Mobidot getMobidot() {
+		if (profileManager != null) return profileManager.getMobidot();
+		return null;
+	}
 
 	private ProfileManagerImpl() {
 		boolean found = false;

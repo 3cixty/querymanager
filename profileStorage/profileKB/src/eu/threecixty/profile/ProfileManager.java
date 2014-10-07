@@ -195,6 +195,12 @@ public interface ProfileManager {
 	 */
 	Set<IDMapping> getIDMappings();
 	
+	/**
+	 * Gets Mobidot interface.
+	 * @return
+	 */
+	Mobidot getMobidot();
+	
 	public class StartAndEndDate {
 
 		private Date startDate;
