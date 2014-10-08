@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 rel. 2 sp2 (http://www.altova.com) by USER USER (Thales Services SAS) -->
+<xs:schema xmlns:pvc="eu.3cixty.privacy" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="eu.3cixty.privacy" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="PrivacyContract">
+		<xs:annotation>
+			<xs:documentation>Contract proposal of an application using the privacy platform.
+			This contract will be discussed with the privacy authority
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="application">
+					<xs:annotation>
+						<xs:documentation>Information about the application that propose this contract</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string" nillable="false">
+								<xs:annotation>
+									<xs:documentation>How the application is known from the user</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="description" type="xs:string" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Explanation of the services provided by the application</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="version" type="xs:string" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Application version number</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="author" type="xs:string" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Application provider : company, person...</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="domains">
+								<xs:annotation>
+									<xs:documentation>Categorization of the application services.
+
+For example : 
+- Transport if the application provides public transport itineraries
+- Food if the application deals with restaurant reservation
+- ....
+
+An application could cover several domains.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="domain" type="pvc:Domain"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:sequence/>
+				<xs:element name="contract">
+					<xs:annotation>
+						<xs:documentation>Defines the part of the user profile the application wants to access
+The decription must be done with SPARQL property paths (a sequence of property names).
+
+For non-SPARQL litterates, a textual description can be provided.
+The privacy authority will contact you later to assist you in the the SPARQL property paths redaction.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="namespaces" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>A sequence of abbreviated forms of namespace used in the propertyPaths elements</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="namespace">
+											<xs:annotation>
+												<xs:documentation>Description of the namespace :
+ - a prefix that is the abbreviated form
+ - an uri that is the expanded form
+
+Example:
+ - prefix = profile
+ - uri = http://3cixty.eurecom.fr/ontology/profile/</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="prefix" type="xs:string"/>
+													<xs:element name="uri" type="xs:string"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:choice>
+								<xs:element name="propertyPaths">
+									<xs:annotation>
+										<xs:documentation>A sequence of SPARQL property paths with a type attribute that specifies if the data is mandatory or optional to your service execution</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence maxOccurs="unbounded">
+											<xs:element name="propertyPath">
+												<xs:annotation>
+													<xs:documentation>The SPARQL path to the value that the service wants to access.
+
+Example with the profile.ttl :
+ - An application that wants to access Tray elements must specify the following path:
+     profile:trayElement 
+
+ - An application that wants to access to the accountName in a Tray :
+       
+profile:trayElement/profile:hasAccount/foaf:accountName
+
+pvc:type
+ - 2 values available : optional or mandatory
+ - the default value is the 'optional' value</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+													<xs:simpleContent>
+														<xs:extension base="xs:string">
+															<xs:attribute ref="pvc:type" use="optional" default="optional"/>
+														</xs:extension>
+													</xs:simpleContent>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="textDescription" type="xs:string" nillable="false">
+									<xs:annotation>
+										<xs:documentation>Specify as accurately as possible, your required data</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:choice>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="1.0"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:attribute name="type">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="mandatory"/>
+				<xs:enumeration value="optional"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+	<xs:simpleType name="Domain">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Food"/>
+			<xs:enumeration value="Cultural"/>
+			<xs:enumeration value="Health"/>
+			<xs:enumeration value="Transport"/>
+			<xs:enumeration value="Communication"/>
+			<xs:enumeration value="Entertainment"/>
+			<xs:enumeration value="Religion"/>
+			<xs:enumeration value="Education"/>
+			<xs:enumeration value="Financial"/>
+			<xs:enumeration value="Other"/>
+			<xs:enumeration value="Sport"/>
+			<xs:enumeration value="Tourism"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

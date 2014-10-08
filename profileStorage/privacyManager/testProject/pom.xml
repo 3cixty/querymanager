@@ -11,7 +11,7 @@
 		<dependency>
 			<groupId>eu.3cixty.privacy</groupId>
 			<artifactId>privacymanager</artifactId>
-			<version>0.3</version>
+			<version>0.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

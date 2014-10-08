@@ -1,18 +1,18 @@
 Privacy Manager
 =========
-Privacy Manager is the 3cixty infrastructure component holding the private knowledge base of user profiles and managing the access controls.
+**Final goal:**
+Privacy Manager will be the 3cixty infrastructure component holding the private knowledge base of user profiles and managing the access controls.
 
-Features:
+**Current features**
+  
+* Storage and retrieval of user profiles
+* Two programs test that show how to use the profile storage APIs
+* Application and user privacy contract definition
 
-  * User-centric privacy of profiles
-  * Fully semantical
-  * Semi-opened privacy framework for service providers
-  * Security management
-
-Version
+Last Release Version
 ----
 #### Identification
-Privacy Manager version 0.3
+Privacy Manager version 0.4
 
 #### Maven
 In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
@@ -20,11 +20,31 @@ In order to use the module in other Maven projects add the following dependency 
      <dependency>
     	<groupId>eu.3cixty.privacy</groupId>
     	<artifactId>privacymanager</artifactId>
-    	<version>0.3</version>
+    	<version>0.4</version>
      </dependency>
 
 Changes log
 ----
+
+#### version 0.4
+This new version contains the APIs definition to manage privacy in the profile storage component.  
+Two main APIs :  
+
+* **CertificationAndPrivacyAuthority**  
+This API allow an application to ask for its registration in the 3Cixty platform. 
+It must provides its privacy contract.  
+A privacy contract must follow the format defined by the **PrivacyContract.xsd** schema.
+
+* **PrivacyContractStorage**  
+This API is used to retrieve applications' privacy contracts and store and retrieve users' privacy contract (contract established the user and an application)
+
+Those APIs are documented in java files.  
+The implementation of those APIs will be provided in future versions.
+
+Note: 
+The privacy APIs definition is also available in its own jar file: privacy-api-0.0.4.jar,
+which does correspond to the delta between version 0.3 and 0.4 of privacy manager.
+
 #### version 0.3
 
 * Implements the merge/replace/delete profile with property path methods :
@@ -68,7 +88,7 @@ Installation is performed during the install Maven phase.
 
 The artifact can also be manually installed in local Maven repository:
 
-```mvn install:install-file -Dfile=libs/privacymanager-0.3.jar -DpomFile=libs/privacymanager-0.3.pom```
+```mvn install:install-file -Dfile=libs/privacymanager-0.4.jar -DpomFile=libs/privacymanager-0.4.pom```
 
 For more commands and install options see [Installing 3rd party library][2]
 
@@ -110,24 +130,31 @@ Set the property ```ProfileStorage.ontology.path``` in the configuration file to
 #### Main API interfaces
 
 The main interfaces are:
+
 * org.theresis.humanization.datastorage.ProfileManager
 * org.theresis.humanization.datastorage.ProfileManagerFactory
 * org.theresis.humanization.auth.Authenticator
 * org.theresis.humanization.auth.Service
 * org.theresis.humanization.auth.Session
 * org.theresis.humanization.auth.SessionManager
+* org.theresis.humanization.privacy.CertificationAndPrivacyAuthority
+* org.theresis.humanization.privacy.PrivacyContractStorage
+* org.theresis.humanization.privacy.UserPrivacyContract
+* org.theresis.humanization.privacy.generated.PrivacyContract
+
 
 #### Main implementation classes
-Implementation classes provided in the distribution:
+Implementation classes provided in the distribution:  
+
 * ```ProfileManagerFactory``` is implemented by ```org.theresis.humanization.profilestore.SimpleProfileManagerFactory```
-
 * ```SessionManager``` is implemented by ```org.theresis.humanization.auth.simple.SimpleSessionManager```
-
+* ```UserPrivacyContract```and ```PrivacyContract``` are implemented
+* Other APIs of ```org.theresis.humanization.privacy``` package currently have not implementation
 * Other implementations are hidden and are obtained using the factory and manager. They are specific to the general implementation of the privacy framework.
 
 #### Principles of use
 
-*The security model is yet to be defined and implemented. That's why the subject is openely discussed in this documentation*
+*The security model is yet to be implemented. That's why the subject is openely discussed in this documentation*
 
 The main operations are provided by the interface ```ProfileManager```. A ProfileManager is created using the factory ```ProfileManagerFactory```'s method ```getProfileManager(String)```. The method's argument is the path of the configuration file to be parsed.
 
@@ -206,10 +233,81 @@ The following code shows how to format a property path to get the user account I
 																userID, 
 																propertyPaths);	
 
+##### Privacy contract definition
+The privacy contract of an applictaion could be defined by code or by an XML file.  
+The following file is an example of what could be the privacy contract for the 3cixty ExploreMi360 application (that wants to access to the whishList) :
+ 
+    <pvc:PrivacyContract schemaVersion="1.0" xsi:schemaLocation="eu.3cixty.privacy PrivacyContract.xsd" xmlns:pvc="eu.3cixty.privacy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    	<pvc:application>
+    		<pvc:name>ExploreMi 360</pvc:name>
+    		<pvc:description>...</pvc:description>
+    		<pvc:version>...</pvc:version>
+    		<pvc:author>....</pvc:author>
+    		<pvc:domains>
+    			<pvc:domain>Tourism</pvc:domain>
+    			<pvc:domain>Food</pvc:domain>
+    			<pvc:domain>Entertainment</pvc:domain>
+    		</pvc:domains>
+    	</pvc:application>
+    	<pvc:contract>
+    		<pvc:namespaces>
+    			<pvc:namespace>
+    				<pvc:prefix>profile</pvc:prefix>
+    				<pvc:uri>http://3cixty.eurecom.fr/ontology/profile/</pvc:uri>
+    			</pvc:namespace>
+    		</pvc:namespaces>
+    		<pvc:propertyPaths>
+    			<pvc:propertyPath pvc:type="optional">profile:trayElement</pvc:propertyPath>
+    		</pvc:propertyPaths>
+    	</pvc:contract>
+    </pvc:PrivacyContract>
+
+Here is an other example for an application that would access to the whish list, but that would get only restaurant items.  
+
+    <pvc:PrivacyContract schemaVersion="1.0" xsi:schemaLocation="eu.3cixty.privacy PrivacyContract.xsd" xmlns:pvc="eu.3cixty.privacy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    	<pvc:application>
+    		<pvc:name>ExploreMi 360</pvc:name>
+    		<pvc:description>...</pvc:description>
+    		<pvc:version>...</pvc:version>
+    		<pvc:author>....</pvc:author>
+    		<pvc:domains>
+    			<pvc:domain>Tourism</pvc:domain>
+    			<pvc:domain>Food</pvc:domain>
+    			<pvc:domain>Entertainment</pvc:domain>
+    		</pvc:domains>
+    	</pvc:application>
+    	<pvc:contract>
+    		<pvc:namespaces>
+    			<pvc:namespace>
+    				<pvc:prefix>profile</pvc:prefix>
+    				<pvc:uri>http://3cixty.eurecom.fr/ontology/profile/</pvc:uri>
+    			</pvc:namespace>
+    		</pvc:namespaces>
+    		<pvc:propertyPaths>
+    			<pvc:propertyPath pvc:type="optional">profile:trayElement[ profile:itemType "Restaurant"]</pvc:propertyPath>
+    		</pvc:propertyPaths>
+    	</pvc:contract>
+    </pvc:PrivacyContract>
+
+##### How to generate a CSR with OpenSSL
+
+* Generate your private key:  
+ 	`   openssl genrsa –out myapp.key 1024`  
+=> ```myapp.key``` is your private key. Keep it secret.
+
+
+* Generate the certificate request   
+	`	openssl req -new -key myapp.key > myapp.csr`  
+Fill the required fields and be carefull with the common name that must be the URL of your server.  
+Please fill the email address in order to get back the certificate.  
+=> ```myapp.csr``` is your CSR. Send it to the certifictaion authority.
+
+
 **Advice**  
 Property path use the SPARQL1.1 Property Path format with some restrictions :
  
 - do not specify variables at the beginning and end of the property path (?x)
+- Do not use the ```^:propertyName``` form
 - Only use namespaces defined in the ontology (for default prefix use ```:propertyName``` ) 
 
 License
