@@ -30,6 +30,8 @@ public class CallLoggingConstants {
 	
 	public static final String KEY_VALIDATE_SERVICE = "Key validate service";
 	
+	public static final String MOBIDOT_EXIST_USER_SERVICE = "Mobidot exist account service";
+	
 	public static final String KEY_VALIDATE_DESC_SUCCESSFUL = "Successful";
 	public static final String KEY_VALIDATE_DESC_FAILED = "Failed";
 	
@@ -38,6 +40,8 @@ public class CallLoggingConstants {
 	public static final String FAILED = "Failed";
 	
 	public static final String INVALID_APP_KEY = "Invalid app key: ";
+	
+	public static final String INVALID_ACCESS_TOKEN = "Invalid access token: ";
 	
 	public static final String INVALID_PARAMS = "Invalid params: ";
 	

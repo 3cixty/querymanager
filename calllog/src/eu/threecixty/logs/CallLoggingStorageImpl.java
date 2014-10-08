@@ -11,8 +11,6 @@ import java.util.List;
 
 import eu.threecixty.db.DBConnection;
 import eu.threecixty.db.ThreeCixyDBException;
-import eu.threecixty.keys.AppKey;
-import eu.threecixty.keys.KeyManager;
 
 /**
  * This class persists statistics information in MySQL database.
@@ -37,7 +35,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 				conn.setAutoCommit(false);
 				String sql = "INSERT INTO " + TABLE_NAME + " (appkey, starttime, timeConsumed, serviceName, description) VALUES (?, ?, ?, ?, ?)";
 				preparedStmt = conn.prepareStatement(sql);
-				preparedStmt.setString(1, logging.getAppKey() == null ? null : logging.getAppKey().getValue());
+				preparedStmt.setString(1, logging.getKey() == null ? null : logging.getKey());
 				preparedStmt.setTimestamp(2, new Timestamp(logging.getStartTime()));
 				preparedStmt.setInt(3, logging.getTimeConsumed());
 				preparedStmt.setString(4, logging.getServiceName());
@@ -88,10 +86,10 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 				preparedStmt.setInt(4, minTimeConsumed);
 				preparedStmt.setInt(5, maxTimeConsumed);
 			    ResultSet rs = preparedStmt.executeQuery();
-			    AppKey tmpAppKey = KeyManager.getInstance().getAppKeyFromKey(appkey);
+			    //AppKey tmpAppKey = KeyManager.getInstance().getAppKeyFromKey(appkey);
 			    while (rs.next()) {
 			    	CallLogging logging = new CallLogging();
-			    	logging.setAppKey(tmpAppKey);
+			    	logging.setKey(appkey);
 			    	Timestamp timestamp = rs.getTimestamp("starttime");
 			    	logging.setStartTime(timestamp.getTime());
 			    	String serviceName = rs.getString("serviceName");
@@ -143,8 +141,8 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 			    while (rs.next()) {
 			    	CallLoggingDisplay loggingDisplay = new CallLoggingDisplay();
 			    	CallLogging logging = new CallLogging();
-			    	AppKey tmpAppKey = KeyManager.getInstance().getAppKeyFromKey(rs.getString("appkey"));
-			    	logging.setAppKey(tmpAppKey);
+			    	//AppKey tmpAppKey = KeyManager.getInstance().getAppKeyFromKey(rs.getString("appkey"));
+			    	logging.setKey(rs.getString("appkey"));
 			    	loggingDisplay.setCallLogging(logging);
 			    	loggingDisplay.setNumberOfCalls(rs.getInt("numberOfCalls"));
 			    	loggings.add(loggingDisplay);

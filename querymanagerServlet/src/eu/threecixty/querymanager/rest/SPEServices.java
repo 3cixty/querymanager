@@ -6,10 +6,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -17,10 +17,10 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
-import eu.threecixty.keys.KeyManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
-import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.oauth.AccessToken;
+import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
 
@@ -31,16 +31,13 @@ import eu.threecixty.profile.ProfileInformationStorage;
  */
 @Path("/" + Constants.PREFIX_NAME)
 public class SPEServices {
-
-	private static final String ACCESS_TOKEN_PARAM = "accessToken";
 	
 	@Context 
 	private HttpServletRequest httpRequest;
 	
 	/**
-	 * Gets profile information in JSON format from a given Google access token and an App key.
-	 * @param accessToken
-	 * @param key
+	 * Gets profile information in JSON format from a given 3cixt access token.
+	 * @param access_token
 	 * @return a string in JSON format which represents the class ProfileInformation. Please check
 	 *         the document at https://docs.google.com/document/d/1RPlZJaCWbb6G9Ilf-nTMavU_AAkzIj8fKSDwSNvpXtg/edit
 	 *         for more information.
@@ -48,26 +45,16 @@ public class SPEServices {
 	@GET
 	@Path("/getProfile")
 	@Produces("application/json")
-	public String getProfile(@QueryParam("accessToken") String accessToken, @QueryParam("key") String key) {
+	public String getProfile(@HeaderParam("access_token") String access_token) {
 		try {
+			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			long starttime = System.currentTimeMillis();
-			if (KeyManager.getInstance().checkAppKey(key)) {
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 				String uid = null;
 				HttpSession session = httpRequest.getSession();
-				if (session.getAttribute(ACCESS_TOKEN_PARAM) != null) {
-					uid = (String) session.getAttribute("uid");
-				} else {
-					uid = GoogleAccountUtils.getUID(accessToken);
-					session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
-				}
-				if (uid == null || uid.equals("")) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.UNAUTHORIZED);
-					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity("The access token is invalid: '" + accessToken + "'")
-					        .type(MediaType.TEXT_PLAIN)
-					        .build());
-				}
+				uid = userAccessToken.getUid();
 				session.setAttribute("uid", uid);
+				String key = userAccessToken.getAppkey();
 				ProfileInformation profile = ProfileInformationStorage.loadProfile(uid);
 				if (profile == null) {
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.FAILED);
@@ -81,9 +68,9 @@ public class SPEServices {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				return ret;
 			} else {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("The key is invalid '" + key + "'")
+				        .entity("The access token is invalid '" + access_token + "'")
 				        .type(MediaType.TEXT_PLAIN)
 				        .build());
 			}
@@ -95,10 +82,10 @@ public class SPEServices {
 			        .build());
 		}
 	}
-
+	
 	/**
 	 * Saves profile information to the KB.
-	 * @param accessToken
+	 * @param access_token
 	 * @param profileStr
 	 * @param key
 	 * @return If successful, the message <code>{"save": "true"}</code> will be returned. Otherwise,
@@ -107,25 +94,14 @@ public class SPEServices {
 	@POST
 	@Path("/saveProfile")
 	@Produces("application/json")
-	public String saveProfile(@FormParam("accessToken") String accessToken, @FormParam("profile") String profileStr, @FormParam("key") String key) {
+	public String saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
 		long starttime = System.currentTimeMillis();
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = null;
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			HttpSession session = httpRequest.getSession();
-			if (session.getAttribute(ACCESS_TOKEN_PARAM) != null) {
-				uid = (String) session.getAttribute("uid");
-			} else {
-				uid = GoogleAccountUtils.getUID(accessToken);
-				session.setMaxInactiveInterval(GoogleAccountUtils.getValidationTime(accessToken));
-			}
-			if (uid == null || uid.equals("")) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.UNAUTHORIZED);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("The access token is invalid: '" + accessToken + "'")
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
-			}
+			String uid = userAccessToken.getUid();
 			session.setAttribute("uid", uid);
+			String key = userAccessToken.getAppkey();
 			if (profileStr == null || profileStr.equals("")) {
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("Invalid profile in JSON format: '" + profileStr + "'")
@@ -154,9 +130,9 @@ public class SPEServices {
 				        .build());
 			}
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
+			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}
@@ -164,61 +140,26 @@ public class SPEServices {
 	
 	/**
 	 * Gets Google UID from a Google access token and an App key.
-	 * @param accessToken
+	 * @param access_token
 	 * @param key
 	 * @return If a given access token is valid, a message <code>{"uid": "103918130978226832690"}</code> for example will be returned. Otherwise,
 	 *         the message <code>{"uid": ""}</code> will be returned.
 	 */
-	@POST
+	@GET
 	@Path("/getUID")
 	@Produces("application/json")
-	public String getUID(@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
+	public String getUID(@HeaderParam("access_token") String access_token) {
 		long starttime = System.currentTimeMillis();
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = GoogleAccountUtils.getUID(accessToken);
-			if (uid == null) uid = "";
-			if (uid.equals("")) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.FAILED);
-			} else {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			}
-			return "{\"uid\":\"" + uid + "\"}";
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.SUCCESSFUL);
+			return "{\"uid\":\"" + userAccessToken.getUid() + "\"}";
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
+			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}
-	}
-	
-	/**
-	 * Checks whether or not a Google access token is valid.
-	 * @param accessToken
-	 * @param key
-	 * @return If a given access token is valid, a message <code>{"validation": "true"}</code> for example will be returned. Otherwise,
-	 *         the message <code>{"validation": "false"}</code> will be returned.
-	 */
-	@POST
-	@Path("/validateAccessToken")
-	@Produces("application/json")
-	public String validate(@FormParam("accessToken") String accessToken, @FormParam("key") String key) {
-		long starttime = System.currentTimeMillis();
-		if (KeyManager.getInstance().checkAppKey(key)) {
-			String uid = GoogleAccountUtils.getUID(accessToken);
-			boolean valid = (uid == null || uid.equals("")) ? false : true;
-			if (valid) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_VALIDATE_AT_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			} else {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_VALIDATE_AT_SERVICE, CallLoggingConstants.FAILED);
-			}
-			return "{\"validation\":\"" + valid + "\"}";
-		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_VALIDATE_AT_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
-		}
-	}
+	}	
 }

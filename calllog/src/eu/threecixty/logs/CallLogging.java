@@ -1,6 +1,5 @@
 package eu.threecixty.logs;
 
-import eu.threecixty.keys.AppKey;
 
 /**
  * This class is to represent information about 3cixty App statistics.
@@ -9,7 +8,7 @@ import eu.threecixty.keys.AppKey;
  */
 public class CallLogging {
 
-	private AppKey appKey;
+	private String key;
 
 	private long startTime;
 	
@@ -23,14 +22,18 @@ public class CallLogging {
 	protected CallLogging() {
 		startTime = System.currentTimeMillis();
 	}
-	
-	public AppKey getAppKey() {
-		return appKey;
+
+	public String getKey() {
+		return key;
 	}
 
-	public void setAppKey(AppKey appKey) {
-		this.appKey = appKey;
+
+
+	public void setKey(String key) {
+		this.key = key;
 	}
+
+
 
 	public long getStartTime() {
 		return startTime;

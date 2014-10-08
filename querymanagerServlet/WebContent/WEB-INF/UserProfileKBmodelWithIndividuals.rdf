@@ -31,9 +31,9 @@
         <author>Johan Koolwaaij (Mobidot)</author>
         <author>Animesh Pathak (Inria)</author>
         <owl:versionInfo>1.0.0</owl:versionInfo>
-        <owl:imports rdf:resource="http://3cixty.com:8080/qm/v1/linkedevents"/>
-        <owl:imports rdf:resource="http://3cixty.com:8080/qm/v1/vcard"/>
-        <owl:imports rdf:resource="http://3cixty.com:8080/qm/v1/foaf"/>
+        <owl:imports rdf:resource="http://localhost:8080/v2/linkedevents"/>
+        <owl:imports rdf:resource="http://localhost:8080/v2/vcard"/>
+        <owl:imports rdf:resource="http://localhost:8080/v2/foaf"/>
     </owl:Ontology>
     
 

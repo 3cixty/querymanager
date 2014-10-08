@@ -131,7 +131,7 @@ public class TrayServices implements TrayServicesIntf {
     	long starttime = System.currentTimeMillis();
     	
 		checkAppKey(key);
-		
+
 		String uid = GoogleAccountUtils.getUID(token);
 
 		Tray tray = TrayStorage.getTray((uid == null || uid.equals("")) ? token : uid, element_id);

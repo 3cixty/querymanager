@@ -49,6 +49,12 @@
     </dependency>
 
     <dependency>
+      <groupId>eu.3cixty</groupId>
+      <artifactId>oauth-wrapper</artifactId>
+	  <version>1.0</version>
+    </dependency>
+
+    <dependency>
 	  <groupId>com.google.code.gson</groupId>
 	  <artifactId>gson</artifactId>
 	  <version>1.7.1</version>
@@ -113,7 +119,7 @@
   </dependencies>
   
   <build>
-    <finalName>qm</finalName>
+    <finalName>v2</finalName>
     <sourceDirectory>src</sourceDirectory>
 
 	

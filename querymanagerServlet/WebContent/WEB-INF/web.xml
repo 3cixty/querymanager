@@ -24,6 +24,7 @@
 		<param-value>/</param-value>
 	</context-param>
  
+ 
 	<listener>
 		<listener-class>
 			org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
@@ -39,7 +40,11 @@
  
 	<servlet-mapping>
 		<servlet-name>resteasy-servlet</servlet-name>
-		<url-pattern>/v1/*</url-pattern>
+		<url-pattern>/**</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>resteasy-servlet</servlet-name>
+		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
     <servlet>
@@ -48,7 +53,7 @@
     </servlet>
     <servlet-mapping>
 	  <servlet-name>json-nospring</servlet-name>
-	  <url-pattern>/v1/json-nospring/*</url-pattern>
+	  <url-pattern>/json-nospring/*</url-pattern>
     </servlet-mapping>
 
 	<!--
