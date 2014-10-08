@@ -1,0 +1,2 @@
+- Fill in the appkeyupdate.properties file with your information
+- Update app key's info by using the Maven `mvn exec:java` command

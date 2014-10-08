@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>eu.3cixty</groupId>
+  <artifactId>oauth-wrapper</artifactId>
+  <name>OAuth Wrapper</name>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  
+ <repositories>
+    <repository>
+      <id>JBoss repository</id>
+      <url>https://repository.jboss.org/nexus/content/repositories/root_repository/maven2/</url>
+    </repository>
+  </repositories>
+  
+  <dependencies>
+    
+    <dependency>
+      <groupId>eu.3cixty</groupId>
+      <artifactId>oauth-utils</artifactId>
+      <version>1.0</version>
+    </dependency>
+    
+    <dependency>
+	  <groupId>commons-codec</groupId>
+	  <artifactId>commons-codec</artifactId>
+	  <version>1.9</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>commons-io</groupId>
+	  <artifactId>commons-io</artifactId>
+	  <version>2.4</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>org.json</groupId>
+	  <artifactId>json</artifactId>
+	  <version>20140107</version>
+    </dependency>
+
+
+    <dependency>
+	  <groupId>eu.3cixty</groupId>
+	  <artifactId>dbconnection</artifactId>
+	  <version>1.0</version>
+    </dependency>
+
+	<!-- Hibernate core -->
+	<dependency>
+		<groupId>hibernate</groupId>
+		<artifactId>hibernate3</artifactId>
+		<version>3.2.3.GA</version>
+	</dependency>
+ 
+	<!-- Hibernate annotation -->
+	<dependency>
+		<groupId>hibernate-annotations</groupId>
+		<artifactId>hibernate-annotations</artifactId>
+		<version>3.3.0.GA</version>
+	</dependency>
+ 
+	<dependency>
+		<groupId>hibernate-commons-annotations</groupId>
+		<artifactId>hibernate-commons-annotations</artifactId>
+		<version>3.0.0.GA</version>
+	</dependency>
+
+
+    <dependency>
+	  <groupId>javax.persistence</groupId>
+	  <artifactId>persistence-api</artifactId>
+	  <version>1.0.2</version>
+    </dependency>
+
+	<dependency>
+		<groupId>javax.transaction</groupId>
+		<artifactId>jta</artifactId>
+		<version>1.1</version>
+	</dependency>
+
+    <dependency>
+	  <groupId>dom4j</groupId>
+  	  <artifactId>dom4j</artifactId>
+	  <version>1.6.1</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>commons-collections</groupId>
+	  <artifactId>commons-collections</artifactId>
+	  <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>cglib</groupId>
+	  <artifactId>cglib</artifactId>
+	  <version>2.2.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>1.18.1</version>
+    </dependency>
+
+<dependency>
+	<groupId>antlr</groupId>
+	<artifactId>antlr</artifactId>
+	<version>2.7.6</version>
+</dependency>
+
+
+
+    <dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.11</version>
+	  <scope>test</scope>
+    </dependency>
+            
+</dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+	<resources>
+		<resource>
+			<directory>resources</directory>
+		</resource>
+	</resources>
+    <testResources>
+      <testResource>
+        <directory>test-resources</directory>
+      </testResource>
+    </testResources>
+	
+	
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+	
+  </build>
+</project>

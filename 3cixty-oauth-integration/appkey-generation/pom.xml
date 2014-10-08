@@ -4,49 +4,27 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>appkey</artifactId>
-  <name>App Key</name>
+  <artifactId>appkey-generation</artifactId>
+  <name>App key generation</name>
   <packaging>jar</packaging>
   <version>1.0</version>
   
   <dependencies>
-    
     <dependency>
-	  <groupId>commons-codec</groupId>
-	  <artifactId>commons-codec</artifactId>
-	  <version>1.9</version>
+	  <groupId>org.json</groupId>
+	  <artifactId>json</artifactId>
+	  <version>20140107</version>
     </dependency>
-
-    <dependency>
-	  <groupId>mysql</groupId>
-	  <artifactId>mysql-connector-java</artifactId>
-	  <version>5.1.31</version>
-    </dependency>
-
-            
-    <dependency>
-	  <groupId>junit</groupId>
-	  <artifactId>junit</artifactId>
-	  <version>4.11</version>
-	  <scope>test</scope>
-    </dependency>
-            
-</dependencies>
+  </dependencies>
+ 
   
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
 	<resources>
 		<resource>
 			<directory>resources</directory>
 		</resource>
 	</resources>
-    <testResources>
-      <testResource>
-        <directory>test-resources</directory>
-      </testResource>
-    </testResources>
-	
 	
     <plugins>
       <plugin>
@@ -56,6 +34,23 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.3.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>eu.threecixty.appkey.Main</mainClass>
+          <executable>maven</executable>
         </configuration>
       </plugin>
     </plugins>

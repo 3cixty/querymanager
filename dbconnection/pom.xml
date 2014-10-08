@@ -4,49 +4,24 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>appkey</artifactId>
-  <name>App Key</name>
+  <artifactId>dbconnection</artifactId>
+  <name>DB Connection</name>
   <packaging>jar</packaging>
   <version>1.0</version>
   
   <dependencies>
     
-    <dependency>
-	  <groupId>commons-codec</groupId>
-	  <artifactId>commons-codec</artifactId>
-	  <version>1.9</version>
-    </dependency>
 
     <dependency>
 	  <groupId>mysql</groupId>
 	  <artifactId>mysql-connector-java</artifactId>
 	  <version>5.1.31</version>
     </dependency>
-
-            
-    <dependency>
-	  <groupId>junit</groupId>
-	  <artifactId>junit</artifactId>
-	  <version>4.11</version>
-	  <scope>test</scope>
-    </dependency>
             
 </dependencies>
   
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
-	<resources>
-		<resource>
-			<directory>resources</directory>
-		</resource>
-	</resources>
-    <testResources>
-      <testResource>
-        <directory>test-resources</directory>
-      </testResource>
-    </testResources>
-	
 	
     <plugins>
       <plugin>

@@ -1,0 +1,80 @@
+package eu.threecixty.oauth.model;
+
+import static javax.persistence.GenerationType.IDENTITY;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+@Entity
+@Table(name = "3cixty_scope", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "scope_name")})
+public class Scope implements java.io.Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5527982130550713799L;
+	
+	private Integer id;
+	private String scopeName;
+	private String description;
+	
+	private Set<App> apps = new HashSet <App>();
+	private Set<UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
+
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
+	@Column(name = "id", unique = true, nullable = false)
+	public Integer getId() {
+		return this.id;
+	}
+ 
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	@Column(name = "scope_name", unique = true, nullable = false, length = 255)
+	public String getScopeName() {
+		return scopeName;
+	}
+
+	public void setScopeName(String scopeName) {
+		this.scopeName = scopeName;
+	}
+
+	@Column(name = "description", unique = false, nullable = true, length = 4000)
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "scopes")
+	public Set<App> getApps() {
+		return apps;
+	}
+
+	public void setApps(Set<App> apps) {
+		this.apps = apps;
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "scopes")
+	public Set<UserAccessToken> getUserAccessTokens() {
+		return userAccessTokens;
+	}
+
+	public void setUserAccessTokens(Set<UserAccessToken> userAccessTokens) {
+		this.userAccessTokens = userAccessTokens;
+	}
+}
