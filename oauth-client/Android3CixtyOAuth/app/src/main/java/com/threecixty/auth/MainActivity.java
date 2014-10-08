@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
 	private String appName;
 	
 	private String accessToken;
+    private String accountName;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,11 +81,15 @@ public class MainActivity extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 	    if (resultCode == RESULT_OK && requestCode == PICK_ACCOUNT_REQUEST) {
 	    	if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME)) {
-	            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+	            accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
 	            OAuthManager.getInstance().auth3CixtyServer(this, appkey, appName, new CallbackImpl(), accountName);
 	    	}
-	      } else if (resultCode == RESULT_OK && requestCode == THREE_CIXTY_PERMISSION_REQUEST) {
-	      }
+	    } else if (resultCode == RESULT_OK && requestCode == THREE_CIXTY_PERMISSION_REQUEST) {
+	    } else if (resultCode == RESULT_OK && requestCode == GOOGLE_PERMISSION_REQUEST) {
+            if (accountName != null) {
+                OAuthManager.getInstance().auth3CixtyServer(this, appkey, appName, new CallbackImpl(), accountName);
+            }
+        }
 
 	}
 

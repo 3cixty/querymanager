@@ -21,6 +21,7 @@ public class GoogleAuthTask extends AsyncTask<Void, Void, Void> {
 	private OAuthCallback callback;
 	private String appkey;
 	private String appName;
+    private boolean shown = true;
 	
 	protected GoogleAuthTask(Activity context, String accountName, String appkey, String appName, OAuthCallback callback) {
 		this.context = context;
@@ -38,6 +39,7 @@ public class GoogleAuthTask extends AsyncTask<Void, Void, Void> {
 				token = GoogleAuthUtil.getToken(context, accountName, "oauth2:" + Scopes.PLUS_ME);
 			} catch (UserRecoverableAuthException e) {
 				//e.printStackTrace();
+                shown = false;
 				context.startActivityForResult(e.getIntent(), MainActivity.GOOGLE_PERMISSION_REQUEST);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -60,7 +62,9 @@ public class GoogleAuthTask extends AsyncTask<Void, Void, Void> {
 			Intent intent = new Intent(context, ScopesActivity.class);
 			context.startActivityForResult(intent, MainActivity.THREE_CIXTY_PERMISSION_REQUEST);
 		} else {
-			Toast.makeText(context, "Cannot authenticate Google account", Toast.LENGTH_SHORT).show();
+            if (shown) {
+                Toast.makeText(context, "Cannot authenticate Google account", Toast.LENGTH_SHORT).show();
+            }
 		}
 	}
 }
