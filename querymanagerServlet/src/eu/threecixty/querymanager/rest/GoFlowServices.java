@@ -27,7 +27,7 @@ public class GoFlowServices {
 	 * @return
 	 */
 	@GET
-	@Path("/getGoFlowAccount")
+	@Path("/createOrRetrieveGoFlowAccount")
 	public Response getAccount(@HeaderParam("access_token") String access_token) {
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
