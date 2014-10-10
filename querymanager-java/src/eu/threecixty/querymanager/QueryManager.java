@@ -34,7 +34,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 
  public class QueryManager implements IQueryManager {
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
-	 private static final String EVENTMEDIA_URL_PREFIX = "http://3cixty.eurecom.fr/sparql?default-graph-uri=&query=";
+	 //private static final String EVENTMEDIA_URL_PREFIX = "http://3cixty.eurecom.fr/sparql?default-graph-uri=&query=";
+	 private static final String EVENTMEDIA_URL_PREFIX = "http://dev.3cixty.com/sparql?default-graph-uri=&query=";
 
 	 /**Original query*/
 	 private ThreeCixtyQuery originalQuery;
