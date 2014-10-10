@@ -15,6 +15,8 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
  *
  */
 public class ProfileManagerImpl implements ProfileManager {
+	
+	public static final String SPARQL_ENDPOINT_URL = "http://dev.3cixty.com/sparql?default-graph-uri=&query=";
 
 	private static final Object _sync = new Object();
 	
