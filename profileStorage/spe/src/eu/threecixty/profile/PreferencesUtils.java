@@ -65,22 +65,22 @@ public class PreferencesUtils {
 	public static float getMinimumScoreRated(String uid) {
 		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_SCORE_RATED;
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX schema: <http://schema.org/>");
-		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>");
-		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>");
+		buffer.append("PREFIX schema: <http://schema.org/>\n");
+		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
+		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
 
-		buffer.append("select distinct ?x ?name ?creatorName ?creatorURI ?ratingValue");
-		buffer.append("where {");
-		buffer.append("?x a <http://ontologydesignpatterns.org/ont/dul/DUL.owl#Place> .");
-		buffer.append("?x schema:review ?review .");
-		buffer.append("?x schema:name ?name .");
-		buffer.append("?review schema:creator ?creator .");
-		buffer.append("?creator schema:name ?creatorName .");
-		buffer.append("?creator schema:url ?creatorURI.");
-		buffer.append("?review schema:reviewRating ?rating .");
-		buffer.append("?rating schema:ratingValue ?ratingValue.");
-		buffer.append("?x dcterms:source <http://www.google.com> .");
-		buffer.append("FILTER (fn:ends-with(STR(?creatorURI),\"" + uid + "\")) .");
+		buffer.append("select  ?ratingValue\n");
+		buffer.append("where {\n");
+		buffer.append("?x a <http://ontologydesignpatterns.org/ont/dul/DUL.owl#Place> .\n");
+		buffer.append("?x schema:review ?review .\n");
+		buffer.append("?x schema:name ?name .\n");
+		buffer.append("?review schema:creator ?creator .\n");
+		buffer.append("?creator schema:name ?creatorName .\n");
+		buffer.append("?creator schema:url ?creatorURI.\n");
+		buffer.append("?review schema:reviewRating ?rating .\n");
+		buffer.append("?rating schema:ratingValue ?ratingValue.\n");
+		buffer.append("?x dcterms:source <http://www.google.com> .\n");
+		buffer.append("FILTER (fn:ends-with(STR(?creatorURI),\"" + uid + "\")) .\n");
 		buffer.append("} \n ORDER BY ?ratingValue \n LIMIT 1");
 		
 		float ret = Float.MAX_VALUE;
@@ -112,7 +112,7 @@ public class PreferencesUtils {
 		try {
 			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
 			if (jsonArr.length() == 0) return DEFAULT_MINIMUM_SCORE_RATED;
-			ret = Float.parseFloat(jsonArr.getJSONObject(0).getJSONObject("ratingValue").getString("value"));
+			ret = Float.parseFloat((jsonArr.getJSONObject(0)).getJSONObject("ratingValue").getString("value"));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
