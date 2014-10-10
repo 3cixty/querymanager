@@ -26,6 +26,7 @@ import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.IProfiler;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.oldmodels.Event;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Place;
@@ -35,7 +36,7 @@ import eu.threecixty.profile.oldmodels.Rating;
  public class QueryManager implements IQueryManager {
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://3cixty.eurecom.fr/sparql?default-graph-uri=&query=";
-	 private static final String EVENTMEDIA_URL_PREFIX = "http://dev.3cixty.com/sparql?default-graph-uri=&query=";
+	 private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 
 	 /**Original query*/
 	 private ThreeCixtyQuery originalQuery;
@@ -142,7 +143,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	private boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
 			boolean augmentedQueryIncluded, StringBuilder sb) throws IOException {
 		sb.setLength(0);
-		String urlStr = EVENTMEDIA_URL_PREFIX + URLEncoder.encode(query, "UTF-8");
+		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
 		urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
 		URL url = new URL(urlStr);
