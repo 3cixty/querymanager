@@ -13,5 +13,5 @@ public interface Partner {
 	PartnerUser getUser(String uid);
 	List <PartnerUser> getUsers();
 	
-	PartnerAccount findAccount(PartnerUser user, String appid);
+	PartnerAccount findAccount(PartnerUser user, String appid, String role);
 }

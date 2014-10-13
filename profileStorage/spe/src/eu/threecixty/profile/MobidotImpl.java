@@ -64,8 +64,8 @@ public class MobidotImpl implements Partner {
 	}
 
 	@Override
-	public PartnerAccount findAccount(PartnerUser user, String appkey) {
-		return partnerIntf.findAccount(user, appkey);
+	public PartnerAccount findAccount(PartnerUser user, String appkey, String role) {
+		return partnerIntf.findAccount(user, appkey, role);
 	}
 
 	private MobidotImpl() {

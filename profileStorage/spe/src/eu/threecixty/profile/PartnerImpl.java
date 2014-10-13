@@ -81,10 +81,10 @@ public class PartnerImpl implements Partner {
 	}
 
 	@Override
-	public PartnerAccount findAccount(PartnerUser user, String appid) {
-		if (user == null || appid == null) return null;
+	public PartnerAccount findAccount(PartnerUser user, String appid, String role) {
+		if (user == null || appid == null || role == null) return null;
 		for (PartnerAccount account: user.getAccounts()) {
-			if (appid.equals(account.getAppId())) return account;
+			if (appid.equals(account.getAppId()) && role.equals(account.getRole())) return account;
 		}
 		return null;
 	}
