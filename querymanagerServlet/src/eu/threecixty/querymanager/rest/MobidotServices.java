@@ -18,12 +18,14 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.profile.MobidotUser;
-import eu.threecixty.profile.MobidotUser.MobidotAccount;
+import eu.threecixty.profile.PartnerUser;
+import eu.threecixty.profile.PartnerUser.PartnerAccount;
 import eu.threecixty.profile.ProfileManagerImpl;
 
 @Path("/" + Constants.VERSION_2)
 public class MobidotServices {
+	
+	private static final String ROLE = "EndUser";
 
 	@GET
 	@Path("/existMobidotAccount")
@@ -42,7 +44,7 @@ public class MobidotServices {
 						"{ \"response\": false}").type(MediaType.APPLICATION_JSON_TYPE).build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.MOBIDOT_EXIST_USER_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
@@ -56,8 +58,10 @@ public class MobidotServices {
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			MobidotUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(userAccessToken.getUid());
-			MobidotAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, userAccessToken.getAppkey());
+			String appid = OAuthWrappers.retrieveApp(userAccessToken.getAppkey()).getAppNameSpace();
+			PartnerUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(userAccessToken.getUid());
+			PartnerAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, appid, ROLE);
+			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.MOBIDOT_GET_USER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 			if (account != null) {
 				JSONObject jsonObj = new JSONObject();
 				jsonObj.put("username", account.getUsername());
@@ -67,7 +71,7 @@ public class MobidotServices {
 				return Response.ok("{}", MediaType.APPLICATION_JSON_TYPE).build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.MOBIDOT_GET_USER_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The access token is invalid '" + access_token + "'")
 			        .type(MediaType.TEXT_PLAIN)
@@ -84,18 +88,20 @@ public class MobidotServices {
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)
 				&& isNotNullOrEmpty(username) && isNotNullOrEmpty(password)) {
-			MobidotUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(userAccessToken.getUid());
-			MobidotAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, userAccessToken.getAppkey());
+			String appid = OAuthWrappers.retrieveApp(userAccessToken.getAppkey()).getAppNameSpace();
+			PartnerUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(userAccessToken.getUid());
+			PartnerAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, appid, ROLE);
+			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.MOBIDOT_ADD_USER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 			if (account != null) { // there exists an account for this given access token
 			    return Response.status(Response.Status.OK).entity(
 					"{ \"response\": false, \"reason\": \"This user already had an account\"}").type(MediaType.APPLICATION_JSON_TYPE).build();
 			} else {
 				if (mobidotUser == null) {
-					mobidotUser = new MobidotUser();
+					mobidotUser = new PartnerUser(userAccessToken.getUid());
 				}
-				if (mobidotUser.getMobidotAccounts() == null) mobidotUser.setMobidotAccounts(new ArrayList <MobidotAccount>());
-				account = new MobidotAccount(username, password, userAccessToken.getAppkey());
-				mobidotUser.getMobidotAccounts().add(account);
+				if (mobidotUser.getAccounts() == null) mobidotUser.setPartnerAccounts(new ArrayList <PartnerAccount>());
+				account = new PartnerAccount(username, password, appid, ROLE);
+				mobidotUser.getAccounts().add(account);
 				if (ProfileManagerImpl.getInstance().getMobidot().updateUser(mobidotUser)) {
 				    return Response.ok("{ \"response\": true }", MediaType.APPLICATION_JSON_TYPE).build();
 				} else {
@@ -103,7 +109,7 @@ public class MobidotServices {
 				}
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.MOBIDOT_ADD_USER_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The access token is invalid '" + access_token + "' or username and password are empty")
 			        .type(MediaType.TEXT_PLAIN)

@@ -31,6 +31,8 @@ public class CallLoggingConstants {
 	public static final String KEY_VALIDATE_SERVICE = "Key validate service";
 	
 	public static final String MOBIDOT_EXIST_USER_SERVICE = "Mobidot exist account service";
+	public static final String MOBIDOT_GET_USER_SERVICE = "Mobidot get account service";
+	public static final String MOBIDOT_ADD_USER_SERVICE = "Mobidot add account service";
 	
 	public static final String KEY_VALIDATE_DESC_SUCCESSFUL = "Successful";
 	public static final String KEY_VALIDATE_DESC_FAILED = "Failed";
@@ -46,6 +48,8 @@ public class CallLoggingConstants {
 	public static final String INVALID_PARAMS = "Invalid params: ";
 	
 	public static final String UNSUPPORTED_FORMAT = "Unsupported format";
+	
+	public static final String GOFLOW_SERVICE = "GoFlow services";
 	
 	
 	private CallLoggingConstants() {

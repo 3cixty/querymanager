@@ -32,7 +32,7 @@ public class GoFlowServer {
 
 	
 	public static void setPath(String path) {
-		GoFlowServer.pathToConfig = GoFlowServer.pathToConfig;
+		GoFlowServer.pathToConfig = path;
 		
 		Properties prop = new Properties();
 		InputStream input = null;
