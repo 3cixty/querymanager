@@ -29,8 +29,8 @@ public class OAuthManager {
 		return singleton;
 	}
 	
-	protected boolean existsToken(Context context) {
-		TokenInfo tokenInfo = loadTokenInfo(context);
+	protected boolean existsToken(Context context, String appid) {
+		TokenInfo tokenInfo = loadTokenInfo(context, appid);
 		return tokenInfo != null;
 	}
 
@@ -41,17 +41,18 @@ public class OAuthManager {
 		return true;
 	}
 	
-	protected TokenInfo getToken(Context context) {
-		return loadTokenInfo(context);
+	protected TokenInfo getToken(Context context, String appid) {
+		return loadTokenInfo(context, appid);
 	}
 
-	protected synchronized boolean saveTokenInfo(Context context, TokenInfo tokenInfo) {
+	protected synchronized boolean saveTokenInfo(Context context, TokenInfo tokenInfo, String appid) {
 		// delete file if there exists
-		if (exists(context.fileList())) {
-			if (!context.deleteFile(OAUTH_FILE_NAME)) return false;
+        String filename = getFileName(appid);
+		if (exists(context.fileList(), appid)) {
+			if (!context.deleteFile(filename)) return false;
 		}
 		try {
-			OutputStream output = context.openFileOutput(OAUTH_FILE_NAME, Context.MODE_PRIVATE);
+			OutputStream output = context.openFileOutput(filename, Context.MODE_PRIVATE);
 			output.write(tokenInfo.toJson().getBytes());
 			output.close();
 			return true;
@@ -65,7 +66,7 @@ public class OAuthManager {
 		return false;
 	}
 
-	protected void auth3CixtyServer(Activity context, String appkey, String appName,
+	protected void auth3CixtyServer(Activity context, String appkey, String appId, String appName,
 			OAuthCallback callback, String accountName) {
 		if (callback == null) {
 			throw new RuntimeException(NULL_CALLBACK);
@@ -73,29 +74,29 @@ public class OAuthManager {
 		if (isNullOrEmpty(appkey) || isNullOrEmpty(appName)) {
 			throw new RuntimeException("Please check your application key or scope");
 		}
-		GoogleAuthTask googleTask = new GoogleAuthTask(context, accountName, appkey, appName, callback);
+		GoogleAuthTask googleTask = new GoogleAuthTask(context, accountName, appkey, appId, appName, callback);
 		googleTask.execute();
 	}
 	
-	protected void revokeToken(Context context, String token, OAuthCallback callback) {
-		new ThreeCixtyRevokeTokenTask(context, token, callback).execute();
+	protected void revokeToken(Context context, String appid, String token, OAuthCallback callback) {
+		new ThreeCixtyRevokeTokenTask(context, appid, token, callback).execute();
 	}
 	
-	protected synchronized void deleteTokenInfo(Context context) {
-		if (exists(context.fileList())) {
-			context.deleteFile(OAUTH_FILE_NAME);
+	protected synchronized void deleteTokenInfo(Context context, String appid) {
+		if (exists(context.fileList(), appid)) {
+			context.deleteFile(getFileName(appid));
 		}
 	}
 
-	protected void refreshToken(Context context, TokenInfo lastTokenInfo, OAuthCallback callback) {
-	    ThreeCixtyRefreshTokenTask task = new ThreeCixtyRefreshTokenTask(context, lastTokenInfo, callback);
+	protected void refreshToken(Context context, String appid, TokenInfo lastTokenInfo, OAuthCallback callback) {
+	    ThreeCixtyRefreshTokenTask task = new ThreeCixtyRefreshTokenTask(context, appid, lastTokenInfo, callback);
 	    task.execute();
     }
 
-	private synchronized TokenInfo loadTokenInfo(Context context) {
-		if (!exists(context.fileList())) return null;
+	private synchronized TokenInfo loadTokenInfo(Context context, String appid) {
+		if (!exists(context.fileList(), appid)) return null;
 		try {
-			InputStream input = context.openFileInput(OAUTH_FILE_NAME);
+			InputStream input = context.openFileInput(getFileName(appid));
 			if (input == null) return null;
 			StringBuilder builder = new StringBuilder();
 			byte[] bytes = new byte[1024];
@@ -115,13 +116,18 @@ public class OAuthManager {
 		return null;
 	}
 	
-	private boolean exists(String [] fileList) {
+	private boolean exists(String [] fileList, String appid) {
 		if (fileList == null) return false;
-		for (String filename: fileList) {
-			if (filename.equals(OAUTH_FILE_NAME)) return true;
+        String filename = getFileName(appid);
+		for (String tmpName: fileList) {
+			if (tmpName.equals(filename)) return true;
 		}
 		return false;
 	}
+
+    private String getFileName(String appid) {
+        return appid.hashCode() + OAUTH_FILE_NAME;
+    }
 	
 	private boolean isNullOrEmpty(String str) {
 		return str == null || str.equals("");

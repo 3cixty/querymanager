@@ -22,10 +22,12 @@ public class MainActivity extends Activity {
 	private static final int PICK_ACCOUNT_REQUEST = 100;
 	
 	private static final String EXTRA_APP_KEY = "app_key";
+    private static final String EXTRA_APP_ID = "app_id";
 	private static final String EXTRA_APP_NAME = "app_name";
 	private static final String EXTRA_TOKEN_KEY = "access_token";
 	
 	private String appkey;
+    private String appid;
 	private String appName;
 	
 	private String accessToken;
@@ -40,13 +42,16 @@ public class MainActivity extends Activity {
 		if (callerIntent.hasExtra(EXTRA_APP_KEY)) {
 			appkey = callerIntent.getStringExtra(EXTRA_APP_KEY);
 		}
+
 		if (callerIntent.hasExtra(EXTRA_APP_NAME)) appName = callerIntent.getStringExtra(EXTRA_APP_NAME);
+
+        if (callerIntent.hasExtra(EXTRA_APP_ID)) appid = callerIntent.getStringExtra(EXTRA_APP_ID);
 		
 		if (callerIntent.hasExtra(EXTRA_TOKEN_KEY)) accessToken = callerIntent.getStringExtra(EXTRA_TOKEN_KEY);
 		
 		Button cmdLogin = (Button) findViewById(R.id.login);
-		if (appkey != null && appName != null) { // get 3Cixty token
-			if (!OAuthManager.getInstance().existsToken(this)) {
+		if (appkey != null && appName != null && appid != null) { // get 3Cixty token
+			if (!OAuthManager.getInstance().existsToken(this, appid)) {
 				cmdLogin.setOnClickListener(new View.OnClickListener() {
 
 					@Override
@@ -56,15 +61,15 @@ public class MainActivity extends Activity {
 				});
 			} else {
 				cmdLogin.setEnabled(false);
-				TokenInfo tokenInfo = OAuthManager.getInstance().getToken(this);
+				TokenInfo tokenInfo = OAuthManager.getInstance().getToken(this, appid);
 				if (OAuthManager.getInstance().hasValidToken(tokenInfo)) {
 					quitOAuthActivity(tokenInfo);
 				} else {
-					OAuthManager.getInstance().refreshToken(this, tokenInfo, new CallbackImpl());
+					OAuthManager.getInstance().refreshToken(this, appid, tokenInfo, new CallbackImpl());
 				}
 			}
 		} else if (accessToken != null) { // revoke 3Cixty token
-			OAuthManager.getInstance().revokeToken(this, accessToken, new CallbackImpl());
+			OAuthManager.getInstance().revokeToken(this, appid, accessToken, new CallbackImpl());
 		}
 	}
 	
@@ -82,12 +87,12 @@ public class MainActivity extends Activity {
 	    if (resultCode == RESULT_OK && requestCode == PICK_ACCOUNT_REQUEST) {
 	    	if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME)) {
 	            accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-	            OAuthManager.getInstance().auth3CixtyServer(this, appkey, appName, new CallbackImpl(), accountName);
+	            OAuthManager.getInstance().auth3CixtyServer(this, appkey, appid, appName, new CallbackImpl(), accountName);
 	    	}
 	    } else if (resultCode == RESULT_OK && requestCode == THREE_CIXTY_PERMISSION_REQUEST) {
 	    } else if (resultCode == RESULT_OK && requestCode == GOOGLE_PERMISSION_REQUEST) {
             if (accountName != null) {
-                OAuthManager.getInstance().auth3CixtyServer(this, appkey, appName, new CallbackImpl(), accountName);
+                OAuthManager.getInstance().auth3CixtyServer(this, appkey, appid, appName, new CallbackImpl(), accountName);
             }
         }
 

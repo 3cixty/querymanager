@@ -21,12 +21,14 @@ public class GoogleAuthTask extends AsyncTask<Void, Void, Void> {
 	private OAuthCallback callback;
 	private String appkey;
 	private String appName;
+    private String appId;
     private boolean shown = true;
 	
-	protected GoogleAuthTask(Activity context, String accountName, String appkey, String appName, OAuthCallback callback) {
+	protected GoogleAuthTask(Activity context, String accountName, String appkey, String appId, String appName, OAuthCallback callback) {
 		this.context = context;
 		this.accountName = accountName;
 		this.appkey = appkey;
+        this.appId = appId;
 		this.appName = appName;
 		this.callback = callback;
 	}
@@ -59,6 +61,7 @@ public class GoogleAuthTask extends AsyncTask<Void, Void, Void> {
 			ScopesActivity.setAppName(appName);
 			ScopesActivity.setCallback(callback);
 			ScopesActivity.setGoogleToken(token);
+            ScopesActivity.setAppid(appId);
 			Intent intent = new Intent(context, ScopesActivity.class);
 			context.startActivityForResult(intent, MainActivity.THREE_CIXTY_PERMISSION_REQUEST);
 		} else {

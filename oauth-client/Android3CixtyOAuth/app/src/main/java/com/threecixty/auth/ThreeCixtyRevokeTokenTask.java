@@ -18,13 +18,15 @@ public class ThreeCixtyRevokeTokenTask extends ThreeCixtyAbstractTask {
 	private static final String REVOKE_OAUTH_SERVICE = SERVER + "/v2/revoke";
 	
 	private Context context;
+    private String appid;
 	private String token;
 	private OAuthCallback callback;
 	
 	private boolean successful = false;
 	
-	protected ThreeCixtyRevokeTokenTask(Context context, String token, OAuthCallback callback) {
+	protected ThreeCixtyRevokeTokenTask(Context context, String appid, String token, OAuthCallback callback) {
 		this.context = context;
+        this.appid = appid;
 		this.token = token;
 		this.callback = callback;
 	}
@@ -63,7 +65,7 @@ public class ThreeCixtyRevokeTokenTask extends ThreeCixtyAbstractTask {
 		if (isCancelled()) return;
 		callback.notifyTokenRevoked(token, successful);
 		if (successful) {
-		    new TokenStorageNotifier(context).deleteToken();
+		    new TokenStorageNotifier(context).deleteToken(appid);
 		}
 	}
 }

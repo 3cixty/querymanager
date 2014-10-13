@@ -16,11 +16,11 @@ public class TokenStorageNotifier {
 		this.context = context;
 	}
 
-	protected void notifyToken(TokenInfo tokenInfo) {
-		OAuthManager.getInstance().saveTokenInfo(context, tokenInfo);
+	protected void notifyToken(TokenInfo tokenInfo, String appid) {
+		OAuthManager.getInstance().saveTokenInfo(context, tokenInfo, appid);
 	}
 
-	protected void deleteToken() {
-		OAuthManager.getInstance().deleteTokenInfo(context);
+	protected void deleteToken(String appid) {
+		OAuthManager.getInstance().deleteTokenInfo(context, appid);
 	}
 }

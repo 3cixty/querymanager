@@ -13,6 +13,7 @@ public class ScopesActivity extends Activity {
 
 	private static String appkey;
 	private static String appName;
+    private static String appid;
 	private static String googleToken;
 	private static OAuthCallback callback;
 	
@@ -35,7 +36,7 @@ public class ScopesActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				String scope = chk.isChecked() ? "Wishlist" : "";
-				new ThreeCixtyAccessTokenTask(ScopesActivity.this, appkey, googleToken, scope, callback).execute();
+				new ThreeCixtyAccessTokenTask(ScopesActivity.this, appkey, appid, googleToken, scope, callback).execute();
 				grantCmd.setEnabled(false);
 			}
 		});
@@ -63,4 +64,8 @@ public class ScopesActivity extends Activity {
 	protected static void setGoogleToken(String googleToken) {
 		ScopesActivity.googleToken = googleToken;
 	}
+
+    protected static void setAppid(String appid) {
+        ScopesActivity.appid = appid;
+    }
 }

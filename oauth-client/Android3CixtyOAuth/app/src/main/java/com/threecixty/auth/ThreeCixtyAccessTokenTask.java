@@ -13,6 +13,7 @@ import android.app.Activity;
 public class ThreeCixtyAccessTokenTask extends ThreeCixtyAbstractTask {
 
 	private String appkey;
+    private String appid;
 	private String googleToken;
 	private String scope;
 	private OAuthCallback callback;
@@ -20,8 +21,9 @@ public class ThreeCixtyAccessTokenTask extends ThreeCixtyAbstractTask {
 	
 	private TokenInfo tokenInfo;
 
-	protected ThreeCixtyAccessTokenTask(Activity activity, String appkey, String googleToken, String scope, OAuthCallback callback) {
+	protected ThreeCixtyAccessTokenTask(Activity activity, String appkey, String appid, String googleToken, String scope, OAuthCallback callback) {
 		this.appkey = appkey;
+        this.appid = appid;
 		this.googleToken = googleToken;
 		this.scope = scope;
 		this.callback = callback;
@@ -57,7 +59,7 @@ public class ThreeCixtyAccessTokenTask extends ThreeCixtyAbstractTask {
 	protected void onPostExecute(Void result) {
 		super.onPostExecute(result);
 		if (tokenInfo != null) {
-			new TokenStorageNotifier(activity).notifyToken(tokenInfo);
+			new TokenStorageNotifier(activity).notifyToken(tokenInfo, appid);
 		}
 		if (tokenInfo != null && callback != null) {
 			callback.notify3CixtyAccessToken(tokenInfo);
