@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -47,7 +48,7 @@ public class GoFlowServices {
 		return getAccount(access_token, DEVELOPER_ROLE);
 	}
 
-	@GET
+	@POST
 	@Path("/registerGoFlowApp")
 	public Response registerApp(@HeaderParam("key") String appkey, @HeaderParam("google_access_token") String g_access_token) {
 		String uid = GoogleAccountUtils.getUID(g_access_token);
