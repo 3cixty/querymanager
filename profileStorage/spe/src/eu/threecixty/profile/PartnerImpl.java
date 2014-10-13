@@ -38,9 +38,10 @@ public class PartnerImpl implements Partner {
 		int index = findIndexOfUID(user.getUid(), mobidotUsers);
 		if (index >= 0) {
 			mobidotUsers.set(index, user); // update accounts
-			return save(mobidotUsers);
+		} else {
+			mobidotUsers.add(user);
 		}
-		return false;
+		return save(mobidotUsers);
 	}
 
 	@Override
@@ -80,10 +81,10 @@ public class PartnerImpl implements Partner {
 	}
 
 	@Override
-	public PartnerAccount findAccount(PartnerUser user, String appkey) {
-		if (user == null || appkey == null) return null;
-		for (PartnerAccount account: user.getMobidotAccounts()) {
-			if (appkey.equals(account.getAppkey())) return account;
+	public PartnerAccount findAccount(PartnerUser user, String appid) {
+		if (user == null || appid == null) return null;
+		for (PartnerAccount account: user.getAccounts()) {
+			if (appid.equals(account.getAppId())) return account;
 		}
 		return null;
 	}

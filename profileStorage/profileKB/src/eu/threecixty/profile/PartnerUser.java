@@ -13,6 +13,10 @@ public class PartnerUser {
 	
 	private List <PartnerAccount> partnerAccounts;
 	
+	public PartnerUser(String uid) {
+		this.uid = uid;
+	}
+	
 	public String getUid() {
 		return uid;
 	}
@@ -21,7 +25,7 @@ public class PartnerUser {
 		this.uid = uid;
 	}
 
-	public List<PartnerAccount> getMobidotAccounts() {
+	public List<PartnerAccount> getAccounts() {
 		return partnerAccounts;
 	}
 
@@ -32,12 +36,12 @@ public class PartnerUser {
 	public static class PartnerAccount {
 		private String username;
 		private String password;
-		private String appkey; // 3Cixty app key
+		private String appid; // 3Cixty app id
 		
-		public PartnerAccount(String username, String pwd, String appkey) {
+		public PartnerAccount(String username, String pwd, String appid) {
 			this.username = username;
 			this.password = pwd;
-			this.appkey = appkey;
+			this.appid = appid;
 		}
 
 		public String getUsername() {
@@ -56,12 +60,12 @@ public class PartnerUser {
 			this.password = password;
 		}
 
-		public String getAppkey() {
-			return appkey;
+		public String getAppId() {
+			return appid;
 		}
 
-		public void setAppkey(String appkey) {
-			this.appkey = appkey;
+		public void setAppId(String appid) {
+			this.appid = appid;
 		}
 	}
 	
