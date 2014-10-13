@@ -4,6 +4,9 @@ public class GoFlowServer {
 
 	private static final Object _sync = new Object();
 	private static GoFlowServer instance;
+	
+	/**Path to the configuration file*/
+	private static String pathToConfig;
 
 	public static GoFlowServer getInstance() {
 		if (instance == null) {
@@ -12,6 +15,10 @@ public class GoFlowServer {
 			}
 		}
 		return instance;
+	}
+	
+	public static void setPath(String path) {
+		GoFlowServer.pathToConfig = path;
 	}
 
 	/**
@@ -44,7 +51,7 @@ public class GoFlowServer {
 	 * @param uid
 	 * @return
 	 */
-	public String getEndUserPassword(String appId, String uid) {
+	public String createDeveloper(String appId, String uid) {
 		// TODO: please implement this method to get the password of a given uid from GoFlow server
 		// Note that password 'null' means user doesn't exists
 		return null;
