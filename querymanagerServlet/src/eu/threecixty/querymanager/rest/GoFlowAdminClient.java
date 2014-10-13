@@ -6,27 +6,9 @@ import com.google.gson.JsonObject;
 
 public class GoFlowAdminClient extends GoFlowEventClient {
 
-	public GoFlowAdminClient(String goFlowServerUrl, String appId, String user, String pwd) throws IOException {
+	public GoFlowAdminClient(String goFlowServerUrl) throws IOException {
 		super(goFlowServerUrl);
-
-		//
-		if (appId == null || appId.equals("") || !validId(appId)) {
-			throw new IOException("Invalid parameter");
-		}
-		if (user == null || user.equals("")) {
-			throw new IOException("Invalid parameter");
-		}
-		if (pwd == null || pwd.equals("")) {
-			throw new IOException("Invalid parameter");
-		}
-
-		//
-		this.appId = appId;
-		this.user = user;
-		this.pwd = pwd;
 	}
-
-
 
 	//
 	//

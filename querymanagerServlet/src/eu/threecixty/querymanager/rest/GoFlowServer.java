@@ -69,7 +69,7 @@ public class GoFlowServer {
 	public String createEndUser(String appId, String uid) {
 		String newPwd = new RandomString(12).nextString();
 		try {
-			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl, appId, adminname, adminpwd);
+			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
 			adminClient.loginUser(adminname, adminpwd, appId);
 			adminClient.registerUser(uid, newPwd, appId);
 			adminClient.assignUser(appId, uid, "add");
@@ -94,7 +94,7 @@ public class GoFlowServer {
 	public String createDeveloper(String appId, String uid) {
 		String newPwd = new RandomString(12).nextString();
 		try {
-			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl, appId, adminname, adminpwd);
+			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
 			adminClient.loginUser(adminname, adminpwd, appId);
 			adminClient.registerUser(uid, newPwd, appId);
 			adminClient.assignOwner(appId, uid, "add");
@@ -112,7 +112,7 @@ public class GoFlowServer {
 	 */
 	public boolean registerNewApp (String appId) {
 		try {
-			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl, appId, adminname, adminpwd);
+			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
 			adminClient.loginUser(adminname, adminpwd, appId);
 			adminClient.registerApp(appId);
 			adminClient.logoutUser();

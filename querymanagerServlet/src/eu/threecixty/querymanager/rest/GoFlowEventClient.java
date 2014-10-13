@@ -42,9 +42,9 @@ public class GoFlowEventClient {
 	protected static final String MONITOR_APP_STOP = "event/monitorAppStop";
 	protected static final String MONITOR_APP_START = "event/monitorAppStart";
 
-	protected String appId = "";
-	protected String user = "";
-	protected String pwd = "";
+//	protected String appId = "";
+//	protected String user = "";
+//	protected String pwd = "";
 
 	protected static final String TOPIC_EXCHANGE_TYPE = "topic";
 
@@ -120,6 +120,18 @@ public class GoFlowEventClient {
 	 */
 	public void loginUser(String nickname, String password, String appId) throws IOException {
 		String res;
+		
+		//
+		if (appId == null || appId.equals("") || !validId(appId)) {
+			throw new IOException("Invalid parameter");
+		}
+		if (nickname == null || nickname.equals("")) {
+			throw new IOException("Invalid parameter");
+		}
+		if (password == null || password.equals("")) {
+			throw new IOException("Invalid parameter");
+		}
+
 
 		JsonObject jsonParam = new JsonObject();
 		jsonParam.addProperty("nickname", nickname);
@@ -144,27 +156,6 @@ public class GoFlowEventClient {
 		return;
 	}
 
-	/**
-	 * 
-	 * @throws IOException
-	 */
-	public void monitorAppStop() throws IOException {
-		String res;
-
-		//
-		if (appId == null || appId.equals("") || !validId(appId)) {
-			throw new IOException("Invalid parameter");
-		}
-
-		JsonObject jsonParam = new JsonObject();
-		jsonParam.addProperty("app", appId);
-		res = sendJsonPostRequest(MONITOR_APP_STOP, jsonParam.toString());
-
-		if (res == null) {
-			throw new IOException("Unable to stop monitoring app");
-		}
-		return;
-	}
 
 	//
 	//
