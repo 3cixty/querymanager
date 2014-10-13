@@ -71,7 +71,13 @@ public class GoFlowServer {
 		try {
 			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
 			adminClient.loginUser(adminname, adminpwd, appId);
-			adminClient.registerUser(uid, newPwd, appId);
+
+			try {
+				adminClient.registerUser(uid, newPwd, appId);
+			} catch (IOException e) {
+				// user already registered for this app (but dvlp account ?)
+				newPwd = "";
+			}
 			adminClient.assignUser(appId, uid, "add");
 			adminClient.logoutUser();
 		} catch (IOException e) {
@@ -96,7 +102,12 @@ public class GoFlowServer {
 		try {
 			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
 			adminClient.loginUser(adminname, adminpwd, appId);
+			try {
 			adminClient.registerUser(uid, newPwd, appId);
+			} catch (IOException e) {
+				// user already registered for this app (but user account ?)
+				newPwd = "";
+			}
 			adminClient.assignOwner(appId, uid, "add");
 			adminClient.logoutUser();
 		} catch (IOException e) {
@@ -110,11 +121,11 @@ public class GoFlowServer {
 	 * @param appId
 	 * @return true if app created, false otherwise
 	 */
-	public boolean registerNewApp (String appId) {
+	public boolean registerNewApp (String appId, String name, String description) {
 		try {
 			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
 			adminClient.loginUser(adminname, adminpwd, appId);
-			adminClient.registerApp(appId);
+			adminClient.registerApp(appId, name, description);
 			adminClient.logoutUser();
 			return true;
 		} catch (IOException e) {
