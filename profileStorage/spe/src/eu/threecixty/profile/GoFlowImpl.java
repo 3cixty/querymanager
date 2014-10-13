@@ -4,15 +4,10 @@ import java.util.List;
 
 import eu.threecixty.profile.PartnerUser.PartnerAccount;
 
-/**
- * This class is to store all the 3Cixty's mobidot users in a file. 
- * @author Cong-Kinh NGUYEN
- *
- */
-public class MobidotImpl implements Partner {
-	
+public class GoFlowImpl implements Partner {
+
 	private static final Object _sync = new Object();
-	private static final String MOBIDOT_FILE = "mobidot.json";
+	private static final String GOFLOW_FILE = "goflow.json";
 	
 	private static Partner instance;
 	
@@ -23,14 +18,14 @@ public class MobidotImpl implements Partner {
 	public static Partner getInstance() {
 		if (instance == null) {
 			synchronized (_sync) {
-				if (instance == null) instance = new MobidotImpl();
+				if (instance == null) instance = new GoFlowImpl();
 			}
 		}
 		return instance;
 	}
 	
 	public static void setPath(String path) {
-		MobidotImpl.path = path;
+		GoFlowImpl.path = path;
 	}
 
 	@Override
@@ -68,7 +63,7 @@ public class MobidotImpl implements Partner {
 		return partnerIntf.findAccount(user, appkey);
 	}
 
-	private MobidotImpl() {
-		partnerIntf = new PartnerImpl(path, MOBIDOT_FILE);
+	private GoFlowImpl() {
+		partnerIntf = new PartnerImpl(path, GOFLOW_FILE);
 	}
 }

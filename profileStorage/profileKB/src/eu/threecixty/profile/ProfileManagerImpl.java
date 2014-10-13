@@ -178,8 +178,14 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public Mobidot getMobidot() {
+	public Partner getMobidot() {
 		if (profileManager != null) return profileManager.getMobidot();
+		return null;
+	}
+
+	@Override
+	public Partner getGoFlow() {
+		if (profileManager != null) return profileManager.getGoFlow();
 		return null;
 	}
 

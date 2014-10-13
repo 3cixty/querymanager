@@ -199,7 +199,13 @@ public interface ProfileManager {
 	 * Gets Mobidot interface.
 	 * @return
 	 */
-	Mobidot getMobidot();
+	Partner getMobidot();
+	
+	/**
+	 * Gets GoFlow interface.
+	 * @return
+	 */
+	Partner getGoFlow();
 	
 	public class StartAndEndDate {
 

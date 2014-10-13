@@ -7,11 +7,11 @@ import java.util.List;
  * @author Cong-Kinh NGUYEN
  *
  */
-public class MobidotUser {
+public class PartnerUser {
 
 	private String uid; // Google user_id
 	
-	private List <MobidotAccount> mobidotAccounts;
+	private List <PartnerAccount> partnerAccounts;
 	
 	public String getUid() {
 		return uid;
@@ -21,20 +21,20 @@ public class MobidotUser {
 		this.uid = uid;
 	}
 
-	public List<MobidotAccount> getMobidotAccounts() {
-		return mobidotAccounts;
+	public List<PartnerAccount> getMobidotAccounts() {
+		return partnerAccounts;
 	}
 
-	public void setMobidotAccounts(List<MobidotAccount> mobidotAccounts) {
-		this.mobidotAccounts = mobidotAccounts;
+	public void setPartnerAccounts(List<PartnerAccount> accounts) {
+		this.partnerAccounts = accounts;
 	}
 
-	public static class MobidotAccount {
+	public static class PartnerAccount {
 		private String username;
 		private String password;
 		private String appkey; // 3Cixty app key
 		
-		public MobidotAccount(String username, String pwd, String appkey) {
+		public PartnerAccount(String username, String pwd, String appkey) {
 			this.username = username;
 			this.password = pwd;
 			this.appkey = appkey;

@@ -143,8 +143,13 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public Mobidot getMobidot() {
+	public Partner getMobidot() {
 		return MobidotImpl.getInstance();
+	}
+
+	@Override
+	public Partner getGoFlow() {
+		return GoFlowImpl.getInstance();
 	}
 
 	/**
