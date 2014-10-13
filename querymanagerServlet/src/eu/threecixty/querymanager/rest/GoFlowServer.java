@@ -15,6 +15,8 @@ public class GoFlowServer {
 	static String adminname = "";
 	static String adminpwd = "";
 	
+	static String ADMIN_APPID = "3Cixty";
+	
 	/**Path to the configuration file*/
 	private static String pathToConfig;
 
@@ -70,7 +72,7 @@ public class GoFlowServer {
 		String newPwd = new RandomString(12).nextString();
 		try {
 			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
-			adminClient.loginUser(adminname, adminpwd, appId);
+			adminClient.loginUser(adminname, adminpwd, ADMIN_APPID);
 
 			try {
 				adminClient.registerUser(uid, newPwd, appId);
@@ -101,7 +103,7 @@ public class GoFlowServer {
 		String newPwd = new RandomString(12).nextString();
 		try {
 			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
-			adminClient.loginUser(adminname, adminpwd, appId);
+			adminClient.loginUser(adminname, adminpwd, ADMIN_APPID);
 			try {
 			adminClient.registerUser(uid, newPwd, appId);
 			} catch (IOException e) {
@@ -124,7 +126,7 @@ public class GoFlowServer {
 	public boolean registerNewApp (String appId, String name, String description) {
 		try {
 			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
-			adminClient.loginUser(adminname, adminpwd, appId);
+			adminClient.loginUser(adminname, adminpwd, ADMIN_APPID);
 			adminClient.registerApp(appId, name, description);
 			adminClient.logoutUser();
 			return true;
