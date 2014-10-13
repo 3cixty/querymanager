@@ -1,9 +1,19 @@
 package eu.threecixty.querymanager.rest;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.Random;
+
 public class GoFlowServer {
 
 	private static final Object _sync = new Object();
 	private static GoFlowServer instance;
+	
+	static String goflowUrl = "";
+	static String adminname = "";
+	static String adminpwd = "";
 	
 	/**Path to the configuration file*/
 	private static String pathToConfig;
@@ -17,8 +27,29 @@ public class GoFlowServer {
 		return instance;
 	}
 	
+	private GoFlowServer() {
+	}
+
+	
 	public static void setPath(String path) {
-		GoFlowServer.pathToConfig = path;
+		GoFlowServer.pathToConfig = GoFlowServer.pathToConfig;
+		
+		Properties prop = new Properties();
+		InputStream input = null;
+	 
+		try {
+	 
+			input = new FileInputStream(GoFlowServer.pathToConfig);
+	 
+			// load a properties file
+				prop.load(input);
+	 
+			// get the property value and print it out
+			goflowUrl = prop.getProperty("GOFLOW_URL");
+			adminname = prop.getProperty("GOFLOW_ADMIN_ID");
+			adminpwd = prop.getProperty("GOFLOW_ADMIN_PWD");
+		} catch (IOException e) {
+		}
 	}
 
 	/**
@@ -36,8 +67,17 @@ public class GoFlowServer {
 	 * @return
 	 */
 	public String createEndUser(String appId, String uid) {
-		// TODO: please implement this method to create an account at GoFlow server
-		return null;
+		String newPwd = new RandomString(12).nextString();
+		try {
+			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl, appId, adminname, adminpwd);
+			adminClient.loginUser(adminname, adminpwd, appId);
+			adminClient.registerUser(uid, newPwd, appId);
+			adminClient.assignUser(appId, uid, "add");
+			adminClient.logoutUser();
+		} catch (IOException e) {
+			return null;
+		}
+		return newPwd;
 	}
 
 
@@ -52,11 +92,69 @@ public class GoFlowServer {
 	 * @return
 	 */
 	public String createDeveloper(String appId, String uid) {
-		// TODO: please implement this method to get the password of a given uid from GoFlow server
-		// Note that password 'null' means user doesn't exists
-		return null;
+		String newPwd = new RandomString(12).nextString();
+		try {
+			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl, appId, adminname, adminpwd);
+			adminClient.loginUser(adminname, adminpwd, appId);
+			adminClient.registerUser(uid, newPwd, appId);
+			adminClient.assignOwner(appId, uid, "add");
+			adminClient.logoutUser();
+		} catch (IOException e) {
+			return null;
+		}
+		return newPwd;
 	}
 	
-	private GoFlowServer() {
+	/**
+	 * 
+	 * @param appId
+	 * @return true if app created, false otherwise
+	 */
+	public boolean registerNewApp (String appId) {
+		try {
+			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl, appId, adminname, adminpwd);
+			adminClient.loginUser(adminname, adminpwd, appId);
+			adminClient.registerApp(appId);
+			adminClient.logoutUser();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+		
 	}
+	
+
+	
+	// cheap not secure password generator - taken from
+	// http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
+
+	static {
+		StringBuilder tmp = new StringBuilder();
+		for (char ch = '0'; ch <= '9'; ++ch)
+			tmp.append(ch);
+		for (char ch = 'a'; ch <= 'z'; ++ch)
+			tmp.append(ch);
+		symbols = tmp.toString().toCharArray();
+	}
+	private static final char[] symbols;
+
+	//
+	public class RandomString {
+		private final Random random = new Random();
+
+		private final char[] buf;
+
+		public RandomString(int length) {
+			if (length < 1)
+				throw new IllegalArgumentException("length < 1: " + length);
+			buf = new char[length];
+		}
+
+		public String nextString() {
+			for (int idx = 0; idx < buf.length; ++idx)
+				buf[idx] = symbols[random.nextInt(symbols.length)];
+			return new String(buf);
+		}
+	}
+
 }
