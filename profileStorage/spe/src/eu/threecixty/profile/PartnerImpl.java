@@ -85,7 +85,7 @@ public class PartnerImpl implements Partner {
 	public PartnerAccount findAccount(PartnerUser user, String appid, String role) {
 		if (user == null || appid == null) return null;
 		for (PartnerAccount account: user.getAccounts()) {
-			if (role == null) {
+			if (role == null) { // without checking role
 				if (appid.equals(account.getAppId())) return account;
 			} else {
 			    if (appid.equals(account.getAppId()) && role.equals(account.getRole())) return account;
