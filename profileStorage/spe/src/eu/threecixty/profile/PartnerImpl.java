@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -75,16 +76,20 @@ public class PartnerImpl implements Partner {
 	@Override
 	public List<PartnerUser> getUsers() {
 		String content = getContent();
-		if (content == null) return null;
+		if (content == null || content.length() == 0) return new ArrayList <PartnerUser>();
 		Gson gson = new Gson();
 		return gson.fromJson(content, new TypeToken<List<PartnerUser>>(){}.getType());
 	}
 
 	@Override
 	public PartnerAccount findAccount(PartnerUser user, String appid, String role) {
-		if (user == null || appid == null || role == null) return null;
+		if (user == null || appid == null) return null;
 		for (PartnerAccount account: user.getAccounts()) {
-			if (appid.equals(account.getAppId()) && role.equals(account.getRole())) return account;
+			if (role == null) {
+				if (appid.equals(account.getAppId())) return account;
+			} else {
+			    if (appid.equals(account.getAppId()) && role.equals(account.getRole())) return account;
+			}
 		}
 		return null;
 	}
@@ -107,6 +112,7 @@ public class PartnerImpl implements Partner {
 			FileOutputStream output = new FileOutputStream(file);
 			output.write(gson.toJson(mobidotUsers).getBytes("UTF-8"));
 			output.close();
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -115,10 +121,10 @@ public class PartnerImpl implements Partner {
 
 	
 	private synchronized String getContent() {
-		if (path == null) return "[]";
+		if (path == null) return null;
 		StringBuffer buffer = new StringBuffer();
 		File file = new File(path + File.separatorChar + filename);
-		if (!file.exists()) return "[]";
+		if (!file.exists()) return null;
 		FileInputStream input = null;
 		try {
 			input = new FileInputStream(file);
@@ -137,7 +143,7 @@ public class PartnerImpl implements Partner {
 					e.printStackTrace();
 				}
 		}
-		if (buffer.length() == 0) return "[]";
+		if (buffer.length() == 0) return null;
 		return buffer.toString();
 	}
 }
