@@ -123,10 +123,12 @@ public class OAuthServices {
 		//String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, scopeNames, redirect_uri, thumbNailUrl);
 		String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
 		if (appKey != null && !appKey.equals("")) {
-			return Response.status(Response.Status.OK)
-	        .entity(" {\"key\": \"" + appKey + "\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
+			boolean ok = GoFlowServices.registerAppFromUID(uid, appKey);
+			if (ok) {
+			    return Response.ok(" {\"key\": \"" + appKey + "\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+			} else {
+				return Response.ok(" {\"response\": \"Cannot register App on GoFlow server\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+			}
 		}
 		return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"appId already existed or scopeName doesn't exist\"} ")

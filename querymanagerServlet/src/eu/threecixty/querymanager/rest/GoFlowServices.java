@@ -57,20 +57,28 @@ public class GoFlowServices {
 		        .entity(" {\"response\": false, \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
+		boolean ok = registerAppFromUID(uid, appkey);
+		
+		if (ok) {
+		    return Response.ok("{ \"response\": true }", MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			return Response.status(Response.Status.BAD_REQUEST)
+	        .entity(" {\"response\": false, \"reason\": \"Cannot register your App on GoFlow server or your AppKey is invalid\"} ")
+	        .type(MediaType.APPLICATION_JSON_TYPE)
+	        .build();
+		}
+		
+	}
+
+	public static boolean registerAppFromUID(String uid, String appkey) {
 		App app = OAuthWrappers.retrieveApp(appkey);
-		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": false, \"reason\": \"App key is invalid\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
+		if (app == null) return false;
 		
 		boolean ok = GoFlowServer.getInstance().registerNewApp(app.getAppNameSpace(), app.getAppName(), app.getDescription());
-		if (!ok) return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": false, \"reason\": \"Cannot register your App on GoFlow server\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
+		if (!ok) return false;
 		
 		getAccountFromUID(uid, app.getAppNameSpace(), DEVELOPER_ROLE);
-		return Response.ok("{ \"response\": true }", MediaType.APPLICATION_JSON_TYPE).build();
+		return true;
 	}
 
 	private Response getAccount(String access_token, String role) {
@@ -90,7 +98,7 @@ public class GoFlowServices {
 		}
 	}
 
-	private Response getAccountFromUID(String uid, String appid, String role) {
+	private static Response getAccountFromUID(String uid, String appid, String role) {
 		// check if there is no account existed at GoFlow server, then go to create an account
 		PartnerUser goflowUser = ProfileManagerImpl.getInstance().getGoFlow().getUser(uid);
 		PartnerAccount account = ProfileManagerImpl.getInstance().getGoFlow().findAccount(goflowUser, appid, null);
@@ -124,6 +132,7 @@ public class GoFlowServices {
 		if (pwd != null) {
 		    jsonObj.put("username", username);
 		    jsonObj.put("password", pwd);
+		    System.out.println("goflow user: " + jsonObj.toString());
 		    return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			return Response.status(Response.Status.BAD_REQUEST).entity("{ \"response\": false, \"reason\": \"Cannot create user at GoFlow\"}").type(MediaType.APPLICATION_JSON_TYPE).build();
