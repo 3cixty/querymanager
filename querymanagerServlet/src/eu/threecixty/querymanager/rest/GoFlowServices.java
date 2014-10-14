@@ -93,7 +93,7 @@ public class GoFlowServices {
 	private Response getAccountFromUID(String uid, String appid, String role) {
 		// check if there is no account existed at GoFlow server, then go to create an account
 		PartnerUser goflowUser = ProfileManagerImpl.getInstance().getGoFlow().getUser(uid);
-		PartnerAccount account = ProfileManagerImpl.getInstance().getGoFlow().findAccount(goflowUser, appid, role);
+		PartnerAccount account = ProfileManagerImpl.getInstance().getGoFlow().findAccount(goflowUser, appid, null);
 		JSONObject jsonObj = new JSONObject();
 		String username, pwd;
 		boolean ok = true;
