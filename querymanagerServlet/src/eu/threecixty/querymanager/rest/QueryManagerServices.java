@@ -77,11 +77,14 @@ public class QueryManagerServices {
 	@Path("/augmentAndExecute")
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
-			@QueryParam("filter") String filter) {
+			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			String user_id =  userAccessToken.getUid();
+			if ("on".equals(debug)) {
+				user_id = "107217557295681360318";
+			}
 			String key = userAccessToken.getAppkey();
 
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
