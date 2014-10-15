@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.oauth.model.App;
@@ -34,7 +35,10 @@ public class OAuthServices {
 	public static final String APP_KEY = "appObj";
 	public static final String UID_KEY = "uid";
 	
-	private static final String V2_ROOT = OAuthWrappers.ROOT_SERVER + "v2/";
+	/**
+	 * Set the server configuration in WebContent/WEB-INF/3cixty.properties
+	 */
+	private static final String V2_ROOT = Configuration.get3CixtyRoot();
 	
 	public static final String GOOGLE_CALLBACK = V2_ROOT + "googlecallback.jsp";
 	public static final String THREECIXTY_CALLBACK = V2_ROOT + "3cixtycallback.jsp";
@@ -123,10 +127,12 @@ public class OAuthServices {
 		//String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, scopeNames, redirect_uri, thumbNailUrl);
 		String appKey = OAuthWrappers.getAppKey(appid, appname, desc, cat, uid, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
 		if (appKey != null && !appKey.equals("")) {
-			return Response.status(Response.Status.OK)
-	        .entity(" {\"key\": \"" + appKey + "\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
+			boolean ok = GoFlowServices.registerAppFromUID(uid, appKey);
+			if (ok) {
+			    return Response.ok(" {\"key\": \"" + appKey + "\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+			} else {
+				return Response.ok(" {\"response\": \"Cannot register App on GoFlow server\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+			}
 		}
 		return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"appId already existed or scopeName doesn't exist\"} ")
