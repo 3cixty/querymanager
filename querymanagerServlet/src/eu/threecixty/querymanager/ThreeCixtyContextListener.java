@@ -6,6 +6,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.db.DBConnection;
 import eu.threecixty.keys.KeyManager;
 import eu.threecixty.oauth.OAuthWrappers;
@@ -25,6 +26,8 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 
 	public void contextInitialized(ServletContextEvent context) {
 	    String realPath = context.getServletContext().getRealPath("/");
+	    Configuration.setPath(realPath);
+	    Configuration.setVersion(context.getServletContext().getContextPath());
 	    RdfFileManager.getInstance().setPathToRdfFile(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
 	    TrayStorage.setPath(realPath);
 	    QueryManagerServices.realPath = realPath;
