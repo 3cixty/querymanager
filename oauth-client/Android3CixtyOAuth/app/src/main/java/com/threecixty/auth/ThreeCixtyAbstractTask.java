@@ -21,7 +21,7 @@ import android.os.AsyncTask;
 
 public abstract class ThreeCixtyAbstractTask extends AsyncTask<Void, Void, Void> {
 
-	protected static final String SERVER = "https://dev.3cixty.com";
+	protected static final String SERVER = "https://api.3cixty.com";
 
 	protected static final String OAUTH_ANDROID_SERVICE = SERVER + "/v2/getAccessToken";
 	protected static final String REFRESH_OAUTH_SERVICE = SERVER + "/v2/token";
