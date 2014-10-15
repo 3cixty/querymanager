@@ -17,6 +17,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Developer;
 import eu.threecixty.oauth.model.Scope;
@@ -27,9 +28,9 @@ import eu.threecixty.oauth.utils.ScopeUtils;
 public class OAuthWrappers { 
 	
 	private static final String ROOT_LOCALHOST = "http://localhost:8080/";
-	private static final String ROOT_3CIXTY = "http://dev.3cixty.com:8080/";
+	//private static final String ROOT_3CIXTY = "http://dev.3cixty.com:8080/";
 	
-	public static final String ROOT_SERVER = ROOT_3CIXTY;
+	private static final String ROOT_SERVER = ROOT_LOCALHOST;
 	
 	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5";
 
@@ -50,7 +51,7 @@ public class OAuthWrappers {
 	// make sure that this user exists in the database (the client table)
 	private static final String clientId = "cool_app_id2";
 	private static final String clientSecret = "secret*+-!S3";
-	private static final String CLIENT_REDIRECT_URI = ROOT_SERVER  + "v2/3cixtycallback.jsp";
+	private static final String CLIENT_REDIRECT_URI = Configuration.get3CixtyRoot() + "/3cixtycallback.jsp";
 	
 	private static boolean firstTimeForClientCoolApp = true;
 
