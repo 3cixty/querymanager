@@ -9,6 +9,14 @@
   <packaging>jar</packaging>
   <version>1.0</version>
   
+  <dependencies>
+    <dependency>
+      <groupId>eu.3cixty</groupId>
+      <artifactId>3cixty-config</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+  
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
