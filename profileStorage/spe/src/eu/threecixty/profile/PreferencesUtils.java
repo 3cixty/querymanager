@@ -1,16 +1,16 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
 
 
 
@@ -33,11 +33,13 @@ public class PreferencesUtils {
 	 */
 	public static int getMinimumNumberOfTimesVisited(String uid) {
 		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
+		
 		StringBuffer buffer = new StringBuffer();
+		
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 		buffer.append("SELECT  DISTINCT  ?numberOfTimes \n");
-		buffer.append("WHERE {\n\n");
+		buffer.append(" WHERE {\n\n");
 		buffer.append("?root a owl:NamedIndividual . \n");
 		buffer.append("?root profile:hasUID ?uid . \n");
 		buffer.append("?root profile:hasPreference ?p1 . \n");
@@ -105,7 +107,6 @@ public class PreferencesUtils {
 //		}
 //		vqe.close();
 		
-		
 		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
 		if (jsonObj == null) return DEFAULT_MINIMUM_SCORE_RATED;
 		
@@ -169,7 +170,7 @@ public class PreferencesUtils {
 		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
-		buffer.append("SELECT  DISTINCT  ?scoreRated \n");
+		buffer.append("SELECT  DISTINCT  ?scoreRated \n"); 
 		buffer.append("WHERE {\n\n");
 	    buffer.append("?meroot a owl:NamedIndividual .\n");
 	    buffer.append("?meroot profile:hasUID ?uid .\n");
@@ -199,27 +200,55 @@ public class PreferencesUtils {
 	 */
 	private static double findMinimumValue(String queryStr, String varName) {
 		double ret = Integer.MAX_VALUE;
-		Model model = RdfFileManager.getInstance().getRdfModel();
-		if (model == null) return ret;
 		
-	    Query query = QueryFactory.create(queryStr);
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn=virtuosoConnection.processConfigFile();
+
+			stmt = conn.createStatement();
+			
+			queryReturnClass qRC=virtuosoConnection.query(queryStr);
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				try {
+				    double d = qs.getLiteral(varName).getDouble();
+				    if (d < ret) ret = d;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if (conn == null) return 0;
+			
+			return ret;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
 			try {
-			    double d = qs.getLiteral(varName).getDouble();
-			    if (d < ret) ret = d;
-			} catch (Exception e) {
-				e.printStackTrace();
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
-		
-		qe.close();
+	
 		return ret;
 	}
 	

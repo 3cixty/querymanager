@@ -1,5 +1,9 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +17,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
+import eu.threecixty.profile.GpsCoordinateUtils;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Preference;
@@ -20,7 +25,7 @@ import eu.threecixty.profile.oldmodels.Preference;
 /**
  * Utility class for populating information place.
  *
- * @author Cong-Kinh NGUYEN
+ * @author Cong-Kinh NGUYEN, Rachit Agarwal
  *
  */
 public class ProfilerPlaceUtils {
@@ -33,8 +38,8 @@ public class ProfilerPlaceUtils {
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static String getCountryName(Model model, String uID) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static String getCountryName(String uID) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -42,7 +47,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "SELECT  DISTINCT  ?countryname\n";
-	    qStr += "WHERE {\n\n";
+	    qStr += " WHERE {\n\n";
 	    qStr += "?root a owl:NamedIndividual .\n";
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "?root vcard:hasAddress ?address . \n";
@@ -50,22 +55,54 @@ public class ProfilerPlaceUtils {
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "}";
 
-	    Query query = QueryFactory.create(qStr);
+		Connection conn = null;
+		Statement stmt = null;
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		ResultSet rs = qe.execSelect();
-		
 		String countryName = null;
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			countryName = qs.getLiteral("countryname").getString();
-			if (countryName != null) {
-			    break;
+		
+	    try {
+			conn=virtuosoConnection.processConfigFile();
+
+			stmt = conn.createStatement();
+			
+			queryReturnClass qRC=virtuosoConnection.query(qStr);
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				countryName = qs.getLiteral("countryname").getString();
+				if (countryName != null) {
+				    break;
+				}
+			}
+			
+			if (conn == null) return null;
+						
+			return countryName;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
-		
-		qe.close();
 		return countryName;
 	}
 
@@ -77,8 +114,8 @@ public class ProfilerPlaceUtils {
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static String getTownName(Model model, String uID) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static String getTownName(String uID) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -86,7 +123,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "SELECT  DISTINCT  ?locality\n";
-	    qStr += "WHERE {\n\n";
+	    qStr += " WHERE {\n\n";
 	    qStr += "?root a owl:NamedIndividual .\n";
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "?root vcard:hasAddress ?address . \n";
@@ -94,23 +131,54 @@ public class ProfilerPlaceUtils {
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "}";
 	    
-	    Query query = QueryFactory.create(qStr);
+	    Connection conn = null;
+		Statement stmt = null;
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		ResultSet rs = qe.execSelect();
-		
 		String townName = null;
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			townName = qs.getLiteral("locality").getString();
-			if (townName != null) {
-			    break;
+		
+	    try {
+			conn=virtuosoConnection.processConfigFile();
+
+			stmt = conn.createStatement();
+			
+			queryReturnClass qRC=virtuosoConnection.query(qStr);
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				townName = qs.getLiteral("locality").getString();
+				if (townName != null) {
+				    break;
+				}
+			}
+			
+			if (conn == null) return null;
+						
+			return townName;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
-		
-		qe.close();
-
 		return townName;
 	}
 
@@ -121,8 +189,8 @@ public class ProfilerPlaceUtils {
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static GpsCoordinate getCoordinates(Model model, String uID) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static GpsCoordinate getCoordinates(String uID) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -131,7 +199,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "PREFIX my: <java:eu.threecixty.functions.>\n\n";
 	    qStr += "SELECT  DISTINCT  ?lon ?lat \n";
-	    qStr += "WHERE {\n\n";
+	    qStr += " WHERE {\n\n";
 	    qStr += "?root a owl:NamedIndividual .\n";
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "?root vcard:hasAddress ?address . \n";
@@ -140,25 +208,54 @@ public class ProfilerPlaceUtils {
 	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
 	    qStr += "}";
 	    
-	    Query query = QueryFactory.create(qStr);
+		Connection conn = null;
+		Statement stmt = null;
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		ResultSet rs = qe.execSelect();
-		
 		GpsCoordinate coordinate = null;
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			double lon = qs.getLiteral("lon").getDouble();
-			double lat = qs.getLiteral("lat").getDouble();
-			
-			coordinate = GpsCoordinateUtils.convert(lat, lon);
-			if (coordinate != null) break;
-
-		}
 		
-		qe.close();
+	    try {
+			conn=virtuosoConnection.processConfigFile();
 
+			stmt = conn.createStatement();
+			
+			queryReturnClass qRC=virtuosoConnection.query(qStr);
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				double lon = qs.getLiteral("lon").getDouble();
+				double lat = qs.getLiteral("lat").getDouble();
+				coordinate = GpsCoordinateUtils.convert(lat, lon);
+				if (coordinate != null) break;
+			}
+			
+			if (conn == null) return null;
+						
+			return coordinate;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		}
 		return coordinate;
 	}
 
@@ -170,8 +267,8 @@ public class ProfilerPlaceUtils {
 	 * @param rating
 	 * @return
 	 */
-	public static List <String> getPlaceNamesFromRating(Model model, String uID, float rating) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getPlaceNamesFromRating(String uID, float rating) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -179,7 +276,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += "WHERE {\n\n";
+	    qStr += " WHERE {\n\n";
 	    qStr += "?root a owl:NamedIndividual .\n";
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "?root profile:hasPreference ?p1 .\n";
@@ -194,25 +291,8 @@ public class ProfilerPlaceUtils {
 	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
 	   // qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
-	    Query query = QueryFactory.create(qStr);
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		List <String> placeNames = new ArrayList <String>();
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String placename = qs.getLiteral("placename").getString();
-			if (placename != null) {
-				placeNames.add(placename);
-			}
-		}
-		
-		qe.close();
-
-		return placeNames;
+	    return getPlaceNameFromQuery(qStr);
 	}
 
 
@@ -223,8 +303,8 @@ public class ProfilerPlaceUtils {
 	 * @param numberOfTimesVisited
 	 * @return
 	 */
-	public static List <String> getPlaceNamesFromNumberOfTimesVisited(Model model, String uID, int numberOfTimesVisited) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getPlaceNamesFromNumberOfTimesVisited(String uID, int numberOfTimesVisited) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -232,7 +312,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += "WHERE {\n\n";
+	    qStr += " WHERE {\n\n";
 	    qStr += "?root a owl:NamedIndividual .\n";
 	    qStr += "?root profile:hasUID ?uid .\n";
 	    qStr += "?root profile:hasPreference ?p1 .\n";
@@ -247,25 +327,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
 	    qStr += "}";
 	    
-	    Query query = QueryFactory.create(qStr);
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		List <String> placeNames = new ArrayList <String>();
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String placename = qs.getLiteral("placename").getString();
-			if (placename != null) {
-				placeNames.add(placename);
-			}
-		}
-		
-		qe.close();
-
-		return placeNames;
+	    return getPlaceNameFromQuery(qStr);
 	}
 
 	/**
@@ -275,8 +337,8 @@ public class ProfilerPlaceUtils {
 	 * @param rating
 	 * @return
 	 */
-	public static List <String> getPlaceNamesFromRatingOfFriends(Model model, String uID, float rating) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getPlaceNamesFromRatingOfFriends(String uID, float rating) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -285,7 +347,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n";
 	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += "WHERE {\n\n";
+	    qStr += " WHERE {\n\n";
 	    qStr += "?meroot a owl:NamedIndividual .\n";
 	    qStr += "?meroot profile:hasUID ?uid .\n";
 	    qStr += "?meroot foaf:knows ?root .\n";
@@ -302,25 +364,7 @@ public class ProfilerPlaceUtils {
 	    //qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
 
-	    Query query = QueryFactory.create(qStr);
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		List <String> placeNames = new ArrayList <String>();
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String placename = qs.getLiteral("placename").getString();
-			if (placename != null) {
-				placeNames.add(placename);
-			}
-		}
-		
-		qe.close();
-
-		return placeNames;
+	    return getPlaceNameFromQuery(qStr);
 	}
 
 	/**
@@ -330,8 +374,8 @@ public class ProfilerPlaceUtils {
 	 * @param numberOfTimesVisited
 	 * @return
 	 */
-	public static List <String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(Model model, String uID, int numberOfTimesVisited) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(String uID, int numberOfTimesVisited) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -340,7 +384,7 @@ public class ProfilerPlaceUtils {
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
 	    qStr += "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n";
 	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += "WHERE {\n\n";
+	    qStr += " WHERE {\n\n";
 	    qStr += "?meroot a owl:NamedIndividual .\n";
 	    qStr += "?meroot profile:hasUID ?uid .\n";
 	    qStr += "?meroot foaf:knows ?root .\n";
@@ -356,24 +400,60 @@ public class ProfilerPlaceUtils {
 	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
 	    qStr += "}";
 
-	    Query query = QueryFactory.create(qStr);
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
+	    return getPlaceNameFromQuery(qStr);
+	}
+
+	private static List<String> getPlaceNameFromQuery(String qStr) {
 		
+		Connection conn = null;
+		Statement stmt = null;
+	    
 		List <String> placeNames = new ArrayList <String>();
 		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String placename = qs.getLiteral("placename").getString();
-			if (placename != null) {
-				placeNames.add(placename);
+	    try {
+			conn=virtuosoConnection.processConfigFile();
+
+			stmt = conn.createStatement();
+			
+			queryReturnClass qRC=virtuosoConnection.query(qStr);
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			String placename = null;
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				placename = qs.getLiteral("placename").getString();
+				if (placename != null && !placename.equals("")) {
+					placeNames.add(placename);
+				}
+			}
+			
+			if (conn == null) return null;
+						
+			return placeNames;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
-		
-		qe.close();
-
 		return placeNames;
 	}
 

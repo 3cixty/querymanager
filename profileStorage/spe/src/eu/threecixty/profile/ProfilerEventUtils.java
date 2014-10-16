@@ -1,24 +1,24 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
+
 
 import eu.threecixty.profile.ProfileManager.StartAndEndDate;
 
 /**
  * Utility class for populating event information.
  *
- * @author Cong-Kinh NGUYEN
+ * @author Cong-Kinh Nguyen, Rachit Agarwal
  *
  */
 public class ProfilerEventUtils {
@@ -29,10 +29,12 @@ public class ProfilerEventUtils {
 	 * @param model
 	 * @param uID
 	 */
-	public static List <String> getEventNamesFromEventPreference(Model model, String uID) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getEventNamesFromEventPreference(String uID) {
+		if (uID == null || uID.equals("")) return null;
+		
 		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
-	    buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+	    
+		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 	    buffer.append("SELECT  DISTINCT  ?eventname\n");
 	    buffer.append("WHERE {\n\n");
 	    buffer.append("?root a owl:NamedIndividual .\n");
@@ -46,27 +48,8 @@ public class ProfilerEventUtils {
 	    buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
 	    buffer.append("FILTER (STR(?liketype) = \"Event\") . \n\n");
 	    buffer.append("}");
-
-	    Query query = QueryFactory.create(buffer.toString());
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		ResultSet rs = qe.execSelect();
-		
-		List <String> eventNames = new ArrayList <String>();
-		
-		String eventname = null;
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			eventname = qs.getLiteral("eventname").getString();
-			if (eventname != null && !eventname.equals("")) {
-				eventNames.add(eventname);
-			}
-		}
-		
-		qe.close();
-
-		return eventNames;
+	    return getEventNameFromQuery(buffer.toString());
 	}
 
 	/**
@@ -74,10 +57,13 @@ public class ProfilerEventUtils {
 	 * @param model
 	 * @param uID
 	 */
-	public static List <StartAndEndDate> getPreferredStartAndEndDates(Model model, String uID) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <StartAndEndDate> getPreferredStartAndEndDates(String uID) {
+		
+		if (uID == null || uID.equals("")) return null;
+		
 		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
-	    buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+	    
+		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 	    buffer.append("SELECT  DISTINCT  ?startDate ?endDate \n");
 	    buffer.append("WHERE {\n\n");
 	    buffer.append("?root a owl:NamedIndividual .\n");
@@ -90,32 +76,63 @@ public class ProfilerEventUtils {
 	    buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
 	    buffer.append("}");
 
-	    Query query = QueryFactory.create(buffer.toString());
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		ResultSet rs = qe.execSelect();
-		
+	    Connection conn = null;
+		Statement stmt = null;
+
 		List <StartAndEndDate> startAndEndDates = new ArrayList<StartAndEndDate>();
 		
-	    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-	    
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			try {
-			Date startDate = sdf.parse(qs.getLiteral("startDate").toString());
-			Date endDate = sdf.parse(qs.getLiteral("endDate").toString());
+		try {
+			conn=virtuosoConnection.processConfigFile();
 
-			StartAndEndDate startAndEndDate = new StartAndEndDate(startDate, endDate);
-			startAndEndDates.add(startAndEndDate);
+			stmt = conn.createStatement();
 			
-			} catch (Exception e) {
-				e.printStackTrace();
+			queryReturnClass qRC=virtuosoConnection.query(buffer.toString());
+
+			ResultSet results = qRC.getReturnedResultSet();
+						
+		    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+		    
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				try {
+				Date startDate = sdf.parse(qs.getLiteral("startDate").toString());
+				Date endDate = sdf.parse(qs.getLiteral("endDate").toString());
+
+				StartAndEndDate startAndEndDate = new StartAndEndDate(startDate, endDate);
+				startAndEndDates.add(startAndEndDate);
+				
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			if (conn == null) return null;
+			
+			return startAndEndDates;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
-		
-		qe.close();
-
 		return startAndEndDates;
 	}
 
@@ -126,8 +143,8 @@ public class ProfilerEventUtils {
 	 * @param uID
 	 * @param rating
 	 */
-	public static List<String> getEventNamesFromRating(Model model, String uID, float rating) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List<String> getEventNamesFromRating(String uID, float rating) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
@@ -148,25 +165,8 @@ public class ProfilerEventUtils {
 	    qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
 	    
-	    Query query = QueryFactory.create(qStr);
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		List <String> eventNames = new ArrayList<String>();
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String eventname = qs.getLiteral("eventname").getString();
-			if (eventname != null && !eventname.equals("")) {
-				eventNames.add(eventname);
-			}
-		}
-		
-		qe.close();
-
-		return eventNames;
+	    return getEventNameFromQuery(qStr);
 	}
 
 	/**
@@ -175,8 +175,8 @@ public class ProfilerEventUtils {
 	 * @param uID
 	 * @param numberOfTimesVisited
 	 */
-	public static List <String> getEventNamesFromNumberOfTimesVisited(Model model, String uID, int numberOfTimesVisited) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getEventNamesFromNumberOfTimesVisited( String uID, int numberOfTimesVisited) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -195,25 +195,62 @@ public class ProfilerEventUtils {
 	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
 	    qStr += "}";
 
-	    Query query = QueryFactory.create(qStr);
+	    return getEventNameFromQuery(qStr);
+	}
+
+	private static List<String> getEventNameFromQuery(String qStr) {
+		Connection conn = null;
+		Statement stmt = null;
 	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
 		List <String> eventNames = new ArrayList <String>();
 		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String eventname = qs.getLiteral("eventname").getString();
-			if (eventname != null && !eventname.equals("")) {
-				eventNames.add(eventname);
+	    try {
+			conn=virtuosoConnection.processConfigFile();
+
+			stmt = conn.createStatement();
+			
+			queryReturnClass qRC=virtuosoConnection.query(qStr);
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			
+			String eventname = null;
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				eventname = qs.getLiteral("eventname").getString();
+				if (eventname != null && !eventname.equals("")) {
+					eventNames.add(eventname);
+				}
+			}
+
+			if (conn == null) return null;
+			
+			return eventNames;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
-		
-		qe.close();
 
-		return eventNames;
+	    return eventNames;
 	}
 
 	/**
@@ -223,8 +260,8 @@ public class ProfilerEventUtils {
 	 * @param rating
 	 * @return
 	 */
-	public static List <String> getEventNamesFromRatingOfFriends(Model model, String uID, float rating) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getEventNamesFromRatingOfFriends(String uID, float rating) {
+		if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
@@ -248,25 +285,7 @@ public class ProfilerEventUtils {
 	    qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
 	    
-	    Query query = QueryFactory.create(qStr);
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		List <String> eventNames = new ArrayList <String>();
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String eventname = qs.getLiteral("eventname").getString();
-			if (eventname != null && !eventname.equals("")) {
-				eventNames.add(eventname);
-			}
-		}
-		
-		qe.close();
-
-		return eventNames;
+	    return getEventNameFromQuery(qStr);
 	}
 
 	/**
@@ -276,8 +295,8 @@ public class ProfilerEventUtils {
 	 * @param numberOfTimesVisited
 	 * @return
 	 */
-	public static List <String> getEventNamesFromNumberOfTimesVisitedOfFriends(Model model, String uID, int numberOfTimesVisited) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getEventNamesFromNumberOfTimesVisitedOfFriends(String uID, int numberOfTimesVisited) {
+		if (uID == null || uID.equals("")) return null;
 		StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 	    buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
@@ -298,25 +317,7 @@ public class ProfilerEventUtils {
 	    buffer.append("FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n");
 	    buffer.append("}");
 
-	    Query query = QueryFactory.create(buffer.toString());
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		List <String> eventNames = new ArrayList <String>();
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String eventname = qs.getLiteral("eventname").getString();
-			if (eventname != null && !eventname.equals("")) {
-				eventNames.add(eventname);
-			}
-		}
-		
-		qe.close();
-
-		return eventNames;
+	   return getEventNameFromQuery(buffer.toString());
 	}
 
 	/**
@@ -324,8 +325,9 @@ public class ProfilerEventUtils {
 	 * @param model
 	 * @param uID
 	 */
-	public static List <String> getEventNamesWhichFriendsLikeToVisit(Model model, String uID) {
-		if (model == null || uID == null || uID.equals("")) return null;
+	public static List <String> getEventNamesWhichFriendsLikeToVisit(String uID) {
+		if (uID == null || uID.equals("")) return null;
+		
 		StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 	    buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
@@ -348,25 +350,7 @@ public class ProfilerEventUtils {
 	    buffer.append("}");
 
 
-	    Query query = QueryFactory.create(buffer.toString());
-	    
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		
-		List <String> eventNames = new ArrayList<String>();
-		
-		ResultSet rs = qe.execSelect();
-		
-		for ( ; rs.hasNext(); ) {
-			QuerySolution qs = rs.next();
-			String eventname = qs.getLiteral("eventname").getString();
-			if (eventname != null && !eventname.equals("")) {
-				eventNames.add(eventname);
-			}
-		}
-		
-		qe.close();
-
-		return eventNames;
+	    return getEventNameFromQuery(buffer.toString());
 	}
 
 	

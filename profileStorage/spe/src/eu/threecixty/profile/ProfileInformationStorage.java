@@ -1,5 +1,7 @@
 package eu.threecixty.profile;
 
+import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.Name;
 
