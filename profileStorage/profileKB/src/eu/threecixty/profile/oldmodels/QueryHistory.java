@@ -3,7 +3,6 @@ package eu.threecixty.profile.oldmodels;
 import java.util.Date;
 
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.ResultSet;
 
 
 import eu.threecixty.profile.annotations.Description;

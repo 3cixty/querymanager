@@ -16,6 +16,8 @@ public class UserProfile{
     @RequiredNotNullEntities
     @Description(hasText="User ID on the 3cxity Plateform")
     private String hasUID="";
+    @Description(hasText="Last Crawl Time on the 3cxity Plateform")
+    private String hasLastCrawlTime="0";
     @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Name")
     private Name hasName;    
     @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
@@ -54,7 +56,14 @@ public class UserProfile{
 //    				+ "This collection holds the user’s previous employers and the current employer if any")
 //    private Set <EmployerInformation> hasEmployerInformation;
   
-    public Name getHasName() {
+    
+    public String getHasLastCrawlTime() {
+		return hasLastCrawlTime;
+	}
+	public void setHasLastCrawlTime(String hasLastCrawlTime) {
+		this.hasLastCrawlTime = hasLastCrawlTime;
+	}
+	public Name getHasName() {
 		return hasName;
 	}
 	public void setHasName(Name hasName) {
@@ -144,4 +153,5 @@ public class UserProfile{
 	public void setHasQueryHistory(Set<QueryHistory> hasQueryHistory) {
 		this.hasQueryHistory = hasQueryHistory;
 	}
+	
 }

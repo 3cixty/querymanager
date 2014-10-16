@@ -6,8 +6,10 @@ package eu.threecixty.profile.oldmodels;
  *
  */
 public enum NatureOfPlace {
+	BusStation,
 	Country,
 	City,
+	College,
 	Museum,
 	Cemetery,
 	Church, 
@@ -15,13 +17,22 @@ public enum NatureOfPlace {
 	Restaurant,
 	Bar,
 	Hostel,
+	Home,
 	Hotel,
+	Station,
+	Metro,
+	Office,
 	University,
 	School,
 	Mall,
+	Place,
 	Theater,
 	Gare,
+	Mosque,
+	Temple,
+	PlaceOfWorship,
+	Establishment,
 	Residence,
 	Others,
-	None,
+	None
 }

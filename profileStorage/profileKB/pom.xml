@@ -31,11 +31,11 @@
 </dependency>
 
 
-    <dependency>
+    <!--  <dependency>
 	  <groupId>eu.3cixty</groupId>
 	  <artifactId>models</artifactId>
 	  <version>1.0</version>
-    </dependency>
+    </dependency>  -->
             
     <dependency>
 	  <groupId>junit</groupId>

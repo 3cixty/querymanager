@@ -207,6 +207,13 @@ public interface ProfileManager {
 	 */
 	Partner getGoFlow();
 	
+	/**
+	 * Map crawl times to User profile
+	 * @return
+	 */
+	Set<IDCrawlTimeMapping> getIDCrawlTimeMappings();
+
+	
 	public class StartAndEndDate {
 
 		private Date startDate;

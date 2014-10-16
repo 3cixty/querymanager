@@ -10,7 +10,9 @@ import eu.threecixty.profile.annotations.Description;
  * @author Mobidot
  */
 public class PersonalPlace {
-    @Description(hasText = "Place ID")
+	@Description(hasText="PersonalPlace URI")
+	private String hasPersonalPlaceURI="";
+	@Description(hasText = "Place ID")
     private Long hasPersonalPlaceId; 
     @Description(hasText = "User ID who visits this place frequently")
     private Long hasUID; 
@@ -34,10 +36,19 @@ public class PersonalPlace {
     private String hasPersonalPlaceWeekdayPattern; 
     @Description(hasText = "Duration of stay per day hour")
     private String hasPersonalPlaceDayhourPattern; 
-    @Description(hasText = "Set to manual if the user changed name and/or location")
+	@Description(hasText = "Set to manual if the user changed name and/or location")
     private DecisionLevel hasDecisionlevel; 
     @Description(hasText = "External IDs of this place, as a + concatenated string, with e.g. FourSquare and FaceBook identities: 4sq:43432+fb:8348734")
     private String hasPersonalPlaceexternalIds;
+	
+    
+    
+    public String getHasPersonalPlaceURI() {
+		return hasPersonalPlaceURI;
+	}
+	public void setHasPersonalPlaceURI(String hasPersonalPlaceURI) {
+		this.hasPersonalPlaceURI = hasPersonalPlaceURI;
+	}
 	public Long getHasPersonalPlaceId() {
 		return hasPersonalPlaceId;
 	}
@@ -113,17 +124,17 @@ public class PersonalPlace {
 			String hasPersonalPlaceDayhourPattern) {
 		this.hasPersonalPlaceDayhourPattern = hasPersonalPlaceDayhourPattern;
 	}
-	public DecisionLevel getHasDecisionlevel() {
-		return hasDecisionlevel;
-	}
-	public void setHasDecisionlevel(DecisionLevel hasDecisionlevel) {
-		this.hasDecisionlevel = hasDecisionlevel;
-	}
 	public String getHasPersonalPlaceexternalIds() {
 		return hasPersonalPlaceexternalIds;
 	}
 	public void setHasPersonalPlaceexternalIds(String hasPersonalPlaceexternalIds) {
 		this.hasPersonalPlaceexternalIds = hasPersonalPlaceexternalIds;
+	}
+	public DecisionLevel getHasDecisionlevel() {
+		return hasDecisionlevel;
+	}
+	public void setHasDecisionlevel(DecisionLevel hasDecisionlevel) {
+		this.hasDecisionlevel = hasDecisionlevel;
 	}
 	
     

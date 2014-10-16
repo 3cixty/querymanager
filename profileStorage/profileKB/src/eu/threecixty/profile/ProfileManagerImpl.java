@@ -15,7 +15,7 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
  *
  */
 public class ProfileManagerImpl implements ProfileManager {
-	
+
 	public static final String SPARQL_ENDPOINT_URL = "http://dev.3cixty.com/sparql?default-graph-uri=&query=";
 
 	private static final Object _sync = new Object();
@@ -190,7 +190,13 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (profileManager != null) return profileManager.getGoFlow();
 		return null;
 	}
-
+	
+	@Override
+	public Set<IDCrawlTimeMapping> getIDCrawlTimeMappings() {
+		if (profileManager != null) return profileManager.getIDCrawlTimeMappings();
+		return new HashSet <IDCrawlTimeMapping>();
+	}
+	
 	private ProfileManagerImpl() {
 		boolean found = false;
 		try {

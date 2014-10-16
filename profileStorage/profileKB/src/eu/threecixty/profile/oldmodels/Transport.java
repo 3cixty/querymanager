@@ -8,6 +8,9 @@ public class Transport {
 	@Description(hasText = "Collection of actual trips made by the user. "
 			+ "This collection can be requested from the MoveSmarter API for a given period of time.")
 	private Set <TripMeasurement> hasTripMeasurement;
+	@Description(hasText="UniqueID")
+	private String hasTransportURI="";
+	
 	@Description(hasText = "Collection of regular trips, frequently made by the user. "
 			+ "This collection can be requested from the MoveSmarter API for a given user, and contains usage statistics as well.")
 	private Set <RegularTrip> hasRegularTrip;
@@ -26,6 +29,13 @@ public class Transport {
 	// data is new 
 	private Boolean newForKB = null;
 	
+	
+	public String getHasTransportURI() {
+		return hasTransportURI;
+	}
+	public void setHasTransportURI(String hasTransportURI) {
+		this.hasTransportURI = hasTransportURI;
+	}
 	public Set<TripMeasurement> getHasTripMeasurement() {
 		return hasTripMeasurement;
 	}

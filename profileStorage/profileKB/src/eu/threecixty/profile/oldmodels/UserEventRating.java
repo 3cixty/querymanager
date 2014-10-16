@@ -8,6 +8,8 @@ import eu.threecixty.profile.annotations.Description;
  *
  */
 public class UserEventRating {
+	@Description(hasText="UniqueID")
+	private String hasUserEventRatingURI="";
 	@Description(hasText="Event details")
 	private EventDetail hasEventDetail;
 	@Description(hasText="User rating of the event")
@@ -18,6 +20,12 @@ public class UserEventRating {
 	// data is new 
 	private Boolean newForKB = null;
 	
+	public String getHasUserEventRatingURI() {
+		return hasUserEventRatingURI;
+	}
+	public void setHasUserEventRatingURI(String hasUserEventRatingURI) {
+		this.hasUserEventRatingURI = hasUserEventRatingURI;
+	}
 	public EventDetail getHasEventDetail() {
 		return hasEventDetail;
 	}
