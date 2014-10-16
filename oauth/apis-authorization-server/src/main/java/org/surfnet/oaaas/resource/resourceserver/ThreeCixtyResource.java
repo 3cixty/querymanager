@@ -2,6 +2,7 @@ package org.surfnet.oaaas.resource.resourceserver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,7 +27,7 @@ import eu.threecixty.oauth.utils.ScopeUtils;
 public class ThreeCixtyResource extends AbstractResource {
 
 	private static final String THREE_CIXTY_RES_SERVER_KEY = ResourceServerUtils.getResourceServerKey();
-	private static final String FIXED_PASSWORD = "fixedPwdMilano";
+//	private static final String FIXED_PASSWORD = "fixedPwdMilano";
 	private static boolean firstTime = true;
 	
     @Inject
@@ -41,13 +42,16 @@ public class ThreeCixtyResource extends AbstractResource {
     		@QueryParam("app_name") String app_name, @QueryParam("scope") String scope,
     		@QueryParam("thumbNailUrl") String thumbNailUrl) {
     	boolean ok = false;
+    	String genertedPwd = null;
     	if (isNullOrEmpty(clientId) || isNullOrEmpty(app_name) || isNullOrEmpty(scope)) {
     		ok = false;
     	} else {
     		Client client = clientRepository.findByClientId(clientId);
     		if (client != null) {
     			ok = true;
+    			genertedPwd = client.getSecret();
     		} else {
+    			genertedPwd = generatePwd();
     			create3CixtyResServerWhenNecessary();
     			ResourceServer resourceServer = resourceServerRepository.findByKey(THREE_CIXTY_RES_SERVER_KEY);
     			client = new Client();
@@ -59,7 +63,7 @@ public class ThreeCixtyResource extends AbstractResource {
     			client.setResourceServer(resourceServer);
     			client.setExpireDuration(60 * 60 * 24); // last for a day
     			client.setUseRefreshTokens(true);
-    			client.setSecret(FIXED_PASSWORD);
+    			client.setSecret(genertedPwd);
     			client.setThumbNailUrl(thumbNailUrl);
     			List <String> scopes = new ArrayList <String>();
     			if (scope.indexOf(',') >= 0) {
@@ -79,7 +83,7 @@ public class ThreeCixtyResource extends AbstractResource {
     	
     	if (ok) {
     		return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON_TYPE)
-    				.entity("{\"response\": \"successful\"}").build();
+    				.entity("{\"response\": \"successful\", \"password\": \"" + genertedPwd + "\"}").build();
     	} else {
     		return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE)
     				.entity("{\"response\": \"error\"}").build();
@@ -164,5 +168,39 @@ public class ThreeCixtyResource extends AbstractResource {
 
 	private boolean isNullOrEmpty(String str) {
 		return str == null || str.equals("");
+	}
+
+	private String generatePwd() {
+		return new RandomString(30).nextString();
+	}
+	
+	private static class RandomString {
+
+		private static final char[] symbols;
+
+		static {
+			StringBuilder tmp = new StringBuilder();
+			for (char ch = '0'; ch <= '9'; ++ch)
+				tmp.append(ch);
+			for (char ch = 'a'; ch <= 'z'; ++ch)
+				tmp.append(ch);
+			symbols = tmp.toString().toCharArray();
+		}   
+
+		private final Random random = new Random(System.currentTimeMillis());
+
+		private final char[] buf;
+
+		public RandomString(int length) {
+			if (length < 1)
+				throw new IllegalArgumentException("length < 1: " + length);
+			buf = new char[length];
+		}
+
+		public String nextString() {
+			for (int idx = 0; idx < buf.length; ++idx) 
+				buf[idx] = symbols[random.nextInt(symbols.length)];
+			return new String(buf);
+		}
 	}
 }
