@@ -20,7 +20,6 @@ import eu.threecixty.profile.oldmodels.UserInteractionMode;
 public class VirtuosoUserProfileStorage {
 	
 	private static final Object _sync = new Object();
-	//private static MyFactory myFactory;
 	
 	/**
 	 * Loads profile information from the KB.
@@ -261,6 +260,11 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 
+	/**
+	 * add last crawl time
+	 * @param uid
+	 * @param time
+	 */
 	private static void saveLastCrawlTimeToKB(String uid, String time) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -299,7 +303,12 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 	
-	
+	/**
+	 * add likes to the kb
+	 * @param uid
+	 * @param preferenceURI
+	 * @param likes
+	 */
 	private static void saveLikesToKB(String uid, String preferenceURI, Set<eu.threecixty.profile.oldmodels.Likes> likes) {
 		Set <eu.threecixty.profile.oldmodels.Likes> oldLikes = new HashSet <eu.threecixty.profile.oldmodels.Likes>();
 				
@@ -453,7 +462,12 @@ public class VirtuosoUserProfileStorage {
 		}		
 	}
 
-	
+	/**
+	 * add place preferences to the kb
+	 * @param uid
+	 * @param preferenceURI
+	 * @param placePreferences
+	 */
 	private static void savePlacePreferenceToKB(String uid, String preferenceURI, Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
 		Set<eu.threecixty.profile.oldmodels.PlacePreference> oldPlacePreferences = new HashSet<eu.threecixty.profile.oldmodels.PlacePreference>();
 		
@@ -531,6 +545,12 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 
+	/**
+	 * add trip preferences to the kb
+	 * @param uid
+	 * @param preferenceURI
+	 * @param tripPreferences
+	 */
 	private static void saveTripPreferenceToKB(String uid, String preferenceURI, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
 		Set<eu.threecixty.profile.oldmodels.TripPreference> oldTripPreferences = new HashSet<eu.threecixty.profile.oldmodels.TripPreference>();
 		
@@ -622,10 +642,8 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 	
-	
-	
 	/**
-	 * Creates transport object store in the KB.
+	 * add transport in the KB.
 	 * @param uid
 	 * @param transport
 	 * @param kbUserProfile
@@ -770,8 +788,6 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 	}
-
-
 
 	/**
 	 * Saves name information into the KB.
@@ -992,7 +1008,11 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 	
-	//Todo: ADD
+	/**
+	 * load last crawl time from the kb
+	 * @param uid
+	 * @param to
+	 */
 	private static void loadLastCrawlTimeFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile to) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -1683,7 +1703,6 @@ public class VirtuosoUserProfileStorage {
 		   	toAccompanying.setHasAccompanyTime(Long.parseLong(acctime));
 	}
 
-	//Todo: Add
 	/**
 	 * Loads first name and last name from KB to profile information.
 	 * @param from
@@ -1776,7 +1795,12 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 	}
-
+	
+	/**
+	 * load place preference from KB 
+	 * @param uid
+	 * @param to
+	 */
 	private static void loadPlacePreferencesFromKBToPreferences(String uid, eu.threecixty.profile.oldmodels.Preference to) {
 		
 		Set <eu.threecixty.profile.oldmodels.PlacePreference> placePreferences = new HashSet <eu.threecixty.profile.oldmodels.PlacePreference>();
@@ -1841,7 +1865,11 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 
-	
+	/**
+	 * load Place detail preferences from kb
+	 * @param placeDetailPreferenceURI
+	 * @param placePreference
+	 */
 	private static void loadPlaceDetailPreferenceFromKBToPlacePreference(
 			String placeDetailPreferenceURI,
 			eu.threecixty.profile.oldmodels.PlacePreference placePreference) {
@@ -1917,6 +1945,11 @@ public class VirtuosoUserProfileStorage {
 		return sdf.format(date);
 	}
 	
+	/**
+	 * convert string to date
+	 * @param dateStr
+	 * @return
+	 */
 	private static Date convert(String dateStr) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		int index = dateStr.indexOf("\"", 5);
