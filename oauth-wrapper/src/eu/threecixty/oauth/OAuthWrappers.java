@@ -34,7 +34,9 @@ public class OAuthWrappers {
 	
 	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5";
 
-	public static final String ENDPOINT_AUTHORIZATION = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/authorize";
+	//public static final String ENDPOINT_AUTHORIZATION = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/authorize";
+	public static final String ENDPOINT_AUTHORIZATION = 
+			Configuration.getHttpServer() + "/" + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/authorize";
 	
 	public static final String ENDPOINT_TO_POST_ACCESS_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/token";
 	private static final String ENDPOINT_TO_VALIDATE_ACCESS_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/v1/tokeninfo?access_token=";
@@ -206,15 +208,17 @@ public class OAuthWrappers {
 		String appkey = createAccessTokenUsingOAuthServer();
 		if (appkey == null || appkey.equals("")) return null;
 		String clientId = tmpAppId + System.currentTimeMillis();
-		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, appName, clientId, description, tmpCategory,
-				developer, scopeNames, redirect_uri);
-		if (!ok) return null;
+		
 		// create clientId in the client table
-		if (!createClientIdForApp(clientId, appName, scopeNames, thumbNailUrl)) {
-			App app = OAuthModelsUtils.getApp(appkey);
-			OAuthModelsUtils.deleteApp(app);
+		String pwd = createClientIdForApp(clientId, appName, scopeNames, thumbNailUrl);
+		if (pwd == null) {
 			return null;
 		}
+		
+		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, appName, clientId, pwd, description, tmpCategory,
+				developer, scopeNames, redirect_uri);
+		if (!ok) return null;
+
 		return appkey;
 	}
 	
@@ -325,6 +329,11 @@ public class OAuthWrappers {
 				.concat(clientSecret).getBytes())));
 		return basicAuth;
 	}
+	
+	public static String getBasicAuth(String username, String pwd) {
+		return "Basic ".concat(new String(Base64.encodeBase64(username.concat(":")
+				.concat(pwd).getBytes())));
+	}
 
 	/**
 	 * Validates a given access token with OAuth server.
@@ -392,7 +401,7 @@ public class OAuthWrappers {
 	    // check ThreeCixtyResourceServer
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
 				app.getClientId().concat(":")
-				.concat("fixedPwdMilano").getBytes())));
+				.concat(app.getPassword()).getBytes())));
 	    
 	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
@@ -421,7 +430,7 @@ public class OAuthWrappers {
 	    // check ThreeCixtyResourceServer
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
 				lastAccessToken.getAppClientKey().concat(":")
-				.concat("fixedPwdMilano").getBytes())));
+				.concat(lastAccessToken.getAppClientPwd()).getBytes())));
 	    
 	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
 	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
@@ -460,7 +469,7 @@ public class OAuthWrappers {
 		return accessToken;
 	}
 
-	private static boolean createClientIdForApp(String clientId,
+	private static String createClientIdForApp(String clientId,
 			String app_name, List<String> scopeNames, String thumbNailUrl) {
 		Client client = Client.create();
 	    Builder builder;
@@ -477,14 +486,17 @@ public class OAuthWrappers {
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has("response")) {
 				String res = jsonObj.getString("response");
-				return res.equalsIgnoreCase("successful");
+				if (res.equalsIgnoreCase("successful")) {
+					return jsonObj.getString("password");
+				}
+				return null;
 			} else {
-				return false;
+				return null;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return null;
 	}
 
 	private static void addScopeNames(String scope, List<String> results) {

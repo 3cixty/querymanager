@@ -254,7 +254,7 @@ public class OAuthModelsUtils {
 		return scopes;
 	}
 
-	protected static boolean addApp(String key, String appId, String appName, String clientId, String description,
+	protected static boolean addApp(String key, String appId, String appName, String clientId, String pwd, String description,
 			String category, Developer developer, List<String> scopeNames, String redirect_uri) {
 		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
@@ -274,6 +274,7 @@ public class OAuthModelsUtils {
 			app.setScopes(scopes);
 			app.setRedirectUri(redirect_uri);
 			app.setClientId(clientId);
+			app.setPassword(pwd);
 			app.setAppName(appName);
 			
 			session.save(app);
@@ -596,6 +597,7 @@ public class OAuthModelsUtils {
 				ac.getScopeNames().add(scope.getScopeName());
 			}
 			ac.setAppClientKey(userAccessToken.getApp().getClientId());
+			ac.setAppClientPwd(userAccessToken.getApp().getPassword());
 			ac.setRefresh_token(refreshToken);
 			session.close();
 			return ac;
@@ -623,6 +625,7 @@ public class OAuthModelsUtils {
 				ac.getScopeNames().add(scope.getScopeName());
 			}
 			ac.setAppClientKey(userAccessToken.getApp().getClientId());
+			ac.setAppClientPwd(userAccessToken.getApp().getPassword());
 			ac.setAccess_token(accessToken);
 			ac.setRefresh_token(userAccessToken.getRefreshToken());
 			ac.setUid(userAccessToken.getUser().getUid());

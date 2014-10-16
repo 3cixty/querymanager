@@ -47,6 +47,8 @@ public class App implements java.io.Serializable {
 	
 	// also check clientId in the 'client' table
 	private String clientId;
+	
+	private String password;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -143,6 +145,15 @@ public class App implements java.io.Serializable {
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
+	}
+
+	@Column(name = "password", unique = false, nullable = false, length = 50)
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	@Column(name = "app_name", unique = false, nullable = false, length = 255)

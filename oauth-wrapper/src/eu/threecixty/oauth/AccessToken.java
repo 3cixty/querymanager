@@ -11,6 +11,8 @@ public class AccessToken {
 	private String token_type = "Bearer";
 	// This attribute is used to avoid making two queries to DB.
 	private String appClientKey;
+	private String appClientPwd;
+	
 	private List <String> scopeNames = new ArrayList <String>();
 	
 	private String uid; // Google UID
@@ -76,6 +78,14 @@ public class AccessToken {
 
 	public void setAppkey(String appkey) {
 		this.appkey = appkey;
+	}
+
+	public String getAppClientPwd() {
+		return appClientPwd;
+	}
+
+	public void setAppClientPwd(String appClientPwd) {
+		this.appClientPwd = appClientPwd;
 	}
 
 
