@@ -38,7 +38,8 @@ public class OAuthServices {
 	/**
 	 * Set the server configuration in WebContent/WEB-INF/3cixty.properties
 	 */
-	private static final String V2_ROOT = Configuration.get3CixtyRoot();
+	private static final String V2_ROOT = Configuration.get3CixtyRoot() + "/";
+	private static final String GOOGLE_CLIENT_ID = Configuration.getGoogleClientId();
 	
 	public static final String GOOGLE_CALLBACK = V2_ROOT + "googlecallback.jsp";
 	public static final String THREECIXTY_CALLBACK = V2_ROOT + "3cixtycallback.jsp";
@@ -214,7 +215,7 @@ public class OAuthServices {
 			//return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
 			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=email%20profile&state=%2Fprofile&redirect_uri="
 			+ OAuthServices.GOOGLE_CALLBACK
-			+"&response_type=token&client_id=239679915676-j58smonkigkh26rugnbsja3pon7bkvbv.apps.googleusercontent.com"))
+			+"&response_type=token&client_id=" + GOOGLE_CLIENT_ID))
 			.header("Access-Control-Allow-Origin", "*").build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -231,7 +232,7 @@ public class OAuthServices {
 			//return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
 			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=email%20profile&state=%2Fprofile&redirect_uri="
 			+ OAuthServices.GOOGLE_CALLBACK
-			+"&response_type=token&client_id=239679915676-j58smonkigkh26rugnbsja3pon7bkvbv.apps.googleusercontent.com"))
+			+"&response_type=token&client_id=" + GOOGLE_CLIENT_ID))
 			.header("Access-Control-Allow-Origin", "*").build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -265,12 +266,13 @@ public class OAuthServices {
 		}
 		
 		try {
+			
 			return Response.temporaryRedirect(new URI(
 					OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
 			+ join(app.getScopes()) + "&client_id="
 			+ app.getClientId() + "&redirect_uri="
 		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
-		    		OAuthWrappers.getBasicAuth()).build();
+		    		OAuthWrappers.getBasicAuth(app.getClientId(), app.getPassword())).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
