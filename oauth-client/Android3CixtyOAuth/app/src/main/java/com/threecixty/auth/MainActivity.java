@@ -1,10 +1,12 @@
 package com.threecixty.auth;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -14,6 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
+
 public class MainActivity extends Activity {
 
 	public static final int THREE_CIXTY_PERMISSION_REQUEST = 200;
@@ -22,8 +28,6 @@ public class MainActivity extends Activity {
 	private static final int PICK_ACCOUNT_REQUEST = 100;
 	
 	private static final String EXTRA_APP_KEY = "app_key";
-    private static final String EXTRA_APP_ID = "app_id";
-	private static final String EXTRA_APP_NAME = "app_name";
 	private static final String EXTRA_TOKEN_KEY = "access_token";
 	
 	private String appkey;
@@ -42,34 +46,92 @@ public class MainActivity extends Activity {
 		if (callerIntent.hasExtra(EXTRA_APP_KEY)) {
 			appkey = callerIntent.getStringExtra(EXTRA_APP_KEY);
 		}
-
-		if (callerIntent.hasExtra(EXTRA_APP_NAME)) appName = callerIntent.getStringExtra(EXTRA_APP_NAME);
-
-        if (callerIntent.hasExtra(EXTRA_APP_ID)) appid = callerIntent.getStringExtra(EXTRA_APP_ID);
 		
 		if (callerIntent.hasExtra(EXTRA_TOKEN_KEY)) accessToken = callerIntent.getStringExtra(EXTRA_TOKEN_KEY);
 		
-		Button cmdLogin = (Button) findViewById(R.id.login);
-		if (appkey != null && appName != null && appid != null) { // get 3Cixty token
-			if (!OAuthManager.getInstance().existsToken(this, appid)) {
-				cmdLogin.setOnClickListener(new View.OnClickListener() {
+		final Button cmdLogin = (Button) findViewById(R.id.login);
+		if (appkey != null) { // get 3Cixty token
 
-					@Override
-					public void onClick(View v) {
-						goWithAskingForPermission();
-					}
-				});
-			} else {
-				cmdLogin.setEnabled(false);
-				TokenInfo tokenInfo = OAuthManager.getInstance().getToken(this, appid);
-				if (OAuthManager.getInstance().hasValidToken(tokenInfo)) {
-					quitOAuthActivity(tokenInfo);
-				} else {
-					OAuthManager.getInstance().refreshToken(this, appid, tokenInfo, new CallbackImpl());
-				}
-			}
+            AsyncTask <Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    URLConnection conn = ThreeCixtyAbstractTask.getUrlConnection(ThreeCixtyAbstractTask.GET_KEY_INFO_SERVICE_FROM_APPKEY);
+                    conn.setRequestProperty("key", appkey);
+                    try {
+                        String content = getContent(conn);
+                        JSONObject jsonObject = new JSONObject(content);
+                        if (jsonObject.has("appid") && jsonObject.has("appname")) {
+                            appid = jsonObject.getString("appid");
+                            appName = jsonObject.getString("appname");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();;
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    if (appName != null && appid != null) {
+                        if (!OAuthManager.getInstance().existsToken(MainActivity.this, appid)) {
+                            cmdLogin.setOnClickListener(new View.OnClickListener() {
+
+                                @Override
+                                public void onClick(View v) {
+                                    goWithAskingForPermission();
+                                }
+                            });
+                        } else {
+                            cmdLogin.setEnabled(false);
+                            TokenInfo tokenInfo = OAuthManager.getInstance().getToken(MainActivity.this, appid);
+                            if (OAuthManager.getInstance().hasValidToken(tokenInfo)) {
+                                quitOAuthActivity(tokenInfo);
+                            } else {
+                                OAuthManager.getInstance().refreshToken(MainActivity.this, appid, tokenInfo, new CallbackImpl());
+                            }
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, "Your appkey is invalid or there is no Internet connection", Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+            task.execute();
 		} else if (accessToken != null) { // revoke 3Cixty token
-			OAuthManager.getInstance().revokeToken(this, appid, accessToken, new CallbackImpl());
+
+            AsyncTask <Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    URLConnection conn = ThreeCixtyAbstractTask.getUrlConnection(ThreeCixtyAbstractTask.GET_KEY_INFO_SERVICE_FROM_ACCESS_TOKEN);
+                    conn.setRequestProperty("access_token", accessToken);
+                    try {
+                        String content = getContent(conn);
+                        JSONObject jsonObject = new JSONObject(content);
+                        if (jsonObject.has("appid")) {
+                            appid = jsonObject.getString("appid");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();;
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    if (appid != null) {
+                        OAuthManager.getInstance().revokeToken(MainActivity.this, appid, accessToken, new CallbackImpl());
+                    } else {
+                        Toast.makeText(MainActivity.this, "Your access token is invalid or there is no Internet connection", Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+            task.execute();
+
 		}
 	}
 	
@@ -123,6 +185,18 @@ public class MainActivity extends Activity {
 		this.setResult(RESULT_OK, intent);
 		finish();
 	}
+
+    protected String getContent(URLConnection conn) throws IOException {
+        byte[] bytes = new byte[1024];
+        int readBytes = 0;
+        InputStream input = conn.getInputStream();
+        StringBuilder builder = new StringBuilder();
+        while ((readBytes = input.read(bytes)) >= 0) {
+            builder.append(new String(bytes, 0, readBytes));
+        }
+        input.close();
+        return builder.toString();
+    }
 
 	private class CallbackImpl implements OAuthCallback {
 

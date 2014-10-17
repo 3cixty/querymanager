@@ -26,7 +26,10 @@ public abstract class ThreeCixtyAbstractTask extends AsyncTask<Void, Void, Void>
 	protected static final String OAUTH_ANDROID_SERVICE = SERVER + "/v2/getAccessToken";
 	protected static final String REFRESH_OAUTH_SERVICE = SERVER + "/v2/token";
 
-	protected URLConnection getUrlConnection(String urlStr) {
+    protected static final String GET_KEY_INFO_SERVICE_FROM_APPKEY = SERVER + "/v2/retrieveKeyInfo";
+    protected static final String GET_KEY_INFO_SERVICE_FROM_ACCESS_TOKEN = SERVER + "/v2/retrieveKeyInfoFromAccessToken";
+
+	protected static URLConnection getUrlConnection(String urlStr) {
 		URLConnection conn = null;
 		try {
 			URL url = new URL(urlStr);
