@@ -111,7 +111,7 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ "  { ";
-			if (time==null || time .isEmpty())
+			if (time==null || time.isEmpty())
 				time="0";
 			query+= "  profile:"+uid+" vcard:hasLastCrawlTime \""+time+"\" ."
 			+ "}";
