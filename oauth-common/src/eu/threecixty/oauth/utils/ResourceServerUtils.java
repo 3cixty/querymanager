@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import eu.threecixty.Configuration;
-
 public class ResourceServerUtils {
 	
 	private static final Object _sync = new Object();
@@ -21,7 +19,7 @@ public class ResourceServerUtils {
 	}
 
 	public static String getResourceServerThumbNailUrl() {
-		return Configuration.getHttpServer() + "/apis-authorization-server-war-1.3.5/3cixty.png";
+		return  getPropVal("THUMB_NAIL_URL");
 	}
 
 	private static String getPropVal(String key) {
