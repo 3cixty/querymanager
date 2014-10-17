@@ -15,7 +15,7 @@ public class Configuration {
 	private static String version;
 
 
-	public static void setPath(String path) {
+	public synchronized static void setPath(String path) {
 		Configuration.path = path;
 	}
 	
@@ -52,7 +52,7 @@ public class Configuration {
 		else return props.getProperty(key + "_DEV");
 	}
 
-	private static void load() {
+	private synchronized static void load() {
 		try {
 			InputStream input = new FileInputStream(path + File.separatorChar
 					+ "WEB-INF" + File.separatorChar + "3cixty.properties");
