@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.theresis.humanization.authen.Service;
 import org.theresis.humanization.authen.Session;
 import org.theresis.humanization.authen.simple.SimpleSessionManager;
-import org.theresis.humanization.conf.ProfileStorageConf;
 import org.theresis.humanization.datastorage.ProfileManager;
 import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
 
@@ -19,7 +18,6 @@ import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
 public class DataStorageTest {
 
 	private ProfileManager profileManager;
-	//private ProfileStorageConf config;
 	private Session session = null;
 	static public String 	propertyFilePath = null;
 
@@ -30,7 +28,6 @@ public class DataStorageTest {
 		profileManager = profileFactory.getProfileManager( propertyFilePath );
 		Service service = profileFactory.getService("test", "pwdTest");
 		session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
-		//config = ProfileStorageConf.getInstance();
 	}
 
 	@Test

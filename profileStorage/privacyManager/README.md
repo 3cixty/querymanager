@@ -1,18 +1,24 @@
+
 Privacy Manager
 =========
-**Final goal:**
+
+
+### Final goal
 Privacy Manager will be the 3cixty infrastructure component holding the private knowledge base of user profiles and managing the access controls.
 
-**Current features**
+### Current features
   
 * Storage and retrieval of user profiles
 * Two programs test that show how to use the profile storage APIs
 * Application and user privacy contract definition
+* Implementation of the privacy contract request api that allow to request a privacy contract certification, update a privacy contract and get the current status of the request
+* Implementation of storage of the user privacy contract
 
-Last Release Version
-----
+# Last Release Version
+----------
+
 #### Identification
-Privacy Manager version 0.4
+Privacy Manager version 1.0
 
 #### Maven
 In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
@@ -20,13 +26,69 @@ In order to use the module in other Maven projects add the following dependency 
      <dependency>
     	<groupId>eu.3cixty.privacy</groupId>
     	<artifactId>privacymanager</artifactId>
-    	<version>0.4</version>
+    	<version>1.0</version>
      </dependency>
+   
 
-Changes log
-----
+# Changes log
+----------
 
-#### version 0.4
+## Version 1.0
+  
+This version contains the implementation of APIs introduced in version 0.4 to manage privacy in the profile storage component.
+As these APIs have not been subject of a review by the project, we have implemented them unchanged, 
+except for minor adjustments due to technical reasons.
+
+
+There's one modification of naming in this version :   
+
+`CertificationAndPrivacyAuthority becomes CertificationAndPrivacyRequest`
+
+A new test file is provided, ```PrivacyAuthorityTest.java````, that shows how to use the APIs and also provides a test of this implementation.
+
+      
+##### Details of API implementation
+
+* **CertificationAndPrivacyRequest API**  
+The implementation uses a database to store the certification requests.
+Thus, before using the CertificationAndPrivacyRequest API, you need to create the database with the following method :
+
+			InitializePrivacyDB.doTheJob( String login, String password, String DBCryptkey)
+
+	Currently, only the login **"SA"** with password **""** is allowed.
+
+ 	**DBCryptKey** is a key used to encrypt the database used by the privacy authority module to store the requests.  
+	If the DBCryptKey is NULL, the database will not be encrypted.
+	A valid random encrypting key could be generated with the following API
+   
+			CryptKeyGenerator.doTheJob
+
+	The location of the database must be defined in a configuration file.  
+	An example of the configuration file is provided in the testProject\src\test\resources, **3CixtyPrivacyAuthority.properties** :
+ 
+	    	# the path of the db where are stored the certification requests
+    		PrivacyAuthority.db.path=./3cixty/DB/privacydb
+
+	And the configuration file path must be provided to privacy-authority mmodule with the fallowing method call :  
+
+			PrivacyAuthorityConf.setPropertyFile(String propertyFilePath)
+										 		  
+	Then, a factory method is provided to create the implementation of the CertificationAndPrivacyRequest API :    
+
+     	CertificationAndPrivacyRequest build( String login, String password, String DBCryptKey )
+      
+ 	Currently, only the login **"SA"** with password **""** is allowed.
+
+		
+
+* **PrivacyContractStorage API**  
+A factory method is provided to create the implementation :
+  
+		PrivacyContractStorage PrivacyContractStorageFactory.getInstance( )    
+This API must be used to store and retrive user privacy contract.
+  
+## Version 0.4  
+  
 This new version contains the APIs definition to manage privacy in the profile storage component.  
 Two main APIs :  
 
@@ -45,7 +107,7 @@ Note:
 The privacy APIs definition is also available in its own jar file: privacy-api-0.0.4.jar,
 which does correspond to the delta between version 0.3 and 0.4 of privacy manager.
 
-#### version 0.3
+## Version 0.3
 
 * Implements the merge/replace/delete profile with property path methods :
   *  mergeProfileProperties
@@ -56,33 +118,33 @@ which does correspond to the delta between version 0.3 and 0.4 of privacy manage
 This behavior could be disabled by setting the option   ```ProfileStorage.jsonld.option.recursive``` to ```false``` in the configuration file
 * [Issue #21][4] : the configuration option ```ProfileStorage.jsonld.option.compact``` was not taken into account. 
 
-#### version alpha 0.2
+## Version alpha 0.2
 
 * Implements the get profile with property path method, ```getProfileProperties```, defined by interface ```ProfileManager```
 * Renamed package names pertaining to products issued by Theresis. As a consequence, the package ```eu.threecixty.privacy``` is now known as ```org.theresis.humanization```
 * [Issue #18][3] : Modification of the JSON-LD output format in order to do not compact property values.
 All property values are provided as arrays. 
 
-#### version alpha 0.1.1
+## Version alpha 0.1.1
 * repackaging
 
-#### version alpha 0.1
+## Version alpha 0.1
 
 * This initial release supports only full reading and writing of user profiles in memory.
 * Property paths based interfaces are not implemented.
 * No provacy management at all
 * No security
 
-Tech
------------
+# Tech
+----
 Privacy Manager uses a number of open source projects to work properly:
 
 * [Jena] - A free and open source Java framework for building Semantic Web and Linked Data applications
 
 The module supports [JSON-LD] and [SPARQL] 1.1 [Property Path][1]
 
-Installation
------------
+# Installation
+----
 
 Installation is performed during the install Maven phase.
 
@@ -92,10 +154,12 @@ The artifact can also be manually installed in local Maven repository:
 
 For more commands and install options see [Installing 3rd party library][2]
 
-Usage
------------
+# Usage
+------
 
-#### Configuration
+### Configuration
+
+##### Profile Storage
 
 Copy the file ```res/3CixtyProfileStorage.properties``` and edit the copy in order to set its properties.
 
@@ -127,7 +191,18 @@ The default file looks like this:
     
 Set the property ```ProfileStorage.ontology.path``` in the configuration file to specify the path to the ontology.
 
-#### Main API interfaces
+##### Privacy authority
+Copy the file ```res/3CixtyPrivacyAuthority.properties``` and edit the copy in order to set its properties.  
+
+The default file looks like this:
+
+	# the path of the db where are stored the certification requests
+	PrivacyAuthority.db.path=./3cixty/DB/privacydb
+
+Set the property ```PrivacyAuthority.db.path``` in the configuration file to specify the path where the privacy authority will store its database.
+
+
+### Main API interfaces
 
 The main interfaces are:
 
@@ -137,19 +212,20 @@ The main interfaces are:
 * org.theresis.humanization.auth.Service
 * org.theresis.humanization.auth.Session
 * org.theresis.humanization.auth.SessionManager
-* org.theresis.humanization.privacy.CertificationAndPrivacyAuthority
+* org.theresis.humanization.privacy.CertificationAndPrivacyRequest
 * org.theresis.humanization.privacy.PrivacyContractStorage
 * org.theresis.humanization.privacy.UserPrivacyContract
 * org.theresis.humanization.privacy.generated.PrivacyContract
 
 
-#### Main implementation classes
+### Main implementation classes
 Implementation classes provided in the distribution:  
 
 * ```ProfileManagerFactory``` is implemented by ```org.theresis.humanization.profilestore.SimpleProfileManagerFactory```
 * ```SessionManager``` is implemented by ```org.theresis.humanization.auth.simple.SimpleSessionManager```
 * ```UserPrivacyContract```and ```PrivacyContract``` are implemented
-* Other APIs of ```org.theresis.humanization.privacy``` package currently have not implementation
+* ```CertificationAndPrivacyRequest``` could be obtained by the  factory ```PrivacyCertAuthorityFactory```
+* ```PrivacyContractStorage``` could be obtained by the  factory ```PrivacyContractStorageFactory```
 * Other implementations are hidden and are obtained using the factory and manager. They are specific to the general implementation of the privacy framework.
 
 #### Principles of use
@@ -234,7 +310,7 @@ The following code shows how to format a property path to get the user account I
 																propertyPaths);	
 
 ##### Privacy contract definition
-The privacy contract of an applictaion could be defined by code or by an XML file.  
+The privacy contract of an application could be defined by code or by an XML file.  
 The following file is an example of what could be the privacy contract for the 3cixty ExploreMi360 application (that wants to access to the whishList) :
  
     <pvc:PrivacyContract schemaVersion="1.0" xsi:schemaLocation="eu.3cixty.privacy PrivacyContract.xsd" xmlns:pvc="eu.3cixty.privacy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -289,6 +365,79 @@ Here is an other example for an application that would access to the whish list,
     	</pvc:contract>
     </pvc:PrivacyContract>
 
+##### Encrypting key generation
+The following code shows how to get an encrypting key for the initialization of the privacy authority database
+
+	String cryptKey = CryptKeyGenerator.doTheJob()
+
+##### Initialization of the Privacy Authority database
+The following code shows how to initialize the privacy authority database with no encryption.
+	
+	InitializePrivacyDB.doTheJob("SA", "", null);
+
+The following code shows how to initialize the privacy authority database with encryption, where the key has been generated by the previous code.
+
+	InitializePrivacyDB.doTheJob("SA", "", "23ee4f98ea895a52ae6e3e2de9081964");
+
+##### Reset of the Privacy Authority database
+In case of problem, you could reset the privacy authority database with this code :
+
+	ResetPrivacyDB.doTheJob("SA", "", "23ee4f98ea895a52ae6e3e2de9081964");
+The encrypting key must be those used to create the database.
+
+##### Privacy contract registration request
+The following code shows how to ask for the registration of an applictaion  privacy contract.
+The encrypting key must be equal to those used to create the table.
+
+		CertificationAndPrivacyRequest auth = null;
+		String	cryptKey		= "23ee4f98ea895a52ae6e3e2de9081964";
+		try {
+			
+			auth = PrivacyCertAuthorityFactory.build( "SA", ##, cryptKey);
+			
+			CertificationAndPrivacyRequest.PocInformation 
+				poc = new CertificationAndPrivacyRequest.PocInformation("3cixty", "poalo sino", "paolo.sini@tin.it", "+336728972872");
+			
+			FileInputStream certificateSigningRequest;
+			FileInputStream privacyContract;
+			
+			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
+			privacyContract = new FileInputStream("./src/test/resources/PrivacyContract_ExploreMi360_example.xml");
+
+			reqId = auth.certifyMyContract(poc, certificateSigningRequest , privacyContract);
+			assertNotNull( reqId.toString()  );
+			
+			
+		} catch (FileNotFoundException e2) {
+			fail( e2.getMessage() );
+		}
+		catch (PrivacyException e) {
+			fail( e.getMessage() );
+		}
+		finally {
+			if ( auth != null ) {
+				auth.terminate();
+			}
+		}		
+
+##### User privacy contract storage
+
+A user privacy contract could be build and store with the following code :
+
+		PrivacyContract appPrivacyContract = PrivacyContractFactory.buildPrivacyContract( pvcFilePath );
+		Service aService = profileFactory.getService( appPrivacyContract.getApplication().getName(), "myAuthent" );
+		try {			
+			session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator( aService, "U2678", "pwd", null ) );			
+		} catch ( Exception e ) {
+
+			fail("Exception caught when creating session for user " + "U2678" );
+		}
+
+		UserPrivacyContract	aUserPrivacyContract = new UserPrivacyContract( appPrivacyContract );
+		PrivacyContractStorage pvcStorage = PrivacyContractStorageFactory.getInstance();
+		pvcStorage.store( session.getUser(), aService, aUserPrivacyContract );
+
+
 ##### How to generate a CSR with OpenSSL
 
 * Generate your private key:  
@@ -322,3 +471,4 @@ Copyright (c) 2014 Thales Services, All rights Reserved.
 [2]: http://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
 [3]: https://github.com/3cixty/profileStorage/issues/18
 [4]: https://github.com/3cixty/profileStorage/issues/21
+

@@ -6,19 +6,26 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.theresis.humanization.authen.Service;
+import org.theresis.humanization.authen.User;
+import org.theresis.humanization.privacy.PrivacyContractStorage;
+import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
+import org.theresis.humanization.privacy.PrivacyException;
+import org.theresis.humanization.privacy.UserPrivacyContractFactory;
 import org.theresis.humanization.privacy.generated.Domain;
 import org.theresis.humanization.privacy.generated.PrivacyContract;
+import org.theresis.humanization.privacy.generated.UserPrivacyContract;
 
 
 @RunWith(JUnit4.class)
 public class PrivacyApisTest {
 
-	@Test
-	public void generatePrivacyContract( ) {
-
+	protected PrivacyContract createPrivacyContract( ) {
+		
 		PrivacyContract privacyContract = new PrivacyContract( );
 		
 		PrivacyContract.Application pc_app = new PrivacyContract.Application( );
@@ -52,7 +59,15 @@ public class PrivacyApisTest {
 		pc_contract.setPropertyPaths(pps);
 		pc_contract.setTextDescription("Help !\nI kneed somebody, help !");
 		privacyContract.setContract( pc_contract );
-        
+		
+		return privacyContract;
+	}
+
+	@Test
+	public void privacyContract2Xml( ) {
+
+		PrivacyContract privacyContract = createPrivacyContract( );
+		
 		try {
 			JAXBContext jc;
 			jc = JAXBContext.newInstance( "org.theresis.humanization.privacy.generated" );
@@ -64,6 +79,57 @@ public class PrivacyApisTest {
         	System.out.println( "\nSaguaroPrivacyContract.xml dump --- end ---\n" );
 	        
 		} catch (JAXBException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Ignore
+	public void testUserPrivacyContractManagement( ) {
+		
+		// Partial test (compilation test) aimed at checking APIs visibility
+		// To be complete has to be merged with Certification Authority tests  
+		// ( Service and User creation, PrivacyContract storage into ) 
+		
+		PrivacyContractStorage privacyContractStorage = PrivacyContractStorageFactory.getInstance( );
+		
+		if( null == privacyContractStorage ) {
+			fail("PrivacyContractStorage is null");
+		}
+		
+		Service service			= null;
+		User user				= null;
+		
+		try {
+			
+			// user install the application
+			
+			// get application Privacy Contract from storage 
+			PrivacyContract privacyContract	= privacyContractStorage.get( service );
+			
+			// create default User Privacy Contract from application Privacy Contract
+			UserPrivacyContract userPrivacyContract	= UserPrivacyContractFactory.buildUserPrivacyContract( privacyContract );
+
+			// TODO do some default contract tweaking
+			
+			// get an eventual older User Privacy Contract storage
+			UserPrivacyContract oldUserPrivacyContract = privacyContractStorage.get(user, service);
+			
+			if( null == oldUserPrivacyContract ) {
+				
+				// store the contract initial version
+				privacyContractStorage.store(user, service, userPrivacyContract);
+				
+			} else {
+				
+				// store the contract updated version
+				privacyContractStorage.update(user, service, userPrivacyContract);
+			}
+
+			// user uninstall the application 
+			// => revoke the contract
+			privacyContractStorage.revoke(user, service);
+			
+		} catch (PrivacyException e) {
 			fail(e.getMessage());
 		}
 	}
