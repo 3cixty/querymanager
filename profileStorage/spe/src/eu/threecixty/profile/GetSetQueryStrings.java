@@ -16,11 +16,11 @@ public class GetSetQueryStrings {
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ "  {"
 			+ "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
 			+ "  profile:"+uid+" rdf:type profile:UserProfile."
-			+ "  profile:"+uid+" vcard:hasUID \""+uid+"\" ."
+			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" ."
 			+ "}";
 			return query;
 	}
@@ -31,17 +31,18 @@ public class GetSetQueryStrings {
 	 */
 	public static String setMultipleUser(Set<String> uids){
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
+			+ "   prefix profile:<"+ PROFILE_URI +">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ "  {";
 		Iterator <String> iterators = uids.iterator();
 		for ( ; iterators.hasNext(); ){
-			query+= "  profile:"+iterators.next()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  profile:"+iterators.next()+" rdf:type profile:UserProfile."
-			+ "  profile:"+iterators.next()+" vcard:hasUID \""+iterators.next()+"\" ."
-			+ "}";
+			String uid=iterators.next();
+			query+= "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+			+ "  profile:"+uid+" rdf:type profile:UserProfile."
+			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" .";
 		}
+		query+= "}";
 		return query;
 	}
 	/**
@@ -53,11 +54,11 @@ public class GetSetQueryStrings {
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ "  {"
 			+ "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
 			+ "  profile:"+uid+" rdf:type profile:UserProfile."
-			+ "  profile:"+uid+" vcard:hasUID \""+uid+"\" ."
+			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" ."
 			+ "}";
 			return query;
 	}
@@ -70,15 +71,16 @@ public class GetSetQueryStrings {
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ "  {";
 		Iterator <String> iterators = uids.iterator();
 		for ( ; iterators.hasNext(); ){
-			query+= "  profile:"+iterators.next()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  profile:"+iterators.next()+" rdf:type profile:UserProfile."
-			+ "  profile:"+iterators.next()+" vcard:hasUID \""+iterators.next()+"\" ."
-			+ "}";
+			String uid=iterators.next();
+			query+= "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+			+ "  profile:"+uid+" rdf:type profile:UserProfile."
+			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" .";
 		}
+		query+= "}";
 		return query;
 	}
 	
@@ -94,7 +96,7 @@ public class GetSetQueryStrings {
 				+ " where {"
 					+ "?s a profile:UserProfile. "
 					+" ?s profile:hasUID ?uid. "
-					+ "?s vcard:hasLastCrawlTime ?lastCrawlTime. "
+					+ "?s profile:hasLastCrawlTime ?lastCrawlTime. "
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
@@ -109,11 +111,11 @@ public class GetSetQueryStrings {
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ "  { ";
 			if (time==null || time.isEmpty())
 				time="0";
-			query+= "  profile:"+uid+" vcard:hasLastCrawlTime \""+time+"\" ."
+			query+= "  profile:"+uid+" profile:hasLastCrawlTime \""+time+"\" ."
 			+ "}";
 			return query;
 	}
@@ -129,7 +131,7 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ "  { "
-			+ "  profile:"+uid+" vcard:hasLastCrawlTime \""+time+"\" ."
+			+ "  profile:"+uid+" profile:hasLastCrawlTime \""+time+"\" ."
 			+ "}";
 			return query;
 	}
@@ -142,13 +144,13 @@ public class GetSetQueryStrings {
 	public static String getName(String uid) {
 		String query="prefix profile:<"+PROFILE_URI+"> "
 				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "select ?name ?givenname ?givenname ?middlename ?additionalname ?nickname"
+				+ "select ?name ?givenname ?familyname ?middlename ?additionalname ?nickname"
 				+ " where {"
 					+ "?s a profile:UserProfile. "
 					+" ?s profile:hasUID ?uid. "
 					+ "?s vcard:hasName ?name. "
 					+ "?name vcard:given-name ?givenname."
-					+ "?name vcard:family-name ?givenname."
+					+ "?name vcard:family-name ?familyname."
 					+ "	Optional {?name profile:middleName ?middlename.}"
 					+ "	Optional {?name vcard:additional-name ?additionalname.}"
 					+ " Optional {?name vcard:nickname ?nickname.}"
@@ -166,22 +168,22 @@ public class GetSetQueryStrings {
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ "  { ";
-			if  (name.getHasNameURI()!=null||!name.getHasNameURI().isEmpty()){
-				query+= "  "+name.getHasNameURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+name.getHasNameURI()+" rdf:type vcard:Name."
-					+ "  profile:"+uid+" vcard:hasName "+name.getHasNameURI()+" .";
-				if (name.getGivenName()!=null||!name.getGivenName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:given-name \""+name.getGivenName()+"\".";
-				if (name.getFamilyName()!=null||!name.getFamilyName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:family-name \""+name.getFamilyName()+"\".";
-				if (name.getMiddleName()!=null||!name.getMiddleName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:profile:middleName \""+name.getMiddleName()+"\".";
-				if (name.getAdditionalName()!=null||!name.getAdditionalName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:additional-name \""+name.getAdditionalName()+"\".";
-				if (name.getNickname()!=null||!name.getNickname().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:nickname "+name.getNickname()+"\" .";
+			if  (name.getHasNameURI()!=null&&!name.getHasNameURI().isEmpty()){
+				query+= "  <"+name.getHasNameURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+					+ "  <"+name.getHasNameURI()+"> rdf:type vcard:Name."
+					+ "  profile:"+uid+" vcard:hasName <"+name.getHasNameURI()+"> .";
+				if (name.getGivenName()!=null&&!name.getGivenName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:given-name \""+name.getGivenName()+"\".";
+				if (name.getFamilyName()!=null&&!name.getFamilyName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:family-name \""+name.getFamilyName()+"\".";
+				if (name.getMiddleName()!=null&&!name.getMiddleName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> profile:middleName \""+name.getMiddleName()+"\".";
+				if (name.getAdditionalName()!=null&&!name.getAdditionalName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:additional-name \""+name.getAdditionalName()+"\".";
+				if (name.getNickname()!=null&&!name.getNickname().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:nickname "+name.getNickname()+"\" .";
 			}
 			query+= "}";
 			return query;
@@ -198,20 +200,20 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ "  { ";
-			if  (name.getHasNameURI()!=null||!name.getHasNameURI().isEmpty()){
-				query+= "  "+name.getHasNameURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+name.getHasNameURI()+" rdf:type vcard:Name."
-					+ "  profile:"+uid+" vcard:hasName "+name.getHasNameURI()+" .";
-				if (name.getGivenName()!=null||!name.getGivenName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:given-name \""+name.getGivenName()+"\".";
-				if (name.getFamilyName()!=null||!name.getFamilyName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:family-name \""+name.getFamilyName()+"\".";
-				if (name.getMiddleName()!=null||!name.getMiddleName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:profile:middleName \""+name.getMiddleName()+"\".";
-				if (name.getAdditionalName()!=null||!name.getAdditionalName().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:additional-name \""+name.getAdditionalName()+"\".";
-				if (name.getNickname()!=null||!name.getNickname().isEmpty())
-					query+= "  "+name.getHasNameURI()+" vcard:nickname "+name.getNickname()+"\" .";
+			if  (name.getHasNameURI()!=null&&!name.getHasNameURI().isEmpty()){
+				query+= "  <"+name.getHasNameURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+					+ " <"+name.getHasNameURI()+"> rdf:type vcard:Name."
+					+ "  profile:"+uid+" vcard:hasName <"+name.getHasNameURI()+"> .";
+				if (name.getGivenName()!=null&&!name.getGivenName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:given-name \""+name.getGivenName()+"\".";
+				if (name.getFamilyName()!=null&&!name.getFamilyName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:family-name \""+name.getFamilyName()+"\".";
+				if (name.getMiddleName()!=null&&!name.getMiddleName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> profile:middleName \""+name.getMiddleName()+"\".";
+				if (name.getAdditionalName()!=null&&!name.getAdditionalName().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:additional-name \""+name.getAdditionalName()+"\".";
+				if (name.getNickname()!=null&&!name.getNickname().isEmpty())
+					query+= "  <"+name.getHasNameURI()+"> vcard:nickname "+name.getNickname()+"\" .";
 			}
 			query+= "}";
 			return query;
@@ -252,22 +254,22 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ "  {";
-		if (address.getHasAddressURI()!=null||!address.getHasAddressURI().isEmpty()){
-			query+= "  "+address.getHasAddressURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  "+address.getHasAddressURI()+" rdf:type vcard:Address."
-				+ "  profile:"+uid+" vcard:hasAddress "+address.getHasAddressURI()+" .";
-			if (address.getCountryName()!=null||!address.getCountryName().isEmpty())
-				query+= "  "+address.getHasAddressURI()+" vcard:country-name \""+address.getCountryName()+"\".";
-			if (address.getTownName()!=null||!address.getTownName().isEmpty())
-				query+= "  "+address.getHasAddressURI()+" vcard:townName \""+address.getTownName()+"\".";
-			if (address.getStreetAddress()!=null||!address.getStreetAddress().isEmpty())
-				query+= "  "+address.getHasAddressURI()+" vcard:street-address \""+address.getStreetAddress()+"\".";
-			if (address.getPostalCode()!=null||!address.getPostalCode().isEmpty())
-				query+= "  "+address.getHasAddressURI()+" vcard:postal-code \""+address.getPostalCode()+"\".";
+		if (address.getHasAddressURI()!=null&&!address.getHasAddressURI().isEmpty()){
+			query+= "  <"+address.getHasAddressURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+				+ "  <"+address.getHasAddressURI()+"> rdf:type vcard:Address."
+				+ "  profile:"+uid+" vcard:hasAddress <"+address.getHasAddressURI()+"> .";
+			if (address.getCountryName()!=null&&!address.getCountryName().isEmpty())
+				query+= "  <"+address.getHasAddressURI()+"> vcard:country-name \""+address.getCountryName()+"\".";
+			if (address.getTownName()!=null&&!address.getTownName().isEmpty())
+				query+= "  <"+address.getHasAddressURI()+"> vcard:townName \""+address.getTownName()+"\".";
+			if (address.getStreetAddress()!=null&&!address.getStreetAddress().isEmpty())
+				query+= "  <"+address.getHasAddressURI()+"> vcard:street-address \""+address.getStreetAddress()+"\".";
+			if (address.getPostalCode()!=null&&!address.getPostalCode().isEmpty())
+				query+= "  <"+address.getHasAddressURI()+"> vcard:postal-code \""+address.getPostalCode()+"\".";
 			if (address.getLongitute()!=0)
-				query+= "  "+address.getHasAddressURI()+" vcard:longitude "+address.getLongitute()+"^^http://www.w3.org/2001/XMLSchema#double .";
+				query+= "  <"+address.getHasAddressURI()+"> vcard:longitude \""+address.getLongitute()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 			if (address.getLatitude()!=0)
-				query+= "  "+address.getHasAddressURI()+" vcard:latitude "+address.getLatitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
+				query+= "  <"+address.getHasAddressURI()+"> vcard:latitude \""+address.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 		}
 		query+= "}";
 		return query;
@@ -284,22 +286,22 @@ public class GetSetQueryStrings {
 				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 				+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ "  {";
-			if (address.getHasAddressURI()!=null||!address.getHasAddressURI().isEmpty()){
-				query+= "  "+address.getHasAddressURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+address.getHasAddressURI()+" rdf:type vcard:Address."
-					+ "  profile:"+uid+" vcard:hasAddress "+address.getHasAddressURI()+" .";
-				if (address.getCountryName()!=null||!address.getCountryName().isEmpty())
-					query+= "  "+address.getHasAddressURI()+" vcard:country-name \""+address.getCountryName()+"\".";
-				if (address.getTownName()!=null||!address.getTownName().isEmpty())
-					query+= "  "+address.getHasAddressURI()+" vcard:townName \""+address.getTownName()+"\".";
-				if (address.getStreetAddress()!=null||!address.getStreetAddress().isEmpty())
-					query+= "  "+address.getHasAddressURI()+" vcard:street-address \""+address.getStreetAddress()+"\".";
-				if (address.getPostalCode()!=null||!address.getPostalCode().isEmpty())
-					query+= "  "+address.getHasAddressURI()+" vcard:postal-code \""+address.getPostalCode()+"\".";
+			if (address.getHasAddressURI()!=null&&!address.getHasAddressURI().isEmpty()){
+				query+= "  <"+address.getHasAddressURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+					+ "  <"+address.getHasAddressURI()+"> rdf:type vcard:Address."
+					+ "  profile:"+uid+" vcard:hasAddress <"+address.getHasAddressURI()+"> .";
+				if (address.getCountryName()!=null&&!address.getCountryName().isEmpty())
+					query+= "  <"+address.getHasAddressURI()+"> vcard:country-name \""+address.getCountryName()+"\".";
+				if (address.getTownName()!=null&&!address.getTownName().isEmpty())
+					query+= "  <"+address.getHasAddressURI()+"> vcard:townName \""+address.getTownName()+"\".";
+				if (address.getStreetAddress()!=null&&!address.getStreetAddress().isEmpty())
+					query+= "  <"+address.getHasAddressURI()+"> vcard:street-address \""+address.getStreetAddress()+"\".";
+				if (address.getPostalCode()!=null&&!address.getPostalCode().isEmpty())
+					query+= "  <"+address.getHasAddressURI()+"> vcard:postal-code \""+address.getPostalCode()+"\".";
 				if (address.getLongitute()!=0)
-					query+= "  "+address.getHasAddressURI()+" vcard:longitude "+address.getLongitute()+"^^http://www.w3.org/2001/XMLSchema#double .";
+					query+= "  <"+address.getHasAddressURI()+"> vcard:longitude \""+address.getLongitute()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 				if (address.getLatitude()!=0)
-					query+= "  "+address.getHasAddressURI()+" vcard:latitude "+address.getLatitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
+					query+= "  <"+address.getHasAddressURI()+"> vcard:latitude \""+address.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 			}
 			query+= "}";
 			return query;
@@ -333,7 +335,8 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <String> iterators = knows.iterator();
 		for ( ; iterators.hasNext(); ){
-			query+= "  profile:"+uid+" foaf:knows profile:"+iterators.next()+" .";
+			String uidKnows=iterators.next();
+			query+= "  profile:"+uid+" foaf:knows profile:"+uidKnows+" .";
 		}
 		query+= "}";
 		return query;
@@ -366,7 +369,8 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <String> iterators = knows.iterator();
 		for ( ; iterators.hasNext(); ){
-			query+= "  profile:"+uid+" foaf:knows profile:"+iterators.next()+" .";
+			String uidKnows=iterators.next();
+			query+= "  profile:"+uid+" foaf:knows profile:"+uidKnows+" .";
 		}
 		query+= "}";
 		return query;
@@ -406,20 +410,18 @@ public class GetSetQueryStrings {
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		
-		if  (profileIdentities.getHasProfileIdentitiesURI()==null||profileIdentities.getHasProfileIdentitiesURI().isEmpty()){
-			profileIdentities.setHasProfileIdentitiesURI("profile:"+uid+"/ProfileIdentities/"+profileIdentities.getHasSource());
-		}
-		else{
-			query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+profileIdentities.getHasProfileIdentitiesURI()+" rdf:type profile:ProfileIdentities."
-					+ "  profile:"+uid+" profile:hasProfileIdentities "+profileIdentities.getHasProfileIdentitiesURI()+" .";
-			if  (profileIdentities.getHasSource()!=null||!profileIdentities.getHasSource().isEmpty())
-				query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" profile:hasSource \""+profileIdentities.getHasSource()+"\" .";
-			if  (profileIdentities.getHasUserAccountID()!=null||!profileIdentities.getHasUserAccountID().isEmpty())
-				query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" profile:hasUserAccountID \""+profileIdentities.getHasUserAccountID()+"\" .";
-			if  (profileIdentities.getHasUserInteractionMode().toString()!=null||!profileIdentities.getHasUserInteractionMode().toString().isEmpty())
-				query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" profile:hasUserInteractionMode \""+profileIdentities.getHasUserInteractionMode()+"\" .";
-		}
+		if  (profileIdentities.getHasProfileIdentitiesURI()==null||profileIdentities.getHasProfileIdentitiesURI().isEmpty())
+			profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/ProfileIdentities/"+profileIdentities.getHasSourceCarrier());
+		query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+				+ "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities."
+				+ "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentities.getHasProfileIdentitiesURI()+"> .";
+		if  (profileIdentities.getHasSource()!=null&&!profileIdentities.getHasSource().isEmpty())
+			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentities.getHasSource()+"> .";
+		if  (profileIdentities.getHasUserAccountID()!=null&&!profileIdentities.getHasUserAccountID().isEmpty())
+			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentities.getHasUserAccountID()+"\" .";
+		if  (profileIdentities.getHasUserInteractionMode().toString()!=null&&!profileIdentities.getHasUserInteractionMode().toString().isEmpty())
+			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentities.getHasUserInteractionMode()+"\" .";
+		
 		query+= "}";
 		return query;
 	}
@@ -436,20 +438,20 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.ProfileIdentities> iterators = profileIdentities.iterator();
 		for ( ; iterators.hasNext(); ){
-			if  (iterators.next().getHasProfileIdentitiesURI()==null||iterators.next().getHasProfileIdentitiesURI().isEmpty()){
-				iterators.next().setHasProfileIdentitiesURI("profile:"+uid+"/ProfileIdentities/"+iterators.next().getHasSource());
-			}
-			else{
-				query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" rdf:type profile:ProfileIdentities.";
-				query+= "  profile:"+uid+" profile:hasProfileIdentities "+iterators.next().getHasProfileIdentitiesURI()+" .";
-				if  (iterators.next().getHasSource()!=null||!iterators.next().getHasSource().isEmpty())
-					query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" profile:hasSource \""+iterators.next().getHasSource()+"\" .";
-				if  (iterators.next().getHasUserAccountID()!=null||!iterators.next().getHasUserAccountID().isEmpty())
-					query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" profile:hasUserAccountID \""+iterators.next().getHasSource()+"\" .";
-				if  (iterators.next().getHasUserInteractionMode().toString()!=null||!iterators.next().getHasUserInteractionMode().toString().isEmpty())
-					query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" profile:hasUserInteractionMode \""+iterators.next().getHasSource()+"\" .";
-			}
+			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity=iterators.next();
+			if  (profileIdentity.getHasProfileIdentitiesURI()==null||profileIdentity.getHasProfileIdentitiesURI().isEmpty())
+				profileIdentity.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/ProfileIdentities/"+profileIdentity.getHasSourceCarrier());
+			
+			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities.";
+			query+= "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentity.getHasProfileIdentitiesURI()+"> .";
+			if  (profileIdentity.getHasSource()!=null&&!profileIdentity.getHasSource().isEmpty())
+				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentity.getHasSource()+"> .";
+			if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
+				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentity.getHasUserAccountID()+"\" .";
+			if  (profileIdentity.getHasUserInteractionMode().toString()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
+				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentity.getHasUserInteractionMode()+"\" .";
+			
 		}
 		query+= "}";
 		return query;
@@ -467,16 +469,16 @@ public class GetSetQueryStrings {
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		
-		if  (profileIdentities.getHasProfileIdentitiesURI()!=null||!profileIdentities.getHasProfileIdentitiesURI().isEmpty()){
-			query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+profileIdentities.getHasProfileIdentitiesURI()+" rdf:type profile:ProfileIdentities."
-					+ "  profile:"+uid+" profile:hasProfileIdentities "+profileIdentities.getHasProfileIdentitiesURI()+" .";
-			if  (profileIdentities.getHasSource()!=null||!profileIdentities.getHasSource().isEmpty())
-				query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" profile:hasSource \""+profileIdentities.getHasSource()+"\" .";
-			if  (profileIdentities.getHasUserAccountID()!=null||!profileIdentities.getHasUserAccountID().isEmpty())
-				query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" profile:hasUserAccountID \""+profileIdentities.getHasUserAccountID()+"\" .";
-			if  (profileIdentities.getHasUserInteractionMode().toString()!=null||!profileIdentities.getHasUserInteractionMode().toString().isEmpty())
-				query+= "  "+profileIdentities.getHasProfileIdentitiesURI()+" profile:hasUserInteractionMode \""+profileIdentities.getHasUserInteractionMode()+"\" .";
+		if  (profileIdentities.getHasProfileIdentitiesURI()!=null&&!profileIdentities.getHasProfileIdentitiesURI().isEmpty()){
+			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+					+ "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities."
+					+ "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentities.getHasProfileIdentitiesURI()+"> .";
+			if  (profileIdentities.getHasSource()!=null&&!profileIdentities.getHasSource().isEmpty())
+				query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentities.getHasSource()+"> .";
+			if  (profileIdentities.getHasUserAccountID()!=null&&!profileIdentities.getHasUserAccountID().isEmpty())
+				query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentities.getHasUserAccountID()+"\" .";
+			if  (profileIdentities.getHasUserInteractionMode().toString()!=null&&!profileIdentities.getHasUserInteractionMode().toString().isEmpty())
+				query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentities.getHasUserInteractionMode()+"\" .";
 		}
 		query+= "}";
 		return query;
@@ -494,16 +496,17 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.ProfileIdentities> iterators = profileIdentities.iterator();
 		for ( ; iterators.hasNext(); ){
-			if  (iterators.next().getHasProfileIdentitiesURI()!=null||!iterators.next().getHasProfileIdentitiesURI().isEmpty()){
-				query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" rdf:type profile:ProfileIdentities.";
-				query+= "  profile:"+uid+" profile:hasProfileIdentities "+iterators.next().getHasProfileIdentitiesURI()+" .";
-				if  (iterators.next().getHasSource()!=null||!iterators.next().getHasSource().isEmpty())
-					query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" profile:hasSource \""+iterators.next().getHasSource()+"\" .";
-				if  (iterators.next().getHasUserAccountID()!=null||!iterators.next().getHasUserAccountID().isEmpty())
-					query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" profile:hasUserAccountID \""+iterators.next().getHasSource()+"\" .";
-				if  (iterators.next().getHasUserInteractionMode().toString()!=null||!iterators.next().getHasUserInteractionMode().toString().isEmpty())
-					query+= "  "+iterators.next().getHasProfileIdentitiesURI()+" profile:hasUserInteractionMode \""+iterators.next().getHasSource()+"\" .";
+			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity=iterators.next();
+			if  (profileIdentity.getHasProfileIdentitiesURI()!=null&&!profileIdentity.getHasProfileIdentitiesURI().isEmpty()){
+				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities.";
+				query+= "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentity.getHasProfileIdentitiesURI()+"> .";
+				if  (profileIdentity.getHasSource()!=null&&!profileIdentity.getHasSource().isEmpty())
+					query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentity.getHasSource()+"> .";
+				if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
+					query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentity.getHasUserAccountID()+"\" .";
+				if  (profileIdentity.getHasUserInteractionMode().toString()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
+					query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentity.getHasUserInteractionMode()+"\" .";
 			}
 		}
 		query+= "}";
@@ -542,12 +545,13 @@ public class GetSetQueryStrings {
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
-			+ " { "
-			+ "  "+preferenceURI+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  "+preferenceURI+" rdf:type profile:Preference."
-			
-			+ "  profile:"+uid+" profile:hasPreference "+preferenceURI+" ."
-			+ "}";
+			+ " { ";
+			if (preferenceURI!=null&&!preferenceURI.isEmpty()){
+				query+= "  <"+preferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+				+ "  <"+preferenceURI+"> rdf:type profile:Preference."
+				+ "  profile:"+uid+" profile:hasPreference <"+preferenceURI+"> .";
+			}
+			query+= "}";
 			return query;
 	}
 	/**
@@ -561,13 +565,14 @@ public class GetSetQueryStrings {
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
-			+ " { "
-			+ "  "+preferenceURI+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  "+preferenceURI+" rdf:type profile:Preference."
-			
-			+ "  profile:"+uid+" profile:hasPreference "+preferenceURI+" ."
-			+ "}";
-			return query;
+			+ " { ";
+		if (preferenceURI!=null&&!preferenceURI.isEmpty()){
+			query+= "  <"+preferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+			+ "  <"+preferenceURI+"> rdf:type profile:Preference."
+			+ "  profile:"+uid+" profile:hasPreference <"+preferenceURI+"> .";
+		}
+		query+= "}";
+		return query;
 	}
 	/**
 	 * get preference of a user in the KB. This selects only the preference uri
@@ -598,20 +603,19 @@ public class GetSetQueryStrings {
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
 			+ "   prefix profile:<"+PROFILE_URI+">"
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ " { ";
-		if (like.getHasLikesURI()==null||like.getHasLikesURI().isEmpty()){
-			like.setHasLikesURI(perferenceURI+"/likes/"+UUID.randomUUID().toString());
-		}
-		else{
-			query+= "  "+like.getHasLikesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  "+like.getHasLikesURI()+" rdf:type profile:Likes."
-				+ "  "+perferenceURI+" profile:hasLike "+like.getHasLikesURI()+" .";
-			if (like.getHasLikeName()!=null||!like.getHasLikeName().isEmpty())
-				query+= "  "+like.getHasLikesURI()+" profile:hasLikeName \""+like.getHasLikeName()+"\" .";
-			if (like.getHasLikeType().toString()!=null||!like.getHasLikeType().toString().isEmpty())
-				query+= "  "+like.getHasLikesURI()+" profile:hasLikeType \""+like.getHasLikeType()+"\" .";
-		}
+		if (like.getHasLikesURI()==null||like.getHasLikesURI().isEmpty())
+			like.setHasLikesURI(perferenceURI+"/Likes/"+UUID.randomUUID().toString());
+	
+		query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+			+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
+			+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+"> .";
+		if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
+			query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
+		if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
+			query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
+
 		query+= "}";
 		return query;
 	}
@@ -629,18 +633,17 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Likes> iterators = likes.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasLikesURI()==null||iterators.next().getHasLikesURI().isEmpty()){
-				iterators.next().setHasLikesURI(perferenceURI+"/likes/"+UUID.randomUUID().toString());
-			}
-			else{
-				query+= "  "+iterators.next().getHasLikesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+iterators.next().getHasLikesURI()+" rdf:type profile:Likes."
-					+ "  "+perferenceURI+" profile:hasLike "+iterators.next().getHasLikesURI()+" .";
-				if (iterators.next().getHasLikeName()!=null||!iterators.next().getHasLikeName().isEmpty())
-					query+= "  "+iterators.next().getHasLikesURI()+" profile:hasLikeName \""+iterators.next().getHasLikeName()+"\" .";
-				if (iterators.next().getHasLikeType().toString()!=null||!iterators.next().getHasLikeType().toString().isEmpty())
-					query+= "  "+iterators.next().getHasLikesURI()+" profile:hasLikeType \""+iterators.next().getHasLikeType()+"\" .";
-			}
+			eu.threecixty.profile.oldmodels.Likes like=iterators.next();
+			if (like.getHasLikesURI()==null||like.getHasLikesURI().isEmpty())
+				like.setHasLikesURI(perferenceURI+"/Likes/"+UUID.randomUUID().toString());
+			
+			query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+				+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
+				+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+"> .";
+			if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
+				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
+			if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
+				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
 		}
 		query+= "}";
 		return query;
@@ -657,14 +660,14 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (like.getHasLikesURI()!=null||!like.getHasLikesURI().isEmpty()){
-			query+= "  "+like.getHasLikesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  "+like.getHasLikesURI()+" rdf:type profile:Likes."
-				+ "  "+perferenceURI+" profile:hasLike "+like.getHasLikesURI()+" .";
-			if (like.getHasLikeName()!=null||!like.getHasLikeName().isEmpty())
-				query+= "  "+like.getHasLikesURI()+" profile:hasLikeName \""+like.getHasLikeName()+"\" .";
-			if (like.getHasLikeType().toString()!=null||!like.getHasLikeType().toString().isEmpty())
-				query+= "  "+like.getHasLikesURI()+" profile:hasLikeType \""+like.getHasLikeType()+"\" .";
+		if (like.getHasLikesURI()!=null&&!like.getHasLikesURI().isEmpty()){
+			query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+				+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
+				+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+">.";
+			if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
+				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
+			if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
+				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
 		}
 		query+= "}";
 		return query;
@@ -683,14 +686,15 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Likes> iterators = likes.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasLikesURI()!=null||!iterators.next().getHasLikesURI().isEmpty()){
-				query+= "  "+iterators.next().getHasLikesURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+iterators.next().getHasLikesURI()+" rdf:type profile:Likes."
-					+ "  "+perferenceURI+" profile:hasLike "+iterators.next().getHasLikesURI()+" .";
-				if (iterators.next().getHasLikeName()!=null||!iterators.next().getHasLikeName().isEmpty())
-					query+= "  "+iterators.next().getHasLikesURI()+" profile:hasLikeName \""+iterators.next().getHasLikeName()+"\" .";
-				if (iterators.next().getHasLikeType().toString()!=null||!iterators.next().getHasLikeType().toString().isEmpty())
-					query+= "  "+iterators.next().getHasLikesURI()+" profile:hasLikeType \""+iterators.next().getHasLikeType()+"\" .";
+			eu.threecixty.profile.oldmodels.Likes like=iterators.next();
+			if (like.getHasLikesURI()!=null&&!like.getHasLikesURI().isEmpty()){
+				query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+					+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
+					+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+"> .";
+				if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
+					query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
+				if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
+					query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
 			}
 		}
 		query+= "}";
@@ -710,9 +714,9 @@ public class GetSetQueryStrings {
 					+ "?s a profile:UserProfile. "
 					+" ?s profile:hasUID ?uid. "
 					+ "?s profile:hasPreference ?pref. "
-					+ "?pref profile:hasLikes ?likes. "
-					+ "?likes profile:haslikeName ?likeName."
-					+ "?likes profile:haslikeType ?liketype."
+					+ "?pref profile:hasLike ?likes. "
+					+ "?likes profile:hasLikeName ?likeName."
+					+ "?likes profile:hasLikeType ?liketype."
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
@@ -732,9 +736,9 @@ public class GetSetQueryStrings {
 					+ "?s a profile:UserProfile. "
 					+" ?s profile:hasUID ?uid. "
 					+ "?s profile:hasPreference ?pref. "
-					+ "?pref profile:hasLikes ?likes. "
-					+ "?likes profile:haslikeName ?likeName."
-					+ "?likes profile:haslikeType ?liketype."
+					+ "?pref profile:hasLike ?likes. "
+					+ "?likes profile:hasLikeName ?likeName."
+					+ "?likes profile:hasLikeType ?liketype."
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+" FILTER (STR(?likeType) = \""+likeType+"\") "//Event
 					+ "}";
@@ -753,10 +757,10 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-			if (transportUri!=null){
-				query+= "  "+transportUri+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+transportUri+" rdf:type profile:Transport ."
-					+ "  profile:"+uid+" profile:hasTransport "+transportUri+" .";
+			if (transportUri!=null&&!transportUri.isEmpty()){
+				query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+					+ "  <"+transportUri+"> rdf:type profile:Transport ."
+					+ "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
 			}
 			query+= "}";
 			return query;
@@ -776,10 +780,10 @@ public class GetSetQueryStrings {
 			Iterator <String> iterators = transportUris.iterator();
 			for ( ; iterators.hasNext(); ){
 				String transportUri=iterators.next();
-				if (transportUri!=null){
-					query+= "  "+transportUri+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-					query+= "  "+transportUri+" rdf:type profile:Transport.";
-					query+= "  profile:"+uid+" profile:hasTransport "+transportUri+" .";
+				if (transportUri!=null&&!transportUri.isEmpty()){
+					query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+					query+= "  <"+transportUri+"> rdf:type profile:Transport.";
+					query+= "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
 				}
 			}
 			query+= "}";
@@ -797,10 +801,10 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-			if (transportUri!=null){
-				query+= "  "+transportUri+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  "+transportUri+" rdf:type profile:Transport ."
-					+ "  profile:"+uid+" profile:hasTransport "+transportUri+" .";
+			if (transportUri!=null&&!transportUri.isEmpty()){
+				query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
+					+ "  <"+transportUri+"> rdf:type profile:Transport ."
+					+ "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
 			}
 			query+= "}";
 			return query;
@@ -820,10 +824,10 @@ public class GetSetQueryStrings {
 			Iterator <String> iterators = transportUris.iterator();
 			for ( ; iterators.hasNext(); ){
 				String transportUri=iterators.next();
-				if (transportUri!=null){
-					query+= "  "+transportUri+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-					query+= "  "+transportUri+" rdf:type profile:Transport.";
-					query+= "  profile:"+uid+" profile:hasTransport "+transportUri+" .";
+				if (transportUri!=null&&!transportUri.isEmpty()){
+					query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+					query+= "  <"+transportUri+"> rdf:type profile:Transport.";
+					query+= "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
 				}
 			}
 			query+= "}";
@@ -862,23 +866,22 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasAccompanyURI()==null||iterators.next().getHasAccompanyURI().isEmpty()){
-				iterators.next().setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
-			}
-			else{
-				query+= "  "+transportURI+" profile:hasAccompany "+iterators.next().getHasAccompanyURI()+" .";
-				query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID1 \""+iterators.next().getHasAccompanyUserid1ST()+"\" .";
-				if (iterators.next().getHasAccompanyUserid2ST()!=null||! iterators.next().getHasAccompanyUserid2ST().isEmpty())
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID2 \""+iterators.next().getHasAccompanyUserid2ST()+"\" .";
-				if (iterators.next().getHasAccompanyScore()>0)
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyScore "+iterators.next().getHasAccompanyScore()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasAccompanyValidity()>0)
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyValidity "+iterators.next().getHasAccompanyValidity()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasAccompanyTime()>0)
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyTime "+iterators.next().getHasAccompanyTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				query+= "  "+iterators.next().getHasAccompanyURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+="  "+iterators.next().getHasAccompanyURI()+" rdf:type profile:Accompanying.";
-			}
+			eu.threecixty.profile.oldmodels.Accompanying accompany =iterators.next();
+			if (accompany.getHasAccompanyURI()==null||accompany.getHasAccompanyURI().isEmpty())
+				accompany.setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
+			
+			query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
+			if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
+			if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
 		}
 		query+= "}";
 		return query;
@@ -895,23 +898,22 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (accompany.getHasAccompanyURI()==null||accompany.getHasAccompanyURI().isEmpty()){
+		if (accompany.getHasAccompanyURI()==null||accompany.getHasAccompanyURI().isEmpty())
 			accompany.setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
-		}
-		else{
-			query+= "  "+transportURI+" profile:hasAccompany "+accompany.getHasAccompanyURI()+" .";
-			query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-			if (accompany.getHasAccompanyUserid2ST()!=null||! accompany.getHasAccompanyUserid2ST().isEmpty())
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-			if (accompany.getHasAccompanyScore()>0)
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyScore "+accompany.getHasAccompanyScore()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (accompany.getHasAccompanyValidity()>0)
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyValidity "+accompany.getHasAccompanyValidity()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (accompany.getHasAccompanyTime()>0)
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyTime "+accompany.getHasAccompanyTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			query+= "  "+accompany.getHasAccompanyURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+="  "+accompany.getHasAccompanyURI()+" rdf:type profile:Accompanying.";
-		}
+		
+		query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
+		query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
+		if (accompany.getHasAccompanyUserid2ST()!=null && !accompany.getHasAccompanyUserid2ST().isEmpty())
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
+		if (accompany.getHasAccompanyScore()!=null && accompany.getHasAccompanyScore()>0)
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (accompany.getHasAccompanyValidity()!=null && accompany.getHasAccompanyValidity()>0)
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (accompany.getHasAccompanyTime()!=null && accompany.getHasAccompanyTime()>0)
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+		query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+
 		query+= "}";
 		return query;
 	}
@@ -929,23 +931,23 @@ public class GetSetQueryStrings {
 				+ " { ";
 			Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
 			for ( ; iterators.hasNext(); ){
-				if (iterators.next().getHasAccompanyURI()==null||iterators.next().getHasAccompanyURI().isEmpty()){
-					iterators.next().setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
-				}
-				else{
-					query+= "  "+transportURI+" profile:hasAccompany "+iterators.next().getHasAccompanyURI()+" .";
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID1 \""+iterators.next().getHasAccompanyUserid1ST()+"\" .";
-					if (iterators.next().getHasAccompanyUserid2ST()!=null||! iterators.next().getHasAccompanyUserid2ST().isEmpty())
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID2 \""+iterators.next().getHasAccompanyUserid2ST()+"\" .";
-					if (iterators.next().getHasAccompanyScore()>0)
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyScore "+iterators.next().getHasAccompanyScore()+"^^http://www.w3.org/2001/XMLSchema#double .";
-					if (iterators.next().getHasAccompanyValidity()>0)
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyValidity "+iterators.next().getHasAccompanyValidity()+"^^http://www.w3.org/2001/XMLSchema#long .";
-					if (iterators.next().getHasAccompanyTime()>0)
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyTime "+iterators.next().getHasAccompanyTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-					query+= "  "+iterators.next().getHasAccompanyURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-					query+="  "+iterators.next().getHasAccompanyURI()+" rdf:type profile:Accompanying.";
-				}
+				eu.threecixty.profile.oldmodels.Accompanying accompany =iterators.next();
+				if (accompany.getHasAccompanyURI()==null||accompany.getHasAccompanyURI().isEmpty())
+					accompany.setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
+				
+				query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
+				if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
+				if (accompany.getHasAccompanyScore()!=null && accompany.getHasAccompanyScore()>0)
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+				
 			}
 			query+= "}";
 			return query;
@@ -964,19 +966,20 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasAccompanyURI()!=null||!iterators.next().getHasAccompanyURI().isEmpty()){
-				query+= "  "+transportURI+" profile:hasAccompany "+iterators.next().getHasAccompanyURI()+" .";
-				query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID1 \""+iterators.next().getHasAccompanyUserid1ST()+"\" .";
-				if (iterators.next().getHasAccompanyUserid2ST()!=null||! iterators.next().getHasAccompanyUserid2ST().isEmpty())
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID2 \""+iterators.next().getHasAccompanyUserid2ST()+"\" .";
-				if (iterators.next().getHasAccompanyScore()>0)
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyScore "+iterators.next().getHasAccompanyScore()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasAccompanyValidity()>0)
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyValidity "+iterators.next().getHasAccompanyValidity()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasAccompanyTime()>0)
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyTime "+iterators.next().getHasAccompanyTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				query+= "  "+iterators.next().getHasAccompanyURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+="  "+iterators.next().getHasAccompanyURI()+" rdf:type profile:Accompanying.";
+			eu.threecixty.profile.oldmodels.Accompanying accompany =iterators.next();
+			if (accompany.getHasAccompanyURI()!=null&&!accompany.getHasAccompanyURI().isEmpty()){
+				query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
+				if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
+				if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
 			}
 		}
 		query+= "}";
@@ -994,19 +997,19 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (accompany.getHasAccompanyURI()!=null||!accompany.getHasAccompanyURI().isEmpty()){
-			query+= "  "+transportURI+" profile:hasAccompany "+accompany.getHasAccompanyURI()+" .";
-			query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-			if (accompany.getHasAccompanyUserid2ST()!=null||! accompany.getHasAccompanyUserid2ST().isEmpty())
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-			if (accompany.getHasAccompanyScore()>0)
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyScore "+accompany.getHasAccompanyScore()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (accompany.getHasAccompanyValidity()>0)
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyValidity "+accompany.getHasAccompanyValidity()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (accompany.getHasAccompanyTime()>0)
-				query+= "  "+accompany.getHasAccompanyURI()+" profile:hasAccompanyTime "+accompany.getHasAccompanyTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			query+= "  "+accompany.getHasAccompanyURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+="  "+accompany.getHasAccompanyURI()+" rdf:type profile:Accompanying.";
+		if (accompany.getHasAccompanyURI()!=null&&!accompany.getHasAccompanyURI().isEmpty()){
+			query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
+			if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
+			if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
+				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
 		}
 		query+= "}";
 		return query;
@@ -1025,19 +1028,20 @@ public class GetSetQueryStrings {
 				+ " { ";
 			Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
 			for ( ; iterators.hasNext(); ){
-				if (iterators.next().getHasAccompanyURI()!=null||!iterators.next().getHasAccompanyURI().isEmpty()){
-					query+= "  "+transportUri+" profile:hasAccompany "+iterators.next().getHasAccompanyURI()+" .";
-					query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID1 \""+iterators.next().getHasAccompanyUserid1ST()+"\" .";
-					if (iterators.next().getHasAccompanyUserid2ST()!=null||! iterators.next().getHasAccompanyUserid2ST().isEmpty())
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyUserID2 \""+iterators.next().getHasAccompanyUserid2ST()+"\" .";
-					if (iterators.next().getHasAccompanyScore()>0)
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyScore "+iterators.next().getHasAccompanyScore()+"^^http://www.w3.org/2001/XMLSchema#double .";
-					if (iterators.next().getHasAccompanyValidity()>0)
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyValidity "+iterators.next().getHasAccompanyValidity()+"^^http://www.w3.org/2001/XMLSchema#long .";
-					if (iterators.next().getHasAccompanyTime()>0)
-						query+= "  "+iterators.next().getHasAccompanyURI()+" profile:hasAccompanyTime "+iterators.next().getHasAccompanyTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-					query+= "  "+iterators.next().getHasAccompanyURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-					query+="  "+iterators.next().getHasAccompanyURI()+" rdf:type profile:Accompanying.";
+				eu.threecixty.profile.oldmodels.Accompanying accompany =iterators.next();
+				if (accompany.getHasAccompanyURI()!=null&&!accompany.getHasAccompanyURI().isEmpty()){
+					query+= "  <"+transportUri+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
+					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
+					if (accompany.getHasAccompanyUserid2ST()!=null&&!accompany.getHasAccompanyUserid2ST().isEmpty())
+						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
+					if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
+						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+					if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
+						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+					if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
+						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+					query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+					query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
 				}
 			}
 			query+= "}";
@@ -1099,37 +1103,36 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (personalPlace.getHasPersonalPlaceURI()==null||personalPlace.getHasPersonalPlaceURI().isEmpty()){
+		if (personalPlace.getHasPersonalPlaceURI()==null||personalPlace.getHasPersonalPlaceURI().isEmpty())
 			personalPlace.setHasPersonalPlaceURI(regularTripURI+"/PersonalPlace/"+UUID.randomUUID().toString());
-		}
-		else{
-			query+= "  "+regularTripURI+" profile:hasPersonalPlace "+personalPlace.getHasPersonalPlaceURI()+" .";
-			if (personalPlace.getHasPersonalPlaceexternalIds()!=null||!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
-				query+= " "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
-			if (personalPlace.getLatitude()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:latitude "+personalPlace.getLatitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getLongitude()>0)
-				query+="  "+personalPlace.getHasPersonalPlaceURI()+" profile:longitude "+personalPlace.getLongitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getHasPersonalPlaceStayDuration()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayDuration "+personalPlace.getHasPersonalPlaceStayDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (personalPlace.getHasPersonalPlaceAccuracy()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceAccuracy "+personalPlace.getHasPersonalPlaceAccuracy()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getHasPersonalPlaceStayPercentage()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayPercentage "+personalPlace.getHasPersonalPlaceStayPercentage()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getPostalcode()!=null||!personalPlace.getPostalcode().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
-			if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null||!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null||!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceType()!=null||!personalPlace.getHasPersonalPlaceType().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
-			if (personalPlace.getHasPersonalPlaceName()!=null||!personalPlace.getHasPersonalPlaceName().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
-			//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-			query+= "  "+personalPlace.getHasPersonalPlaceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  "+personalPlace.getHasPersonalPlaceURI()+" rdf:type profile:PersonalPlace .";
-		}
+		
+		query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
+		if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
+			query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
+		if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
+			query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
+		if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
+		if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
+		if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
+		if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
+		//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
+		query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+		query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
+
 		query+= "}";
 		return query;
 	}
@@ -1147,37 +1150,37 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.PersonalPlace> iterators = personalPlaces.iterator();
 		for ( ; iterators.hasNext(); ){	
-			if (iterators.next().getHasPersonalPlaceURI()==null||iterators.next().getHasPersonalPlaceURI().isEmpty()){
-				iterators.next().setHasPersonalPlaceURI(regularTripURI+"/PersonalPlace/"+UUID.randomUUID().toString());
-				}
-			else{
-				query+= "  "+regularTripURI+" profile:hasPersonalPlace "+iterators.next().getHasPersonalPlaceURI()+" .";
-				if (iterators.next().getHasPersonalPlaceexternalIds()!=null||!iterators.next().getHasPersonalPlaceexternalIds().isEmpty())
-					query+= " "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceExternalIDs \""+iterators.next().getHasPersonalPlaceexternalIds()+"\" .";
-				if (iterators.next().getLatitude()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:latitude "+iterators.next().getLatitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getLongitude()>0)
-					query+="  "+iterators.next().getHasPersonalPlaceURI()+" profile:longitude "+iterators.next().getLongitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasPersonalPlaceStayDuration()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayDuration "+iterators.next().getHasPersonalPlaceStayDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasPersonalPlaceAccuracy()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceAccuracy "+iterators.next().getHasPersonalPlaceAccuracy()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasPersonalPlaceStayPercentage()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayPercentage "+iterators.next().getHasPersonalPlaceStayPercentage()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getPostalcode()!=null||!iterators.next().getPostalcode().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" vcard:postal-code \""+iterators.next().getPostalcode()+"\" .";
-				if (iterators.next().getHasPersonalPlaceWeekdayPattern()!=null||!iterators.next().getHasPersonalPlaceWeekdayPattern().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceWeekDayPattern \""+iterators.next().getHasPersonalPlaceWeekdayPattern()+"\" .";
-				if (iterators.next().getHasPersonalPlaceDayhourPattern()!=null||!iterators.next().getHasPersonalPlaceDayhourPattern().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceDayHourPattern \""+iterators.next().getHasPersonalPlaceDayhourPattern()+"\" .";
-				if (iterators.next().getHasPersonalPlaceType()!=null||!iterators.next().getHasPersonalPlaceType().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceType \""+iterators.next().getHasPersonalPlaceType()+"\" .";
-				if (iterators.next().getHasPersonalPlaceName()!=null||!iterators.next().getHasPersonalPlaceName().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceName \""+iterators.next().getHasPersonalPlaceName()+"\" .";
-				//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-				query+= "  "+iterators.next().getHasPersonalPlaceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasPersonalPlaceURI()+" rdf:type profile:PersonalPlace .";
-			}
+			eu.threecixty.profile.oldmodels.PersonalPlace personalPlace=iterators.next();
+			if (personalPlace.getHasPersonalPlaceURI()==null||personalPlace.getHasPersonalPlaceURI().isEmpty())
+				personalPlace.setHasPersonalPlaceURI(regularTripURI+"/PersonalPlace/"+UUID.randomUUID().toString());
+				
+			query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
+			if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
+				query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
+			if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
+				query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
+			if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
+			if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
+			if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
+			if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
+			//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
+
 		}
 		query+= "}";
 		return query;
@@ -1194,33 +1197,33 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (personalPlace.getHasPersonalPlaceURI()!=null||!personalPlace.getHasPersonalPlaceURI().isEmpty()){
-			query+= "  "+regularTripURI+" profile:hasPersonalPlace "+personalPlace.getHasPersonalPlaceURI()+" .";
-			if (personalPlace.getHasPersonalPlaceexternalIds()!=null||!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
-				query+= " "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
-			if (personalPlace.getLatitude()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:latitude "+personalPlace.getLatitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getLongitude()>0)
-				query+="  "+personalPlace.getHasPersonalPlaceURI()+" profile:longitude "+personalPlace.getLongitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getHasPersonalPlaceStayDuration()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayDuration "+personalPlace.getHasPersonalPlaceStayDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (personalPlace.getHasPersonalPlaceAccuracy()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceAccuracy "+personalPlace.getHasPersonalPlaceAccuracy()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getHasPersonalPlaceStayPercentage()>0)
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayPercentage "+personalPlace.getHasPersonalPlaceStayPercentage()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (personalPlace.getPostalcode()!=null||!personalPlace.getPostalcode().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
-			if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null||!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null||!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceType()!=null||!personalPlace.getHasPersonalPlaceType().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
-			if (personalPlace.getHasPersonalPlaceName()!=null||!personalPlace.getHasPersonalPlaceName().isEmpty())
-				query+= "  "+personalPlace.getHasPersonalPlaceURI()+" profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
+		if (personalPlace.getHasPersonalPlaceURI()!=null&&!personalPlace.getHasPersonalPlaceURI().isEmpty()){
+			query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
+			if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
+				query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
+			if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
+				query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
+			if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
+			if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
+			if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
+			if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
 			//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-			query+= "  "+personalPlace.getHasPersonalPlaceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  "+personalPlace.getHasPersonalPlaceURI()+" rdf:type profile:PersonalPlace .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
 		}
 		query+= "}";
 		return query;
@@ -1239,33 +1242,34 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.PersonalPlace> iterators = personalPlaces.iterator();
 		for ( ; iterators.hasNext(); ){	
-			if (iterators.next().getHasPersonalPlaceURI()!=null||!iterators.next().getHasPersonalPlaceURI().isEmpty()){
-				query+= "  "+regularTripURI+" profile:hasPersonalPlace "+iterators.next().getHasPersonalPlaceURI()+" .";
-				if (iterators.next().getHasPersonalPlaceexternalIds()!=null||!iterators.next().getHasPersonalPlaceexternalIds().isEmpty())
-					query+= " "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceExternalIDs \""+iterators.next().getHasPersonalPlaceexternalIds()+"\" .";
-				if (iterators.next().getLatitude()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:latitude "+iterators.next().getLatitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getLongitude()>0)
-					query+="  "+iterators.next().getHasPersonalPlaceURI()+" profile:longitude "+iterators.next().getLongitude()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasPersonalPlaceStayDuration()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayDuration "+iterators.next().getHasPersonalPlaceStayDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasPersonalPlaceAccuracy()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceAccuracy "+iterators.next().getHasPersonalPlaceAccuracy()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasPersonalPlaceStayPercentage()>0)
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceStayPercentage "+iterators.next().getHasPersonalPlaceStayPercentage()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getPostalcode()!=null||!iterators.next().getPostalcode().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" vcard:postal-code \""+iterators.next().getPostalcode()+"\" .";
-				if (iterators.next().getHasPersonalPlaceWeekdayPattern()!=null||!iterators.next().getHasPersonalPlaceWeekdayPattern().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceWeekDayPattern \""+iterators.next().getHasPersonalPlaceWeekdayPattern()+"\" .";
-				if (iterators.next().getHasPersonalPlaceDayhourPattern()!=null||!iterators.next().getHasPersonalPlaceDayhourPattern().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceDayHourPattern \""+iterators.next().getHasPersonalPlaceDayhourPattern()+"\" .";
-				if (iterators.next().getHasPersonalPlaceType()!=null||!iterators.next().getHasPersonalPlaceType().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceType \""+iterators.next().getHasPersonalPlaceType()+"\" .";
-				if (iterators.next().getHasPersonalPlaceName()!=null||!iterators.next().getHasPersonalPlaceName().isEmpty())
-					query+= "  "+iterators.next().getHasPersonalPlaceURI()+" profile:hasPersonalPlaceName \""+iterators.next().getHasPersonalPlaceName()+"\" .";
+			eu.threecixty.profile.oldmodels.PersonalPlace personalPlace=iterators.next();
+			if (personalPlace.getHasPersonalPlaceURI()!=null&&!personalPlace.getHasPersonalPlaceURI().isEmpty()){
+				query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
+				if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
+					query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
+				if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
+					query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
+				if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
+				if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
+				if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
+				if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
+					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
 				//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-				query+= "  "+iterators.next().getHasPersonalPlaceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasPersonalPlaceURI()+" rdf:type profile:PersonalPlace .";
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
 			}
 		}
 		query+= "}";
@@ -1373,38 +1377,38 @@ public class GetSetQueryStrings {
 				+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 
-			if (regularTrip.getHasRegularTripURI()!=null||!regularTrip.getHasRegularTripURI().isEmpty()){
-				query+= "  "+transportUri+" profile:hasRegularTrip "+regularTrip.getHasRegularTripURI()+" .";
-				if (regularTrip.getHasRegularTripName()!=null||!regularTrip.getHasRegularTripName().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
-				if (regularTrip.getHasRegularTripDepartureTime()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripDepartureTime "+regularTrip.getHasRegularTripDepartureTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripDepartureTimeSD()>0)
-					query+="  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripDepartureTimeSD "+regularTrip.getHasRegularTripDepartureTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripTravelTime()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTravelTime "+regularTrip.getHasRegularTripTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripTravelTimeSD()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTravelTimeSD "+regularTrip.getHasRegularTripTravelTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripFastestTravelTime()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripFastestTravelTime "+regularTrip.getHasRegularTripFastestTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripLastChanged()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripLastChanged "+regularTrip.getHasRegularTripLastChanged()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripTotalDistance()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTotalDistance "+regularTrip.getHasRegularTripTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (regularTrip.getHasRegularTripTotalCount()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTotalCount "+regularTrip.getHasRegularTripTotalCount()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (regularTrip.getHasModalityType().toString()!=null||!regularTrip.getHasModalityType().toString().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
-				if (regularTrip.getHasRegularTripWeekdayPattern()!=null||!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
-				if (regularTrip.getHasRegularTripDayhourPattern()!=null||!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
-				if (regularTrip.getHasRegularTripTravelTimePattern()!=null||!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
-				if (regularTrip.getHasRegularTripWeatherPattern()!=null||!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  "+regularTrip.getHasRegularTripURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+regularTrip.getHasRegularTripURI()+" rdf:type profile:RegularTrip .";
+			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
+				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
+				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
+				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
+					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripLastChanged()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
+				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
+				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
+				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
+				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
 			}
 			query+= "}";
 			return query;
@@ -1423,38 +1427,39 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iterators = regularTrips.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasRegularTripURI()!=null||!iterators.next().getHasRegularTripURI().isEmpty()){
-				query+= "  "+transportUri+" profile:hasRegularTrip "+iterators.next().getHasRegularTripURI()+" .";
-				if (iterators.next().getHasRegularTripName()!=null||!iterators.next().getHasRegularTripName().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripName \""+iterators.next().getHasRegularTripName()+"\" .";
-				if (iterators.next().getHasRegularTripDepartureTime()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripDepartureTime "+iterators.next().getHasRegularTripDepartureTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripDepartureTimeSD()>0)
-					query+="  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripDepartureTimeSD "+iterators.next().getHasRegularTripDepartureTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripTravelTime()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTravelTime "+iterators.next().getHasRegularTripTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripTravelTimeSD()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTravelTimeSD "+iterators.next().getHasRegularTripTravelTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripFastestTravelTime()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripFastestTravelTime "+iterators.next().getHasRegularTripFastestTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripLastChanged()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripLastChanged "+iterators.next().getHasRegularTripLastChanged()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripTotalDistance()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTotalDistance "+iterators.next().getHasRegularTripTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasRegularTripTotalCount()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTotalCount "+iterators.next().getHasRegularTripTotalCount()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasModalityType().toString()!=null||!iterators.next().getHasModalityType().toString().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasModalityType \""+iterators.next().getHasModalityType()+"\" .";
-				if (iterators.next().getHasRegularTripWeekdayPattern()!=null||!iterators.next().getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripWeekdayPattern \""+iterators.next().getHasRegularTripWeekdayPattern()+"\" .";
-				if (iterators.next().getHasRegularTripDayhourPattern()!=null||!iterators.next().getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripDayhourPattern \""+iterators.next().getHasRegularTripDayhourPattern()+"\" .";
-				if (iterators.next().getHasRegularTripTravelTimePattern()!=null||!iterators.next().getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTimePattern \""+iterators.next().getHasRegularTripTravelTimePattern()+"\" .";
-				if (iterators.next().getHasRegularTripWeatherPattern()!=null||!iterators.next().getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripWeatherPattern \""+iterators.next().getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  "+iterators.next().getHasRegularTripURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasRegularTripURI()+" rdf:type profile:RegularTrip .";
+			eu.threecixty.profile.oldmodels.RegularTrip regularTrip= iterators.next();
+			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
+				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
+				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
+				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
+					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripLastChanged()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
+				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
+				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
+				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
+				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
 			}
 		}
 		query+= "}";
@@ -1473,38 +1478,38 @@ public class GetSetQueryStrings {
 				+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 
-			if (regularTrip.getHasRegularTripURI()!=null||!regularTrip.getHasRegularTripURI().isEmpty()){
-				query+= "  "+transportUri+" profile:hasRegularTrip "+regularTrip.getHasRegularTripURI()+" .";
-				if (regularTrip.getHasRegularTripName()!=null||!regularTrip.getHasRegularTripName().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
-				if (regularTrip.getHasRegularTripDepartureTime()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripDepartureTime "+regularTrip.getHasRegularTripDepartureTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripDepartureTimeSD()>0)
-					query+="  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripDepartureTimeSD "+regularTrip.getHasRegularTripDepartureTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripTravelTime()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTravelTime "+regularTrip.getHasRegularTripTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripTravelTimeSD()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTravelTimeSD "+regularTrip.getHasRegularTripTravelTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripFastestTravelTime()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripFastestTravelTime "+regularTrip.getHasRegularTripFastestTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripLastChanged()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripLastChanged "+regularTrip.getHasRegularTripLastChanged()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (regularTrip.getHasRegularTripTotalDistance()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTotalDistance "+regularTrip.getHasRegularTripTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (regularTrip.getHasRegularTripTotalCount()>0)
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTotalCount "+regularTrip.getHasRegularTripTotalCount()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (regularTrip.getHasModalityType().toString()!=null||!regularTrip.getHasModalityType().toString().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
-				if (regularTrip.getHasRegularTripWeekdayPattern()!=null||!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
-				if (regularTrip.getHasRegularTripDayhourPattern()!=null||!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
-				if (regularTrip.getHasRegularTripTravelTimePattern()!=null||!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
-				if (regularTrip.getHasRegularTripWeatherPattern()!=null||!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  "+regularTrip.getHasRegularTripURI()+" profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  "+regularTrip.getHasRegularTripURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+regularTrip.getHasRegularTripURI()+" rdf:type profile:RegularTrip .";
+			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
+				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
+				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
+				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
+					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripLastChanged()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
+				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
+				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
+				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
+				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
 			}
 			query+= "}";
 			return query;
@@ -1523,38 +1528,39 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iterators = regularTrips.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasRegularTripURI()!=null||!iterators.next().getHasRegularTripURI().isEmpty()){
-				query+= "  "+transportUri+" profile:hasRegularTrip "+iterators.next().getHasRegularTripURI()+" .";
-				if (iterators.next().getHasRegularTripName()!=null||!iterators.next().getHasRegularTripName().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripName \""+iterators.next().getHasRegularTripName()+"\" .";
-				if (iterators.next().getHasRegularTripDepartureTime()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripDepartureTime "+iterators.next().getHasRegularTripDepartureTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripDepartureTimeSD()>0)
-					query+="  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripDepartureTimeSD "+iterators.next().getHasRegularTripDepartureTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripTravelTime()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTravelTime "+iterators.next().getHasRegularTripTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripTravelTimeSD()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTravelTimeSD "+iterators.next().getHasRegularTripTravelTimeSD()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripFastestTravelTime()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripFastestTravelTime "+iterators.next().getHasRegularTripFastestTravelTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripLastChanged()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripLastChanged "+iterators.next().getHasRegularTripLastChanged()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasRegularTripTotalDistance()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTotalDistance "+iterators.next().getHasRegularTripTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasRegularTripTotalCount()>0)
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTotalCount "+iterators.next().getHasRegularTripTotalCount()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasModalityType().toString()!=null||!iterators.next().getHasModalityType().toString().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasModalityType \""+iterators.next().getHasModalityType()+"\" .";
-				if (iterators.next().getHasRegularTripWeekdayPattern()!=null||!iterators.next().getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripWeekdayPattern \""+iterators.next().getHasRegularTripWeekdayPattern()+"\" .";
-				if (iterators.next().getHasRegularTripDayhourPattern()!=null||!iterators.next().getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripDayhourPattern \""+iterators.next().getHasRegularTripDayhourPattern()+"\" .";
-				if (iterators.next().getHasRegularTripTravelTimePattern()!=null||!iterators.next().getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripTimePattern \""+iterators.next().getHasRegularTripTravelTimePattern()+"\" .";
-				if (iterators.next().getHasRegularTripWeatherPattern()!=null||!iterators.next().getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  "+iterators.next().getHasRegularTripURI()+" profile:hasRegularTripWeatherPattern \""+iterators.next().getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  "+iterators.next().getHasRegularTripURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasRegularTripURI()+" rdf:type profile:RegularTrip .";
+			eu.threecixty.profile.oldmodels.RegularTrip regularTrip= iterators.next();
+			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
+				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
+				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
+				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
+					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
+				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
+				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
+				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
+				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
+					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
 			}
 		}
 		query+= "}";
@@ -1575,7 +1581,7 @@ public class GetSetQueryStrings {
 					+" ?s profile:hasUID ?uid. "
 					+ "?s profile:hasTransport ?transport. "
 					+ "?transport profile:hasRegularTrip ?regularTrip. "
-					+ "?regularTrip profile:hasRegularTripID ?tripID ."
+					+ "Optional {?regularTrip profile:hasRegularTripID ?tripID .}"
 					+ "Optional {?regularTrip profile:hasRegularTripName ?name .}"
 					+ "Optional {?regularTrip profile:hasRegularTripDepartureTime ?departureTime .}"
 					+ "Optional {?regularTrip profile:hasRegularTripDepartureTimeSD ?departuretimeSD .}"
@@ -1606,7 +1612,7 @@ public class GetSetQueryStrings {
 				+ "select ?regularTrip ?tripID ?name ?departureTime ?departureTimeSD ?travelTime ?travelTimeSD ?fastestTravelTime ?lastChanged ?totalDistance ?totalCount ?modalityType ?weekdayPattern ?dayhourPattern ?timePattern ?weatherPattern "//?pplace "
 				+ " where {"
 					+ "?transport profile:hasRegularTrip ?regularTrip. "
-					+ "?regularTrip profile:hasRegularTripID ?tripID ."
+					+ "Optional {?regularTrip profile:hasRegularTripID ?tripID .}"
 					+ "Optional {?regularTrip profile:hasRegularTripName ?name .}"
 					+ "Optional {?regularTrip profile:hasRegularTripDepartureTime ?departureTime .}"
 					+ "Optional {?regularTrip profile:hasRegularTripDepartureTimeSD ?departuretimeSD .}"
@@ -1638,30 +1644,29 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (tripPreference.getHasTripPreferenceURI()!=null||!tripPreference.getHasTripPreferenceURI().isEmpty()){
+		if (tripPreference.getHasTripPreferenceURI()!=null&&!tripPreference.getHasTripPreferenceURI().isEmpty())
 			tripPreference.setHasTripPreferenceURI(preferenceURI+"/TripPreference/"+UUID.randomUUID().toString());
-		}
-		else{
-			query+= "  "+preferenceURI+" profile:hasTripPrefernce "+tripPreference.getHasTripPreferenceURI()+" .";
-			if (tripPreference.getHasPreferredMaxTotalDistance()>0)
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredMaxTotalDistance "+tripPreference.getHasPreferredMaxTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (tripPreference.getHasPreferredTripDuration()>0)
-				query+="  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredTripDuration "+tripPreference.getHasPreferredTripDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (tripPreference.getHasPreferredTripTime()>0)
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredTripTime "+tripPreference.getHasPreferredTripTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (tripPreference.getHasPreferredCity()!=null||!tripPreference.getHasPreferredCity().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
-			if (tripPreference.getHasPreferredCountry()!=null||!tripPreference.getHasPreferredCountry().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
-			if (tripPreference.getHasPreferredWeatherCondition()!=null||!tripPreference.getHasPreferredWeatherCondition().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
-			if (tripPreference.getHasPreferredMinTimeOfAccompany()>0)
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredMinTimeOfAccompany "+tripPreference.getHasPreferredMinTimeOfAccompany()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (tripPreference.getHasModalityType().toString()!=null||!tripPreference.getHasModalityType().toString().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
-			query+= "  "+tripPreference.getHasTripPreferenceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  "+tripPreference.getHasTripPreferenceURI()+" rdf:type profile:TripPreference .";
-		}
+	
+		query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
+		if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
+			query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
+		if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
+		if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
+		if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
+		query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+		query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
+
 		query+= "}";
 		return query;
 	}
@@ -1679,30 +1684,30 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.TripPreference> iterators = tripPreferences.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasTripPreferenceURI()==null ||iterators.next().getHasTripPreferenceURI().isEmpty()){
-				iterators.next().setHasTripPreferenceURI(preferenceURI+"/TripPreference/"+UUID.randomUUID().toString());
-			}
-			else{
-				query+= "  "+preferenceURI+" profile:hasTripPrefernce "+iterators.next().getHasTripPreferenceURI()+" .";
-				if (iterators.next().getHasPreferredMaxTotalDistance()>0)
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredMaxTotalDistance "+iterators.next().getHasPreferredMaxTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasPreferredTripDuration()>0)
-					query+="  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredTripDuration "+iterators.next().getHasPreferredTripDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasPreferredTripTime()>0)
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredTripTime "+iterators.next().getHasPreferredTripTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasPreferredCity()!=null||!iterators.next().getHasPreferredCity().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredCity \""+iterators.next().getHasPreferredCity()+"\" .";
-				if (iterators.next().getHasPreferredCountry()!=null||!iterators.next().getHasPreferredCountry().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredCountry \""+iterators.next().getHasPreferredCountry()+"\" .";
-				if (iterators.next().getHasPreferredWeatherCondition()!=null||!iterators.next().getHasPreferredWeatherCondition().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredWeatherCondition \""+iterators.next().getHasPreferredWeatherCondition()+"\" .";
-				if (iterators.next().getHasPreferredMinTimeOfAccompany()>0)
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredMinTimeOfAccompany "+iterators.next().getHasPreferredMinTimeOfAccompany()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasModalityType().toString()!=null||!iterators.next().getHasModalityType().toString().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasModalityType \""+iterators.next().getHasModalityType().toString()+"\" .";
-				query+= "  "+iterators.next().getHasTripPreferenceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasTripPreferenceURI()+" rdf:type profile:TripPreference .";
-			}
+			eu.threecixty.profile.oldmodels.TripPreference tripPreference=iterators.next();
+			if (tripPreference.getHasTripPreferenceURI()==null ||tripPreference.getHasTripPreferenceURI().isEmpty())
+				tripPreference.setHasTripPreferenceURI(preferenceURI+"/TripPreference/"+UUID.randomUUID().toString());
+			
+			query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
+			if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
+				query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
+			if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
+			if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
+			if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
+			
 		}
 		query+= "}";
 		return query;
@@ -1719,26 +1724,26 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (tripPreference.getHasTripPreferenceURI()!=null||!tripPreference.getHasTripPreferenceURI().isEmpty()){
-			query+= "  "+preferenceURI+" profile:hasTripPrefernce "+tripPreference.getHasTripPreferenceURI()+" .";
-			if (tripPreference.getHasPreferredMaxTotalDistance()>0)
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredMaxTotalDistance "+tripPreference.getHasPreferredMaxTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-			if (tripPreference.getHasPreferredTripDuration()>0)
-				query+="  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredTripDuration "+tripPreference.getHasPreferredTripDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (tripPreference.getHasPreferredTripTime()>0)
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredTripTime "+tripPreference.getHasPreferredTripTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (tripPreference.getHasPreferredCity()!=null||!tripPreference.getHasPreferredCity().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
-			if (tripPreference.getHasPreferredCountry()!=null||!tripPreference.getHasPreferredCountry().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
-			if (tripPreference.getHasPreferredWeatherCondition()!=null||!tripPreference.getHasPreferredWeatherCondition().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
-			if (tripPreference.getHasPreferredMinTimeOfAccompany()>0)
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasPreferredMinTimeOfAccompany "+tripPreference.getHasPreferredMinTimeOfAccompany()+"^^http://www.w3.org/2001/XMLSchema#long .";
-			if (tripPreference.getHasModalityType().toString()!=null||!tripPreference.getHasModalityType().toString().isEmpty())
-				query+= "  "+tripPreference.getHasTripPreferenceURI()+" profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
-			query+= "  "+tripPreference.getHasTripPreferenceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  "+tripPreference.getHasTripPreferenceURI()+" rdf:type profile:TripPreference .";
+		if (tripPreference.getHasTripPreferenceURI()!=null&&!tripPreference.getHasTripPreferenceURI().isEmpty()){
+			query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
+			if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
+				query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
+			if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
+			if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
+			if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
 		}
 		query+= "}";
 		return query;
@@ -1757,26 +1762,27 @@ public class GetSetQueryStrings {
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.TripPreference> iterators = tripPreferences.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next().getHasTripPreferenceURI()!=null||!iterators.next().getHasTripPreferenceURI().isEmpty()){
-				query+= "  "+preferenceURI+" profile:hasTripPrefernce "+iterators.next().getHasTripPreferenceURI()+" .";
-				if (iterators.next().getHasPreferredMaxTotalDistance()>0)
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredMaxTotalDistance "+iterators.next().getHasPreferredMaxTotalDistance()+"^^http://www.w3.org/2001/XMLSchema#double .";
-				if (iterators.next().getHasPreferredTripDuration()>0)
-					query+="  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredTripDuration "+iterators.next().getHasPreferredTripDuration()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasPreferredTripTime()>0)
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredTripTime "+iterators.next().getHasPreferredTripTime()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasPreferredCity()!=null||!iterators.next().getHasPreferredCity().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredCity \""+iterators.next().getHasPreferredCity()+"\" .";
-				if (iterators.next().getHasPreferredCountry()!=null||!iterators.next().getHasPreferredCountry().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredCountry \""+iterators.next().getHasPreferredCountry()+"\" .";
-				if (iterators.next().getHasPreferredWeatherCondition()!=null||!iterators.next().getHasPreferredWeatherCondition().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredWeatherCondition \""+iterators.next().getHasPreferredWeatherCondition()+"\" .";
-				if (iterators.next().getHasPreferredMinTimeOfAccompany()>0)
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasPreferredMinTimeOfAccompany "+iterators.next().getHasPreferredMinTimeOfAccompany()+"^^http://www.w3.org/2001/XMLSchema#long .";
-				if (iterators.next().getHasModalityType().toString()!=null||!iterators.next().getHasModalityType().toString().isEmpty())
-					query+= "  "+iterators.next().getHasTripPreferenceURI()+" profile:hasModalityType \""+iterators.next().getHasModalityType().toString()+"\" .";
-				query+= "  "+iterators.next().getHasTripPreferenceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next().getHasTripPreferenceURI()+" rdf:type profile:TripPreference .";
+			eu.threecixty.profile.oldmodels.TripPreference tripPreference=iterators.next();
+			if (tripPreference.getHasTripPreferenceURI()!=null&&!tripPreference.getHasTripPreferenceURI().isEmpty()){
+				query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
+				if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
+					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
+					query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
+					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
+					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
+				if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
+					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
+				if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
+					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
+				if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
+					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+				if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
+					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
 			}
 		}
 		query+= "}";
@@ -1822,14 +1828,13 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (placePreferenceURI==null ||placePreferenceURI.isEmpty()){
+		if (placePreferenceURI==null ||placePreferenceURI.isEmpty())
 			placePreferenceURI=preferenceURI+"/PlacePreference/"+UUID.randomUUID().toString();
-		}
-		else{
-			query+= " "+preferenceURI+" profile:hasPlacePreference "+placePreferenceURI+" .";
-			query+= "  "+placePreferenceURI+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  "+placePreferenceURI+" rdf:type profile:PlacePreference .";
-		}
+		
+		query+= " <"+preferenceURI+"> profile:hasPlacePreference <"+placePreferenceURI+"> .";
+		query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+		query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
+
 		query+= "}";
 		return query;
 	}
@@ -1847,10 +1852,11 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <String> iterators = placePreferenceURIs.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next()!=null||!iterators.next().isEmpty()){
-				query+= " "+preferenceURI+" profile:hasPlacePreference "+iterators.next()+" .";
-				query+= "  "+iterators.next()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next()+" rdf:type profile:PlacePreference .";
+			String placePreferenceURI=iterators.next();
+			if (placePreferenceURI!=null&&!placePreferenceURI.isEmpty()){
+				query+= " <"+preferenceURI+"> profile:hasPlacePreference "+placePreferenceURI+" .";
+				query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
 			}
 		}
 		query+= "}";
@@ -1869,9 +1875,9 @@ public class GetSetQueryStrings {
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (placePreferenceURI!=null){
-			query+= " "+preferenceURI+" profile:hasPlacePreference "+placePreferenceURI+" .";
-			query+= "  "+placePreferenceURI+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  "+placePreferenceURI+" rdf:type profile:PlacePreference .";
+			query+= " <"+preferenceURI+"> profile:hasPlacePreference <"+placePreferenceURI+"> .";
+			query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
 		}
 		query+= "}";
 		return query;
@@ -1890,10 +1896,11 @@ public class GetSetQueryStrings {
 			+ " { ";
 		Iterator <String> iterators = placePreferenceURIs.iterator();
 		for ( ; iterators.hasNext(); ){
-			if (iterators.next()!=null||!iterators.next().isEmpty()){
-				query+= " "+preferenceURI+" profile:hasPlacePreference "+iterators.next()+" .";
-				query+= "  "+iterators.next()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+iterators.next()+" rdf:type profile:PlacePreference .";
+			String placePreferenceURI=iterators.next();
+			if (placePreferenceURI!=null&&!placePreferenceURI.isEmpty()){
+				query+= " <"+preferenceURI+"> profile:hasPlacePreference <"+placePreferenceURI+"> .";
+				query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
 			}
 		}
 		query+= "}";
@@ -1932,17 +1939,15 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-			if (placeDetailPreference.getHasPlaceDetailPreferenceURI()==null ||placeDetailPreference.getHasPlaceDetailPreferenceURI().isEmpty()){
+			if (placeDetailPreference.getHasPlaceDetailPreferenceURI()==null ||placeDetailPreference.getHasPlaceDetailPreferenceURI().isEmpty())
 				placeDetailPreference.setHasPlaceDetailPreferenceURI(placePreferenceURI+"/PlaceDetailPreference/"+UUID.randomUUID().toString());
-			}
-			else{
-				query+= "  "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" rdf:type profile:PlaceDetailPreference.";
-				query+= "  "+placePreferenceURI+" profile:hasPlaceDetailPreference "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" .";
-				
-				if (placeDetailPreference.getHasNatureOfPlace().toString()!=null||! placeDetailPreference.getHasNatureOfPlace().toString().isEmpty()) 
-					query+= "  "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" profile:hasNatureOfPlace \""+placeDetailPreference.getHasNatureOfPlace() +"\" .";
-			}
+		
+			query+= "  <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+			query+= "  <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> rdf:type profile:PlaceDetailPreference.";
+			query+= "  <"+placePreferenceURI+"> profile:hasPlaceDetailPreference <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> .";
+			
+			if (placeDetailPreference.getHasNatureOfPlace().toString()!=null&&! placeDetailPreference.getHasNatureOfPlace().toString().isEmpty()) 
+				query+= "  <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> profile:hasNatureOfPlace \""+placeDetailPreference.getHasNatureOfPlace() +"\" .";
 			query+= "}";
 			return query;
 	}
@@ -1958,13 +1963,13 @@ public class GetSetQueryStrings {
 			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-			if (placeDetailPreference.getHasPlaceDetailPreferenceURI()!=null||!placeDetailPreference.getHasPlaceDetailPreferenceURI().isEmpty()){
-				query+= "  "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" rdf:type profile:PlaceDetailPreference.";
-				query+= "  "+placePreferenceURI+" profile:hasPlaceDetailPreference "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" .";
+			if (placeDetailPreference.getHasPlaceDetailPreferenceURI()!=null&&!placeDetailPreference.getHasPlaceDetailPreferenceURI().isEmpty()){
+				query+= "  <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
+				query+= "  <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> rdf:type profile:PlaceDetailPreference.";
+				query+= "  <"+placePreferenceURI+"> profile:hasPlaceDetailPreference <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> .";
 				
-				if (placeDetailPreference.getHasNatureOfPlace().toString()!=null||! placeDetailPreference.getHasNatureOfPlace().toString().isEmpty()) 
-					query+= "  "+placeDetailPreference.getHasPlaceDetailPreferenceURI()+" profile:hasNatureOfPlace \""+placeDetailPreference.getHasNatureOfPlace() +"\" .";
+				if (placeDetailPreference.getHasNatureOfPlace().toString()!=null&&! placeDetailPreference.getHasNatureOfPlace().toString().isEmpty()) 
+					query+= "  <"+placeDetailPreference.getHasPlaceDetailPreferenceURI()+"> profile:hasNatureOfPlace \""+placeDetailPreference.getHasNatureOfPlace() +"\" .";
 			}
 			query+= "}";
 			return query;
