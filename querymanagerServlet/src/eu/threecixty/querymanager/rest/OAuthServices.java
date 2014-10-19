@@ -19,6 +19,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONObject;
+
 import com.google.gson.Gson;
 
 import eu.threecixty.Configuration;
@@ -183,6 +185,41 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"appid doesn't exist\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
+	}
+	
+	@GET
+	@Path("/retrieveKeyInfo")
+	public Response retrieveKeyInfo(@HeaderParam("key") String key) {
+		App app = OAuthWrappers.retrieveApp(key);
+		if (app == null) {
+			return Response.status(Response.Status.OK)
+	        .entity(" {\"response\": \"not found\"} ")
+	        .type(MediaType.APPLICATION_JSON_TYPE)
+	        .build();
+		}
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("response", "found");
+		jsonObj.put("appid", app.getAppNameSpace());
+		jsonObj.put("appname", app.getAppName());
+		return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+	}
+
+	@GET
+	@Path("/retrieveKeyInfoFromAccessToken")
+	public Response retrieveKeyInfoFromAccessToken(@HeaderParam("access_token") String access_token) {
+		AccessToken tokenInfo = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (tokenInfo == null) {
+			return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+		}
+		App app = OAuthWrappers.retrieveApp(tokenInfo.getAppkey());
+		if (app == null) {
+			return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+		}
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("response", "found");
+		jsonObj.put("appid", app.getAppNameSpace());
+		jsonObj.put("appname", app.getAppName());
+		return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
