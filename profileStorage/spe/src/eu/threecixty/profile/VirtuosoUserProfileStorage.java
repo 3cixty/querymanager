@@ -76,8 +76,10 @@ public class VirtuosoUserProfileStorage {
 			saveKnowsToKB(profile.getHasUID(), profile.getKnows());
 			
 			savePreferenceToKB(profile.getHasUID(), profile.getPreferences());
-			
-			saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
+			if (profile.getPreferences()==null)
+				saveTransportToKB(profile.getHasUID(), null);
+			else
+				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -485,6 +487,13 @@ public class VirtuosoUserProfileStorage {
 				}
 				
 			}
+			
+			
+			saveLikesToKB(uid, oldPrefs.getHasPreferenceURI(), null);
+			
+			saveTripPreferenceToKB(uid, oldPrefs.getHasPreferenceURI(), null);
+			
+			savePlacePreferenceToKB(uid, oldPrefs.getHasPreferenceURI(), null);
 			
 			String str = GetSetQueryStrings.removePreferences(uid,oldPrefs.getHasPreferenceURI());
 			virtuosoConnection.insertDeleteQuery(str);
