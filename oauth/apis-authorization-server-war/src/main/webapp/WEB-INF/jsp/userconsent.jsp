@@ -59,6 +59,7 @@
       </fieldset>
       <fieldset>
         <div class="form-actions">
+        <strong>Note that clicking "Grant Permissions" below will give this app the ability to read and/modify your FirstName, LastName, and last known location in the 3cixty Platform.</strong><br/>
           <button id="user_oauth_approval" name="user_oauth_approval" value="true" type="submit"
                   class="btn btn-success">Grant permission</button>
           &nbsp;&nbsp;&nbsp;<em>or</em>&nbsp;&nbsp;&nbsp;
