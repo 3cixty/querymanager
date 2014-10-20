@@ -319,7 +319,26 @@ public class VirtuosoUserProfileStorage {
 			
 			stmt = conn.createStatement();
 			
-			String str = GetSetQueryStrings.removeLastCrawlTime(uid, time);
+			
+			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			String oldtime="";
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				try {
+					//?lastCrawlTime
+					RDFNode lastCrawlTime = qs.get("lastCrawlTime");
+					
+				    if (lastCrawlTime!=null)
+				    	oldtime=lastCrawlTime.toString();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			String str = GetSetQueryStrings.removeLastCrawlTime(uid, oldtime);
 			virtuosoConnection.insertDeleteQuery(str);
 			
 			str = GetSetQueryStrings.setLastCrawlTime(uid, time);
