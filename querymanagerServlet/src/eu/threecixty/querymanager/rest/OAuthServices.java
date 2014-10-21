@@ -34,6 +34,8 @@ import eu.threecixty.profile.GoogleAccountUtils;
 @Path("/" + Constants.VERSION_2)
 public class OAuthServices {
 	
+	private static final String ID_PATTERN = "^[a-z_A-Z0-9:\\-]*$";
+	
 	public static final String APP_KEY = "appObj";
 	public static final String UID_KEY = "uid";
 	
@@ -120,6 +122,12 @@ public class OAuthServices {
 			@DefaultValue("")@QueryParam("redirect_uri") String redirect_uri,
 			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
 		//thumbNailUrl
+		if (!validId(appid) || appid == null || appid.equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST)
+			        .entity(" {\"response\": \"failed\", \"reason\": \"appId only contains characters in the following patterns ^[a-z_A-Z0-9:\\-]*$\"} ")
+			        .type(MediaType.APPLICATION_JSON_TYPE)
+			        .build();
+		}
 		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
@@ -413,6 +421,13 @@ public class OAuthServices {
 		return builder.toString();
 	}
 
+	protected boolean validId(String id) {
+		if (id.matches(ID_PATTERN)) {
+			return true;
+		}
+		return false;
+	}
+	
 	private class DeveloperScope {
 		
 		public DeveloperScope(String scopeName, String desc) {
