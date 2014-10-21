@@ -10,12 +10,15 @@
   <version>1.0</version>
   
   <modules>
+    <module>3cixty-config</module>
     <module>dbconnection</module>
 	<module>oauth-common</module>
     <module>oauth-wrapper</module>
 	<module>appkey</module>
 	<module>3cixty-oauth-integration</module>
-    <!--module>oauth</module-->
+
+    <module>oauth</module>
+
   </modules>
   
   <build>
