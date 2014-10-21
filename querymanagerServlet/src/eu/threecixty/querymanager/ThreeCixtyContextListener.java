@@ -31,7 +31,12 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    		+ File.separatorChar + FOLDER_ROOT;
 	    Configuration.setPath(realPath);
 	    Configuration.setVersion(context.getServletContext().getContextPath());
-	    RdfFileManager.getInstance().setPathToRdfFile(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
+	    File rdfFile = new File(pathTo3CixtyDataFolder + File.separatorChar + "UserProfileKBmodelWithIndividuals.rdf");
+	    if (!rdfFile.exists()) {
+	    	File originalFile = new File(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
+	    	originalFile.renameTo(rdfFile);
+	    }
+	    RdfFileManager.getInstance().setPathToRdfFile(rdfFile.getAbsolutePath());
 	    TrayStorage.setPath(pathTo3CixtyDataFolder);
 	    QueryManagerServices.realPath = realPath;
 	    KeyManager.getInstance().setPath(realPath + File.separatorChar + "keyapps" + File.separatorChar);
