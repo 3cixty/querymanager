@@ -138,6 +138,10 @@ public class ThreeCixtyResource extends AbstractResource {
     	if (firstTime) {
     		ResourceServer resourceServer = resourceServerRepository.findByKey(THREE_CIXTY_RES_SERVER_KEY);
     		if (resourceServer != null) {
+    			// update scopes
+    			List <String> scopes = ScopeUtils.getScopeNames();
+    			resourceServer.setScopes(scopes);
+    			resourceServerRepository.save(resourceServer);
     			firstTime = false;
     			return;
     		}
