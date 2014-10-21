@@ -59,11 +59,12 @@ public class VirtuosoUserProfileStorage {
 	 * @param profile
 	 * @return
 	 */
-	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
+	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile, String type) {
 		if (profile == null) return false;
 		
 		try {
-			saveUIDInfoTOKB(profile.getHasUID());
+			if (!type.equals("delete"))
+				saveUIDInfoTOKB(profile.getHasUID(), type);
 			
 			saveNameInfoToKB(profile.getHasUID(),profile.getHasName());
 			
@@ -81,13 +82,16 @@ public class VirtuosoUserProfileStorage {
 			else
 				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
 			
+			if (type.equals("Delete"))
+				saveUIDInfoTOKB(profile.getHasUID(), type);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	private static void saveUIDInfoTOKB(String uid) {
+	private static void saveUIDInfoTOKB(String uid, String type) {
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -99,8 +103,14 @@ public class VirtuosoUserProfileStorage {
 			
 			stmt = conn.createStatement();
 			
-			String str = GetSetQueryStrings.setUser(uid);
-			virtuosoConnection.insertDeleteQuery(str);
+			if (type.equals("delete")){
+				String str = GetSetQueryStrings.removeUser(uid);
+				virtuosoConnection.insertDeleteQuery(str);
+			}
+			else{
+				String str = GetSetQueryStrings.setUser(uid);
+				virtuosoConnection.insertDeleteQuery(str);
+			}
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
