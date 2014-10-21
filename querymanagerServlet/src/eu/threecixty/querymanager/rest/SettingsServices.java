@@ -38,6 +38,8 @@ public class SettingsServices {
 
 	
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
+
+	private static final String PROFILE_SCOPE_NAME = "Profile";
 	
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -50,6 +52,13 @@ public class SettingsServices {
 		HttpSession session = httpRequest.getSession();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			try {
+				checkPermission(access_token);
+			} catch (ThreeCixtyPermissionException e1) {
+				CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
+						CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
+				return Response.status(Response.Status.UNAUTHORIZED).entity(e1.getMessage()).build();
+			}
 			String uid =  userAccessToken.getUid();
 			String key = userAccessToken.getAppkey();
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -93,6 +102,13 @@ public class SettingsServices {
 		String accessToken = (String) session.getAttribute(ACCESS_TOKEN_PARAM);
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			try {
+				checkPermission(accessToken);
+			} catch (ThreeCixtyPermissionException e1) {
+				CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
+						CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
+				return Response.status(Response.Status.UNAUTHORIZED).entity(e1.getMessage()).build();
+			}
 			String uid =  userAccessToken.getUid();
 			String key = userAccessToken.getAppkey();
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -177,5 +193,12 @@ public class SettingsServices {
 	private boolean isNotNullOrEmpty(String str) {
 		if (str == null || str.equals("")) return false;
 		return true;
+	}
+
+	private void checkPermission(String token) throws ThreeCixtyPermissionException {
+		AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(token);
+		if (!accessToken.getScopeNames().contains(PROFILE_SCOPE_NAME)) {
+		    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
+		}
 	}
 }
