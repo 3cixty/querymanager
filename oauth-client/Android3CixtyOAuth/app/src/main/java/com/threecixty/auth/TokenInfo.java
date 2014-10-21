@@ -36,6 +36,7 @@ public class TokenInfo {
 	
 	
 	public static TokenInfo parse(String strJson) throws JSONException {
+        System.out.println(strJson);
 		JSONObject jsonObj = new JSONObject(strJson);
 		TokenInfo tokenInfo = new TokenInfo();
 		if (jsonObj.has(ACCESS_TOKEN_KEY)) tokenInfo.setAccess_token(jsonObj.getString(ACCESS_TOKEN_KEY));

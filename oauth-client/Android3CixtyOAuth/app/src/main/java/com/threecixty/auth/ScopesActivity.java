@@ -28,14 +28,19 @@ public class ScopesActivity extends Activity {
 		TextView decView = (TextView) findViewById(R.id.scopeDeclaration);
 		decView.setText("This data will be shared");
 	    
-		final CheckBox chk = (CheckBox) findViewById(R.id.scopeCheckbox);
+		final CheckBox wishlistChk = (CheckBox) findViewById(R.id.scopeWishlistChk);
+        final CheckBox profileChk = (CheckBox) findViewById(R.id.scopeProfileChk);
 		
 		final Button grantCmd = (Button) findViewById(R.id.grantPermission);
 		grantCmd.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				String scope = chk.isChecked() ? "Wishlist" : "";
+				String scope = null;
+                if (wishlistChk.isChecked() && profileChk.isChecked()) scope = "WishList,Profile";
+                else if (wishlistChk.isChecked()) scope = "WishList";
+                else if (profileChk.isChecked()) scope = "Profile";
+                else scope = "";
 				new ThreeCixtyAccessTokenTask(ScopesActivity.this, appkey, appid, googleToken, scope, callback).execute();
 				grantCmd.setEnabled(false);
 			}

@@ -38,7 +38,7 @@ public class ThreeCixtyAccessTokenTask extends ThreeCixtyAbstractTask {
 			
 			conn.setRequestProperty("google_access_token", encode(googleToken));
 			conn.setRequestProperty("key", encode(appkey));
-			conn.setRequestProperty("scope", encode(scope));
+			conn.setRequestProperty("scope", scope);
 			
 			InputStream input = conn.getInputStream();
 			tokenInfo = parse(input);

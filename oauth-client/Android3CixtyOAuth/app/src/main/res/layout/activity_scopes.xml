@@ -25,8 +25,9 @@
         android:id="@+id/scopeDeclaration"/>
     
     <CheckBox android:layout_width="fill_parent"  android:layout_height="wrap_content"
-        android:id="@+id/scopeCheckbox" android:checked="true" android:text="WishList"/>
-    
+        android:id="@+id/scopeWishlistChk" android:checked="true" android:text="WishList"/>
+    <CheckBox android:layout_width="fill_parent"  android:layout_height="wrap_content"
+        android:id="@+id/scopeProfileChk" android:checked="true" android:text="Profile"/>
 
         
         <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Grant permission" android:id="@+id/grantPermission"/>
