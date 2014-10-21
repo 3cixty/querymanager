@@ -132,7 +132,7 @@ public class GoFlowServices {
 		if (pwd != null) {
 		    jsonObj.put("username", username);
 		    jsonObj.put("password", pwd);
-		    System.out.println("goflow user: " + jsonObj.toString());
+		    jsonObj.put("appid", appid);
 		    return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			return Response.status(Response.Status.BAD_REQUEST).entity("{ \"response\": false, \"reason\": \"Cannot create user at GoFlow\"}").type(MediaType.APPLICATION_JSON_TYPE).build();
