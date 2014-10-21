@@ -43,7 +43,7 @@
       <input type="hidden" name="AUTH_STATE" value="${AUTH_STATE}"/>
 
       <h2>This data will be shared</h2>
-
+      <c:set var="profileScope" value="Profile" />
       <fieldset>
         <c:forEach items="${client.scopes}" var="availableScope">
           <c:set var="checked" value="" />
@@ -54,12 +54,16 @@
           </c:forEach>
           <input type="checkbox" id="GRANTED_SCOPES" name="GRANTED_SCOPES" <c:out value="${checked}"/>
                  value="${availableScope}"/>
-          <span class="consent-label">${availableScope}</span><br/>
+          <span class="consent-label">${availableScope}
+            <c:if test="${availableScope eq profileScope}">
+             (<strong> Note that clicking "Grant Permissions" below while checking "Profile" will give this app the ability to read and/modify your FirstName, LastName, and last known location in the 3cixty Platform.</strong>)
+            </c:if>
+          </span><br/>
         </c:forEach>
       </fieldset>
       <fieldset>
         <div class="form-actions">
-        <strong>Note that clicking "Grant Permissions" below will give this app the ability to read and/modify your FirstName, LastName, and last known location in the 3cixty Platform.</strong><br/>
+        
           <button id="user_oauth_approval" name="user_oauth_approval" value="true" type="submit"
                   class="btn btn-success">Grant permission</button>
           &nbsp;&nbsp;&nbsp;<em>or</em>&nbsp;&nbsp;&nbsp;
