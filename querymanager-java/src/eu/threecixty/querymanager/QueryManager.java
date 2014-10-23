@@ -151,7 +151,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return builder.toString();
 	}
 
 	/**

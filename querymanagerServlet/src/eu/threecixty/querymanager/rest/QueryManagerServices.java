@@ -151,10 +151,8 @@ public class QueryManagerServices {
 						.type(MediaType.TEXT_PLAIN)
 						.build());
 			} else {
-				IProfiler profiler = null;
-				QueryManager qm = new QueryManager("false");
 
-				String result = executeQuery(profiler, qm, query, null, eventMediaFormat, false);
+				String result = QueryManager.executeQuery(query, eventMediaFormat);
 
 				// log calls
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -182,8 +180,9 @@ public class QueryManagerServices {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
-			QueryManager qm = new QueryManager("false");
-			String ret = executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
+			
+			String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+			
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
@@ -234,8 +233,7 @@ public class QueryManagerServices {
 				String query = createGroupQuery(group, offset, limit,
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
-				QueryManager qm = new QueryManager("false");
-				String ret = executeQuery(null, qm, query, null, EventMediaFormat.JSON, false);
+				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			}
@@ -322,7 +320,6 @@ public class QueryManagerServices {
 		long starttime = System.currentTimeMillis();
 
 		if (OAuthWrappers.validateAppKey(key)) {
-			IProfiler profiler = null;
 
 				Gson gson = new Gson();
 				KeyValuePair pair1 = null;
@@ -334,16 +331,13 @@ public class QueryManagerServices {
 					pair2 = gson.fromJson(filter2, KeyValuePair.class);
 				} catch (Exception e) {}
 
-				profiler = null;
-				QueryManager qm = new QueryManager("false");
-
 				String query = createSelectSparqlQuery(offset, limit,
 						(pair1 == null ? null : pair1.getGroupBy()),
 						(pair1 == null ? null : pair1.getValue()),
 						(pair2 == null ? null : pair2.getGroupBy()),
 						(pair2 == null ? null : pair2.getValue()));
 
-				String result = executeQuery(profiler, qm, query, null, EventMediaFormat.JSON, false);
+				String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
