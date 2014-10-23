@@ -134,13 +134,34 @@ import eu.threecixty.profile.oldmodels.Rating;
 	}
 
 	/**
+	 * Executes query without creating a new instance of QueryManager.
+	 * <br>
+	 * Note that this method doesn't augment the given query.
+	 * @param query
+	 * @param format
+	 * @return
+	 */
+	public static String executeQuery(String query, EventMediaFormat format) {
+		if (query == null || format == null) return "";
+		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
+				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
+		StringBuilder builder = new StringBuilder();
+		try {
+			hasElementsForBindings(query, format, formatType, false, builder);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
 	 * Checks whether or not there is one element at least for result.
 	 * @param query
 	 * @param buffer
 	 * @return
 	 * @throws IOException 
 	 */
-	private boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
+	private static boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
 			boolean augmentedQueryIncluded, StringBuilder sb) throws IOException {
 		sb.setLength(0);
 		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");

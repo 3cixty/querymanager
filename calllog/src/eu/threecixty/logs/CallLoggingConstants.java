@@ -25,6 +25,7 @@ public class CallLoggingConstants {
 	public static final String QA_SPARQL_SERVICE = "QA sparql service";
 	
 	public static final String QA_COUNT_ITEMS_RESTSERVICE = "QA count items rest service";
+	public static final String QA_COUNT_POIS_RESTSERVICE = "QA count PoIs rest service";
 	public static final String QA_AGGREGATE_ITEMS_RESTSERVICE = "QA aggregate items rest service";
 	public static final String QA_GET_ITEMS_RESTSERVICE = "QA get items rest service";
 	
