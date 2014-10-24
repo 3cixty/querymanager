@@ -195,6 +195,31 @@ public class QueryManagerServices {
 	}
 
 	/**
+	 * Counts the number of PoIs in the KB.
+	 * @param key
+	 * @return
+	 */
+	@GET
+	@Path("/countPoIs")
+	public Response countPoIs(@HeaderParam("key") String key) {
+		long starttime = System.currentTimeMillis();
+		if (OAuthWrappers.validateAppKey(key)) {
+			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place }";
+			
+			String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+			
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+
+	/**
 	 * Gets aggregated information of a given group in the KB at EventMedia.
 	 * @param group
 	 * @param offset
@@ -244,6 +269,39 @@ public class QueryManagerServices {
 			        .build());
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+
+	/**
+	 * Gets aggregated information of PoIs categories in the KB at EventMedia.
+	 * @param group
+	 * @param offset
+	 * @param limit
+	 * @param filter1
+	 * @param filter2
+	 * @param key
+	 * @return
+	 */
+	@GET
+	@Path("/getAggregatedPoIs")
+	public Response getAggregatedPoIs(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@HeaderParam("key") String key) {
+		long starttime = System.currentTimeMillis();
+		if (OAuthWrappers.validateAppKey(key)) {
+			int tmpOffset = offset < 0 ? 0 : offset;
+			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
+			+ tmpOffset +( limit < 0 ? "" : "\nLIMIT  " + limit);
+			String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)
@@ -309,6 +367,48 @@ public class QueryManagerServices {
 		}
 	}
 	
+	/**
+	 * Gets PoIs in details.
+	 *
+	 * @param access_token
+	 * @param offset
+	 * @param limit
+	 * @param preference
+	 * @param category
+	 * @return
+	 */
+	@GET
+	@Path("/getPoIs")
+	public Response getPoIs(@HeaderParam("access_token") String access_token,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
+			@DefaultValue("") @QueryParam("category") String category) {
+		
+		long starttime = System.currentTimeMillis();
+
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String user_id =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
+
+			IProfiler profiler = new Profiler(user_id);
+			QueryManager qm = new QueryManager(user_id);
+
+			String query = createSelectSparqlQueryForPoI(offset, limit, category);
+
+			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The access token is invalid '" + access_token + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+	
+
 	@GET
 	@Path("/getItemsWithoutAccessToken")
 	public Response getItemsWithoutUserInfo(
@@ -342,6 +442,30 @@ public class QueryManagerServices {
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+
+	@GET
+	@Path("/getPoIsWithoutAccessToken")
+	public Response getPoIsWithoutUserInfo(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("{}") @QueryParam("category") String category, @HeaderParam("key") String key) {
+		
+		long starttime = System.currentTimeMillis();
+
+		if (OAuthWrappers.validateAppKey(key)) {
+			String query = createSelectSparqlQueryForPoI(offset, limit, category);
+
+			String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)
@@ -414,6 +538,18 @@ public class QueryManagerServices {
 		buffer.append("} \n");
 		return createSelectSparqlQuery(buffer.toString(),
 				offset, limit);
+	}
+
+	private String createSelectSparqlQueryForPoI(int offset, int limit,
+			String category) {
+		StringBuffer buffer = new StringBuffer();
+		if (category != null && !category.equals("")) {
+			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n    ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n    FILTER ( str(?catRead) = \""
+		            + category + "\" )\n  }\n");
+		} else {
+			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location\n  }");
+		}
+		return createSelectSparqlQuery(buffer.toString(), offset, limit);
 	}
 
 	private String createSelectSparqlQuery(String initQuery, int offset, int limit) {

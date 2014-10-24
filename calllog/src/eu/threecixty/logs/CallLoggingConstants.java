@@ -27,7 +27,9 @@ public class CallLoggingConstants {
 	public static final String QA_COUNT_ITEMS_RESTSERVICE = "QA count items rest service";
 	public static final String QA_COUNT_POIS_RESTSERVICE = "QA count PoIs rest service";
 	public static final String QA_AGGREGATE_ITEMS_RESTSERVICE = "QA aggregate items rest service";
+	public static final String QA_AGGREGATE_POIS_RESTSERVICE = "QA aggregate PoIs rest service";
 	public static final String QA_GET_ITEMS_RESTSERVICE = "QA get items rest service";
+	public static final String QA_GET_POIS_RESTSERVICE = "QA get PoIs rest service";
 	
 	public static final String KEY_VALIDATE_SERVICE = "Key validate service";
 	
