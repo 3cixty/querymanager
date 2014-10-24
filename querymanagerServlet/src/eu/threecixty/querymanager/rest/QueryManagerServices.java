@@ -382,7 +382,9 @@ public class QueryManagerServices {
 	public Response getPoIs(@HeaderParam("access_token") String access_token,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
-			@DefaultValue("") @QueryParam("category") String category) {
+			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("0") @QueryParam("minRating") int minRating,
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -394,7 +396,7 @@ public class QueryManagerServices {
 			IProfiler profiler = new Profiler(user_id);
 			QueryManager qm = new QueryManager(user_id);
 
-			String query = createSelectSparqlQueryForPoI(offset, limit, category);
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -454,12 +456,15 @@ public class QueryManagerServices {
 	public Response getPoIsWithoutUserInfo(
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("{}") @QueryParam("category") String category, @HeaderParam("key") String key) {
+			@DefaultValue("{}") @QueryParam("category") String category,
+			@DefaultValue("0") @QueryParam("minRating") int minRating,
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@HeaderParam("key") String key) {
 		
 		long starttime = System.currentTimeMillis();
 
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = createSelectSparqlQueryForPoI(offset, limit, category);
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -541,13 +546,15 @@ public class QueryManagerServices {
 	}
 
 	private String createSelectSparqlQueryForPoI(int offset, int limit,
-			String category) {
+			String category, int minRating, int maxRating) {
 		StringBuffer buffer = new StringBuffer();
 		if (category != null && !category.equals("")) {
-			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n    ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n    FILTER ( str(?catRead) = \""
-		            + category + "\" )\n  }\n");
+			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n    ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
+		            + category + "\" )\n  FILTER ( xsd:decimal(?ratingValue) >= " 
+					+ minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < " + maxRating + " )\n  }\n");
 		} else {
-			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location\n  }");
+			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
+		                + minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < "  + maxRating + " )\n  }");
 		}
 		return createSelectSparqlQuery(buffer.toString(), offset, limit);
 	}
