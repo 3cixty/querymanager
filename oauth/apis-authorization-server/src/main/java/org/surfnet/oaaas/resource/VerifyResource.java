@@ -87,12 +87,12 @@ public class VerifyResource implements EnvironmentAware {
     }
 
     AccessToken token = accessTokenRepository.findByToken(accessToken);
-    LOG.warn("den day roi: " + token);
-    LOG.warn("token's client: " + token.getClient());
-    for (Client tmpClient: resourceServer.getClients()) {
-    	LOG.warn("client: " + tmpClient);
-    }
     if (token == null || !resourceServer.containsClient(token.getClient())) {
+        LOG.warn("den day roi: " + token);
+        
+        for (AccessToken tmpAT: accessTokenRepository.findAll()) {
+        	LOG.warn("found token in repo: " + tmpAT.getToken());
+        }
       LOG.warn("Access token {} not found for resource server '{}'. Responding with 404 in VerifyResource#verifyToken for user {}", accessToken, resourceServer.getName(), credentials);
       return Response.status(Status.NOT_FOUND).entity(new VerifyTokenResponse("not_found")).build();
     }
