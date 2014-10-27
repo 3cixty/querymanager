@@ -23,6 +23,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import org.surfnet.oaaas.auth.AbstractAuthenticator;
 import org.surfnet.oaaas.auth.AbstractUserConsentHandler;
 import org.surfnet.oaaas.auth.OAuth2Validator;
@@ -137,6 +138,7 @@ public class TokenResource {
     }
   }
 
+  @Transactional
   private AccessToken createAccessToken(AuthorizationRequest request, boolean isImplicitGrant) {
     Client client = request.getClient();
     long expireDuration = client.getExpireDuration();

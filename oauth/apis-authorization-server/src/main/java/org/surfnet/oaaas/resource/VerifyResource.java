@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.transaction.annotation.Transactional;
 import org.surfnet.oaaas.auth.ObjectMapperProvider;
 import org.surfnet.oaaas.auth.principal.UserPassCredentials;
 import org.surfnet.oaaas.model.AccessToken;
-import org.surfnet.oaaas.model.Client;
 import org.surfnet.oaaas.model.ResourceServer;
 import org.surfnet.oaaas.model.VerifyTokenResponse;
 import org.surfnet.oaaas.repository.AccessTokenRepository;
@@ -69,6 +69,7 @@ public class VerifyResource implements EnvironmentAware {
 
   private boolean jsonTypeInfoIncluded;
 
+  @Transactional
   @GET
   public Response verifyToken(@HeaderParam(HttpHeaders.AUTHORIZATION)
                               String authorization, @QueryParam("access_token")
@@ -88,11 +89,6 @@ public class VerifyResource implements EnvironmentAware {
 
     AccessToken token = accessTokenRepository.findByToken(accessToken);
     if (token == null || !resourceServer.containsClient(token.getClient())) {
-        LOG.warn("den day roi: " + token);
-        
-        for (AccessToken tmpAT: accessTokenRepository.findAll()) {
-        	LOG.warn("found token in repo: " + tmpAT.getToken());
-        }
       LOG.warn("Access token {} not found for resource server '{}'. Responding with 404 in VerifyResource#verifyToken for user {}", accessToken, resourceServer.getName(), credentials);
       return Response.status(Status.NOT_FOUND).entity(new VerifyTokenResponse("not_found")).build();
     }
