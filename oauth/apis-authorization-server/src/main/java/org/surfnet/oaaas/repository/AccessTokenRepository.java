@@ -45,6 +45,9 @@ public interface AccessTokenRepository extends CrudRepository<AccessToken, Long>
   Number countByUniqueResourceOwnerIdAndClientId(long clientId);
   
   @Transactional
+  AccessToken save(AccessToken t);
+  
+  @Transactional
   void delete(AccessToken token);
 
   @Query(value="select * from accesstoken where expires > 0 and expires < ?1", nativeQuery = true)
