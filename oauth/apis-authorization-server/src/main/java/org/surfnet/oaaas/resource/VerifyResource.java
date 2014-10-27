@@ -26,6 +26,7 @@ import org.springframework.core.env.Environment;
 import org.surfnet.oaaas.auth.ObjectMapperProvider;
 import org.surfnet.oaaas.auth.principal.UserPassCredentials;
 import org.surfnet.oaaas.model.AccessToken;
+import org.surfnet.oaaas.model.Client;
 import org.surfnet.oaaas.model.ResourceServer;
 import org.surfnet.oaaas.model.VerifyTokenResponse;
 import org.surfnet.oaaas.repository.AccessTokenRepository;
@@ -86,6 +87,11 @@ public class VerifyResource implements EnvironmentAware {
     }
 
     AccessToken token = accessTokenRepository.findByToken(accessToken);
+    System.out.println("den day roi: " + token);
+    System.out.println("token's client: " + token.getClient());
+    for (Client tmpClient: resourceServer.getClients()) {
+    	System.out.println("client: " + tmpClient);
+    }
     if (token == null || !resourceServer.containsClient(token.getClient())) {
       LOG.warn("Access token {} not found for resource server '{}'. Responding with 404 in VerifyResource#verifyToken for user {}", accessToken, resourceServer.getName(), credentials);
       return Response.status(Status.NOT_FOUND).entity(new VerifyTokenResponse("not_found")).build();
