@@ -28,6 +28,7 @@ import org.surfnet.oaaas.model.Client;
 @Repository
 public interface AccessTokenRepository extends CrudRepository<AccessToken, Long> {
 
+  @Transactional(readOnly = true)
   AccessToken findByToken(String token);
   
   AccessToken findByTokenAndClient(String token, Client client);
