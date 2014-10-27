@@ -68,6 +68,7 @@ public class VerifyResource implements EnvironmentAware {
 
   private boolean jsonTypeInfoIncluded;
 
+
   @GET
   public Response verifyToken(@HeaderParam(HttpHeaders.AUTHORIZATION)
                               String authorization, @QueryParam("access_token")
@@ -86,6 +87,7 @@ public class VerifyResource implements EnvironmentAware {
     }
 
     AccessToken token = accessTokenRepository.findByToken(accessToken);
+    if (token == null) token = TokenResource.findByToken(accessToken);
     if (token == null || !resourceServer.containsClient(token.getClient())) {
       LOG.warn("Access token {} not found for resource server '{}'. Responding with 404 in VerifyResource#verifyToken for user {}", accessToken, resourceServer.getName(), credentials);
       return Response.status(Status.NOT_FOUND).entity(new VerifyTokenResponse("not_found")).build();

@@ -41,7 +41,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.surfnet.oaaas.auth.OAuth2Validator.*;
@@ -58,12 +60,15 @@ public class TokenResource {
   public static final String BASIC_REALM = "Basic realm=\"OAuth2 Secure\"";
 
   public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+  
+  /**This attribute is used to avoid synchronization issues among different instances of access token spring data repo*/
+  private static List <AccessToken> hackAccessTokens = new ArrayList<AccessToken>();
 
   @Inject
   private AuthorizationRequestRepository authorizationRequestRepository;
 
   @Inject
-  private AccessTokenRepository accessTokenRepository;
+  public AccessTokenRepository accessTokenRepository;
 
   @Inject
   private OAuth2Validator oAuth2Validator;
@@ -146,7 +151,9 @@ public class TokenResource {
     String refreshToken = (client.isUseRefreshTokens()) ? getTokenValue(true) : null;
     AuthenticatedPrincipal principal = request.getPrincipal();
     AccessToken token = new AccessToken(getTokenValue(false), principal, client, expires, request.getGrantedScopes(), refreshToken);
-    return accessTokenRepository.save(token);
+    AccessToken ret = accessTokenRepository.save(token);
+    hackAccessTokens.add(ret);
+    return ret;
   }
 
   private AuthorizationRequest findAuthorizationRequest(HttpServletRequest request) {
@@ -357,5 +364,52 @@ public class TokenResource {
   public void setoAuth2Validator(OAuth2Validator oAuth2Validator) {
     this.oAuth2Validator = oAuth2Validator;
   }
+  
+  /**
+   * Should be called in the VerifyResource class.
+   * @param token
+   * @return
+   */
+  public static synchronized AccessToken findByToken(String token) {
+	  if (token == null) return null;
+	  for (AccessToken tmpAt: hackAccessTokens) {
+		  if (token.equals(tmpAt.getToken())) return tmpAt;
+	  }
+	  return null;
+  }
 
+  /**
+   * Should be called in the RevokeResource class.
+   * @param token
+   */
+  public static synchronized void deleteByToken(String token) {
+	  if (token == null) return ;
+	  AccessToken at = null;
+	  for (AccessToken tmpAt: hackAccessTokens) {
+		  if (token.equals(tmpAt.getToken())) {
+			  at = tmpAt;
+			  break;
+		  }
+	  }
+	  if (at != null) hackAccessTokens.remove(at);
+  }
+
+  /**
+   * Should be called in the Cleaner class.
+   * @param differentAccessTokenRepository
+   */
+  public static synchronized void cleanAccessToken(AccessTokenRepository differentAccessTokenRepository) {
+	  if (differentAccessTokenRepository == null) return;
+	  // note that there might be different between a supposed instance in repo and hack list
+	  List <AccessToken> list = new ArrayList <AccessToken>();
+	  for (AccessToken tmpAT1: differentAccessTokenRepository.findAll()) {
+		  for (AccessToken tmpAT2: hackAccessTokens) {
+			  if (tmpAT1.getToken().equals(tmpAT2.getToken())) {
+				  list.add(tmpAT2);
+				  break;
+			  }
+		  }
+	  }
+	  hackAccessTokens.removeAll(list);
+  }
 }

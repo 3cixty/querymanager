@@ -88,6 +88,7 @@ public class RevokeResource {
     	return Response.ok().build();
     }
     accessTokenRepository.delete(token);
+    TokenResource.deleteByToken(accessToken);
     return Response.ok().build();
   }
 

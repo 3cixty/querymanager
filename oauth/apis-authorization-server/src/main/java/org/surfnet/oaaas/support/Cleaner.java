@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.surfnet.oaaas.model.AccessToken;
 import org.surfnet.oaaas.repository.AccessTokenRepository;
+import org.surfnet.oaaas.resource.TokenResource;
 
 import javax.inject.Inject;
 import java.util.Date;
@@ -31,6 +32,7 @@ public class Cleaner {
   @Scheduled(fixedDelay = CLEANUP_INTERVAL)
   public void cleanupExpiredAccessTokens() {
     LOG.debug("Cleaning up expired access tokens");
+    TokenResource.cleanAccessToken(accessTokenRepository);
     for (AccessToken at : accessTokenRepository.findByMaxExpires(System.currentTimeMillis() - EXPIRED_TOKEN_CLEANUP_AGE)) {
       LOG.debug("Deleting expired access token {} (created: {}, expired: {})", at.getToken(), at.getCreationDate(), new Date(at.getExpires()));
       accessTokenRepository.delete(at);
