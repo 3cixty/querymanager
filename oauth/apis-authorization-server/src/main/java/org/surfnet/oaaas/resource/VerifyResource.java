@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.transaction.annotation.Transactional;
 import org.surfnet.oaaas.auth.ObjectMapperProvider;
 import org.surfnet.oaaas.auth.principal.UserPassCredentials;
 import org.surfnet.oaaas.model.AccessToken;
@@ -69,7 +68,6 @@ public class VerifyResource implements EnvironmentAware {
 
   private boolean jsonTypeInfoIncluded;
 
-  @Transactional
   @GET
   public Response verifyToken(@HeaderParam(HttpHeaders.AUTHORIZATION)
                               String authorization, @QueryParam("access_token")
