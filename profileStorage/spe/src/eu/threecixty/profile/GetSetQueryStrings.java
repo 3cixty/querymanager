@@ -137,6 +137,58 @@ public class GetSetQueryStrings {
 	}
 		
 	/**
+	 * select gender
+	 * @param uid
+	 * @return
+	 */
+	public static String getGender(String uid) {
+		String query="prefix profile:<"+PROFILE_URI+"> "
+				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
+				+ "select ?lastCrawlTime "
+				+ " where {"
+					+ "?s a profile:UserProfile. "
+					+" ?s profile:hasUID ?uid. "
+					+ "?s vcard:gender ?gender. "
+					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
+					+ "}";
+		return query;
+	}
+	/**
+	 * insert gender. if gender=null or "" then insert "unknown"
+	 * @param uid
+	 * @param time
+	 * @return
+	 */
+	public static String setGender(String uid, String gender ){
+		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
+			+ "   prefix profile:<"+PROFILE_URI+">"
+			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
+			+ "  { ";
+			if (gender==null || gender.isEmpty())
+				gender="unknown";
+			query+= "  profile:"+uid+" vcard:gender \""+gender+"\" ."
+			+ "}";
+			return query;
+	}
+	/**
+	 * remove gender from the KB
+	 * @param uid
+	 * @param time
+	 * @return
+	 */
+	public static String removeGender(String uid, String gender ){
+		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
+			+ "   prefix profile:<"+PROFILE_URI+">"
+			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "  { "
+			+ "  profile:"+uid+" vcard:gender \""+gender+"\" ."
+			+ "}";
+			return query;
+	}
+	
+	/**
 	 * Select name of the user from KB
 	 * @param uid
 	 * @return
