@@ -35,6 +35,8 @@ public class VirtuosoUserProfileStorage {
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
 			
+			loadGenderFromKBToUserProfile(uid,toUserProfile);
+			
 			loadNameFromKBToUserProfile(uid, toUserProfile);
 			
 			loadAddressInfoFromKBToUserProfile(uid, toUserProfile);
@@ -66,6 +68,8 @@ public class VirtuosoUserProfileStorage {
 			if (!type.equals("delete"))
 				saveUIDInfoTOKB(profile.getHasUID(), type);
 			
+			saveGenderToKB(profile.getHasUID(),profile.getHasGender());
+					
 			saveNameInfoToKB(profile.getHasUID(),profile.getHasName());
 			
 			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress());
@@ -82,7 +86,7 @@ public class VirtuosoUserProfileStorage {
 			else
 				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
 			
-			if (type.equals("Delete"))
+			if (type.equals("delete"))
 				saveUIDInfoTOKB(profile.getHasUID(), type);
 			
 		} catch (Exception e) {
@@ -319,6 +323,68 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 
+	/**
+	 * add gender
+	 * @param uid
+	 * @param time
+	 */
+	private static void saveGenderToKB(String uid, String gender) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			conn=virtuosoConnection.processConfigFile();
+
+			if (conn == null) return;
+			
+			stmt = conn.createStatement();
+			
+			
+			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getGender(uid));
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			String oldGender="";
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				try {
+					//?gender
+					RDFNode oldGendertemp = qs.get("gender");
+					
+				    if (gender!=null)
+				    	oldGender=oldGendertemp.toString();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			String str = GetSetQueryStrings.removeGender(uid, oldGender);
+			virtuosoConnection.insertDeleteQuery(str);
+			
+			str = GetSetQueryStrings.setGender(uid, gender);
+			virtuosoConnection.insertDeleteQuery(str);
+		}catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * add last crawl time
 	 * @param uid
@@ -1042,7 +1108,6 @@ public class VirtuosoUserProfileStorage {
 		}
 	}
 
-
 	/**
 	 * Loads likes from the KB to a preference instance.
 	 * @param from
@@ -1110,6 +1175,66 @@ public class VirtuosoUserProfileStorage {
 				ex.printStackTrace();
 			}
 		}
+	}
+	
+	/**
+	 * load gender from the kb
+	 * @param uid
+	 * @param to
+	 */
+	private static void loadGenderFromKBToUserProfile(String uid,
+			UserProfile to) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn=virtuosoConnection.processConfigFile();
+			
+			if (conn == null) return;
+			
+			stmt = conn.createStatement();
+			
+			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getGender(uid));
+
+			ResultSet results = qRC.getReturnedResultSet();
+			
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				try {
+					RDFNode gender = qs.get("gender");
+				   
+				    if (gender!=null)
+				    	to.setHasGender(gender.toString());	
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			return;
+
+
+		} catch ( IOException  ex) {
+			ex.printStackTrace();
+		} catch ( SQLException ex){
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
 	}
 	
 	/**

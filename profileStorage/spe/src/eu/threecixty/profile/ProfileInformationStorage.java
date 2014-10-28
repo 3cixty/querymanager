@@ -8,7 +8,7 @@ import eu.threecixty.profile.oldmodels.Name;
 
 /**
  * This class is used to read and write profile information into the KB.
- * @author Cong-Kinh NGUYEN
+ * @author Rachit Agarwal
  *
  */
 public class ProfileInformationStorage {
@@ -62,7 +62,7 @@ public class ProfileInformationStorage {
 			}
 			
 			
-			ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
+			ProfileManagerImpl.getInstance().saveProfile(kbUserProfile, "Insert");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

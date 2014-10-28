@@ -16,7 +16,7 @@ import eu.threecixty.profile.oldmodels.Name;
 /**
  * Utility class to update account info.
  *
- * @author Cong-Kinh NGUYEN
+ * @author Rachit Agarwal
  *
  */
 public class GoogleAccountUtils {
@@ -92,7 +92,7 @@ public class GoogleAccountUtils {
 			
 			profile.setKnows(knows);
 
-			ProfileManagerImpl.getInstance().saveProfile(profile);
+			ProfileManagerImpl.getInstance().saveProfile(profile, "Insert");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

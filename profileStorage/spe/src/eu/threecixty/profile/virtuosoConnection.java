@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
-
+import virtuoso.jena.driver.*;
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
 import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
@@ -62,12 +62,17 @@ public class virtuosoConnection {
 				throw new IOException("The property virtuoso.graph doesn't exists");
 			}
 			try {
+				Class.forName("virtuoso.jdbc4.Driver");
 				return DriverManager.getConnection(virtuosoConnection.DB_URL,
 					virtuosoConnection.USER, virtuosoConnection.PASS);
 			}catch(SQLException ex){
-				throw new SQLException("Connction not possible. This Service not available.");
-			}
-			
+				ex.printStackTrace();
+				throw new SQLException("Connection not possible. This Service not available.");
+			}	
+		catch(ClassNotFoundException ex){
+			ex.printStackTrace();
+			throw new SQLException("Connection not possible. This Service not available.");
+		}	
 		}
 
 		/**

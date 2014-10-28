@@ -38,8 +38,8 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile) {
-		return VirtuosoUserProfileStorage.saveProfile(userProfile);
+	public boolean saveProfile(UserProfile userProfile,String type) {
+		return VirtuosoUserProfileStorage.saveProfile(userProfile,type);
 	}
 
 	@Override
