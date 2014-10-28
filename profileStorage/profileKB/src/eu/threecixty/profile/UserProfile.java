@@ -22,11 +22,11 @@ public class UserProfile{
     private Name hasName;    
     @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Address")
     private Address hasAddress;    
-///    @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Gender")
-//    private Gender hasGender;      
+    @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Gender")
+    private String hasGender;      
     @Description(hasText = "Collection hold the various identities that the user has holds other than 3cixty ID. "
-    		+ "These identities are the source from where user data is gathered. some sample identities are user’s"
-    		+ " facebook identity, user’s twitter identity etc." )
+    		+ "These identities are the source from where user data is gathered. some sample identities are userï¿½s"
+    		+ " facebook identity, userï¿½s twitter identity etc." )
     private Set<ProfileIdentities> hasProfileIdenties; 
     
     //each of the following can be empty 
@@ -53,7 +53,7 @@ public class UserProfile{
 //    				+"This collection holds the level of education user has completed or is currently enroled in")
 //    private Set <Eduation> hasEducation;
 //    @Description(hasText = "Collection that holds the Employment history of the user. "
-//    				+ "This collection holds the user’s previous employers and the current employer if any")
+//    				+ "This collection holds the userï¿½s previous employers and the current employer if any")
 //    private Set <EmployerInformation> hasEmployerInformation;
   
     
@@ -81,12 +81,12 @@ public class UserProfile{
 //	public void setBirthDate(Date birthDate) {
 //		this.birthDate = birthDate;
 //	}
-//	public Gender getHasGender() {
-//		return hasGender;
-//	}
-//	public void setHasGender(Gender hasGender) {
-//		this.hasGender = hasGender;
-//	}
+	public String getHasGender() {
+		return hasGender;
+	}
+	public void setHasGender(String hasGender) {
+		this.hasGender = hasGender;
+	}
 	public Set<ProfileIdentities> getHasProfileIdenties() {
 		return hasProfileIdenties;
 	}

@@ -27,7 +27,7 @@ public interface ProfileManager {
 	 * 				The user profile.
 	 * @return <code>true</code> if the method is successful to save data, <code>false</code> otherwise. 
 	 */
-	boolean saveProfile(UserProfile userProfile);
+	boolean saveProfile(UserProfile userProfile,String type);
 
 	/**
 	 * Checks whether or not a given Google UID exists in the KB.
@@ -194,18 +194,6 @@ public interface ProfileManager {
 	 * @return
 	 */
 	Set<IDMapping> getIDMappings();
-	
-	/**
-	 * Gets Mobidot interface.
-	 * @return
-	 */
-	Partner getMobidot();
-	
-	/**
-	 * Gets GoFlow interface.
-	 * @return
-	 */
-	Partner getGoFlow();
 	
 	/**
 	 * Map crawl times to User profile
