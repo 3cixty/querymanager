@@ -408,6 +408,28 @@ public class OAuthModelsUtils {
 		}
 	}
 
+	protected static Set <Scope> getScopes(App app) {
+		if (app == null) return null;
+		Set <Scope> scopes = new HashSet <Scope>();
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM App A WHERE A.id = :id";
+			Query query = session.createQuery(hql);
+			List<?> results = query.setInteger("id", app.getId()).list();
+			if (results.size() == 0) return null;
+			App tmp = (App) results.get(0);
+			for (Scope scope: tmp.getScopes()) {
+				scopes.add(scope);
+			}
+			session.close();
+			return scopes;
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	protected static boolean addUserAccessToken(String accessToken, String refreshToken,
 			String scope, User user, App app) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -272,6 +273,10 @@ public class OAuthWrappers {
 	 */
 	public static App retrieveApp(String appkey) {
 		return OAuthModelsUtils.getApp(appkey);
+	}
+	
+	public static Set <Scope> getScopes(App app) {
+		return OAuthModelsUtils.getScopes(app);
 	}
 
 	/**
