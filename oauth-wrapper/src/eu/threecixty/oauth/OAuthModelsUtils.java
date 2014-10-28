@@ -63,6 +63,7 @@ public class OAuthModelsUtils {
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
 			if (results.size() == 0) return null;
+			session.close();
 			return (User) results.get(0);
 		} catch (HibernateException e) {
 			return null;
@@ -132,6 +133,7 @@ public class OAuthModelsUtils {
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
 			if (results.size() == 0) return null;
+			session.close();
 			return (Developer) results.get(0);
 		} catch (HibernateException e) {
 			return null;
@@ -222,6 +224,7 @@ public class OAuthModelsUtils {
 				Scope scope = (Scope) obj;
 				scopes.add(scope);
 			}
+			session.close();
 		} catch (HibernateException e) {
 		}
 		return scopes;
@@ -248,7 +251,7 @@ public class OAuthModelsUtils {
 		Set <Scope> scopes = new HashSet <Scope>();
 		if (scopeNames == null || scopeNames.size() == 0) return scopes;
 		for (String scopeName: scopeNames) {
-			Scope scope = OAuthModelsUtils.getScope(scopeName);
+			Scope scope = getScope(scopeName);
 			if (scope != null) scopes.add(scope);
 		}
 		return scopes;
@@ -378,6 +381,7 @@ public class OAuthModelsUtils {
 			Query query = session.createQuery(hql);
 			List<?> results = query.setString("key", key).list();
 			if (results.size() == 0) return null;
+			session.close();
 			return (App) results.get(0);
 		} catch (HibernateException e) {
 			e.printStackTrace();
@@ -397,6 +401,7 @@ public class OAuthModelsUtils {
 			
 			List <?> results = query.setEntity(0, developer).setString(1, appid).list();
 			if (results.size() == 0) return null;
+			session.close();
 			return (App) results.get(0);
 		} catch (HibernateException e) {
 			return null;
