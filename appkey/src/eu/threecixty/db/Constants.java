@@ -7,7 +7,7 @@ public class Constants {
 	//public static final String DB_PWD = "3cixtydatabase001";
 	
 	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	public static final String DB_URL = "jdbc:mysql://localhost:3306/" + Constants.DB_NAME;
+	public static final String DB_URL = "jdbc:mysql://localhost:3306/" + Constants.DB_NAME + "?autoReconnect=true";
 	
 	private Constants() {
 	}
