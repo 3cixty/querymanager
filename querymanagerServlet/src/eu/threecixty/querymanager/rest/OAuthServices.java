@@ -314,7 +314,7 @@ public class OAuthServices {
 			
 			return Response.temporaryRedirect(new URI(
 					OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
-			+ join(app.getScopes()) + "&client_id="
+			+ join(OAuthWrappers.getScopes(app)) + "&client_id="
 			+ app.getClientId() + "&redirect_uri="
 		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
 		    		OAuthWrappers.getBasicAuth(app.getClientId(), app.getPassword())).build();
