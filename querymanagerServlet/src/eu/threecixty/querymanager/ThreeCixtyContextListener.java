@@ -8,7 +8,6 @@ import javax.servlet.annotation.WebListener;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.db.DBConnection;
-import eu.threecixty.keys.KeyManager;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoFlowImpl;
 import eu.threecixty.profile.MobidotImpl;
@@ -39,7 +38,6 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    RdfFileManager.getInstance().setPathToRdfFile(rdfFile.getAbsolutePath());
 	    TrayStorage.setPath(pathTo3CixtyDataFolder);
 	    QueryManagerServices.realPath = realPath;
-	    KeyManager.getInstance().setPath(realPath + File.separatorChar + "keyapps" + File.separatorChar);
 	    MobidotImpl.setPath(pathTo3CixtyDataFolder);
 	    GoFlowImpl.setPath(pathTo3CixtyDataFolder);
 	    GoFlowServer.setPath(realPath + File.separatorChar + "WEB-INF" + File.separatorChar + "goflow.properties");

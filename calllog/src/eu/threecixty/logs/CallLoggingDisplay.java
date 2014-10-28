@@ -1,7 +1,5 @@
 package eu.threecixty.logs;
 
-import eu.threecixty.keys.AppKey;
-
 /**
  * This class is to represent information about 3cixty App statistics.
  * @author Rachit@Inria

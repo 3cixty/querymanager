@@ -11,9 +11,9 @@ import com.googlecode.jsonrpc4j.JsonRpcError;
 import com.googlecode.jsonrpc4j.JsonRpcErrors;
 
 
-import eu.threecixty.keys.KeyManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.TrayStorage;
@@ -750,7 +750,7 @@ public class TrayServices implements TrayServicesIntf {
 	}
 
 	private void checkAppKey(String key) throws InvalidKeyException {
-    	if (!KeyManager.getInstance().checkAppKey(key)) {
+    	if (!OAuthWrappers.validateAppKey(key)) {
     		CallLoggingManager.getInstance().save(key, System.currentTimeMillis(), CallLoggingConstants.TRAY_SERVICE,
     				CallLoggingConstants.INVALID_APP_KEY + key);
     		throw new InvalidKeyException();
