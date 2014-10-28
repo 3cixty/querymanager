@@ -182,7 +182,7 @@ public class CrawlerCron {
 
 				user.setHasLastCrawlTime(getDateTime().toString());
 
-				ProfileManagerImpl.getInstance().saveProfile(user);
+				ProfileManagerImpl.getInstance().saveProfile(user,"insert");
 			}
 			System.out.println("All user sucessfully crawled at: "
 					+ getDateTime().toString());
