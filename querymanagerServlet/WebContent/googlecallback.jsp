@@ -1,3 +1,4 @@
+<%@page import="eu.threecixty.Configuration" %>
 <%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -31,7 +32,7 @@
     function redirect() {
     	var token = getAccessToken();
     	if (token == null) {
-    		window.location = "./error.jsp";
+    		window.location = "<%=Configuration.get3CixtyRoot()%>/error.jsp";
     	} else {
         	window.location = '<%=OAuthServices.REDIRECT_URI%>?google_access_token=' + token;
     	}
@@ -40,7 +41,7 @@
     function showAccessToken() {
     	var token = getAccessToken();
     	if (token == null) {
-    		window.location = "./error.jsp";
+    		window.location = "<%=Configuration.get3CixtyRoot()%>/error.jsp";
     	} else {
 		    window.opener.location=window.opener.location + "#access_token=" + token;
 		    window.opener.location.reload();

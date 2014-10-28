@@ -1,4 +1,5 @@
 <%@page import="eu.threecixty.querymanager.rest.Constants" %>
+<%@page import="eu.threecixty.Configuration" %>
 <%@ page language="java" import="eu.threecixty.profile.ThreeCixtySettings" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 
@@ -6,7 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link href="./3cixty.css" rel="stylesheet" type="text/css">
+<link href="<%=Configuration.get3CixtyRoot()%>/3cixty.css" rel="stylesheet" type="text/css">
 <title>Settings</title>
 </head>
 <body>
@@ -21,7 +22,7 @@
         ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
 %>
 
-<form action="./<%=Constants.PREFIX_NAME %>/saveSettings" method="post">
+<form action="<%=Configuration.get3CixtyRoot()%>/saveSettings" method="post">
 <div>
     <input type="hidden" name="accessToken" value="<%=accessToken%>">
     <input type="hidden" name="key" value="<%=key%>">

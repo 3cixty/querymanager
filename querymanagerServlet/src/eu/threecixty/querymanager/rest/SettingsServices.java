@@ -1,12 +1,13 @@
 package eu.threecixty.querymanager.rest;
 
-import java.net.HttpURLConnection;
-import java.net.URI;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -14,10 +15,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 
 import eu.threecixty.logs.CallLoggingConstants;
@@ -46,48 +44,57 @@ public class SettingsServices {
 
 	@GET
 	@Path("/viewSettings")
-	@Produces("text/plain")
-	public Response view(@HeaderParam("access_token") String access_token) {
-		long starttime = System.currentTimeMillis();
-		HttpSession session = httpRequest.getSession();
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			try {
-				checkPermission(access_token);
-			} catch (ThreeCixtyPermissionException e1) {
-				CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
-						CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
-				return Response.status(Response.Status.UNAUTHORIZED).entity(e1.getMessage()).build();
-			}
-			String uid =  userAccessToken.getUid();
-			String key = userAccessToken.getAppkey();
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			session.setAttribute("uid", uid);
+	public void view(@HeaderParam("access_token") String access_token, @Context HttpServletResponse response,
+            @Context HttpServletRequest request) {
+		try {
+			PrintWriter writer = response.getWriter();
 
-			ThreeCixtySettings settings = SettingsStorage.load(uid);
-			session.setAttribute("settings", settings);
-			session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
+			long starttime = System.currentTimeMillis();
+			HttpSession session = httpRequest.getSession();
+			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+				try {
+					checkPermission(access_token);
+				} catch (ThreeCixtyPermissionException e1) {
+					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
+							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					writer.write(e1.getMessage());
+					writer.close();
+					return;
+				}
+				String uid =  userAccessToken.getUid();
+				String key = userAccessToken.getAppkey();
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE,
+						CallLoggingConstants.SUCCESSFUL);
+				session.setAttribute("uid", uid);
 
-			try {
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp")).build();
-			} catch (Exception e) {
-				e.printStackTrace();
+				ThreeCixtySettings settings = SettingsStorage.load(uid);
+				session.setAttribute("settings", settings);
+				session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
+				session.setAttribute("key", key);
+
+				try {
+					request.getRequestDispatcher(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp").forward(request, response);
+					return;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE,
+						CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				writer.write("Your access token '" + access_token + "' is invalid.");
+				writer.close();
 			}
-		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				    .entity("Your access token '" + access_token + "' is invalid.")
-				    .type(MediaType.TEXT_PLAIN)
-				    .build();
+		} catch (IOException e2) {
+			e2.printStackTrace();
 		}
-		
-		return null;
 	}
 
 	@POST
 	@Path("/saveSettings")
-	@Produces("text/plain")
-	public Response save(@DefaultValue("")@FormParam("firstName") String firstName,
+	public void save(@DefaultValue("")@FormParam("firstName") String firstName,
 			@DefaultValue("")@FormParam("lastName") String lastName,
 			@DefaultValue("")@FormParam("townName") String townName,
 			@DefaultValue("")@FormParam("countryName") String countryName,
@@ -95,70 +102,79 @@ public class SettingsServices {
 			@DefaultValue("")@FormParam("lon") String lonStr,
 			@DefaultValue("")@FormParam("pi_sources") List<String> sources,
 			@DefaultValue("")@FormParam("pi_ids") List<String> pi_ids,
-			@DefaultValue("")@FormParam("pi_ats") List<String> pi_ats) {
-		long starttime = System.currentTimeMillis();
-		
-		HttpSession session = httpRequest.getSession();
-		String accessToken = (String) session.getAttribute(ACCESS_TOKEN_PARAM);
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
-			try {
-				checkPermission(accessToken);
-			} catch (ThreeCixtyPermissionException e1) {
-				CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
-						CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
-				return Response.status(Response.Status.UNAUTHORIZED).entity(e1.getMessage()).build();
-			}
-			String uid =  userAccessToken.getUid();
-			String key = userAccessToken.getAppkey();
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
-			if (settings == null) {
-				settings = SettingsStorage.load(uid);
-				settings.setUid(uid);
-			}
+			@DefaultValue("")@FormParam("pi_ats") List<String> pi_ats,
+			@Context HttpServletResponse response,
+            @Context HttpServletRequest request) {
+		try {
+			PrintWriter writer = response.getWriter();
+			long starttime = System.currentTimeMillis();
 
-			if (isNotNullOrEmpty(firstName)) settings.setFirstName(firstName);
-
-			if (isNotNullOrEmpty(lastName)) settings.setLastName(lastName);
-
-			if (isNotNullOrEmpty(townName)) settings.setTownName(townName);
-
-			if (isNotNullOrEmpty(countryName)) settings.setCountryName(countryName);
-
-			if (isNotNullOrEmpty(latStr)) settings.setCurrentLatitude(Double.parseDouble(latStr));
-
-			if (isNotNullOrEmpty(lonStr)) settings.setCurrentLongitude(Double.parseDouble(lonStr));
-
-			if (sources != null && sources.size() > 0 && pi_ids != null
-					&& pi_ids.size() > 0 && pi_ats != null && pi_ats.size() > 0
-					) {
-
-				for (int i = 0; i < sources.size(); i++) {
-					addProfileIdentities(sources.get(i), pi_ids.get(i), pi_ats.get(i), settings);
+			HttpSession session = httpRequest.getSession();
+			String accessToken = (String) session.getAttribute(ACCESS_TOKEN_PARAM);
+			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+				try {
+					checkPermission(accessToken);
+				} catch (ThreeCixtyPermissionException e1) {
+					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
+							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					writer.write(e1.getMessage());
+					writer.close();
+					return;
 				}
+				String uid =  userAccessToken.getUid();
+				String key = userAccessToken.getAppkey();
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
+				if (settings == null) {
+					settings = SettingsStorage.load(uid);
+					settings.setUid(uid);
+				}
+
+				if (isNotNullOrEmpty(firstName)) settings.setFirstName(firstName);
+
+				if (isNotNullOrEmpty(lastName)) settings.setLastName(lastName);
+
+				if (isNotNullOrEmpty(townName)) settings.setTownName(townName);
+
+				if (isNotNullOrEmpty(countryName)) settings.setCountryName(countryName);
+
+				if (isNotNullOrEmpty(latStr)) settings.setCurrentLatitude(Double.parseDouble(latStr));
+
+				if (isNotNullOrEmpty(lonStr)) settings.setCurrentLongitude(Double.parseDouble(lonStr));
+
+				if (sources != null && sources.size() > 0 && pi_ids != null
+						&& pi_ids.size() > 0 && pi_ats != null && pi_ats.size() > 0
+						) {
+
+					for (int i = 0; i < sources.size(); i++) {
+						addProfileIdentities(sources.get(i), pi_ids.get(i), pi_ats.get(i), settings);
+					}
+				}
+
+				SettingsStorage.save(settings);
+
+				session.setAttribute("settings", settings);
+
+				session.setAttribute("successful", true);
+
+				try {
+					request.getRequestDispatcher(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp").forward(request, response);
+					return;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE,
+						CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				writer.write("Your access token '" + accessToken + "' is invalid.");
+				writer.close();
 			}
-
-			SettingsStorage.save(settings);
-
-			session.setAttribute("settings", settings);
-
-			session.setAttribute("successful", true);
-
-			try {
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp")).build();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				    .entity("Your Access token '" + accessToken + "' is invalid")
-				    .type(MediaType.TEXT_PLAIN)
-				    .build();
+		} catch (IOException e2) {
+			e2.printStackTrace();
 		}
-		
-		return null;
 	}
 
 

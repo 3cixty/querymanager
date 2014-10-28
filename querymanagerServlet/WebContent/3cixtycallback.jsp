@@ -1,3 +1,4 @@
+<%@page import="eu.threecixty.Configuration" %>
 <%@page import="eu.threecixty.querymanager.rest.Constants" %>
 <%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
 <%@page import="eu.threecixty.oauth.model.App" %>
@@ -20,7 +21,7 @@
     	var expires_in = getParam("&expires_in=");
     	var scope = getParam("&scope=");
     	if (token == null || refresh_token == null || expires_in == null) {
-    		window.location = "./error.jsp";
+    		window.location = "<%=Configuration.get3CixtyRoot()%>/error.jsp";
     	} else {
     		window.location = '<%=OAuthServices.REDIRECT_URI_CLIENT%>?access_token=' + token 
     				+ "&refresh_token=" + refresh_token + "&expires_in=" + expires_in + "&scope=" + scope;
