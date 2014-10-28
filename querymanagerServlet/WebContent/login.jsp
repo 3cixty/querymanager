@@ -13,7 +13,7 @@
 %>
 <form action="./auth">
     <input type=hidden name="key" value="<%=key%>">
-    <label style="width: 60%">Login to 3Cixty platform. Note that 3Cixty uses Google account to authenticate the user</label>
+    <label style="width: 60%">Sign in to 3Cixty platform. Note that 3Cixty uses Google account to authenticate the user</label>
     <label style="width: 40%"><input type=submit value="Login" ></label>
 </div>
  
