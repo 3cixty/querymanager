@@ -44,6 +44,7 @@ public class LocalOntologyServices {
 				while ((readBytes = inStream.read(b)) >= 0) {
 					sb.append(new String(b, 0, readBytes));
 				}
+				inStream.close();
 			}
 			return sb.toString();
 		} catch (FileNotFoundException e) {
