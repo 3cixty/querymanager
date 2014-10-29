@@ -14,8 +14,8 @@
 
 	<!-- Auto scan REST service -->
 	<context-param>
-		<param-name>resteasy.resources</param-name>
-		<param-value>eu.threecixty.querymanager.rest.GoFlowServices, eu.threecixty.querymanager.rest.LocalOntologyServices, eu.threecixty.querymanager.rest.MobidotServices, eu.threecixty.querymanager.rest.OAuthServices, eu.threecixty.querymanager.rest.QueryManagerServices, eu.threecixty.querymanager.rest.SettingsServices, eu.threecixty.querymanager.rest.SPEServices, eu.threecixty.querymanager.rest.TrayServices</param-value>
+		<param-name>resteasy.scan</param-name>
+		<param-value>true</param-value>
 	</context-param>
  
 	<!-- this need same with resteasy servlet url-pattern -->
@@ -30,22 +30,6 @@
 			org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
 		</listener-class>
 	</listener>
- 
-	<servlet>
-		<servlet-name>resteasy-servlet</servlet-name>
-		<servlet-class>
-			org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
-		</servlet-class>
-	</servlet>
- 
-	<servlet-mapping>
-		<servlet-name>resteasy-servlet</servlet-name>
-		<url-pattern>/**</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>resteasy-servlet</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
 
     <servlet>
 	  <servlet-name>json-nospring</servlet-name>
@@ -116,5 +100,17 @@
             <!-- CORS Filter mapping -->
             <filter-name>CORS</filter-name>
             <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <filter>
+        <filter-name>Resteasy</filter-name>
+        <filter-class>
+            org.jboss.resteasy.plugins.server.servlet.FilterDispatcher
+        </filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>Resteasy</filter-name>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
 </web-app>
