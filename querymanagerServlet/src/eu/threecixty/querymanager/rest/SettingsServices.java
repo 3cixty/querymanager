@@ -67,12 +67,10 @@ public class SettingsServices {
 				String key = userAccessToken.getAppkey();
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE,
 						CallLoggingConstants.SUCCESSFUL);
-				session.setAttribute("uid", uid);
 
 				ThreeCixtySettings settings = SettingsStorage.load(uid);
 				session.setAttribute("settings", settings);
 				session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
-				session.setAttribute("key", key);
 
 				try {
 					request.getRequestDispatcher(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp").forward(request, response);
@@ -103,6 +101,7 @@ public class SettingsServices {
 			@DefaultValue("")@FormParam("pi_sources") List<String> sources,
 			@DefaultValue("")@FormParam("pi_ids") List<String> pi_ids,
 			@DefaultValue("")@FormParam("pi_ats") List<String> pi_ats,
+			@FormParam("access_token") String access_token,
 			@Context HttpServletResponse response,
             @Context HttpServletRequest request) {
 		try {
@@ -110,11 +109,10 @@ public class SettingsServices {
 			long starttime = System.currentTimeMillis();
 
 			HttpSession session = httpRequest.getSession();
-			String accessToken = (String) session.getAttribute(ACCESS_TOKEN_PARAM);
-			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
-			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 				try {
-					checkPermission(accessToken);
+					checkPermission(access_token);
 				} catch (ThreeCixtyPermissionException e1) {
 					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
 							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
@@ -156,6 +154,7 @@ public class SettingsServices {
 				SettingsStorage.save(settings);
 
 				session.setAttribute("settings", settings);
+				session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
 
 				session.setAttribute("successful", true);
 
@@ -166,10 +165,10 @@ public class SettingsServices {
 					e.printStackTrace();
 				}
 			} else {
-				CallLoggingManager.getInstance().save(accessToken, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE,
-						CallLoggingConstants.INVALID_ACCESS_TOKEN + accessToken);
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_SAVE_SERVICE,
+						CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				writer.write("Your access token '" + accessToken + "' is invalid.");
+				writer.write("Your access token '" + access_token + "' is invalid.");
 				writer.close();
 			}
 		} catch (IOException e2) {
