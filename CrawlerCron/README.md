@@ -9,7 +9,7 @@ To integrate this module on your server, make sure that Movesmarter server has t
 3. Pulls public information at 3am.
 4. No Direct API access to the component. 
 5. The component connects to other components in the 3cixty Platform via KB. 
-6. User Specific History of when the job was last executed successfully for the user.
+6. History of when the job was last executed successfully for the user.
 7. `Accompany` uses `3cixty IDs (google IDs)` to related people.
 8. inconsistent data field in `json` format output is handled.
 9. Multiple `inferences` using the mobility data and personal data are made. These include `Preferred Trip Distance`, `Preferred Trip Time`, `Preferred Trip Modality`, `Preferred City`, `Preferred Country`, `preferred weather conditions`.
