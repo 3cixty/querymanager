@@ -62,7 +62,7 @@
 
             <init-param>
                 <param-name>cors.allowOrigin</param-name>
-                <param-value>http://apps-for-your-car.com, http://3cixty.com, https://3cixty.com</param-value>
+                <param-value>http://apps-for-your-car.com, http://3cixty.com, https://3cixty.com, https://account.google.com</param-value>
             </init-param>
 
             <init-param>
