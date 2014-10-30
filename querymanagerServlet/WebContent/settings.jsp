@@ -70,7 +70,7 @@ Disclaimer: The information marked by red star are required. For Mobidot account
 <div style="height: 10px;"></div>
 <div align="center"  >
     <input type="submit" value="Save">
-    <input type="button" value="Cancel" onclick="reset();">
+    <input type="button" value="Reset" onclick="reset();">
 </div>
 </form>
 
