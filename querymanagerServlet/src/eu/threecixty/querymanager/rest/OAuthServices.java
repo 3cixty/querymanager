@@ -318,7 +318,8 @@ public class OAuthServices {
 			+ join(OAuthWrappers.getScopes(app)) + "&client_id="
 			+ app.getClientId() + "&redirect_uri="
 		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
-		    		OAuthWrappers.getBasicAuth(app.getClientId(), app.getPassword())).build();
+		    		OAuthWrappers.getBasicAuth(app.getClientId(), app.getPassword()))
+		    		.header("Access-Control-Allow-Origin", "*").build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -392,7 +393,8 @@ public class OAuthServices {
 					+ "#access_token=" + accessToken.getAccess_token()
 					+ "&refresh_token=" + accessToken.getRefresh_token()
 					+ "&expires_in=" + expires_in
-					+ "&scope=" + join(accessToken.getScopeNames(), ",") )).build();
+					+ "&scope=" + join(accessToken.getScopeNames(), ",") ))
+					.header("Access-Control-Allow-Origin", "*").build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
