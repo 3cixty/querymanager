@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -153,11 +154,11 @@ public class OAuthServices {
 
 	@POST
 	@Path("/updateAppKey")
-	public Response updateAppKey(@QueryParam("key") String key, 
-			@DefaultValue("") @QueryParam("appname") String appname,
-			@DefaultValue("") @QueryParam("description") String desc, @DefaultValue("") @QueryParam("category") String cat,
-			@DefaultValue("") @QueryParam("scopeName") List<String> scopeNames, @DefaultValue("") @QueryParam("redirect_uri") String redirect_uri,
-			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
+	public Response updateAppKey(@FormParam("key") String key, 
+			@DefaultValue("") @FormParam("appname") String appname,
+			@DefaultValue("") @FormParam("description") String desc, @DefaultValue("") @FormParam("category") String cat,
+			@DefaultValue("") @FormParam("scopeName") List<String> scopeNames, @DefaultValue("") @FormParam("redirect_uri") String redirect_uri,
+			@DefaultValue("")@FormParam("thumbNailUrl") String thumbNailUrl) {
 		// TODO: there is only one scope by default
 		//boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, scopeNames, redirect_uri, thumbNailUrl);
 		boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
