@@ -154,7 +154,7 @@ public class OAuthServices {
 	}
 
 	@POST
-	@Path("/updateAppKey")
+	@Path("/updateAppInfo")
 	public Response updateAppKey(@FormParam("google_access_token") String googleAccessToken,
 			@FormParam("appid") String appid, 
 			@DefaultValue("") @FormParam("appname") String appname,
@@ -188,7 +188,7 @@ public class OAuthServices {
 
 	@GET
 	@Path("/getApps")
-	public Response getApps(@QueryParam("google_access_token") String g_access_token) {
+	public Response getApps(@QueryParam("google_access_token") String g_access_token, @DefaultValue("json") @QueryParam("format") String format) {
 		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
@@ -212,7 +212,13 @@ public class OAuthServices {
 			jsonObj.put("thumbnail", app.getThumbnail() == null ? "" : app.getThumbnail());
 			root.put(jsonObj);
 		}
-		return Response.ok(root.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		if (format.equalsIgnoreCase("html")){
+			String jsonOutput = root.toString(4);
+			String htmlout = "<html><body><pre>" +jsonOutput +  "</pre></body></html>";
+			return Response.ok(htmlout, MediaType.TEXT_HTML).build();
+		}
+		else
+			return Response.ok(root.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
