@@ -154,14 +154,27 @@ public class OAuthServices {
 
 	@POST
 	@Path("/updateAppKey")
-	public Response updateAppKey(@FormParam("key") String key, 
+	public Response updateAppKey(@FormParam("google_access_token") String googleAccessToken,
+			@FormParam("appid") String appid, 
 			@DefaultValue("") @FormParam("appname") String appname,
 			@DefaultValue("") @FormParam("description") String desc, @DefaultValue("") @FormParam("category") String cat,
 			@DefaultValue("") @FormParam("scopeName") List<String> scopeNames, @DefaultValue("") @FormParam("redirect_uri") String redirect_uri,
 			@DefaultValue("")@FormParam("thumbNailUrl") String thumbNailUrl) {
+		if (!validId(appid) || appid == null || appid.equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST)
+			        .entity(" {\"response\": \"failed\", \"reason\": \"appId only contains characters in the following patterns ^[a-z_A-Z0-9:\\-]*$\"} ")
+			        .type(MediaType.APPLICATION_JSON_TYPE)
+			        .build();
+		}
+		String uid = GoogleAccountUtils.getUID(googleAccessToken);
+		if (uid == null || uid.equals(""))
+			return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
 		// TODO: there is only one scope by default
 		//boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, scopeNames, redirect_uri, thumbNailUrl);
-		boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
+		boolean ok = OAuthWrappers.updateAppKey(uid, appid, appname, desc, cat, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
 		if (ok) {
 			return Response.status(Response.Status.OK)
 	        .entity(" {\"response\": \"successful\"} ")
