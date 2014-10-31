@@ -16,6 +16,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -366,7 +367,10 @@ public class OAuthServices {
 			+ app.getClientId() + "&redirect_uri="
 		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
 		    		OAuthWrappers.getBasicAuth(app.getClientId(), app.getPassword()))
-		    		.header("Access-Control-Allow-Origin", "*").build();
+		    		.header("Access-Control-Allow-Origin", "*")
+                    .cacheControl(cacheControlNoStore())
+                    .header("Pragma", "no-cache")
+		    		.build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -478,6 +482,12 @@ public class OAuthServices {
 		return false;
 	}
 	
+	private CacheControl cacheControlNoStore() {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setNoStore(true);
+		return cacheControl;
+	}
+
 	private class DeveloperScope {
 		
 		public DeveloperScope(String scopeName, String desc) {
