@@ -43,7 +43,7 @@ public class Main {
 				String thumbNailUrl = props.getProperty(THUMB_NAIL_URL);
 				
 				StringBuffer buffer = new StringBuffer();
-				buffer.append("gogole_access_token=" + encode(googleToken));
+				buffer.append("google_access_token=" + encode(googleToken));
 				append(buffer, "appid", encode(appid));
 				append(buffer, "description", encode(desc));
 				append(buffer, "category", encode(cat));
@@ -87,7 +87,7 @@ public class Main {
 			output.write(formParams.getBytes());
 			output.close();
 			
-			InputStream input = url.openConnection().getInputStream();
+			InputStream input = conn.getInputStream();
 
 			StringBuffer buffer = new StringBuffer();
 			byte[] b = new byte[1024];
