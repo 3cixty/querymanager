@@ -6,7 +6,9 @@ import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -84,6 +86,50 @@ public class ThreeCixtyResource extends AbstractResource {
     	if (ok) {
     		return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON_TYPE)
     				.entity("{\"response\": \"successful\", \"password\": \"" + genertedPwd + "\"}").build();
+    	} else {
+    		return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE)
+    				.entity("{\"response\": \"error\"}").build();
+    	}
+    }
+    
+    @POST
+    @Path("/updateClientIdForApp")
+    public Response updateAppClientId(@FormParam("clientId") String clientId,
+    		@FormParam("app_name") String app_name, @FormParam("scope") String scope,
+    		@FormParam("thumbNailUrl") String thumbNailUrl) {
+    	boolean ok = false;
+    	if (isNullOrEmpty(clientId)) {
+    		ok = false;
+    	} else {
+    		Client client = clientRepository.findByClientId(clientId);
+    		if (client != null) {
+    			ok = true;
+    			create3CixtyResServerWhenNecessary();
+    			if (!isNullOrEmpty(app_name)) client.setName(app_name);
+    			
+    			if (!isNullOrEmpty(thumbNailUrl)) client.setThumbNailUrl(thumbNailUrl);
+    			
+    			if (!isNullOrEmpty(scope)) {
+    				List <String> scopes = new ArrayList <String>();
+    				if (scope.indexOf(',') >= 0) {
+    					String [] tmpScopeNames = scope.split(",");
+    					for (String tmpScopeName: tmpScopeNames) {
+    						scopes.add(tmpScopeName.trim());
+    					}
+    				} else {
+    					scopes.add(scope);
+    				}
+    				client.setScopes(scopes);
+    			}
+    			
+    			clientRepository.save(client);
+    			ok = true;
+    		}
+    	}
+    	
+    	if (ok) {
+    		return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON_TYPE)
+    				.entity("{\"response\": \"successful\" }").build();
     	} else {
     		return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE)
     				.entity("{\"response\": \"error\"}").build();
