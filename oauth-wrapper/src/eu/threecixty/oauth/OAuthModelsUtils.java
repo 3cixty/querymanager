@@ -62,12 +62,12 @@ public class OAuthModelsUtils {
 			String hql = "FROM User U WHERE U.uid = ? AND U.class ='" + User.class.getSimpleName() + "'";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
-			if (results.size() == 0) return null;
 			session.close();
-			return (User) results.get(0);
+			if (results.size() > 0) return (User) results.get(0);
 		} catch (HibernateException e) {
 			return null;
 		}
+		return null;
 	}
 
 	protected static boolean saveOrUpdate(User user) {
@@ -132,12 +132,12 @@ public class OAuthModelsUtils {
 			        + Developer.class.getSimpleName() + "' ";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
-			if (results.size() == 0) return null;
 			session.close();
-			return (Developer) results.get(0);
+			if (results.size() > 0) return (Developer) results.get(0);
 		} catch (HibernateException e) {
 			return null;
 		}
+		return null;
 	}
 
 	protected static boolean saveOrUpdate(Developer developer) {
@@ -201,7 +201,10 @@ public class OAuthModelsUtils {
 			String hql = "FROM Scope S WHERE S.scopeName = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, scopeName).list();
-			if (results.size() == 0) return false;
+			if (results.size() == 0) {
+				session.close();
+				return false;
+			}
 			Scope scope = (Scope) results.get(0);
 			session.delete(scope);
 			session.getTransaction().commit();
@@ -262,6 +265,9 @@ public class OAuthModelsUtils {
 		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
 		try {
+			Set <Scope> scopes = OAuthModelsUtils.getScopes(scopeNames);
+			if (scopes.size() == 0) return false;
+			
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
@@ -272,8 +278,6 @@ public class OAuthModelsUtils {
 			app.setCategory(category);
 			app.setDescription(description);
 			app.setDeveloper(developer);
-			Set <Scope> scopes = OAuthModelsUtils.getScopes(scopeNames);
-			if (scopes.size() == 0) return false;
 			app.setScopes(scopes);
 			app.setRedirectUri(redirect_uri);
 			app.setClientId(clientId);
@@ -292,7 +296,7 @@ public class OAuthModelsUtils {
 	}
 
 	protected static boolean updateApp(String uid, String appid, String appname, String description,
-			String category, List<String> scopeNames, String redirect_uri) {
+			String category, List<String> scopeNames, String redirect_uri, String thumbNail) {
 		
 		try {
 			Developer developer = getDeveloper(uid);
@@ -303,7 +307,10 @@ public class OAuthModelsUtils {
 			String hql = "FROM App A WHERE A.developer = ? AND A.appNameSpace = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setEntity(0, developer).setString(1, appid).list();
-			if (results.size() == 0) return false;
+			if (results.size() == 0) {
+				session.close();
+				return false;
+			}
 			
 			App app = (App) results.get(0);
 
@@ -322,6 +329,8 @@ public class OAuthModelsUtils {
 			if (redirect_uri != null && !redirect_uri.equals("")) {
 				app.setRedirectUri(redirect_uri);
 			}
+			
+			if (thumbNail != null && !thumbNail.equals("")) app.setThumbnail(thumbNail);
 			
 			session.beginTransaction();
 			
@@ -383,8 +392,8 @@ public class OAuthModelsUtils {
 			String hql = "FROM App A WHERE A.key = :key";
 			Query query = session.createQuery(hql);
 			List<?> results = query.setString("key", key).list();
-			if (results.size() == 0) return null;
 			session.close();
+			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {
 			e.printStackTrace();
@@ -392,19 +401,42 @@ public class OAuthModelsUtils {
 		}
 	}
 
+	protected static List <App> getApps(String uid) {
+		List <App> apps = new ArrayList <App>();
+		try {
+			Developer developer = getDeveloper(uid);
+			if (developer == null) return apps;
+
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM App A WHERE A.developer = ? ";
+			Query query = session.createQuery(hql);
+			List<?> results = query.setEntity(0, developer).list();
+			session.close();
+			if (results.size() == 0) return apps;
+			for (Object obj: results) {
+				apps.add((App) obj);
+			}
+		} catch (HibernateException e) {
+			e.printStackTrace();
+		}
+		return apps;
+	}
+
 	protected static App retrieveApp(String uid, String appid) {
 		if (isNullOrEmpty(appid)) return null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
-
 			Developer developer = OAuthModelsUtils.getDeveloper(uid);
 			if (developer == null) return null;
+			
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			
 			String hql = "FROM App A WHERE A.developer = ? AND A.appNameSpace = ?";
 			Query query = session.createQuery(hql);
 			
 			List <?> results = query.setEntity(0, developer).setString(1, appid).list();
-			if (results.size() == 0) return null;
 			session.close();
+			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {
 			return null;
@@ -420,7 +452,10 @@ public class OAuthModelsUtils {
 			String hql = "FROM App A WHERE A.id = :id";
 			Query query = session.createQuery(hql);
 			List<?> results = query.setInteger("id", app.getId()).list();
-			if (results.size() == 0) return null;
+			if (results.size() == 0) {
+				session.close();
+				return null;
+			}
 			App tmp = (App) results.get(0);
 			for (Scope scope: tmp.getScopes()) {
 				scopes.add(scope);
@@ -437,6 +472,23 @@ public class OAuthModelsUtils {
 			String scope, User user, App app) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
 		try {
+			List <Scope> listOfScopes = new ArrayList <Scope>();
+			
+			if (scope != null) {
+				if (!scope.equals("null")) { // 'null' means no check at all for scopes
+					if (scope.indexOf(',') >= 0) { // a list of scopes
+						String [] tmpScopeNames = scope.split(",");
+						for (String tmpScopeName: tmpScopeNames) {
+							Scope objScope = getScope(tmpScopeName.trim());
+							if (objScope != null) listOfScopes.add(objScope);
+						}
+					} else { // one scope
+						Scope objScope = getScope(scope.trim());
+						if (objScope != null) listOfScopes.add(objScope);
+					}
+				}
+			}
+			
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
 			UserAccessToken userAccessToken = new UserAccessToken();
@@ -445,20 +497,7 @@ public class OAuthModelsUtils {
 			userAccessToken.setApp(app);
 			userAccessToken.setRefreshToken(refreshToken);
 			
-			if (scope != null) {
-				if (!scope.equals("null")) { // 'null' means no check at all for scopes
-					if (scope.indexOf(',') >= 0) { // a list of scopes
-						String [] tmpScopeNames = scope.split(",");
-						for (String tmpScopeName: tmpScopeNames) {
-							Scope objScope = getScope(tmpScopeName.trim());
-							if (objScope != null) userAccessToken.getScopes().add(objScope);
-						}
-					} else { // one scope
-						Scope objScope = getScope(scope.trim());
-						if (objScope != null) userAccessToken.getScopes().add(objScope);
-					}
-				}
-			}
+			userAccessToken.getScopes().addAll(listOfScopes);
 
 			session.beginTransaction();
 
@@ -600,9 +639,8 @@ public class OAuthModelsUtils {
 			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, refreshToken).list();
-			if (results.size() == 0) return false;
 			session.close();
-			return true;
+			return results.size() > 0;
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			return false;

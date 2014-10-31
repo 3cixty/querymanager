@@ -60,6 +60,8 @@ public class OAuthWrappers {
 
 	private static final String resourceServerKey = ResourceServerUtils.getResourceServerKey();
 	private static final String resourceServerSecret = ResourceServerUtils.getResourceServerSecret();
+
+	private static final String ENDPOINT_TO_UPDATE_CLIENT_FOR_APP = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/3cixty/updateClientIdForApp";
 	
 //	/**
 //	 * Gets user access token.
@@ -222,6 +224,10 @@ public class OAuthWrappers {
 
 		return appkey;
 	}
+
+	public static List <App> getApps(String uid) {
+		return OAuthModelsUtils.getApps(uid);
+	}
 	
 	public static AccessToken refreshAccessToken(String lastRefreshToken) {
 		AccessToken lastAccessToken = OAuthModelsUtils.findTokenInfoFromRefreshToken(lastRefreshToken);
@@ -249,10 +255,11 @@ public class OAuthWrappers {
 
 	public static boolean updateAppKey(String uid, String appid, String appname, String description,
 			String category, List<String> scopeNames, String redirect_uri, String thumbNailUrl) {
-		if (thumbNailUrl != null && !thumbNailUrl.equals("")) {
-			
-		}
-		return OAuthModelsUtils.updateApp(uid, appid, appname, description, category, scopeNames, redirect_uri);
+		App app = OAuthModelsUtils.retrieveApp(uid, appid);
+		if (app == null) return false;
+		boolean ok = updateClientIdForApp(app.getClientId(), appname, scopeNames, thumbNailUrl);
+		if (!ok) return false;
+		return OAuthModelsUtils.updateApp(uid, appid, appname, description, category, scopeNames, redirect_uri, thumbNailUrl);
 	}
 
 	/**
@@ -502,6 +509,36 @@ public class OAuthWrappers {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private static boolean updateClientIdForApp(String clientId,
+			String app_name, List<String> scopeNames, String thumbNailUrl) {
+		Client client = Client.create();
+	    Builder builder;
+		try {
+			builder = client.resource(ENDPOINT_TO_UPDATE_CLIENT_FOR_APP)
+					.header(AUTHORIZATION, getBasicAuth());
+			
+	        ClientResponse clientResponse = builder.post(ClientResponse.class,  "clientId=" + clientId
+					+ "&app_name=" + URLEncoder.encode(app_name, "UTF-8")
+					+ "&scope=" + URLEncoder.encode(join(scopeNames), "UTF-8")
+					+ "&thumbNailUrl=" + URLEncoder.encode(thumbNailUrl, "UTF-8"));
+
+			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			JSONObject jsonObj = new JSONObject(jsonStr);
+			if (jsonObj.has("response")) {
+				String res = jsonObj.getString("response");
+				if (res.equalsIgnoreCase("successful")) {
+					return true;
+				}
+				return false;
+			} else {
+				return false;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	private static void addScopeNames(String scope, List<String> results) {

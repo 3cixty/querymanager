@@ -44,6 +44,9 @@ public class App implements java.io.Serializable {
 	private String category;
 	private String redirectUri;
 	
+	/**Attribute which is to be returned to developers, but the value where users see in the client table of OAuth server*/
+	private String thumbnail;
+	
 	
 	// also check clientId in the 'client' table
 	private String clientId;
@@ -163,5 +166,14 @@ public class App implements java.io.Serializable {
 
 	public void setAppName(String appName) {
 		this.appName = appName;
+	}
+
+	@Column(name = "thumbNail", unique = false, nullable = true, length = 255)
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 }
