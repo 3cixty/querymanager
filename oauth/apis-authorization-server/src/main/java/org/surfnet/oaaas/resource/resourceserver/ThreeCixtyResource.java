@@ -8,13 +8,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.surfnet.oaaas.auth.principal.UserPassCredentials;
 import org.surfnet.oaaas.model.Client;
 import org.surfnet.oaaas.model.ResourceServer;
 import org.surfnet.oaaas.repository.ClientRepository;
@@ -42,7 +45,11 @@ public class ThreeCixtyResource extends AbstractResource {
     @Path("/createClientIdForApp")
     public Response createAppClientId(@QueryParam("clientId") String clientId,
     		@QueryParam("app_name") String app_name, @QueryParam("scope") String scope,
-    		@QueryParam("thumbNailUrl") String thumbNailUrl) {
+    		@QueryParam("thumbNailUrl") String thumbNailUrl,
+    		@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization) {
+    	
+    	if (!checkAuthorization(authorization)) return Response.status(Response.Status.UNAUTHORIZED).build();
+    	
     	boolean ok = false;
     	String genertedPwd = null;
     	if (isNullOrEmpty(clientId) || isNullOrEmpty(app_name) || isNullOrEmpty(scope)) {
@@ -91,12 +98,16 @@ public class ThreeCixtyResource extends AbstractResource {
     				.entity("{\"response\": \"error\"}").build();
     	}
     }
-    
-    @POST
+
+	@POST
     @Path("/updateClientIdForApp")
     public Response updateAppClientId(@FormParam("clientId") String clientId,
     		@FormParam("app_name") String app_name, @FormParam("scope") String scope,
-    		@FormParam("thumbNailUrl") String thumbNailUrl) {
+    		@FormParam("thumbNailUrl") String thumbNailUrl,
+    		@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization) {
+		
+		if (!checkAuthorization(authorization)) return Response.status(Response.Status.UNAUTHORIZED).build();
+		
     	boolean ok = false;
     	if (isNullOrEmpty(clientId)) {
     		ok = false;
@@ -140,7 +151,11 @@ public class ThreeCixtyResource extends AbstractResource {
     @Path("/createClientForAskingAccessToken")
     public Response createClientForAskingAccessToken(@QueryParam("clientId") String clientId,
     		@QueryParam("clientSecret") String clientSecret,
-    		@QueryParam("redirect_uri") String redirect_uri) {
+    		@QueryParam("redirect_uri") String redirect_uri,
+    		@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization) {
+    	
+    	if (!checkAuthorization(authorization)) return Response.status(Response.Status.UNAUTHORIZED).build();
+    	
     	boolean ok = false;
     	if (isNullOrEmpty(clientId) || isNullOrEmpty(clientSecret)) {
     		ok = false;
@@ -214,6 +229,13 @@ public class ThreeCixtyResource extends AbstractResource {
 		List <String> scopes = ScopeUtils.getScopeNames();
 		resourceServer.setScopes(scopes);
 		return resourceServer;
+	}
+
+    private boolean checkAuthorization(String authorization) {
+    	UserPassCredentials credentials = new UserPassCredentials(authorization);
+    	Client client = clientRepository.findByClientId(credentials.getUsername());
+    	if (client == null) return false;
+    	return client.getSecret() != null && !client.getSecret().equals("") && client.getSecret().equals(credentials.getPassword());
 	}
 
 	private boolean isNullOrEmpty(String str) {
