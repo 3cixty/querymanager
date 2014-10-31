@@ -2,17 +2,21 @@ package eu.threecixty.appkey;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Properties;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import org.json.JSONObject;
 
 public class Main {
 	
-	private static final String APP_KEY = "key";
+	private static final String GOOGLE_ACCESS_TOKEN_KEY = "google_access_token";
+	private static final String APP_ID_KEY = "appid";
 	private static final String DESCRIPTION_KEY = "description";
 	private static final String CATEGORY_KEY = "category";
 	private static final String REDIRECT_URI_KEY = "redirect_uri";
@@ -30,35 +34,26 @@ public class Main {
 			Properties props = new Properties();
 			try {
 				props.load(input);
-				String key = props.getProperty(APP_KEY);
+				String googleToken = props.getProperty(GOOGLE_ACCESS_TOKEN_KEY);
+				String appid = props.getProperty(APP_ID_KEY);
 				String appname = props.getProperty(APP_NAME_KEY);
 				String desc = props.getProperty(DESCRIPTION_KEY);
 				String cat = props.getProperty(CATEGORY_KEY);
 				String redirect_uri = props.getProperty(REDIRECT_URI_KEY);
 				String thumbNailUrl = props.getProperty(THUMB_NAIL_URL);
 				
-				// TODO: note that 'redirect_uri' and 'thumbNailUrl' are optional, don't provide 
-				// these information if you don't have, for example:
-				/*
-				 * http://localhost:8080/v2/getAppKey?google_access_token=" + encode(googleAccessToken)
-						+ "&appid=" + encode(appid)
-						+ "&description=" + encode(desc)
-						+ "&category=" + encode(cat)
-				        + "&scopeName=" + encode(scopeName)
-				        + "&appname=" + encode(appname)
-				 */
-				
 				StringBuffer buffer = new StringBuffer();
-				buffer.append("http://localhost:8080/v2/updateAppKey?key=" + encode(key));
+				buffer.append("gogole_access_token=" + encode(googleToken));
+				append(buffer, "appid", encode(appid));
 				append(buffer, "description", encode(desc));
 				append(buffer, "category", encode(cat));
 				append(buffer, "appname", encode(appname));
 				append(buffer, "redirect_uri", encode(redirect_uri));
 				append(buffer, "thumbNailUrl", encode(thumbNailUrl));
 				
-				URL url = new URL(buffer.toString());
+				URL url = new URL("https://api.3cixty.com/v2/updateAppKey");
 				//
-				String content = getContent(url);
+				String content = getContent(url, buffer.toString());
 				if (content == null) {
 					System.out.println("Please check your server");
 				} else {
@@ -82,8 +77,16 @@ public class Main {
 		buffer.append("&").append(paramKey).append("=").append(paramVal);
 	}
 
-	private static String getContent(URL url) {
+	private static String getContent(URL url, String formParams) {
 		try {
+			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+			
+			OutputStream output = conn.getOutputStream();
+			output.write(formParams.getBytes());
+			output.close();
+			
 			InputStream input = url.openConnection().getInputStream();
 
 			StringBuffer buffer = new StringBuffer();
