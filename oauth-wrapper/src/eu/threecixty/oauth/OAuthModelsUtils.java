@@ -291,17 +291,18 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	protected static boolean updateApp(String key, String appname, String description,
+	protected static boolean updateApp(String uid, String appid, String appname, String description,
 			String category, List<String> scopeNames, String redirect_uri) {
 		
 		try {
+			Developer developer = getDeveloper(uid);
+			if (developer == null) return false;
+
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
-			session.beginTransaction();
-
-			String hql = "FROM App A WHERE A.key = ?";
+			String hql = "FROM App A WHERE A.developer = ? AND A.appNameSpace = ?";
 			Query query = session.createQuery(hql);
-			List <?> results = query.setString(0, key).list();
+			List <?> results = query.setEntity(0, developer).setString(1, appid).list();
 			if (results.size() == 0) return false;
 			
 			App app = (App) results.get(0);
@@ -321,6 +322,8 @@ public class OAuthModelsUtils {
 			if (redirect_uri != null && !redirect_uri.equals("")) {
 				app.setRedirectUri(redirect_uri);
 			}
+			
+			session.beginTransaction();
 			
 			session.update(app);
 

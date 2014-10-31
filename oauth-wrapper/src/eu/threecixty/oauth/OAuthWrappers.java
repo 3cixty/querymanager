@@ -247,12 +247,12 @@ public class OAuthWrappers {
 		return OAuthModelsUtils.findGoogleUIDFromAccessToken(accessToken);
 	}
 
-	public static boolean updateAppKey(String key, String appname, String description,
+	public static boolean updateAppKey(String uid, String appid, String appname, String description,
 			String category, List<String> scopeNames, String redirect_uri, String thumbNailUrl) {
 		if (thumbNailUrl != null && !thumbNailUrl.equals("")) {
 			
 		}
-		return OAuthModelsUtils.updateApp(key, appname, description, category, scopeNames, redirect_uri);
+		return OAuthModelsUtils.updateApp(uid, appid, appname, description, category, scopeNames, redirect_uri);
 	}
 
 	/**
