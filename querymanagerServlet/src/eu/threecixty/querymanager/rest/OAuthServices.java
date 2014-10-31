@@ -310,7 +310,10 @@ public class OAuthServices {
 			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=email%20profile&state=%2Fprofile&redirect_uri="
 			+ OAuthServices.GOOGLE_CALLBACK
 			+"&response_type=token&client_id=" + GOOGLE_CLIENT_ID))
-			.header("Access-Control-Allow-Origin", "*").build();
+			.header("Access-Control-Allow-Origin", "*")
+            .cacheControl(cacheControlNoStore())
+            .header("Pragma", "no-cache")
+			.build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
