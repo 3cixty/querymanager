@@ -233,6 +233,12 @@ public class ThreeCixtyResource extends AbstractResource {
 
     private boolean checkAuthorization(String authorization) {
     	UserPassCredentials credentials = new UserPassCredentials(authorization);
+    	if (ResourceServerUtils.getResourceServerKey() != null
+    			&& ResourceServerUtils.getResourceServerKey().equals(credentials.getUsername())
+    			&& ResourceServerUtils.getResourceServerSecret() != null
+    			&& ResourceServerUtils.getResourceServerSecret().equals(credentials.getPassword())) {
+    		return true;
+    	}
     	Client client = clientRepository.findByClientId(credentials.getUsername());
     	if (client == null) return false;
     	return client.getSecret() != null && !client.getSecret().equals("") && client.getSecret().equals(credentials.getPassword());
