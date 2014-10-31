@@ -20,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
@@ -172,8 +173,6 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		// TODO: there is only one scope by default
-		//boolean ok = OAuthWrappers.updateAppKey(key, appname, desc, cat, scopeNames, redirect_uri, thumbNailUrl);
 		boolean ok = OAuthWrappers.updateAppKey(uid, appid, appname, desc, cat, ScopeUtils.getScopeNames(), redirect_uri, thumbNailUrl);
 		if (ok) {
 			return Response.status(Response.Status.OK)
@@ -182,9 +181,38 @@ public class OAuthServices {
 	        .build();
 		}
 		return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"app key or scope name is invalid\"} ")
+		        .entity(" {\"response\": \"failed\" } ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
+	}
+
+	@GET
+	@Path("/getApps")
+	public Response getApps(@QueryParam("google_access_token") String g_access_token) {
+		String uid = GoogleAccountUtils.getUID(g_access_token);
+		if (uid == null || uid.equals(""))
+			return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		List <App> apps = OAuthWrappers.getApps(uid);
+		JSONArray root = new JSONArray();
+		for (App app: apps) {
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("key", app.getKey());
+			jsonObj.put("id", app.getAppNameSpace());
+			jsonObj.put("name", app.getAppName() == null ? "" : app.getAppName());
+			jsonObj.put("description", app.getDescription() == null ? "" : app.getDescription());
+			Set <Scope> scopes = OAuthWrappers.getScopes(app);
+			List <String> strScopes = new ArrayList <String>();
+			for (Scope scope: scopes) {
+				strScopes.add(scope.getScopeName());
+			}
+			jsonObj.put("scopes", strScopes);
+			jsonObj.put("thumbnail", app.getThumbnail() == null ? "" : app.getThumbnail());
+			root.put(jsonObj);
+		}
+		return Response.ok(root.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
