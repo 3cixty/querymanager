@@ -228,7 +228,7 @@ public class PrivacyAuthorityTest {
 			FileInputStream privacyContract;
 			
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
-			privacyContract = new FileInputStream("./src/test/resources/ PrivacyContract_RestoMi_example.xml");
+			privacyContract = new FileInputStream("./src/test/resources/PrivacyContract_RestoMi_example.xml");
 
 			reqId = auth.updateMyContract(certificateSigningRequest , privacyContract);
 			fail();
