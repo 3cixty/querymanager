@@ -8,6 +8,8 @@ public class Constants {
 	
 	public static final String OFFSET_LINK_TO_ERROR_PAGE = "./";
 	
+	public static final String OFFSET_LINK_TO_DASHBOARD_PAGE = OFFSET_LINK_TO_ERROR_PAGE;
+	
 	public static final String OFFSET_LINK_TO_SETTINGS_PAGE = OFFSET_LINK_TO_ERROR_PAGE;
 	
 	public static final String OFFSET_LINK_TO_AUTH_PAGE = OFFSET_LINK_TO_ERROR_PAGE;
