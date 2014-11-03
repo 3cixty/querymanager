@@ -14,6 +14,14 @@
   <name>SPE</name>
   <packaging>jar</packaging>
   <version>1.0</version>
+
+  <repositories>
+    <repository>
+      <id>internal repo - virtuoso</id>
+      <url>file://${basedir}/libs</url>
+    </repository>
+  </repositories>
+
   <dependencies>
 
     <dependency>
@@ -80,50 +88,5 @@
         <directory>test-resources</directory>
       </testResource>
     </testResources>
-    
-    <plugins>
-
-			<plugin>
-				<inherited>false</inherited>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>2.5.1</version>
-				<executions>
-					<execution>
-						<id>virt_jena install</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>libs/com/openlink/virtuoso/virt_jena/6.1.6/virt_jena-6.1.6.jar</file>
-							<groupId>com.openlink.virtuoso</groupId>
-							<artifactId>virt_jena</artifactId>
-							<version>6.1.6</version>
-							<packaging>jar</packaging>
-							<pomFile>libs/com/openlink/virtuoso/virt_jena/6.1.6/virt_jena-6.1.6.pom</pomFile>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>virtjdbc install</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>libs/com/openlink/virtuoso/virt_jena/6.1.6/virt_jena-6.1.6.jar</file>
-							<groupId>com.openlink.virtuoso</groupId>
-							<artifactId>virt_jena</artifactId>
-							<version>6.1.6</version>
-							<packaging>jar</packaging>
-							<pomFile>libs/com/openlink/virtuoso/virt_jena/6.1.6/virt_jena-6.1.6.pom</pomFile>
-						</configuration>
-					</execution>
-					</executions>
-			</plugin>
-
-    </plugins>
-    
   </build>
 </project>
