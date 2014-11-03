@@ -210,7 +210,8 @@ public class OAuthServices {
 				strScopes.add(scope.getScopeName());
 			}
 			jsonObj.put("scopes", strScopes);
-			jsonObj.put("thumbnail", app.getThumbnail() == null ? "" : app.getThumbnail());
+			jsonObj.put("redirect_uri", app.getRedirectUri() == null ? "" : app.getRedirectUri());
+			jsonObj.put("logo", app.getThumbnail() == null ? "" : app.getThumbnail());
 			root.put(jsonObj);
 		}
 		if (format.equalsIgnoreCase("html")){
