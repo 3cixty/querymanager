@@ -96,6 +96,8 @@ public class ProfilerPlaceUtils {
 	    
 	    Query query = QueryFactory.create(qStr);
 	    
+	    System.out.println(qStr);
+	    
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
 		
 		ResultSet rs = qe.execSelect();
@@ -105,6 +107,7 @@ public class ProfilerPlaceUtils {
 			QuerySolution qs = rs.next();
 			townName = qs.getLiteral("locality").getString();
 			if (townName != null) {
+				System.out.println(townName);
 			    break;
 			}
 		}
