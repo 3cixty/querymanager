@@ -241,7 +241,6 @@ public class QueryUtils {
 		if (object == null || query == null || attrName == null || propertyName == null) return;
 		Class <?> clazz = object.getClass();
 		String keyName = getNameFromClass(clazz, isForEvents);
-		System.out.println(keyName);
 		Properties props = clazzProperties.get(keyName);
 		if (props == null) {
 			props = loadProperties(clazz, isForEvents);
@@ -250,7 +249,6 @@ public class QueryUtils {
 		}
 		// Property Value must follow the regular expression [subject,predicate,object]*,filterVariableName
 		String property = (String) props.get(propertyName);
-		System.out.println(property);
 		if (property == null) return;
 		addExprsAndTriples(query, object, attrName, property, exprs, triples, threeCixyExpr);
 
