@@ -16,6 +16,7 @@ import org.theresis.humanization.privacy.PrivacyContractStorage;
 import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
 import org.theresis.humanization.privacy.PrivacyException;
 import org.theresis.humanization.privacy.UserPrivacyContractFactory;
+import org.theresis.humanization.privacy.generated.Application;
 import org.theresis.humanization.privacy.generated.Domain;
 import org.theresis.humanization.privacy.generated.PrivacyContract;
 import org.theresis.humanization.privacy.generated.UserPrivacyContract;
@@ -28,10 +29,10 @@ public class PrivacyApisTest {
 		
 		PrivacyContract privacyContract = new PrivacyContract( );
 		
-		PrivacyContract.Application pc_app = new PrivacyContract.Application( );
+		Application pc_app = new Application( );
 		pc_app.setAuthor( "Cactus Software Ltd");
 		pc_app.setDescription( "Cactus cult");
-		PrivacyContract.Application.Domains domains = new PrivacyContract.Application.Domains( );
+		Application.Domains domains = new Application.Domains( );
 		domains.getDomain().add( Domain.RELIGION );
 		domains.getDomain().add( Domain.OTHER );
 		pc_app.setDomains( domains );
@@ -104,7 +105,7 @@ public class PrivacyApisTest {
 			// user install the application
 			
 			// get application Privacy Contract from storage 
-			PrivacyContract privacyContract	= privacyContractStorage.get( service );
+			PrivacyContract privacyContract	= privacyContractStorage.get( service.getServiceID() );
 			
 			// create default User Privacy Contract from application Privacy Contract
 			UserPrivacyContract userPrivacyContract	= UserPrivacyContractFactory.buildUserPrivacyContract( privacyContract );
@@ -112,22 +113,22 @@ public class PrivacyApisTest {
 			// TODO do some default contract tweaking
 			
 			// get an eventual older User Privacy Contract storage
-			UserPrivacyContract oldUserPrivacyContract = privacyContractStorage.get(user, service);
+			UserPrivacyContract oldUserPrivacyContract = privacyContractStorage.get(user.getUserID(), service.getServiceID());
 			
 			if( null == oldUserPrivacyContract ) {
 				
 				// store the contract initial version
-				privacyContractStorage.store(user, service, userPrivacyContract);
+				privacyContractStorage.store(user.getUserID(), service.getServiceID(), userPrivacyContract);
 				
 			} else {
 				
 				// store the contract updated version
-				privacyContractStorage.update(user, service, userPrivacyContract);
+				privacyContractStorage.update(user.getUserID(), service.getServiceID(), userPrivacyContract);
 			}
 
 			// user uninstall the application 
 			// => revoke the contract
-			privacyContractStorage.revoke(user, service);
+			privacyContractStorage.revoke(user.getUserID(), service.getServiceID());
 			
 		} catch (PrivacyException e) {
 			fail(e.getMessage());

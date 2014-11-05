@@ -27,9 +27,9 @@ import org.theresis.humanization.privacy.CertificationAndPrivacyRequest;
 import org.theresis.humanization.privacy.CertificationAndPrivacyRequest.RequestStatus;
 import org.theresis.humanization.privacy.CertificationRequestId;
 import org.theresis.humanization.privacy.PrivacyCertAuthorityFactory;
+import org.theresis.humanization.privacy.PrivacyDBInitialize;
 import org.theresis.humanization.privacy.PrivacyException;
-import org.theresis.humanization.privacy.db.InitializePrivacyDB;
-import org.theresis.humanization.privacy.db.ResetPrivacyDB;
+import org.theresis.humanization.privacy.conf.PrivacyAuthorityConf;
 
 /**
  * Test of the privacy authority
@@ -38,17 +38,19 @@ import org.theresis.humanization.privacy.db.ResetPrivacyDB;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PrivacyAuthorityTest {
 
-	private static String					login			= "sa";
-	private static String					password		= "";
+	private static String					passwordSA		= "toto";
+	private static String					passwordAPI		= "titi";
+	private static String					passwordAdmin	= "tata";
 	private static CertificationRequestId	reqId			= null;
-	private static String					cryptKey		= null; //"23ee4f98ea895a52ae6e3e2de9081964";
+	private static CertificationRequestId	reqIdUpdate		= null;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
-		ResetPrivacyDB.doTheJob(login, password, cryptKey);
-		InitializePrivacyDB.doTheJob(login, password, cryptKey);
+		PrivacyAuthorityConf.setPropertyFile("DefaultPrivacyAuthority.properties");
+		PrivacyDBInitialize.resetAndInit(passwordSA, passwordSA, passwordAPI, passwordAdmin);
 		reqId = null;
+		reqIdUpdate = null;
 	}
 	
 	
@@ -60,7 +62,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( login, password, cryptKey);
+			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 			
 			CertificationAndPrivacyRequest.PocInformation 
 				poc = new CertificationAndPrivacyRequest.PocInformation("3cixty", "poalo sino", "poalo.sini@tin.it", "+336728972872");
@@ -96,7 +98,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
-			auth = PrivacyCertAuthorityFactory.build( login, password, cryptKey);
+			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 			
 			CertificationAndPrivacyRequest.PocInformation 
 				poc = new CertificationAndPrivacyRequest.PocInformation("3cixty", "poalo sino", "poalo.sini@tin.it", "+336728972872");
@@ -131,7 +133,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
-			auth = PrivacyCertAuthorityFactory.build( login, password, cryptKey);
+			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 			
 			FileInputStream certificateSigningRequest;
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
@@ -161,7 +163,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
-			auth = PrivacyCertAuthorityFactory.build( login, password, cryptKey);
+			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 			
 			FileInputStream certificateSigningRequest;
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
@@ -191,7 +193,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( login, password, cryptKey);
+			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 						
 			FileInputStream certificateSigningRequest;
 			FileInputStream privacyContract;
@@ -222,14 +224,14 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( login, password, cryptKey);
+			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 						
 			FileInputStream certificateSigningRequest;
 			FileInputStream privacyContract;
 			
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
 			privacyContract = new FileInputStream("./src/test/resources/PrivacyContract_RestoMi_example.xml");
-
+			
 			reqId = auth.updateMyContract(certificateSigningRequest , privacyContract);
 			fail();
 						
@@ -254,7 +256,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( login, password, cryptKey);
+			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 						
 			FileInputStream certificateSigningRequest;
 			FileInputStream privacyContract;
@@ -262,9 +264,9 @@ public class PrivacyAuthorityTest {
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
 			privacyContract = new FileInputStream("./src/test/resources/Update_PrivacyContract_ExploreMi360_example.xml");
 
-			reqId = auth.updateMyContract(certificateSigningRequest , privacyContract);
+			reqIdUpdate = auth.updateMyContract(certificateSigningRequest , privacyContract);
 			
-			assertTrue( reqId != null );
+			assertTrue( reqIdUpdate != null );
 						
 		} catch (FileNotFoundException e2) {
 			fail( e2.getMessage() );
@@ -279,5 +281,4 @@ public class PrivacyAuthorityTest {
 		}		
 	}		
 	
-		
 }

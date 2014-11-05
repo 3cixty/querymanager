@@ -1,0 +1,214 @@
+@prefix schema: <http://schema.org/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix profile: <http://3cixty.eurecom.fr/ontology/profile/>.
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix mbt: <http://3cixty.eurecom.fr/ontology/mobidot/>.
+
+profile:
+    a owl:Ontology ;
+    dc:created "" ;
+    dc:description "" ;
+    dc:title "" ;
+    owl:imports foaf: ;
+    vann:preferredNamespacePrefix "profile" ;
+    vann:preferredNamespaceUri "http://3cixty.eurecom.fr/ontology/profile/" ;
+    owl:versionInfo "" ;
+    foaf:maker
+	[foaf:name ""] .
+
+#Classes definition
+
+profile:Like
+    a owl:Class ;
+    rdfs:comment "" ;
+    rdfs:isDefinedBy profile: ;
+    rdfs:label "like" ;
+    vs:term_status "unstable" .
+
+profile:QueryHistory
+    a owl:Class ;
+    rdfs:comment "" ;
+    rdfs:isDefinedBy profile: ;
+    rdfs:label "query history" ;
+    vs:term_status "unstable" .
+
+profile:Tray
+    a owl:Class ;
+    rdfs:comment "" ;
+    rdfs:isDefinedBy profile: ;
+    rdfs:label "tray" ;
+    owl:equivalentClass foaf:OnlineAccount ;
+    owl:equivalentClass schema:Rating ;
+    vs:term_status "unstable" .
+
+#ObjectProperties definition
+
+profile:queryHistoryElement
+      a owl:ObjectProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:Person ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "query history element" ;
+      rdfs:range profile:QueryHistory ;
+      vs:term_status "unstable" .
+
+profile:trayElement
+      a owl:ObjectProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:Person ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "tray element" ;
+      rdfs:range profile:Tray ;
+      vs:term_status "unstable" .
+
+profile:review
+      a owl:ObjectProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:Person ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "review" ;
+      rdfs:range schema:Review ;
+      vs:term_status "unstable" .
+
+profile:like
+      a owl:ObjectProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:Person ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "like" ;
+      rdfs:range profile:Like ;
+      vs:term_status "unstable" .
+
+profile:hasAccount
+      a owl:ObjectProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Tray ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "has account" ;
+      rdfs:range foaf:OnlineAccount ;
+      vs:term_status "unstable" .
+      
+profile:hasRating
+      a owl:ObjectProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Tray ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "has rating" ;
+      rdfs:range schema:Rating ;
+      vs:term_status "unstable" .
+
+#DatatypeProperties definition
+
+profile:userID
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:Person ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "user id" ;
+      rdfs:range xsd:string ;
+      vs:term_status "unstable" .
+
+profile:queryTime
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:QueryHistory ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "query time" ;
+      rdfs:range xsd:date ;
+      vs:term_status "unstable" .
+
+profile:query
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:QueryHistory ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "query" ;
+      rdfs:range xsd:string ;
+      vs:term_status "unstable" .
+
+profile:queryID
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:QueryHistory ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "query id" ;
+      rdfs:range xsd:string ;
+      vs:term_status "unstable" .
+
+profile:trayElementEntryTime
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Tray ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "tray element entry time" ;
+      rdfs:range xsd:date ;
+      vs:term_status "unstable" .
+
+profile:itemType
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Tray ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "item type" ;
+      rdfs:range xsd:string ;
+      vs:term_status "unstable" .
+
+profile:trayItemID
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Tray ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "tray item id" ;
+      rdfs:range xsd:string ;
+      vs:term_status "unstable" .
+
+profile:attendedTrayItem
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Tray ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "attended tray item" ;
+      rdfs:range xsd:boolean ;
+      vs:term_status "unstable" .
+
+profile:attendedTrayItemDate
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Tray ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "attended tray item date" ;
+      rdfs:range xsd:date ;
+      vs:term_status "unstable" .
+
+profile:numberOfTimesVisited
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:Review ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "number of times visited" ;
+      rdfs:range xsd:positiveInteger ;
+      vs:term_status "unstable" .
+
+profile:likeName
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain profile:Like ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "like name" ;
+      rdfs:range xsd:string ;
+      vs:term_status "unstable" .
+
+profile:thingID
+      a owl:DatatypeProperty ;
+      rdfs:comment "" ;
+      rdfs:domain schema:Thing ;
+      rdfs:isDefinedBy profile: ;
+      rdfs:label "thing id" ;
+      rdfs:range xsd:string ;
+      vs:term_status "unstable" .

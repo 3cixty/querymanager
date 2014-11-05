@@ -2,6 +2,7 @@ package eu.threecixty.privacymanager;
 
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,25 +14,48 @@ import org.junit.runner.RunWith;
 import org.theresis.humanization.authen.Service;
 import org.theresis.humanization.authen.Session;
 import org.theresis.humanization.authen.simple.SimpleSessionManager;
+import org.theresis.humanization.conf.ProfileStorageConf;
 import org.theresis.humanization.datastorage.ProfileException;
 import org.theresis.humanization.datastorage.ProfileManager;
 import org.theresis.humanization.datastorage.ValuedProperty;
+import org.theresis.humanization.privacy.PrivacyCertAuthorityRequestor;
+import org.theresis.humanization.privacy.PrivacyCertAuthorityTool;
+import org.theresis.humanization.privacy.PrivacyContractFactory;
+import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
+import org.theresis.humanization.privacy.PrivacyDBInitialize;
+import org.theresis.humanization.privacy.conf.PrivacyAuthorityConf;
+import org.theresis.humanization.privacy.generated.UserPrivacyContract;
 import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
 
 @RunWith(JUnit4.class)
 public class PropertyPathTest {
 
 	private ProfileManager profileManager;
-	private Session session = null;
-	static public String 	propertyFilePath = null;
+	static public String 		propertyFilePath = "src/test/resources/TestProfileStorage.properties";
+	static public String 		privacyPropertyFilePath = "src/test/resources/TestPrivacyAuthority.properties";
+	static private String		appName = "Test";
+	static private String		appversion = "1.0";
+	static private String		userID1  = "110248277616794929135";
+	static private String		userID2  = "100900047095598983805";
 
 	@Before
 	public void setUp() throws Exception {
 	
+		// the privacy DB
+		ProfileStorageConf.setPropertyFile(propertyFilePath);
+		PrivacyAuthorityConf.setPropertyFile( privacyPropertyFilePath );
+		PrivacyDBInitialize.resetAndInit("toto", "toto", "toto", "toto");
+		FileInputStream is = new FileInputStream( "src/test/resources/UPC_TestApp.xml" );
+		UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
+		PrivacyCertAuthorityRequestor.getKaaStorage().store(userID1, 
+															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+															upc);
+		PrivacyCertAuthorityRequestor.getKaaStorage().store(userID2, 
+															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+															upc);
+		
 		SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-		profileManager = profileFactory.getProfileManager( propertyFilePath );
-		Service service = profileFactory.getService("test", "pwdTest");
-		session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+		profileManager = profileFactory.getProfileManager( propertyFilePath );		
 	}
 
 	@Test
@@ -39,19 +63,22 @@ public class PropertyPathTest {
 
 		try {
 
-			String userID = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 			
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference/:hasPlaceDetailPreference/:hasNatureOfPlace";
 			String knowsPath = "foaf:knows/:hasProfileIdentities*/:hasUserAccountID";
-			String ratingPath = ":hasPreference/:hasUserPlaceRating*";
+			String ratingPath = ":hasPreference/:hasUserEnteredRatings/:hasUserHotelRating/:hasRating";
 			List<String> propertyPaths = new ArrayList<String>();
 			propertyPaths.add(hasGenderPath);
 			propertyPaths.add(hasPlacePath);
 			propertyPaths.add(knowsPath);
 			propertyPaths.add(ratingPath);
 
-			Collection<ValuedProperty> propertyValues = profileManager.getProfileProperties(session, userID, propertyPaths);
+			Collection<ValuedProperty> propertyValues = profileManager.getProfileProperties(session, userID1, propertyPaths);
 
 			System.out.println(" results : ");
 
@@ -69,10 +96,11 @@ public class PropertyPathTest {
 					assertEquals("junk2", val.getValue(0));
 					assertEquals("100900047095598983805", val.getValue(1));
 				} else if (val.getPropertyPath().compareTo(ratingPath) == 0) {
-					assertTrue(val.getNbValues() == 1);
-					assertEquals(
-							"http://www.eu.3cixty.org/profile#110248277616794929135Preference",
-							val.getValue(0));
+					assertTrue( val.getNbValues() == 1 );
+					assertTrue( val.getValue(0).contains("hasUserInteractionMode") );									
+					assertTrue( val.getValue(0).contains("Visited") );
+					assertTrue( val.getValue(0).contains("hasUserDefinedRating") );
+					assertTrue( val.getValue(0).contains("4.0") );
 				} else {
 					fail("Not expected property " + val);
 				}
@@ -87,13 +115,17 @@ public class PropertyPathTest {
 	public void getCountryNamePropertyPath() {
 
 		try {
-			String userID = "100900047095598983805";
+
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 			
 			String hasCountryName = "vcard:hasAddress/vcard:country-name";
 			List<String> propertyPaths = new ArrayList<String>();
 			propertyPaths.add(hasCountryName);
 
-			Collection<ValuedProperty> propertyValues = profileManager.getProfileProperties(session, userID, propertyPaths);
+			Collection<ValuedProperty> propertyValues = profileManager.getProfileProperties(session, userID2, propertyPaths);
 
 			System.out.println(" results : ");
 
@@ -113,11 +145,15 @@ public class PropertyPathTest {
 		}
 	}
 
+	
 	@Test
 	public void deleteValuedPropertyPath() {
 
 		try {
-			String userID = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference*";
@@ -132,10 +168,10 @@ public class PropertyPathTest {
 			valuedPlacePref.addValue("http://www.eu.3cixty.org/profile#110248277616794929135ItalyPlacePreference");
 			pairsPropertyPathValues.add(valuedPlacePref);
 
-			profileManager.deleteProfileProperties( session, userID, pairsPropertyPathValues);
+			profileManager.deleteProfileProperties( session, userID1, pairsPropertyPathValues);
 
 			// now, check that the properties have been removed
-			String jsonProfile = profileManager.getProfile(session, userID);
+			String jsonProfile = profileManager.getProfile(session, userID1);
 			assertNotNull(jsonProfile);
 			assertFalse(jsonProfile.contains("hasGender"));
 			assertFalse(jsonProfile.contains("Male"));
@@ -149,11 +185,15 @@ public class PropertyPathTest {
 		}
 	}
 
+	
 	@Test
 	public void deleteNotSetPropertyPath() {
 
 		try {
-			String userID = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 
 			String hasGenderPath = ":hasGender";
 
@@ -161,10 +201,10 @@ public class PropertyPathTest {
 			ValuedProperty valuedGender = new ValuedProperty(hasGenderPath);
 			valuedGender.addValue("Female");
 			pairsPropertyPathValues.add(valuedGender);
-			profileManager.deleteProfileProperties( session, userID, pairsPropertyPathValues);
+			profileManager.deleteProfileProperties( session, userID1, pairsPropertyPathValues);
 
 			// now, check that the properties have been removed
-			String jsonProfile = profileManager.getProfile( session, userID );
+			String jsonProfile = profileManager.getProfile( session, userID1 );
 			assertNotNull(jsonProfile);
 			assertTrue(jsonProfile.contains("hasGender"));
 			assertTrue(jsonProfile.contains("Male"));
@@ -177,11 +217,15 @@ public class PropertyPathTest {
 		}
 	}
 
+	
 	@Test
 	public void mergeValuedPropertyPath() {
 
 		try {
-			String userID = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference/:hasPlaceDetailPreference/:hasNatureOfPlace";
@@ -202,10 +246,10 @@ public class PropertyPathTest {
 			valuedProfilePref.addValue("http://www.eu.3cixty.org/profile#110248277616794929135facebookProf");
 			pairsPropertyPathValues.add(valuedProfilePref);
 
-			profileManager.mergeProfileProperties( session, userID, pairsPropertyPathValues);
+			profileManager.mergeProfileProperties( session, userID1, pairsPropertyPathValues);
 
 			// now, check that the properties have been removed
-			String jsonProfile = profileManager.getProfile(session, userID);
+			String jsonProfile = profileManager.getProfile(session, userID1);
 			System.out.println("Merged profile = " + jsonProfile);
 
 			assertNotNull(jsonProfile);
@@ -216,11 +260,11 @@ public class PropertyPathTest {
 
 			Collection<String> propertyPathValues = new ArrayList<String>();
 			propertyPathValues.add(hasPlacePath);
-			Collection<ValuedProperty> placeRes = profileManager.getProfileProperties(session, userID, propertyPathValues);
+			Collection<ValuedProperty> placeRes = profileManager.getProfileProperties(session, userID1, propertyPathValues);
 			assertTrue(placeRes.size() == 1);
 			assertTrue(placeRes.iterator().next().getValues().contains("Restaurant"));
 
-			assertTrue(jsonProfile.contains("110248277616794929135facebookProf"));
+			assertTrue(jsonProfile.contains("profile2:facebookProf"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -228,12 +272,15 @@ public class PropertyPathTest {
 		}
 	}
 
-
+	
 	@Test
 	public void mergeStringValuePropertyPath() {
 
 		try {
-			String updatedUser = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 
 			String hasGenderPath = ":hasEmail";
 
@@ -244,10 +291,10 @@ public class PropertyPathTest {
 			valuedGender.addValue(email);
 			pairsPropertyPathValues.add(valuedGender);
 
-			profileManager.mergeProfileProperties(session, updatedUser, pairsPropertyPathValues);
+			profileManager.mergeProfileProperties(session, userID1, pairsPropertyPathValues);
 
 			// now, check that the properties have been removed
-			String jsonProfile = profileManager.getProfile(session, updatedUser);
+			String jsonProfile = profileManager.getProfile(session, userID1);
 			System.out.println("Merged profile = " + jsonProfile);
 
 			assertNotNull(jsonProfile);
@@ -261,13 +308,16 @@ public class PropertyPathTest {
 	}
 
 
-
+	
 	@Test
 	public void mergeInvalidEnumValuePropertyPath() {
 
 		try {
 
-			String userID = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 
 			String hasGenderPath = ":hasGender";
 
@@ -277,7 +327,7 @@ public class PropertyPathTest {
 			valuedGender.addValue("Toto");
 			pairsPropertyPathValues.add(valuedGender);
 
-			profileManager.mergeProfileProperties(session, userID, pairsPropertyPathValues);
+			profileManager.mergeProfileProperties(session, userID1, pairsPropertyPathValues);
 
 		} catch (Exception e) {
 			// Normal exception
@@ -285,12 +335,16 @@ public class PropertyPathTest {
 		}
 	}
 
+	
 	@Test
 	public void replaceValuedPropertyPath() {
 
 		try {
 
-			String updatedUser = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference/:hasPlaceDetailPreference/:hasNatureOfPlace";
@@ -312,11 +366,11 @@ public class PropertyPathTest {
 					.addValue("http://www.eu.3cixty.org/profile#110248277616794929135facebookProf");
 			pairsPropertyPathValues.add(valuedProfilePref);
 
-			profileManager.replaceProfileProperties(session, updatedUser,
+			profileManager.replaceProfileProperties(session, userID1,
 					pairsPropertyPathValues);
 
 			// now, check that the properties have been removed
-			String jsonProfile = profileManager.getProfile(session, updatedUser);
+			String jsonProfile = profileManager.getProfile(session, userID1);
 			System.out.println("Replace profile = " + jsonProfile);
 
 			assertNotNull(jsonProfile);
@@ -328,7 +382,7 @@ public class PropertyPathTest {
 			Collection<String> propertyPathValues = new ArrayList<String>();
 			propertyPathValues.add(hasPlacePath);
 			Collection<ValuedProperty> placeRes = profileManager
-					.getProfileProperties(session, updatedUser, propertyPathValues);
+					.getProfileProperties(session, userID1, propertyPathValues);
 			assertTrue(placeRes.size() == 1);
 			assertTrue(placeRes.iterator().next().getValues()
 					.contains("Restaurant"));
@@ -336,10 +390,10 @@ public class PropertyPathTest {
 			propertyPathValues.clear();
 			propertyPathValues.add(hasProfileIdentities);
 			Collection<ValuedProperty> profRes = profileManager
-					.getProfileProperties(session, updatedUser, propertyPathValues);
+					.getProfileProperties(session, userID1, propertyPathValues);
 			assertTrue(profRes.size() == 1);
 			assertTrue(jsonProfile
-					.contains("110248277616794929135facebookProf"));
+					.contains("profile2:facebookProf"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -347,36 +401,4 @@ public class PropertyPathTest {
 		}
 	}
 
-	@Test
-	public void getFriendsRatingPropertyPath() {
-
-		try {
-
-			String userID = "110248277616794929135";
-
-			String hasFriendRating = "foaf:knows/:hasPreference/:hasUserEnteredRatings/:hasUserHotelRating/:hasRating/:hasUserDefinedRating";
-
-			List<String> propertyPaths = new ArrayList<String>();
-			propertyPaths.add(hasFriendRating);
-
-			Collection<ValuedProperty> propertyValues = profileManager.getProfileProperties(session, userID, propertyPaths);
-
-			System.out.println(" results : ");
-
-			for (ValuedProperty val : propertyValues) {
-
-				System.out.println(" - " + val);
-				if (val.getPropertyPath().compareTo(hasFriendRating) == 0) {
-					assertTrue(val.getNbValues() == 1);
-					System.out.println(val.getValue(0));
-					assertTrue(val.getValue(0).startsWith("5.0"));
-				} else {
-					fail("Not expected property " + val);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
 }
