@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,6 +38,12 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://3cixty.eurecom.fr/sparql?default-graph-uri=&query=";
 	 private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
+	 
+	 private static final Logger LOGGER = Logger.getLogger(
+			 QueryManager.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	 /**Original query*/
 	 private ThreeCixtyQuery originalQuery;
@@ -112,6 +119,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 				originalQueryStr = removePrefixes(originalQueryStr);
 			}
 			
+			logInfo("Augmented query: " + augmentedQueryStr);
+			
 			StringBuilder sb = new StringBuilder();
 			
 			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, augmentedQueryIncluded, sb);
@@ -122,13 +131,13 @@ import eu.threecixty.profile.oldmodels.Rating;
 			return sb.toString();
 
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			return "ERROR:" + e.getMessage();
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			return "ERROR:" + e.getMessage();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			return "ERROR:" + e.getMessage();
 		}
 	}
@@ -164,6 +173,9 @@ import eu.threecixty.profile.oldmodels.Rating;
 	private static boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
 			boolean augmentedQueryIncluded, StringBuilder sb) throws IOException {
 		sb.setLength(0);
+
+		logInfo("Query to be executed: " + query);
+
 		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
 		urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
@@ -239,6 +251,19 @@ import eu.threecixty.profile.oldmodels.Rating;
 	public void performORAugmentation(List<Triple> triples, List<Expr> exprs) {
 		if (preference == null || query == null) return;
 		if (triples.size() == 0 && exprs.size() == 0) return;
+		if (DEBUG_MOD) {
+			logInfo("Enter into the performORAugmentation method");
+			logInfo("Information about triples added: ----------------------");
+			for (Triple triple: triples) {
+				logInfo(triple.toString());
+			}
+			logInfo("-------------------------------------------------------");
+			logInfo("Information about expressions added: ----------------------");
+			for (Expr expr: exprs) {
+				logInfo(expr.toString());
+			}
+			logInfo("-------------------------------------------------------");
+		}
 		augmentedQuery = new AugmentedQuery(query.cloneQuery());
 		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
 		QueryUtils.addFilterWithOrOperandForExprsIntoQuery(exprs, augmentedQuery.getQuery().getQuery());
@@ -251,32 +276,48 @@ import eu.threecixty.profile.oldmodels.Rating;
 	public void addTriplesAndExprsToLists(
 			List<Triple> triples, List<Expr> exprs) {
 		if (query == null || preference == null) return;
+		
+		logInfo("Enter into the addTriplesAndExprsToLists method");
+		
 		Set <Place> places = preference.getHasPlaces();
-		if (places != null) {
+		if (places != null && places.size() > 0) {
+			logInfo("List of places: --------------------");
 			for (Place place: places) {
+				logInfo("Place name: " + place.getHasPlaceDetail().getHasPlaceName()
+						+ ", NatureOfPlace: " + place.getHasPlaceDetail().getHasNatureOfPlace());
 				query.addExpressionsAndTriples(place, exprs, triples, isForEvents);
 			}
+			logInfo("------------------------------------");
 		}
 
 		Set <Event> events = preference.getHasEvents();
-		if (events != null) {
+		if (events != null && events.size() > 0) {
+			logInfo("List of events: --------------------");
 			for (Event event: events) {
+				logInfo("Event name: " + event.getHasEventDetail().getHasEventName()
+						+ ", NatureOfEvent: " + event.getHasEventDetail().getHasNatureOfEvent());
 				query.addExpressionsAndTriples(event, exprs, triples, isForEvents);
 			}
+			logInfo("------------------------------------");
 		}
 
 		Set <Period> periods = preference.getHasPeriods();
-		if (periods != null) {
+		if (periods != null && periods.size() > 0) {
+			logInfo("List of periods: -------------------");
 			addPeriodsToTriplesAndExprsList(periods, query, triples, exprs, isForEvents);
+			logInfo("------------------------------------");
 		}
 
 		Set <Double> scoresRequired = preference.getScoresRequired();
 		if (scoresRequired != null && scoresRequired.size() > 0) {
+			logInfo("List of scores: --------------------");
 			for (Double score: scoresRequired) {
+				logInfo("Score: " + score);
 				Rating rating = new Rating();
 				rating.setHasUseDefinedRating(score);
 				query.addExpressionsAndTriples(rating, exprs, triples, isForEvents);
 			}
+			logInfo("------------------------------------");
 		}
 	}
 
@@ -348,6 +389,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 
 	private void addPeriodsToTriplesAndExprsList(Set<Period> periods, ThreeCixtyQuery query, List <Triple> triples, List <Expr> exprs, boolean isForEvents) {
 		for (Period period: periods) {
+			logInfo("start date: " + period.getStartDate() + ", end date: " + period.getEndDate());
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "startDate", "datetime",
 					exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "endDate", "datetime",
@@ -363,5 +405,14 @@ import eu.threecixty.profile.oldmodels.Rating;
 			return query.substring(index + 2);
 		}
 		return query;
+	}
+	
+	/**
+	 * Logs message at Info level
+	 * @param msg
+	 */
+	private static void logInfo(String msg) {
+		if (!DEBUG_MOD) return;
+		LOGGER.info(msg);
 	}
 }
