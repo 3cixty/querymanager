@@ -132,7 +132,6 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 								+ TABLE_NAME +".timeConsumed <= ? "*/
 						+ " GROUP BY " + APPKEY_TABLE_NAME +".app_name, DATE_FORMAT(DATE_SUB("+ TABLE_NAME +".starttime, INTERVAL 1 Month),'%Y,%m,%d') "
 						+ "DESC";
-				System.out.println(sql);
 				preparedStmt = conn.prepareStatement(sql);
 				//preparedStmt.setTimestamp(1, new Timestamp(from));
 				//preparedStmt.setTimestamp(2, new Timestamp(to));

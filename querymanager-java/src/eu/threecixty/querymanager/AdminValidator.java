@@ -5,10 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.File;
 import java.util.Scanner;
 
-public class validateAdmin {
+public class AdminValidator {
 	private String adminPwd = null;
 	
-    public validateAdmin(){}
+    public AdminValidator(){}
 	public boolean validate(String username, String password,String path){
 		if (username.equals("3cixtyAdmin") && password.equals(getDbPassword(path))) {
 			return true;

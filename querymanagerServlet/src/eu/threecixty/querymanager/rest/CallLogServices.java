@@ -20,7 +20,7 @@ import javax.ws.rs.core.Context;
 
 import eu.threecixty.logs.CallLoggingDisplay;
 import eu.threecixty.logs.CallLoggingManager;
-import eu.threecixty.querymanager.validateAdmin;
+import eu.threecixty.querymanager.AdminValidator;
 
 /**
  * The class is an end point for Administer APIs calls.
@@ -38,11 +38,11 @@ public class CallLogServices  {
 	public Response login(@FormParam("username") String username,
 			@FormParam("password") String password) {
 		try {
-			validateAdmin admin=new validateAdmin();
+			AdminValidator admin=new AdminValidator();
 			if (admin.validate(username,password,realPath)) {
 				HttpSession session = httpRequest.getSession();
 				session.setAttribute("admin", true);
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_DASHBOARD_PAGE +"dashboard.html")).build();
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_DASHBOARD_PAGE +"dashboard.jsp")).build();
 			} else {
 				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
 			}
