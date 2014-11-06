@@ -20,7 +20,7 @@ import eu.threecixty.db.ThreeCixyDBException;
 public class CallLoggingStorageImpl implements CallLoggingStorage {
 
 	private static final String TABLE_NAME = "logcall";
-	private static final String APPKEY_TABLE_NAME = "app_key";
+	private static final String APPKEY_TABLE_NAME = "3cixty_app";
 
 	private boolean firstTime = true;
 	
@@ -121,29 +121,31 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 			Connection conn = DBConnection.getInstance().getConnection();
 			PreparedStatement  preparedStmt = null;
 			try {
-				String sql = "SELECT " + TABLE_NAME +".appkey, "
-						+ "COUNT(" + TABLE_NAME +".appkey) AS numberOfCalls "
-						+ "FROM " + TABLE_NAME
-						+ " WHERE " + TABLE_NAME +".appkey IN ( SELECT appkey FROM "+ APPKEY_TABLE_NAME + " ) AND "
-								+ TABLE_NAME +".starttime >=? AND "
+				String sql = "SELECT "+ APPKEY_TABLE_NAME+".app_name AS appName, " //TODO checktable name
+						+ "DATE_FORMAT(DATE_SUB("+TABLE_NAME +".starttime, INTERVAL 1 Month),'%Y,%m,%d') AS starttime, "
+						+ "COUNT("+APPKEY_TABLE_NAME +".app_name) AS numberOfCalls "
+						+ "FROM " + TABLE_NAME +"," + APPKEY_TABLE_NAME
+						+ " WHERE "+ TABLE_NAME+".appkey LIKE "+ APPKEY_TABLE_NAME+".app_key"// AND "
+								/*+ TABLE_NAME +".starttime >=? AND "
 								+ TABLE_NAME +".starttime <= ? AND "
 								+ TABLE_NAME +".timeConsumed >= ? AND "
-								+ TABLE_NAME +".timeConsumed <= ? "
-						+ "GROUP BY " + TABLE_NAME +".appkey "
+								+ TABLE_NAME +".timeConsumed <= ? "*/
+						+ " GROUP BY " + APPKEY_TABLE_NAME +".app_name, DATE_FORMAT(DATE_SUB("+ TABLE_NAME +".starttime, INTERVAL 1 Month),'%Y,%m,%d') "
 						+ "DESC";
 				preparedStmt = conn.prepareStatement(sql);
-				preparedStmt.setTimestamp(1, new Timestamp(from));
-				preparedStmt.setTimestamp(2, new Timestamp(to));
-				preparedStmt.setInt(3, minTimeConsumed);
-				preparedStmt.setInt(4, maxTimeConsumed);
+				//preparedStmt.setTimestamp(1, new Timestamp(from));
+				//preparedStmt.setTimestamp(2, new Timestamp(to));
+				//preparedStmt.setInt(3, minTimeConsumed);
+				//preparedStmt.setInt(4, maxTimeConsumed);
 			    ResultSet rs = preparedStmt.executeQuery();
 
 			    while (rs.next()) {
 			    	CallLoggingDisplay loggingDisplay = new CallLoggingDisplay();
 			    	CallLogging logging = new CallLogging();
 			    	//AppKey tmpAppKey = KeyManager.getInstance().getAppKeyFromKey(rs.getString("appkey"));
-			    	logging.setKey(rs.getString("appkey"));
+			    	logging.setKey(rs.getString("appName"));
 			    	loggingDisplay.setCallLogging(logging);
+			    	loggingDisplay.setDateCall(rs.getString("starttime"));;
 			    	loggingDisplay.setNumberOfCalls(rs.getInt("numberOfCalls"));
 			    	loggings.add(loggingDisplay);
 			    }

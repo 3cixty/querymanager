@@ -15,6 +15,7 @@ import eu.threecixty.profile.RdfFileManager;
 import eu.threecixty.profile.TrayStorage;
 import eu.threecixty.querymanager.rest.GoFlowServer;
 import eu.threecixty.querymanager.rest.QueryManagerServices;
+import eu.threecixty.querymanager.rest.CallLogServices;
 
 @WebListener
 public class ThreeCixtyContextListener implements ServletContextListener {
@@ -38,6 +39,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    RdfFileManager.getInstance().setPathToRdfFile(rdfFile.getAbsolutePath());
 	    TrayStorage.setPath(pathTo3CixtyDataFolder);
 	    QueryManagerServices.realPath = realPath;
+        CallLogServices.realPath = realPath;
 	    MobidotImpl.setPath(pathTo3CixtyDataFolder);
 	    GoFlowImpl.setPath(pathTo3CixtyDataFolder);
 	    GoFlowServer.setPath(realPath + File.separatorChar + "WEB-INF" + File.separatorChar + "goflow.properties");
