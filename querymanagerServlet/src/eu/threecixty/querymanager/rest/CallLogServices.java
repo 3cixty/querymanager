@@ -33,6 +33,11 @@ public class CallLogServices  {
     public static String realPath;
 	@Context 
 	private HttpServletRequest httpRequest;
+	/**
+	 * login admin
+	 * @param username, password
+	 * @return
+	 **/
 	@POST
 	@Path("/loginAdmin")
 	public Response login(@FormParam("username") String username,
@@ -55,7 +60,6 @@ public class CallLogServices  {
 	
 	/**
 	 * Counts the number of calls.
-	 * @param key
 	 * @return
 	 */
 	@GET
@@ -73,7 +77,10 @@ public class CallLogServices  {
 			        .build());
 		}
 	}
-	
+	/**
+	 * execute query
+	 * @return string
+	 **/ 
 	private String executeQuery() {
 
 		Collection <CallLoggingDisplay> collectionslog = CallLoggingManager.getInstance().getCallsWithCount();
