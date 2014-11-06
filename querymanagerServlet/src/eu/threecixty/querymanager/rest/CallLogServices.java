@@ -11,7 +11,6 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -42,7 +41,6 @@ public class CallLogServices  {
 			validateAdmin admin=new validateAdmin();
 			if (admin.validate(username,password,realPath)) {
 				HttpSession session = httpRequest.getSession();
-				session.setAttribute("permission", true);
 				session.setAttribute("admin", true);
 				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_DASHBOARD_PAGE +"dashboard.html")).build();
 			} else {
@@ -64,9 +62,8 @@ public class CallLogServices  {
 	@Path("/getCallRecords")
 	public Response getCallRecords() {
         HttpSession session = httpRequest.getSession();
-		String admin = (String) session.getAttribute("admin");
-		String permissions = (String) session.getAttribute("permission");
-		if (admin.equals("true") && permissions.equals("true")) {
+		Boolean admin = (Boolean) session.getAttribute("admin");
+		if (admin) {
 			String ret = executeQuery();			
 			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
