@@ -15,7 +15,7 @@
 <form action="<%=Configuration.get3CixtyRoot()%>/auth">
     <input type=hidden name="key" value="<%=key%>">
     <label style="width: 60%">Sign in to 3cixty platform. Note that 3cixty uses Google account to authenticate the user</label>
-    <label style="width: 40%"><input type=submit value="Login" ></label>
+    <label style="width: 40%"><input type=submit value="Sign In" ></label>
 </div>
  
 </form>
