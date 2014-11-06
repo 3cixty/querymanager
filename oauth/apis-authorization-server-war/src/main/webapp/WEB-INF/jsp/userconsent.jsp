@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="" />
   <meta name="author" content="" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
   <title>Consent</title>
   <!-- Le styles -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/client/css/bootstrap.min.css" />
@@ -66,9 +69,6 @@
         
           <button id="user_oauth_approval" name="user_oauth_approval" value="true" type="submit"
                   class="btn btn-success">Grant permission</button>
-          &nbsp;&nbsp;&nbsp;<em>or</em>&nbsp;&nbsp;&nbsp;
-          <button type="submit" name="user_oauth_approval" value="false"
-                  class="btn btn-danger">Deny permission</button>
         </div>
       </fieldset>
     </form>
