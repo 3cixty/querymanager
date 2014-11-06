@@ -199,7 +199,8 @@
 					'width' : '90%'
 				},
 				'hAxis' : {
-					'slantedText' : false
+					'slantedText' : false,
+					'direction' : -1
 				//'title':'Date'
 				},
 				'vAxis' : {
