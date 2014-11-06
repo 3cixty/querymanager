@@ -120,7 +120,7 @@
 			'state' : {
 				'range' : {
 					'start' : new Date(2014, 9, 1),
-					'end' : new Date(2014, 9, 31)
+					'end' : new Date()
 				}
 			}
 		});
