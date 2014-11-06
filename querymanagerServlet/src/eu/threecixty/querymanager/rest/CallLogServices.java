@@ -77,6 +77,24 @@ public class CallLogServices  {
 			        .build());
 		}
 	}
+    
+    /**
+     * logoutadmin.
+     * @return
+     */
+    @GET
+    @Path("/logoutAdmin")
+    public Response logoutAdmin() {
+        try {
+            httpRequest.getSession().invalidate();
+            return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "appkeyadmin_login.jsp")).build();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    
 	/**
 	 * execute query
 	 * @return string

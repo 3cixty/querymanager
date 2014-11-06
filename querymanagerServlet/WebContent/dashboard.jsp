@@ -274,6 +274,12 @@
 </script>
 </head>
 <body>
+<form action="./logoutAdmin" method="get">
+<div>
+<input type="submit" name="logout" value="Logout">
+</div>
+</form>
+
 	<div id="dashboard_div"
 		style="border: 1px solid rgb(204, 204, 204); margin-top: 1em; position: relative;"padding-left: 1em">
 		</p>
