@@ -33,7 +33,7 @@ public class SettingsStorage {
 			saveAddressInfoToKB(settings, userProfile);
 			addProfileIdentitiesIntoUserProfile(settings, userProfile);
 
-			ProfileManagerImpl.getInstance().saveProfile(userProfile,"Insert");
+			ProfileManagerImpl.getInstance().saveProfile(userProfile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

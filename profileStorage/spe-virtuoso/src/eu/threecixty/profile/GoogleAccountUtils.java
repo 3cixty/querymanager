@@ -92,7 +92,7 @@ public class GoogleAccountUtils {
 			
 			profile.setKnows(knows);
 
-			ProfileManagerImpl.getInstance().saveProfile(profile, "Insert");
+			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

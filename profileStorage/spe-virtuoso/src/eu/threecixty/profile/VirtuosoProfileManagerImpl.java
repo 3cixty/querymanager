@@ -5,24 +5,17 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.IDCrawlTimeMapping;
 import eu.threecixty.profile.IDMapping;
 import eu.threecixty.profile.ProfileManager;
-import eu.threecixty.profile.RdfFileManager;
 import eu.threecixty.profile.UserProfile;
 
 /**
@@ -38,8 +31,8 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile,String type) {
-		return VirtuosoUserProfileStorage.saveProfile(userProfile,type);
+	public boolean saveProfile(UserProfile userProfile) {
+		return VirtuosoUserProfileStorage.saveProfile(userProfile);
 	}
 
 	@Override
@@ -141,10 +134,6 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	@Override
 	public GpsCoordinate getCoordinate(String uid) {
 		return ProfilerPlaceUtils.getCoordinates( uid);
-	}
-	
-	private Model getModel() {
-		return RdfFileManager.getInstance().getRdfModel();
 	}
 
 	@Override
@@ -302,5 +291,15 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			}
 		}
 		return idCrawlTimeMapping;
+	}
+
+	@Override
+	public Partner getMobidot() {
+		return MobidotImpl.getInstance();
+	}
+
+	@Override
+	public Partner getGoFlow() {
+		return GoFlowImpl.getInstance();
 	}
 }

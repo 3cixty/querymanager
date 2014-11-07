@@ -62,7 +62,7 @@ public class ProfileInformationStorage {
 			}
 			
 			
-			ProfileManagerImpl.getInstance().saveProfile(kbUserProfile, "Insert");
+			ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -193,4 +193,13 @@ class SimpleProfileManagerImpl implements ProfileManager {
 			qe.close();
 			return idMapping;
 	}
+
+	/**
+	 * XXX: We never integrate Crawler for RDF version.
+	 */
+	@Override
+	public Set<IDCrawlTimeMapping> getIDCrawlTimeMappings() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -760,7 +760,7 @@ public class UserProfileStorage {
 	private static void loadUserEnteredRatingFromKBToPI(MyFactory mf,
 			UserEnteredRatings from, UserEnteredRating to) {
 		Set <eu.threecixty.profile.oldmodels.UserEventRating> toUserEventRatings = new HashSet <eu.threecixty.profile.oldmodels.UserEventRating>();
-		to.setHasUserEventRatin(toUserEventRatings);
+		to.setHasUserEventRating(toUserEventRatings);
 		if (from.hasHasUserEventRating()) {
 			Iterator <? extends UserEventRating> fromUserEventRatings = from.getHasUserEventRating().iterator();
 			for (; fromUserEventRatings.hasNext(); ) {

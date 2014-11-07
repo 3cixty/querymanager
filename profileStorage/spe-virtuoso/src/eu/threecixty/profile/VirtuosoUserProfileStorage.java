@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,8 +18,6 @@ import eu.threecixty.profile.oldmodels.UserInteractionMode;
 public class VirtuosoUserProfileStorage {
 	
 	private static final String PROFILE_URI = "http://www.eu.3cixty.org/profile#";
-	
-	private static final Object _sync = new Object();
 	
 	/**
 	 * Loads profile information from the KB.
@@ -61,12 +56,11 @@ public class VirtuosoUserProfileStorage {
 	 * @param profile
 	 * @return
 	 */
-	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile, String type) {
+	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
 		if (profile == null) return false;
 		
 		try {
-			if (!type.equals("delete"))
-				saveUIDInfoTOKB(profile.getHasUID(), type);
+			saveUIDInfoTOKB(profile.getHasUID());
 			
 			saveGenderToKB(profile.getHasUID(),profile.getHasGender());
 					
@@ -86,8 +80,6 @@ public class VirtuosoUserProfileStorage {
 			else
 				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
 			
-			if (type.equals("delete"))
-				saveUIDInfoTOKB(profile.getHasUID(), type);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -95,7 +87,7 @@ public class VirtuosoUserProfileStorage {
 		return false;
 	}
 
-	private static void saveUIDInfoTOKB(String uid, String type) {
+	private static void saveUIDInfoTOKB(String uid) {
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -107,14 +99,13 @@ public class VirtuosoUserProfileStorage {
 			
 			stmt = conn.createStatement();
 			
-			if (type.equals("delete")){
-				String str = GetSetQueryStrings.removeUser(uid);
-				virtuosoConnection.insertDeleteQuery(str);
-			}
-			else{
-				String str = GetSetQueryStrings.setUser(uid);
-				virtuosoConnection.insertDeleteQuery(str);
-			}
+
+			String deleteQuery = GetSetQueryStrings.removeUser(uid);
+			virtuosoConnection.insertDeleteQuery(deleteQuery);
+
+			String insertQuery = GetSetQueryStrings.setUser(uid);
+			virtuosoConnection.insertDeleteQuery(insertQuery);
+
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
@@ -2153,43 +2144,6 @@ public class VirtuosoUserProfileStorage {
 				ex.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Checks whether or not a given input string contains something.
-	 * @param input
-	 * @return
-	 */
-	private static boolean isNullOrEmpty(String input) {
-		if (input == null || input.equals("")) return true;
-		return false;
-	}
-
-	/**
-	 * Converts a given date to string.
-	 * @param date
-	 * @return
-	 */
-	private static String convert(Date date) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		return sdf.format(date);
-	}
-	
-	/**
-	 * convert string to date
-	 * @param dateStr
-	 * @return
-	 */
-	private static Date convert(String dateStr) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		int index = dateStr.indexOf("\"", 5);
-		if (index < 0) return null;
-		try {
-			return sdf.parse(dateStr.substring(1, index));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
 	/**
