@@ -73,6 +73,13 @@ public class UserProfileStorage {
 			UserProfile userProfile = mf.getUserProfile(PROFILE_URI + uid);
 
 			if (userProfile == null) return null;
+
+			if (!userProfile.hasHasUID()) {
+				synchronized (_sync) {
+					userProfile.addHasUID(uid);
+					mf.saveOwlOntology();
+				}
+			}
 			
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
@@ -116,31 +123,40 @@ public class UserProfileStorage {
 	 * @param profile
 	 * @return
 	 */
-	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
+	public static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
 		if (profile == null) return false;
-		try {
-			MyFactory mf = getMyFactory();
-			UserProfile kbUserProfile = mf.getUserProfile(PROFILE_URI + profile.getHasUID());
+		synchronized (_sync) {
 
-			if (kbUserProfile == null) {
-				kbUserProfile = mf.createUserProfile(PROFILE_URI + profile.getHasUID());
+
+			try {
+				MyFactory mf = getMyFactory();
+				UserProfile kbUserProfile = mf.getUserProfile(PROFILE_URI + profile.getHasUID());
+
+				if (kbUserProfile == null) {
+					kbUserProfile = mf.createUserProfile(PROFILE_URI + profile.getHasUID());
+				}
+
+				if (!kbUserProfile.hasHasUID()) {
+					kbUserProfile.addHasUID(profile.getHasUID());
+				}
+
+				saveNameInfoToKB(profile, kbUserProfile, mf);
+
+				saveAddressInfoToKB(profile, kbUserProfile, mf);
+
+				saveProfileIdentitiesToKB(profile, mf, kbUserProfile);
+				saveKnowsToKB(profile, kbUserProfile, mf);
+
+				if (profile.getPreferences() != null) {
+					savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), kbUserProfile, mf);
+				}
+
+				mf.saveOwlOntology();
+
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			
-			saveNameInfoToKB(profile, kbUserProfile, mf);
-			
-			saveAddressInfoToKB(profile, kbUserProfile, mf);
-			
-			saveProfileIdentitiesToKB(profile, mf, kbUserProfile);
-			saveKnowsToKB(profile, kbUserProfile, mf);
-			
-			if (profile.getPreferences() != null) {
-				savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), kbUserProfile, mf);
-			}
-			
-			mf.saveOwlOntology();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return false;
 	}

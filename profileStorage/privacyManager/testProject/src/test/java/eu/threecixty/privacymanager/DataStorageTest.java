@@ -2,6 +2,7 @@ package eu.threecixty.privacymanager;
 
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
 import java.util.Set;
 
 import org.junit.Before;
@@ -13,24 +14,44 @@ import org.theresis.humanization.authen.Session;
 import org.theresis.humanization.authen.simple.SimpleSessionManager;
 import org.theresis.humanization.conf.ProfileStorageConf;
 import org.theresis.humanization.datastorage.ProfileManager;
+import org.theresis.humanization.privacy.PrivacyCertAuthorityRequestor;
+import org.theresis.humanization.privacy.PrivacyCertAuthorityTool;
+import org.theresis.humanization.privacy.PrivacyContractFactory;
+import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
+import org.theresis.humanization.privacy.PrivacyDBInitialize;
+import org.theresis.humanization.privacy.conf.PrivacyAuthorityConf;
+import org.theresis.humanization.privacy.generated.UserPrivacyContract;
 import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
 
 @RunWith(JUnit4.class)
 public class DataStorageTest {
 
 	private ProfileManager profileManager;
-	//private ProfileStorageConf config;
-	private Session session = null;
-	static public String 	propertyFilePath = null;
+	static public String 		propertyFilePath = "src/test/resources/TestProfileStorage.properties";
+	static public String 		privacyPropertyFilePath = "src/test/resources/TestPrivacyAuthority.properties";
+	static private String		appName = "Test";
+	static private String		appversion = "1.0";
+	static private String		userID1  = "110248277616794929135";
+	static private String		userID2  = "100900047095598983805";
 
 	@Before
 	public void setUp() throws Exception {
 	
+		// the privacy DB
+		ProfileStorageConf.setPropertyFile(propertyFilePath);
+		PrivacyAuthorityConf.setPropertyFile( privacyPropertyFilePath );
+		PrivacyDBInitialize.resetAndInit("toto", "toto", "toto", "toto");
+		FileInputStream is = new FileInputStream( "src/test/resources/UPC_TestApp.xml" );
+		UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
+		PrivacyCertAuthorityRequestor.getKaaStorage().store( 	userID1, 
+															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+															upc);
+		PrivacyCertAuthorityRequestor.getKaaStorage().store( 	userID2, 
+															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+															upc);
+		
 		SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-		profileManager = profileFactory.getProfileManager( propertyFilePath );
-		Service service = profileFactory.getService("test", "pwdTest");
-		session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
-		//config = ProfileStorageConf.getInstance();
+		profileManager = profileFactory.getProfileManager( propertyFilePath );		
 	}
 
 	@Test
@@ -38,11 +59,16 @@ public class DataStorageTest {
 
 	
 		try {
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+
 			Set<String> users = profileManager.getAllUsersIDs(session);
 
 			assertEquals(2, users.size());
-			assertTrue(users.contains("110248277616794929135"));
-			assertTrue(users.contains("100900047095598983805"));
+			assertTrue(users.contains( userID1 ));
+			assertTrue(users.contains( userID2 ));
 
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -54,8 +80,13 @@ public class DataStorageTest {
 
 		try {
 
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+
 			String rawProfile = profileManager.getProfile(session, "dummy" );
-			assertEquals(null, rawProfile);
+			assertTrue( rawProfile.isEmpty() );
 
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -67,7 +98,12 @@ public class DataStorageTest {
 
 		try {
 
-			String profileResult = profileManager.getProfile(session, "110248277616794929135" );
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+
+			String profileResult = profileManager.getProfile(session, userID1 );
 			assertNotNull(profileResult);
 
 			System.out.println(profileResult); // only a visual confirmation
@@ -82,9 +118,12 @@ public class DataStorageTest {
 	public void getUserProfile() {
 		
 		try {
-			String readUserID = "110248277616794929135";
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
 			
-			String jsonProfile = profileManager.getProfile( session, readUserID );		
+			String jsonProfile = profileManager.getProfile( session, userID1 );		
 			System.out.println(jsonProfile);
 			assertNotNull(jsonProfile);
 			
@@ -123,6 +162,18 @@ public class DataStorageTest {
 					  "}"+
 					"}";			
 
+			// declare a contract
+			FileInputStream is = new FileInputStream( "src/test/resources/UPC_TestApp.xml" );
+			UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
+			PrivacyCertAuthorityRequestor.getKaaStorage().store( 	newUserID, 
+																PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+																upc);
+			
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+
 			profileManager.mergeProfile(session, newUserID, newSerialProfile);
 
 			// Now check the creation
@@ -146,7 +197,6 @@ public class DataStorageTest {
 		
 		try {
 			// the modified user
-			String mergedUserID = "100900047095598983805";
 			
 			// Modify the user profile of user ID to change some properties
 			String newSerialProfile = "{"+
@@ -162,10 +212,15 @@ public class DataStorageTest {
 					  "}"+
 					"}";		
 			
-			profileManager.mergeProfile(session, mergedUserID, newSerialProfile);
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+
+			profileManager.mergeProfile(session, userID2, newSerialProfile);
 
 			// Now check the creation
-			String jsonProfile = profileManager.getProfile(session, mergedUserID);
+			String jsonProfile = profileManager.getProfile(session, userID2);
 			assertNotNull(jsonProfile);
 			System.out.println("Merged Profile is : " + jsonProfile);						
 			
@@ -179,7 +234,6 @@ public class DataStorageTest {
 		
 		try {
 			// the modified user
-			String replUserId = "100900047095598983805";
 			
 			// Modify the user profile of user ID to change some properties
 			String newSerialProfile = "{"+
@@ -195,10 +249,15 @@ public class DataStorageTest {
 					  "}"+
 					"}";
 		
-			profileManager.replaceProfile(session, replUserId, newSerialProfile);		
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+
+			profileManager.replaceProfile(session, userID2, newSerialProfile);		
 			
 			// Now check the creation
-			String jsonProfile =  profileManager.getProfile(session, replUserId);		
+			String jsonProfile =  profileManager.getProfile(session, userID2);		
 			assertNotNull(jsonProfile);
 			System.out.println("Result of replace profile is : " + jsonProfile);						
 			
@@ -211,15 +270,19 @@ public class DataStorageTest {
 	public void deleteUserProfile() {
 		
 		try {
-			String userID = "110248277616794929135";
 
-			String result = profileManager.getProfile(session, userID);
+			// build the session
+			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
+			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			
+			String result = profileManager.getProfile(session, userID1);
 			assertNotNull(result);
 
-			boolean res = profileManager.deleteProfile(session, userID);
+			boolean res = profileManager.deleteProfile(session, userID1);
 			assertTrue(res);
 
-			assertFalse(profileManager.hasProfile(session, userID));
+			assertFalse(profileManager.hasProfile(session, userID1));
 			
 		} catch (Exception e) {
 			fail( e.getMessage() );

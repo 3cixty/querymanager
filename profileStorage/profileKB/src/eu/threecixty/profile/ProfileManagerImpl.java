@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**
@@ -15,9 +16,9 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
  *
  */
 public class ProfileManagerImpl implements ProfileManager {
-
-	public static final String SPARQL_ENDPOINT_URL = "http://dev.3cixty.com/sparql?default-graph-uri=&query=";
 	
+	public static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql?default-graph-uri=&query=";
+
 	private static final Object _sync = new Object();
 	
 	// TODO: make sure this full name is correct with the corresponding implementation with VIRTUOSO
@@ -49,8 +50,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile, String type) {
-		if (profileManager != null) return profileManager.saveProfile(userProfile, type);
+	public boolean saveProfile(UserProfile userProfile) {
+		if (profileManager != null) return profileManager.saveProfile(userProfile);
 		return false;
 	}
 
@@ -178,13 +179,25 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (profileManager != null) return profileManager.getIDMappings();
 		return new HashSet <IDMapping>();
 	}
-	
+
 	@Override
 	public Set<IDCrawlTimeMapping> getIDCrawlTimeMappings() {
 		if (profileManager != null) return profileManager.getIDCrawlTimeMappings();
 		return new HashSet <IDCrawlTimeMapping>();
 	}
 	
+	@Override
+	public Partner getMobidot() {
+		if (profileManager != null) return profileManager.getMobidot();
+		return null;
+	}
+
+	@Override
+	public Partner getGoFlow() {
+		if (profileManager != null) return profileManager.getGoFlow();
+		return null;
+	}
+
 	private ProfileManagerImpl() {
 		boolean found = false;
 		try {

@@ -14,14 +14,17 @@
   <name>SPE</name>
   <packaging>jar</packaging>
   <version>1.0</version>
-  
+
   <repositories>
     <repository>
-      <id>maven.aksw</id>
-      <url>http://maven.aksw.org/archiva/repository/internal/</url>
+      <id>internal repo - virtuoso</id>
+      <url>file://${basedir}/libs</url>
+      <releases>
+          <enabled>true</enabled>
+      </releases>
     </repository>
   </repositories>
-  
+
   <dependencies>
 
     <dependency>

@@ -12,7 +12,7 @@
 		for the JAR and POM is privacymanager-M.m.g.jar where M.m.g is the Maven 
 		version of the privacy manager artifact. -->
 	<properties>
-		<privacyManagerVersion>0.4</privacyManagerVersion>
+		<privacyManagerVersion>1.1</privacyManagerVersion>
 	</properties>
 
 	<build>
