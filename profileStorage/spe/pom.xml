@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>eu.3cixty</groupId>
+    <artifactId>profiler-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+  
+  <groupId>eu.3cixty</groupId>
+  <artifactId>spe</artifactId>
+  <name>SPE</name>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+
+  <repositories>
+    <repository>
+      <id>internal repo - virtuoso</id>
+      <url>file://${basedir}/libs</url>
+      <releases>
+          <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>
+
+  <dependencies>
+
+    <dependency>
+	  <groupId>eu.3cixty</groupId>
+	  <artifactId>models</artifactId>
+	  <version>1.0</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>eu.3cixty</groupId>
+	  <artifactId>profileKB</artifactId>
+	  <version>1.0</version>
+    </dependency>
+            
+    <dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.11</version>
+	  <scope>test</scope>
+    </dependency>
+    
+  <dependency>
+	<groupId>com.google.code.gson</groupId>
+	<artifactId>gson</artifactId>
+	<version>1.7.1</version>
+  </dependency>
+            
+<dependency>
+	<groupId>org.json</groupId>
+	<artifactId>json</artifactId>
+	<version>20090211</version>
+</dependency>
+
+<dependency>
+	<groupId>xml-apis</groupId>
+	<artifactId>xml-apis</artifactId>
+	<version>1.4.01</version>
+</dependency>
+      
+    <dependency>
+      <groupId>com.openlink.virtuoso</groupId>
+      <artifactId>virt_jena</artifactId>
+      <version>6.1.6</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.openlink.virtuoso</groupId>
+      <artifactId>virtjdbc3</artifactId>
+      <version>6.1.4</version>
+    </dependency>
+
+</dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+	<resources>
+		<resource>
+			<directory>resources</directory>
+		</resource>
+	</resources>
+    <testResources>
+      <testResource>
+        <directory>test-resources</directory>
+      </testResource>
+    </testResources>
+  </build>
+</project>
