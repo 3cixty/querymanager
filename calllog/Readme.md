@@ -31,3 +31,4 @@ On a successful login the Admin can view the dashboard page with features listed
 - logout feature.
 
 snapshot of the dashboard:
+![alt tag](https://github.com/3cixty/querymanager/blob/master/calllog/image/dashboard.png)
