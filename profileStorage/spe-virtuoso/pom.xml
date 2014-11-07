@@ -10,7 +10,7 @@
   </parent>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>spe</artifactId>
+  <artifactId>spe-virtuoso</artifactId>
   <name>SPE</name>
   <packaging>jar</packaging>
   <version>1.0</version>
