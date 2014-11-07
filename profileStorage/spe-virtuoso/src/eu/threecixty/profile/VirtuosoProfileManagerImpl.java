@@ -42,98 +42,98 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public int getMinimumNumberOfTimesVisited(String uid) {
-		return PreferencesUtils.getMinimumNumberOfTimesVisited(uid);
+		return PreferencesUtilsVirtuoso.getMinimumNumberOfTimesVisited(uid);
 	}
 
 	@Override
 	public float getMinimumScoreRated(String uid) {
-		return PreferencesUtils.getMinimumScoreRated(uid);
+		return PreferencesUtilsVirtuoso.getMinimumScoreRated(uid);
 	}
 
 	@Override
 	public int getMinimumNumberOfTimesVisitedForFriends(String uid) {
-		return PreferencesUtils.getMinimumNumberOfTimesVisitedForFriends(uid);
+		return PreferencesUtilsVirtuoso.getMinimumNumberOfTimesVisitedForFriends(uid);
 	}
 
 	@Override
 	public float getMinimumScoreRatedForFriends(String uid) {
-		return PreferencesUtils.getMinimumScoreRatedForFriends(uid);
+		return PreferencesUtilsVirtuoso.getMinimumScoreRatedForFriends(uid);
 	}
 
 	@Override
 	public String getCountryName(String uid) {
-		return ProfilerPlaceUtils.getCountryName(uid);
+		return ProfilerPlaceUtilsVirtuoso.getCountryName(uid);
 	}
 
 	@Override
 	public String getTownName(String uid) {
-		return ProfilerPlaceUtils.getTownName(uid);
+		return ProfilerPlaceUtilsVirtuoso.getTownName(uid);
 	}
 
 	@Override
 	public List<String> getPlaceNamesFromRating(String uid, float rating) {
-		return ProfilerPlaceUtils.getPlaceNamesFromRating(uid, rating);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromRating(uid, rating);
 	}
 
 	@Override
 	public List<String> getPlaceNamesFromNumberOfTimesVisited(String uid,
 			int number) {
-		return ProfilerPlaceUtils.getPlaceNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromNumberOfTimesVisitedOfFriends(uid, number);
 	}
 
 	@Override
 	public List<String> getPlaceNamesFromRatingOfFriends(String uid,
 			float rating) {
-		return ProfilerPlaceUtils.getPlaceNamesFromRatingOfFriends(uid, rating);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromRatingOfFriends(uid, rating);
 	}
 
 	@Override
 	public List<String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(
 			String uid, int number) {
-		return ProfilerPlaceUtils.getPlaceNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromNumberOfTimesVisitedOfFriends(uid, number);
 	}
 
 	@Override
 	public List<String> getEventNamesFromEventPreferences(String uid) {
-		return ProfilerEventUtils.getEventNamesFromEventPreference(uid);
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromEventPreference(uid);
 	}
 
 	@Override
 	public List<StartAndEndDate> getPreferredStartAndEndDates(String uid) {
-		return ProfilerEventUtils.getPreferredStartAndEndDates(uid);
+		return ProfilerEventUtilsVirtuoso.getPreferredStartAndEndDates(uid);
 	}
 
 	@Override
 	public List<String> getEventNamesFromRating(String uid, float rating) {
-		return ProfilerEventUtils.getEventNamesFromRating(uid, rating);
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromRating(uid, rating);
 	}
 
 	@Override
 	public List<String> getEventNamesFromNumberOfTimesVisited(String uid,
 			int number) {
-		return ProfilerEventUtils.getEventNamesFromNumberOfTimesVisited(uid, number);
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromNumberOfTimesVisited(uid, number);
 	}
 
 	@Override
 	public List<String> getEventNamesFromRatingOfFriends(String uid,
 			float rating) {
-		return ProfilerEventUtils.getEventNamesFromRatingOfFriends(uid, rating);
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromRatingOfFriends(uid, rating);
 	}
 
 	@Override
 	public List<String> getEventNamesFromNumberOfTimesVisitedOfFriends(
 			String uid, int number) {
-		return ProfilerEventUtils.getEventNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromNumberOfTimesVisitedOfFriends(uid, number);
 	}
 
 	@Override
 	public List<String> getEventNamesWhichFriendsLikeToVisit(String uid) {
-		return ProfilerEventUtils.getEventNamesWhichFriendsLikeToVisit( uid);
+		return ProfilerEventUtilsVirtuoso.getEventNamesWhichFriendsLikeToVisit( uid);
 	}
 
 	@Override
 	public GpsCoordinate getCoordinate(String uid) {
-		return ProfilerPlaceUtils.getCoordinates( uid);
+		return ProfilerPlaceUtilsVirtuoso.getCoordinates( uid);
 	}
 
 	@Override

@@ -11,32 +11,23 @@
   
   <groupId>eu.3cixty</groupId>
   <artifactId>spe-virtuoso</artifactId>
-  <name>SPE</name>
+  <name>SPE Virtuoso</name>
   <packaging>jar</packaging>
   <version>1.0</version>
-
-  <repositories>
-    <repository>
-      <id>internal repo - virtuoso</id>
-      <url>file://${basedir}/libs</url>
-      <releases>
-          <enabled>true</enabled>
-      </releases>
-    </repository>
-  </repositories>
 
   <dependencies>
 
     <dependency>
-	  <groupId>eu.3cixty</groupId>
-	  <artifactId>models</artifactId>
-	  <version>1.0</version>
-    </dependency>
-
-    <dependency>
-	  <groupId>eu.3cixty</groupId>
-	  <artifactId>profileKB</artifactId>
-	  <version>1.0</version>
+      <groupId>eu.3cixty</groupId>
+      <artifactId>spe</artifactId>
+      <version>${project.version}</version>
+      
+      <exclusions>
+        <exclusion>
+          <groupId>eu.3cixty</groupId>
+          <artifactId>models</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
             
     <dependency>
@@ -44,36 +35,6 @@
 	  <artifactId>junit</artifactId>
 	  <version>4.11</version>
 	  <scope>test</scope>
-    </dependency>
-    
-  <dependency>
-	<groupId>com.google.code.gson</groupId>
-	<artifactId>gson</artifactId>
-	<version>1.7.1</version>
-  </dependency>
-            
-<dependency>
-	<groupId>org.json</groupId>
-	<artifactId>json</artifactId>
-	<version>20090211</version>
-</dependency>
-
-<dependency>
-	<groupId>xml-apis</groupId>
-	<artifactId>xml-apis</artifactId>
-	<version>1.4.01</version>
-</dependency>
-      
-    <dependency>
-      <groupId>com.openlink.virtuoso</groupId>
-      <artifactId>virt_jena</artifactId>
-      <version>6.1.6</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.openlink.virtuoso</groupId>
-      <artifactId>virtjdbc3</artifactId>
-      <version>6.1.4</version>
     </dependency>
 
 </dependencies>

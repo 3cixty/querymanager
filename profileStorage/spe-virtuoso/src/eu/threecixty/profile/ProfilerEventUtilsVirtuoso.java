@@ -21,7 +21,7 @@ import eu.threecixty.profile.ProfileManager.StartAndEndDate;
  * @author Cong-Kinh Nguyen, Rachit Agarwal
  *
  */
-public class ProfilerEventUtils {
+public class ProfilerEventUtilsVirtuoso {
 
 	/**
 	 * Adds event name into a given preference.
@@ -84,6 +84,8 @@ public class ProfilerEventUtils {
 		
 		try {
 			conn=virtuosoConnection.processConfigFile();
+			
+			if (conn == null) return null;
 
 			stmt = conn.createStatement();
 			
@@ -106,8 +108,6 @@ public class ProfilerEventUtils {
 					e.printStackTrace();
 				}
 			}
-			
-			if (conn == null) return null;
 			
 			return startAndEndDates;
 
@@ -206,6 +206,8 @@ public class ProfilerEventUtils {
 		
 	    try {
 			conn=virtuosoConnection.processConfigFile();
+			
+			if (conn == null) return null;
 
 			stmt = conn.createStatement();
 			
@@ -222,8 +224,6 @@ public class ProfilerEventUtils {
 					eventNames.add(eventname);
 				}
 			}
-
-			if (conn == null) return null;
 			
 			return eventNames;
 
@@ -358,6 +358,6 @@ public class ProfilerEventUtils {
 	/**
 	 * Prohibits instantiations.
 	 */
-	private ProfilerEventUtils() {
+	private ProfilerEventUtilsVirtuoso() {
 	}
 }

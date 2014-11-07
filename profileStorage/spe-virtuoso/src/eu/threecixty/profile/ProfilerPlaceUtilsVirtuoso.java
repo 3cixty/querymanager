@@ -9,13 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.threecixty.profile.GpsCoordinateUtils;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
@@ -28,7 +23,7 @@ import eu.threecixty.profile.oldmodels.Preference;
  * @author Cong-Kinh NGUYEN, Rachit Agarwal
  *
  */
-public class ProfilerPlaceUtils {
+public class ProfilerPlaceUtilsVirtuoso {
 	
 	/**
 	 * Adds country name into preference.
@@ -62,6 +57,8 @@ public class ProfilerPlaceUtils {
 		
 	    try {
 			conn=virtuosoConnection.processConfigFile();
+			
+			if (conn == null) return null;
 
 			stmt = conn.createStatement();
 			
@@ -76,8 +73,6 @@ public class ProfilerPlaceUtils {
 				    break;
 				}
 			}
-			
-			if (conn == null) return null;
 						
 			return countryName;
 
@@ -138,6 +133,8 @@ public class ProfilerPlaceUtils {
 		
 	    try {
 			conn=virtuosoConnection.processConfigFile();
+			
+			if (conn == null) return null;
 
 			stmt = conn.createStatement();
 			
@@ -152,8 +149,6 @@ public class ProfilerPlaceUtils {
 				    break;
 				}
 			}
-			
-			if (conn == null) return null;
 						
 			return townName;
 
@@ -215,6 +210,8 @@ public class ProfilerPlaceUtils {
 		
 	    try {
 			conn=virtuosoConnection.processConfigFile();
+			
+			if (conn == null) return null;
 
 			stmt = conn.createStatement();
 			
@@ -229,8 +226,6 @@ public class ProfilerPlaceUtils {
 				coordinate = GpsCoordinateUtils.convert(lat, lon);
 				if (coordinate != null) break;
 			}
-			
-			if (conn == null) return null;
 						
 			return coordinate;
 
@@ -412,6 +407,7 @@ public class ProfilerPlaceUtils {
 		
 	    try {
 			conn=virtuosoConnection.processConfigFile();
+			if (conn == null) return null;
 
 			stmt = conn.createStatement();
 			
@@ -427,8 +423,6 @@ public class ProfilerPlaceUtils {
 					placeNames.add(placename);
 				}
 			}
-			
-			if (conn == null) return null;
 						
 			return placeNames;
 
@@ -475,6 +469,6 @@ public class ProfilerPlaceUtils {
 		}
 	}
 	
-	private ProfilerPlaceUtils() {
+	private ProfilerPlaceUtilsVirtuoso() {
 	}
 }

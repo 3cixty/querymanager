@@ -3,21 +3,27 @@ package eu.threecixty.profile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.oldmodels.Name;
 
 /**
  * Utility class to update account info.
  *
- * @author Cong-Kinh NGUYEN
+ * @author Rachit Agarwal
  *
  */
 public class GoogleAccountUtils {
 	
 //	/**
-//	 * Validates a given access token, then extract Google info to update UserProfile if there is
+//	 * Validates a given access token, 
+//   * then extract Google info (name, knows) to update UserProfile if there is
 //	 * no information about this user.
 //	 * @param accessToken
 //	 * @return public user ID if the given access token is valid. Otherwise, the method returns an empty string.
@@ -48,10 +54,48 @@ public class GoogleAccountUtils {
 			name.setGivenName(givenName);
 			name.setFamilyName(familyName);
 
+			
+			// do this when login to 3cixty authorization say edit settings,
+			// select circles you want the app to get info form.
+			// then select only me.
+			// finaly say authourize.
+			reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+					+ accessToken);
+			json = new JSONObject(reqMsg);
+			
+			String nextPageToken = null;
+		 	Set<String> knows = new HashSet<String>();
+			
+		 	
+			if (json.has("nextPageToken")){		
+				while(json.has("nextPageToken")){
+					nextPageToken = json.getString("nextPageToken");
+					JSONArray jsonArray = json.getJSONArray("items");
+					int length=jsonArray.length();
+					for (int i = 0; i < length; i++) {
+							JSONObject jObject = jsonArray.getJSONObject(i);
+							knows.add(jObject.getString("id"));
+					}
+					reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+							+ accessToken+"&pageToken="+nextPageToken);
+					json = new JSONObject(reqMsg);
+				}
+			}
+			else{
+				JSONArray jsonArray = json.getJSONArray("items");
+				int length=jsonArray.length();
+				for (int i = 0; i < length; i++) {
+						JSONObject jObject = jsonArray.getJSONObject(i);
+						knows.add(jObject.getString("id"));
+				}
+			}			
+			
+			profile.setKnows(knows);
+
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		if (user_id == null) return "";
 		return user_id;

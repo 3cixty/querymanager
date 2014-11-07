@@ -20,7 +20,7 @@ import com.hp.hpl.jena.query.ResultSet;
  * @author Cong-Kinh NGUYEN
  *
  */
-public class PreferencesUtils {
+public class PreferencesUtilsVirtuoso {
 
 	private static final int DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED = 1;
 	private static final float DEFAULT_MINIMUM_SCORE_RATED = 3;
@@ -206,6 +206,8 @@ public class PreferencesUtils {
 
 		try {
 			conn=virtuosoConnection.processConfigFile();
+			
+			if (conn == null) return 0;
 
 			stmt = conn.createStatement();
 			
@@ -222,7 +224,6 @@ public class PreferencesUtils {
 					e.printStackTrace();
 				}
 			}
-			if (conn == null) return 0;
 			
 			return ret;
 
@@ -255,6 +256,6 @@ public class PreferencesUtils {
 	/**
 	 * Prohibits instantiations.
 	 */
-	private PreferencesUtils() {
+	private PreferencesUtilsVirtuoso() {
 	}
 }
