@@ -184,7 +184,7 @@ public class CallGPlusProfileParser {
 									.getString("long_name"));
 
 						}
-						if (types.contains("Street_number")
+						/*if (types.contains("Street_number")
 								|| types.contains("route")
 								|| types.contains("establishment")) {
 							if (streetAddress != "") {
@@ -192,9 +192,9 @@ public class CallGPlusProfileParser {
 								streetAddress.concat(addarr.getJSONObject(i)
 										.getString("long_name"));
 							}
-						}
+						}*/
 					}
-					address.setStreetAddress(streetAddress);
+					//address.setStreetAddress(streetAddress);
 				}
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
