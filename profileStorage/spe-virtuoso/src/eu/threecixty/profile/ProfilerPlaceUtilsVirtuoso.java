@@ -1,18 +1,14 @@
 package eu.threecixty.profile;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import eu.threecixty.profile.GpsCoordinateUtils;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Preference;
@@ -26,237 +22,132 @@ import eu.threecixty.profile.oldmodels.Preference;
 public class ProfilerPlaceUtilsVirtuoso {
 	
 	/**
-	 * Adds country name into preference.
+	 * Gets country name.
 	 *
-	 * @param model
-	 * 				RDF model.
 	 * @param uID
 	 * 				User identity.
 	 */
 	public static String getCountryName(String uID) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
-	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "SELECT  DISTINCT  ?countryname\n";
-	    qStr += " WHERE {\n\n";
-	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root profile:hasUID ?uid .\n";
-	    qStr += "?root vcard:hasAddress ?address . \n";
-	    qStr += "?address vcard:country-name ?countryname .";
-	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "}";
-
-		Connection conn = null;
-		Statement stmt = null;
-	    
-		String countryName = null;
 		
-	    try {
-			conn=virtuosoConnection.processConfigFile();
-			
-			if (conn == null) return null;
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("PREFIX schema: <http://schema.org/>\n");
+		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
+		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
+		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
+		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(qStr);
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				countryName = qs.getLiteral("countryname").getString();
-				if (countryName != null) {
-				    break;
-				}
-			}
-						
-			return countryName;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
+		buffer.append("select  ?countryName\n");
+		buffer.append("where {\n");
+		buffer.append("?meroot rdf:type	foaf:Person .\n");
+		buffer.append("?meroot profile:userID	?uid .\n");
+		buffer.append("?meroot schema:address	?address .\n");
+		buffer.append("?address schema:addressCountry	?countryName .\n");
+		
+		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
+		buffer.append("}");
+		
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
+		if (jsonObj == null) return null;
+		
+		try {
+			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+			if (jsonArr.length() == 0) return null;
+			return jsonArr.getJSONObject(0).getJSONObject("countryName").getString("value");
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
-		return countryName;
+		
+		return null;
 	}
 
 	/**
-	 * Adds town name into preference.
+	 * Gets town name.
 	 *
-	 * @param model
-	 * 				The RDF model.
 	 * @param uID
 	 * 				User identity.
 	 */
 	public static String getTownName(String uID) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
-	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "SELECT  DISTINCT  ?locality\n";
-	    qStr += " WHERE {\n\n";
-	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root profile:hasUID ?uid .\n";
-	    qStr += "?root vcard:hasAddress ?address . \n";
-	    qStr += "?address profile:townName ?locality .\n";
-	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "}";
-	    
-	    Connection conn = null;
-		Statement stmt = null;
-	    
-		String townName = null;
+
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("PREFIX schema: <http://schema.org/>\n");
+		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
+		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
+		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
+		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+
+		buffer.append("select  ?townName\n");
+		buffer.append("where {\n");
+		buffer.append("?meroot rdf:type	foaf:Person .\n");
+		buffer.append("?meroot profile:userID	?uid .\n");
+		buffer.append("?meroot schema:address	?address .\n");
+		buffer.append("?address schema:addressLocality	?townName .\n");
 		
-	    try {
-			conn=virtuosoConnection.processConfigFile();
-			
-			if (conn == null) return null;
-
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(qStr);
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				townName = qs.getLiteral("locality").getString();
-				if (townName != null) {
-				    break;
-				}
-			}
-						
-			return townName;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
+		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
+		buffer.append("}");
+		
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
+		if (jsonObj == null) return null;
+		
+		try {
+			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+			if (jsonArr.length() == 0) return null;
+			return jsonArr.getJSONObject(0).getJSONObject("townName").getString("value");
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
-		return townName;
+		
+		return null;
 	}
 
 	/**
-	 * Adds GPS coordinates into preference.
-	 * @param model
-	 * 				The RDF model.
+	 * Gets GPS coordinates.
 	 * @param uID
 	 * 				User identity.
 	 */
 	public static GpsCoordinate getCoordinates(String uID) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
-	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "PREFIX my: <java:eu.threecixty.functions.>\n\n";
-	    qStr += "SELECT  DISTINCT  ?lon ?lat \n";
-	    qStr += " WHERE {\n\n";
-	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root profile:hasUID ?uid .\n";
-	    qStr += "?root vcard:hasAddress ?address . \n";
-	    qStr += "?address vcard:longitude ?lon . \n";
-	    qStr += "?address vcard:latitude ?lat . \n";
-	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "}";
-	    
-		Connection conn = null;
-		Statement stmt = null;
-	    
-		GpsCoordinate coordinate = null;
 		
-	    try {
-			conn=virtuosoConnection.processConfigFile();
-			
-			if (conn == null) return null;
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("PREFIX schema: <http://schema.org/>\n");
+		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
+		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
+		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
+		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(qStr);
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				double lon = qs.getLiteral("lon").getDouble();
-				double lat = qs.getLiteral("lat").getDouble();
-				coordinate = GpsCoordinateUtils.convert(lat, lon);
-				if (coordinate != null) break;
-			}
-						
+		buffer.append("select  ?lon ?lat \n");
+		buffer.append("where {\n");
+		buffer.append("?meroot rdf:type	foaf:Person .\n");
+		buffer.append("?meroot profile:userID	?uid .\n");
+		buffer.append("?meroot schema:homeLocation	?homeLocation .\n");
+		buffer.append("?homeLocation schema:geo	?geo .\n");
+		buffer.append("?geo schema:latitude	?lat .\n");
+		buffer.append("?geo schema:longitude ?lon .\n");
+		
+		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
+		buffer.append("}");
+		
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
+		if (jsonObj == null) return null;
+		
+		try {
+			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+			if (jsonArr.length() == 0) return null;
+			double lat = Double.parseDouble(jsonArr.getJSONObject(0).getJSONObject("lat").getString("value"));
+			double lon = Double.parseDouble(jsonArr.getJSONObject(0).getJSONObject("lon").getString("value"));
+			GpsCoordinate coordinate = new GpsCoordinate(lat, lon);
 			return coordinate;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
-		return coordinate;
+		
+		return null;
 	}
 
 
 	/**
-	 * Gets both Hotel and Place Names.
+	 * Gets Place Names.
 	 * @param model
 	 * @param uID
 	 * @param rating
@@ -264,30 +155,29 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 */
 	public static List <String> getPlaceNamesFromRating(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
-	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += " WHERE {\n\n";
-	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root profile:hasUID ?uid .\n";
-	    qStr += "?root profile:hasPreference ?p1 .\n";
-	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    qStr += "?u1 ?userRating ?s1 .\n";
-	    qStr += "?s1 profile:hasRating ?r1 .\n";
-	    qStr += "?r1 profile:hasUserDefinedRating ?r2 .\n";
-	    qStr += "?r1 profile:hasUserInteractionMode ?mode .\n";
-	    qStr += "?s1 ?ratingDetail ?h1 .\n";
-	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
-	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
-	   // qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
-	    qStr += "}";
-	    
-	    return getPlaceNameFromQuery(qStr);
+		
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("PREFIX schema: <http://schema.org/>\n");
+		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
+		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
+		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
+		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+
+		buffer.append("SELECT  ?name \n");
+		buffer.append("where {\n");
+		buffer.append("?meroot rdf:type	foaf:Person .\n");
+		buffer.append("?meroot profile:userID	?uid .\n");
+		buffer.append("?meroot profile:review	?review .\n");
+		buffer.append("?review schema:reviewRating	?reviewRating .\n");
+		buffer.append("?review schema:itemReviewed	?itemReviewed .\n");
+		buffer.append("?itemReviewed schema:name	?name .\n");
+		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
+		
+		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n");
+		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
+		buffer.append("}");
+		
+		return getPlaceNamesFromQuery(buffer.toString());
 	}
 
 
@@ -299,30 +189,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 * @return
 	 */
 	public static List <String> getPlaceNamesFromNumberOfTimesVisited(String uID, int numberOfTimesVisited) {
-		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
-	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += " WHERE {\n\n";
-	    qStr += "?root a owl:NamedIndividual .\n";
-	    qStr += "?root profile:hasUID ?uid .\n";
-	    qStr += "?root profile:hasPreference ?p1 .\n";
-	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    //qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
-	    qStr += "?u1 ?userRating ?s1 .\n";
-	    qStr += "?s1 profile:hasNumberofTimesVisited ?n1  .\n";
-	    //qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
-	    qStr += "?s1 ?ratingDetail ?h1 .\n";
-	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
-	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
-	    qStr += "}";
-	    
-	    return getPlaceNameFromQuery(qStr);
+		return null;
 	}
 
 	/**
@@ -334,32 +201,32 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 */
 	public static List <String> getPlaceNamesFromRatingOfFriends(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
-	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n";
-	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += " WHERE {\n\n";
-	    qStr += "?meroot a owl:NamedIndividual .\n";
-	    qStr += "?meroot profile:hasUID ?uid .\n";
-	    qStr += "?meroot foaf:knows ?root .\n";
-	    qStr += "?root profile:hasPreference ?p1 .\n";
-	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    qStr += "?u1 ?userRating ?s1 .\n";
-	    qStr += "?s1 profile:hasRating ?r1 .\n";
-	    qStr += "?r1 profile:hasUserDefinedRating ?r2 .\n";
-	    qStr += "?r1 profile:hasUserInteractionMode ?mode .\n";
-	    qStr += "?s1 ?ratingDetail ?h1 .\n";
-	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
-	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "FILTER (?r2 >= " + rating + ") . \n\n";
-	    //qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
-	    qStr += "}";
 
-	    return getPlaceNameFromQuery(qStr);
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("PREFIX schema: <http://schema.org/>\n");
+		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
+		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
+		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
+		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+
+		buffer.append("SELECT  ?name \n");
+		buffer.append("where {\n");
+		buffer.append("?meroot rdf:type	foaf:Person .\n");
+		buffer.append("?meroot profile:userID	?uid .\n");
+		
+		buffer.append("?meroot schema:knows	?knows .\n");
+		
+		buffer.append("?knows profile:review	?review .\n"); // friends' review
+		buffer.append("?review schema:reviewRating	?reviewRating .\n");
+		buffer.append("?review schema:itemReviewed	?itemReviewed .\n");
+		buffer.append("?itemReviewed schema:name	?name .\n");
+		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
+		
+		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n");
+		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
+		buffer.append("}");
+
+	    return getPlaceNamesFromQuery(buffer.toString());
 	}
 
 	/**
@@ -371,82 +238,23 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 */
 	public static List <String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(String uID, int numberOfTimesVisited) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
-	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	    qStr += "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n";
-	    qStr += "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n";
-	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
-	    qStr += "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n";
-	    qStr += "SELECT  DISTINCT  ?placename\n";
-	    qStr += " WHERE {\n\n";
-	    qStr += "?meroot a owl:NamedIndividual .\n";
-	    qStr += "?meroot profile:hasUID ?uid .\n";
-	    qStr += "?meroot foaf:knows ?root .\n";
-	    qStr += "?root profile:hasPreference ?p1 .\n";
-	    qStr +=	"?p1 profile:hasUserEnteredRatings ?u1 .\n";
-	    //qStr += "?u1 profile:hasUserHotelRating ?s1 .\n";
-	    qStr += "?u1 ?userRating ?s1 .\n";
-	    qStr += "?s1 profile:hasNumberofTimesVisited ?n1  .\n";
-	    //qStr += "?s1 profile:hasHotelDetail ?h1 .\n";
-	    qStr += "?s1 ?ratingDetail ?h1 .\n";
-	    qStr += "?h1 profile:hasPlaceName ?placename .\n";
-	    qStr += "FILTER (STR(?uid) = \"" + uID + "\") . \n\n";
-	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
-	    qStr += "}";
-
-	    return getPlaceNameFromQuery(qStr);
+		return null;
 	}
 
-	private static List<String> getPlaceNameFromQuery(String qStr) {
-		
-		Connection conn = null;
-		Statement stmt = null;
+	private static List<String> getPlaceNamesFromQuery(String qStr) {
 	    
 		List <String> placeNames = new ArrayList <String>();
 		
-	    try {
-			conn=virtuosoConnection.processConfigFile();
-			if (conn == null) return null;
-
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(qStr);
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			String placename = null;
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				placename = qs.getLiteral("placename").getString();
-				if (placename != null && !placename.equals("")) {
-					placeNames.add(placename);
-				}
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(qStr);
+		if (jsonObj == null) return placeNames;
+		
+		try {
+			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+			for (int index = 0; index < jsonArr.length(); index++) {
+				placeNames.add(jsonArr.getJSONObject(index).getJSONObject("name").getString("value"));
 			}
-						
-			return placeNames;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
 		return placeNames;
 	}

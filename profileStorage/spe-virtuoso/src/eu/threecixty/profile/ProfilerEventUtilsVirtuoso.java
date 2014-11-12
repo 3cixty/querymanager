@@ -1,16 +1,8 @@
 package eu.threecixty.profile;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
+
 
 
 import eu.threecixty.profile.ProfileManager.StartAndEndDate;
@@ -32,7 +24,7 @@ public class ProfilerEventUtilsVirtuoso {
 	public static List <String> getEventNamesFromEventPreference(String uID) {
 		if (uID == null || uID.equals("")) return null;
 		
-		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
+/*		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 	    buffer.append("SELECT  DISTINCT  ?eventname\n");
@@ -49,7 +41,8 @@ public class ProfilerEventUtilsVirtuoso {
 	    buffer.append("FILTER (STR(?liketype) = \"Event\") . \n\n");
 	    buffer.append("}");
 	    
-	    return getEventNameFromQuery(buffer.toString());
+	    return getEventNameFromQuery(buffer.toString());*/
+		return null;
 	}
 
 	/**
@@ -61,7 +54,7 @@ public class ProfilerEventUtilsVirtuoso {
 		
 		if (uID == null || uID.equals("")) return null;
 		
-		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
+/*		StringBuffer buffer = new StringBuffer("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
 	    buffer.append("SELECT  DISTINCT  ?startDate ?endDate \n");
@@ -133,7 +126,8 @@ public class ProfilerEventUtilsVirtuoso {
 				ex.printStackTrace();
 			}
 		}
-		return startAndEndDates;
+		return startAndEndDates;*/
+		return null;
 	}
 
 
@@ -144,7 +138,7 @@ public class ProfilerEventUtilsVirtuoso {
 	 * @param rating
 	 */
 	public static List<String> getEventNamesFromRating(String uID, float rating) {
-		if (uID == null || uID.equals("")) return null;
+		/*if (uID == null || uID.equals("")) return null;
 	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
@@ -166,7 +160,8 @@ public class ProfilerEventUtilsVirtuoso {
 	    qStr += "}";
 	    
 	    
-	    return getEventNameFromQuery(qStr);
+	    return getEventNameFromQuery(qStr);*/
+		return null;
 	}
 
 	/**
@@ -177,7 +172,7 @@ public class ProfilerEventUtilsVirtuoso {
 	 */
 	public static List <String> getEventNamesFromNumberOfTimesVisited( String uID, int numberOfTimesVisited) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
+	    /*String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
@@ -195,62 +190,8 @@ public class ProfilerEventUtilsVirtuoso {
 	    qStr += "FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n";
 	    qStr += "}";
 
-	    return getEventNameFromQuery(qStr);
-	}
-
-	private static List<String> getEventNameFromQuery(String qStr) {
-		Connection conn = null;
-		Statement stmt = null;
-	    
-		List <String> eventNames = new ArrayList <String>();
-		
-	    try {
-			conn=virtuosoConnection.processConfigFile();
-			
-			if (conn == null) return null;
-
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(qStr);
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			
-			String eventname = null;
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				eventname = qs.getLiteral("eventname").getString();
-				if (eventname != null && !eventname.equals("")) {
-					eventNames.add(eventname);
-				}
-			}
-			
-			return eventNames;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
-
-	    return eventNames;
+	    return getEventNameFromQuery(qStr);*/
+		return null;
 	}
 
 	/**
@@ -262,7 +203,7 @@ public class ProfilerEventUtilsVirtuoso {
 	 */
 	public static List <String> getEventNamesFromRatingOfFriends(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
-	    String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
+	   /* String qStr = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
 	    qStr += "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
 	    qStr += "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
 	    qStr += "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n";
@@ -285,7 +226,8 @@ public class ProfilerEventUtilsVirtuoso {
 	    qStr += "FILTER (str(?mode) = \"Visited\") . \n\n";
 	    qStr += "}";
 	    
-	    return getEventNameFromQuery(qStr);
+	    return getEventNameFromQuery(qStr);*/
+		return null;
 	}
 
 	/**
@@ -297,7 +239,7 @@ public class ProfilerEventUtilsVirtuoso {
 	 */
 	public static List <String> getEventNamesFromNumberOfTimesVisitedOfFriends(String uID, int numberOfTimesVisited) {
 		if (uID == null || uID.equals("")) return null;
-		StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
+		/*StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 	    buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
 	    buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
@@ -317,7 +259,8 @@ public class ProfilerEventUtilsVirtuoso {
 	    buffer.append("FILTER (?n1 >= " + numberOfTimesVisited + ") . \n\n");
 	    buffer.append("}");
 
-	   return getEventNameFromQuery(buffer.toString());
+	   return getEventNameFromQuery(buffer.toString());*/
+		return null;
 	}
 
 	/**
@@ -328,7 +271,7 @@ public class ProfilerEventUtilsVirtuoso {
 	public static List <String> getEventNamesWhichFriendsLikeToVisit(String uID) {
 		if (uID == null || uID.equals("")) return null;
 		
-		StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
+		/*StringBuffer buffer = new StringBuffer("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 	    buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    buffer.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
 	    buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
@@ -350,7 +293,8 @@ public class ProfilerEventUtilsVirtuoso {
 	    buffer.append("}");
 
 
-	    return getEventNameFromQuery(buffer.toString());
+	    return getEventNameFromQuery(buffer.toString());*/
+		return null;
 	}
 
 	

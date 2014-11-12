@@ -1,17 +1,5 @@
 package eu.threecixty.profile;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-
 
 
 /**
@@ -32,30 +20,7 @@ public class PreferencesUtilsVirtuoso {
 	 * @return
 	 */
 	public static int getMinimumNumberOfTimesVisited(String uid) {
-		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
-		
-		StringBuffer buffer = new StringBuffer();
-		
-		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
-		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
-		buffer.append("SELECT  DISTINCT  ?numberOfTimes \n");
-		buffer.append(" WHERE {\n\n");
-		buffer.append("?root a owl:NamedIndividual . \n");
-		buffer.append("?root profile:hasUID ?uid . \n");
-		buffer.append("?root profile:hasPreference ?p1 . \n");
-		buffer.append("?p1 profile:hasUserEnteredRatings ?u1 . \n");
-		buffer.append("?u1 ?predicate ?s1 . \n");
-		buffer.append("?s1 profile:hasNumberofTimesVisited ?numberOfTimes  . \n");
-		buffer.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
-		buffer.append("}");
-		
-		int minNumberOfTimes = (int) findMinimumValue(buffer.toString(), "numberOfTimes");
-		
-		if (minNumberOfTimes == Integer.MAX_VALUE) {
-			return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
-		}
-		
-		return minNumberOfTimes;
+		return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
 	}
 
 	/**
@@ -66,7 +31,7 @@ public class PreferencesUtilsVirtuoso {
 	 */
 	public static float getMinimumScoreRated(String uid) {
 		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_SCORE_RATED;
-		StringBuffer buffer = new StringBuffer();
+/*		StringBuffer buffer = new StringBuffer();
 		buffer.append("PREFIX schema: <http://schema.org/>\n");
 		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
 		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
@@ -122,7 +87,8 @@ public class PreferencesUtilsVirtuoso {
 			return DEFAULT_MINIMUM_SCORE_RATED;
 		}
 		
-		return ret;
+		return ret;*/
+		return DEFAULT_MINIMUM_SCORE_RATED;
 	}
 
 	/**
@@ -132,30 +98,7 @@ public class PreferencesUtilsVirtuoso {
 	 * @return
 	 */
 	public static int getMinimumNumberOfTimesVisitedForFriends(String uid) {
-		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
-		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
-		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
-		buffer.append("SELECT  DISTINCT  ?numberOfTimes \n");
-		buffer.append("WHERE {\n\n");
-	    buffer.append("?meroot a owl:NamedIndividual .\n");
-	    buffer.append("?meroot profile:hasUID ?uid .\n");
-	    buffer.append("?meroot foaf:knows ?root .\n");
-		buffer.append("?root profile:hasPreference ?p1 . \n");
-		buffer.append("?p1 profile:hasUserEnteredRatings ?u1 . \n");
-		buffer.append("?u1 ?predicate ?s1 . \n");
-		buffer.append("?s1 profile:hasNumberofTimesVisited ?numberOfTimes  . \n");
-		buffer.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
-		buffer.append("}");
-		
-		int minNumberOfTimes = (int) findMinimumValue(buffer.toString(), "numberOfTimes");
-		
-		if (minNumberOfTimes == Integer.MAX_VALUE) {
-			return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
-		}
-		
-		return minNumberOfTimes;
+		return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
 	}
 
 	/**
@@ -165,92 +108,54 @@ public class PreferencesUtilsVirtuoso {
 	 * @return
 	 */
 	public static float getMinimumScoreRatedForFriends(String uid) {
-		if (uid == null || uid.equals("")) return DEFAULT_MINIMUM_SCORE_RATED;
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
+		
+/*		StringBuffer buffer = new StringBuffer();
+		buffer.append("PREFIX schema: <http://schema.org/>\n");
+		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
+		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
 		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
 		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
-		buffer.append("SELECT  DISTINCT  ?scoreRated \n"); 
-		buffer.append("WHERE {\n\n");
-	    buffer.append("?meroot a owl:NamedIndividual .\n");
-	    buffer.append("?meroot profile:hasUID ?uid .\n");
-	    buffer.append("?meroot foaf:knows ?root .\n");
-		buffer.append("?root profile:hasPreference ?p1 . \n");
-		buffer.append("?p1 profile:hasUserEnteredRatings ?u1 . \n");
-		buffer.append("?u1 ?predicate ?s1 . \n");
-		buffer.append("?s1 profile:hasRating ?r1 .\n");
-		buffer.append("?r1 profile:hasUserDefinedRating ?scoreRated .\n");
-		buffer.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
-		buffer.append("}");
-		
-		float minRated = (float) findMinimumValue(buffer.toString(), "scoreRated");
 
-		if (minRated == Integer.MAX_VALUE) {
+		buffer.append("select  ?ratingValue\n");
+		buffer.append("where {\n");
+		buffer.append("?meroot rdf:type	foaf:Person .\n");
+		buffer.append("?meroot profile:userID	?uid .\n");
+		buffer.append("?meroot schema:knows	?friends .\n");
+		buffer.append("?friends profile:review	?review .\n");
+		buffer.append("?review schema:reviewRating	?reviewRating .\n");
+		
+		
+		//buffer.append("?meroot profile:review	?review .\n");
+		buffer.append("?x a <http://ontologydesignpatterns.org/ont/dul/DUL.owl#Place> .\n");
+		buffer.append("?x schema:review ?review .\n");
+		buffer.append("?x schema:name ?name .\n");
+		buffer.append("?review schema:creator ?creator .\n");
+		//buffer.append("?creator schema:name ?creatorName .\n");
+		buffer.append("?creator schema:url ?creatorURI.\n");
+		buffer.append("?review schema:reviewRating ?rating .\n");
+		buffer.append("?rating schema:ratingValue ?ratingValue.\n");
+		buffer.append("?x dcterms:source <http://www.google.com> .\n");
+		buffer.append("FILTER (fn:ends-with(STR(?creatorURI),\"" + uid + "\")) .\n");
+		buffer.append("} \n ORDER BY ?ratingValue \n LIMIT 1");
+		
+		float ret = Float.MAX_VALUE;
+		
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
+		if (jsonObj == null) return DEFAULT_MINIMUM_SCORE_RATED;
+		
+		try {
+			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+			if (jsonArr.length() == 0) return DEFAULT_MINIMUM_SCORE_RATED;
+			ret = Float.parseFloat((jsonArr.getJSONObject(0)).getJSONObject("ratingValue").getString("value"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		if (ret == Float.MAX_VALUE) {
 			return DEFAULT_MINIMUM_SCORE_RATED;
 		}
-		
-		return minRated;
-	}
-
-	/**
-	 * Finds minimum value of a given variable name from UserProfile.
-	 * @param queryStr
-	 * @param varName
-	 * @return
-	 */
-	private static double findMinimumValue(String queryStr, String varName) {
-		double ret = Integer.MAX_VALUE;
-		
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=virtuosoConnection.processConfigFile();
-			
-			if (conn == null) return 0;
-
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(queryStr);
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-				    double d = qs.getLiteral(varName).getDouble();
-				    if (d < ret) ret = d;
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			return ret;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
-	
-		return ret;
+		return ret;*/
+		return DEFAULT_MINIMUM_SCORE_RATED;
 	}
 	
 	/**
