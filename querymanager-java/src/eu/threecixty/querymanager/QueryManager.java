@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.graph.Triple;
@@ -96,7 +95,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	
 	@Override
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
-			EventMediaFormat format, boolean augmentedQueryIncluded) {
+			EventMediaFormat format) {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQueryStr = "";
@@ -114,10 +113,10 @@ import eu.threecixty.profile.oldmodels.Rating;
 			
 			StringBuilder sb = new StringBuilder();
 			
-			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, augmentedQueryIncluded, sb);
+			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, sb);
 			if (ok) return sb.toString();
 			
-			hasElementsForBindings(originalQueryStr, format, formatType, augmentedQueryIncluded, sb);
+			hasElementsForBindings(originalQueryStr, format, formatType, sb);
 			
 			return sb.toString();
 
@@ -147,7 +146,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		StringBuilder builder = new StringBuilder();
 		try {
-			hasElementsForBindings(query, format, formatType, false, builder);
+			hasElementsForBindings(query, format, formatType, builder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -162,7 +161,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @throws IOException 
 	 */
 	private static boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
-			boolean augmentedQueryIncluded, StringBuilder sb) throws IOException {
+			StringBuilder sb) throws IOException {
 		sb.setLength(0);
 		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
 		urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
@@ -177,25 +176,15 @@ import eu.threecixty.profile.oldmodels.Rating;
 		}
 		input.close();
 		boolean ok = true;
-		if (augmentedQueryIncluded) {
-			if (EventMediaFormat.JSON == format) {
-				// check if there is one element at least
-				JSONObject json = new JSONObject(sb.toString());
-				if (json.getJSONObject("results").getJSONArray("bindings").length() < 1) {
-					ok = false;
-				}
-				
-				int lastIndex = sb.lastIndexOf("}");
-				if (lastIndex >= 0) {
-					JSONArray jsonArr = new JSONArray();
-					JSONObject jsonObj = new JSONObject();
-					jsonObj.put("AugmentedQuery", query);
-					jsonArr.put(jsonObj);
-					String augmentedQueryJson = ", " + "\"AugmentedQueries\": " + jsonArr.toString();
-					sb.insert(lastIndex, augmentedQueryJson);
-				}
+
+		if (EventMediaFormat.JSON == format) {
+			// check if there is one element at least
+			JSONObject json = new JSONObject(sb.toString());
+			if (json.getJSONObject("results").getJSONArray("bindings").length() < 1) {
+				ok = false;
 			}
 		}
+
 		return ok;
 	}
 
