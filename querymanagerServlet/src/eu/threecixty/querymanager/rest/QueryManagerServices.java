@@ -98,7 +98,7 @@ public class QueryManagerServices {
 				IProfiler profiler = new Profiler(user_id);
 				QueryManager qm = new QueryManager(user_id);
 
-				String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true);
+				String result = executeQuery(profiler, qm, query, filter, eventMediaFormat);
 
 				// log calls
 
@@ -355,7 +355,7 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getGroupBy()),
 					(pair2 == null ? null : pair2.getValue()));
 
-			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
+			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
@@ -398,7 +398,7 @@ public class QueryManagerServices {
 
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
-			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false);
+			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
@@ -479,7 +479,7 @@ public class QueryManagerServices {
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter, EventMediaFormat eventMediaFormat, boolean augmentedQueryIncluded) {
+			String query, String filter, EventMediaFormat eventMediaFormat) {
 
 		if (allPrefixes == null) {
 			allPrefixes = getAllPrefixes() + " ";
@@ -498,7 +498,7 @@ public class QueryManagerServices {
 
 		qm.setQuery(placeQuery);
 		
-		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat, augmentedQueryIncluded);
+		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat);
 		return  result;
 	}
 
