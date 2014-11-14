@@ -308,6 +308,7 @@ public class OAuthWrappers {
 	 */
 	public static boolean validateUserAccessToken(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return false;
+		if (!OAuthModelsUtils.existUserAccessToken(accessToken)) return false;
 		return tokenInfo(accessToken) != null;
 	}
 
