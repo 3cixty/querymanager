@@ -307,7 +307,7 @@ public class TrayServices {
 	
 	private void checkPermission(String token) throws ThreeCixtyPermissionException {
 		AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(token);
-		if (!accessToken.getScopeNames().contains(WISH_LIST_SCOPE_NAME)) {
+		if (accessToken == null || !accessToken.getScopeNames().contains(WISH_LIST_SCOPE_NAME)) {
 		    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
 		}
 	}
