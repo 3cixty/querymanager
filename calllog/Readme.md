@@ -18,15 +18,15 @@ To display call logs `callLogService` is used.
 
 The 3cixty Admin sign in into the platform using baseurl+`/appkeyadmin_login.jsp` and provides his credentials. The default username is `3cixtyAdmin` and password is `*3cixtyI$InMilan*`.
 
-On a successful sign in the Admin can view the dashboard page with features listed below
+On a successful sign in, the Admin can **ONLY** view the dashboard page with features listed below
 
-- uses Google Visualization api and google charts
+- use of Google Visualization api and google charts
 - slider to chose Request/day for an app
 - highlight on table data
 - data view on pie chart 
 - selection based on number of calls made
-- when an item is selected the pieChart, it changes the areachart.
-- availability to the admin of 3cixty.
+- when an item is selected in the pieChart, it changes the areachart.
+- availability limited to the admin of 3cixty.
 - hover over to see the tooltip.
 - logout feature.
 
