@@ -43,6 +43,8 @@ public class CallLoggingConstants {
 	public static final String UNAUTHORIZED = "unauthorized user";
 	public static final String SUCCESSFUL = "Successful";
 	public static final String FAILED = "Failed";
+	public static final String ILLEGAL_QUERY = "Illegal query to access to private graph";
+	public static final String UNPARSED_QUERY = "Unparsed query";
 	
 	public static final String INVALID_APP_KEY = "Invalid app key: ";
 	

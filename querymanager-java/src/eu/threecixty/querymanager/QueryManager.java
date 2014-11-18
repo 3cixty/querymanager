@@ -36,6 +36,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
 	 //private static final String EVENTMEDIA_URL_PREFIX = "http://3cixty.eurecom.fr/sparql?default-graph-uri=&query=";
 	 private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
+	 private static final String PREFIX_PROFILE_ADDED = "PREFIX profile:<http://www.eu.3cixty.org/profile#> ";
 
 	 /**Original query*/
 	 private ThreeCixtyQuery originalQuery;
@@ -344,13 +345,14 @@ import eu.threecixty.profile.oldmodels.Rating;
 		}
 	}
 
-	private String removePrefixes(String query) {
+	public static String removePrefixes(String query) {
+		if (query == null) return null;
 		int lastPrefixIndex = query.lastIndexOf("PREFIX");
 		if (lastPrefixIndex < 0) return query;
 		int index = query.indexOf('\n', lastPrefixIndex);
 		if (index >= lastPrefixIndex) {
 			return query.substring(index + 2);
 		}
-		return query;
+		return PREFIX_PROFILE_ADDED + query;
 	}
 }

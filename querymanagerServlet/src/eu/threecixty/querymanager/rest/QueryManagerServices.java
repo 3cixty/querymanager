@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
 
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
@@ -30,6 +31,7 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.querymanager.EventMediaFormat;
+import eu.threecixty.querymanager.FromClauseUtils;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
@@ -98,27 +100,35 @@ public class QueryManagerServices {
 				IProfiler profiler = new Profiler(user_id);
 				QueryManager qm = new QueryManager(user_id);
 
-				String result = executeQuery(profiler, qm, query, filter, eventMediaFormat);
+				try {
+					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat);
 
-				// log calls
+					// log calls
 
-				if (filter == null) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				} else if (filter.equals("location")) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				} else if (filter.equals("enteredrating")) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				} else if (filter.equals("preferred")) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				} else if (filter.equals("friends")) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				} else {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					if (filter == null) {
+						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					} else if (filter.equals("location")) {
+						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					} else if (filter.equals("enteredrating")) {
+						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					} else if (filter.equals("preferred")) {
+						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					} else if (filter.equals("friends")) {
+						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					} else {
+						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					}
+
+
+					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+				} catch (ThreeCixtyPermissionException tcpe) {
+					CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY + query);
+					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity(tcpe.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
 				}
-
-
-				return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
-						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 			}
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
@@ -146,13 +156,32 @@ public class QueryManagerServices {
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 			if (eventMediaFormat == null || query == null) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 						.entity("The format is not supported or query is null")
 						.type(MediaType.TEXT_PLAIN)
-						.build());
+						.build();
 			} else {
 
-				String result = QueryManager.executeQuery(query, eventMediaFormat);
+				Query jenaQuery = createJenaQuery(query);
+				if (jenaQuery == null) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNPARSED_QUERY);
+					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+							.entity(CallLoggingConstants.UNPARSED_QUERY)
+							.type(MediaType.TEXT_PLAIN)
+							.build();
+				}
+				if (FromClauseUtils.containFromProfile(jenaQuery)) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY + " " + query);
+					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity(CallLoggingConstants.ILLEGAL_QUERY)
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
+				FromClauseUtils.addFromGraphs(jenaQuery);
+				
+				String queryToBeExecuted = QueryManager.removePrefixes(jenaQuery.toString());
+				
+				String result = QueryManager.executeQuery(queryToBeExecuted, eventMediaFormat);
 
 				// log calls
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -162,10 +191,10 @@ public class QueryManagerServices {
 			}
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 			        .entity("The key is invalid '" + key + "'")
 			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			        .build();
 		}
 	}
 	
@@ -355,9 +384,17 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getGroupBy()),
 					(pair2 == null ? null : pair2.getValue()));
 
-			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+			try {
+				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (ThreeCixtyPermissionException tcpe) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(tcpe.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -398,9 +435,17 @@ public class QueryManagerServices {
 
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
-			String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+			try {
+				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (ThreeCixtyPermissionException tcpe) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY );
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(tcpe.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -479,13 +524,14 @@ public class QueryManagerServices {
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter, EventMediaFormat eventMediaFormat) {
+			String query, String filter, EventMediaFormat eventMediaFormat) throws ThreeCixtyPermissionException {
 
-		if (allPrefixes == null) {
-			allPrefixes = getAllPrefixes() + " ";
-		}
-
-		Query jenaQuery = qm.createJenaQuery(allPrefixes + query);
+		Query jenaQuery = createJenaQuery(query);
+		
+		if (FromClauseUtils.containFromProfile(jenaQuery)) throw new ThreeCixtyPermissionException(
+				"Illegal to make a query to get private information");
+		
+		FromClauseUtils.addFromGraphs(jenaQuery);
 		
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);
@@ -570,6 +616,15 @@ public class QueryManagerServices {
 		return query.toString();
 	}
 
+	private Query createJenaQuery(String queryStr) {
+		if (queryStr == null) return null;
+		if (allPrefixes == null) {
+			allPrefixes = getAllPrefixes() + " ";
+		}
+
+		Query jenaQuery = QueryFactory.create(allPrefixes + queryStr);
+		return jenaQuery;
+	}
 
 	/**
      * To validate the sparql query, we need prefixes. These prefixes are same as those used by EventMedia.
