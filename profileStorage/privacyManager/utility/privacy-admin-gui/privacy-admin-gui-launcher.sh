@@ -1,0 +1,2 @@
+#!/bin/bash
+java -classpath "./../../distribution/libs/privacymanager-1.2.jar;privacy-admin-gui-1.2.jar" org.theresis.humanization.privacy.admin.view.AdminView "../../distribution/res/3CixtyPrivacyAuthority.properties"

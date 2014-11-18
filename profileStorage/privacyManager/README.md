@@ -9,18 +9,19 @@ Privacy Manager will be the 3cixty infrastructure component holding the private 
 ### Current features
   
 * Storage and retrieval of user profiles
-* Two programs test that show how to use the profile storage APIs
+* Five programs test that show how to use the profile storage and privacy APIs
 * Application and user privacy contract definition
 * Implementation of the privacy contract request api that allow to request a privacy contract certification, update a privacy contract and get the current status of the request
 * Implementation of storage of the user privacy contract
 * Implementation of privacy management during user profiles retrieval
-* An WEB application that allows to generate privacy contract for application with a simple interface 
+* A WEB application that allows to generate privacy contract for application with a simple interface
+* A GUI for the privacy certification authority, in order to accept or refuse privacy contracts
 
 # Last Release Version
 ----------
 
 #### Identification
-Privacy Manager version 1.1
+Privacy Manager version 1.2
 
 #### Maven
 In order to use the module in other Maven projects add the following dependency in the project's pom.xml:
@@ -28,12 +29,43 @@ In order to use the module in other Maven projects add the following dependency 
      <dependency>
     	<groupId>eu.3cixty.privacy</groupId>
     	<artifactId>privacymanager</artifactId>
-    	<version>1.1</version>
+    	<version>1.2</version>
      </dependency>
    
 
 # Changes log
 ----------
+
+## Version 1.2
+This version contains the modifications required by INRIA during the last integration meeting:
+
+ -  groups definitions restricted to `SELF` (data access for a user is therefore limited to its own data)
+ -  the `getAllUsersIDs` API is callable in an anonymous session (no user authentification required)
+ -  all certification cycle handling is performed based on the `application id` (aka the app key)  
+ -  new API `getCertificate()` for accessing the generated certificate
+ -  the definition of the property pathes in the privacy contract, now contains an `additional attribute "label"`, which contain a textual description that can be presented to the user for approval
+ -  a `privacy certification authority application` is provided to manage privacy contracts acceptance or refusal
+ 
+Other modifications :
+
+ -  re-organization of some APIs packaging (session creation and profile manager access)
+ -  the privacy contract generator has been updated to cope with the new xsd definition 
+
+### How to launch the Privacy Authority GUI
+
+You can use the `privacy-admin-gui-launcher.bat` or `privacy-admin-gui-launcher.sh` scripts that are provided in the `privacyManager\utility\privacy-admin-gui` folder.
+
+The program needs one argument : the path of the properties file used to configure the privacy DB (see `3CixtyPrivacyAuthority.properties`).
+
+On program startup, the private key and certificate of the privacy autority are required in order to generate to sign the CSR in case of acceptance of a privacy contract request.
+
+### Creation of an anonymous session
+
+		ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+		Service service = profileFactory.getService( "ExploreMI 360", "1.0");
+		Session 
+			session = profileFactory.getSession( profileFactory.getAuthenticator(service, null) );
+
 
 ## Version 1.1
 

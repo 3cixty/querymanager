@@ -11,17 +11,14 @@ import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.theresis.humanization.authen.Service;
 import org.theresis.humanization.authen.Session;
-import org.theresis.humanization.authen.simple.SimpleSessionManager;
 import org.theresis.humanization.conf.ProfileStorageConf;
 import org.theresis.humanization.datastorage.ProfileManager;
-import org.theresis.humanization.privacy.PrivacyCertAuthorityRequestor;
-import org.theresis.humanization.privacy.PrivacyCertAuthorityTool;
 import org.theresis.humanization.privacy.PrivacyContractFactory;
 import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
 import org.theresis.humanization.privacy.PrivacyDBInitialize;
 import org.theresis.humanization.privacy.conf.PrivacyAuthorityConf;
 import org.theresis.humanization.privacy.generated.UserPrivacyContract;
-import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
+import org.theresis.humanization.profilestore.ThreeCixtyFactory;
 
 @RunWith(JUnit4.class)
 public class DataStorageTest {
@@ -37,21 +34,28 @@ public class DataStorageTest {
 	@Before
 	public void setUp() throws Exception {
 	
+		System.out.println( " -------- setUp -------- ");
+		
 		// the privacy DB
 		ProfileStorageConf.setPropertyFile(propertyFilePath);
 		PrivacyAuthorityConf.setPropertyFile( privacyPropertyFilePath );
 		PrivacyDBInitialize.resetAndInit("toto", "toto", "toto", "toto");
 		FileInputStream is = new FileInputStream( "src/test/resources/UPC_TestApp.xml" );
 		UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
-		PrivacyCertAuthorityRequestor.getKaaStorage().store( 	userID1, 
-															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+		System.out.println("-- coucou1");
+		PrivacyContractStorageFactory.getInstance().store( 	userID1, 
+															appName, 
 															upc);
-		PrivacyCertAuthorityRequestor.getKaaStorage().store( 	userID2, 
-															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+		System.out.println("-- coucou2");
+		PrivacyContractStorageFactory.getInstance().store( 	userID2, 
+															appName, 
 															upc);
+		System.out.println("-- coucou3");
+		ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+		System.out.println("-- coucou4");
 		
-		SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
 		profileManager = profileFactory.getProfileManager( propertyFilePath );		
+		System.out.println( " -------- end setUp -------- ");
 	}
 
 	@Test
@@ -60,9 +64,9 @@ public class DataStorageTest {
 	
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion);
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, null) );
 
 			Set<String> users = profileManager.getAllUsersIDs(session);
 
@@ -81,9 +85,9 @@ public class DataStorageTest {
 		try {
 
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 
 			String rawProfile = profileManager.getProfile(session, "dummy" );
 			assertTrue( rawProfile.isEmpty() );
@@ -99,9 +103,9 @@ public class DataStorageTest {
 		try {
 
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 
 			String profileResult = profileManager.getProfile(session, userID1 );
 			assertNotNull(profileResult);
@@ -117,11 +121,12 @@ public class DataStorageTest {
 	@Test
 	public void getUserProfile() {
 		
+		System.out.println("--------- getUserProfile ---------");
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 			
 			String jsonProfile = profileManager.getProfile( session, userID1 );		
 			System.out.println(jsonProfile);
@@ -130,7 +135,8 @@ public class DataStorageTest {
 		} catch (Exception e) {
 			fail( e.getMessage() );
 		}
-	}
+		System.out.println("--------- end  getUserProfile ---------");
+			}
 	
 	@Test
 	public void createUserProfile() {
@@ -165,14 +171,14 @@ public class DataStorageTest {
 			// declare a contract
 			FileInputStream is = new FileInputStream( "src/test/resources/UPC_TestApp.xml" );
 			UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
-			PrivacyCertAuthorityRequestor.getKaaStorage().store( 	newUserID, 
-																PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+			PrivacyContractStorageFactory.getInstance().store( 	newUserID, 
+																appName, 
 																upc);
 			
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 
 			profileManager.mergeProfile(session, newUserID, newSerialProfile);
 
@@ -213,9 +219,9 @@ public class DataStorageTest {
 					"}";		
 			
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 
 			profileManager.mergeProfile(session, userID2, newSerialProfile);
 
@@ -250,9 +256,9 @@ public class DataStorageTest {
 					"}";
 		
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678",  null) );
 
 			profileManager.replaceProfile(session, userID2, newSerialProfile);		
 			
@@ -272,9 +278,9 @@ public class DataStorageTest {
 		try {
 
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 			
 			String result = profileManager.getProfile(session, userID1);
 			assertNotNull(result);

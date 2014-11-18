@@ -13,19 +13,16 @@ import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.theresis.humanization.authen.Service;
 import org.theresis.humanization.authen.Session;
-import org.theresis.humanization.authen.simple.SimpleSessionManager;
 import org.theresis.humanization.conf.ProfileStorageConf;
 import org.theresis.humanization.datastorage.ProfileException;
 import org.theresis.humanization.datastorage.ProfileManager;
 import org.theresis.humanization.datastorage.ValuedProperty;
-import org.theresis.humanization.privacy.PrivacyCertAuthorityRequestor;
-import org.theresis.humanization.privacy.PrivacyCertAuthorityTool;
 import org.theresis.humanization.privacy.PrivacyContractFactory;
 import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
 import org.theresis.humanization.privacy.PrivacyDBInitialize;
 import org.theresis.humanization.privacy.conf.PrivacyAuthorityConf;
 import org.theresis.humanization.privacy.generated.UserPrivacyContract;
-import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
+import org.theresis.humanization.profilestore.ThreeCixtyFactory;
 
 @RunWith(JUnit4.class)
 public class PropertyPathTest {
@@ -47,14 +44,14 @@ public class PropertyPathTest {
 		PrivacyDBInitialize.resetAndInit("toto", "toto", "toto", "toto");
 		FileInputStream is = new FileInputStream( "src/test/resources/UPC_TestApp.xml" );
 		UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
-		PrivacyCertAuthorityRequestor.getKaaStorage().store(userID1, 
-															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+		PrivacyContractStorageFactory.getInstance().store(	userID1, 
+															appName, 
 															upc);
-		PrivacyCertAuthorityRequestor.getKaaStorage().store(userID2, 
-															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+		PrivacyContractStorageFactory.getInstance().store(	userID2, 
+															appName, 
 															upc);
 		
-		SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+		ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
 		profileManager = profileFactory.getProfileManager( propertyFilePath );		
 	}
 
@@ -64,9 +61,9 @@ public class PropertyPathTest {
 		try {
 
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion);
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID1,  null) );
 			
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference/:hasPlaceDetailPreference/:hasNatureOfPlace";
@@ -117,9 +114,9 @@ public class PropertyPathTest {
 		try {
 
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID2,  null) );
 			
 			String hasCountryName = "vcard:hasAddress/vcard:country-name";
 			List<String> propertyPaths = new ArrayList<String>();
@@ -143,6 +140,7 @@ public class PropertyPathTest {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
+		
 	}
 
 	
@@ -151,9 +149,9 @@ public class PropertyPathTest {
 
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference*";
@@ -191,9 +189,9 @@ public class PropertyPathTest {
 
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID1,  null) );
 
 			String hasGenderPath = ":hasGender";
 
@@ -223,9 +221,9 @@ public class PropertyPathTest {
 
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID1, null) );
 
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference/:hasPlaceDetailPreference/:hasNatureOfPlace";
@@ -278,9 +276,9 @@ public class PropertyPathTest {
 
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID1, null) );
 
 			String hasGenderPath = ":hasEmail";
 
@@ -315,9 +313,9 @@ public class PropertyPathTest {
 		try {
 
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 
 			String hasGenderPath = ":hasGender";
 
@@ -342,9 +340,9 @@ public class PropertyPathTest {
 		try {
 
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID1,  null) );
 
 			String hasGenderPath = ":hasGender";
 			String hasPlacePath = ":hasPreference/:hasPlacePreference/:hasPlaceDetailPreference/:hasNatureOfPlace";

@@ -65,15 +65,25 @@ Example with the profile.ttl :
  - An application that wants to access to the accountName in a Tray :
        
 profile:trayElement/profile:hasAccount/foaf:accountName
-
-pvc:type
- - 2 values available : optional or mandatory
- - the default value is the 'optional' value</xs:documentation>
+</xs:documentation>
 												</xs:annotation>
 												<xs:complexType>
 													<xs:simpleContent>
 														<xs:extension base="xs:string">
-															<xs:attribute ref="pvc:type" use="optional" default="optional"/>
+															<xs:attribute ref="pvc:type" use="optional" default="optional">
+																<xs:annotation>
+																	<xs:documentation> 2 values available : 
+ - optional : the returned value could be empty
+ - mandatory : the returned value must not be empty
+
+The default value is the 'optional' value</xs:documentation>
+																</xs:annotation>
+															</xs:attribute>
+															<xs:attribute name="label" type="xs:string" use="required">
+																<xs:annotation>
+																	<xs:documentation>String to be displayed to the user, that explains clearly the  accessed data by the property path</xs:documentation>
+																</xs:annotation>
+															</xs:attribute>
 														</xs:extension>
 													</xs:simpleContent>
 												</xs:complexType>
@@ -102,7 +112,7 @@ pvc:type
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
-			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="2.0"/>
+			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="3.0"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:attribute name="type">
