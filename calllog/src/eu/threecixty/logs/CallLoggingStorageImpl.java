@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import eu.threecixty.db.DBConnection;
 import eu.threecixty.db.ThreeCixyDBException;
 
@@ -22,9 +24,16 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 	private static final String TABLE_NAME = "logcall";
 	private static final String APPKEY_TABLE_NAME = "3cixty_app";
 
+	 private static final Logger LOGGER = Logger.getLogger(
+			 CallLoggingStorageImpl.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	private boolean firstTime = true;
 	
 	public boolean save(CallLogging logging) {
+		logInfo("Before logging call to DB");
 		if (logging == null) return false;
 		try {
 			createTableWhenNecessary();
@@ -62,7 +71,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 			e.printStackTrace();
 			
 		}
-		
+		logInfo("After logging call to DB");
 		return false;
 	}
 
@@ -191,4 +200,12 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		}
 	}
 
+	/**
+	 * Logs message at Info level
+	 * @param msg
+	 */
+	private static void logInfo(String msg) {
+		if (!DEBUG_MOD) return;
+		LOGGER.info(msg);
+	}	
 }

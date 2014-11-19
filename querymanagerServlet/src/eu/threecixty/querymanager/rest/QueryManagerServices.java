@@ -20,6 +20,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -45,6 +47,12 @@ import eu.threecixty.querymanager.ThreeCixtyQuery;
 @Path("/" + Constants.PREFIX_NAME)
 public class QueryManagerServices {
 	private static final String LOCALITY_TRIPLES = "?event lode:atPlace ?place . \n ?place vcard:adr ?address . \n ?address vcard:locality ?locality .\n";
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 QueryManagerServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private static final Map <String, String> groupTriples = new HashMap <String, String>();
 	
@@ -80,9 +88,11 @@ public class QueryManagerServices {
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
+		logInfo("Start augmentAndExecute method ----------------------");
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			logInfo("Found a valid access token");
 			String user_id =  userAccessToken.getUid();
 			if ("on".equals(debug)) {
 				user_id = "107217557295681360318";
@@ -97,14 +107,16 @@ public class QueryManagerServices {
 						.type(MediaType.TEXT_PLAIN)
 						.build());
 			} else {
+				logInfo("Before reading user profile");
 				IProfiler profiler = new Profiler(user_id);
 				QueryManager qm = new QueryManager(user_id);
 
 				try {
+					logInfo("Before augmenting and executing a query");
 					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat);
 
 					// log calls
-
+					
 					if (filter == null) {
 						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 					} else if (filter.equals("location")) {
@@ -118,7 +130,6 @@ public class QueryManagerServices {
 					} else {
 						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 					}
-
 
 					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
 							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
@@ -151,8 +162,10 @@ public class QueryManagerServices {
 	@Path("/executeQuery")
 	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
 			@QueryParam("format") String format, @QueryParam("query") String query) {
+		logInfo("Start executeQuery method ----------------------");
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
+			logInfo("App key is validated");
 			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 			if (eventMediaFormat == null || query == null) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
@@ -652,6 +665,15 @@ public class QueryManagerServices {
 		}
     	return "";
     }
+    
+	/**
+	 * Logs message at Info level
+	 * @param msg
+	 */
+	private static void logInfo(String msg) {
+		if (!DEBUG_MOD) return;
+		LOGGER.info(msg);
+	}
 
     public class KeyValuePair {
 

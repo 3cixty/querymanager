@@ -197,6 +197,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 				ok = false;
 			}
 		}
+		
+		logInfo("Finished executing the query on Virtuoso: ok = " + ok);
 
 		return ok;
 	}
