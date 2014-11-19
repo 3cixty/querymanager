@@ -27,6 +27,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 
 	public void contextInitialized(ServletContextEvent context) {
 	    String realPath = context.getServletContext().getRealPath("/");
+	    System.setProperty("contextPath", context.getServletContext().getContextPath());
 	    String pathTo3CixtyDataFolder =  new File(new File(realPath).getParent()).getParent()
 	    		+ File.separatorChar + FOLDER_ROOT;
 	    Configuration.setPath(realPath);
