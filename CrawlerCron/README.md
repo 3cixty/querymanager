@@ -19,10 +19,10 @@ To integrate this module on your server, make sure that Movesmarter server has t
 
 - Private information of the user like `knows` is extracted when the user logs in into 3cixty platform. To get `knows` users should authenticate the app to get list of people in a `circle` information. To do so, at the time of login a user should click `Edit list`. 
 
-![alt tag](https://github.com/3cixty/profiler/blob/scrapper/CrawlerCron/images/login.png)
+![alt tag](https://github.com/3cixty/profiler/blob/virtuosoVersionOfRDF/CrawlerCron/images/login.png)
  
 - Then select the `circles` the user wants the app to get information from. The image below shows how to select all circles
 
-![alt tag](https://github.com/3cixty/profiler/blob/scrapper/CrawlerCron/images/login2.png)
+![alt tag](https://github.com/3cixty/profiler/blob/virtuosoVersionOfRDF/CrawlerCron/images/login2.png)
 
 - Then click `Ok` to return to previous screen. It is also important to select `only you`. Then click `Accept`.
