@@ -51,6 +51,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 				preparedStmt.setString(5, logging.getDescription());
 			    preparedStmt.executeUpdate();
 				conn.commit();
+				logInfo("After logging call to DB");
 				return true;
 			} catch (SQLException e) {
 				e.printStackTrace();
