@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,9 +18,7 @@ import eu.threecixty.profile.oldmodels.UserInteractionMode;
 public class VirtuosoUserProfileStorage {
 	
 	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
-	
-	private static final Object _sync = new Object();
-	
+
 	/**
 	 * Loads profile information from the KB.
 	 * @param uid
@@ -1996,43 +1991,6 @@ public class VirtuosoUserProfileStorage {
 		placePreference.setHasPlaceDetailPreference(placeDetailPreference);
 	}
 
-	/**
-	 * Checks whether or not a given input string contains something.
-	 * @param input
-	 * @return
-	 */
-	private static boolean isNullOrEmpty(String input) {
-		if (input == null || input.equals("")) return true;
-		return false;
-	}
-
-	/**
-	 * Converts a given date to string.
-	 * @param date
-	 * @return
-	 */
-	private static String convert(Date date) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		return sdf.format(date);
-	}
-	
-	/**
-	 * convert string to date
-	 * @param dateStr
-	 * @return
-	 */
-	private static Date convert(String dateStr) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		int index = dateStr.indexOf("\"", 5);
-		if (index < 0) return null;
-		try {
-			return sdf.parse(dateStr.substring(1, index));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
 	/**
 	 * Checks whether or not a given UID exists in the UserProfile.
 	 * @param uid
