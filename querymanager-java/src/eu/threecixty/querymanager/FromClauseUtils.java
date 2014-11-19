@@ -9,8 +9,7 @@ public class FromClauseUtils {
 //	private static final String PROFILE_PREFIX = "<http://3cixty.com/ontology/profile/>";
 	private static final String PROFILE_GRAPH = "http://3cixty.com/fakeprofile";
 	
-	private static final String [] FROM_GRAPHS = {"http://www.openlinksw.com/schemas/virtrdf#", "http://localhost:8890/sparql",
-		"http://localhost:8890/DAV/", "http://www.w3.org/2002/07/owl#", "http://3cixty.com/yelp",
+	private static final String [] FROM_GRAPHS = {"http://www.w3.org/2002/07/owl#", "http://3cixty.com/yelp",
 		"http://3cixty.com/foursquare", "http://3cixty.com/googleplaces", "http://3cixty.com/events",
 		"http://data.linkedevents.org/kos/yelp/", "http://3cixty.com/hotelMetro", "http://3cixty.com/eventMetro",
 		"http://3cixty.com/topCategories", "http://data.linkedevents.org/kos/foursquare/", "http://3cixty.com/metro"};
