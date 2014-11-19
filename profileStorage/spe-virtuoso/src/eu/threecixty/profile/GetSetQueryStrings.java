@@ -5,23 +5,37 @@ import java.util.Set;
 import java.util.UUID;
 
 public class GetSetQueryStrings {
-	private static final String PROFILE_URI = "http://www.eu.3cixty.org/profile#";
+	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 	
+	private static final String PREFIX = "prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+										+"prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> "
+										+"prefix foaf:	<http://xmlns.com/foaf/0.1/> "
+										+"prefix schema:	<http://schema.org/> "
+										+"prefix xsd:	<http://www.w3.org/2001/XMLSchema#> "
+										+"prefix profile:	<http://3cixty.com/ontology/profile/> "
+										+"prefix frap:	<http://purl.org/frap#> "
+										+"prefix dc:	<http://purl.org/dc/elements/1.1/> ";
+										//+"prefix dbpedia-owl:	<http://dbpedia.org/ontology/> "
+										//+"prefix xpath:	<http://www.w3.org/2005/> "
+										//+"prefix googlekos: <http://data.linkedevents.org/kos/googleplaces/> ";
+	
+	
+	private static String makeUser(String uid) {
+		String query= " <"+PROFILE_URI+uid+"> rdf:type foaf:Person. "
+				+" <"+ PROFILE_URI+uid+"> profile:userID \""+uid+"\" . ";
+		return query;
+	}
 	/**
 	 * insert User in the KB
 	 * @param uid
 	 * @return
 	 */
 	public static String setUser(String uid){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
-			+ "  {"
-			+ "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  profile:"+uid+" rdf:type profile:UserProfile."
-			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" ."
-			+ "}";
+		String query=PREFIX
+			+ " INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +"> "
+			+ " { ";
+				query+= makeUser(uid);
+			query+= "}";
 			return query;
 	}
 	/**
@@ -30,36 +44,29 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultipleUser(Set<String> uids){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+ PROFILE_URI +">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
-			+ "  {";
-		Iterator <String> iterators = uids.iterator();
-		for ( ; iterators.hasNext(); ){
-			String uid=iterators.next();
-			query+= "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  profile:"+uid+" rdf:type profile:UserProfile."
-			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" .";
-		}
-		query+= "}";
+		String query= PREFIX
+					+ "INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +"> "
+					+ "{ ";
+					Iterator <String> iterators = uids.iterator();
+					for ( ; iterators.hasNext(); ){
+						String uid=iterators.next();
+						query+= makeUser(uid);
+					}
+			query+= "}";
 		return query;
 	}
+	
 	/**
 	 * Remove user from the kb
 	 * @param uid
 	 * @return
 	 */
 	public static String removeUser(String uid){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH +">"
-			+ "  {"
-			+ "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  profile:"+uid+" rdf:type profile:UserProfile."
-			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" ."
-			+ "}";
+		String query=PREFIX
+			+ "DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH +"> "
+			+ "{ ";
+			query+= makeUser(uid);
+			query+= "}";
 			return query;
 	}
 	/**
@@ -68,19 +75,15 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeMultipleUser(Set<String> uids){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH +">"
-			+ "  {";
-		Iterator <String> iterators = uids.iterator();
-		for ( ; iterators.hasNext(); ){
-			String uid=iterators.next();
-			query+= "  profile:"+uid+" rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  profile:"+uid+" rdf:type profile:UserProfile."
-			+ "  profile:"+uid+" profile:hasUID \""+uid+"\" .";
-		}
-		query+= "}";
+		String query=PREFIX
+					+ "DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH +"> "
+					+ "{";
+					Iterator <String> iterators = uids.iterator();
+					for ( ; iterators.hasNext(); ){
+						String uid=iterators.next();
+						query+= makeUser(uid);
+					}
+			query+= "}";
 		return query;
 	}
 	
@@ -90,12 +93,11 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getLastCrawlTime(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
+		String query=PREFIX
 				+ "select ?lastCrawlTime "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
 					+ "?s profile:hasLastCrawlTime ?lastCrawlTime. "
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
@@ -108,14 +110,11 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setLastCrawlTime(String uid, String time ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
-			+ "  { ";
-			if (time==null || time.isEmpty())
-				time="0";
-			query+= "  profile:"+uid+" profile:hasLastCrawlTime \""+time+"\" ."
+		String query=PREFIX
+			+ "INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +"> "
+			+ "{ ";
+				if (time==null || time.isEmpty()) time="0";
+				query+= "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime \""+time+"\" ."
 			+ "}";
 			return query;
 	}
@@ -126,12 +125,10 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeLastCrawlTime(String uid, String time ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
-			+ "  { "
-			+ "  profile:"+uid+" profile:hasLastCrawlTime \""+time+"\" ."
+		String query=PREFIX
+			+ "DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
+			+ "{ "
+				+ "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime \""+time+"\" ."
 			+ "}";
 			return query;
 	}
@@ -142,13 +139,12 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getGender(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "select ?lastCrawlTime "
+		String query=PREFIX
+				+ "select ?gender "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s vcard:gender ?gender. "
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s schema:gender ?gender. "
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
@@ -160,14 +156,12 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setGender(String uid, String gender ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
-			+ "  { ";
+		String query=PREFIX
+			+ "INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +"> "
+			+ "{ ";
 			if (gender==null || gender.isEmpty())
 				gender="unknown";
-			query+= "  profile:"+uid+" vcard:gender \""+gender+"\" ."
+			query+= "<"+PROFILE_URI+uid+"> schema:gender \""+gender+"\" ."
 			+ "}";
 			return query;
 	}
@@ -178,12 +172,10 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeGender(String uid, String gender ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ "  { "
-			+ "  profile:"+uid+" vcard:gender \""+gender+"\" ."
+			+ "<"+PROFILE_URI+uid+"> schema:gender \""+gender+"\" ."
 			+ "}";
 			return query;
 	}
@@ -194,20 +186,25 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getName(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "select ?name ?givenname ?familyname ?middlename ?additionalname ?nickname"
+		String query=PREFIX
+				+ "select ?givenname ?familyname "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s vcard:hasName ?name. "
-					+ "?name vcard:given-name ?givenname."
-					+ "?name vcard:family-name ?familyname."
-					+ "	Optional {?name profile:middleName ?middlename.}"
-					+ "	Optional {?name vcard:additional-name ?additionalname.}"
-					+ " Optional {?name vcard:nickname ?nickname.}"
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s schema:givenName ?givenname."
+					+ "?s schema:familyName ?familyname."
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
+		return query;
+	}
+	
+	private static String makeNameQuery(String uid,
+			eu.threecixty.profile.oldmodels.Name name) {
+		String query="";
+		if (name.getGivenName()!=null&&!name.getGivenName().isEmpty())
+			query+= "  <"+PROFILE_URI+uid+"> schema:givenName \""+name.getGivenName()+"\".";
+		if (name.getFamilyName()!=null&&!name.getFamilyName().isEmpty())
+			query+= "  <"+PROFILE_URI+uid+"> schema:familyName \""+name.getFamilyName()+"\".";
 		return query;
 	}
 	/**
@@ -217,29 +214,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setName(String uid, eu.threecixty.profile.oldmodels.Name name ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ "  { ";
-			if  (name.getHasNameURI()!=null&&!name.getHasNameURI().isEmpty()){
-				query+= "  <"+name.getHasNameURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  <"+name.getHasNameURI()+"> rdf:type vcard:Name."
-					+ "  profile:"+uid+" vcard:hasName <"+name.getHasNameURI()+"> .";
-				if (name.getGivenName()!=null&&!name.getGivenName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:given-name \""+name.getGivenName()+"\".";
-				if (name.getFamilyName()!=null&&!name.getFamilyName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:family-name \""+name.getFamilyName()+"\".";
-				if (name.getMiddleName()!=null&&!name.getMiddleName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> profile:middleName \""+name.getMiddleName()+"\".";
-				if (name.getAdditionalName()!=null&&!name.getAdditionalName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:additional-name \""+name.getAdditionalName()+"\".";
-				if (name.getNickname()!=null&&!name.getNickname().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:nickname "+name.getNickname()+"\" .";
-			}
+			query+= makeNameQuery(uid, name);
 			query+= "}";
 			return query;
 	}
+	
 	/**
 	 * remove name object of the user from the KB
 	 * @param uid
@@ -247,26 +229,10 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeName(String uid, eu.threecixty.profile.oldmodels.Name name ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ "  { ";
-			if  (name.getHasNameURI()!=null&&!name.getHasNameURI().isEmpty()){
-				query+= "  <"+name.getHasNameURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ " <"+name.getHasNameURI()+"> rdf:type vcard:Name."
-					+ "  profile:"+uid+" vcard:hasName <"+name.getHasNameURI()+"> .";
-				if (name.getGivenName()!=null&&!name.getGivenName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:given-name \""+name.getGivenName()+"\".";
-				if (name.getFamilyName()!=null&&!name.getFamilyName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:family-name \""+name.getFamilyName()+"\".";
-				if (name.getMiddleName()!=null&&!name.getMiddleName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> profile:middleName \""+name.getMiddleName()+"\".";
-				if (name.getAdditionalName()!=null&&!name.getAdditionalName().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:additional-name \""+name.getAdditionalName()+"\".";
-				if (name.getNickname()!=null&&!name.getNickname().isEmpty())
-					query+= "  <"+name.getHasNameURI()+"> vcard:nickname "+name.getNickname()+"\" .";
-			}
+			query+= makeNameQuery(uid, name);
 			query+= "}";
 			return query;
 	}
@@ -277,21 +243,49 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getAddress(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "select ?address ?townname ?countryname ?staddress ?pcode ?longitude ?lat "
+		String query=PREFIX
+				+ "select ?address ?townname ?countryname ?staddress ?pcode ?homeLocation ?geoLocation ?longitude ?lat "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "OPTIONAL {?s vcard:hasAddress ?address. }"
-					+ "OPTIONAL {?address vcard:latitude ?lat.}"
-					+ "OPTIONAL {?address vcard:longitude ?longitude. }"
-					+ "OPTIONAL {?address vcard:postal-code ?pcode.}"
-					+ "OPTIONAL {?address vcard:street-address ?staddress.}"
-					+ "OPTIONAL {?address vcard:townName ?townname.}"
-					+ "OPTIONAL {?address vcard:country-name ?countryname.}"
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "OPTIONAL {?s schema:address ?address. }"
+					+ "OPTIONAL {?address schema:postalCode ?pcode.}"
+					+ "OPTIONAL {?address schema:streetAddress ?staddress.}"
+					+ "OPTIONAL {?address schema:addressLocality ?townname.}"
+					+ "OPTIONAL {?address schema:addressCountry ?countryname.}"
+					+ "OPTIONAL {?s schema:homeLocation ?homeLocation.}"
+					+ "OPTIONAL {?homeLocation schema:geo ?geoLocation.}"
+					+ "OPTIONAL {?geoLocation schema:latitude ?lat.}"
+					+ "OPTIONAL {?geoLocation schema:longitude ?longitude. }"
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
+		return query;
+	}
+	
+	private static String makeAddressQuery(String uid,
+			eu.threecixty.profile.oldmodels.Address address) {
+		String query= "  <"+address.getHasAddressURI()+"> rdf:type schema:PostalAddress."
+				+ "  <"+PROFILE_URI+uid+"> schema:address <"+address.getHasAddressURI()+"> .";
+		if (address.getCountryName()!=null&&!address.getCountryName().isEmpty())
+			query+= "  <"+address.getHasAddressURI()+"> schema:addressCountry \""+address.getCountryName()+"\".";
+		if (address.getTownName()!=null&&!address.getTownName().isEmpty())
+			query+= "  <"+address.getHasAddressURI()+"> schema:addressLocality \""+address.getTownName()+"\".";
+		if (address.getStreetAddress()!=null&&!address.getStreetAddress().isEmpty())
+			query+= "  <"+address.getHasAddressURI()+"> schema:streetAddress \""+address.getStreetAddress()+"\".";
+		if (address.getPostalCode()!=null&&!address.getPostalCode().isEmpty())
+			query+= "  <"+address.getHasAddressURI()+"> schema:postalCode \""+address.getPostalCode()+"\".";
+		if (address.getLongitute()!=0 || address.getLatitude()!=0){
+			String id=address.getHasAddressURI()+"/HomeLocation";
+			query+="<"+PROFILE_URI+uid+"> schema:homeLocation <"+id+"> .";
+			query+="<"+id+"> rdf:type schema:Place .";
+			String idgeo=id+"/GeoCoordinates";
+			query+="<"+id+"> schema:geo <"+idgeo+"> .";
+			query+="<"+idgeo+"> rdf:type schema:GeoCoordinates";
+			if (address.getLongitute()!=0)	
+				query+= "  <"+idgeo+"> schema:longitude \""+address.getLongitute()+"\" .";
+			if (address.getLatitude()!=0)
+				query+= "  <"+idgeo+"> schema:latitude \""+address.getLatitude()+"\" .";
+		}
 		return query;
 	}
 	/**
@@ -301,31 +295,16 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setAddress(String uid, eu.threecixty.profile.oldmodels.Address address){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ "  {";
 		if (address.getHasAddressURI()!=null&&!address.getHasAddressURI().isEmpty()){
-			query+= "  <"+address.getHasAddressURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  <"+address.getHasAddressURI()+"> rdf:type vcard:Address."
-				+ "  profile:"+uid+" vcard:hasAddress <"+address.getHasAddressURI()+"> .";
-			if (address.getCountryName()!=null&&!address.getCountryName().isEmpty())
-				query+= "  <"+address.getHasAddressURI()+"> vcard:country-name \""+address.getCountryName()+"\".";
-			if (address.getTownName()!=null&&!address.getTownName().isEmpty())
-				query+= "  <"+address.getHasAddressURI()+"> vcard:townName \""+address.getTownName()+"\".";
-			if (address.getStreetAddress()!=null&&!address.getStreetAddress().isEmpty())
-				query+= "  <"+address.getHasAddressURI()+"> vcard:street-address \""+address.getStreetAddress()+"\".";
-			if (address.getPostalCode()!=null&&!address.getPostalCode().isEmpty())
-				query+= "  <"+address.getHasAddressURI()+"> vcard:postal-code \""+address.getPostalCode()+"\".";
-			if (address.getLongitute()!=0)
-				query+= "  <"+address.getHasAddressURI()+"> vcard:longitude \""+address.getLongitute()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (address.getLatitude()!=0)
-				query+= "  <"+address.getHasAddressURI()+"> vcard:latitude \""+address.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			query+= makeAddressQuery(uid,address);
 		}
 		query+= "}";
 		return query;
 	}
+	
 	/**
 	 * remove Address of the user from the KB
 	 * @param uid
@@ -333,27 +312,11 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeAddress(String uid, eu.threecixty.profile.oldmodels.Address address){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 				+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ "  {";
 			if (address.getHasAddressURI()!=null&&!address.getHasAddressURI().isEmpty()){
-				query+= "  <"+address.getHasAddressURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  <"+address.getHasAddressURI()+"> rdf:type vcard:Address."
-					+ "  profile:"+uid+" vcard:hasAddress <"+address.getHasAddressURI()+"> .";
-				if (address.getCountryName()!=null&&!address.getCountryName().isEmpty())
-					query+= "  <"+address.getHasAddressURI()+"> vcard:country-name \""+address.getCountryName()+"\".";
-				if (address.getTownName()!=null&&!address.getTownName().isEmpty())
-					query+= "  <"+address.getHasAddressURI()+"> vcard:townName \""+address.getTownName()+"\".";
-				if (address.getStreetAddress()!=null&&!address.getStreetAddress().isEmpty())
-					query+= "  <"+address.getHasAddressURI()+"> vcard:street-address \""+address.getStreetAddress()+"\".";
-				if (address.getPostalCode()!=null&&!address.getPostalCode().isEmpty())
-					query+= "  <"+address.getHasAddressURI()+"> vcard:postal-code \""+address.getPostalCode()+"\".";
-				if (address.getLongitute()!=0)
-					query+= "  <"+address.getHasAddressURI()+"> vcard:longitude \""+address.getLongitute()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (address.getLatitude()!=0)
-					query+= "  <"+address.getHasAddressURI()+"> vcard:latitude \""+address.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+				query+= makeAddressQuery(uid,address);
 			}
 			query+= "}";
 			return query;
@@ -366,11 +329,10 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setKnows(String uid, String uidKnows){
-		String query="   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ " INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { "
-				+ "  profile:"+uid+" foaf:knows profile:"+uidKnows+" ."
+				+ "  <"+PROFILE_URI+uid+"> schema:knows <"+PROFILE_URI+uidKnows+"> ."
 				+ "}";
 				return query;
 	}
@@ -381,14 +343,13 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultipleKnows(String uid, Set <String> knows){
-		String query="   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ " INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <String> iterators = knows.iterator();
 		for ( ; iterators.hasNext(); ){
 			String uidKnows=iterators.next();
-			query+= "  profile:"+uid+" foaf:knows profile:"+uidKnows+" .";
+			query+= "  <"+PROFILE_URI+uid+"> schema:knows <"+PROFILE_URI+uidKnows+"> .";
 		}
 		query+= "}";
 		return query;
@@ -400,11 +361,10 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeKnows(String uid, String uidKnows){
-		String query="   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ " DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { "
-				+ "  profile:"+uid+" foaf:knows profile:"+uidKnows+" ."
+				+ "  <"+PROFILE_URI+uid+"> schema:knows <"+PROFILE_URI+uidKnows+"> ."
 				+ "}";
 				return query;
 	}
@@ -415,14 +375,13 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeMultipleKnows(String uid, Set <String> knows){
-		String query="   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ " DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <String> iterators = knows.iterator();
 		for ( ; iterators.hasNext(); ){
 			String uidKnows=iterators.next();
-			query+= "  profile:"+uid+" foaf:knows profile:"+uidKnows+" .";
+			query+= "  <"+PROFILE_URI+uid+"> schema:knows <"+PROFILE_URI+uidKnows+"> .";
 		}
 		query+= "}";
 		return query;
@@ -433,50 +392,49 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getKnows(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?uidknows "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
 					+ "OPTIONAL {"
-						+ "?s foaf:knows ?knows. "
-						+ "?knows  profile:hasUID ?uidknows.  "
+						+ "?s schema:knows ?knows. "
+						+ "?knows  profile:userID ?uidknows.  "
 					+ "}"
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
 	}
 	
+	private static String makeProfileItentitiesQuery(String uid,
+			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity) {
+		String query= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type foaf:OnLineAccount."
+				+ "  <"+PROFILE_URI+uid+"> foaf:account <"+profileIdentity.getHasProfileIdentitiesURI()+"> .";
+		if  (profileIdentity.getHasSource()!=null&&!profileIdentity.getHasSource().isEmpty())
+			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> foaf:accountServiceHomepage <"+profileIdentity.getHasSource()+"> .";
+		if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
+			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> foaf:accountName \""+profileIdentity.getHasUserAccountID()+"\" .";
+		if  (profileIdentity.getHasUserInteractionMode().toString()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
+			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:userInteractionMode \""+profileIdentity.getHasUserInteractionMode()+"\" .";
+		return query;
+	}
 	/**
 	 * insert profile Identity of a user in the KB	
 	 * @param uid
 	 * @param profileIdentities
 	 * @return
 	 */
-	public static String setProfileIdentities(String uid, eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String setProfileIdentities(String uid, eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity){
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		
-		if  (profileIdentities.getHasProfileIdentitiesURI()==null||profileIdentities.getHasProfileIdentitiesURI().isEmpty())
-			profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/ProfileIdentities/"+profileIdentities.getHasSourceCarrier());
-		query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities."
-				+ "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentities.getHasProfileIdentitiesURI()+"> .";
-		if  (profileIdentities.getHasSource()!=null&&!profileIdentities.getHasSource().isEmpty())
-			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentities.getHasSource()+"> .";
-		if  (profileIdentities.getHasUserAccountID()!=null&&!profileIdentities.getHasUserAccountID().isEmpty())
-			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentities.getHasUserAccountID()+"\" .";
-		if  (profileIdentities.getHasUserInteractionMode().toString()!=null&&!profileIdentities.getHasUserInteractionMode().toString().isEmpty())
-			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentities.getHasUserInteractionMode()+"\" .";
-		
+		if  (profileIdentity.getHasProfileIdentitiesURI()==null||profileIdentity.getHasProfileIdentitiesURI().isEmpty())
+			profileIdentity.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/Account/"+profileIdentity.getHasSourceCarrier());
+		query+= makeProfileItentitiesQuery(uid, profileIdentity);
 		query+= "}";
 		return query;
 	}
+
 	/**
 	 * insert multiple profile Identities of a user in the KB
 	 * @param uid
@@ -484,26 +442,15 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultipleProfileIdentities(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities){
-		String query="   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ " INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.ProfileIdentities> iterators = profileIdentities.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity=iterators.next();
 			if  (profileIdentity.getHasProfileIdentitiesURI()==null||profileIdentity.getHasProfileIdentitiesURI().isEmpty())
-				profileIdentity.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/ProfileIdentities/"+profileIdentity.getHasSourceCarrier());
-			
-			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities.";
-			query+= "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentity.getHasProfileIdentitiesURI()+"> .";
-			if  (profileIdentity.getHasSource()!=null&&!profileIdentity.getHasSource().isEmpty())
-				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentity.getHasSource()+"> .";
-			if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
-				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentity.getHasUserAccountID()+"\" .";
-			if  (profileIdentity.getHasUserInteractionMode().toString()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
-				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentity.getHasUserInteractionMode()+"\" .";
-			
+				profileIdentity.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/Account/"+profileIdentity.getHasSourceCarrier());
+			query+= makeProfileItentitiesQuery(uid, profileIdentity);			
 		}
 		query+= "}";
 		return query;
@@ -514,23 +461,13 @@ public class GetSetQueryStrings {
 	 * @param profileIdentities
 	 * @return
 	 */
-	public static String removeProfileIdentities(String uid, eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removeProfileIdentities(String uid, eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity){
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		
-		if  (profileIdentities.getHasProfileIdentitiesURI()!=null&&!profileIdentities.getHasProfileIdentitiesURI().isEmpty()){
-			query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities."
-					+ "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentities.getHasProfileIdentitiesURI()+"> .";
-			if  (profileIdentities.getHasSource()!=null&&!profileIdentities.getHasSource().isEmpty())
-				query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentities.getHasSource()+"> .";
-			if  (profileIdentities.getHasUserAccountID()!=null&&!profileIdentities.getHasUserAccountID().isEmpty())
-				query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentities.getHasUserAccountID()+"\" .";
-			if  (profileIdentities.getHasUserInteractionMode().toString()!=null&&!profileIdentities.getHasUserInteractionMode().toString().isEmpty())
-				query+= "  <"+profileIdentities.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentities.getHasUserInteractionMode()+"\" .";
+		if  (profileIdentity.getHasProfileIdentitiesURI()!=null&&!profileIdentity.getHasProfileIdentitiesURI().isEmpty()){
+			query+= makeProfileItentitiesQuery(uid, profileIdentity);
 		}
 		query+= "}";
 		return query;
@@ -542,23 +479,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeMultipleProfileIdentities(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities){
-		String query="   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "  DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.ProfileIdentities> iterators = profileIdentities.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity=iterators.next();
 			if  (profileIdentity.getHasProfileIdentitiesURI()!=null&&!profileIdentity.getHasProfileIdentitiesURI().isEmpty()){
-				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type profile:ProfileIdentities.";
-				query+= "  profile:"+uid+" profile:hasProfileIdentities <"+profileIdentity.getHasProfileIdentitiesURI()+"> .";
-				if  (profileIdentity.getHasSource()!=null&&!profileIdentity.getHasSource().isEmpty())
-					query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasSource <"+profileIdentity.getHasSource()+"> .";
-				if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
-					query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserAccountID \""+profileIdentity.getHasUserAccountID()+"\" .";
-				if  (profileIdentity.getHasUserInteractionMode().toString()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
-					query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:hasUserInteractionMode \""+profileIdentity.getHasUserInteractionMode()+"\" .";
+				query+= makeProfileItentitiesQuery(uid, profileIdentity);
 			}
 		}
 		query+= "}";
@@ -570,17 +498,15 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getProfileIdentities(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?pi ?source ?piID ?uIM "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasProfileIdentities ?pi. "
-					+ "?pi profile:hasSource ?source."
-					+ "?pi profile:hasUserAccountID ?piID."
-					+ "?pi profile:hasUserInteractionMode ?uIM."
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s foaf:account ?pi. "
+					+ "?pi foaf:accountServiceHomepage ?source."
+					+ "?pi profile:accountName ?piID."
+					+ "?pi profile:userInteractionMode ?uIM."
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
@@ -591,111 +517,100 @@ public class GetSetQueryStrings {
 	 * @param uid
 	 * @param preferenceURI
 	 * @return
-	 */
+	 *//*
 	public static String setPreferences(String uid, String preferenceURI){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 			if (preferenceURI!=null&&!preferenceURI.isEmpty()){
-				query+= "  <"+preferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  <"+preferenceURI+"> rdf:type profile:Preference."
-				+ "  profile:"+uid+" profile:hasPreference <"+preferenceURI+"> .";
+				query+= "  <"+preferenceURI+"> rdf:type frap:Preference."
+				+ "  <"+PROFILE_URI+uid+"> frap:holds <"+preferenceURI+"> .";
 			}
 			query+= "}";
 			return query;
 	}
-	/**
+	*//**
 	 * remove preference of a user in the KB. This removes only the preference uri not the preference object
 	 * @param uid
 	 * @param preferenceURI
 	 * @return
-	 */
+	 *//*
 	public static String removePreferences(String uid,String preferenceURI){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (preferenceURI!=null&&!preferenceURI.isEmpty()){
-			query+= "  <"+preferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  <"+preferenceURI+"> rdf:type profile:Preference."
-			+ "  profile:"+uid+" profile:hasPreference <"+preferenceURI+"> .";
+			query+= "  <"+preferenceURI+"> rdf:type frap:Preference."
+					+ "  <"+PROFILE_URI+uid+"> frap:holds <"+preferenceURI+"> .";
 		}
 		query+= "}";
 		return query;
 	}
-	/**
+
+	*//**
 	 * get preference of a user in the KB. This selects only the preference uri
 	 * @param uid
 	 * @return
-	 */
+	 *//*
 	public static String getPreferences(String uid) {
 		String query="prefix profile:<"+PROFILE_URI+"> "
 				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
 				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
 				+ "select ?pref "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasPreference ?pref. "
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s frap:holds ?pref. "
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
-	}
+	}*/
 	
+	private static String makeLikeQuery(String uid,
+			eu.threecixty.profile.oldmodels.Likes like) {
+		String query="  <"+like.getHasLikesURI()+"> rdf:type profile:Like."
+			+ "  <"+PROFILE_URI+uid+"> profile:like <"+like.getHasLikesURI()+"> .";
+		if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
+			query+= "  <"+like.getHasLikesURI()+"> schema:likeName \""+like.getHasLikeName()+"\" .";
+		if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
+			query+= "  <"+like.getHasLikesURI()+"> dc:subject \""+like.getHasLikeType()+"\" .";
+		return query;
+	}
 	/**
 	 * insert user like to the kb.
 	 * @param perferenceURI
 	 * @param like
 	 * @return
 	 */
-	public static String setLikes(String perferenceURI, eu.threecixty.profile.oldmodels.Likes like){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String setLikes(String uid, eu.threecixty.profile.oldmodels.Likes like){
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH +">"
 			+ " { ";
 		if (like.getHasLikesURI()==null||like.getHasLikesURI().isEmpty())
-			like.setHasLikesURI(perferenceURI+"/Likes/"+UUID.randomUUID().toString());
+			like.setHasLikesURI(PROFILE_URI+uid+"/Likes/"+UUID.randomUUID().toString());
 	
-		query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-			+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
-			+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+"> .";
-		if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
-			query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
-		if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
-			query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
+		query+= makeLikeQuery(uid, like);
 
 		query+= "}";
 		return query;
 	}
+	
 	/**
 	 * insert multiple likes of the user in the kb
 	 * @param perferenceURI
 	 * @param likes
 	 * @return
 	 */
-	public static String setMultipleLikes(String perferenceURI, Set<eu.threecixty.profile.oldmodels.Likes> likes){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String setMultipleLikes(String uid, Set<eu.threecixty.profile.oldmodels.Likes> likes){
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Likes> iterators = likes.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.Likes like=iterators.next();
 			if (like.getHasLikesURI()==null||like.getHasLikesURI().isEmpty())
-				like.setHasLikesURI(perferenceURI+"/Likes/"+UUID.randomUUID().toString());
-			
-			query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
-				+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+"> .";
-			if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
-				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
-			if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
-				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
+				like.setHasLikesURI(PROFILE_URI+uid+"/Likes/"+UUID.randomUUID().toString());
+			query+= makeLikeQuery(uid, like);
 		}
 		query+= "}";
 		return query;
@@ -706,20 +621,12 @@ public class GetSetQueryStrings {
 	 * @param like
 	 * @return
 	 */
-	public static String removeLikes(String perferenceURI, eu.threecixty.profile.oldmodels.Likes like){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removeLikes(String uid, eu.threecixty.profile.oldmodels.Likes like){
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (like.getHasLikesURI()!=null&&!like.getHasLikesURI().isEmpty()){
-			query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-				+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
-				+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+">.";
-			if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
-				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
-			if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
-				query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
+			query+= makeLikeQuery(uid, like);
 		}
 		query+= "}";
 		return query;
@@ -730,23 +637,15 @@ public class GetSetQueryStrings {
 	 * @param likes
 	 * @return
 	 */
-	public static String removeMultipleLikes(String perferenceURI, Set<eu.threecixty.profile.oldmodels.Likes> likes){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removeMultipleLikes(String uid, Set<eu.threecixty.profile.oldmodels.Likes> likes){
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Likes> iterators = likes.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.Likes like=iterators.next();
 			if (like.getHasLikesURI()!=null&&!like.getHasLikesURI().isEmpty()){
-				query+= "  <"+like.getHasLikesURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  <"+like.getHasLikesURI()+"> rdf:type profile:Likes."
-					+ "  <"+perferenceURI+"> profile:hasLike <"+like.getHasLikesURI()+"> .";
-				if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
-					query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeName \""+like.getHasLikeName()+"\" .";
-				if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
-					query+= "  <"+like.getHasLikesURI()+"> profile:hasLikeType \""+like.getHasLikeType()+"\" .";
+				query+= makeLikeQuery(uid, like);
 			}
 		}
 		query+= "}";
@@ -758,17 +657,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getLikes(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?likes ?likeName ?liketype "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasPreference ?pref. "
-					+ "?pref profile:hasLike ?likes. "
-					+ "?likes profile:hasLikeName ?likeName."
-					+ "?likes profile:hasLikeType ?liketype."
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s profile:like ?likes. "
+					+ "?likes schema:likeName ?likeName."
+					+ "?likes dc:subject ?liketype."
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
@@ -780,23 +676,25 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getSpecificLikes(String uid,String likeType) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?likes ?likeName ?liketype "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasPreference ?pref. "
-					+ "?pref profile:hasLike ?likes. "
-					+ "?likes profile:hasLikeName ?likeName."
-					+ "?likes profile:hasLikeType ?liketype."
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s profile:like ?likes. "
+					+ "?likes schema:likeName ?likeName."
+					+ "?likes dc:subject ?liketype."
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+" FILTER (STR(?likeType) = \""+likeType+"\") "//Event
 					+ "}";
 		return query;
 	}
 	
+	private static String makeTransportQuery(String uid, String transportUri) {
+		String query = "  <"+transportUri+"> rdf:type profile:Mobility ."
+			+ "  <"+PROFILE_URI+uid+"> profile:mobility <"+transportUri+"> .";
+		return query;
+	}
 	/**
 	 * insert transport of a user in the KB. This inserts only the transport uri not the transport object
 	 * @param uid
@@ -804,19 +702,16 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setTransport(String uid, String transportUri){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 			if (transportUri!=null&&!transportUri.isEmpty()){
-				query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  <"+transportUri+"> rdf:type profile:Transport ."
-					+ "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
+				query+= makeTransportQuery(uid, transportUri);
 			}
 			query+= "}";
 			return query;
 	}
+	
 	/**
 	 * insert multiple transport of a user in the KB. This inserts only the transport uri not the transport object
 	 * @param uid
@@ -824,18 +719,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultipleTransport(String uid, Set<String> transportUris){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 			Iterator <String> iterators = transportUris.iterator();
 			for ( ; iterators.hasNext(); ){
 				String transportUri=iterators.next();
 				if (transportUri!=null&&!transportUri.isEmpty()){
-					query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-					query+= "  <"+transportUri+"> rdf:type profile:Transport.";
-					query+= "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
+					query+= makeTransportQuery(uid, transportUri);
 				}
 			}
 			query+= "}";
@@ -848,15 +739,11 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeTransport(String uid, String transportUri){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 			if (transportUri!=null&&!transportUri.isEmpty()){
-				query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>."
-					+ "  <"+transportUri+"> rdf:type profile:Transport ."
-					+ "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
+				query+= makeTransportQuery(uid, transportUri);
 			}
 			query+= "}";
 			return query;
@@ -868,18 +755,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeMultipleTransport(String uid, Set<String> transportUris){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 			Iterator <String> iterators = transportUris.iterator();
 			for ( ; iterators.hasNext(); ){
 				String transportUri=iterators.next();
 				if (transportUri!=null&&!transportUri.isEmpty()){
-					query+= "  <"+transportUri+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-					query+= "  <"+transportUri+"> rdf:type profile:Transport.";
-					query+= "  profile:"+uid+" profile:hasTransport <"+transportUri+"> .";
+					query+= makeTransportQuery(uid, transportUri);
 				}
 			}
 			query+= "}";
@@ -891,19 +774,31 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getTransport(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?transport "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasTransport ?transport. "
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s profile:mobility ?transport. "
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
 	}
 
+	private static String makeAccompanyQuery(String transportURI,
+			eu.threecixty.profile.oldmodels.Accompanying accompany) {
+		String query= "  <"+transportURI+"> profile:accompany <"+accompany.getHasAccompanyURI()+"> .";
+		if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:accompanyUser \""+accompany.getHasAccompanyUserid2ST()+"\" .";
+		if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:score \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:validity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
+			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:time \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompany.";
+		return query;
+	}
 	/**
 	 * insert multiple accompanies in the kb.
 	 * @param transportURI
@@ -911,9 +806,7 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultipleAccompanying(String transportURI, Set<eu.threecixty.profile.oldmodels.Accompanying> accompanys){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO  GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
@@ -922,22 +815,12 @@ public class GetSetQueryStrings {
 			if (accompany.getHasAccompanyURI()==null||accompany.getHasAccompanyURI().isEmpty())
 				accompany.setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
 			
-			query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
-			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-			if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-			if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+			query+= makeAccompanyQuery(transportURI, accompany);
 		}
 		query+= "}";
 		return query;
 	}
+	
 	/**
 	 * insert single accompany in the kb. 
 	 * @param accompany
@@ -945,26 +828,13 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setAccompanyingAssociatedToSpecificTransport(eu.threecixty.profile.oldmodels.Accompanying accompany, String transportURI){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (accompany.getHasAccompanyURI()==null||accompany.getHasAccompanyURI().isEmpty())
 			accompany.setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
 		
-		query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
-		query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-		if (accompany.getHasAccompanyUserid2ST()!=null && !accompany.getHasAccompanyUserid2ST().isEmpty())
-			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-		if (accompany.getHasAccompanyScore()!=null && accompany.getHasAccompanyScore()>0)
-			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-		if (accompany.getHasAccompanyValidity()!=null && accompany.getHasAccompanyValidity()>0)
-			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-		if (accompany.getHasAccompanyTime()!=null && accompany.getHasAccompanyTime()>0)
-			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-		query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-		query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+		query+= makeAccompanyQuery(transportURI, accompany);
 
 		query+= "}";
 		return query;
@@ -976,9 +846,7 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultipleAccompanyingAssociatedToSpecificTransport(String transportURI, Set<eu.threecixty.profile.oldmodels.Accompanying> accompanys){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 				+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 			Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
@@ -987,18 +855,7 @@ public class GetSetQueryStrings {
 				if (accompany.getHasAccompanyURI()==null||accompany.getHasAccompanyURI().isEmpty())
 					accompany.setHasAccompanyURI(transportURI+"/Accompany/"+UUID.randomUUID().toString());
 				
-				query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-				if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-				if (accompany.getHasAccompanyScore()!=null && accompany.getHasAccompanyScore()>0)
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+				query+= makeAccompanyQuery(transportURI, accompany);
 				
 			}
 			query+= "}";
@@ -1011,27 +868,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeMultipleAccompanying(String transportURI, Set<eu.threecixty.profile.oldmodels.Accompanying> accompanys){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.Accompanying accompany =iterators.next();
 			if (accompany.getHasAccompanyURI()!=null&&!accompany.getHasAccompanyURI().isEmpty()){
-				query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-				if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-				if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+				query+= makeAccompanyQuery(transportURI, accompany);
 			}
 		}
 		query+= "}";
@@ -1044,24 +888,11 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeAccompanyingAssociatedToSpecificTransport(eu.threecixty.profile.oldmodels.Accompanying accompany, String transportURI){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (accompany.getHasAccompanyURI()!=null&&!accompany.getHasAccompanyURI().isEmpty()){
-			query+= "  <"+transportURI+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
-			query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-			if (accompany.getHasAccompanyUserid2ST()!=null&&! accompany.getHasAccompanyUserid2ST().isEmpty())
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-			if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
-				query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+			query+= makeAccompanyQuery(transportURI, accompany);
 		}
 		query+= "}";
 		return query;
@@ -1072,32 +903,32 @@ public class GetSetQueryStrings {
 	 * @param accompanys
 	 * @return
 	 */
-	public static String removeMultipleAccompanyingAssociatedToSpecificTransport(String transportUri, Set<eu.threecixty.profile.oldmodels.Accompanying> accompanys){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removeMultipleAccompanyingAssociatedToSpecificTransport(String transportURI, Set<eu.threecixty.profile.oldmodels.Accompanying> accompanys){
+		String query=PREFIX
 				+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 			Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
 			for ( ; iterators.hasNext(); ){
 				eu.threecixty.profile.oldmodels.Accompanying accompany =iterators.next();
 				if (accompany.getHasAccompanyURI()!=null&&!accompany.getHasAccompanyURI().isEmpty()){
-					query+= "  <"+transportUri+"> profile:hasAccompany <"+accompany.getHasAccompanyURI()+"> .";
-					query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID1 \""+accompany.getHasAccompanyUserid1ST()+"\" .";
-					if (accompany.getHasAccompanyUserid2ST()!=null&&!accompany.getHasAccompanyUserid2ST().isEmpty())
-						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyUserID2 \""+accompany.getHasAccompanyUserid2ST()+"\" .";
-					if (accompany.getHasAccompanyScore()!=null&&accompany.getHasAccompanyScore()>0)
-						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyScore \""+accompany.getHasAccompanyScore()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-					if (accompany.getHasAccompanyValidity()!=null&&accompany.getHasAccompanyValidity()>0)
-						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyValidity \""+accompany.getHasAccompanyValidity()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-					if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
-						query+= "  <"+accompany.getHasAccompanyURI()+"> profile:hasAccompanyTime \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-					query+= "  <"+accompany.getHasAccompanyURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-					query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompanying.";
+					query+= makeAccompanyQuery(transportURI, accompany);
 				}
 			}
 			query+= "}";
 			return query;
+	}
+	
+	/**
+	 * make Get Accompany Query
+	 * @return
+	 */
+	private static String makeGetAccompanyQuery(){
+		String query= "?transport profile:accompany ?accompany. "
+				+ "Optional {?accompany profile:accompanyUser ?uid2 .}"
+				+ "Optional {?accompany profile:score ?score .}"
+				+ "Optional {?accompany profile:validity ?validity .}"
+				+ "Optional {?accompany profile:time ?acctime .}";
+		return query;
 	}
 	/**
 	 * select accompanies associated to the user
@@ -1105,20 +936,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getAccompanying(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?accompany ?uid2 ?score ?validity ?acctime "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasTransport ?transport. "
-					+ "?transport profile:hasAccompany ?accompany. "
-					+ "Optional {?accompany profile:hasAccompanyUserID2 ?uid2 .}"
-					+ "Optional {?accompany profile:hasAccompanyScore ?score .}"
-					+ "Optional {?accompany profile:hasAccompanyValidity ?validity .}"
-					+ "Optional {?accompany profile:hasAccompanyTime ?acctime .}"
-					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s profile:mobility ?transport. ";
+					query+=makeGetAccompanyQuery();
+					query+=" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
 	}
@@ -1128,17 +953,11 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getAccompanyingForTransport(String transportURI) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?accompany ?uid2 ?score ?validity ?acctime "
-				+ " where {"
-					+ "?transport profile:hasAccompany ?accompany. "
-					+ "Optional {?accompany profile:hasAccompanyUserID2 ?uid2 .}"
-					+ "Optional {?accompany profile:hasAccompanyScore ?score .}"
-					+ "Optional {?accompany profile:hasAccompanyValidity ?validity .}"
-					+ "Optional {?accompany profile:hasAccompanyTime ?acctime .}"
-					+" FILTER (STR(?transport) = \""+transportURI+"\") "
+				+ " where {";
+					query+=makeGetAccompanyQuery();
+					query+=" FILTER (STR(?transport) = \""+transportURI+"\") "
 					+ "}";
 		return query;
 	}
@@ -1150,42 +969,44 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setPersonalPlacesAssociatedToSpecificRegularTrip(String regularTripURI, eu.threecixty.profile.oldmodels.PersonalPlace personalPlace ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (personalPlace.getHasPersonalPlaceURI()==null||personalPlace.getHasPersonalPlaceURI().isEmpty())
 			personalPlace.setHasPersonalPlaceURI(regularTripURI+"/PersonalPlace/"+UUID.randomUUID().toString());
 		
-		query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
+		query+= makePersonalPlaceQuery(regularTripURI, personalPlace);
+
+		query+= "}";
+		return query;
+	}
+	private static String makePersonalPlaceQuery(String regularTripURI,
+			eu.threecixty.profile.oldmodels.PersonalPlace personalPlace) {
+		String query= "  <"+regularTripURI+"> profile:personalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
 		if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
-			query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
+			query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:externalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
 		if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
 			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 		if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
 			query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 		if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:stayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
 		if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:accuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 		if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:stayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
 		if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:postalCode \""+personalPlace.getPostalcode()+"\" .";
 		if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:weekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
 		if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:dayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
 		if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:type \""+personalPlace.getHasPersonalPlaceType()+"\" .";
 		if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
+			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdfs:label \""+personalPlace.getHasPersonalPlaceName()+"\" .";
 		//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-		query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
 		query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
-
-		query+= "}";
 		return query;
 	}
 	/**
@@ -1195,9 +1016,7 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(String regularTripURI, Set<eu.threecixty.profile.oldmodels.PersonalPlace> personalPlaces ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 				+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.PersonalPlace> iterators = personalPlaces.iterator();
@@ -1206,32 +1025,7 @@ public class GetSetQueryStrings {
 			if (personalPlace.getHasPersonalPlaceURI()==null||personalPlace.getHasPersonalPlaceURI().isEmpty())
 				personalPlace.setHasPersonalPlaceURI(regularTripURI+"/PersonalPlace/"+UUID.randomUUID().toString());
 				
-			query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
-			if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
-				query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
-			if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
-				query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
-			if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
-			if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
-			//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
+			query+= makePersonalPlaceQuery(regularTripURI, personalPlace);
 
 		}
 		query+= "}";
@@ -1244,38 +1038,12 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removePersonalPlacesAssociatedToSpecificRegularTrip(String regularTripURI, eu.threecixty.profile.oldmodels.PersonalPlace personalPlace ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (personalPlace.getHasPersonalPlaceURI()!=null&&!personalPlace.getHasPersonalPlaceURI().isEmpty()){
-			query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
-			if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
-				query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
-			if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
-				query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
-			if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
-			if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
-			if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
-			//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
+			query+= makePersonalPlaceQuery(regularTripURI, personalPlace);
+
 		}
 		query+= "}";
 		return query;
@@ -1287,44 +1055,37 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(String regularTripURI, Set<eu.threecixty.profile.oldmodels.PersonalPlace> personalPlaces ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 				+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.PersonalPlace> iterators = personalPlaces.iterator();
 		for ( ; iterators.hasNext(); ){	
 			eu.threecixty.profile.oldmodels.PersonalPlace personalPlace=iterators.next();
 			if (personalPlace.getHasPersonalPlaceURI()!=null&&!personalPlace.getHasPersonalPlaceURI().isEmpty()){
-				query+= "  <"+regularTripURI+"> profile:hasPersonalPlace <"+personalPlace.getHasPersonalPlaceURI()+"> .";
-				if (personalPlace.getHasPersonalPlaceexternalIds()!=null&&!personalPlace.getHasPersonalPlaceexternalIds().isEmpty())
-					query+= " <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceExternalIDs \""+personalPlace.getHasPersonalPlaceexternalIds()+"\" .";
-				if (personalPlace.getLatitude()!=null&&personalPlace.getLatitude()>0)
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:latitude \""+personalPlace.getLatitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (personalPlace.getLongitude()!=null&&personalPlace.getLongitude()>0)
-					query+="  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:longitude \""+personalPlace.getLongitude()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (personalPlace.getHasPersonalPlaceStayDuration()!=null&&personalPlace.getHasPersonalPlaceStayDuration()>0)
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayDuration \""+personalPlace.getHasPersonalPlaceStayDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (personalPlace.getHasPersonalPlaceAccuracy()!=null&&personalPlace.getHasPersonalPlaceAccuracy()>0)
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceAccuracy \""+personalPlace.getHasPersonalPlaceAccuracy()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (personalPlace.getHasPersonalPlaceStayPercentage()!=null&&personalPlace.getHasPersonalPlaceStayPercentage()>0)
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceStayPercentage \""+personalPlace.getHasPersonalPlaceStayPercentage()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (personalPlace.getPostalcode()!=null&&!personalPlace.getPostalcode().isEmpty())
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> vcard:postal-code \""+personalPlace.getPostalcode()+"\" .";
-				if (personalPlace.getHasPersonalPlaceWeekdayPattern()!=null&&!personalPlace.getHasPersonalPlaceWeekdayPattern().isEmpty())
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceWeekDayPattern \""+personalPlace.getHasPersonalPlaceWeekdayPattern()+"\" .";
-				if (personalPlace.getHasPersonalPlaceDayhourPattern()!=null&&!personalPlace.getHasPersonalPlaceDayhourPattern().isEmpty())
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceDayHourPattern \""+personalPlace.getHasPersonalPlaceDayhourPattern()+"\" .";
-				if (personalPlace.getHasPersonalPlaceType()!=null&&!personalPlace.getHasPersonalPlaceType().isEmpty())
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceType \""+personalPlace.getHasPersonalPlaceType()+"\" .";
-				if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
-					query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> profile:hasPersonalPlaceName \""+personalPlace.getHasPersonalPlaceName()+"\" .";
-				//query+= "  profile:"+uid+"PersonalPlace/"+ID+" profile:hasUID \""+ID+"\" .";
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .";
+				query+= makePersonalPlaceQuery(regularTripURI, personalPlace);
 			}
 		}
 		query+= "}";
+		return query;
+	}
+	
+	/**
+	 * make Get Personal Places Query
+	 * @return
+	 */
+	private static String makeGetPersonalPlacesQuery(){
+		String query= "?pplace a profile:PersonalPlace. "
+				+ "Optional {?pplace profile:externalIDs ?externalIDs .}"
+				+ "Optional {?pplace profile:latitude ?latitude .}"
+				+ "Optional {?pplace profile:longitude ?longitude .}"
+				+ "Optional {?pplace profile:stayDuration ?stayDuration .}"
+				+ "Optional {?pplace profile:accuracy ?accuracy .}"
+				+ "Optional {?pplace profile:stayPercentage ?stayPercentage .}"
+				+ "Optional {?pplace profile:postalCode ?pcode .}"
+				+ "Optional {?pplace profile:weekDayPattern ?weekDayPattern .}"
+				+ "Optional {?pplace profile:dayHourPattern ?dayHourPattern .}"
+				+ "Optional {?pplace profile:type ?placeType .}"
+				+ "Optional {?pplace rdfs:label ?placeName .}";
 		return query;
 	}
 	/**
@@ -1333,29 +1094,16 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getPersonalPlaces(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?pplace ?externalIDs ?latitude ?longitude ?stayDuration ?accuracy ?stayPercentage ?pcode ?weekDayPattern ?dayHourPattern ?placeType ?placeName "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasTransport ?transport. "
-					+ "?transport profile:hasRegularTrip ?regularTrip. "
-					+ "?regularTrip profile:hasPersonalPlace ?pplace ."
-					+ "Optional {?pplace profile:hasPersonalPlaceExternalIDs ?externalIDs .}"
-					+ "Optional {?pplace profile:latitude ?latitude .}"
-					+ "Optional {?pplace profile:longitude ?longitude .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceStayDuration ?stayDuration .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceAccuracy ?accuracy .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceStayPercentage ?stayPercentage .}"
-					+ "Optional {?pplace vcard:postal-code ?pcode .}"
-					+ "Optional {?pplace profile:hasUID ?id .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceWeekDayPattern ?weekDayPattern .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceDayHourPattern ?dayHourPattern .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceType ?placeType .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceName ?placeName .}"
-					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s profile:mobility ?transport. "
+					+ "?transport profile:regularTrip ?regularTrip. "
+					+ "?regularTrip profile:personalPlace ?pplace .";
+					query+=makeGetPersonalPlacesQuery();
+					query+=" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
 	}
@@ -1365,25 +1113,12 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getPersonalPlacesForRegularTrips(String regularTripURI) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?pplace ?externalIDs ?latitude ?longitude ?stayDuration ?accuracy ?stayPercentage ?pcode ?weekDayPattern ?dayHourPattern ?placeType ?placeName "
 				+ " where {"
-					+ "?regularTrip profile:hasPersonalPlace ?pplace ."
-					+ "Optional {?pplace profile:hasPersonalPlaceExternalIDs ?externalIDs .}"
-					+ "Optional {?pplace profile:latitude ?latitude .}"
-					+ "Optional {?pplace profile:longitude ?longitude .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceStayDuration ?stayDuration .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceAccuracy ?accuracy .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceStayPercentage ?stayPercentage .}"
-					+ "Optional {?pplace vcard:postal-code ?pcode .}"
-					+ "Optional {?pplace profile:hasUID ?id .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceWeekDayPattern ?weekDayPattern .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceDayHourPattern ?dayHourPattern .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceType ?placeType .}"
-					+ "Optional {?pplace profile:hasPersonalPlaceName ?placeName .}"
-					+" FILTER (STR(?regularTrip) = \""+regularTripURI+"\") "
+					+ "?regularTrip profile:personalPlace ?pplace .";
+					query+=makeGetPersonalPlacesQuery();
+					query+=" FILTER (STR(?regularTrip) = \""+regularTripURI+"\") "
 					+ "}";
 		return query;
 	}
@@ -1393,29 +1128,55 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getPersonalPlacesFromURI(String uri) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?pplace ?externalIDs ?latitude ?longitude ?stayDuration ?accuracy ?stayPercentage ?pcode ?weekDayPattern ?dayHourPattern ?placeType ?placeName "
-				+ " where {"
-					+ "?s a profile:PersonalPlace. "
-					+ "Optional {?s profile:hasPersonalPlaceExternalIDs ?externalIDs .}"
-					+ "Optional {?s profile:latitude ?latitude .}"
-					+ "Optional {?s profile:longitude ?longitude .}"
-					+ "Optional {?s profile:hasPersonalPlaceStayDuration ?stayDuration .}"
-					+ "Optional {?s profile:hasPersonalPlaceAccuracy ?accuracy .}"
-					+ "Optional {?s profile:hasPersonalPlaceStayPercentage ?stayPercentage .}"
-					+ "Optional {?s vcard:postal-code ?pcode .}"
-					+ "Optional {?s profile:hasUID ?id .}"
-					+ "Optional {?s profile:hasPersonalPlaceWeekDayPattern ?weekDayPattern .}"
-					+ "Optional {?s profile:hasPersonalPlaceDayHourPattern ?dayHourPattern .}"
-					+ "Optional {?s profile:hasPersonalPlaceType ?placeType .}"
-					+ "Optional {?s profile:hasPersonalPlaceName ?placeName .}"
-					+" FILTER (STR(?s) = \""+uri+"\") "
+				+ " where {";
+				query+=makeGetPersonalPlacesQuery();
+				query+=" FILTER (STR(?s) = \""+uri+"\") "
 					+ "}";
 		return query;
 	}
 	
+	/**
+	 * make Regular Trip Query
+	 * @param transportUri
+	 * @param regularTrip
+	 * @return
+	 */
+	private static String makeRegularTripQuery(String transportUri,
+			eu.threecixty.profile.oldmodels.RegularTrip regularTrip) {
+		String query= "  <"+transportUri+"> profile:regularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
+		if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdfs:label \""+regularTrip.getHasRegularTripName()+"\" .";
+		if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:departureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
+			query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:departureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:travelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:travelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		//if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
+			//query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:fastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (regularTrip.getHasRegularTripLastChanged()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:lastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
+		if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:totalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:totalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
+		if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:tripModality \""+regularTrip.getHasModalityType()+"\" .";
+		if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:weekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
+		if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:dayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
+		//if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
+		//	query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
+		if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
+			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:weatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
+		query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
+		return query;
+	}
 	/**
 	 * insert regular trip associated to a specific transport of a user in the kb
 	 * @param transportUri
@@ -1423,48 +1184,17 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setRegularTripsAssociatedToSpecificTransport(String transportUri, eu.threecixty.profile.oldmodels.RegularTrip regularTrip){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 				+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 
 			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
-				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
-				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
-				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
-					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripLastChanged()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
-				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
-				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
-				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
-				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
+				query+= makeRegularTripQuery(transportUri, regularTrip);
 			}
 			query+= "}";
 			return query;
 	}
+	
 	/**
 	 * insert multiple regular trip associated to a specific transport of a user in the kb
 	 * @param transportUri
@@ -1472,46 +1202,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String setMultipleRegularTripsAssociatedToSpecificTransport(String transportUri, Set<eu.threecixty.profile.oldmodels.RegularTrip> regularTrips){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iterators = regularTrips.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.RegularTrip regularTrip= iterators.next();
 			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
-				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
-				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
-				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
-					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripLastChanged()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
-				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
-				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
-				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
-				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
+				query+= makeRegularTripQuery(transportUri, regularTrip);
 			}
 		}
 		query+= "}";
@@ -1524,44 +1222,12 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeRegularTripsAssociatedToSpecificTransport(String transportUri, eu.threecixty.profile.oldmodels.RegularTrip regularTrip){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 				+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 
 			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
-				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
-				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
-				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
-					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripLastChanged()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
-				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
-				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
-				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
-				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
+				query+= makeRegularTripQuery(transportUri, regularTrip);
 			}
 			query+= "}";
 			return query;
@@ -1573,49 +1239,40 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String removeMultipleRegularTripsAssociatedToSpecificTransport(String transportUri, Set<eu.threecixty.profile.oldmodels.RegularTrip> regularTrips){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iterators = regularTrips.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.RegularTrip regularTrip= iterators.next();
 			if (regularTrip.getHasRegularTripURI()!=null&&!regularTrip.getHasRegularTripURI().isEmpty()){
-				query+= "  <"+transportUri+"> profile:hasRegularTrip <"+regularTrip.getHasRegularTripURI()+"> .";
-				if (regularTrip.getHasRegularTripName()!=null&&!regularTrip.getHasRegularTripName().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripName \""+regularTrip.getHasRegularTripName()+"\" .";
-				if (regularTrip.getHasRegularTripDepartureTime()!=null&&regularTrip.getHasRegularTripDepartureTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTime \""+regularTrip.getHasRegularTripDepartureTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripDepartureTimeSD()!=null&&regularTrip.getHasRegularTripDepartureTimeSD()>0)
-					query+="  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDepartureTimeSD \""+regularTrip.getHasRegularTripDepartureTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTime()!=null&&regularTrip.getHasRegularTripTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTime \""+regularTrip.getHasRegularTripTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTravelTimeSD()!=null&&regularTrip.getHasRegularTripTravelTimeSD()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTravelTimeSD \""+regularTrip.getHasRegularTripTravelTimeSD()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripFastestTravelTime()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripFastestTravelTime \""+regularTrip.getHasRegularTripFastestTravelTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripFastestTravelTime()!=null&&regularTrip.getHasRegularTripLastChanged()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripLastChanged \""+regularTrip.getHasRegularTripLastChanged()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (regularTrip.getHasRegularTripTotalDistance()!=null&&regularTrip.getHasRegularTripTotalDistance()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalDistance \""+regularTrip.getHasRegularTripTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasRegularTripTotalCount()!=null&&regularTrip.getHasRegularTripTotalCount()>0)
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTotalCount \""+regularTrip.getHasRegularTripTotalCount()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (regularTrip.getHasModalityType().toString()!=null&&!regularTrip.getHasModalityType().toString().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasModalityType \""+regularTrip.getHasModalityType()+"\" .";
-				if (regularTrip.getHasRegularTripWeekdayPattern()!=null&&!regularTrip.getHasRegularTripWeekdayPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeekdayPattern \""+regularTrip.getHasRegularTripWeekdayPattern()+"\" .";
-				if (regularTrip.getHasRegularTripDayhourPattern()!=null&&!regularTrip.getHasRegularTripDayhourPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripDayhourPattern \""+regularTrip.getHasRegularTripDayhourPattern()+"\" .";
-				if (regularTrip.getHasRegularTripTravelTimePattern()!=null&&!regularTrip.getHasRegularTripTravelTimePattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripTimePattern \""+regularTrip.getHasRegularTripTravelTimePattern()+"\" .";
-				if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
-					query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:hasRegularTripWeatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" .";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip .";
+				query+= makeRegularTripQuery(transportUri, regularTrip);
 			}
 		}
 		query+= "}";
+		return query;
+	}
+	/**
+	 * make get regular trips query
+	 * @return
+	 */
+	private static String makeGetRegularTripsQuery(){
+		String query= "?transport profile:regularTrip ?regularTrip. "
+				+ "Optional {?regularTrip profile:id ?tripID .}"
+				+ "Optional {?regularTrip rdfs:label ?name .}"
+				+ "Optional {?regularTrip profile:departureTime ?departureTime .}"
+				+ "Optional {?regularTrip profile:departureTimeSD ?departuretimeSD .}"
+				+ "Optional {?regularTrip profile:travelTime ?travelTime .}"
+				+ "Optional {?regularTrip profile:travelTimeSD ?travelTimeSD .}"
+				//+ "Optional {?regularTrip profile:hasRegularTripFastestTravelTime ?fastestTravelTime .}"
+				+ "Optional {?regularTrip profile:lastChanged ?lastChanged .}"
+				+ "Optional {?regularTrip profile:totalDistance ?totalDistance .}"
+				+ "Optional {?regularTrip profile:totalCount ?totalCount .}"
+				+ "Optional {?regularTrip profile:tripModality ?modalityType .}"
+				+ "Optional {?regularTrip profile:weekdayPattern ?weekdayPattern .}"
+				+ "Optional {?regularTrip profile:dayhourPattern ?dayhourPattern .}"
+				//+ "Optional {?regularTrip profile:hasRegularTripTimePattern ?timePattern .}"
+				+ "Optional {?regularTrip profile:weatherPattern ?weatherPattern .}";
 		return query;
 	}
 	/**
@@ -1624,31 +1281,14 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getRegularTrips(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
-				+ "select ?regularTrip ?tripID ?name ?departureTime ?departureTimeSD ?travelTime ?travelTimeSD ?fastestTravelTime ?lastChanged ?totalDistance ?totalCount ?modalityType ?weekdayPattern ?dayhourPattern ?timePattern ?weatherPattern "//?pplace "
+		String query=PREFIX
+				+ " select ?regularTrip ?tripID ?name ?departureTime ?departureTimeSD ?travelTime ?travelTimeSD ?lastChanged ?totalDistance ?totalCount ?modalityType ?weekdayPattern ?dayhourPattern ?weatherPattern "//?pplace "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasTransport ?transport. "
-					+ "?transport profile:hasRegularTrip ?regularTrip. "
-					+ "Optional {?regularTrip profile:hasRegularTripID ?tripID .}"
-					+ "Optional {?regularTrip profile:hasRegularTripName ?name .}"
-					+ "Optional {?regularTrip profile:hasRegularTripDepartureTime ?departureTime .}"
-					+ "Optional {?regularTrip profile:hasRegularTripDepartureTimeSD ?departuretimeSD .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTravelTime ?travelTime .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTravelTimeSD ?travelTimeSD .}"
-					+ "Optional {?regularTrip profile:hasRegularTripFastestTravelTime ?fastestTravelTime .}"
-					+ "Optional {?regularTrip profile:hasRegularTripLastChanged ?lastChanged .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTotalDistance ?totalDistance .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTotalCount ?totalCount .}"
-					+ "Optional {?regularTrip profile:hasModalityType ?modalityType .}"
-					+ "Optional {?regularTrip profile:hasRegularTripWeekdayPattern ?weekdayPattern .}"
-					+ "Optional {?regularTrip profile:hasRegularTripDayhourPattern ?dayhourPattern .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTimePattern ?timePattern .}"
-					+ "Optional {?regularTrip profile:hasRegularTripWeatherPattern ?weatherPattern .}"
-					+" FILTER (STR(?uid) = \""+uid+"\") "
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s profile:mobility ?transport. ";
+					query+=makeGetRegularTripsQuery();
+					query+=" FILTER (STR(?uid) = \""+uid+"\") "
 					+ "}";
 		return query;
 	}
@@ -1658,107 +1298,88 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getRegularTripsForTransport(String transportURI) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
-				+ "select ?regularTrip ?tripID ?name ?departureTime ?departureTimeSD ?travelTime ?travelTimeSD ?fastestTravelTime ?lastChanged ?totalDistance ?totalCount ?modalityType ?weekdayPattern ?dayhourPattern ?timePattern ?weatherPattern "//?pplace "
-				+ " where {"
-					+ "?transport profile:hasRegularTrip ?regularTrip. "
-					+ "Optional {?regularTrip profile:hasRegularTripID ?tripID .}"
-					+ "Optional {?regularTrip profile:hasRegularTripName ?name .}"
-					+ "Optional {?regularTrip profile:hasRegularTripDepartureTime ?departureTime .}"
-					+ "Optional {?regularTrip profile:hasRegularTripDepartureTimeSD ?departuretimeSD .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTravelTime ?travelTime .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTravelTimeSD ?travelTimeSD .}"
-					+ "Optional {?regularTrip profile:hasRegularTripFastestTravelTime ?fastestTravelTime .}"
-					+ "Optional {?regularTrip profile:hasRegularTripLastChanged ?lastChanged .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTotalDistance ?totalDistance .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTotalCount ?totalCount .}"
-					+ "Optional {?regularTrip profile:hasModalityType ?modalityType .}"
-					+ "Optional {?regularTrip profile:hasRegularTripWeekdayPattern ?weekdayPattern .}"
-					+ "Optional {?regularTrip profile:hasRegularTripDayhourPattern ?dayhourPattern .}"
-					+ "Optional {?regularTrip profile:hasRegularTripTimePattern ?timePattern .}"
-					+ "Optional {?regularTrip profile:hasRegularTripWeatherPattern ?weatherPattern .}"
-					+" FILTER (STR(?transport) = \""+transportURI+"\") "
+		String query=PREFIX
+				+ " select ?regularTrip ?tripID ?name ?departureTime ?departureTimeSD ?travelTime ?travelTimeSD ?lastChanged ?totalDistance ?totalCount ?modalityType ?weekdayPattern ?dayhourPattern  ?weatherPattern "//?pplace "
+				+ " where {";
+				query+=makeGetRegularTripsQuery();
+				query+=" FILTER (STR(?transport) = \""+transportURI+"\") "
 					+ "}";
 		return query;
 	}
 	
+	/**
+	 * make query for the TripPreference
+	 * @param uid
+	 * @param tripPreference
+	 * @return
+	 */
+	private static String makeTripPreferenceQuery(String uid,
+			eu.threecixty.profile.oldmodels.TripPreference tripPreference, String type) {
+		String about="_:about";
+		String filter="_:filter";
+		if (type.isEmpty()){
+			about="?about";
+			filter="?filter";
+		}
+		String query= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type frap:Preference ."
+				+ " <"+tripPreference.getHasTripPreferenceURI()+"> frap:about "+about+" . "
+				+ about+" rdf:type frap:Pattern . "
+				+ about+"  frap:filter "+filter+" . "
+				+ filter+"  rdf:type frap:Filter . ";
+		if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
+			query+= filter+"  profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> . ";
+		if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
+			query+=filter+"  profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> . ";
+		if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
+			query+= filter+" profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> . ";
+		if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
+			query+= filter+"   profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" . ";
+		if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
+			query+= filter+"   profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" . ";
+		if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
+			query+= filter+"   profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" . ";
+		if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
+			query+= filter+"   profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> . ";
+		if (tripPreference.getHasModalityType()!=null)
+			query+= filter+"   profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" . ";
+		query+= "  <"+PROFILE_URI+uid+"> frap:holds <"+tripPreference.getHasTripPreferenceURI()+"> . ";
+		return query;
+	}
 	/**
 	 * insert Trip preferences of the user in the kb
 	 * @param preferenceURI
 	 * @param tripPreference
 	 * @return
 	 */
-	public static String setTripPreferences(String preferenceURI, eu.threecixty.profile.oldmodels.TripPreference tripPreference){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String setTripPreferences(String uid, eu.threecixty.profile.oldmodels.TripPreference tripPreference){
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
+		
 		if (tripPreference.getHasTripPreferenceURI()!=null&&!tripPreference.getHasTripPreferenceURI().isEmpty())
-			tripPreference.setHasTripPreferenceURI(preferenceURI+"/TripPreference/"+UUID.randomUUID().toString());
+			tripPreference.setHasTripPreferenceURI(PROFILE_URI+uid+"/Preference/TripPreference/"+UUID.randomUUID().toString());
 	
-		query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
-		if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-		if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
-			query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-		if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-		if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
-		if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
-		if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
-		if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-		if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
-		query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-		query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
-
+		query+= makeTripPreferenceQuery(uid, tripPreference,"I");
 		query+= "}";
 		return query;
 	}
 	/**
 	 * insert multiple Trip preferences of the user in the kb
-	 * @param preferenceURI
+	 * @param uid
 	 * @param tripPreferences
 	 * @return
 	 */
-	public static String setMultipleTripPreferences(String preferenceURI, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String setMultipleTripPreferences(String uid, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences){
+		String query=PREFIX
 				+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.TripPreference> iterators = tripPreferences.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.TripPreference tripPreference=iterators.next();
 			if (tripPreference.getHasTripPreferenceURI()==null ||tripPreference.getHasTripPreferenceURI().isEmpty())
-				tripPreference.setHasTripPreferenceURI(preferenceURI+"/TripPreference/"+UUID.randomUUID().toString());
+				tripPreference.setHasTripPreferenceURI(PROFILE_URI+uid+"/Preference/TripPreference/"+UUID.randomUUID().toString());
 			
-			query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
-			if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
-				query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
-			if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
-			if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
-			if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
+			query+= makeTripPreferenceQuery(uid, tripPreference,"I");
 			
 		}
 		query+= "}";
@@ -1766,75 +1387,35 @@ public class GetSetQueryStrings {
 	}
 	/**
 	 * remove Trip preferences of the user in the kb
-	 * @param preferenceURI
+	 * @param uid
 	 * @param tripPreference
 	 * @return
 	 */
-	public static String removeTripPreferences(String preferenceURI, eu.threecixty.profile.oldmodels.TripPreference tripPreference){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removeTripPreferences(String uid, eu.threecixty.profile.oldmodels.TripPreference tripPreference){
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 		if (tripPreference.getHasTripPreferenceURI()!=null&&!tripPreference.getHasTripPreferenceURI().isEmpty()){
-			query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
-			if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-			if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
-				query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
-			if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
-			if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
-			if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-			if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
+			query+= makeTripPreferenceQuery(uid, tripPreference,"");
 		}
 		query+= "}";
 		return query;
 	}
 	/**
 	 * remove multiple Trip preferences of the user in the kb
-	 * @param preferenceURI
+	 * @param uid
 	 * @param tripPreferences
 	 * @return
 	 */
-	public static String removeMultipleTripPreferences(String preferenceURI, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-				+ "   prefix profile:<"+PROFILE_URI+">"
-				+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removeMultipleTripPreferences(String uid, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences){
+		String query=PREFIX
 				+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.TripPreference> iterators = tripPreferences.iterator();
 		for ( ; iterators.hasNext(); ){
 			eu.threecixty.profile.oldmodels.TripPreference tripPreference=iterators.next();
 			if (tripPreference.getHasTripPreferenceURI()!=null&&!tripPreference.getHasTripPreferenceURI().isEmpty()){
-				query+= "  <"+preferenceURI+"> profile:hasTripPrefernce <"+tripPreference.getHasTripPreferenceURI()+"> .";
-				if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
-					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> .";
-				if (tripPreference.getHasPreferredTripDuration()!=null&&tripPreference.getHasPreferredTripDuration()>0)
-					query+="  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripDuration \""+tripPreference.getHasPreferredTripDuration()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (tripPreference.getHasPreferredTripTime()!=null&&tripPreference.getHasPreferredTripTime()>0)
-					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredTripTime \""+tripPreference.getHasPreferredTripTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (tripPreference.getHasPreferredCity()!=null&&!tripPreference.getHasPreferredCity().isEmpty())
-					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCity \""+tripPreference.getHasPreferredCity()+"\" .";
-				if (tripPreference.getHasPreferredCountry()!=null&&!tripPreference.getHasPreferredCountry().isEmpty())
-					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredCountry \""+tripPreference.getHasPreferredCountry()+"\" .";
-				if (tripPreference.getHasPreferredWeatherCondition()!=null&&!tripPreference.getHasPreferredWeatherCondition().isEmpty())
-					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredWeatherCondition \""+tripPreference.getHasPreferredWeatherCondition()+"\" .";
-				if (tripPreference.getHasPreferredMinTimeOfAccompany()!=null&&tripPreference.getHasPreferredMinTimeOfAccompany()>0)
-					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasPreferredMinTimeOfAccompany \""+tripPreference.getHasPreferredMinTimeOfAccompany()+"\"^^<http://www.w3.org/2001/XMLSchema#long> .";
-				if (tripPreference.getHasModalityType().toString()!=null&&!tripPreference.getHasModalityType().toString().isEmpty())
-					query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> profile:hasModalityType \""+tripPreference.getHasModalityType().toString()+"\" .";
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+tripPreference.getHasTripPreferenceURI()+"> rdf:type profile:TripPreference .";
+				query+= makeTripPreferenceQuery(uid, tripPreference,"");
 			}
 		}
 		query+= "}";
@@ -1846,90 +1427,109 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getTripPreferences(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
+		String query=PREFIX
 				+ "select ?tripPreference ?preferredMaxTotalDistance ?preferredTripDuration ?preferredTripTime ?preferredCity ?preferredCountry ?preferredWeatherCondition ?preferredMinTimeOfAccompany ?modality "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasPreference ?pref. "
-					+ "?pref profile:hasTripPrefernce ?tripPreference. "
-					+ "Optional {?tripPreference profile:hasPreferredMaxTotalDistance ?preferredMaxTotalDistance .}"
-					+ "Optional {?tripPreference profile:hasPreferredTripDuration ?preferredTripDuration .}"
-					+ "Optional {?tripPreference profile:hasPreferredTripTime ?preferredTripTime .}"
-					+ "Optional {?tripPreference profile:hasPreferredCity ?preferredCity .}"
-					+ "Optional {?tripPreference profile:hasPreferredCountry ?preferredCountry .}"
-					+ "Optional {?tripPreference profile:hasPreferredWeatherCondition ?preferredWeatherCondition .}"
-					+ "Optional {?tripPreference profile:hasPreferredMinTimeOfAccompany ?preferredMinTimeOfAccompany .}"
-					+ "Optional {?tripPreference profile:hasModalityType ?modality .}"
+					+ "?s a frap:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s frap:holds ?tripPreference. "
+					+ "?tripPreference frap:about ?about . "
+					+ "?about frap:filter ?filter . "
+					+ "Optional {?filter profile:hasPreferredMaxTotalDistance ?preferredMaxTotalDistance .}"
+					+ "Optional {?filter profile:hasPreferredTripDuration ?preferredTripDuration .}"
+					+ "Optional {?filter profile:hasPreferredTripTime ?preferredTripTime .}"
+					+ "Optional {?filter profile:hasPreferredCity ?preferredCity .}"
+					+ "Optional {?filter profile:hasPreferredCountry ?preferredCountry .}"
+					+ "Optional {?filter profile:hasPreferredWeatherCondition ?preferredWeatherCondition .}"
+					+ "Optional {?filter profile:hasPreferredMinTimeOfAccompany ?preferredMinTimeOfAccompany .}"
+					+ "Optional {?filter profile:hasModalityType ?modality .}"
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
 	}
-
+	
 	/**
-	 * insert place preference of the user in the kb
-	 * @param preferenceURI
-	 * @param placePreferenceURI
+	 * make the query for placePreference
+	 * @param uid
+	 * @param placePreference
 	 * @return
 	 */
-	public static String setPlacePreferences(String preferenceURI, String placePreferenceURI ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	private static String makePlacePreferenceQuery(String uid,
+			eu.threecixty.profile.oldmodels.PlacePreference placePreference, String type) {
+		String query= " <"+PROFILE_URI+uid+"> frap:holds <"+placePreference.getHasPlacePreferenceURI()+"> .";
+		query+= "  <"+placePreference.getHasPlacePreferenceURI()+"> rdf:type frap:Preference .";
+		String about="_:about";
+		String filter="_:filter";
+		if (type.isEmpty()){
+			about="?about";
+			filter="?filter";
+		}
+		
+		query+= " <"+placePreference.getHasPlacePreferenceURI()+"> frap:about "+about+" . "
+		+ about+" rdf:type frap:Pattern . "
+		+ about+" frap:filter "+filter+" . "
+		+ filter+" rdf:type frap:Filter . ";
+		
+		if (placePreference.getHasPlaceDetailPreference()!=null){
+			if (placePreference.getHasPlaceDetailPreference().getHasNatureOfPlace()!=null) 
+				query+= filter+" profile:hasNatureOfPlace"+ placePreference.getHasPlaceDetailPreference().getHasNatureOfPlace()+" . ";
+		}
+		return query;
+	}
+	/**
+	 * insert place preference of the user in the kb
+	 * @param uid
+	 * @param placePreference
+	 * @return
+	 */
+	public static String setPlacePreferences(String uid, eu.threecixty.profile.oldmodels.PlacePreference placePreference ){
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (placePreferenceURI==null ||placePreferenceURI.isEmpty())
-			placePreferenceURI=preferenceURI+"/PlacePreference/"+UUID.randomUUID().toString();
+		if (placePreference.getHasPlacePreferenceURI()==null ||placePreference.getHasPlacePreferenceURI().isEmpty())
+			placePreference.setHasPlacePreferenceURI(PROFILE_URI+uid+"/Preference/PlacePreference/"+UUID.randomUUID().toString());
 		
-		query+= " <"+preferenceURI+"> profile:hasPlacePreference <"+placePreferenceURI+"> .";
-		query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-		query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
+		query+= makePlacePreferenceQuery(uid, placePreference,"I");
 
 		query+= "}";
 		return query;
 	}
+	
 	/**
 	 * insert multiple place preferences of the user in the kb
-	 * @param preferenceURI
-	 * @param placePreferenceURIs
+	 * @param uid
+	 * @param placePreferences
 	 * @return
 	 */
-	public static String setMultiplePlacePreferences(String preferenceURI, Set<String> placePreferenceURIs ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String setMultiplePlacePreferences(String uid, Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences){
+		String query=PREFIX
 			+ "  INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		Iterator <String> iterators = placePreferenceURIs.iterator();
+		Iterator <eu.threecixty.profile.oldmodels.PlacePreference> iterators = placePreferences.iterator();
 		for ( ; iterators.hasNext(); ){
-			String placePreferenceURI=iterators.next();
-			if (placePreferenceURI!=null&&!placePreferenceURI.isEmpty()){
-				query+= " <"+preferenceURI+"> profile:hasPlacePreference "+placePreferenceURI+" .";
-				query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
-			}
+			eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
+			if (placePreference.getHasPlacePreferenceURI()==null || placePreference.getHasPlacePreferenceURI().isEmpty())
+				placePreference.setHasPlacePreferenceURI(PROFILE_URI+uid+"/Preference/PlacePreference/"+UUID.randomUUID().toString());
+			query+= makePlacePreferenceQuery(uid, placePreference,"I");
+
 		}
 		query+= "}";
 		return query;
 	}
 	/**
 	 * remove place preference of the user in the kb
-	 * @param preferenceURI
-	 * @param placePreferenceURI
+	 * @param uid
+	 * @param placePreference
 	 * @return
 	 */
-	public static String removePlacePreferences(String preferenceURI, String placePreferenceURI ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removePlacePreferences(String uid, eu.threecixty.profile.oldmodels.PlacePreference placePreference ){
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		if (placePreferenceURI!=null){
-			query+= " <"+preferenceURI+"> profile:hasPlacePreference <"+placePreferenceURI+"> .";
-			query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-			query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
+		if (placePreference.getHasPlacePreferenceURI()!=null){
+			query+= makePlacePreferenceQuery(uid, placePreference,"");
+
+
 		}
 		query+= "}";
 		return query;
@@ -1940,19 +1540,16 @@ public class GetSetQueryStrings {
 	 * @param placePreferenceURIs
 	 * @return
 	 */
-	public static String removeMultiplePlacePreferences(String preferenceURI, Set<String> placePreferenceURIs ){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+	public static String removeMultiplePlacePreferences(String uid, Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences ){
+		String query=PREFIX
 			+ "   DELETE FROM GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
-		Iterator <String> iterators = placePreferenceURIs.iterator();
+		Iterator <eu.threecixty.profile.oldmodels.PlacePreference> iterators = placePreferences.iterator();
 		for ( ; iterators.hasNext(); ){
-			String placePreferenceURI=iterators.next();
-			if (placePreferenceURI!=null&&!placePreferenceURI.isEmpty()){
-				query+= " <"+preferenceURI+"> profile:hasPlacePreference <"+placePreferenceURI+"> .";
-				query+= "  <"+placePreferenceURI+"> rdf:type <http://www.w3.org/2002/07/owl#NamedIndividual>.";
-				query+= "  <"+placePreferenceURI+"> rdf:type profile:PlacePreference .";
+			eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
+			if (placePreference.getHasPlacePreferenceURI()!=null&&!placePreference.getHasPlacePreferenceURI().isEmpty()){
+				query+= makePlacePreferenceQuery(uid, placePreference,"");
+
 			}
 		}
 		query+= "}";
@@ -1964,16 +1561,15 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String getPlacePreferences(String uid) {
-		String query="prefix profile:<"+PROFILE_URI+"> "
-				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
-				+ "prefix foaf:<http://xmlns.com/foaf/0.1/>"
-				+ "select ?placePreference ?placeDetailPreference "
+		String query=PREFIX
+				+ "select ?placePreference ?natureOfPlace "
 				+ " where {"
-					+ "?s a profile:UserProfile. "
-					+" ?s profile:hasUID ?uid. "
-					+ "?s profile:hasPreference ?pref. "
-					+ "?pref profile:hasPlacePreference ?placePreference. "
-					+ "Optional {?placePreference profile:hasPlaceDetailPreference ?placeDetailPreference .}"
+					+ "?s a foaf:Person. "
+					+" ?s profile:userID ?uid. "
+					+ "?s frap:holds ?placePreference. "
+					+ "?placePreference frap:about ?about . "
+					+ "?about frap:filter ?filter . "
+					+ "Optional {?filter profile:hasNatureOfPlace ?natureOfPlace .}"
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
 		return query;
@@ -1984,11 +1580,9 @@ public class GetSetQueryStrings {
 	 * @param placePreferenceURI
 	 * @param placeDetailPreference
 	 * @return
-	 */
+	 *//*
 	public static String setPlaceDetailPreference(String placePreferenceURI, eu.threecixty.profile.oldmodels.PlaceDetailPreference placeDetailPreference){
-		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
-			+ "   prefix profile:<"+PROFILE_URI+">"
-			+ "   prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+		String query=PREFIX
 			+ "   INSERT INTO GRAPH <"+ virtuosoConnection.GRAPH+">"
 			+ " { ";
 			if (placeDetailPreference.getHasPlaceDetailPreferenceURI()==null ||placeDetailPreference.getHasPlaceDetailPreferenceURI().isEmpty())
@@ -2003,12 +1597,12 @@ public class GetSetQueryStrings {
 			query+= "}";
 			return query;
 	}
-	/**
+	*//**
 	 * remove place detail preferences of the user in the kb
 	 * @param placePreferenceURI
 	 * @param placeDetailPreference
 	 * @return
-	 */
+	 *//*
 	public static String removePlaceDetailPreference(String placePreferenceURI, eu.threecixty.profile.oldmodels.PlaceDetailPreference placeDetailPreference){
 		String query="prefix vcard:<http://www.w3.org/2006/vcard/ns#>"
 			+ "   prefix profile:<"+PROFILE_URI+">"
@@ -2026,11 +1620,11 @@ public class GetSetQueryStrings {
 			query+= "}";
 			return query;
 	}
-	/**
+	*//**
 	 * select place detail preferences of the user in the kb
 	 * @param uid
 	 * @return
-	 */
+	 *//*
 	public static String getPlaceDetailPreference(String uid) {
 		String query="prefix profile:<"+PROFILE_URI+"> "
 				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
@@ -2047,11 +1641,11 @@ public class GetSetQueryStrings {
 					+ "}";
 		return query;
 	}	
-	/**
+	*//**
 	 * select place detail preferences associated to a URI 
 	 * @param uri
 	 * @return
-	 */
+	 *//*
 	public static String getPlaceDetailPreferenceFromURI(String uri) {
 		String query="prefix profile:<"+PROFILE_URI+"> "
 				+ "prefix vcard:<http://www.w3.org/2006/vcard/ns#> "
@@ -2063,4 +1657,4 @@ public class GetSetQueryStrings {
 					+ "}";
 		return query;
 	}	
-}
+*/}

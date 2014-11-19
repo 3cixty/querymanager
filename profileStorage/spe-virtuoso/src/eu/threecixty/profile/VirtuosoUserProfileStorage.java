@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -17,7 +20,9 @@ import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
 public class VirtuosoUserProfileStorage {
 	
-	private static final String PROFILE_URI = "http://www.eu.3cixty.org/profile#";
+	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
+	
+	private static final Object _sync = new Object();
 	
 	/**
 	 * Loads profile information from the KB.
@@ -60,6 +65,7 @@ public class VirtuosoUserProfileStorage {
 		if (profile == null) return false;
 		
 		try {
+			
 			saveUIDInfoTOKB(profile.getHasUID());
 			
 			saveGenderToKB(profile.getHasUID(),profile.getHasGender());
@@ -80,7 +86,6 @@ public class VirtuosoUserProfileStorage {
 			else
 				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
 			
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -99,13 +104,13 @@ public class VirtuosoUserProfileStorage {
 			
 			stmt = conn.createStatement();
 			
-
+			
 			String deleteQuery = GetSetQueryStrings.removeUser(uid);
 			virtuosoConnection.insertDeleteQuery(deleteQuery);
-
+			
 			String insertQuery = GetSetQueryStrings.setUser(uid);
 			virtuosoConnection.insertDeleteQuery(insertQuery);
-
+			
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
@@ -187,7 +192,7 @@ public class VirtuosoUserProfileStorage {
 						eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
 						profileIdentities.setHasSource("https://plus.google.com");
 						profileIdentities.setHasSourceCarrier("Google");
-						profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/ProfileItentities/"+profileIdentities.getHasSourceCarrier());
+						profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
 						profileIdentities.setHasUserAccountID(know);
 						profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
 						str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
@@ -267,7 +272,7 @@ public class VirtuosoUserProfileStorage {
 				    if (uri!=null)
 				    	tmpProfile.setHasProfileIdentitiesURI(uri.asResource().getURI());
 				    if (source!=null)
-				    	tmpProfile.setHasSource(source.toString());
+				    	tmpProfile.setHasSource(source.asResource().getURI());
 				    if (piID!=null)
 				    	tmpProfile.setHasUserAccountID(piID.toString());	
 				    if (uIM!=null)
@@ -444,7 +449,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param likes
 	 */
-	private static void saveLikesToKB(String uid, String preferenceURI, Set<eu.threecixty.profile.oldmodels.Likes> likes) {
+	private static void saveLikesToKB(String uid, Set<eu.threecixty.profile.oldmodels.Likes> likes) {
 		Set <eu.threecixty.profile.oldmodels.Likes> oldLikes = new HashSet <eu.threecixty.profile.oldmodels.Likes>();
 				
 		Connection conn = null;
@@ -481,11 +486,11 @@ public class VirtuosoUserProfileStorage {
 				}
 			}
 			
-			String str = GetSetQueryStrings.removeMultipleLikes(preferenceURI, oldLikes);
+			String str = GetSetQueryStrings.removeMultipleLikes(uid, oldLikes);
 			virtuosoConnection.insertDeleteQuery(str);
 		
 			if (likes!=null&&!likes.isEmpty()){
-				str = GetSetQueryStrings.setMultipleLikes(preferenceURI, likes);
+				str = GetSetQueryStrings.setMultipleLikes(uid, likes);
 				virtuosoConnection.insertDeleteQuery(str);
 			}
 			return;
@@ -524,84 +529,14 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 */
 	private static void savePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference) {
-		
-		eu.threecixty.profile.oldmodels.Preference oldPrefs = new eu.threecixty.profile.oldmodels.Preference();
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=virtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getPreferences(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					
-				    RDFNode prefURI = qs.get("pref");
-				    
-				    if (prefURI!=null)
-				    	oldPrefs.setHasPreferenceURI(prefURI.asResource().getURI());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-			}
-			
-			
-			saveLikesToKB(uid, oldPrefs.getHasPreferenceURI(), null);
-			
-			saveTripPreferenceToKB(uid, oldPrefs.getHasPreferenceURI(), null);
-			
-			savePlacePreferenceToKB(uid, oldPrefs.getHasPreferenceURI(), null);
-			
-			String str = GetSetQueryStrings.removePreferences(uid,oldPrefs.getHasPreferenceURI());
-			virtuosoConnection.insertDeleteQuery(str);
-			
 			if (preference!=null){
-				if (preference.getHasPreferenceURI()==null && preference.getHasPreferenceURI().isEmpty())
-					preference.setHasPreferenceURI(PROFILE_URI+uid+"/Preference");
 				
-				str = GetSetQueryStrings.setPreferences(uid,preference.getHasPreferenceURI());
-				virtuosoConnection.insertDeleteQuery(str);
+				saveLikesToKB(uid,  preference.getHasLikes());
 				
-				saveLikesToKB(uid, preference.getHasPreferenceURI(), preference.getHasLikes());
+				saveTripPreferenceToKB(uid, preference.getHasTripPreference());
 				
-				saveTripPreferenceToKB(uid, preference.getHasPreferenceURI(), preference.getHasTripPreference());
-				
-				savePlacePreferenceToKB(uid, preference.getHasPreferenceURI(), preference.getHasPlacePreference());
+				savePlacePreferenceToKB(uid, preference.getHasPlacePreference());
 			}
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}		
 	}
 
 	/**
@@ -610,7 +545,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param placePreferences
 	 */
-	private static void savePlacePreferenceToKB(String uid, String preferenceURI, Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
+	private static void savePlacePreferenceToKB(String uid, Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
 		Set<eu.threecixty.profile.oldmodels.PlacePreference> oldPlacePreferences = new HashSet<eu.threecixty.profile.oldmodels.PlacePreference>();
 		
 		Connection conn = null;
@@ -633,12 +568,12 @@ public class VirtuosoUserProfileStorage {
 					eu.threecixty.profile.oldmodels.PlacePreference placePreference = new eu.threecixty.profile.oldmodels.PlacePreference();
 					
 					RDFNode placePreferenceURI = qs.get("placePreference");
-					RDFNode placeDetailPreferenceURI = qs.get("placeDetailPreference");
+					RDFNode natureOfPlace = qs.get("natureOfPlace");
 					
 					if (placePreferenceURI!=null)
 				    	placePreference.setHasPlacePreferenceURI(placePreferenceURI.asResource().getURI());
-					if (placeDetailPreferenceURI!=null){
-				       	loadPlaceDetailPreferenceFromKBToPlacePreference(placeDetailPreferenceURI.asResource().getURI(),placePreference);
+					if (natureOfPlace!=null){
+				       	loadPlaceDetailPreferenceFromKBToPlacePreference(natureOfPlace.asLiteral().getString(),placePreference);
 				    }
 				    oldPlacePreferences.add(placePreference);
 				}catch (Exception e) {
@@ -649,9 +584,9 @@ public class VirtuosoUserProfileStorage {
 			Iterator <eu.threecixty.profile.oldmodels.PlacePreference> iterators=oldPlacePreferences.iterator();
 			for ( ; iterators.hasNext(); ){ 
 				eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
-				String str = GetSetQueryStrings.removePlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
-				virtuosoConnection.insertDeleteQuery(str);
-				str = GetSetQueryStrings.removePlacePreferences(preferenceURI, placePreference.getHasPlacePreferenceURI());
+				//String str = GetSetQueryStrings.removePlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
+				//virtuosoConnection.insertDeleteQuery(str);
+				String str = GetSetQueryStrings.removePlacePreferences(uid, placePreference);
 				virtuosoConnection.insertDeleteQuery(str);
 			}	
 			
@@ -659,9 +594,9 @@ public class VirtuosoUserProfileStorage {
 				iterators=placePreferences.iterator();
 				for ( ; iterators.hasNext(); ){ 
 					eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
-					String str = GetSetQueryStrings.setPlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
-					virtuosoConnection.insertDeleteQuery(str);
-					str = GetSetQueryStrings.setPlacePreferences(preferenceURI, placePreference.getHasPlacePreferenceURI());
+					//String str = GetSetQueryStrings.setPlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
+					//virtuosoConnection.insertDeleteQuery(str);
+					String str = GetSetQueryStrings.setPlacePreferences(uid, placePreference);
 					virtuosoConnection.insertDeleteQuery(str);
 				}
 			}
@@ -697,7 +632,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param tripPreferences
 	 */
-	private static void saveTripPreferenceToKB(String uid, String preferenceURI, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
+	private static void saveTripPreferenceToKB(String uid, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
 		Set<eu.threecixty.profile.oldmodels.TripPreference> oldTripPreferences = new HashSet<eu.threecixty.profile.oldmodels.TripPreference>();
 		
 		Connection conn = null;
@@ -757,10 +692,10 @@ public class VirtuosoUserProfileStorage {
 				}
 			}
 			
-			String str = GetSetQueryStrings.removeMultipleTripPreferences(preferenceURI, oldTripPreferences);
+			String str = GetSetQueryStrings.removeMultipleTripPreferences(uid, oldTripPreferences);
 			virtuosoConnection.insertDeleteQuery(str);
 			if (tripPreferences!=null&&!tripPreferences.isEmpty()){
-				str = GetSetQueryStrings.setMultipleTripPreferences(preferenceURI, tripPreferences);
+				str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
 				virtuosoConnection.insertDeleteQuery(str);
 			}
 			return;
@@ -890,8 +825,8 @@ public class VirtuosoUserProfileStorage {
 				iterators=transports.iterator();
 				for ( ; iterators.hasNext(); ){ 
 					eu.threecixty.profile.oldmodels.Transport transport=iterators.next();
-					if (transport.getHasTransportURI()==null&&transport.getHasTransportURI().isEmpty()) {
-						transport.setHasTransportURI(PROFILE_URI+uid+"/Transport/"+UUID.randomUUID().toString());
+					if (transport.getHasTransportURI()==null||transport.getHasTransportURI().isEmpty()) {
+						transport.setHasTransportURI(PROFILE_URI+uid+"/Mobility/"+UUID.randomUUID().toString());
 					}
 					
 					if (transport.getHasAccompanyings()!=null&&!transport.getHasAccompanyings().isEmpty()){
@@ -974,12 +909,12 @@ public class VirtuosoUserProfileStorage {
 			for ( ; results.hasNext(); ) {
 				QuerySolution qs = results.next();
 				try {
-					RDFNode nameuri = qs.get("name");
+					//RDFNode nameuri = qs.get("name");
 					RDFNode gn = qs.get("givenname");
 					RDFNode fn = qs.get("familyname");
 				    
-				    if (nameuri!=null)
-				    	toNameTemp.setHasNameURI(nameuri.asResource().getURI());
+				    //if (nameuri!=null)
+				    //	toNameTemp.setHasNameURI(nameuri.asResource().getURI());
 				    if (fn!=null)
 				    	toNameTemp.setFamilyName(fn.toString());
 				    if (gn!=null)
@@ -994,7 +929,7 @@ public class VirtuosoUserProfileStorage {
 			virtuosoConnection.insertDeleteQuery(str);
 			
 			if (name!=null){
-				name.setHasNameURI(PROFILE_URI+uid+"/Name");
+				//name.setHasNameURI(PROFILE_URI+uid+"/Name");
 				str = GetSetQueryStrings.setName(uid, name);
 				virtuosoConnection.insertDeleteQuery(str);
 			}
@@ -1050,6 +985,8 @@ public class VirtuosoUserProfileStorage {
 					RDFNode addressuri = qs.get("address");
 					RDFNode cname = qs.get("countryname");
 				    RDFNode tname = qs.get("townname");
+				    RDFNode homeLocationURI = qs.get("homeLocation");
+				    RDFNode geoLocationURI = qs.get("geoLocation");
 				    RDFNode lon = qs.get("longitude");
 				    RDFNode lat = qs.get("lat");
 				    if (addressuri!=null)
@@ -1058,10 +995,14 @@ public class VirtuosoUserProfileStorage {
 				    	oldddress.setCountryName(cname.toString());
 				    if (tname!=null)
 				    	oldddress.setTownName(tname.toString());	
+				    if (homeLocationURI!=null)
+				    	oldddress.setHasHomeLocationURI(homeLocationURI.asResource().getURI());
+				    if (geoLocationURI!=null)
+				    	oldddress.setHasGeoCoordinatesURI(geoLocationURI.asResource().getURI());
 				    if (lon!=null)
-				    	oldddress.setLongitute(lon.asLiteral().getDouble());
+				    	oldddress.setLongitute(Double.parseDouble(lon.asLiteral().getString()));
 				    if (lat!=null)
-				    	oldddress.setLatitude(lat.asLiteral().getDouble());	
+				    	oldddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1312,12 +1253,12 @@ public class VirtuosoUserProfileStorage {
 			for ( ; results.hasNext(); ) {
 				QuerySolution qs = results.next();
 				try {
-					RDFNode nameuri = qs.get("name");
+					//RDFNode nameuri = qs.get("name");
 					RDFNode gn = qs.get("givenname");
 					RDFNode fn = qs.get("familyname");
 				    
-				    if (nameuri!=null)
-				    	toName.setHasNameURI(nameuri.asResource().getURI());
+				    //if (nameuri!=null)
+				    //	toName.setHasNameURI(nameuri.asResource().getURI());
 				    if (fn!=null)
 				    	toName.setFamilyName(fn.toString());
 				    if (gn!=null)
@@ -1379,10 +1320,12 @@ public class VirtuosoUserProfileStorage {
 			
 			for ( ; results.hasNext(); ) {
 				QuerySolution qs = results.next();
-				try {
+				try {//?homeLocation ?geoLocation 
 					RDFNode addressuri = qs.get("address");
 					RDFNode cname = qs.get("countryname");
 				    RDFNode tname = qs.get("townname");
+				    RDFNode homeLocationURI = qs.get("homeLocation");
+				    RDFNode geoLocationURI = qs.get("geoLocation");
 				    RDFNode lon = qs.get("longitude");
 				    RDFNode lat = qs.get("lat");
 				    if (addressuri!=null)
@@ -1390,11 +1333,15 @@ public class VirtuosoUserProfileStorage {
 				    if (cname!=null)
 				    	toAddress.setCountryName(cname.toString());
 				    if (tname!=null)
-				    	toAddress.setTownName(tname.toString());	
+				    	toAddress.setTownName(tname.toString());
+				    if (homeLocationURI!=null)
+				    	toAddress.setHasHomeLocationURI(homeLocationURI.asResource().getURI());
+				    if (geoLocationURI!=null)
+				    	toAddress.setHasGeoCoordinatesURI(geoLocationURI.asResource().getURI());
 				    if (lon!=null)
-				    	toAddress.setLongitute(lon.asLiteral().getDouble());
+				    	toAddress.setLongitute(Double.parseDouble(lon.asLiteral().getString()));
 				    if (lat!=null)
-				    	toAddress.setLatitude(lat.asLiteral().getDouble());	
+				    	toAddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1463,7 +1410,7 @@ public class VirtuosoUserProfileStorage {
 				    if (uri!=null)
 				    	tmpProfile.setHasProfileIdentitiesURI(uri.asResource().getURI());
 				    if (source!=null)
-				    	tmpProfile.setHasSource(source.toString());
+				    	tmpProfile.setHasSource(source.asResource().getURI());
 				    if (piID!=null)
 				    	tmpProfile.setHasUserAccountID(piID.toString());	
 				    if (uIM!=null)
@@ -1571,66 +1518,14 @@ public class VirtuosoUserProfileStorage {
 	private static void loadPreferencesFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile toUserProfile) {
 		eu.threecixty.profile.oldmodels.Preference toPrefs = new eu.threecixty.profile.oldmodels.Preference();
 
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=virtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getPreferences(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					
-					RDFNode prefURI = qs.get("pref");
-				    
-				    if (prefURI!=null)
-				    	toPrefs.setHasPreferenceURI(prefURI.asResource().getURI());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-			}
-			
-			loadLikesFromKBToPreference(uid,toPrefs);
-			loadTripPreferencesFromKBToPreferences(uid, toPrefs);
-			loadPlacePreferencesFromKBToPreferences(uid, toPrefs);
-			loadTransportFromKBToPreferences(uid,toPrefs);
+		loadLikesFromKBToPreference(uid,toPrefs);
+		loadTripPreferencesFromKBToPreferences(uid, toPrefs);
+		loadPlacePreferencesFromKBToPreferences(uid, toPrefs);
+		loadTransportFromKBToPreferences(uid,toPrefs);
 						
-			toUserProfile.setPreferences(toPrefs);
+		toUserProfile.setPreferences(toPrefs);
 						
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}		
-	}
 	/**
 	 * Loads transport from the KB.
 	 * @param userProfile
@@ -1749,14 +1644,14 @@ public class VirtuosoUserProfileStorage {
 		RDFNode departureTimeSD = qs.get("departureTimeSD");
 		RDFNode travelTime = qs.get("travelTime");
 		RDFNode travelTimeSD = qs.get("travelTimeSD");
-		RDFNode fastestTravelTime = qs.get("fastestTravelTime");
+		//RDFNode fastestTravelTime = qs.get("fastestTravelTime");
 		RDFNode lastChanged = qs.get("lastChanged");
 		RDFNode totalDistance = qs.get("totalDistance");
 		RDFNode totalCount = qs.get("totalCount");
 		RDFNode modalityType = qs.get("modalityType");
 		RDFNode weekdayPattern = qs.get("weekdayPattern");
 		RDFNode dayhourPattern = qs.get("dayhourPattern");
-		RDFNode timePattern = qs.get("timePattern");
+		//RDFNode timePattern = qs.get("timePattern");
 		RDFNode weatherPattern = qs.get("weatherPattern");
 	    
 	    if (regularTripURI!=null)
@@ -1773,8 +1668,8 @@ public class VirtuosoUserProfileStorage {
     		toRegularTrip.setHasRegularTripTravelTime(travelTime.asLiteral().getLong());
     	if (travelTimeSD!=null)
     		toRegularTrip.setHasRegularTripTravelTimeSD(travelTimeSD.asLiteral().getLong());
-    	if (fastestTravelTime!=null)
-    		toRegularTrip.setHasRegularTripFastestTravelTime(fastestTravelTime.asLiteral().getLong());
+    	//if (fastestTravelTime!=null)
+    	//	toRegularTrip.setHasRegularTripFastestTravelTime(fastestTravelTime.asLiteral().getLong());
     	if (lastChanged!=null)
     		toRegularTrip.setHasRegularTripLastChanged(lastChanged.asLiteral().getLong());
     	if (totalDistance!=null)
@@ -1787,8 +1682,8 @@ public class VirtuosoUserProfileStorage {
     		toRegularTrip.setHasRegularTripWeekdayPattern(weekdayPattern.toString());
     	if (dayhourPattern!=null)
     		toRegularTrip.setHasRegularTripDayhourPattern(dayhourPattern.toString());
-    	if (timePattern!=null)
-    		toRegularTrip.setHasRegularTripTravelTimePattern(timePattern.toString());
+    	//if (timePattern!=null)
+    	//    	toRegularTrip.setHasRegularTripTravelTimePattern(timePattern.toString());
     	if (weatherPattern!=null)
     		toRegularTrip.setHasRegularTripWeatherPattern(weatherPattern.toString());
     	
@@ -2046,12 +1941,12 @@ public class VirtuosoUserProfileStorage {
 					//?placePreference ?placeDetailPreference 
 					eu.threecixty.profile.oldmodels.PlacePreference placePreference = new eu.threecixty.profile.oldmodels.PlacePreference();
 					RDFNode placePreferenceURI = qs.get("placePreference");
-					RDFNode placeDetailPreferenceURI = qs.get("placeDetailPreference");
+					RDFNode natureOfPlace = qs.get("natureOfPlace");
 				    
 				    if (placePreferenceURI!=null)
 				    	placePreference.setHasPlacePreferenceURI(placePreferenceURI.asResource().getURI());
-				    if (placeDetailPreferenceURI!=null){
-				    	loadPlaceDetailPreferenceFromKBToPlacePreference(placeDetailPreferenceURI.asResource().getURI(),placePreference);
+				    if (natureOfPlace!=null){
+				    	loadPlaceDetailPreferenceFromKBToPlacePreference(natureOfPlace.asLiteral().getString(),placePreference);
 				    }
 				    placePreferences.add(placePreference);
 				} catch (Exception e) {
@@ -2092,58 +1987,50 @@ public class VirtuosoUserProfileStorage {
 	 * @param placePreference
 	 */
 	private static void loadPlaceDetailPreferenceFromKBToPlacePreference(
-			String placeDetailPreferenceURI,
+			String natureOfPlace,
 			eu.threecixty.profile.oldmodels.PlacePreference placePreference) {
 		eu.threecixty.profile.oldmodels.PlaceDetailPreference placeDetailPreference= new eu.threecixty.profile.oldmodels.PlaceDetailPreference();
-		Connection conn = null;
-		Statement stmt = null;
 
+	 	if (natureOfPlace!=null)
+	    	placeDetailPreference.setHasNatureOfPlace(eu.threecixty.profile.oldmodels.NatureOfPlace.valueOf(natureOfPlace));
+		placePreference.setHasPlaceDetailPreference(placeDetailPreference);
+	}
+
+	/**
+	 * Checks whether or not a given input string contains something.
+	 * @param input
+	 * @return
+	 */
+	private static boolean isNullOrEmpty(String input) {
+		if (input == null || input.equals("")) return true;
+		return false;
+	}
+
+	/**
+	 * Converts a given date to string.
+	 * @param date
+	 * @return
+	 */
+	private static String convert(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		return sdf.format(date);
+	}
+	
+	/**
+	 * convert string to date
+	 * @param dateStr
+	 * @return
+	 */
+	private static Date convert(String dateStr) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		int index = dateStr.indexOf("\"", 5);
+		if (index < 0) return null;
 		try {
-			conn=virtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getPlaceDetailPreferenceFromURI(placeDetailPreferenceURI));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?natureOfPlace 
-					String natureOfPlace = qs.getLiteral("natureOfPlace").toString();
-					
-				    if (natureOfPlace!=null)
-				    	placeDetailPreference.setHasNatureOfPlace(eu.threecixty.profile.oldmodels.NatureOfPlace.valueOf(natureOfPlace));
-					placePreference.setHasPlaceDetailPreference(placeDetailPreference);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			return;
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
+			return sdf.parse(dateStr.substring(1, index));
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
+		return null;
 	}
 	
 	/**

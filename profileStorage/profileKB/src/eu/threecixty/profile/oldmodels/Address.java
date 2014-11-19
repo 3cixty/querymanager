@@ -21,6 +21,10 @@ public class Address {
 	private String postalCode="";
 	@Description(hasText="Country of residence")
 	private String countryName="";
+	@Description(hasText="HomeLocationURI")
+	private String hasHomeLocationURI="";
+	@Description(hasText="GeoCoordinatesURI")
+	private String hasGeoCoordinatesURI="";
 	@Description(hasText="longitude information. Uses http://www.w3.org/2006/vcard/ns#longitude")
 	private double longitute=0.0;
 	@Description(hasText="latitude information. Uses http://www.w3.org/2006/vcard/ns#latitude")
@@ -66,6 +70,21 @@ public class Address {
 	public void setCountryName(String countryName) {
 		this.countryName = countryName;
 	}
+	
+	public String getHasHomeLocationURI() {
+		return hasHomeLocationURI;
+	}
+	public void setHasHomeLocationURI(String hasHomeLocationURI) {
+		this.hasHomeLocationURI = hasHomeLocationURI;
+	}
+	public String getHasGeoCoordinatesURI() {
+		return hasGeoCoordinatesURI;
+	}
+	public void setHasGeoCoordinatesURI(String hasGeoCoordinatesURI) {
+		this.hasGeoCoordinatesURI = hasGeoCoordinatesURI;
+	}
+	
+	
 	public double getLongitute() {
 		return longitute;
 	}
