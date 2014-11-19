@@ -152,7 +152,7 @@ public class GoFlowEventClient {
 	 */
 	public void logoutUser() throws IOException {
 		String requestStr = "";
-		String res = sendGetRequest(LOGOUT, requestStr);
+		sendGetRequest(LOGOUT, requestStr);
 		return;
 	}
 
