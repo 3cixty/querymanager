@@ -17,6 +17,14 @@
   <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
+  
+  <style type="text/css">
+     .imageSize {
+        width: 150px;
+        height: 150px;
+     }
+  </style>
+  
 </head>
 <body>
 
@@ -35,11 +43,11 @@
     </div>
 
     <div class="consent">
-      <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}" />
+      <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}" class="imageSize" />
       <img src="${pageContext.request.contextPath}/client/img/arrow.png" />
       <img alt="${client.resourceServer.name}"
         title="${client.resourceServer.name}"
-        src="${client.resourceServer.thumbNailUrl}" />
+        src="${client.resourceServer.thumbNailUrl}" class="imageSize"  />
     </div>
 
     <form id="accept" method="post" action="${pageContext.request.contextPath}${actionUri}">
@@ -59,10 +67,11 @@
                  value="${availableScope}"/>
           <span class="consent-label">${availableScope}
             <c:if test="${availableScope eq profileScope}">
-             (<strong> Note that clicking "Grant Permissions" below while checking "Profile" will give this app the ability to read and/modify your FirstName, LastName, and last known location in the 3cixty Platform.</strong>)
+             (<strong>Note that clicking "Grant Permissions" below while checking "Profile" will give this app the ability to read and modify your FirstName, LastName, and last known location in the 3cixty Platform</strong>)
             </c:if>
           </span><br/>
         </c:forEach>
+        <div><strong>Note that if you do not select any scopes, no private information can be read/modified by the requesting application.</strong></div>
       </fieldset>
       <fieldset>
         <div class="form-actions">
