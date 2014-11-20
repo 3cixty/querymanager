@@ -41,25 +41,25 @@ public class VirtuosoConnection {
 				VirtuosoConnection.DB_URL = prop.getProperty("virtuoso.address");
 			} else {
 				throw new IOException(
-						"The property virtuoso.address doesn't exists");
+						"The property virtuoso.address doesn't exist");
 			}
 
 			if (prop.getProperty("virtuoso.user") != null) {
 				VirtuosoConnection.USER = prop.getProperty("virtuoso.user");
 			} else {
-				throw new IOException("The property virtuoso.user doesn't exists");
+				throw new IOException("The property virtuoso.user doesn't exist");
 			}
 
 			if (prop.getProperty("virtuoso.pass") != null) {
 				VirtuosoConnection.PASS = prop.getProperty("virtuoso.pass");
 			} else {
-				throw new IOException("The property virtuoso.pass doesn't exists");
+				throw new IOException("The property virtuoso.pass doesn't exist");
 			}
 			
 			if (prop.getProperty("virtuoso.graph") != null) {
 				VirtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
 			} else {
-				throw new IOException("The property virtuoso.graph doesn't exists");
+				throw new IOException("The property virtuoso.graph doesn't exist");
 			}
 			try {
 				Class.forName("virtuoso.jdbc4.Driver");
