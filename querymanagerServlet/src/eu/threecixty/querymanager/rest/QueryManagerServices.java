@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 
+import eu.threecixty.TimeLoggerUtils;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -672,7 +673,7 @@ public class QueryManagerServices {
 	 */
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
-		LOGGER.info(msg);
+		LOGGER.info(TimeLoggerUtils.getCurrentTime() + " " + msg);
 	}
 
     public class KeyValuePair {

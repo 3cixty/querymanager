@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import eu.threecixty.TimeLoggerUtils;
 import eu.threecixty.db.DBConnection;
 import eu.threecixty.db.ThreeCixyDBException;
 
@@ -207,6 +208,6 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 	 */
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
-		LOGGER.info(msg);
+		LOGGER.info(TimeLoggerUtils.getCurrentTime() + " " + msg);
 	}	
 }
