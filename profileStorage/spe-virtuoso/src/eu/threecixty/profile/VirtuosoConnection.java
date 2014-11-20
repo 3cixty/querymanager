@@ -3,6 +3,7 @@ package eu.threecixty.profile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
 import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
@@ -11,6 +12,8 @@ import virtuoso.jena.driver.VirtuosoUpdateRequest;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
+
+import eu.threecixty.Configuration;
 
 public class VirtuosoConnection {
 	// JDBC driver name and database URL
@@ -55,12 +58,12 @@ public class VirtuosoConnection {
 			} else {
 				throw new IOException("The property virtuoso.pass doesn't exist");
 			}
-			
-			if (prop.getProperty("virtuoso.graph") != null) {
-				VirtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
-			} else {
-				throw new IOException("The property virtuoso.graph doesn't exist");
-			}
+			VirtuosoConnection.GRAPH = Configuration.PROFILE_GRAPH;
+//			if (prop.getProperty("virtuoso.graph") != null) {
+//				VirtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
+//			} else {
+//				throw new IOException("The property virtuoso.graph doesn't exist");
+//			}
 			try {
 				Class.forName("virtuoso.jdbc4.Driver");
 //				return DriverManager.getConnection(VirtuosoConnection.DB_URL,
