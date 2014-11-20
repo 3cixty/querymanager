@@ -137,20 +137,14 @@ filter : ?user1 != ?user2</xs:documentation>
 															</xs:complexType>
 														</xs:element>
 													</xs:sequence>
-													<xs:attribute name="id" type="xs:string" use="required">
+													<xs:attribute name="id" type="xs:string" use="required" fixed="[[[ Self Trust Group ]]]">
 														<xs:annotation>
 															<xs:documentation>Identifier of the group.
-3 groups are actually defined :
+only one group is actually defined :
 
 - [[[ Self Trust Group ]]]
 The user himself
-
-- [[[ Known People Trust Group ]]]
-For the friends of the user
-NOT TAKEN INTO ACCOUNT CURRENTLY
-
-- [[[ Default Trust Group ]]]
-All other people</xs:documentation>
+</xs:documentation>
 														</xs:annotation>
 													</xs:attribute>
 												</xs:complexType>
@@ -167,7 +161,7 @@ All other people</xs:documentation>
 					</xs:key>
 				</xs:element>
 			</xs:sequence>
-			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="2.0"/>
+			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="3.0"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

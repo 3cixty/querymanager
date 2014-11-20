@@ -26,18 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.theresis.humanization.authen.Service;
 import org.theresis.humanization.authen.Session;
-import org.theresis.humanization.authen.simple.SimpleSessionManager;
 import org.theresis.humanization.conf.ProfileStorageConf;
 import org.theresis.humanization.datastorage.ProfileManager;
 import org.theresis.humanization.datastorage.ValuedProperty;
-import org.theresis.humanization.privacy.PrivacyCertAuthorityRequestor;
-import org.theresis.humanization.privacy.PrivacyCertAuthorityTool;
 import org.theresis.humanization.privacy.PrivacyContractFactory;
 import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
 import org.theresis.humanization.privacy.PrivacyDBInitialize;
 import org.theresis.humanization.privacy.conf.PrivacyAuthorityConf;
 import org.theresis.humanization.privacy.generated.UserPrivacyContract;
-import org.theresis.humanization.profilestore.SimpleProfileManagerFactory;
+import org.theresis.humanization.profilestore.ThreeCixtyFactory;
 
 /**
  * Test on privacy filtering
@@ -65,11 +62,11 @@ public class PrivacyTest {
 		PrivacyDBInitialize.resetAndInit("toto", "toto", "toto", "toto");
 		FileInputStream is = new FileInputStream( "src/test/resources/UPC_ExploreMi360.xml" );
 		UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
-		PrivacyCertAuthorityRequestor.getKaaStorage().store( 	userID1, 
-															PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+		PrivacyContractStorageFactory.getInstance().store( 	userID1, 
+															appName, 
 															upc);
 		
-		SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
+		ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
 		profileManager = profileFactory.getProfileManager( propertyFilePath );				
 	}
 
@@ -80,9 +77,9 @@ public class PrivacyTest {
 		
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 			
 			Set<String> users = profileManager.getAllUsersIDs(session);
 
@@ -102,9 +99,9 @@ public class PrivacyTest {
 		
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678",  null) );
 			
 			assertTrue( profileManager.hasProfile(session, userID1) );
 
@@ -120,9 +117,9 @@ public class PrivacyTest {
 		
 		try {
 			// build the session
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678", null) );
 			
 			assertTrue( ! profileManager.hasProfile(session, "toto") );
 
@@ -139,9 +136,9 @@ public class PrivacyTest {
 		try {
 			
 			// the storage
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService("test", "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService("test", "4.0");
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, "U2678",  null) );
 			
 			String jsonProfile = profileManager.getProfile(session, userID1);
 			assertTrue( jsonProfile.isEmpty() );
@@ -160,21 +157,14 @@ public class PrivacyTest {
 		logger.info(" ---- getUserProfile privacy ----" );
 		
 		try {
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, "U2678", "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion);
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID2, null) );
 			
 			String jsonProfile = profileManager.getProfile(session, userID1);
-			logger.debug(jsonProfile);
+			logger.debug(" Found profile :\n" + jsonProfile);
 			
-			assertNotNull(jsonProfile);
-			assertTrue( ! jsonProfile.contains("gender") );
-			assertTrue( ! jsonProfile.contains("givenName") );
-			assertTrue( ! jsonProfile.contains("attendedTrayItemDate") );
-			assertTrue( jsonProfile.contains("\"familyName\" : [ \"Colombo\" ]") );
-			assertTrue( ! jsonProfile.contains("\"familyName\" : [ \"Maurel\" ]") );
-			assertTrue( jsonProfile.contains("Flo & Vince\" ]") );
-			assertTrue( ! jsonProfile.contains("Beaugrenelle\" ]") );			
+			assertTrue( jsonProfile.isEmpty() );
 			
 			logger.info( " -> getUserProfilePrivacy OK");			
 			
@@ -186,13 +176,12 @@ public class PrivacyTest {
 	@Test
 	public void test6_getMyUserProfilePrivacy() {
 
-		//logger.info(" ---- getMyUserProfile privacy----" );
 		System.out.println(" ---- getMyUserProfile privacy---");
 		
 		try {
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, userID1, "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID1, null) );
 			
 			String jsonProfile = profileManager.getProfile(session, userID1);
 			logger.debug(jsonProfile);
@@ -202,11 +191,12 @@ public class PrivacyTest {
 			assertTrue( ! jsonProfile.contains("gender") );
 			assertTrue( ! jsonProfile.contains("givenName") );
 			assertTrue( jsonProfile.contains("attendedTrayItemDate") );
-			assertTrue( ! jsonProfile.contains("\"familyName\" : [ \"Colombo\" ]") );
+			assertTrue( jsonProfile.contains("attendedTrayItem") );
+			assertTrue( jsonProfile.contains("\"familyName\" : [ \"Colombo\" ]") );
 			assertTrue( ! jsonProfile.contains("\"familyName\" : [ \"Maurel\" ]") );
 			assertTrue( jsonProfile.contains("Flo & Vince\" ]") );
-			assertTrue( jsonProfile.contains("Beaugrenelle\" ]") );			
-
+			assertTrue( jsonProfile.contains("http://www.lerestodu15ieme.fr") );						
+			
 			logger.info( " -> getMyUserProfilePrivacy OK");
 		
 		} catch (Exception e) {
@@ -222,13 +212,13 @@ public class PrivacyTest {
 		try {
 			FileInputStream is = new FileInputStream( "src/test/resources/UPC2_ExploreMi360.xml" );
 			UserPrivacyContract upc = PrivacyContractFactory.buildUserPrivacyContract( is );
-			PrivacyCertAuthorityRequestor.getKaaStorage().store( userID2, 
-																PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion), 
+			PrivacyContractStorageFactory.getInstance().store( 	userID2, 
+																appName, 
 																upc);
 
-			SimpleProfileManagerFactory profileFactory = SimpleProfileManagerFactory.getInstance();
-			Service service = profileFactory.getService( PrivacyCertAuthorityTool.buildserviceID4Application(appName, appversion) , "pwdTest");
-			Session session = SimpleSessionManager.getInstance().getSession( profileFactory.getAuthenticator(service, userID1, "pwd", null) );
+			ThreeCixtyFactory profileFactory = ThreeCixtyFactory.getInstance();
+			Service service = profileFactory.getService( appName, appversion );
+			Session session = profileFactory.getSession( profileFactory.getAuthenticator(service, userID1, null) );
 			
 			Collection<String> propertyPaths = new ArrayList<String>();
 			String propPath1 = "profile:trayElement[profile:hasRating / schema:ratingValue > \"2\"]/profile:hasAccount /foaf:accountName";

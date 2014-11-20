@@ -6,22 +6,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.theresis.humanization.authen.Service;
-import org.theresis.humanization.authen.User;
-import org.theresis.humanization.privacy.PrivacyContractStorage;
-import org.theresis.humanization.privacy.PrivacyContractStorageFactory;
-import org.theresis.humanization.privacy.PrivacyException;
-import org.theresis.humanization.privacy.UserPrivacyContractFactory;
 import org.theresis.humanization.privacy.generated.Application;
 import org.theresis.humanization.privacy.generated.Domain;
 import org.theresis.humanization.privacy.generated.PrivacyContract;
-import org.theresis.humanization.privacy.generated.UserPrivacyContract;
 
 
+@SuppressWarnings("restriction")
 @RunWith(JUnit4.class)
 public class PrivacyApisTest {
 
@@ -84,54 +77,4 @@ public class PrivacyApisTest {
 		}
 	}
 	
-	@Ignore
-	public void testUserPrivacyContractManagement( ) {
-		
-		// Partial test (compilation test) aimed at checking APIs visibility
-		// To be complete has to be merged with Certification Authority tests  
-		// ( Service and User creation, PrivacyContract storage into ) 
-		
-		PrivacyContractStorage privacyContractStorage = PrivacyContractStorageFactory.getInstance( );
-		
-		if( null == privacyContractStorage ) {
-			fail("PrivacyContractStorage is null");
-		}
-		
-		Service service			= null;
-		User user				= null;
-		
-		try {
-			
-			// user install the application
-			
-			// get application Privacy Contract from storage 
-			PrivacyContract privacyContract	= privacyContractStorage.get( service.getServiceID() );
-			
-			// create default User Privacy Contract from application Privacy Contract
-			UserPrivacyContract userPrivacyContract	= UserPrivacyContractFactory.buildUserPrivacyContract( privacyContract );
-
-			// TODO do some default contract tweaking
-			
-			// get an eventual older User Privacy Contract storage
-			UserPrivacyContract oldUserPrivacyContract = privacyContractStorage.get(user.getUserID(), service.getServiceID());
-			
-			if( null == oldUserPrivacyContract ) {
-				
-				// store the contract initial version
-				privacyContractStorage.store(user.getUserID(), service.getServiceID(), userPrivacyContract);
-				
-			} else {
-				
-				// store the contract updated version
-				privacyContractStorage.update(user.getUserID(), service.getServiceID(), userPrivacyContract);
-			}
-
-			// user uninstall the application 
-			// => revoke the contract
-			privacyContractStorage.revoke(user.getUserID(), service.getServiceID());
-			
-		} catch (PrivacyException e) {
-			fail(e.getMessage());
-		}
-	}
 }

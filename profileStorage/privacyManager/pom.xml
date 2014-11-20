@@ -12,7 +12,7 @@
 	<groupId>eu.3cixty.privacy</groupId>
 	<artifactId>privacymanager-parent</artifactId>
 	<name>Privacy manager parent</name>
-	<version>1.1</version>
+	<version>1.2</version>
 	<packaging>pom</packaging>
 
 	<modules>

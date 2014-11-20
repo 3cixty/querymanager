@@ -59,6 +59,7 @@ public class PrivacyAuthorityTest {
 		
 		System.out.println("*** certifyContractPEMCSR");
 		
+		String appKey = "qsdq29Jj9345l0";
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
@@ -73,7 +74,7 @@ public class PrivacyAuthorityTest {
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
 			privacyContract = new FileInputStream("./src/test/resources/PrivacyContract_ExploreMi360_example.xml");
 
-			reqId = auth.certifyMyContract(poc, certificateSigningRequest , privacyContract);
+			reqId = auth.certifyMyContract(appKey, poc, certificateSigningRequest , privacyContract);
 			assertNotNull( reqId.toString()  );
 			
 			
@@ -95,6 +96,7 @@ public class PrivacyAuthorityTest {
 		
 		System.out.println("*** certifyContractDERCSR");
 		
+		String appKey = "qjd7hshg6453jB30D2";
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
@@ -109,7 +111,7 @@ public class PrivacyAuthorityTest {
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.der");
 			privacyContract = new FileInputStream("./src/test/resources/PrivacyContract_ExploreMi360_example.xml");
 
-			CertificationRequestId reqId = auth.certifyMyContract(poc, certificateSigningRequest , privacyContract);
+			CertificationRequestId reqId = auth.certifyMyContract(appKey, poc, certificateSigningRequest , privacyContract);
 			assertNotNull( reqId );
 			
 		} catch (FileNotFoundException e2) {
@@ -130,21 +132,17 @@ public class PrivacyAuthorityTest {
 		
 		System.out.println("*** getRequestStatusPending");
 		
+		String appKey = "qsdq29Jj9345l0";
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
 			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 			
-			FileInputStream certificateSigningRequest;
-			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
-
-			RequestStatus reqStatus = auth.getRequestStatus( certificateSigningRequest, reqId );
+			RequestStatus reqStatus = auth.getRequestStatus( appKey, reqId );
 			
 			assertEquals( RequestStatus.PENDING, reqStatus );
 			
-		} catch (FileNotFoundException e2) {
-			fail( e2.getMessage() );
-		}
+		} 
 		catch (PrivacyException e) {
 			assertEquals("Application ExploreMi 360 is already certified. Use updateMyContract to update the privacy contract", e.getMessage() );
 		}
@@ -160,21 +158,17 @@ public class PrivacyAuthorityTest {
 		
 		System.out.println("*** getUnknownRequestStatus");
 				
+		String appKey = "qsdq29Jj9345l0";
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
 			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
 			
-			FileInputStream certificateSigningRequest;
-			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
-
-			RequestStatus reqStatus = auth.getRequestStatus( certificateSigningRequest, new CertificationRequestId( UUID.randomUUID() ) );
+			RequestStatus reqStatus = auth.getRequestStatus( appKey, new CertificationRequestId( UUID.randomUUID() ) );
 			
 			assertEquals( RequestStatus.UNKNOWN, reqStatus );
 			
-		} catch (FileNotFoundException e2) {
-			fail( e2.getMessage() );
-		}
+		} 
 		catch (PrivacyException e) {
 			assertEquals("Application ExploreMi 360 is already certified. Use updateMyContract to update the privacy contract", e.getMessage() );
 		}
@@ -190,6 +184,7 @@ public class PrivacyAuthorityTest {
 		
 		System.out.println("*** updateSameContract()");
 		
+		String appKey = "qsdq29Jj9345l0";
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
@@ -201,7 +196,7 @@ public class PrivacyAuthorityTest {
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
 			privacyContract = new FileInputStream("./src/test/resources/PrivacyContract_ExploreMi360_example.xml");
 
-			reqId = auth.updateMyContract(certificateSigningRequest , privacyContract);
+			reqId = auth.updateMyContract(appKey, certificateSigningRequest , privacyContract);
 						
 		} catch (FileNotFoundException e2) {
 			fail( e2.getMessage() );
@@ -221,6 +216,7 @@ public class PrivacyAuthorityTest {
 		
 		System.out.println("*** updateContractUnknowApp()");
 		
+		String appKey = "A8H3GSDFg52Hdh9";
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
@@ -232,7 +228,7 @@ public class PrivacyAuthorityTest {
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
 			privacyContract = new FileInputStream("./src/test/resources/PrivacyContract_RestoMi_example.xml");
 			
-			reqId = auth.updateMyContract(certificateSigningRequest , privacyContract);
+			reqId = auth.updateMyContract(appKey, certificateSigningRequest , privacyContract);
 			fail();
 						
 		} catch (FileNotFoundException e2) {
@@ -253,6 +249,7 @@ public class PrivacyAuthorityTest {
 		
 		System.out.println("*** updateContract()");
 		
+		String appKey = "qsdq29Jj9345l0";
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
@@ -264,7 +261,7 @@ public class PrivacyAuthorityTest {
 			certificateSigningRequest = new FileInputStream("./src/test/resources/exploreMi360.csr");
 			privacyContract = new FileInputStream("./src/test/resources/Update_PrivacyContract_ExploreMi360_example.xml");
 
-			reqIdUpdate = auth.updateMyContract(certificateSigningRequest , privacyContract);
+			reqIdUpdate = auth.updateMyContract(appKey, certificateSigningRequest , privacyContract);
 			
 			assertTrue( reqIdUpdate != null );
 						
