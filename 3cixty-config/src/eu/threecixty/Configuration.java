@@ -13,6 +13,8 @@ public class Configuration {
 	private static Properties props;
 
 	private static String version;
+	
+	public static final String PROFILE_GRAPH = "http://3cixty.com/fakeprofile";
 
 
 	public synchronized static void setPath(String path) {
