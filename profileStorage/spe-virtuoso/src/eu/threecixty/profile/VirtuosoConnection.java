@@ -35,6 +35,7 @@ public class VirtuosoConnection {
 			String propfileName="conf.properties";
 			InputStream instream=Thread.currentThread().getContextClassLoader().getResourceAsStream(propfileName);
 			prop.load(instream);
+			instream.close();
 
 			if (prop.getProperty("virtuoso.address") != null) {
 				VirtuosoConnection.DB_URL = prop.getProperty("virtuoso.address");
@@ -67,7 +68,7 @@ public class VirtuosoConnection {
 			}catch(SQLException ex){
 				ex.printStackTrace();
 				throw new SQLException("Connection not possible. This Service not available.");
-			}	
+			}
 		catch(ClassNotFoundException ex){
 			ex.printStackTrace();
 			throw new SQLException("Connection not possible. This Service not available.");
