@@ -173,13 +173,13 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		Statement stmt = null;
 	    
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return null;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(queryString);
+			QueryReturnClass qRC=VirtuosoConnection.query(queryString);
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -245,13 +245,13 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		Statement stmt = null;
 	    
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return null;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(queryString);
+			QueryReturnClass qRC=VirtuosoConnection.query(queryString);
 
 			ResultSet results = qRC.getReturnedResultSet();
 			

@@ -6,7 +6,6 @@ import java.sql.DriverManager;
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
-import virtuoso.jena.driver.*;
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
 import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
@@ -16,7 +15,7 @@ import virtuoso.jena.driver.VirtuosoUpdateRequest;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 
-public class virtuosoConnection {
+public class VirtuosoConnection {
 	// JDBC driver name and database URL
 		static String DB_URL;
 
@@ -38,33 +37,33 @@ public class virtuosoConnection {
 			prop.load(instream);
 
 			if (prop.getProperty("virtuoso.address") != null) {
-				virtuosoConnection.DB_URL = prop.getProperty("virtuoso.address");
+				VirtuosoConnection.DB_URL = prop.getProperty("virtuoso.address");
 			} else {
 				throw new IOException(
 						"The property virtuoso.address doesn't exists");
 			}
 
 			if (prop.getProperty("virtuoso.user") != null) {
-				virtuosoConnection.USER = prop.getProperty("virtuoso.user");
+				VirtuosoConnection.USER = prop.getProperty("virtuoso.user");
 			} else {
 				throw new IOException("The property virtuoso.user doesn't exists");
 			}
 
 			if (prop.getProperty("virtuoso.pass") != null) {
-				virtuosoConnection.PASS = prop.getProperty("virtuoso.pass");
+				VirtuosoConnection.PASS = prop.getProperty("virtuoso.pass");
 			} else {
 				throw new IOException("The property virtuoso.pass doesn't exists");
 			}
 			
 			if (prop.getProperty("virtuoso.graph") != null) {
-				virtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
+				VirtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
 			} else {
 				throw new IOException("The property virtuoso.graph doesn't exists");
 			}
 			try {
 				Class.forName("virtuoso.jdbc4.Driver");
-				return DriverManager.getConnection(virtuosoConnection.DB_URL,
-					virtuosoConnection.USER, virtuosoConnection.PASS);
+				return DriverManager.getConnection(VirtuosoConnection.DB_URL,
+					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 			}catch(SQLException ex){
 				ex.printStackTrace();
 				throw new SQLException("Connection not possible. This Service not available.");
@@ -82,8 +81,8 @@ public class virtuosoConnection {
 		 * @throws IOException
 		 */
 		public static void insertDeleteQuery(String Query) throws IOException {
-			VirtGraph virtGraph = new VirtGraph(virtuosoConnection.DB_URL,
-					virtuosoConnection.USER, virtuosoConnection.PASS);
+			VirtGraph virtGraph = new VirtGraph(VirtuosoConnection.DB_URL,
+					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 			/*System.out.println("\nexecute: "+ type +" GRAPH "+ virtuosoConnection.GRAPH
 						+ " { <aa> <bb> 'cc' ."
 						+ " <aa1> <bb1> <123> . "
@@ -101,8 +100,8 @@ public class virtuosoConnection {
 		 * @throws IOException
 		 */
 		public static void updateQuery(String deleteOldDataQuery, String insertNewDataQuery) throws IOException {
-			VirtGraph virtGraph = new VirtGraph(virtuosoConnection.DB_URL,
-					virtuosoConnection.USER, virtuosoConnection.PASS);
+			VirtGraph virtGraph = new VirtGraph(VirtuosoConnection.DB_URL,
+					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 			/*System.out.println("\nexecute: Delete From GRAPH "+ virtuosoConnection.GRAPH
 						+ " { <aa> <bb> 'cc' ."
 						+ " <aa1> <bb1> <123> . "
@@ -126,19 +125,19 @@ public class virtuosoConnection {
 		 * Query a graph
 		 * @param query
 		 */
-		public static queryReturnClass query(String query) {
-			VirtGraph virtGraph = new VirtGraph(virtuosoConnection.DB_URL,
-					virtuosoConnection.USER, virtuosoConnection.PASS);
+		public static QueryReturnClass query(String query) {
+			VirtGraph virtGraph = new VirtGraph(VirtuosoConnection.DB_URL,
+					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 
 			Query sparql = QueryFactory
 					.create(query);
 			
-			sparql.addGraphURI(virtuosoConnection.GRAPH);
+			sparql.addGraphURI(VirtuosoConnection.GRAPH);
 			
 			VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create(
 					sparql, virtGraph);
 			
-			queryReturnClass qRC= new queryReturnClass();
+			QueryReturnClass qRC= new QueryReturnClass();
 			qRC.setResultSelectVar(sparql.getResultVars());
 			qRC.setReturnedResultSet(vqe.execSelect());
 			qRC.setQuery(sparql);

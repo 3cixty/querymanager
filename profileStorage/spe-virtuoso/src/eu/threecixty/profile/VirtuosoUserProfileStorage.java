@@ -93,7 +93,7 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
@@ -101,10 +101,10 @@ public class VirtuosoUserProfileStorage {
 			
 			
 			String deleteQuery = GetSetQueryStrings.removeUser(uid);
-			virtuosoConnection.insertDeleteQuery(deleteQuery);
+			VirtuosoConnection.insertDeleteQuery(deleteQuery);
 			
 			String insertQuery = GetSetQueryStrings.setUser(uid);
-			virtuosoConnection.insertDeleteQuery(insertQuery);
+			VirtuosoConnection.insertDeleteQuery(insertQuery);
 			
 
 		} catch ( IOException  ex) {
@@ -145,13 +145,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -183,7 +183,7 @@ public class VirtuosoUserProfileStorage {
 					for ( ; iterators.hasNext(); ){
 						String know=iterators.next();
 						str=GetSetQueryStrings.setUser(know);
-						virtuosoConnection.insertDeleteQuery(str);
+						VirtuosoConnection.insertDeleteQuery(str);
 						eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
 						profileIdentities.setHasSource("https://plus.google.com");
 						profileIdentities.setHasSourceCarrier("Google");
@@ -191,10 +191,10 @@ public class VirtuosoUserProfileStorage {
 						profileIdentities.setHasUserAccountID(know);
 						profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
 						str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
-						virtuosoConnection.insertDeleteQuery(str);
+						VirtuosoConnection.insertDeleteQuery(str);
 					}
 					str = GetSetQueryStrings.setMultipleKnows(uid,knowsNotInKB);
-					virtuosoConnection.insertDeleteQuery(str);
+					VirtuosoConnection.insertDeleteQuery(str);
 				}
 			}
 			//delete know from profileKB
@@ -205,7 +205,7 @@ public class VirtuosoUserProfileStorage {
 			
 			if (knowsToDeleteKB!=null&&!knowsToDeleteKB.isEmpty()){
 				String str = GetSetQueryStrings.removeMultipleKnows(uid,knowsToDeleteKB);
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
 
 		} catch ( IOException  ex) {
@@ -245,13 +245,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -282,11 +282,11 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 			String str = GetSetQueryStrings.removeMultipleProfileIdentities(uid, oldProfiles);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 			
 			if (profileIdentities!=null&&!profileIdentities.isEmpty()){
 				str = GetSetQueryStrings.setMultipleProfileIdentities(uid, profileIdentities);
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
 			return;
 
@@ -323,14 +323,14 @@ public class VirtuosoUserProfileStorage {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getGender(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getGender(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -349,10 +349,10 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 			String str = GetSetQueryStrings.removeGender(uid, oldGender);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 			
 			str = GetSetQueryStrings.setGender(uid, gender);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
 		} catch ( SQLException ex){
@@ -385,14 +385,14 @@ public class VirtuosoUserProfileStorage {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -411,10 +411,10 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 			String str = GetSetQueryStrings.removeLastCrawlTime(uid, oldtime);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 			
 			str = GetSetQueryStrings.setLastCrawlTime(uid, time);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
 		} catch ( SQLException ex){
@@ -451,13 +451,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -482,11 +482,11 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 			String str = GetSetQueryStrings.removeMultipleLikes(uid, oldLikes);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 		
 			if (likes!=null&&!likes.isEmpty()){
 				str = GetSetQueryStrings.setMultipleLikes(uid, likes);
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
 			return;
 
@@ -547,13 +547,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -582,7 +582,7 @@ public class VirtuosoUserProfileStorage {
 				//String str = GetSetQueryStrings.removePlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
 				//virtuosoConnection.insertDeleteQuery(str);
 				String str = GetSetQueryStrings.removePlacePreferences(uid, placePreference);
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}	
 			
 			if (placePreferences!=null&&!placePreferences.isEmpty()){
@@ -592,7 +592,7 @@ public class VirtuosoUserProfileStorage {
 					//String str = GetSetQueryStrings.setPlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
 					//virtuosoConnection.insertDeleteQuery(str);
 					String str = GetSetQueryStrings.setPlacePreferences(uid, placePreference);
-					virtuosoConnection.insertDeleteQuery(str);
+					VirtuosoConnection.insertDeleteQuery(str);
 				}
 			}
 			return;
@@ -634,13 +634,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -688,10 +688,10 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 			String str = GetSetQueryStrings.removeMultipleTripPreferences(uid, oldTripPreferences);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 			if (tripPreferences!=null&&!tripPreferences.isEmpty()){
 				str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
 			return;
 
@@ -734,13 +734,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -755,7 +755,7 @@ public class VirtuosoUserProfileStorage {
 					
 					oldtransport.setHasTransportURI(transport.asResource().getURI());
 					
-					queryReturnClass qRCRegularTrips=virtuosoConnection.query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
+					QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
 					ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
 					
 					Set <eu.threecixty.profile.oldmodels.RegularTrip> toRegularTrips = new HashSet <eu.threecixty.profile.oldmodels.RegularTrip>();
@@ -771,7 +771,7 @@ public class VirtuosoUserProfileStorage {
 						}
 					}
 					
-					queryReturnClass qRCAccompanying=virtuosoConnection.query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
+					QueryReturnClass qRCAccompanying=VirtuosoConnection.query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
 					ResultSet resultsAccompanying = qRCAccompanying.getReturnedResultSet();
 					
 					Set <eu.threecixty.profile.oldmodels.Accompanying> toAccompanyings = new HashSet <eu.threecixty.profile.oldmodels.Accompanying>();
@@ -801,19 +801,19 @@ public class VirtuosoUserProfileStorage {
 			for ( ; iterators.hasNext(); ){ 
 				eu.threecixty.profile.oldmodels.Transport transport=iterators.next();
 				str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasAccompanyings());
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 				Set <eu.threecixty.profile.oldmodels.RegularTrip> setRegTrip=transport.getHasRegularTrip();
 				Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iteratorRegTrip=setRegTrip.iterator();
 				for ( ; iteratorRegTrip.hasNext(); ){ 
 					eu.threecixty.profile.oldmodels.RegularTrip regularTrip=iteratorRegTrip.next();
 					str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
-					virtuosoConnection.insertDeleteQuery(str);
+					VirtuosoConnection.insertDeleteQuery(str);
 				}
 				str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasRegularTrip());
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 				
 				str = GetSetQueryStrings.removeTransport(uid, transport.getHasTransportURI());
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
 			
 			if (transports!=null&&!transports.isEmpty()){
@@ -826,7 +826,7 @@ public class VirtuosoUserProfileStorage {
 					
 					if (transport.getHasAccompanyings()!=null&&!transport.getHasAccompanyings().isEmpty()){
 						str = GetSetQueryStrings.setMultipleAccompanyingAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasAccompanyings());
-						virtuosoConnection.insertDeleteQuery(str);
+						VirtuosoConnection.insertDeleteQuery(str);
 					}
 					
 					Set <eu.threecixty.profile.oldmodels.RegularTrip> setRegTrip=transport.getHasRegularTrip();
@@ -839,16 +839,16 @@ public class VirtuosoUserProfileStorage {
 						}
 						if (regularTrip.getHasPersonalPlacesNew()!=null&&!regularTrip.getHasPersonalPlacesNew().isEmpty()){
 							str = GetSetQueryStrings.setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
-							virtuosoConnection.insertDeleteQuery(str);
+							VirtuosoConnection.insertDeleteQuery(str);
 						}
 					}
 					if ( transport.getHasRegularTrip()!=null&&!transport.getHasRegularTrip().isEmpty()){
 						str = GetSetQueryStrings.setMultipleRegularTripsAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasRegularTrip());
-						virtuosoConnection.insertDeleteQuery(str);
+						VirtuosoConnection.insertDeleteQuery(str);
 					}
 					
 					str = GetSetQueryStrings.setTransport(uid, transport.getHasTransportURI());
-					virtuosoConnection.insertDeleteQuery(str);
+					VirtuosoConnection.insertDeleteQuery(str);
 				}		
 			}
 			return;
@@ -891,13 +891,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getName(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getName(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -921,12 +921,12 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 			String str = GetSetQueryStrings.removeName(uid, toNameTemp);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 			
 			if (name!=null){
 				//name.setHasNameURI(PROFILE_URI+uid+"/Name");
 				str = GetSetQueryStrings.setName(uid, name);
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
 
 		} catch ( IOException  ex) {
@@ -964,13 +964,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1004,12 +1004,12 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 			String str = GetSetQueryStrings.removeAddress(uid, oldddress);
-			virtuosoConnection.insertDeleteQuery(str);
+			VirtuosoConnection.insertDeleteQuery(str);
 			
 			if (address!=null){
 				address.setHasAddressURI(PROFILE_URI+uid+"/Address");
 				str = GetSetQueryStrings.setAddress(uid, address);
-				virtuosoConnection.insertDeleteQuery(str);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
 
 		} catch ( IOException  ex) {
@@ -1047,13 +1047,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1115,13 +1115,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 			
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getGender(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getGender(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1174,13 +1174,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 			
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1235,13 +1235,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getName(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getName(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1303,13 +1303,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1382,13 +1382,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1459,13 +1459,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1534,13 +1534,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
 			ResultSet results = qRC.getReturnedResultSet();
 			
 			for ( ; results.hasNext(); ) {
@@ -1554,7 +1554,7 @@ public class VirtuosoUserProfileStorage {
 					
 					toTransport.setHasTransportURI(transport.asResource().getURI());
 					
-					queryReturnClass qRCRegularTrips=virtuosoConnection.query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
+					QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
 					ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
 					
 					Set <eu.threecixty.profile.oldmodels.RegularTrip> toRegularTrips = new HashSet <eu.threecixty.profile.oldmodels.RegularTrip>();
@@ -1570,7 +1570,7 @@ public class VirtuosoUserProfileStorage {
 						}
 					}
 					
-					queryReturnClass qRCAccompanying=virtuosoConnection.query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
+					QueryReturnClass qRCAccompanying=VirtuosoConnection.query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
 					ResultSet resultsAccompanying = qRCAccompanying.getReturnedResultSet();
 					
 					Set <eu.threecixty.profile.oldmodels.Accompanying> toAccompanyings = new HashSet <eu.threecixty.profile.oldmodels.Accompanying>();
@@ -1702,13 +1702,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getPersonalPlacesForRegularTrips(regularTripURI));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPersonalPlacesForRegularTrips(regularTripURI));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1827,13 +1827,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -1920,13 +1920,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 
 		try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
 			
@@ -2013,13 +2013,13 @@ public class VirtuosoUserProfileStorage {
 		Statement stmt = null;
 	   		
 	    try {
-			conn=virtuosoConnection.processConfigFile();
+			conn=VirtuosoConnection.processConfigFile();
 
 			if (conn == null) return false;
 			
 			stmt = conn.createStatement();
 			
-			queryReturnClass qRC=virtuosoConnection.query(qStr);
+			QueryReturnClass qRC=VirtuosoConnection.query(qStr);
 
 			ResultSet results = qRC.getReturnedResultSet();
 			

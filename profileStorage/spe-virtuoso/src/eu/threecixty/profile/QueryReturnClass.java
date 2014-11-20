@@ -5,7 +5,7 @@ import java.util.List;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.ResultSet;
 
-public class queryReturnClass {
+public class QueryReturnClass {
 	
 	private List<String> resultSelectVar;
 	private Query query;
