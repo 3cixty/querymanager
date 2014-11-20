@@ -4,10 +4,12 @@ import java.util.List;
 
 import com.hp.hpl.jena.query.Query;
 
+import eu.threecixty.Configuration;
+
 public class FromClauseUtils {
 //	private static final String SCHEMA_PREFIX = "<http://schema.org/>";
 //	private static final String PROFILE_PREFIX = "<http://3cixty.com/ontology/profile/>";
-	private static final String PROFILE_GRAPH = "http://3cixty.com/fakeprofile";
+	private static final String PROFILE_GRAPH = Configuration.PROFILE_GRAPH;
 	
 	private static final String [] FROM_GRAPHS = {"http://www.w3.org/2002/07/owl#", "http://3cixty.com/yelp",
 		"http://3cixty.com/foursquare", "http://3cixty.com/googleplaces", "http://3cixty.com/events",
