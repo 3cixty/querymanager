@@ -2,10 +2,7 @@ package eu.threecixty.profile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.DriverManager;
 import java.util.Properties;
-import java.sql.Connection;
-import java.sql.SQLException;
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
 import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
@@ -26,11 +23,14 @@ public class VirtuosoConnection {
 		// Graph to query
 		static String GRAPH;
 		
+		private static boolean firstTime = true;
+		
 		/**
 		 * read config file (parameters for virtuoso)
 		 * @throws IOException
 		 */
-		public static Connection processConfigFile() throws IOException, SQLException {
+		private static void processConfigFile() throws IOException {
+			if (!firstTime) return;
 			Properties prop = new Properties();
 			String propfileName="conf.properties";
 			InputStream instream=Thread.currentThread().getContextClassLoader().getResourceAsStream(propfileName);
@@ -63,15 +63,11 @@ public class VirtuosoConnection {
 			}
 			try {
 				Class.forName("virtuoso.jdbc4.Driver");
-				return DriverManager.getConnection(VirtuosoConnection.DB_URL,
-					VirtuosoConnection.USER, VirtuosoConnection.PASS);
-			}catch(SQLException ex){
-				ex.printStackTrace();
-				throw new SQLException("Connection not possible. This Service not available.");
-			}
-		catch(ClassNotFoundException ex){
+//				return DriverManager.getConnection(VirtuosoConnection.DB_URL,
+//					VirtuosoConnection.USER, VirtuosoConnection.PASS);
+				firstTime = false;
+			}catch(ClassNotFoundException ex){
 			ex.printStackTrace();
-			throw new SQLException("Connection not possible. This Service not available.");
 		}	
 		}
 
@@ -82,6 +78,7 @@ public class VirtuosoConnection {
 		 * @throws IOException
 		 */
 		public static void insertDeleteQuery(String Query) throws IOException {
+			processConfigFile();
 			VirtGraph virtGraph = new VirtGraph(VirtuosoConnection.DB_URL,
 					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 			/*System.out.println("\nexecute: "+ type +" GRAPH "+ virtuosoConnection.GRAPH
@@ -101,6 +98,7 @@ public class VirtuosoConnection {
 		 * @throws IOException
 		 */
 		public static void updateQuery(String deleteOldDataQuery, String insertNewDataQuery) throws IOException {
+			processConfigFile();
 			VirtGraph virtGraph = new VirtGraph(VirtuosoConnection.DB_URL,
 					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 			/*System.out.println("\nexecute: Delete From GRAPH "+ virtuosoConnection.GRAPH
@@ -127,6 +125,11 @@ public class VirtuosoConnection {
 		 * @param query
 		 */
 		public static QueryReturnClass query(String query) {
+			try {
+				processConfigFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			VirtGraph virtGraph = new VirtGraph(VirtuosoConnection.DB_URL,
 					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 

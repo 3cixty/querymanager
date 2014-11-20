@@ -1,10 +1,6 @@
 package eu.threecixty.profile;
 
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -169,56 +165,22 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     			+ "}";
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		
-		Connection conn = null;
-		Statement stmt = null;
-	    
-		try {
-			conn=VirtuosoConnection.processConfigFile();
+		QueryReturnClass qRC=VirtuosoConnection.query(queryString);
 
-			if (conn == null) return null;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(queryString);
+		ResultSet results = qRC.getReturnedResultSet();
 
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				String UID = qs.getLiteral("uid").getString();
-				String mobidotUserName = qs.getLiteral("mobidotID").getString();
-				//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
-				IDMapping mapper=new IDMapping();
-				mapper.setThreeCixtyID(UID);
-				mapper.setMobidotUserName(mobidotUserName);
-				//mapper.setMobidotID(mobidotID);
-				idMapping.add(mapper);
-			}
-						
-			return idMapping;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			String UID = qs.getLiteral("uid").getString();
+			String mobidotUserName = qs.getLiteral("mobidotID").getString();
+			//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
+			IDMapping mapper=new IDMapping();
+			mapper.setThreeCixtyID(UID);
+			mapper.setMobidotUserName(mobidotUserName);
+			//mapper.setMobidotID(mobidotID);
+			idMapping.add(mapper);
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
+
 		return idMapping;
 	}
 	/**
@@ -240,56 +202,23 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     			+ "\n"
     			+ "}";
 		Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
-		
-		Connection conn = null;
-		Statement stmt = null;
 	    
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return null;
 			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(queryString);
+		QueryReturnClass qRC=VirtuosoConnection.query(queryString);
 
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				String UID = qs.getLiteral("uid").getString();
-				String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
-				
-				IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
-				mapper.setThreeCixtyID(UID);
-				mapper.setLastCrawlTime(lastCrawlTime);
-				idCrawlTimeMapping.add(mapper);
-			}
-						
-			return idCrawlTimeMapping;
+		ResultSet results = qRC.getReturnedResultSet();
 
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			String UID = qs.getLiteral("uid").getString();
+			String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
 
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
+			IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
+			mapper.setThreeCixtyID(UID);
+			mapper.setLastCrawlTime(lastCrawlTime);
+			idCrawlTimeMapping.add(mapper);
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
+
 		return idCrawlTimeMapping;
 	}
 

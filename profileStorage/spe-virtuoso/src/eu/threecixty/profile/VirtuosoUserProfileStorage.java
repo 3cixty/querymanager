@@ -1,9 +1,6 @@
 package eu.threecixty.profile;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -89,16 +86,7 @@ public class VirtuosoUserProfileStorage {
 
 	private static void saveUIDInfoTOKB(String uid) {
 
-		Connection conn = null;
-		Statement stmt = null;
-
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
 			
 			String deleteQuery = GetSetQueryStrings.removeUser(uid);
 			VirtuosoConnection.insertDeleteQuery(deleteQuery);
@@ -109,24 +97,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 		
 	}
@@ -140,16 +110,8 @@ public class VirtuosoUserProfileStorage {
 	private static void saveKnowsToKB(String uid, Set <String> knows) {
 		
 		Set <String> knowsTemp = new HashSet <String>();
-		
-		Connection conn = null;
-		Statement stmt = null;
 
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
 
@@ -210,24 +172,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -240,16 +184,8 @@ public class VirtuosoUserProfileStorage {
 	private static void saveProfileIdentitiesToKB(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities) {
 		
 		Set <eu.threecixty.profile.oldmodels.ProfileIdentities> oldProfiles = new HashSet <eu.threecixty.profile.oldmodels.ProfileIdentities>();
-		
-		Connection conn = null;
-		Statement stmt = null;
 
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
 
@@ -293,24 +229,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -320,15 +238,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param time
 	 */
 	private static void saveGenderToKB(String uid, String gender) {
-		Connection conn = null;
-		Statement stmt = null;
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getGender(uid));
 
@@ -355,24 +265,6 @@ public class VirtuosoUserProfileStorage {
 			VirtuosoConnection.insertDeleteQuery(str);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 	
@@ -382,16 +274,9 @@ public class VirtuosoUserProfileStorage {
 	 * @param time
 	 */
 	private static void saveLastCrawlTimeToKB(String uid, String time) {
-		Connection conn = null;
-		Statement stmt = null;
+		
 		try {
-			conn=VirtuosoConnection.processConfigFile();
 
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
@@ -417,24 +302,6 @@ public class VirtuosoUserProfileStorage {
 			VirtuosoConnection.insertDeleteQuery(str);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 	
@@ -446,16 +313,8 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void saveLikesToKB(String uid, Set<eu.threecixty.profile.oldmodels.Likes> likes) {
 		Set <eu.threecixty.profile.oldmodels.Likes> oldLikes = new HashSet <eu.threecixty.profile.oldmodels.Likes>();
-				
-		Connection conn = null;
-		Statement stmt = null;
 
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
 
@@ -493,24 +352,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 	
@@ -542,16 +383,8 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void savePlacePreferenceToKB(String uid, Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
 		Set<eu.threecixty.profile.oldmodels.PlacePreference> oldPlacePreferences = new HashSet<eu.threecixty.profile.oldmodels.PlacePreference>();
-		
-		Connection conn = null;
-		Statement stmt = null;
 
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
 
@@ -600,24 +433,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -630,16 +445,8 @@ public class VirtuosoUserProfileStorage {
 	private static void saveTripPreferenceToKB(String uid, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
 		Set<eu.threecixty.profile.oldmodels.TripPreference> oldTripPreferences = new HashSet<eu.threecixty.profile.oldmodels.TripPreference>();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
+						
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
 
 			ResultSet results = qRC.getReturnedResultSet();
@@ -698,24 +505,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 	
@@ -730,15 +519,7 @@ public class VirtuosoUserProfileStorage {
 		
 		Set<eu.threecixty.profile.oldmodels.Transport> oldTransports = new HashSet<eu.threecixty.profile.oldmodels.Transport>();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
 
@@ -856,24 +637,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -887,15 +650,7 @@ public class VirtuosoUserProfileStorage {
 		
 		eu.threecixty.profile.oldmodels.Name toNameTemp = new eu.threecixty.profile.oldmodels.Name();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getName(uid));
 
@@ -931,24 +686,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -960,15 +697,7 @@ public class VirtuosoUserProfileStorage {
 	private static void saveAddressInfoToKB(String uid,	eu.threecixty.profile.oldmodels.Address address) {
 		eu.threecixty.profile.oldmodels.Address oldddress =  new eu.threecixty.profile.oldmodels.Address();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
 		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
 
@@ -1014,24 +743,6 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -1042,66 +753,33 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void loadLikesFromKBToPreference(String uid, eu.threecixty.profile.oldmodels.Preference to) {
 		Set <eu.threecixty.profile.oldmodels.Likes> toLikes = new HashSet <eu.threecixty.profile.oldmodels.Likes>();
-				
-		Connection conn = null;
-		Statement stmt = null;
 
-		try {
-			conn=VirtuosoConnection.processConfigFile();
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
 
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?likes ?likeName ?liketype
-					eu.threecixty.profile.oldmodels.Likes oldLikes = new eu.threecixty.profile.oldmodels.Likes();
-					RDFNode likeURI = qs.get("likes");
-					RDFNode likeName = qs.get("likeName");
-					RDFNode liketype = qs.get("liketype");
-				    if (likeURI!=null)
-				    	oldLikes.setHasLikesURI(likeURI.asResource().getURI());
-				    if (likeName!=null)
-				    	oldLikes.setHasLikeName(likeName.toString());
-				    if (liketype!=null)
-				    	oldLikes.setHasLikeType(eu.threecixty.profile.oldmodels.LikeType.valueOf(liketype.toString()));	
-				   toLikes.add(oldLikes);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			to.setHasLikes(toLikes);
-
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
+		ResultSet results = qRC.getReturnedResultSet();
+		
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+				//?likes ?likeName ?liketype
+				eu.threecixty.profile.oldmodels.Likes oldLikes = new eu.threecixty.profile.oldmodels.Likes();
+				RDFNode likeURI = qs.get("likes");
+				RDFNode likeName = qs.get("likeName");
+				RDFNode liketype = qs.get("liketype");
+			    if (likeURI!=null)
+			    	oldLikes.setHasLikesURI(likeURI.asResource().getURI());
+			    if (likeName!=null)
+			    	oldLikes.setHasLikeName(likeName.toString());
+			    if (liketype!=null)
+			    	oldLikes.setHasLikeType(eu.threecixty.profile.oldmodels.LikeType.valueOf(liketype.toString()));	
+			   toLikes.add(oldLikes);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		to.setHasLikes(toLikes);
+
+		return;
 	}
 	
 	/**
@@ -1111,57 +789,23 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void loadGenderFromKBToUserProfile(String uid,
 			UserProfile to) {
-		Connection conn = null;
-		Statement stmt = null;
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getGender(uid));
 
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-			
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getGender(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					RDFNode gender = qs.get("gender");
-				   
-				    if (gender!=null)
-				    	to.setHasGender(gender.toString());	
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
+		ResultSet results = qRC.getReturnedResultSet();
+		
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+				RDFNode gender = qs.get("gender");
+			   
+			    if (gender!=null)
+			    	to.setHasGender(gender.toString());	
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		
+		return;
 	}
 	
 	/**
@@ -1170,56 +814,24 @@ public class VirtuosoUserProfileStorage {
 	 * @param to
 	 */
 	private static void loadLastCrawlTimeFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile to) {
-		Connection conn = null;
-		Statement stmt = null;
+		
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
 
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-			
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					RDFNode lastCrawlTime = qs.get("lastCrawlTime");
-				   
-				    if (lastCrawlTime!=null)
-				    	to.setHasLastCrawlTime(lastCrawlTime.toString());	
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
+		ResultSet results = qRC.getReturnedResultSet();
+		
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+				RDFNode lastCrawlTime = qs.get("lastCrawlTime");
+			   
+			    if (lastCrawlTime!=null)
+			    	to.setHasLastCrawlTime(lastCrawlTime.toString());	
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		
+		return;
 	}
 	
 	/**
@@ -1230,64 +842,30 @@ public class VirtuosoUserProfileStorage {
 	private static void loadNameFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile to) {
 		
 		eu.threecixty.profile.oldmodels.Name toName = new eu.threecixty.profile.oldmodels.Name();
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getName(uid));
+
+		ResultSet results = qRC.getReturnedResultSet();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getName(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//RDFNode nameuri = qs.get("name");
-					RDFNode gn = qs.get("givenname");
-					RDFNode fn = qs.get("familyname");
-				    
-				    //if (nameuri!=null)
-				    //	toName.setHasNameURI(nameuri.asResource().getURI());
-				    if (fn!=null)
-				    	toName.setFamilyName(fn.toString());
-				    if (gn!=null)
-				    	toName.setGivenName(gn.toString());	
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			to.setHasName(toName);
-			
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+				//RDFNode nameuri = qs.get("name");
+				RDFNode gn = qs.get("givenname");
+				RDFNode fn = qs.get("familyname");
+			    
+			    //if (nameuri!=null)
+			    //	toName.setHasNameURI(nameuri.asResource().getURI());
+			    if (fn!=null)
+			    	toName.setFamilyName(fn.toString());
+			    if (gn!=null)
+			    	toName.setGivenName(gn.toString());	
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		to.setHasName(toName);
+		
+		return;
 	}
 
 	/**
@@ -1299,74 +877,41 @@ public class VirtuosoUserProfileStorage {
 		
 		eu.threecixty.profile.oldmodels.Address toAddress = new eu.threecixty.profile.oldmodels.Address();
 				
-		Connection conn = null;
-		Statement stmt = null;
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
 
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {//?homeLocation ?geoLocation 
-					RDFNode addressuri = qs.get("address");
-					RDFNode cname = qs.get("countryname");
-				    RDFNode tname = qs.get("townname");
-				    RDFNode homeLocationURI = qs.get("homeLocation");
-				    RDFNode geoLocationURI = qs.get("geoLocation");
-				    RDFNode lon = qs.get("longitude");
-				    RDFNode lat = qs.get("lat");
-				    if (addressuri!=null)
-				    	toAddress.setHasAddressURI(addressuri.asResource().getURI());
-				    if (cname!=null)
-				    	toAddress.setCountryName(cname.toString());
-				    if (tname!=null)
-				    	toAddress.setTownName(tname.toString());
-				    if (homeLocationURI!=null)
-				    	toAddress.setHasHomeLocationURI(homeLocationURI.asResource().getURI());
-				    if (geoLocationURI!=null)
-				    	toAddress.setHasGeoCoordinatesURI(geoLocationURI.asResource().getURI());
-				    if (lon!=null)
-				    	toAddress.setLongitute(Double.parseDouble(lon.asLiteral().getString()));
-				    if (lat!=null)
-				    	toAddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			to.setHasAddress(toAddress);
-						
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+		ResultSet results = qRC.getReturnedResultSet();
+		
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			try {//?homeLocation ?geoLocation 
+				RDFNode addressuri = qs.get("address");
+				RDFNode cname = qs.get("countryname");
+			    RDFNode tname = qs.get("townname");
+			    RDFNode homeLocationURI = qs.get("homeLocation");
+			    RDFNode geoLocationURI = qs.get("geoLocation");
+			    RDFNode lon = qs.get("longitude");
+			    RDFNode lat = qs.get("lat");
+			    if (addressuri!=null)
+			    	toAddress.setHasAddressURI(addressuri.asResource().getURI());
+			    if (cname!=null)
+			    	toAddress.setCountryName(cname.toString());
+			    if (tname!=null)
+			    	toAddress.setTownName(tname.toString());
+			    if (homeLocationURI!=null)
+			    	toAddress.setHasHomeLocationURI(homeLocationURI.asResource().getURI());
+			    if (geoLocationURI!=null)
+			    	toAddress.setHasGeoCoordinatesURI(geoLocationURI.asResource().getURI());
+			    if (lon!=null)
+			    	toAddress.setLongitute(Double.parseDouble(lon.asLiteral().getString()));
+			    if (lat!=null)
+			    	toAddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		to.setHasAddress(toAddress);
+					
+		return;
 	}
 	
 	/**
@@ -1377,73 +922,39 @@ public class VirtuosoUserProfileStorage {
 	private static void loadProfileIdentitiesFromUserProfile(String uid, eu.threecixty.profile.UserProfile toUserProfile) {
 		
 		Set <eu.threecixty.profile.oldmodels.ProfileIdentities> oldProfiles = new HashSet <eu.threecixty.profile.oldmodels.ProfileIdentities>();
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
+
+		ResultSet results = qRC.getReturnedResultSet();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			try {
+				
+				eu.threecixty.profile.oldmodels.ProfileIdentities tmpProfile = new eu.threecixty.profile.oldmodels.ProfileIdentities();
+				RDFNode uri = qs.get("pi");
+				RDFNode source = qs.get("source");
+				RDFNode piID = qs.get("piID");
+				RDFNode uIM = qs.get("uIM");
+			    
+			    if (uri!=null)
+			    	tmpProfile.setHasProfileIdentitiesURI(uri.asResource().getURI());
+			    if (source!=null)
+			    	tmpProfile.setHasSource(source.asResource().getURI());
+			    if (piID!=null)
+			    	tmpProfile.setHasUserAccountID(piID.toString());	
+			    if (uIM!=null)
+			    	tmpProfile.setHasUserInteractionMode(eu.threecixty.profile.oldmodels.UserInteractionMode.valueOf(uIM.toString()));	
+			    
+			    oldProfiles.add(tmpProfile); 
 			
-			stmt = conn.createStatement();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
+		}
+		toUserProfile.setHasProfileIdenties(oldProfiles);
 					
-					eu.threecixty.profile.oldmodels.ProfileIdentities tmpProfile = new eu.threecixty.profile.oldmodels.ProfileIdentities();
-					RDFNode uri = qs.get("pi");
-					RDFNode source = qs.get("source");
-					RDFNode piID = qs.get("piID");
-					RDFNode uIM = qs.get("uIM");
-				    
-				    if (uri!=null)
-				    	tmpProfile.setHasProfileIdentitiesURI(uri.asResource().getURI());
-				    if (source!=null)
-				    	tmpProfile.setHasSource(source.asResource().getURI());
-				    if (piID!=null)
-				    	tmpProfile.setHasUserAccountID(piID.toString());	
-				    if (uIM!=null)
-				    	tmpProfile.setHasUserInteractionMode(eu.threecixty.profile.oldmodels.UserInteractionMode.valueOf(uIM.toString()));	
-				    
-				    oldProfiles.add(tmpProfile); 
-				
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-			}
-			toUserProfile.setHasProfileIdenties(oldProfiles);
-						
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
+		return;
 	}
 
 	/**
@@ -1454,60 +965,26 @@ public class VirtuosoUserProfileStorage {
 	private static void loadKnowsFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile toUserProfile) {
 		
 		Set <String> knows = new HashSet <String>();
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
+
+		ResultSet results = qRC.getReturnedResultSet();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					
-				    RDFNode uidknows = qs.get("uidknows");
-				    
-				    if (uidknows!=null)
-				    	knows.add(uidknows.toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			try {
 				
+			    RDFNode uidknows = qs.get("uidknows");
+			    
+			    if (uidknows!=null)
+			    	knows.add(uidknows.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			toUserProfile.setKnows(knows);
-						
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
+			
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
+		toUserProfile.setKnows(knows);
+					
+		return;
 	}
 
 	private static void loadPreferencesFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile toUserProfile) {
@@ -1529,99 +1006,65 @@ public class VirtuosoUserProfileStorage {
 	private static void loadTransportFromKBToPreferences(String uid, eu.threecixty.profile.oldmodels.Preference toPrefs) {
 		
 		Set <eu.threecixty.profile.oldmodels.Transport> toTransports = new HashSet <eu.threecixty.profile.oldmodels.Transport>();
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
+		ResultSet results = qRC.getReturnedResultSet();
+		
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			try {
+				RDFNode transport = qs.get("transport");
+
+				if (transport==null) return;
 				
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					RDFNode transport = qs.get("transport");
-
-					if (transport==null) return;
-					
-					eu.threecixty.profile.oldmodels.Transport toTransport = new eu.threecixty.profile.oldmodels.Transport();
-					
-					toTransport.setHasTransportURI(transport.asResource().getURI());
-					
-					QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
-					ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
-					
-					Set <eu.threecixty.profile.oldmodels.RegularTrip> toRegularTrips = new HashSet <eu.threecixty.profile.oldmodels.RegularTrip>();
-					
-					for ( ; resultsRegularTrips.hasNext(); ) {
-						QuerySolution qsRegularTrips = resultsRegularTrips.next();
-						try {
-							eu.threecixty.profile.oldmodels.RegularTrip toRegularTrip = new eu.threecixty.profile.oldmodels.RegularTrip();
-							loadRegularTripFromKB(qsRegularTrips, toRegularTrip);
-					    	toRegularTrips.add(toRegularTrip);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+				eu.threecixty.profile.oldmodels.Transport toTransport = new eu.threecixty.profile.oldmodels.Transport();
+				
+				toTransport.setHasTransportURI(transport.asResource().getURI());
+				
+				QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
+				ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
+				
+				Set <eu.threecixty.profile.oldmodels.RegularTrip> toRegularTrips = new HashSet <eu.threecixty.profile.oldmodels.RegularTrip>();
+				
+				for ( ; resultsRegularTrips.hasNext(); ) {
+					QuerySolution qsRegularTrips = resultsRegularTrips.next();
+					try {
+						eu.threecixty.profile.oldmodels.RegularTrip toRegularTrip = new eu.threecixty.profile.oldmodels.RegularTrip();
+						loadRegularTripFromKB(qsRegularTrips, toRegularTrip);
+				    	toRegularTrips.add(toRegularTrip);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				
+				QueryReturnClass qRCAccompanying=VirtuosoConnection.query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
+				ResultSet resultsAccompanying = qRCAccompanying.getReturnedResultSet();
+				
+				Set <eu.threecixty.profile.oldmodels.Accompanying> toAccompanyings = new HashSet <eu.threecixty.profile.oldmodels.Accompanying>();
+				
+				for ( ; resultsAccompanying.hasNext(); ) {
+					QuerySolution sAccompanying = resultsAccompanying.next();
+					try {
+						eu.threecixty.profile.oldmodels.Accompanying toAccompanying = new eu.threecixty.profile.oldmodels.Accompanying();
+						loadAccompanyingFromKB(sAccompanying,uid,toAccompanying);
+				    	toAccompanyings.add(toAccompanying);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 					
-					QueryReturnClass qRCAccompanying=VirtuosoConnection.query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
-					ResultSet resultsAccompanying = qRCAccompanying.getReturnedResultSet();
-					
-					Set <eu.threecixty.profile.oldmodels.Accompanying> toAccompanyings = new HashSet <eu.threecixty.profile.oldmodels.Accompanying>();
-					
-					for ( ; resultsAccompanying.hasNext(); ) {
-						QuerySolution sAccompanying = resultsAccompanying.next();
-						try {
-							eu.threecixty.profile.oldmodels.Accompanying toAccompanying = new eu.threecixty.profile.oldmodels.Accompanying();
-							loadAccompanyingFromKB(sAccompanying,uid,toAccompanying);
-					    	toAccompanyings.add(toAccompanying);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
-					}
-				
-					toTransport.setHasAccompanyings(toAccompanyings);
-					toTransport.setHasRegularTrip(toRegularTrips);
-					toTransports.add(toTransport);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
-			}
 			
-			toPrefs.setHasTransport(toTransports);
-						
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+				toTransport.setHasAccompanyings(toAccompanyings);
+				toTransport.setHasRegularTrip(toRegularTrips);
+				toTransports.add(toTransport);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		
+		toPrefs.setHasTransport(toTransports);
+					
+		return;
 	}
 
 	/**
@@ -1697,95 +1140,62 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void loadPersonalPlaceFromKBToRegularTrips(String regularTripURI,
 			Set <eu.threecixty.profile.oldmodels.PersonalPlace> toPersonalPlaces) {
+
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPersonalPlacesForRegularTrips(regularTripURI));
+
+		ResultSet results = qRC.getReturnedResultSet();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPersonalPlacesForRegularTrips(regularTripURI));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?pplace ?ID ?externalIDs ?latitude ?longitude ?stayDuration ?accuracy ?stayPercentage 
-					//?pcode ?weekDayPattern ?dayHourPattern ?placeType ?placeName "
-					eu.threecixty.profile.oldmodels.PersonalPlace toPersonalPlace = new eu.threecixty.profile.oldmodels.PersonalPlace();
-					
-					RDFNode externalIDs = qs.get("externalIDs");
-					RDFNode latitude = qs.get("latitude");
-					RDFNode longitude = qs.get("longitude");
-					RDFNode stayDuration = qs.get("stayDuration");
-					RDFNode accuracy = qs.get("accuracy");
-					RDFNode stayPercentage = qs.get("stayPercentage");
-					RDFNode pcode = qs.get("pcode");
-					RDFNode weekDayPattern = qs.get("weekDayPattern");
-					RDFNode dayHourPattern = qs.get("dayHourPattern");
-					RDFNode placeType = qs.get("placeType");
-					RDFNode placeName = qs.get("placeName");
-				    
-				    
-				    if (externalIDs!=null)
-				    	toPersonalPlace.setHasPersonalPlaceexternalIds(externalIDs.toString());
-			    	if (latitude!=null)
-			    		toPersonalPlace.setLatitude(latitude.asLiteral().getDouble());
-		    		if (longitude!=null)
-		    			toPersonalPlace.setLongitude(longitude.asLiteral().getDouble());
-         			if (stayDuration!=null)
-         				 toPersonalPlace.setHasPersonalPlaceStayDuration(stayDuration.asLiteral().getLong());
-    				if (accuracy!=null)
-    					 toPersonalPlace.setHasPersonalPlaceAccuracy(accuracy.asLiteral().getDouble());
-					if (stayPercentage!=null)
-						toPersonalPlace.setHasPersonalPlaceStayPercentage(stayPercentage.asLiteral().getDouble());
-					if (pcode!=null)
-						toPersonalPlace.setPostalcode(pcode.toString());
-					if (weekDayPattern!=null)
-						toPersonalPlace.setHasPersonalPlaceWeekdayPattern(weekDayPattern.toString());
-					if (dayHourPattern!=null)
-						toPersonalPlace.setHasPersonalPlaceDayhourPattern(dayHourPattern.toString());
-					if (placeType!=null)
-						toPersonalPlace.setHasPersonalPlaceType(placeType.toString());
-					if (placeName!=null)
-						toPersonalPlace.setHasPersonalPlaceName(placeName.toString());
-				    							
-					toPersonalPlaces.add(toPersonalPlace);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			try {
+				//?pplace ?ID ?externalIDs ?latitude ?longitude ?stayDuration ?accuracy ?stayPercentage 
+				//?pcode ?weekDayPattern ?dayHourPattern ?placeType ?placeName "
+				eu.threecixty.profile.oldmodels.PersonalPlace toPersonalPlace = new eu.threecixty.profile.oldmodels.PersonalPlace();
 				
+				RDFNode externalIDs = qs.get("externalIDs");
+				RDFNode latitude = qs.get("latitude");
+				RDFNode longitude = qs.get("longitude");
+				RDFNode stayDuration = qs.get("stayDuration");
+				RDFNode accuracy = qs.get("accuracy");
+				RDFNode stayPercentage = qs.get("stayPercentage");
+				RDFNode pcode = qs.get("pcode");
+				RDFNode weekDayPattern = qs.get("weekDayPattern");
+				RDFNode dayHourPattern = qs.get("dayHourPattern");
+				RDFNode placeType = qs.get("placeType");
+				RDFNode placeName = qs.get("placeName");
+			    
+			    
+			    if (externalIDs!=null)
+			    	toPersonalPlace.setHasPersonalPlaceexternalIds(externalIDs.toString());
+		    	if (latitude!=null)
+		    		toPersonalPlace.setLatitude(latitude.asLiteral().getDouble());
+				if (longitude!=null)
+					toPersonalPlace.setLongitude(longitude.asLiteral().getDouble());
+				if (stayDuration!=null)
+					 toPersonalPlace.setHasPersonalPlaceStayDuration(stayDuration.asLiteral().getLong());
+				if (accuracy!=null)
+					 toPersonalPlace.setHasPersonalPlaceAccuracy(accuracy.asLiteral().getDouble());
+				if (stayPercentage!=null)
+					toPersonalPlace.setHasPersonalPlaceStayPercentage(stayPercentage.asLiteral().getDouble());
+				if (pcode!=null)
+					toPersonalPlace.setPostalcode(pcode.toString());
+				if (weekDayPattern!=null)
+					toPersonalPlace.setHasPersonalPlaceWeekdayPattern(weekDayPattern.toString());
+				if (dayHourPattern!=null)
+					toPersonalPlace.setHasPersonalPlaceDayhourPattern(dayHourPattern.toString());
+				if (placeType!=null)
+					toPersonalPlace.setHasPersonalPlaceType(placeType.toString());
+				if (placeName!=null)
+					toPersonalPlace.setHasPersonalPlaceName(placeName.toString());
+			    							
+				toPersonalPlaces.add(toPersonalPlace);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
 		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}	
+		
+		return;
 	}
 
 	/**
@@ -1822,89 +1232,55 @@ public class VirtuosoUserProfileStorage {
 	private static void loadTripPreferencesFromKBToPreferences(String uid, eu.threecixty.profile.oldmodels.Preference to) {
 		
 		Set <eu.threecixty.profile.oldmodels.TripPreference> tripPreferences = new HashSet <eu.threecixty.profile.oldmodels.TripPreference>();
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
+
+		ResultSet results = qRC.getReturnedResultSet();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?tripPreference ?preferredMaxTotalDistance ?preferredTripDuration ?preferredTripTime 
-					//?preferredCity ?preferredCountry ?preferredWeatherCondition 
-					//?preferredMinTimeOfAccompany ?modality 
-					eu.threecixty.profile.oldmodels.TripPreference tripPreference = new eu.threecixty.profile.oldmodels.TripPreference();
-					RDFNode tripPreferenceURI = qs.get("tripPreference");
-					RDFNode preferredMaxTotalDistance = qs.get("preferredMaxTotalDistance");
-					RDFNode preferredTripDuration = qs.get("preferredTripDuration");
-					RDFNode preferredTripTime = qs.get("preferredTripTime");
-					RDFNode preferredCity = qs.get("preferredCity");
-					RDFNode preferredCountry = qs.get("preferredCountry");
-					RDFNode preferredWeatherCondition = qs.get("preferredWeatherCondition");
-					RDFNode preferredMinTimeOfAccompany = qs.get("preferredMinTimeOfAccompany");
-					RDFNode modality = qs.get("modality");
-				    
-				    if (tripPreferenceURI!=null)
-				    	tripPreference.setHasTripPreferenceURI(tripPreferenceURI.asResource().getURI());
-				    if (preferredMaxTotalDistance!=null)
-				    	tripPreference.setHasPreferredMaxTotalDistance(preferredMaxTotalDistance.asLiteral().getDouble());
-				    if (preferredTripDuration!=null)
-				    	tripPreference.setHasPreferredTripDuration(preferredTripDuration.asLiteral().getLong());
-				    if (preferredTripTime!=null)
-				    	tripPreference.setHasPreferredTripTime(preferredTripTime.asLiteral().getLong());
-				    if (preferredCity!=null)
-				    	tripPreference.setHasPreferredCity(preferredCity.toString());
-				    if (preferredCountry!=null)
-				    	tripPreference.setHasPreferredCountry(preferredCountry.toString());
-				    if (preferredWeatherCondition!=null)
-				    	tripPreference.setHasPreferredWeatherCondition(preferredWeatherCondition.toString());
-				    if (preferredMinTimeOfAccompany!=null)
-				    	tripPreference.setHasPreferredMinTimeOfAccompany(preferredMinTimeOfAccompany.asLiteral().getLong());
-				    if (modality!=null)
-				    	tripPreference.setHasModalityType(eu.threecixty.profile.oldmodels.ModalityType.valueOf(modality.toString()));
-				    
-				    
-				    tripPreferences.add(tripPreference);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			to.setHasTripPreference(tripPreferences);
-
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+				//?tripPreference ?preferredMaxTotalDistance ?preferredTripDuration ?preferredTripTime 
+				//?preferredCity ?preferredCountry ?preferredWeatherCondition 
+				//?preferredMinTimeOfAccompany ?modality 
+				eu.threecixty.profile.oldmodels.TripPreference tripPreference = new eu.threecixty.profile.oldmodels.TripPreference();
+				RDFNode tripPreferenceURI = qs.get("tripPreference");
+				RDFNode preferredMaxTotalDistance = qs.get("preferredMaxTotalDistance");
+				RDFNode preferredTripDuration = qs.get("preferredTripDuration");
+				RDFNode preferredTripTime = qs.get("preferredTripTime");
+				RDFNode preferredCity = qs.get("preferredCity");
+				RDFNode preferredCountry = qs.get("preferredCountry");
+				RDFNode preferredWeatherCondition = qs.get("preferredWeatherCondition");
+				RDFNode preferredMinTimeOfAccompany = qs.get("preferredMinTimeOfAccompany");
+				RDFNode modality = qs.get("modality");
+			    
+			    if (tripPreferenceURI!=null)
+			    	tripPreference.setHasTripPreferenceURI(tripPreferenceURI.asResource().getURI());
+			    if (preferredMaxTotalDistance!=null)
+			    	tripPreference.setHasPreferredMaxTotalDistance(preferredMaxTotalDistance.asLiteral().getDouble());
+			    if (preferredTripDuration!=null)
+			    	tripPreference.setHasPreferredTripDuration(preferredTripDuration.asLiteral().getLong());
+			    if (preferredTripTime!=null)
+			    	tripPreference.setHasPreferredTripTime(preferredTripTime.asLiteral().getLong());
+			    if (preferredCity!=null)
+			    	tripPreference.setHasPreferredCity(preferredCity.toString());
+			    if (preferredCountry!=null)
+			    	tripPreference.setHasPreferredCountry(preferredCountry.toString());
+			    if (preferredWeatherCondition!=null)
+			    	tripPreference.setHasPreferredWeatherCondition(preferredWeatherCondition.toString());
+			    if (preferredMinTimeOfAccompany!=null)
+			    	tripPreference.setHasPreferredMinTimeOfAccompany(preferredMinTimeOfAccompany.asLiteral().getLong());
+			    if (modality!=null)
+			    	tripPreference.setHasModalityType(eu.threecixty.profile.oldmodels.ModalityType.valueOf(modality.toString()));
+			    
+			    
+			    tripPreferences.add(tripPreference);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		to.setHasTripPreference(tripPreferences);
+
+		return;
 	}
 	
 	/**
@@ -1915,65 +1291,31 @@ public class VirtuosoUserProfileStorage {
 	private static void loadPlacePreferencesFromKBToPreferences(String uid, eu.threecixty.profile.oldmodels.Preference to) {
 		
 		Set <eu.threecixty.profile.oldmodels.PlacePreference> placePreferences = new HashSet <eu.threecixty.profile.oldmodels.PlacePreference>();
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
+
+		ResultSet results = qRC.getReturnedResultSet();
 		
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn=VirtuosoConnection.processConfigFile();
-
-			if (conn == null) return;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?placePreference ?placeDetailPreference 
-					eu.threecixty.profile.oldmodels.PlacePreference placePreference = new eu.threecixty.profile.oldmodels.PlacePreference();
-					RDFNode placePreferenceURI = qs.get("placePreference");
-					RDFNode natureOfPlace = qs.get("natureOfPlace");
-				    
-				    if (placePreferenceURI!=null)
-				    	placePreference.setHasPlacePreferenceURI(placePreferenceURI.asResource().getURI());
-				    if (natureOfPlace!=null){
-				    	loadPlaceDetailPreferenceFromKBToPlacePreference(natureOfPlace.asLiteral().getString(),placePreference);
-				    }
-				    placePreferences.add(placePreference);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			to.setHasPlacePreference(placePreferences);
-
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+				//?placePreference ?placeDetailPreference 
+				eu.threecixty.profile.oldmodels.PlacePreference placePreference = new eu.threecixty.profile.oldmodels.PlacePreference();
+				RDFNode placePreferenceURI = qs.get("placePreference");
+				RDFNode natureOfPlace = qs.get("natureOfPlace");
+			    
+			    if (placePreferenceURI!=null)
+			    	placePreference.setHasPlacePreferenceURI(placePreferenceURI.asResource().getURI());
+			    if (natureOfPlace!=null){
+			    	loadPlaceDetailPreferenceFromKBToPlacePreference(natureOfPlace.asLiteral().getString(),placePreference);
+			    }
+			    placePreferences.add(placePreference);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		to.setHasPlacePreference(placePreferences);
+
+		return;
 	}
 
 	/**
@@ -2009,52 +1351,18 @@ public class VirtuosoUserProfileStorage {
 	    qStr += "FILTER (STR(?uid) = \"" + uid + "\") . \n\n";
 	    qStr += "}";
 	    
-	    Connection conn = null;
-		Statement stmt = null;
-	   		
-	    try {
-			conn=VirtuosoConnection.processConfigFile();
+	    QueryReturnClass qRC=VirtuosoConnection.query(qStr);
 
-			if (conn == null) return false;
-			
-			stmt = conn.createStatement();
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(qStr);
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				RDFNode tmpuid = qs.get("uid");
-				if (tmpuid != null && !tmpuid.asLiteral().getString().equals("")) {
-					return true;
-				}
-			}
-						
-			return false;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-		} catch ( SQLException ex){
-			ex.printStackTrace();
-		}
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+		ResultSet results = qRC.getReturnedResultSet();
+		
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			RDFNode tmpuid = qs.get("uid");
+			if (tmpuid != null && !tmpuid.asLiteral().getString().equals("")) {
+				return true;
 			}
 		}
+					
 		return false;
 	}
 	
