@@ -1,8 +1,0 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Wed Oct 15 20:23:23 CEST 2014
-http\://repo.maven.apache.org/maven2/.lastUpdated=1413389844685
-file\://D\:\\github\\querymanager\\querymanagerServlet/libs/.error=
-file\://D\:\\github\\querymanager\\querymanagerServlet/libs/.lastUpdated=1412946303964
-http\://repo.maven.apache.org/maven2/.error=
-@default-http\://maven.aksw.org/archiva/repository/internal/.lastUpdated=1413397403380
-http\://maven.aksw.org/archiva/repository/internal/.error=Could not transfer artifact com.openlink.virtuoso\:virtjdbc3\:pom\:6.1.4 from/to maven.aksw (http\://maven.aksw.org/archiva/repository/internal/)\: Failed to transfer file\: http\://maven.aksw.org/archiva/repository/internal/com/openlink/virtuoso/virtjdbc3/6.1.4/virtjdbc3-6.1.4.pom. Return code is\: 503 , ReasonPhrase\:Service Temporarily Unavailable.
