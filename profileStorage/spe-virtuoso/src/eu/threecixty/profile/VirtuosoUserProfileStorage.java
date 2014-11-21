@@ -99,12 +99,30 @@ public class VirtuosoUserProfileStorage {
 
 		try {
 			
-			String deleteQuery = GetSetQueryStrings.removeUser(uid);
-			VirtuosoConnection.insertDeleteQuery(deleteQuery);
+			boolean available=false;
+		
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(uid));
+
+			ResultSet results = qRC.getReturnedResultSet();
 			
-			String insertQuery = GetSetQueryStrings.setUser(uid);
-			VirtuosoConnection.insertDeleteQuery(insertQuery);
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				try {
+					
+				    RDFNode userURI = qs.get("uri");
+				    
+				    if (userURI!=null)
+				    	available=true;
+				    
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			
+			if (!available){
+				String insertQuery = GetSetQueryStrings.setUser(uid);
+				VirtuosoConnection.insertDeleteQuery(insertQuery);
+			}
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
