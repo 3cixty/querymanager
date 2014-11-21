@@ -147,21 +147,16 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	 * @return
 	 */
 	private Set<IDMapping> getMobidotIDsForUsers() {
-        String queryString = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-    			+"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
-    			+"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-    			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-    			+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n"
-    			+ "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n"
-    			+ "SELECT ?uid ?mobidotID\n"
-    			+ "WHERE {\n\n"
-    			+ "?root a owl:NamedIndividual .\n"
-    			+ "?root profile:hasUID ?uid .\n"
-    			+ "?root profile:hasProfileIdentities ?profileidentities .\n"
-    			+ "?profileidentities profile:hasUserAccountID ?mobidotID. \n"
-    			+ "?profileidentities profile:hasSource ?source. \n"
-    			+ "Filter(STR(?source) =\"" + "https://www.movesmarter.nl/portal" + "\"). \n"
-    			+ "\n"
+        String queryString = "prefix foaf:	<http://xmlns.com/foaf/0.1/> "
+			+"prefix profile:	<http://3cixty.com/ontology/profile/> "
+    			+ "SELECT ?uid ?mobidotID "
+    			+ "WHERE { "
+    			+ "?root a foaf:Person . "
+    			+ "?root profile:userID ?uid . "
+    			+ "?root foaf:account ?pi . "
+			+ "?pi foaf:accountServiceHomepage ?source ."
+			+ "?pi foaf:accountName ?mobidotID ."
+			+ "Filter(STR(?source) =\"https://www.movesmarter.nl/portal\") . "
     			+ "}";
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		
@@ -188,19 +183,14 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	 * @return
 	 */
 	private Set<IDCrawlTimeMapping> getCrawlTimesForUsers() {
-        String queryString = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-    			+"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
-    			+"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-    			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-    			+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n"
-    			+ "PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n"
-    			+ "SELECT ?uid ?lastCrawlTime\n"
-    			+ "WHERE {\n\n"
-    			+ "?root a owl:NamedIndividual .\n"
-    			+ "?root profile:hasUID ?uid .\n"
-    			+ "?root profile:hasLastCrawlTime ?lastCrawlTime .\n"
-    			+ "\n"
-    			+ "}";
+        String queryString = "prefix foaf:	<http://xmlns.com/foaf/0.1/> "
+			+"prefix profile:	<http://3cixty.com/ontology/profile/> "
+    			+ "SELECT ?uid ?lastCrawlTime "
+    			+ "WHERE { "
+    			+ "?root a foaf:Person . "
+    			+ "?root profile:userID ?uid . "
+    			+ "?root profile:hasLastCrawlTime ?lastCrawlTime . "
+      			+ "}";
 		Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
 	    
 			
