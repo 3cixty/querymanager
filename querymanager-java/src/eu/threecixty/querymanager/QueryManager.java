@@ -25,7 +25,6 @@ import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.ThreeCixtyExpression;
-import eu.threecixty.TimeLoggerUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.oldmodels.Event;
@@ -407,6 +406,6 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 */
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
-		LOGGER.info(TimeLoggerUtils.getCurrentTime() + " " + msg);
+		LOGGER.info(msg);
 	}
 }
