@@ -308,7 +308,7 @@ public class OAuthServices {
 		session.setAttribute(APP_KEY, app);
 		try {
 			//return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
-			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=email%20profile&state=%2Fprofile&redirect_uri="
+			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fplus.login&state=%2Fprofile&redirect_uri="
 			+ OAuthServices.GOOGLE_CALLBACK
 			+"&response_type=token&client_id=" + GOOGLE_CLIENT_ID))
 			.header("Access-Control-Allow-Origin", "*")
