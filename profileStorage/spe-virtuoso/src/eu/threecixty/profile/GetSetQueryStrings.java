@@ -505,7 +505,7 @@ public class GetSetQueryStrings {
 					+" ?s profile:userID ?uid. "
 					+ "?s foaf:account ?pi. "
 					+ "?pi foaf:accountServiceHomepage ?source."
-					+ "?pi profile:accountName ?piID."
+					+ "?pi foaf:accountName ?piID."
 					+ "?pi profile:userInteractionMode ?uIM."
 					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
 					+ "}";
