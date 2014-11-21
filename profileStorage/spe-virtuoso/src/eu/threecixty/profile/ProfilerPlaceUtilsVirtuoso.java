@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Preference;
@@ -21,6 +22,8 @@ import eu.threecixty.profile.oldmodels.Preference;
  */
 public class ProfilerPlaceUtilsVirtuoso {
 	
+	private static final String PREFIXES = Configuration.PREFIXES;
+	
 	/**
 	 * Gets country name.
 	 *
@@ -30,12 +33,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	public static String getCountryName(String uID) {
 		if (uID == null || uID.equals("")) return null;
 		
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX schema: <http://schema.org/>\n");
-		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
-		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
-		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
-		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+		StringBuffer buffer = new StringBuffer(PREFIXES);
 
 		buffer.append("select  ?countryName\n");
 		buffer.append("where {\n");
@@ -70,12 +68,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	public static String getTownName(String uID) {
 		if (uID == null || uID.equals("")) return null;
 
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX schema: <http://schema.org/>\n");
-		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
-		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
-		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
-		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+		StringBuffer buffer = new StringBuffer(PREFIXES);
 
 		buffer.append("select  ?townName\n");
 		buffer.append("where {\n");
@@ -109,12 +102,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	public static GpsCoordinate getCoordinates(String uID) {
 		if (uID == null || uID.equals("")) return null;
 		
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX schema: <http://schema.org/>\n");
-		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
-		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
-		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
-		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+		StringBuffer buffer = new StringBuffer(PREFIXES);
 
 		buffer.append("select  ?lon ?lat \n");
 		buffer.append("where {\n");
@@ -156,24 +144,17 @@ public class ProfilerPlaceUtilsVirtuoso {
 	public static List <String> getPlaceNamesFromRating(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
 		
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX schema: <http://schema.org/>\n");
-		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
-		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
-		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
-		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+		StringBuffer buffer = new StringBuffer(PREFIXES);
 
 		buffer.append("SELECT  ?name \n");
 		buffer.append("where {\n");
-		buffer.append("?meroot rdf:type	foaf:Person .\n");
-		buffer.append("?meroot profile:userID	?uid .\n");
-		buffer.append("?meroot profile:review	?review .\n");
+		buffer.append("?x a dul:Place .\n");
+		buffer.append("?x schema:review ?review .\n");
+		buffer.append("?x schema:name ?name .\n");
 		buffer.append("?review schema:reviewRating	?reviewRating .\n");
-		buffer.append("?review schema:itemReviewed	?itemReviewed .\n");
-		buffer.append("?itemReviewed schema:name	?name .\n");
 		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
-		
-		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n");
+		buffer.append("?review schema:creator ?creator . \n");
+		buffer.append("?creator schema:url " + getGoogleReviewCreator(uID) + ".\n");
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
 		buffer.append("}");
 		
@@ -202,12 +183,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	public static List <String> getPlaceNamesFromRatingOfFriends(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
 
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("PREFIX schema: <http://schema.org/>\n");
-		buffer.append("PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n");
-		buffer.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
-		buffer.append("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n");
-		buffer.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+		StringBuffer buffer = new StringBuffer(PREFIXES);
 
 		buffer.append("SELECT  ?name \n");
 		buffer.append("where {\n");
@@ -216,14 +192,19 @@ public class ProfilerPlaceUtilsVirtuoso {
 		
 		buffer.append("?meroot schema:knows	?knows .\n");
 		
-		buffer.append("?knows profile:review	?review .\n"); // friends' review
-		buffer.append("?review schema:reviewRating	?reviewRating .\n");
-		buffer.append("?review schema:itemReviewed	?itemReviewed .\n");
-		buffer.append("?itemReviewed schema:name	?name .\n");
-		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
+		buffer.append("?knows profile:userID	?friendsUID .\n"); // friends' UID
 		
-		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n");
+		
+		buffer.append("?x a dul:Place .\n");
+		buffer.append("?x schema:review ?review .\n");
+		buffer.append("?x schema:name ?name .\n");
+		buffer.append("?review schema:reviewRating	?reviewRating .\n");
+		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
+		buffer.append("?review schema:creator ?creator . \n");
+		buffer.append("?creator schema:url ?creatorURI .\n");
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
+		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n");
+		buffer.append("FILTER(fn:ends-with(STR(?creatorURI), STR(?friendsUID))) \n");
 		buffer.append("}");
 
 	    return getPlaceNamesFromQuery(buffer.toString());
@@ -257,6 +238,10 @@ public class ProfilerPlaceUtilsVirtuoso {
 			e.printStackTrace();
 		}
 		return placeNames;
+	}
+	
+	private static String getGoogleReviewCreator(String uid) {
+		return "<https://plus.google.com/" + uid + ">";
 	}
 
 	public static void addDays(Preference pref, Period period) {

@@ -4,21 +4,12 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.threecixty.Configuration;
+
 public class GetSetQueryStrings {
 	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 	
-	private static final String PREFIX = "prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-										+"prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> "
-										+"prefix foaf:	<http://xmlns.com/foaf/0.1/> "
-										+"prefix schema:	<http://schema.org/> "
-										+"prefix xsd:	<http://www.w3.org/2001/XMLSchema#> "
-										+"prefix profile:	<http://3cixty.com/ontology/profile/> "
-										+"prefix frap:	<http://purl.org/frap#> "
-										+"prefix dc:	<http://purl.org/dc/elements/1.1/> ";
-										//+"prefix dbpedia-owl:	<http://dbpedia.org/ontology/> "
-										//+"prefix xpath:	<http://www.w3.org/2005/> "
-										//+"prefix googlekos: <http://data.linkedevents.org/kos/googleplaces/> ";
-	
+	private static final String PREFIX = Configuration.PREFIXES;
 	
 	private static String makeUser(String uid) {
 		String query= " <"+PROFILE_URI+uid+"> rdf:type foaf:Person. "
