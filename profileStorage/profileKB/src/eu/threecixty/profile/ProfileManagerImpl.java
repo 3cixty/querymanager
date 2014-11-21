@@ -8,7 +8,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import eu.threecixty.Configuration;
-import eu.threecixty.TimeLoggerUtils;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**
@@ -254,6 +253,6 @@ public class ProfileManagerImpl implements ProfileManager {
 	 */
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
-		LOGGER.info(TimeLoggerUtils.getCurrentTime() + " " + msg);
+		LOGGER.info(msg);
 	}
 }

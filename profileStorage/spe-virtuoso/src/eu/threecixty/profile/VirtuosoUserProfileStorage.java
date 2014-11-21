@@ -12,7 +12,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
-import eu.threecixty.TimeLoggerUtils;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
 public class VirtuosoUserProfileStorage {
@@ -54,7 +53,7 @@ public class VirtuosoUserProfileStorage {
 			return toUserProfile;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+			LOGGER.error(e.getMessage());
 		}
 		return null;
 	}
@@ -91,7 +90,7 @@ public class VirtuosoUserProfileStorage {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+			LOGGER.error(e.getMessage());
 		}
 		return false;
 	}
@@ -109,7 +108,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 		
 	}
@@ -185,7 +184,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 
@@ -227,7 +226,7 @@ public class VirtuosoUserProfileStorage {
 				
 				} catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 				
 			}
@@ -244,7 +243,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 
@@ -281,7 +280,7 @@ public class VirtuosoUserProfileStorage {
 			VirtuosoConnection.insertDeleteQuery(str);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 	
@@ -309,7 +308,7 @@ public class VirtuosoUserProfileStorage {
 				    	oldtime=lastCrawlTime.toString();
 				} catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 			}
 			
@@ -320,7 +319,7 @@ public class VirtuosoUserProfileStorage {
 			VirtuosoConnection.insertDeleteQuery(str);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 	
@@ -356,7 +355,7 @@ public class VirtuosoUserProfileStorage {
 				   oldLikes.add(oldLike);
 				} catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 			}
 			
@@ -372,7 +371,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 	
@@ -427,7 +426,7 @@ public class VirtuosoUserProfileStorage {
 				    oldPlacePreferences.add(placePreference);
 				}catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 			}
 			
@@ -455,7 +454,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 
@@ -514,7 +513,7 @@ public class VirtuosoUserProfileStorage {
 				    oldTripPreferences.add(tripPreference);
 				} catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 			}
 			
@@ -529,7 +528,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 	
@@ -574,7 +573,7 @@ public class VirtuosoUserProfileStorage {
 					    	toRegularTrips.add(toRegularTrip);
 						} catch (Exception e) {
 							e.printStackTrace();
-							LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+							LOGGER.error(e.getMessage());
 						}
 					}
 					
@@ -591,7 +590,7 @@ public class VirtuosoUserProfileStorage {
 					    	toAccompanyings.add(toAccompanying);
 						} catch (Exception e) {
 							e.printStackTrace();
-							LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+							LOGGER.error(e.getMessage());
 						}
 						
 					}
@@ -602,7 +601,7 @@ public class VirtuosoUserProfileStorage {
 				
 				}catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 			}
 			String str ="";
@@ -665,7 +664,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 
@@ -701,7 +700,7 @@ public class VirtuosoUserProfileStorage {
 				    
 				} catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 			}
 			
@@ -716,7 +715,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 
@@ -760,7 +759,7 @@ public class VirtuosoUserProfileStorage {
 				    	oldddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
 				} catch (Exception e) {
 					e.printStackTrace();
-					LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 			}
 			
@@ -775,7 +774,7 @@ public class VirtuosoUserProfileStorage {
 
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
-			LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + ex.getMessage());
+			LOGGER.error(ex.getMessage());
 		}
 	}
 
@@ -808,7 +807,7 @@ public class VirtuosoUserProfileStorage {
 			   toLikes.add(oldLikes);
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		to.setHasLikes(toLikes);
@@ -836,7 +835,7 @@ public class VirtuosoUserProfileStorage {
 			    	to.setHasGender(gender.toString());	
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		
@@ -863,7 +862,7 @@ public class VirtuosoUserProfileStorage {
 			    	to.setHasLastCrawlTime(lastCrawlTime.toString());	
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		
@@ -897,7 +896,7 @@ public class VirtuosoUserProfileStorage {
 			    	toName.setGivenName(gn.toString());	
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		to.setHasName(toName);
@@ -944,7 +943,7 @@ public class VirtuosoUserProfileStorage {
 			    	toAddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		to.setHasAddress(toAddress);
@@ -987,7 +986,7 @@ public class VirtuosoUserProfileStorage {
 			
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 			
 		}
@@ -1018,7 +1017,7 @@ public class VirtuosoUserProfileStorage {
 			    	knows.add(uidknows.toString());
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 			
 		}
@@ -1073,7 +1072,7 @@ public class VirtuosoUserProfileStorage {
 				    	toRegularTrips.add(toRegularTrip);
 					} catch (Exception e) {
 						e.printStackTrace();
-						LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+						LOGGER.error(e.getMessage());
 					}
 				}
 				
@@ -1090,7 +1089,7 @@ public class VirtuosoUserProfileStorage {
 				    	toAccompanyings.add(toAccompanying);
 					} catch (Exception e) {
 						e.printStackTrace();
-						LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+						LOGGER.error(e.getMessage());
 					}
 					
 				}
@@ -1101,7 +1100,7 @@ public class VirtuosoUserProfileStorage {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		
@@ -1234,7 +1233,7 @@ public class VirtuosoUserProfileStorage {
 				toPersonalPlaces.add(toPersonalPlace);
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 			
 		}
@@ -1320,7 +1319,7 @@ public class VirtuosoUserProfileStorage {
 			    tripPreferences.add(tripPreference);
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		to.setHasTripPreference(tripPreferences);
@@ -1356,7 +1355,7 @@ public class VirtuosoUserProfileStorage {
 			    placePreferences.add(placePreference);
 			} catch (Exception e) {
 				e.printStackTrace();
-				LOGGER.error(TimeLoggerUtils.getCurrentTime() + " " + e.getMessage());
+				LOGGER.error(e.getMessage());
 			}
 		}
 		to.setHasPlacePreference(placePreferences);
@@ -1418,7 +1417,7 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
-		LOGGER.info(TimeLoggerUtils.getCurrentTime() + " " + msg);
+		LOGGER.info(msg);
 	}
 	
 	private VirtuosoUserProfileStorage() {
