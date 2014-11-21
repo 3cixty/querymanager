@@ -65,9 +65,8 @@ public class VirtuosoUserProfileStorage {
 	 */
 	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
 		if (profile == null) return false;
-		
 		try {
-			
+			if (DEBUG_MOD) LOGGER.info("begin saving user profile");
 			saveUIDInfoTOKB(profile.getHasUID());
 			
 			saveGenderToKB(profile.getHasUID(),profile.getHasGender());
@@ -88,6 +87,7 @@ public class VirtuosoUserProfileStorage {
 			else
 				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
 			
+			if (DEBUG_MOD) LOGGER.info("end saving user profile");
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOGGER.error(e.getMessage());
@@ -1403,21 +1403,12 @@ public class VirtuosoUserProfileStorage {
 			QuerySolution qs = results.next();
 			RDFNode tmpuid = qs.get("uid");
 			if (tmpuid != null && !tmpuid.asLiteral().getString().equals("")) {
-				logInfo("Found UID = " + uid + " in Virtuoso");
+				if (DEBUG_MOD) LOGGER.info("Found UID = " + uid + " in Virtuoso");
 				return true;
 			}
 		}
-		logInfo("Not found UID = " + uid + " in Virtuoso. Here is the sparql query: " + qStr.toString());	
+		if (DEBUG_MOD) LOGGER.info("Not found UID = " + uid + " in Virtuoso. Here is the sparql query: " + qStr.toString());	
 		return false;
-	}
-	
-	/**
-	 * Logs message at Info level
-	 * @param msg
-	 */
-	private static void logInfo(String msg) {
-		if (!DEBUG_MOD) return;
-		LOGGER.info(msg);
 	}
 	
 	private VirtuosoUserProfileStorage() {

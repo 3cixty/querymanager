@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
 import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
@@ -16,6 +18,10 @@ import com.hp.hpl.jena.query.QueryFactory;
 import eu.threecixty.Configuration;
 
 public class VirtuosoConnection {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 VirtuosoConnection.class.getName());
+	
 	// JDBC driver name and database URL
 		static String DB_URL;
 
@@ -59,19 +65,19 @@ public class VirtuosoConnection {
 				throw new IOException("The property virtuoso.pass doesn't exist");
 			}
 			VirtuosoConnection.GRAPH = Configuration.PROFILE_GRAPH;
-//			if (prop.getProperty("virtuoso.graph") != null) {
-//				VirtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
-//			} else {
-//				throw new IOException("The property virtuoso.graph doesn't exist");
-//			}
+			//			if (prop.getProperty("virtuoso.graph") != null) {
+			//				VirtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
+			//			} else {
+			//				throw new IOException("The property virtuoso.graph doesn't exist");
+			//			}
 			try {
-				Class.forName("virtuoso.jdbc4.Driver");
-//				return DriverManager.getConnection(VirtuosoConnection.DB_URL,
-//					VirtuosoConnection.USER, VirtuosoConnection.PASS);
+				Class.forName("virtuoso.jdbc3.Driver");
+				//				return DriverManager.getConnection(VirtuosoConnection.DB_URL,
+				//					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 				firstTime = false;
 			}catch(ClassNotFoundException ex){
-			ex.printStackTrace();
-		}	
+				LOGGER.error(ex.getMessage());
+			}	
 		}
 
 		/**
