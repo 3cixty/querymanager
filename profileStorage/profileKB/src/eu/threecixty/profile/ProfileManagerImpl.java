@@ -213,10 +213,13 @@ public class ProfileManagerImpl implements ProfileManager {
 			profileManager = (ProfileManager) Class.forName(VIRTUOSO_PM_IMPL).newInstance();
 			found = true;
 		} catch (ClassNotFoundException e) {
+			logInfo(e.getMessage());
 			//e.printStackTrace();
 		} catch (InstantiationException e) {
+			logInfo(e.getMessage());
 			//e.printStackTrace();
 		} catch (IllegalAccessException e) {
+			logInfo(e.getMessage());
 			//e.printStackTrace();
 		}
 		if (!found) {
