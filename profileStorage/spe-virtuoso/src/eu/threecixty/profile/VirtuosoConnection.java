@@ -21,6 +21,9 @@ public class VirtuosoConnection {
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 VirtuosoConnection.class.getName());
+	 
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	// JDBC driver name and database URL
 		static String DB_URL;
@@ -65,19 +68,7 @@ public class VirtuosoConnection {
 				throw new IOException("The property virtuoso.pass doesn't exist");
 			}
 			VirtuosoConnection.GRAPH = Configuration.PROFILE_GRAPH;
-			//			if (prop.getProperty("virtuoso.graph") != null) {
-			//				VirtuosoConnection.GRAPH = prop.getProperty("virtuoso.graph");
-			//			} else {
-			//				throw new IOException("The property virtuoso.graph doesn't exist");
-			//			}
-			try {
-				Class.forName("virtuoso.jdbc3.Driver");
-				//				return DriverManager.getConnection(VirtuosoConnection.DB_URL,
-				//					VirtuosoConnection.USER, VirtuosoConnection.PASS);
-				firstTime = false;
-			}catch(ClassNotFoundException ex){
-				LOGGER.error(ex.getMessage());
-			}	
+			firstTime = false;
 		}
 
 		/**
@@ -120,6 +111,9 @@ public class VirtuosoConnection {
 					+ " <aa4> <bb4> <0123> . "
 					+ "<aa5> <bb5> 0456. "
 					+ "}");*/
+			
+			if (DEBUG_MOD) LOGGER.info("delete query = " + deleteOldDataQuery + "\n insert query = " + insertNewDataQuery);
+			
 			VirtuosoUpdateRequest vur = VirtuosoUpdateFactory
 					.create(deleteOldDataQuery, virtGraph);
 			vur.exec();
