@@ -77,7 +77,20 @@ public class GetSetQueryStrings {
 			query+= "}";
 		return query;
 	}
-	
+	/**
+	 * Get the URI of the user
+	 * @param uid
+	 * @return
+	 */
+	public static String getUserURI(String uid){
+		String query=PREFIX
+				+ "select ?uri "
+				+ " where {"
+					+ "?uri a foaf:Person. "
+					+" ?uri profile:userID \""+uid+"\". "
+					+ "}";
+		return query;
+	}
 	/**
 	 * select last crawl time
 	 * @param uid
