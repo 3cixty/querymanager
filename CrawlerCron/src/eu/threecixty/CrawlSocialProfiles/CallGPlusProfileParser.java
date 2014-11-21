@@ -218,13 +218,14 @@ public class CallGPlusProfileParser {
 							"scrap.js", UID, timeStamp.toString() });
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					proc.getInputStream()));
-			String result = "";
+			StringBuilder result = new StringBuilder(); // http://stackoverflow.com/questions/65668/why-to-use-stringbuffer-in-java-instead-of-the-string-concatenation-operator
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				result += line;
+				result.append(line);
 			}
+			reader.close();
 			HtmlParser htmlParser = new HtmlParser();
-			return htmlParser.printProfile(UID, result, timeStamp,
+			return htmlParser.printProfile(UID, result.toString(), timeStamp,
 					lastCrawlTime);
 		} catch (IOException e) {
 			e.printStackTrace();
