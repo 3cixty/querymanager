@@ -5,7 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import eu.threecixty.Configuration;
+import eu.threecixty.TimeLoggerUtils;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**
@@ -16,6 +19,12 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
  *
  */
 public class ProfileManagerImpl implements ProfileManager {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ProfileManagerImpl.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	public static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql?default-graph-uri=&query=";
 
@@ -233,5 +242,15 @@ public class ProfileManagerImpl implements ProfileManager {
 				e.printStackTrace();
 			}
 		}
+		logInfo("profileManager = " + profileManager.getClass().getName());
+	}
+	
+	/**
+	 * Logs message at Info level
+	 * @param msg
+	 */
+	private static void logInfo(String msg) {
+		if (!DEBUG_MOD) return;
+		LOGGER.info(TimeLoggerUtils.getCurrentTime() + " " + msg);
 	}
 }
