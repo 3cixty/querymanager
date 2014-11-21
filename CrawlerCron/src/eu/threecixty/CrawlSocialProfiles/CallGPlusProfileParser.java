@@ -171,7 +171,6 @@ public class CallGPlusProfileParser {
 							"results").getJSONObject(0);
 					JSONArray addarr = jsonob
 							.getJSONArray("address_components");
-					String streetAddress = "";
 					for (int i = 0; i < addarr.length(); i++) {
 						String types = addarr.getJSONObject(i)
 								.getJSONArray("types").toString();
