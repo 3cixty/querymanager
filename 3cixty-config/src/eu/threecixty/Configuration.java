@@ -15,6 +15,7 @@ public class Configuration {
 	private static String version;
 	
 	public static final String PROFILE_GRAPH = "http://3cixty.com/fakeprofile";
+	public static final String PROFILE_PREFIX = "PREFIX profile:	<http://3cixty.com/ontology/profile/>\n";
 
 
 	public synchronized static void setPath(String path) {
