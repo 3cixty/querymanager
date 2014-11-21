@@ -29,12 +29,13 @@ public class FromClauseUtils {
 	 */
 	public static boolean containFromProfile(Query query) {
 		if (query == null) return false;
-		if (query.hasDatasetDescription()) { // contain FROM, FROM NAMED
-			List <String> graphUris = query.getGraphURIs();
-			if (graphUris != null && graphUris.contains(PROFILE_GRAPH)) return true;
-			List <String> namedGraphUris = query.getNamedGraphURIs();
-			if (namedGraphUris != null && namedGraphUris.contains(PROFILE_GRAPH)) return true;
-		}
+		// TODO: remove comment lines
+//		if (query.hasDatasetDescription()) { // contain FROM, FROM NAMED
+//			List <String> graphUris = query.getGraphURIs();
+//			if (graphUris != null && graphUris.contains(PROFILE_GRAPH)) return true;
+//			List <String> namedGraphUris = query.getNamedGraphURIs();
+//			if (namedGraphUris != null && namedGraphUris.contains(PROFILE_GRAPH)) return true;
+//		}
 		return false;
 	}
 	
@@ -46,10 +47,11 @@ public class FromClauseUtils {
 	 * @param query
 	 */
 	public static void addFromGraphs(Query query) {
-		if (query == null) return;
-		for (String graph: FROM_GRAPHS) {
-			if (!query.usesGraphURI(graph)) query.addGraphURI(graph);
-		}
+		//TODO: remove comment lines
+//		if (query == null) return;
+//		for (String graph: FROM_GRAPHS) {
+//			if (!query.usesGraphURI(graph)) query.addGraphURI(graph);
+//		}
 	}
 	
 //	private static String genSubjectVar(Query query) {
