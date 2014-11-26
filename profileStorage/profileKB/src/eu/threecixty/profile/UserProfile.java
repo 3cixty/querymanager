@@ -56,6 +56,8 @@ public class UserProfile{
 //    				+ "This collection holds the user�s previous employers and the current employer if any")
 //    private Set <EmployerInformation> hasEmployerInformation;
   
+    /**Attribute to store profile picture*/
+    private String profileImage;
     
     public String getHasLastCrawlTime() {
 		return hasLastCrawlTime;
@@ -153,5 +155,12 @@ public class UserProfile{
 	public void setHasQueryHistory(Set<QueryHistory> hasQueryHistory) {
 		this.hasQueryHistory = hasQueryHistory;
 	}
-	
+
+	public String getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
+	}	
 }
