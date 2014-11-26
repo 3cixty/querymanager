@@ -1602,7 +1602,6 @@ public class GetSetQueryStrings {
 	public static String createQueryToDeleteProfileImage(String uid) {
 		String query = " DELETE WHERE { GRAPH <" + VirtuosoConnection.GRAPH + ">" 
 				+ "{ <" + PROFILE_URI + uid + "> foaf:img ?o  } \n}";
-		System.out.println(query);
 		return query;
 	}
 	
