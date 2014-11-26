@@ -27,6 +27,7 @@ public class ProfileInformationStorage {
 			profileInfo.setUid(uid);
 			loadNameFromKBToPI(uid, userProfile, profileInfo);
 			loadAddressInfoFromKBToPI(uid, userProfile, profileInfo);
+			profileInfo.setProfileImage(userProfile.getProfileImage());
 
 			if (userProfile.getPreferences() == null) {
 				return profileInfo;
@@ -58,7 +59,9 @@ public class ProfileInformationStorage {
 			if (profile.getPreference() != null) {
 				kbUserProfile.setPreferences(profile.getPreference());
 			}
-			
+			if (!isNullOrEmpty(profile.getProfileImage())) {
+				kbUserProfile.setProfileImage(profile.getProfileImage());
+			}
 			
 			ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
 			
