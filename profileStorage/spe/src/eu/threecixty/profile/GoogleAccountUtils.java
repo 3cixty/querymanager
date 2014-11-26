@@ -45,10 +45,14 @@ public class GoogleAccountUtils {
 			String givenName = json.getString("given_name");
 			String familyName = json.getString("family_name");
 			
-			if (ProfileManagerImpl.getInstance().existUID(user_id)) return user_id; // no need to update info as it exists
+			// XXX: always save UserProfile to update with GoogleProfile
+			//if (ProfileManagerImpl.getInstance().existUID(user_id)) return user_id; // no need to update info as it exists
+			
+			String picture = json.getString("picture");
 			
 			UserProfile profile = new UserProfile();
 			profile.setHasUID(user_id);
+			profile.setProfileImage(picture);
 			Name name = new Name();
 			profile.setHasName(name);
 			name.setGivenName(givenName);
