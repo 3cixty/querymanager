@@ -83,13 +83,6 @@ import eu.threecixty.profile.oldmodels.Rating;
 		return augmentedQueryStr;
 	}
 
-	private  String getAugmentedQueryWithoutPrefixes(AugmentedQuery augmentedQuery) {
-		if (augmentedQuery == null) return "";
-		augmentedQuery.getQuery().getQuery().setDistinct(true);
-		String augmentedQueryStr = removePrefixes(augmentedQuery.convert2String());
-		return augmentedQueryStr;
-	}
-
 	public ThreeCixtyQuery getQuery() {
 		return query;
 	}
@@ -106,16 +99,19 @@ import eu.threecixty.profile.oldmodels.Rating;
 			EventMediaFormat format) {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
+		augmentedQuery.getQuery().getQuery().setDistinct(true);
+		String augmentedQueryWithNotFromProfile = FromClauseUtils.addNotFromTo(augmentedQuery.getQuery().getQuery());
+		
 		augmentedQueryStr = "";
 		String originalQueryStr = originalQuery.convert2String();
 		try {
 			if (originalQuery != null && originalQueryStr.contains("http://schema.org/")) {
 			    augmentedQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
-			            + getAugmentedQueryWithoutPrefixes(augmentedQuery);
+			            + removePrefixes(augmentedQueryWithNotFromProfile);
 			    originalQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
 			    		+ removePrefixes(originalQueryStr);
 			} else {
-				augmentedQueryStr = getAugmentedQueryWithoutPrefixes(augmentedQuery);
+				augmentedQueryStr = removePrefixes(augmentedQueryWithNotFromProfile);
 				originalQueryStr = removePrefixes(originalQueryStr);
 			}
 			

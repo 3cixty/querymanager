@@ -544,15 +544,11 @@ public class QueryManagerServices {
 		if (FromClauseUtils.containFromProfile(jenaQuery)) throw new ThreeCixtyPermissionException(
 				"Illegal to make a query to get private information");
 		
-		String not_from_profile_query = FromClauseUtils.addNotFromTo(jenaQuery);
-		
-		Query queryModifiedWithNotFromProfile = createJenaQuery(not_from_profile_query);
-		
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);
 		qm.setForEvents(isForEvents);
 
-		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(queryModifiedWithNotFromProfile);
+		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
 
 		qm.setQuery(threecixtyQuery);
 		
