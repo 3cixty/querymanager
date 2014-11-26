@@ -190,9 +190,9 @@ public class QueryManagerServices {
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
-				FromClauseUtils.addFromGraphs(jenaQuery);
+				String not_from_profile_query = FromClauseUtils.addNotFromTo(jenaQuery);
 				
-				String queryToBeExecuted = QueryManager.removePrefixes(jenaQuery.toString());
+				String queryToBeExecuted = QueryManager.removePrefixes(not_from_profile_query);
 				
 				String result = QueryManager.executeQuery(queryToBeExecuted, eventMediaFormat);
 
@@ -544,18 +544,17 @@ public class QueryManagerServices {
 		if (FromClauseUtils.containFromProfile(jenaQuery)) throw new ThreeCixtyPermissionException(
 				"Illegal to make a query to get private information");
 		
-		FromClauseUtils.addFromGraphs(jenaQuery);
+		String not_from_profile_query = FromClauseUtils.addNotFromTo(jenaQuery);
+		
+		Query queryModifiedWithNotFromProfile = createJenaQuery(not_from_profile_query);
 		
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);
 		qm.setForEvents(isForEvents);
 
-		// TODO: correct the following line by exactly recognizing query's type
-		// suppose that we recognize that the query is for places
-		ThreeCixtyQuery placeQuery = new ThreeCixtyQuery(jenaQuery);
+		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(queryModifiedWithNotFromProfile);
 
-
-		qm.setQuery(placeQuery);
+		qm.setQuery(threecixtyQuery);
 		
 		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat);
 		return  result;

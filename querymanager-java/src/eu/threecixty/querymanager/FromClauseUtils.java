@@ -1,20 +1,22 @@
 package eu.threecixty.querymanager;
 
-import java.util.List;
-
 import com.hp.hpl.jena.query.Query;
 
 import eu.threecixty.Configuration;
 
 public class FromClauseUtils {
+	
+	private static final String WHERE = "WHERE";
+	private static final String NOT_FROM_PROFILE = "NOT FROM <" + Configuration.PROFILE_GRAPH + ">\n";
+	
 //	private static final String SCHEMA_PREFIX = "<http://schema.org/>";
 //	private static final String PROFILE_PREFIX = "<http://3cixty.com/ontology/profile/>";
-	private static final String PROFILE_GRAPH = Configuration.PROFILE_GRAPH;
-	
-	private static final String [] FROM_GRAPHS = {"http://www.w3.org/2002/07/owl#", "http://3cixty.com/yelp",
-		"http://3cixty.com/foursquare", "http://3cixty.com/googleplaces", "http://3cixty.com/events",
-		"http://data.linkedevents.org/kos/yelp/", "http://3cixty.com/hotelMetro", "http://3cixty.com/eventMetro",
-		"http://3cixty.com/topCategories", "http://data.linkedevents.org/kos/foursquare/", "http://3cixty.com/metro"};
+//	private static final String PROFILE_GRAPH = Configuration.PROFILE_GRAPH;
+//	
+//	private static final String [] FROM_GRAPHS = {"http://www.w3.org/2002/07/owl#", "http://3cixty.com/yelp",
+//		"http://3cixty.com/foursquare", "http://3cixty.com/googleplaces", "http://3cixty.com/events",
+//		"http://data.linkedevents.org/kos/yelp/", "http://3cixty.com/hotelMetro", "http://3cixty.com/eventMetro",
+//		"http://3cixty.com/topCategories", "http://data.linkedevents.org/kos/foursquare/", "http://3cixty.com/metro"};
 	
 //	private static final Node GIVEN_NAME_PREDICATE = NodeFactory.createURI(SCHEMA_PREFIX + ":givenName");
 //	private static final Node FAMILY_NAME_PREDICATE = NodeFactory.createURI(SCHEMA_PREFIX + ":familyName");
@@ -37,6 +39,24 @@ public class FromClauseUtils {
 //			if (namedGraphUris != null && namedGraphUris.contains(PROFILE_GRAPH)) return true;
 //		}
 		return false;
+	}
+	
+	/**
+	 * Adds <code>NOT FROM</code> to a given query.
+	 * <br>
+	 * Note that <code>NOT FROM</code> is not a standard query and is not supported by Jena.
+	 * @param query
+	 * @return a query in string format.
+	 */
+	public static String addNotFromTo(Query query) {
+		if (query == null) return null;
+		// query's keywords are always in upper-case after using query.toString
+		String originalQuery = query.toString();
+		int whereIndex = originalQuery.indexOf(WHERE);
+		if (whereIndex < 0) return originalQuery; // it seems not to be existed
+		else {
+			return originalQuery.replaceFirst(WHERE, NOT_FROM_PROFILE + WHERE);
+		}
 	}
 	
 	/**
