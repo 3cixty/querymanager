@@ -37,6 +37,14 @@ public class VirtuosoConnection {
 		
 		private static boolean firstTime = true;
 		
+		static {
+			try {
+				processConfigFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		/**
 		 * read config file (parameters for virtuoso)
 		 * @throws IOException

@@ -41,6 +41,8 @@ public class VirtuosoUserProfileStorage {
 			
 			loadNameFromKBToUserProfile(uid, toUserProfile);
 			
+			loadProfileImageToUserProfile(uid, toUserProfile);
+			
 			loadAddressInfoFromKBToUserProfile(uid, toUserProfile);
 			
 			loadLastCrawlTimeFromKBToUserProfile(uid,toUserProfile);
@@ -73,6 +75,8 @@ public class VirtuosoUserProfileStorage {
 			saveGenderToKB(profile.getHasUID(),profile.getHasGender());
 					
 			saveNameInfoToKB(profile.getHasUID(),profile.getHasName());
+			
+			saveProfileImage(profile.getHasUID(), profile.getProfileImage());
 			
 			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress());
 			
@@ -924,6 +928,23 @@ public class VirtuosoUserProfileStorage {
 	}
 
 	/**
+	 * Loads profile image from Virtuoso.
+	 * @param uid
+	 * @param to
+	 */
+	private static void loadProfileImageToUserProfile(String uid, eu.threecixty.profile.UserProfile to) {
+		String query = GetSetQueryStrings.createQueryToGetProfileImage(uid);
+		QueryReturnClass qRC=VirtuosoConnection.query(query);
+
+		ResultSet results = qRC.getReturnedResultSet();
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			to.setProfileImage(qs.get("profileImage").toString());
+			break;
+		}
+	}
+	
+	/**
 	 * Loads address information from KB (user profile).
 	 * @param from
 	 * @param to
@@ -1397,6 +1418,28 @@ public class VirtuosoUserProfileStorage {
 		placePreference.setHasPlaceDetailPreference(placeDetailPreference);
 	}
 
+	/**
+	 * Saves a given profileImage link into Virtuoso.
+	 * @param uid
+	 * @param profileImageLink
+	 */
+	private static void saveProfileImage(String uid, String profileImageLink) {
+		// TODO:
+		if (profileImageLink == null || profileImageLink.equals("")) return;
+		String queryToDeleteOldValue = GetSetQueryStrings.createQueryToDeleteProfileImage(uid);
+		try {
+			VirtuosoConnection.insertDeleteQuery(queryToDeleteOldValue);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String queryToInsertValue = GetSetQueryStrings.createQueryToInsertProfileImage(uid, profileImageLink);
+		try {
+			VirtuosoConnection.insertDeleteQuery(queryToInsertValue);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Checks whether or not a given UID exists in the UserProfile.
 	 * @param uid

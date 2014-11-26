@@ -1580,6 +1580,47 @@ public class GetSetQueryStrings {
 	}
 
 	/**
+	 * Creates query to insert a given profile image to Virtuoso.
+	 * @param uid
+	 * @param profileImage
+	 * @return
+	 */
+	public static String createQueryToInsertProfileImage(String uid, String profileImage) {
+		String query=PREFIX
+				+ "INSERT INTO GRAPH <"+ VirtuosoConnection.GRAPH +"> "
+				+ "{ ";
+					query+= "<" + PROFILE_URI + uid + "> foaf:img \"" + profileImage + "\" ."
+				+ "}";
+		return query;
+	}
+	
+	/**
+	 * Creates a query to delete the profile image of a given UID in Virtuoso. 
+	 * @param uid
+	 * @return
+	 */
+	public static String createQueryToDeleteProfileImage(String uid) {
+		String query = "WITH <" + VirtuosoConnection.GRAPH + ">"
+				+ "DELETE { ?s ?p ?o }" 
+				+ "WHERE" 
+				+ "{ <" + PROFILE_URI + uid + "> foaf:img ?o  } ";
+		return query;
+	}
+	
+	/**
+	 * Creates a query to get the profile image of a given UID.
+	 * @param uid
+	 * @return
+	 */
+	public static String createQueryToGetProfileImage(String uid) {
+		String query=PREFIX
+				+ "select ?profileImage "
+				+ " where "
+				+ "{ <" + PROFILE_URI + uid + "> foaf:img ?profileImage  } ";
+		return query;
+	}
+
+	/**
 	 * insert place Details preference of the user in the kb
 	 * @param placePreferenceURI
 	 * @param placeDetailPreference
