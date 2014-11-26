@@ -12,6 +12,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
 public class VirtuosoUserProfileStorage {
@@ -1406,7 +1407,7 @@ public class VirtuosoUserProfileStorage {
 		StringBuilder qStr = new StringBuilder("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 		qStr.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>\n");
 	    qStr.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
-	    qStr.append("PREFIX profile: <http://www.eu.3cixty.org/profile#>\n\n");
+	    qStr.append(Configuration.PROFILE_PREFIX);
 	    qStr.append("SELECT  DISTINCT  ?uid\n");
 	    qStr.append("WHERE {\n\n");
 	    qStr.append("?root a owl:NamedIndividual .\n");
