@@ -181,4 +181,7 @@ public interface IQueryManager {
 
 	boolean isForEvents();
 	void setForEvents(boolean isForEvents);
+	
+	boolean isForDateRanges();
+	void setForDateRanges(boolean isForDateRanges);
 }

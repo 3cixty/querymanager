@@ -547,6 +547,10 @@ public class QueryManagerServices {
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);
 		qm.setForEvents(isForEvents);
+		
+		/// XXX: hack for date ranges query
+		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
+		qm.setForDateRanges(isForDateRages);
 
 		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
 

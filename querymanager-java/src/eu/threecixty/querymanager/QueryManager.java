@@ -65,6 +65,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	
 	private String augmentedQueryStr;
 	private boolean isForEvents;
+	private boolean isForDateRanges;
 	
 	public QueryManager(String uid) {
 		this(uid, null);
@@ -403,5 +404,15 @@ import eu.threecixty.profile.oldmodels.Rating;
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
 		LOGGER.info(msg);
+	}
+
+	@Override
+	public boolean isForDateRanges() {
+		return isForDateRanges;
+	}
+
+	@Override
+	public void setForDateRanges(boolean isForDateRanges) {
+		this.isForDateRanges = isForDateRanges;
 	}
 }
