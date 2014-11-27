@@ -47,6 +47,8 @@
 				var myProfile = eval('(' + xhr.responseText + ')');
 				var lbl = document.getElementById("currentUser");
 				lbl.textContent = myProfile.firstName + " " + myProfile.lastName;
+                                var vImg = document.getElementById("profileImage");
+                                vImg.src = myProfile.profileImage;
     		}
     	}
     	xhr.send(null);
@@ -122,6 +124,7 @@
     		document.write('<input type=button value="Login using 3cixty" onclick="auth3Cixty();" />');
     	} else {
 		    document.write('<div>Current User: <label id="currentUser" /></div>');
+                        document.write('<img id="profileImage" />');
 			document.write('<div><a href="javascript:void(0)" onclick="refreshAccessToken();">Refresh Token</a></div>');
 			document.write('<div>You should control user scope at client side, but you can <a href="javascript:void(0)" onclick="checkWishListAPIStatus();">test WishList API status with your access token</a></div>');
 			document.write('<div><a href="javascript:void(0)" onclick="revokeAccessToken();">Logout</a></div>');

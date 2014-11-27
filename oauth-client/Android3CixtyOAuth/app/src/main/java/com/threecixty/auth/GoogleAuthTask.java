@@ -38,7 +38,8 @@ public class GoogleAuthTask extends AsyncTask<Void, Void, Void> {
 		
 		if (accountName != null) {
 			try {
-				token = GoogleAuthUtil.getToken(context, accountName, "oauth2:" + Scopes.PLUS_ME);
+				token = GoogleAuthUtil.getToken(context, accountName, "oauth2:" + Scopes.PLUS_LOGIN
+                        + " https://www.googleapis.com/auth/userinfo.email");
 			} catch (UserRecoverableAuthException e) {
 				//e.printStackTrace();
                 shown = false;
