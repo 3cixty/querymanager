@@ -1589,7 +1589,7 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 				+ "INSERT INTO GRAPH <"+ VirtuosoConnection.GRAPH +"> "
 				+ "{ ";
-					query+= "<" + PROFILE_URI + uid + "> foaf:img \"" + profileImage + "\" ."
+					query+= "<" + PROFILE_URI + uid + "> foaf:img <" + profileImage + "> ."
 				+ "}";
 		return query;
 	}

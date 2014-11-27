@@ -1424,7 +1424,6 @@ public class VirtuosoUserProfileStorage {
 	 * @param profileImageLink
 	 */
 	private static void saveProfileImage(String uid, String profileImageLink) {
-		// TODO:
 		if (profileImageLink == null || profileImageLink.equals("")) return;
 		String queryToDeleteOldValue = GetSetQueryStrings.createQueryToDeleteProfileImage(uid);
 		try {
