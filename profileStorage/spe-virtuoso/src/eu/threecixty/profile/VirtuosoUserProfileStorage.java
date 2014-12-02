@@ -385,7 +385,6 @@ public class VirtuosoUserProfileStorage {
 
 					if (transport==null) break;
 					
-					System.out.println(transport.asResource().getURI());
 					QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsURIForTransport(transport.asResource().getURI()));
 					ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
 					
@@ -395,7 +394,6 @@ public class VirtuosoUserProfileStorage {
 							RDFNode regularTripURI = qsRegularTrips.get("regularTrip");
 							
 							if (regularTripURI!=null){
-								System.out.println(regularTripURI.asResource().getURI());
 								String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(regularTripURI.asResource().getURI());
 								VirtuosoConnection.insertDeleteQuery(str);
 							}

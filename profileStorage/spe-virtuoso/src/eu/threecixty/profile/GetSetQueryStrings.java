@@ -90,7 +90,6 @@ public class GetSetQueryStrings {
 				if (time==null || time.isEmpty()) time="0";
 				query+= "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime \""+time+"\" ."
 			+ "}}";
-				System.out.println(query);
 			return query;
 	}
 	/**
@@ -144,7 +143,6 @@ public class GetSetQueryStrings {
 				gender="unknown";
 			query+= "<"+PROFILE_URI+uid+"> schema:gender \""+gender+"\" ."
 			+ "}}";
-			System.out.println(query);
 			return query;
 	}
 	/**
@@ -158,7 +156,6 @@ public class GetSetQueryStrings {
 			+ "   DELETE  Where {GRAPH <"+ VirtuosoConnection.GRAPH+">"
 			+ "  { "
 			+ " <"+PROFILE_URI+uid+"> schema:gender ?o .}}";
-		System.out.println(query);
 			return query;
 			/*
 			 { GRAPH <"+ VirtuosoConnection.GRAPH+">"
@@ -228,7 +225,6 @@ public class GetSetQueryStrings {
 			+ "  { ";
 			query+= makeRemoveNameQuery(uid);
 			query+= "}}";
-			System.out.println(query);
 			return query;
 			/*
 			 { GRAPH <"+ VirtuosoConnection.GRAPH+">"
@@ -338,7 +334,6 @@ public class GetSetQueryStrings {
 					+ "OPTIONAL {?homeLocation schema:geo ?geoLocation.}"
 					+ "OPTIONAL {?geoLocation schema:latitude ?lat.}"
 					+ "OPTIONAL {?geoLocation schema:longitude ?longitude. } } }";
-		System.out.println(query);	
 		return query;
 			
 			/*
@@ -944,7 +939,6 @@ public class GetSetQueryStrings {
 			}
 		}
 		query+= "}}";
-		System.out.println(query);
 		return query;
 	}
 	
@@ -1112,7 +1106,6 @@ public class GetSetQueryStrings {
 			
 		}
 		query+= "}}";
-		System.out.println(query);
 		return query;
 	}
 
@@ -1183,7 +1176,6 @@ public class GetSetQueryStrings {
 					+ "Optional {?filter profile:hasPreferredMinTimeOfAccompany ?preferredMinTimeOfAccompany .}"
 					+ "Optional {?filter profile:hasModalityType ?modality .}"
 					+ "}";
-		System.out.println(query); 
 		return query;
 	}
 	
@@ -1228,7 +1220,6 @@ public class GetSetQueryStrings {
 		query+= makePlacePreferenceQuery(uid, placePreference);
 
 		query+= "}}";
-		System.out.println(query);
 		return query;
 	}
 	
