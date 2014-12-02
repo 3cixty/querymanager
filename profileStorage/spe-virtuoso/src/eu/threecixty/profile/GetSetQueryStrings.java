@@ -1094,7 +1094,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setMultipleTripPreferences(String uid, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences){
 		String query=PREFIX
-				+ "   INSERT { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.TripPreference> iterators = tripPreferences.iterator();
 		for ( ; iterators.hasNext(); ){
