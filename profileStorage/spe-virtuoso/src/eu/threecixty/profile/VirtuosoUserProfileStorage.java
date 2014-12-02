@@ -143,68 +143,52 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 */
 	private static void saveKnowsToKB(String uid, Set <String> knows) {
-		
-		Set <String> knowsTemp = new HashSet <String>();
 
 		try {
 			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getKnows(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					
-				    RDFNode uidknows = qs.get("uidknows");
-				    
-				    if (uidknows!=null)
-				    	knowsTemp.add(uidknows.toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-			}
+			String str = GetSetQueryStrings.removeAllKnows(uid);
+			VirtuosoConnection.insertDeleteQuery(str);
 			
 			//add new knows profiles
 			if (knows!=null){
-				Set<String> knowsNotInKB=knows;
-				knowsNotInKB.removeAll(knowsTemp);
-			
-			
-				String str="";
-				
-				if (knowsNotInKB!=null&&!knowsNotInKB.isEmpty()){
-					
-					Iterator <String> iterators = knowsNotInKB.iterator();
+				if (knows!=null&&!knows.isEmpty()){
+					Iterator <String> iterators = knows.iterator();
 					for ( ; iterators.hasNext(); ){
 						String know=iterators.next();
-						str=GetSetQueryStrings.setUser(know);
-						VirtuosoConnection.insertDeleteQuery(str);
-						eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
-						profileIdentities.setHasSource("https://plus.google.com");
-						profileIdentities.setHasSourceCarrier("Google");
-						profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
-						profileIdentities.setHasUserAccountID(know);
-						profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
-						str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
-						VirtuosoConnection.insertDeleteQuery(str);
+					
+						QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(know));
+	
+						ResultSet results = qRC.getReturnedResultSet();
+						if (!results.hasNext()){
+						//for ( ; results.hasNext(); ) {
+							//QuerySolution qs = results.next();
+							try {
+								
+							    //RDFNode uri = qs.get("uri");
+							    
+							    //if (uri==null){
+							    	str=GetSetQueryStrings.setUser(know);
+									VirtuosoConnection.insertDeleteQuery(str);
+									eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
+									profileIdentities.setHasSource("https://plus.google.com");
+									profileIdentities.setHasSourceCarrier("Google");
+									profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
+									profileIdentities.setHasUserAccountID(know);
+									profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
+									str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
+									VirtuosoConnection.insertDeleteQuery(str);
+							    //}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							
+						}
 					}
-					str = GetSetQueryStrings.setMultipleKnows(uid,knowsNotInKB);
-					VirtuosoConnection.insertDeleteQuery(str);
 				}
+			str = GetSetQueryStrings.setMultipleKnows(uid,knows);
+			VirtuosoConnection.insertDeleteQuery(str);
 			}
-			//delete know from profileKB
-			//only delete links profile remains
-			Set<String> knowsToDeleteKB=knowsTemp;
-			if (knows!=null)
-				knowsToDeleteKB.removeAll(knows);
 			
-			if (knowsToDeleteKB!=null&&!knowsToDeleteKB.isEmpty()){
-				String str = GetSetQueryStrings.removeMultipleKnows(uid,knowsToDeleteKB);
-				VirtuosoConnection.insertDeleteQuery(str);
-			}
-
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
 			LOGGER.error(ex.getMessage());
@@ -219,42 +203,9 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void saveProfileIdentitiesToKB(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities) {
 		
-		Set <eu.threecixty.profile.oldmodels.ProfileIdentities> oldProfiles = new HashSet <eu.threecixty.profile.oldmodels.ProfileIdentities>();
-
 		try {
 			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getProfileIdentities(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					eu.threecixty.profile.oldmodels.ProfileIdentities tmpProfile = new eu.threecixty.profile.oldmodels.ProfileIdentities();
-					RDFNode uri = qs.get("pi");
-					RDFNode source = qs.get("source");
-					RDFNode piID = qs.get("piID");
-					RDFNode uIM = qs.get("uIM");
-				    
-				    if (uri!=null)
-				    	tmpProfile.setHasProfileIdentitiesURI(uri.asResource().getURI());
-				    if (source!=null)
-				    	tmpProfile.setHasSource(source.asResource().getURI());
-				    if (piID!=null)
-				    	tmpProfile.setHasUserAccountID(piID.toString());	
-				    if (uIM!=null)
-				    	tmpProfile.setHasUserInteractionMode(eu.threecixty.profile.oldmodels.UserInteractionMode.valueOf(uIM.toString()));	
-				    
-				    oldProfiles.add(tmpProfile); 
-				
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
-				}
-				
-			}
-			
-			String str = GetSetQueryStrings.removeMultipleProfileIdentities(uid, oldProfiles);
+			String str = GetSetQueryStrings.removeAllProfileIdentitiesOfUser(uid);
 			VirtuosoConnection.insertDeleteQuery(str);
 			
 			if (profileIdentities!=null&&!profileIdentities.isEmpty()){
@@ -277,30 +228,13 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void saveGenderToKB(String uid, String gender) {
 		try {
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getGender(uid));
 
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			String oldGender="";
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?gender
-					RDFNode oldGendertemp = qs.get("gender");
-					
-				    if (gender!=null)
-				    	oldGender=oldGendertemp.toString();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			String str = GetSetQueryStrings.removeGender(uid);
+			VirtuosoConnection.insertDeleteQuery(str);
+			if (gender!=null){
+				str = GetSetQueryStrings.setGender(uid, gender);
+				VirtuosoConnection.insertDeleteQuery(str);
 			}
-			
-			String str = GetSetQueryStrings.removeGender(uid, oldGender);
-			VirtuosoConnection.insertDeleteQuery(str);
-			
-			str = GetSetQueryStrings.setGender(uid, gender);
-			VirtuosoConnection.insertDeleteQuery(str);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
 			LOGGER.error(ex.getMessage());
@@ -315,27 +249,8 @@ public class VirtuosoUserProfileStorage {
 	private static void saveLastCrawlTimeToKB(String uid, String time) {
 		
 		try {
-
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLastCrawlTime(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			String oldtime="";
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?lastCrawlTime
-					RDFNode lastCrawlTime = qs.get("lastCrawlTime");
-					
-				    if (lastCrawlTime!=null)
-				    	oldtime=lastCrawlTime.toString();
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
-				}
-			}
-			
-			String str = GetSetQueryStrings.removeLastCrawlTime(uid, oldtime);
+		
+			String str = GetSetQueryStrings.removeLastCrawlTime(uid);
 			VirtuosoConnection.insertDeleteQuery(str);
 			
 			str = GetSetQueryStrings.setLastCrawlTime(uid, time);
@@ -352,40 +267,15 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param likes
 	 */
-	private static void saveLikesToKB(String uid, Set<eu.threecixty.profile.oldmodels.Likes> likes) {
-		Set <eu.threecixty.profile.oldmodels.Likes> oldLikes = new HashSet <eu.threecixty.profile.oldmodels.Likes>();
-
+	private static void saveLikesToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference ){//Set<eu.threecixty.profile.oldmodels.Likes> likes) {
+		
 		try {
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getLikes(uid));
 
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?likes ?likeName ?liketype
-					eu.threecixty.profile.oldmodels.Likes oldLike = new eu.threecixty.profile.oldmodels.Likes();
-					RDFNode likeURI = qs.get("likes");
-					RDFNode likeName = qs.get("likeName");
-					RDFNode liketype = qs.get("liketype");
-				    if (likeURI!=null)
-				    	oldLike.setHasLikesURI(likeURI.asResource().getURI());
-				    if (likeName!=null)
-				    	oldLike.setHasLikeName(likeName.toString());
-				    if (liketype!=null)
-				    	oldLike.setHasLikeType(eu.threecixty.profile.oldmodels.LikeType.valueOf(liketype.toString()));	
-				   oldLikes.add(oldLike);
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
-				}
-			}
-			
-			String str = GetSetQueryStrings.removeMultipleLikes(uid, oldLikes);
+			String str = GetSetQueryStrings.removeAllLikesOfUser(uid);
 			VirtuosoConnection.insertDeleteQuery(str);
 		
-			if (likes!=null&&!likes.isEmpty()){
+			if (preference!=null){//likes!=null&&!likes.isEmpty()){
+				Set<eu.threecixty.profile.oldmodels.Likes> likes=preference.getHasLikes();
 				str = GetSetQueryStrings.setMultipleLikes(uid, likes);
 				VirtuosoConnection.insertDeleteQuery(str);
 			}
@@ -408,14 +298,14 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 */
 	private static void savePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference) {
-			if (preference!=null){
+			//if (preference!=null){
 				
-				saveLikesToKB(uid,  preference.getHasLikes());
+				saveLikesToKB(uid,  preference);//.getHasLikes());
 				
-				saveTripPreferenceToKB(uid, preference.getHasTripPreference());
-				
-				savePlacePreferenceToKB(uid, preference.getHasPlacePreference());
-			}
+				saveTripPreferenceToKB(uid, preference);//.getHasTripPreference());
+				 
+				savePlacePreferenceToKB(uid, preference);//.getHasPlacePreference());
+			//}
 	}
 
 	/**
@@ -424,57 +314,23 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param placePreferences
 	 */
-	private static void savePlacePreferenceToKB(String uid, Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
-		Set<eu.threecixty.profile.oldmodels.PlacePreference> oldPlacePreferences = new HashSet<eu.threecixty.profile.oldmodels.PlacePreference>();
-
+	private static void savePlacePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference){//Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
+		
 		try {
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getPlacePreferences(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					eu.threecixty.profile.oldmodels.PlacePreference placePreference = new eu.threecixty.profile.oldmodels.PlacePreference();
-					
-					RDFNode placePreferenceURI = qs.get("placePreference");
-					RDFNode natureOfPlace = qs.get("natureOfPlace");
-					
-					if (placePreferenceURI!=null)
-				    	placePreference.setHasPlacePreferenceURI(placePreferenceURI.asResource().getURI());
-					if (natureOfPlace!=null){
-				       	loadPlaceDetailPreferenceFromKBToPlacePreference(natureOfPlace.asLiteral().getString(),placePreference);
-				    }
-				    oldPlacePreferences.add(placePreference);
-				}catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
-				}
-			}
-			
-			Iterator <eu.threecixty.profile.oldmodels.PlacePreference> iterators=oldPlacePreferences.iterator();
-			for ( ; iterators.hasNext(); ){ 
-				eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
-				//String str = GetSetQueryStrings.removePlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
-				//virtuosoConnection.insertDeleteQuery(str);
-				String str = GetSetQueryStrings.removePlacePreferences(uid, placePreference);
+				String str = GetSetQueryStrings.removePlacePreferences(uid);
 				VirtuosoConnection.insertDeleteQuery(str);
-			}	
-			
-			if (placePreferences!=null&&!placePreferences.isEmpty()){
-				iterators=placePreferences.iterator();
-				for ( ; iterators.hasNext(); ){ 
-					eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
-					//String str = GetSetQueryStrings.setPlaceDetailPreference(placePreference.getHasPlacePreferenceURI(), placePreference.getHasPlaceDetailPreference());
-					//virtuosoConnection.insertDeleteQuery(str);
-					String str = GetSetQueryStrings.setPlacePreferences(uid, placePreference);
-					VirtuosoConnection.insertDeleteQuery(str);
+				if(preference!=null){
+					Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences=preference.getHasPlacePreference();
+					if (placePreferences!=null&&!placePreferences.isEmpty()){
+						Iterator <eu.threecixty.profile.oldmodels.PlacePreference> iterators=placePreferences.iterator();
+						for ( ; iterators.hasNext(); ){ 
+							eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
+							str = GetSetQueryStrings.setPlacePreferences(uid, placePreference);
+							VirtuosoConnection.insertDeleteQuery(str);
+						}
+					}						
 				}
-			}
-			return;
-
-
+				return;
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
 			LOGGER.error(ex.getMessage());
@@ -487,68 +343,20 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param tripPreferences
 	 */
-	private static void saveTripPreferenceToKB(String uid, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
-		Set<eu.threecixty.profile.oldmodels.TripPreference> oldTripPreferences = new HashSet<eu.threecixty.profile.oldmodels.TripPreference>();
+	private static void saveTripPreferenceToKB(String uid,eu.threecixty.profile.oldmodels.Preference preference){// Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
 		
 		try {
-						
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTripPreferences(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
+			String str = GetSetQueryStrings.removeMultipleTripPreferences(uid);
+			VirtuosoConnection.insertDeleteQuery(str);
+			if (preference!=null){
 			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//?tripPreference ?preferredMaxTotalDistance ?preferredTripDuration ?preferredTripTime 
-					//?preferredCity ?preferredCountry ?preferredWeatherCondition 
-					//?preferredMinTimeOfAccompany ?modality 
-					eu.threecixty.profile.oldmodels.TripPreference tripPreference = new eu.threecixty.profile.oldmodels.TripPreference();
-					RDFNode tripPreferenceURI = qs.get("tripPreference");
-					RDFNode preferredMaxTotalDistance = qs.get("preferredMaxTotalDistance");
-					RDFNode preferredTripDuration = qs.get("preferredTripDuration");
-					RDFNode preferredTripTime = qs.get("preferredTripTime");
-					RDFNode preferredCity = qs.get("preferredCity");
-					RDFNode preferredCountry = qs.get("preferredCountry");
-					RDFNode preferredWeatherCondition = qs.get("preferredWeatherCondition");
-					RDFNode preferredMinTimeOfAccompany = qs.get("preferredMinTimeOfAccompany");
-					RDFNode modality = qs.get("modality");
-				    
-				    if (tripPreferenceURI!=null)
-				    	tripPreference.setHasTripPreferenceURI(tripPreferenceURI.asResource().getURI());
-				    if (preferredMaxTotalDistance!=null)
-				    	tripPreference.setHasPreferredMaxTotalDistance(preferredMaxTotalDistance.asLiteral().getDouble());
-				    if (preferredTripDuration!=null)
-				    	tripPreference.setHasPreferredTripDuration(preferredTripDuration.asLiteral().getLong());
-				    if (preferredTripTime!=null)
-				    	tripPreference.setHasPreferredTripTime(preferredTripTime.asLiteral().getLong());
-				    if (preferredCity!=null)
-				    	tripPreference.setHasPreferredCity(preferredCity.toString());
-				    if (preferredCountry!=null)
-				    	tripPreference.setHasPreferredCountry(preferredCountry.toString());
-				    if (preferredWeatherCondition!=null)
-				    	tripPreference.setHasPreferredWeatherCondition(preferredWeatherCondition.toString());
-				    if (preferredMinTimeOfAccompany!=null)
-				    	tripPreference.setHasPreferredMinTimeOfAccompany(preferredMinTimeOfAccompany.asLiteral().getLong());
-				    if (modality!=null)
-				    	tripPreference.setHasModalityType(eu.threecixty.profile.oldmodels.ModalityType.valueOf(modality.toString()));
-				    
-				    
-				    oldTripPreferences.add(tripPreference);
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
+				Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences=preference.getHasTripPreference();
+				if (tripPreferences!=null&&!tripPreferences.isEmpty()){
+					str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
+					VirtuosoConnection.insertDeleteQuery(str);
 				}
 			}
-			
-			String str = GetSetQueryStrings.removeMultipleTripPreferences(uid, oldTripPreferences);
-			VirtuosoConnection.insertDeleteQuery(str);
-			if (tripPreferences!=null&&!tripPreferences.isEmpty()){
-				str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
-				VirtuosoConnection.insertDeleteQuery(str);
-			}
 			return;
-
-
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
 			LOGGER.error(ex.getMessage());
@@ -564,8 +372,6 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void saveTransportToKB(String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports) {
 		
-		Set<eu.threecixty.profile.oldmodels.Transport> oldTransports = new HashSet<eu.threecixty.profile.oldmodels.Transport>();
-		
 		try {
 			
 			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
@@ -579,76 +385,41 @@ public class VirtuosoUserProfileStorage {
 
 					if (transport==null) break;
 					
-					eu.threecixty.profile.oldmodels.Transport oldtransport = new eu.threecixty.profile.oldmodels.Transport();
-					
-					oldtransport.setHasTransportURI(transport.asResource().getURI());
-					
-					QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
+					System.out.println(transport.asResource().getURI());
+					QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsURIForTransport(transport.asResource().getURI()));
 					ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
-					
-					Set <eu.threecixty.profile.oldmodels.RegularTrip> toRegularTrips = new HashSet <eu.threecixty.profile.oldmodels.RegularTrip>();
 					
 					for ( ; resultsRegularTrips.hasNext(); ) {
 						QuerySolution qsRegularTrips = resultsRegularTrips.next();
 						try {
-							eu.threecixty.profile.oldmodels.RegularTrip toRegularTrip = new eu.threecixty.profile.oldmodels.RegularTrip();
-							loadRegularTripFromKB(qsRegularTrips, toRegularTrip);
-					    	toRegularTrips.add(toRegularTrip);
+							RDFNode regularTripURI = qsRegularTrips.get("regularTrip");
+							
+							if (regularTripURI!=null){
+								System.out.println(regularTripURI.asResource().getURI());
+								String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(regularTripURI.asResource().getURI());
+								VirtuosoConnection.insertDeleteQuery(str);
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 							LOGGER.error(e.getMessage());
 						}
 					}
+					String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(transport.asResource().getURI());
+					VirtuosoConnection.insertDeleteQuery(str);
 					
-					QueryReturnClass qRCAccompanying=VirtuosoConnection.query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
-					ResultSet resultsAccompanying = qRCAccompanying.getReturnedResultSet();
-					
-					Set <eu.threecixty.profile.oldmodels.Accompanying> toAccompanyings = new HashSet <eu.threecixty.profile.oldmodels.Accompanying>();
-					
-					for ( ; resultsAccompanying.hasNext(); ) {
-						QuerySolution sAccompanying = resultsAccompanying.next();
-						try {
-							eu.threecixty.profile.oldmodels.Accompanying toAccompanying = new eu.threecixty.profile.oldmodels.Accompanying();
-							loadAccompanyingFromKB(sAccompanying,uid,toAccompanying);
-					    	toAccompanyings.add(toAccompanying);
-						} catch (Exception e) {
-							e.printStackTrace();
-							LOGGER.error(e.getMessage());
-						}
-						
-					}
-				
-					oldtransport.setHasAccompanyings(toAccompanyings);
-					oldtransport.setHasRegularTrip(toRegularTrips);
-					oldTransports.add(oldtransport);
+					str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(transport.asResource().getURI());
+					VirtuosoConnection.insertDeleteQuery(str);
 				
 				}catch (Exception e) {
 					e.printStackTrace();
 					LOGGER.error(e.getMessage());
 				}
 			}
-			String str ="";
-			Iterator <eu.threecixty.profile.oldmodels.Transport> iterators=oldTransports.iterator();
-			for ( ; iterators.hasNext(); ){ 
-				eu.threecixty.profile.oldmodels.Transport transport=iterators.next();
-				str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasAccompanyings());
-				VirtuosoConnection.insertDeleteQuery(str);
-				Set <eu.threecixty.profile.oldmodels.RegularTrip> setRegTrip=transport.getHasRegularTrip();
-				Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iteratorRegTrip=setRegTrip.iterator();
-				for ( ; iteratorRegTrip.hasNext(); ){ 
-					eu.threecixty.profile.oldmodels.RegularTrip regularTrip=iteratorRegTrip.next();
-					str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
-					VirtuosoConnection.insertDeleteQuery(str);
-				}
-				str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasRegularTrip());
-				VirtuosoConnection.insertDeleteQuery(str);
-				
-				str = GetSetQueryStrings.removeTransport(uid, transport.getHasTransportURI());
-				VirtuosoConnection.insertDeleteQuery(str);
-			}
+			String str = GetSetQueryStrings.removeTransport(uid);
+			VirtuosoConnection.insertDeleteQuery(str);
 			
 			if (transports!=null&&!transports.isEmpty()){
-				iterators=transports.iterator();
+				Iterator<eu.threecixty.profile.oldmodels.Transport> iterators=transports.iterator();
 				for ( ; iterators.hasNext(); ){ 
 					eu.threecixty.profile.oldmodels.Transport transport=iterators.next();
 					if (transport.getHasTransportURI()==null||transport.getHasTransportURI().isEmpty()) {
@@ -665,7 +436,7 @@ public class VirtuosoUserProfileStorage {
 					Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iteratorsRegularTrip=setRegTrip.iterator();
 					for ( ; iteratorsRegularTrip.hasNext(); ){ 
 						eu.threecixty.profile.oldmodels.RegularTrip regularTrip=iteratorsRegularTrip.next();
-						if (regularTrip.getHasRegularTripURI()==null&&regularTrip.getHasRegularTripURI().isEmpty()) {
+						if (regularTrip.getHasRegularTripURI()==null||regularTrip.getHasRegularTripURI().isEmpty()) {
 							regularTrip.setHasRegularTripURI(transport.getHasTransportURI()+"/RegularTrip/"+UUID.randomUUID().toString());
 						}
 						if (regularTrip.getHasPersonalPlacesNew()!=null&&!regularTrip.getHasPersonalPlacesNew().isEmpty()){
@@ -699,35 +470,9 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void saveNameInfoToKB(String uid, eu.threecixty.profile.oldmodels.Name name) {
 		
-		eu.threecixty.profile.oldmodels.Name toNameTemp = new eu.threecixty.profile.oldmodels.Name();
-		
 		try {
 			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getName(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					//RDFNode nameuri = qs.get("name");
-					RDFNode gn = qs.get("givenname");
-					RDFNode fn = qs.get("familyname");
-				    
-				    //if (nameuri!=null)
-				    //	toNameTemp.setHasNameURI(nameuri.asResource().getURI());
-				    if (fn!=null)
-				    	toNameTemp.setFamilyName(fn.toString());
-				    if (gn!=null)
-				    	toNameTemp.setGivenName(gn.toString());
-				    
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
-				}
-			}
-			
-			String str = GetSetQueryStrings.removeName(uid, toNameTemp);
+			String str = GetSetQueryStrings.removeName(uid);
 			VirtuosoConnection.insertDeleteQuery(str);
 			
 			if (name!=null){
@@ -748,45 +493,10 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 */
 	private static void saveAddressInfoToKB(String uid,	eu.threecixty.profile.oldmodels.Address address) {
-		eu.threecixty.profile.oldmodels.Address oldddress =  new eu.threecixty.profile.oldmodels.Address();
-		
+	
 		try {
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getAddress(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					RDFNode addressuri = qs.get("address");
-					RDFNode cname = qs.get("countryname");
-				    RDFNode tname = qs.get("townname");
-				    RDFNode homeLocationURI = qs.get("homeLocation");
-				    RDFNode geoLocationURI = qs.get("geoLocation");
-				    RDFNode lon = qs.get("longitude");
-				    RDFNode lat = qs.get("lat");
-				    if (addressuri!=null)
-				    	oldddress.setHasAddressURI(addressuri.asResource().getURI());
-				    if (cname!=null)
-				    	oldddress.setCountryName(cname.toString());
-				    if (tname!=null)
-				    	oldddress.setTownName(tname.toString());	
-				    if (homeLocationURI!=null)
-				    	oldddress.setHasHomeLocationURI(homeLocationURI.asResource().getURI());
-				    if (geoLocationURI!=null)
-				    	oldddress.setHasGeoCoordinatesURI(geoLocationURI.asResource().getURI());
-				    if (lon!=null)
-				    	oldddress.setLongitute(Double.parseDouble(lon.asLiteral().getString()));
-				    if (lat!=null)
-				    	oldddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
-				}
-			}
-			
-			String str = GetSetQueryStrings.removeAddress(uid, oldddress);
+		
+			String str = GetSetQueryStrings.removeAddress(uid);
 			VirtuosoConnection.insertDeleteQuery(str);
 			
 			if (address!=null){
