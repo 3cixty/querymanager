@@ -33,7 +33,6 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.querymanager.EventMediaFormat;
-import eu.threecixty.querymanager.FromClauseUtils;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
@@ -183,16 +182,8 @@ public class QueryManagerServices {
 							.type(MediaType.TEXT_PLAIN)
 							.build();
 				}
-				if (FromClauseUtils.containFromProfile(jenaQuery)) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY + " " + query);
-					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity(CallLoggingConstants.ILLEGAL_QUERY)
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
-				}
-				String not_from_profile_query = FromClauseUtils.addNotFromTo(jenaQuery);
 				
-				String queryToBeExecuted = QueryManager.removePrefixes(not_from_profile_query);
+				String queryToBeExecuted = QueryManager.removePrefixes(jenaQuery.toString());
 				
 				String result = QueryManager.executeQuery(queryToBeExecuted, eventMediaFormat);
 
@@ -540,9 +531,6 @@ public class QueryManagerServices {
 			String query, String filter, EventMediaFormat eventMediaFormat) throws ThreeCixtyPermissionException {
 
 		Query jenaQuery = createJenaQuery(query);
-		
-		if (FromClauseUtils.containFromProfile(jenaQuery)) throw new ThreeCixtyPermissionException(
-				"Illegal to make a query to get private information");
 		
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);

@@ -102,18 +102,18 @@ import eu.threecixty.profile.oldmodels.Rating;
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQuery.getQuery().getQuery().setDistinct(true);
-		String augmentedQueryWithNotFromProfile = FromClauseUtils.addNotFromTo(augmentedQuery.getQuery().getQuery());
+		augmentedQueryStr = augmentedQuery.getQuery().getQuery().toString();
 		
 		augmentedQueryStr = "";
 		String originalQueryStr = originalQuery.convert2String();
 		try {
 			if (originalQuery != null && originalQueryStr.contains("http://schema.org/")) {
 			    augmentedQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
-			            + removePrefixes(augmentedQueryWithNotFromProfile);
+			            + removePrefixes(augmentedQueryStr);
 			    originalQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
 			    		+ removePrefixes(originalQueryStr);
 			} else {
-				augmentedQueryStr = removePrefixes(augmentedQueryWithNotFromProfile);
+				augmentedQueryStr = removePrefixes(augmentedQueryStr);
 				originalQueryStr = removePrefixes(originalQueryStr);
 			}
 			
