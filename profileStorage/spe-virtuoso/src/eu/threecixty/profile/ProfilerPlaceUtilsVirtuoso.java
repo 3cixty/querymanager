@@ -45,7 +45,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString(), uID);
 		if (jsonObj == null) return null;
 		
 		try {
@@ -80,7 +80,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString(), uID);
 		if (jsonObj == null) return null;
 		
 		try {
@@ -116,7 +116,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString());
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString(), uID);
 		if (jsonObj == null) return null;
 		
 		try {
@@ -226,7 +226,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	    
 		List <String> placeNames = new ArrayList <String>();
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(qStr);
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(qStr);
 		if (jsonObj == null) return placeNames;
 		
 		try {

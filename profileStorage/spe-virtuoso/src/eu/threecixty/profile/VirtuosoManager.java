@@ -151,35 +151,25 @@ public class VirtuosoManager {
 	}
 	
 	public JSONObject executeQuery(String queryStr, String uid) {
-		if (DEBUG_MOD) LOGGER.info("Query to be executed: " + queryStr);
 		if (uid == null || uid.equals("")) return null;
 		JSONObject jsonObject = null;
-		String jsonStr = null;
 		VirtGraph virtGraph = getVirtGraph(uid);
 		if (virtGraph == null) return null;
-		Query query = QueryFactory.create(queryStr);
-		VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create (query, virtGraph);
-		ResultSet results = vqe.execSelect();
-		try {
-		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		    ResultSetFormatter.outputAsJSON(baos, results);
-		    jsonStr = new String(baos.toByteArray());
-		    baos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		vqe.close();
+		jsonObject = executeQuery(queryStr, virtGraph);
 		virtGraph.close();
-		if (jsonStr != null) {
-			try {
-				jsonObject = new JSONObject(jsonStr);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
 		return jsonObject;
 	}
 	
+	public JSONObject executeQueryWithDBA(String queryStr) {
+		JSONObject jsonObject = null;
+		VirtGraph virtGraphDBA = getVirtGraph();
+		if (virtGraphDBA == null) return null;
+		jsonObject = executeQuery(queryStr, virtGraphDBA);
+		virtGraphDBA.close();
+		return jsonObject;
+	}
+
+
 	/**
 	 * Executes a given query through the SPARQL end point.
 	 * @param queryStr
@@ -235,6 +225,10 @@ public class VirtuosoManager {
 		return uid;
 	}
 	
+	/**
+	 * Gets VirtGraph with DBA user.
+	 * @return
+	 */
 	public VirtGraph getVirtGraph() {
 		VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL,
 				VirtuosoConnection.USER, VirtuosoConnection.PASS);
@@ -280,6 +274,31 @@ public class VirtuosoManager {
 				spoolConn = null;
 			}
 		}
+	}
+	
+	private JSONObject executeQuery(String queryStr, VirtGraph virtGraph) {
+		if (DEBUG_MOD) LOGGER.info("Query to be executed: " + queryStr);
+		String jsonStr = null;
+		Query query = QueryFactory.create(queryStr);
+		VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create (query, virtGraph);
+		ResultSet results = vqe.execSelect();
+		try {
+		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    ResultSetFormatter.outputAsJSON(baos, results);
+		    jsonStr = new String(baos.toByteArray());
+		    baos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		vqe.close();
+		if (jsonStr != null) {
+			try {
+				return new JSONObject(jsonStr);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 	
 	private void setReadAccessToNobody(Statement stmt) {
