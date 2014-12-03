@@ -14,7 +14,8 @@ public class Configuration {
 
 	private static String version;
 	
-	public static final String PROFILE_GRAPH = "http://3cixty.com/fakeprofile";
+	public static final String PROFILE_GRAPH = "http://3cixty.com";
+	//public static final String PROFILE_GRAPH = "http://3cixty.com/fakeprofile";
 	public static final String PROFILE_PREFIX = "prefix profile:	<http://3cixty.com/ontology/profile/> ";
 	public static final String PREFIXES = "prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
 			+"prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> "
@@ -52,6 +53,10 @@ public class Configuration {
 	
 	public static String getGoogleClientId() {
 		return getProperty("CLIENT_ID");
+	}
+	
+	public static String getVirtuosoJDBC() {
+		return getProperty("VIRTUOSO_JDBC");
 	}
 	
 	private static String getProperty(String key) {
