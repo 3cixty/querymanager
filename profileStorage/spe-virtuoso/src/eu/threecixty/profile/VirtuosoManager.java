@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -39,6 +41,7 @@ public class VirtuosoManager {
 	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixty.com/private/";
 	
 	private static boolean firstTime = true;
+	private static List <String> publicGraphs;
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 VirtuosoManager.class.getName());
@@ -92,8 +95,13 @@ public class VirtuosoManager {
         	// secondly, current user has no permission at all
 			stmt.addBatch("DB.DBA.RDF_DEFAULT_USER_PERMS_SET ('" + uid + "', 0)");
         	
-        	// finally, set READ access to current user
+        	// thirdly, set READ access to current user
 			stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + getGraph(uid) + "', '" + uid + "', 1)");
+			
+			// finally, set READ access to all public graphs
+			for (String graphUri: getPublicGraphs(stmt)) {
+				stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + graphUri + "', '" + uid + "', 1)");
+			}
 			
 			stmt.executeBatch();
 			conn.commit();
@@ -276,16 +284,32 @@ public class VirtuosoManager {
 	
 	private void setReadAccessToNobody(Statement stmt) {
 		try {
-			java.sql.ResultSet rs = stmt.executeQuery("DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()");
-			for ( ; rs.next(); ) {
-				String graphUri = rs.getString(1) ;
-				if (!graphUri.startsWith(PREFIX_EACH_USER_PROFILE_GRAPH))
-					stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + graphUri + "', 'nobody', 1)");
+			for (String graphUri: getPublicGraphs(stmt)) {
+				stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + graphUri + "', 'nobody', 1)");
 			}
 			stmt.executeBatch();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private List <String> getPublicGraphs(Statement stmt) {
+		if (publicGraphs != null) return publicGraphs;
+		synchronized (_sync) {
+			if (publicGraphs == null) {
+				publicGraphs = new ArrayList <String>();
+				try {
+					java.sql.ResultSet rs = stmt.executeQuery("DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()");
+					for ( ; rs.next(); ) {
+						String graphUri = rs.getString(1) ;
+						if (!graphUri.startsWith(PREFIX_EACH_USER_PROFILE_GRAPH)) publicGraphs.add(graphUri);
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return publicGraphs;
 	}
 	
 	private VirtGraph getVirtGraph(String uid) {
