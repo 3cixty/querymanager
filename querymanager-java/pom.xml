@@ -26,7 +26,7 @@
 
     <dependency>
 	  <groupId>eu.3cixty</groupId>
-	  <artifactId>profileKB</artifactId>
+	  <artifactId>spe-virtuoso</artifactId>
 	  <version>1.0</version>
     </dependency>
 

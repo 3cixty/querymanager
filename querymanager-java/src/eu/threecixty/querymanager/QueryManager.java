@@ -27,6 +27,7 @@ import com.hp.hpl.jena.util.FileManager;
 import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.VirtuosoManager;
 import eu.threecixty.profile.oldmodels.Event;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Place;
@@ -120,10 +121,10 @@ import eu.threecixty.profile.oldmodels.Rating;
 			
 			StringBuilder sb = new StringBuilder();
 			
-			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, sb);
+			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, sb, uid);
 			if (ok) return sb.toString();
 			
-			hasElementsForBindings(originalQueryStr, format, formatType, sb);
+			hasElementsForBindings(originalQueryStr, format, formatType, sb, uid);
 			
 			return sb.toString();
 
@@ -153,7 +154,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		StringBuilder builder = new StringBuilder();
 		try {
-			hasElementsForBindings(query, format, formatType, builder);
+			hasElementsForBindings(query, format, formatType, builder, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,31 +169,39 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @throws IOException 
 	 */
 	private static boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
-			StringBuilder sb) throws IOException {
+			StringBuilder sb, String uid) throws IOException {
 		sb.setLength(0);
 
 		logInfo("Query to be executed: " + query);
 
-		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
-		urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
-
-		URL url = new URL(urlStr);
-
-		InputStream input = url.openStream();
-		byte [] b = new byte[1024];
-		int readBytes = 0;
-		while ((readBytes = input.read(b)) >= 0) {
-			sb.append(new String(b, 0, readBytes));
-		}
-		input.close();
 		boolean ok = true;
+		if (uid == null) {
+			String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
+			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
-		if (EventMediaFormat.JSON == format) {
-			// check if there is one element at least
-			JSONObject json = new JSONObject(sb.toString());
-			if (json.getJSONObject("results").getJSONArray("bindings").length() < 1) {
+			URL url = new URL(urlStr);
+
+			InputStream input = url.openStream();
+			byte [] b = new byte[1024];
+			int readBytes = 0;
+			while ((readBytes = input.read(b)) >= 0) {
+				sb.append(new String(b, 0, readBytes));
+			}
+			input.close();
+
+			if (EventMediaFormat.JSON == format) {
+				// check if there is one element at least
+				JSONObject json = new JSONObject(sb.toString());
+				if (json.getJSONObject("results").getJSONArray("bindings").length() < 1) {
+					ok = false;
+				}
+			}
+		} else {
+			JSONObject result = VirtuosoManager.getInstance().executeQuery(query, uid);
+			if (result.getJSONObject("results").getJSONArray("bindings").length() < 1) {
 				ok = false;
 			}
+			sb.append(result.toString());
 		}
 		
 		logInfo("Finished executing the query on Virtuoso: ok = " + ok);
