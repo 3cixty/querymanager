@@ -23,7 +23,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setUser(String uid){
 		String query=PREFIX
-			+ " INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH +"> "
+			+ " INSERT DATA { GRAPH <"+ getGraphName(uid) +"> "
 			+ " { ";
 				query+= makeUser(uid);
 			query+= "}}";
@@ -38,10 +38,10 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeUser(String uid){
 		String query=PREFIX
-			+ "DELETE { GRAPH <"+ VirtuosoConnection.GRAPH +"> "
+			+ "DELETE { GRAPH <"+ getGraphName(uid) +"> "
 			+ "{ ";
 			query+= makeUser(uid);
-			query+= "}}";// Where {GRAPH <"+ VirtuosoConnection.GRAPH +"> "
+			query+= "}}";// Where {GRAPH <"+ getGraphName(uid) +"> "
 			//+ "{ ";
 			//query+= makeUser(uid);
 			//query+= "}}";
@@ -85,7 +85,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setLastCrawlTime(String uid, String time ){
 		String query=PREFIX
-			+ "INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH +"> "
+			+ "INSERT DATA { GRAPH <"+ getGraphName(uid) +"> "
 			+ "{ ";
 				if (time==null || time.isEmpty()) time="0";
 				query+= "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime \""+time+"\" ."
@@ -100,13 +100,13 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeLastCrawlTime(String uid ){
 		String query=PREFIX
-			+ "DELETE  Where { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "DELETE  Where { GRAPH <"+ getGraphName(uid)+">"
 			+ "{ "
 				+ "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime ?o ."
 			+ "}}";
 			return query;
 			/*
-			 { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			 { GRAPH <"+ getGraphName(uid)+">"
 			+ "{ "
 				+ "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime ?o ."
 			+ "}}
@@ -137,7 +137,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setGender(String uid, String gender ){
 		String query=PREFIX
-			+ "INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH +"> "
+			+ "INSERT DATA { GRAPH <"+ getGraphName(uid) +"> "
 			+ "{ ";
 			if (gender==null || gender.isEmpty())
 				gender="unknown";
@@ -153,12 +153,12 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeGender(String uid){
 		String query=PREFIX
-			+ "   DELETE  Where {GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   DELETE  Where {GRAPH <"+ getGraphName(uid)+">"
 			+ "  { "
 			+ " <"+PROFILE_URI+uid+"> schema:gender ?o .}}";
 			return query;
 			/*
-			 { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			 { GRAPH <"+ getGraphName(uid)+">"
 			+ "  { "
 			+ "<"+PROFILE_URI+uid+"> schema:gender ?o ."
 			+ "}}
@@ -206,7 +206,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setName(String uid, eu.threecixty.profile.oldmodels.Name name ){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH +">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid) +">"
 			+ "  { ";
 			query+= makeNameQuery(uid, name);
 			query+= "}}";
@@ -221,13 +221,13 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeName(String uid){
 		String query=PREFIX
-			+ "   DELETE Where { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+">"
 			+ "  { ";
 			query+= makeRemoveNameQuery(uid);
 			query+= "}}";
 			return query;
 			/*
-			 { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			 { GRAPH <"+ getGraphName(uid)+">"
 			+ "  { ";
 			query+= makeRemoveNameQuery(uid);
 			query+= "}}
@@ -293,7 +293,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setAddress(String uid, eu.threecixty.profile.oldmodels.Address address){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ "  {";
 		if (address.getHasAddressURI()!=null&&!address.getHasAddressURI().isEmpty()){
 			query+= makeAddressQuery(uid,address);
@@ -310,7 +310,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeAddress(String uid){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 				+ "  { ?s schema:address ?address."
 					+ "?address rdf:type schema:PostalAddress . "
 					+ "?address schema:postalCode ?pcode."
@@ -321,7 +321,7 @@ public class GetSetQueryStrings {
 					+ "?homeLocation schema:geo ?geoLocation."
 					+ "?geoLocation schema:latitude ?lat."
 					+ "?geoLocation schema:longitude ?longitude. "
-				+ "}} where { GRAPH <"+ VirtuosoConnection.GRAPH+"> "
+				+ "}} where { GRAPH <"+ getGraphName(uid)+"> "
 				+ "  {?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s schema:address ?address. "
@@ -337,7 +337,7 @@ public class GetSetQueryStrings {
 		return query;
 			
 			/*
-			 { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			 { GRAPH <"+ getGraphName(uid)+">"
 				+ "  {";
 				query+= makeRemoveAddressQuery(uid);
 			query+= "}}
@@ -352,7 +352,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setMultipleKnows(String uid, Set <String> knows){
 		String query=PREFIX
-				+ " INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ " INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 		Iterator <String> iterators = knows.iterator();
 		for ( ; iterators.hasNext(); ){
@@ -370,7 +370,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeSingleKnows(String uid, String uidKnows){
 		String query=PREFIX
-				+ " DELETE DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ " DELETE DATA { GRAPH <"+ getGraphName(uid)+">"
 				+ " { "
 				+ "  <"+PROFILE_URI+uid+"> schema:knows <"+PROFILE_URI+uidKnows+"> ."
 				+ "}}";
@@ -384,10 +384,10 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeAllKnows(String uid){
 		String query=PREFIX
-				+ " DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ " DELETE { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 			query+= "  <"+PROFILE_URI+uid+"> schema:knows ?o.";
-			query+= "}} Where {GRAPH <" + VirtuosoConnection.GRAPH + ">{  <"+PROFILE_URI+uid+"> schema:knows ?o.}}";
+			query+= "}} Where {GRAPH <" + getGraphName(uid) + ">{  <"+PROFILE_URI+uid+"> schema:knows ?o.}}";
 		return query;
 	}
 
@@ -430,7 +430,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setProfileIdentities(String uid, eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 		if  (profileIdentity.getHasProfileIdentitiesURI()==null||profileIdentity.getHasProfileIdentitiesURI().isEmpty())
 			profileIdentity.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/Account/"+profileIdentity.getHasSourceCarrier());
@@ -447,7 +447,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setMultipleProfileIdentities(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities){
 		String query=PREFIX
-				+ " INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ " INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.ProfileIdentities> iterators = profileIdentities.iterator();
 		for ( ; iterators.hasNext(); ){
@@ -468,14 +468,14 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeAllProfileIdentitiesOfUser(String uid){
 		String query=PREFIX
-				+ "  DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "  DELETE { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 				query+= " <"+PROFILE_URI+uid+"> foaf:account ?pi . "
 						+ " ?pi rdf:type foaf:OnlineAccount . "
 						+ " ?pi foaf:accountServiceHomepage ?accountServiceHomepage . "
 						+ " ?pi foaf:accountName ?accountName . "
 						+ " ?pi profile:userInteractionMode ?userInteractionMode . ";
-		query+= "}} Where { GRAPH <" + VirtuosoConnection.GRAPH + "> { <"+PROFILE_URI+uid+"> foaf:account ?pi . "
+		query+= "}} Where { GRAPH <" + getGraphName(uid) + "> { <"+PROFILE_URI+uid+"> foaf:account ?pi . "
 						+ " ?pi rdf:type foaf:OnlineAccount . "
 						+ " ?pi foaf:accountServiceHomepage ?accountServiceHomepage . "
 						+ " ?pi foaf:accountName ?accountName . "
@@ -520,7 +520,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setMultipleLikes(String uid, Set<eu.threecixty.profile.oldmodels.Likes> likes){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.Likes> iterators = likes.iterator();
 		for ( ; iterators.hasNext(); ){
@@ -541,13 +541,13 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeAllLikesOfUser(String uid){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 		query+= " <"+PROFILE_URI+uid+"> profile:like ?likes . "
 				+ " ?likes rdf:type profile:Like . "
 				+ " ?likes schema:likeName ?likeName . "
 				+ " ?likes dc:subject ?liketype . ";
-			query+= "}} Where{GRAPH <" + VirtuosoConnection.GRAPH + "> { <"+PROFILE_URI+uid+"> profile:like ?likes . "
+			query+= "}} Where{GRAPH <" + getGraphName(uid) + "> { <"+PROFILE_URI+uid+"> profile:like ?likes . "
 				+ " ?likes rdf:type profile:Like . "
 				+ " ?likes schema:likeName ?likeName . "
 				+ " ?likes dc:subject ?liketype . "
@@ -585,7 +585,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setTransport(String uid, String transportUri){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 			if (transportUri!=null&&!transportUri.isEmpty()){
 				query+= makeTransportQuery(uid, transportUri);
@@ -602,7 +602,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setMultipleTransport(String uid, Set<String> transportUris){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 			Iterator <String> iterators = transportUris.iterator();
 			for ( ; iterators.hasNext(); ){
@@ -623,11 +623,11 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeTransport(String uid){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 			+ " { "
 			+"  <"+PROFILE_URI+uid+"> profile:mobility ?o ."
 			+"  ?o rdf:type profile:Mobility .";
-			query+= "}} where {GRAPH <" + VirtuosoConnection.GRAPH + ">{  <"+PROFILE_URI+uid+"> profile:mobility ?o ."
+			query+= "}} where {GRAPH <" + getGraphName(uid) + ">{  <"+PROFILE_URI+uid+"> profile:mobility ?o ."
 						+"  ?o rdf:type profile:Mobility .}}";
 			return query;
 	}
@@ -669,9 +669,9 @@ public class GetSetQueryStrings {
 	 * @param accompanys
 	 * @return
 	 */
-	public static String setMultipleAccompanyingAssociatedToSpecificTransport(String transportURI, Set<eu.threecixty.profile.oldmodels.Accompanying> accompanys){
+	public static String setMultipleAccompanyingAssociatedToSpecificTransport(String uid, String transportURI, Set<eu.threecixty.profile.oldmodels.Accompanying> accompanys){
 		String query=PREFIX
-				+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 			Iterator <eu.threecixty.profile.oldmodels.Accompanying> iterators = accompanys.iterator();
 			for ( ; iterators.hasNext(); ){
@@ -692,9 +692,9 @@ public class GetSetQueryStrings {
 	 * @param accompanys
 	 * @return
 	 */
-	public static String removeMultipleAccompanyingAssociatedToSpecificTransport(String transportURI){
+	public static String removeMultipleAccompanyingAssociatedToSpecificTransport(String uid, String transportURI){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 		query+=" <"+transportURI+"> profile:accompany ?accompany. "
 				+ "?accompany rdf:type profile:Accompany. "
@@ -702,7 +702,7 @@ public class GetSetQueryStrings {
 				+ "?accompany profile:score ?score ."
 				+ "?accompany profile:validity ?validity ."
 				+ "?accompany profile:time ?acctime .  ";
-			query+= "}} where {GRAPH <" + VirtuosoConnection.GRAPH + "> { <"+transportURI+"> profile:accompany ?accompany. "
+			query+= "}} where {GRAPH <" + getGraphName(uid) + "> { <"+transportURI+"> profile:accompany ?accompany. "
 					+ "?accompany rdf:type profile:Accompany. "
 				+ "Optional {?accompany profile:accompanyUser ?uid2 .}"
 				+ "Optional {?accompany profile:score ?score .}"
@@ -735,9 +735,9 @@ public class GetSetQueryStrings {
 	 * @param personalPlace
 	 * @return
 	 */
-	public static String setPersonalPlacesAssociatedToSpecificRegularTrip(String regularTripURI, eu.threecixty.profile.oldmodels.PersonalPlace personalPlace ){
+	public static String setPersonalPlacesAssociatedToSpecificRegularTrip(String uid, String regularTripURI, eu.threecixty.profile.oldmodels.PersonalPlace personalPlace ){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 		if (personalPlace.getHasPersonalPlaceURI()==null||personalPlace.getHasPersonalPlaceURI().isEmpty())
 			personalPlace.setHasPersonalPlaceURI(regularTripURI+"/PersonalPlace/"+UUID.randomUUID().toString());
@@ -782,9 +782,9 @@ public class GetSetQueryStrings {
 	 * @param personalPlaces
 	 * @return
 	 */
-	public static String setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(String regularTripURI, Set<eu.threecixty.profile.oldmodels.PersonalPlace> personalPlaces ){
+	public static String setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(String uid, String regularTripURI, Set<eu.threecixty.profile.oldmodels.PersonalPlace> personalPlaces ){
 		String query=PREFIX
-				+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.PersonalPlace> iterators = personalPlaces.iterator();
 		for ( ; iterators.hasNext(); ){	
@@ -822,12 +822,12 @@ public class GetSetQueryStrings {
 	 * @param personalPlaces
 	 * @return
 	 */
-	public static String removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(String regularTripURI){
+	public static String removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(String uid, String regularTripURI){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 				query+= makeRemovePersonalPlaceQuery(regularTripURI);
-				query+= "}} Where {GRAPH <" + VirtuosoConnection.GRAPH + ">{"
+				query+= "}} Where {GRAPH <" + getGraphName(uid) + ">{"
 				+"  <"+regularTripURI+"> profile:personalPlace ?pplace ."
 				+ "Optional {?pplace profile:externalIDs ?externalIDs .}"
 				+ "Optional {?pplace profile:latitude ?latitude .}"
@@ -927,9 +927,9 @@ public class GetSetQueryStrings {
 	 * @param regularTrips
 	 * @return
 	 */
-	public static String setMultipleRegularTripsAssociatedToSpecificTransport(String transportUri, Set<eu.threecixty.profile.oldmodels.RegularTrip> regularTrips){
+	public static String setMultipleRegularTripsAssociatedToSpecificTransport(String uid, String transportUri, Set<eu.threecixty.profile.oldmodels.RegularTrip> regularTrips){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iterators = regularTrips.iterator();
 		for ( ; iterators.hasNext(); ){
@@ -970,12 +970,12 @@ public class GetSetQueryStrings {
 	 * @param regularTrips
 	 * @return
 	 */
-	public static String removeMultipleRegularTripsAssociatedToSpecificTransport(String transportUri){
+	public static String removeMultipleRegularTripsAssociatedToSpecificTransport(String uid, String transportUri){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 				query+= makeRemoveRegularTripQuery(transportUri);
-		query+= "}} where {GRAPH <" + VirtuosoConnection.GRAPH + ">{"
+		query+= "}} where {GRAPH <" + getGraphName(uid) + ">{"
 			+"  <"+transportUri+"> profile:regularTrip ?regularTrip ."
 			+"?transport profile:regularTrip ?regularTrip. "
 			+ "Optional {?regularTrip profile:id ?tripID .}"
@@ -1094,7 +1094,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setMultipleTripPreferences(String uid, Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences){
 		String query=PREFIX
-				+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 		Iterator <eu.threecixty.profile.oldmodels.TripPreference> iterators = tripPreferences.iterator();
 		for ( ; iterators.hasNext(); ){
@@ -1132,10 +1132,10 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeMultipleTripPreferences(String uid){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 				query+= makeRemoveTripPreferenceQuery();
-		query+= "}} Where { GRAPH <" + VirtuosoConnection.GRAPH + "> {"
+		query+= "}} Where { GRAPH <" + getGraphName(uid) + "> {"
 				+ "?s a foaf:Person. \n"
 				+" ?s profile:userID \""+uid+"\" . \n"
 				+" ?s frap:holds ?tripPreference. \n"
@@ -1212,7 +1212,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String setPlacePreferences(String uid, eu.threecixty.profile.oldmodels.PlacePreference placePreference ){
 		String query=PREFIX
-			+ "   INSERT DATA { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   INSERT DATA { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 		if (placePreference.getHasPlacePreferenceURI()==null ||placePreference.getHasPlacePreferenceURI().isEmpty())
 			placePreference.setHasPlacePreferenceURI(PROFILE_URI+uid+"/PlacePreference/"+UUID.randomUUID().toString());
@@ -1239,10 +1239,10 @@ public class GetSetQueryStrings {
 	 */
 	public static String removePlacePreferences(String uid){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ VirtuosoConnection.GRAPH+">"
+			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
 			+ " { ";
 			query+= makeRemovePlacePreferenceQuery();
-		query+= "}} where { GRAPH <" + VirtuosoConnection.GRAPH + "> {"
+		query+= "}} where { GRAPH <" + getGraphName(uid) + "> {"
 				+ " ?s a foaf:Person. "
 				+" ?s profile:userID \""+uid+"\". "
 				+" ?s frap:holds ?placePreference. "
@@ -1280,7 +1280,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String createQueryToInsertProfileImage(String uid, String profileImage) {
 		String query=PREFIX
-				+ "INSERT INTO GRAPH <"+ VirtuosoConnection.GRAPH +"> "
+				+ "INSERT INTO GRAPH <"+ getGraphName(uid) +"> "
 				+ "{ ";
 					query+= "<" + PROFILE_URI + uid + "> foaf:img <" + profileImage + "> ."
 				+ "}";
@@ -1293,7 +1293,7 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	public static String createQueryToDeleteProfileImage(String uid) {
-		String query = " DELETE WHERE { GRAPH <" + VirtuosoConnection.GRAPH + ">" 
+		String query = " DELETE WHERE { GRAPH <" + getGraphName(uid) + ">" 
 				+ "{ <" + PROFILE_URI + uid + "> foaf:img ?o  } \n}";
 		return query;
 	}
@@ -1311,4 +1311,13 @@ public class GetSetQueryStrings {
 		return query;
 	}
 
+	/**
+	 * Delegate method to get user's private graph.
+	 * @param uid
+	 * 				User ID
+	 * @return Private graph name
+	 */
+	private static String getGraphName(String uid) {
+		return VirtuosoManager.getInstance().getGraph(uid);
+	}
 }

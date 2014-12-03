@@ -394,7 +394,7 @@ public class VirtuosoUserProfileStorage {
 							RDFNode regularTripURI = qsRegularTrips.get("regularTrip");
 							
 							if (regularTripURI!=null){
-								String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(regularTripURI.asResource().getURI());
+								String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTripURI.asResource().getURI());
 								VirtuosoConnection.insertDeleteQuery(str);
 							}
 						} catch (Exception e) {
@@ -402,10 +402,10 @@ public class VirtuosoUserProfileStorage {
 							LOGGER.error(e.getMessage());
 						}
 					}
-					String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(transport.asResource().getURI());
+					String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
 					VirtuosoConnection.insertDeleteQuery(str);
 					
-					str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(transport.asResource().getURI());
+					str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.asResource().getURI());
 					VirtuosoConnection.insertDeleteQuery(str);
 				
 				}catch (Exception e) {
@@ -425,7 +425,7 @@ public class VirtuosoUserProfileStorage {
 					}
 					
 					if (transport.getHasAccompanyings()!=null&&!transport.getHasAccompanyings().isEmpty()){
-						str = GetSetQueryStrings.setMultipleAccompanyingAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasAccompanyings());
+						str = GetSetQueryStrings.setMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasAccompanyings());
 						VirtuosoConnection.insertDeleteQuery(str);
 					}
 					
@@ -438,12 +438,12 @@ public class VirtuosoUserProfileStorage {
 							regularTrip.setHasRegularTripURI(transport.getHasTransportURI()+"/RegularTrip/"+UUID.randomUUID().toString());
 						}
 						if (regularTrip.getHasPersonalPlacesNew()!=null&&!regularTrip.getHasPersonalPlacesNew().isEmpty()){
-							str = GetSetQueryStrings.setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
+							str = GetSetQueryStrings.setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
 							VirtuosoConnection.insertDeleteQuery(str);
 						}
 					}
 					if ( transport.getHasRegularTrip()!=null&&!transport.getHasRegularTrip().isEmpty()){
-						str = GetSetQueryStrings.setMultipleRegularTripsAssociatedToSpecificTransport(transport.getHasTransportURI(), transport.getHasRegularTrip());
+						str = GetSetQueryStrings.setMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasRegularTrip());
 						VirtuosoConnection.insertDeleteQuery(str);
 					}
 					
