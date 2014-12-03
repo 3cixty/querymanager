@@ -143,6 +143,7 @@ public class VirtuosoManager {
 	}
 	
 	public JSONObject executeQuery(String queryStr, String uid) {
+		if (DEBUG_MOD) LOGGER.info("Query to be executed: " + queryStr);
 		if (uid == null || uid.equals("")) return null;
 		JSONObject jsonObject = null;
 		String jsonStr = null;
@@ -177,6 +178,7 @@ public class VirtuosoManager {
 	 * @return
 	 */
 	public JSONObject executeQuery(String queryStr) {
+		if (DEBUG_MOD) LOGGER.info("Query to be executed: " + queryStr);
 		try {
 			String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(queryStr, "UTF-8")
 					+ "&format=" + RESULT_JSON_FORMAT ;
@@ -226,7 +228,8 @@ public class VirtuosoManager {
 	}
 	
 	public VirtGraph getVirtGraph() {
-		VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL, VirtuosoConnection.USER, VirtuosoConnection.PASS);
+		VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL,
+				VirtuosoConnection.USER, VirtuosoConnection.PASS);
 		return graph;
 	}
 	
@@ -287,15 +290,7 @@ public class VirtuosoManager {
 	
 	private VirtGraph getVirtGraph(String uid) {
 		String password = getPassword(uid);
-		VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", uid, password);
-		//VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", "dba", "dba");
-		return graph;
-	}
-	
-	private VirtGraph getVirtGraph(String graphStr, String uid) {
-		String password = getPassword(uid);
-		VirtGraph graph = new VirtGraph (graphStr, "jdbc:virtuoso://localhost:1111", uid, password);
-		//VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", "dba", "dba");
+		VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL, uid, password);
 		return graph;
 	}
 	
