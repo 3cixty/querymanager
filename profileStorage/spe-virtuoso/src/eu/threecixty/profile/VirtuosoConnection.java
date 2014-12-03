@@ -52,8 +52,7 @@ public class VirtuosoConnection {
 		private static void processConfigFile() throws IOException {
 			if (!firstTime) return;
 			Properties prop = new Properties();
-			String propfileName="conf.properties";
-			InputStream instream=Thread.currentThread().getContextClassLoader().getResourceAsStream(propfileName);
+			InputStream instream = VirtuosoConnection.class.getResourceAsStream("/conf.properties");
 			prop.load(instream);
 			instream.close();
 
