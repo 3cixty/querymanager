@@ -34,9 +34,8 @@ public class VirtuosoManager {
 	
 	private static final String RESULT_JSON_FORMAT = "application%2Fsparql-results%2Bjson";// application/sparql-results+json
 	
-	private static final String PASSWORD_FIXED = "Mil(ano3Cix)ty!";
+//	private static final String PASSWORD_FIXED = "Mil(ano3Cix)ty!";
 	
-	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixty.com/private/";
 	
 	private static boolean firstTime = true;
@@ -226,20 +225,6 @@ public class VirtuosoManager {
 		return uid;
 	}
 	
-	private VirtGraph getVirtGraph(String uid) {
-		String password = getPassword(uid);
-		VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", uid, password);
-		//VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", "dba", "dba");
-		return graph;
-	}
-	
-	private VirtGraph getVirtGraph(String graphStr, String uid) {
-		String password = getPassword(uid);
-		VirtGraph graph = new VirtGraph (graphStr, "jdbc:virtuoso://localhost:1111", uid, password);
-		//VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", "dba", "dba");
-		return graph;
-	}
-	
 	public VirtGraph getVirtGraph() {
 		VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL, VirtuosoConnection.USER, VirtuosoConnection.PASS);
 		return graph;
@@ -248,20 +233,6 @@ public class VirtuosoManager {
 	public String getGraph(String uid) {
 		if (uid == null) return null;
 		return PREFIX_EACH_USER_PROFILE_GRAPH + uid;
-	}
-	
-	private void setReadAccessToNobody(Statement stmt) {
-		try {
-			java.sql.ResultSet rs = stmt.executeQuery("DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()");
-			for ( ; rs.next(); ) {
-				String graphUri = rs.getString(1) ;
-				if (!graphUri.startsWith(PREFIX_EACH_USER_PROFILE_GRAPH))
-					stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + graphUri + "', 'nobody', 1)");
-			}
-			stmt.executeBatch();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -298,6 +269,34 @@ public class VirtuosoManager {
 				spoolConn = null;
 			}
 		}
+	}
+	
+	private void setReadAccessToNobody(Statement stmt) {
+		try {
+			java.sql.ResultSet rs = stmt.executeQuery("DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()");
+			for ( ; rs.next(); ) {
+				String graphUri = rs.getString(1) ;
+				if (!graphUri.startsWith(PREFIX_EACH_USER_PROFILE_GRAPH))
+					stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + graphUri + "', 'nobody', 1)");
+			}
+			stmt.executeBatch();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private VirtGraph getVirtGraph(String uid) {
+		String password = getPassword(uid);
+		VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", uid, password);
+		//VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", "dba", "dba");
+		return graph;
+	}
+	
+	private VirtGraph getVirtGraph(String graphStr, String uid) {
+		String password = getPassword(uid);
+		VirtGraph graph = new VirtGraph (graphStr, "jdbc:virtuoso://localhost:1111", uid, password);
+		//VirtGraph graph = new VirtGraph ("jdbc:virtuoso://localhost:1111", "dba", "dba");
+		return graph;
 	}
 	
 	private VirtuosoManager() {
