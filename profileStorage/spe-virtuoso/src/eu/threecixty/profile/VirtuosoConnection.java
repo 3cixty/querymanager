@@ -57,12 +57,7 @@ public class VirtuosoConnection {
 			prop.load(instream);
 			instream.close();
 
-			if (prop.getProperty("virtuoso.address") != null) {
-				VirtuosoConnection.DB_URL = prop.getProperty("virtuoso.address");
-			} else {
-				throw new IOException(
-						"The property virtuoso.address doesn't exist");
-			}
+			VirtuosoConnection.DB_URL = Configuration.getVirtuosoJDBC();
 
 			if (prop.getProperty("virtuoso.user") != null) {
 				VirtuosoConnection.USER = prop.getProperty("virtuoso.user");
