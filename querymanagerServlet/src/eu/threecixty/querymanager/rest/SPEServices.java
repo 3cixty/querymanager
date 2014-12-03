@@ -9,7 +9,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -32,6 +31,8 @@ import eu.threecixty.profile.ProfileInformationStorage;
 @Path("/" + Constants.PREFIX_NAME)
 public class SPEServices {
 	
+	public static final String PROFILE_SCOPE_NAME = "Profile";
+	
 	@Context 
 	private HttpServletRequest httpRequest;
 	
@@ -44,8 +45,12 @@ public class SPEServices {
 	 */
 	@GET
 	@Path("/getProfile")
-	@Produces("application/json")
-	public String getProfile(@HeaderParam("access_token") String access_token) {
+	public Response getProfile(@HeaderParam("access_token") String access_token) {
+		try {
+			checkPermission(access_token);
+		} catch (ThreeCixtyPermissionException e) {
+			Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to access the user profile").build();
+		}
 		try {
 			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			long starttime = System.currentTimeMillis();
@@ -66,7 +71,7 @@ public class SPEServices {
 				Gson gson = new Gson();
 				String ret = gson.toJson(profile);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				return ret;
+				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
 			} else {
 				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -93,8 +98,12 @@ public class SPEServices {
 	 */
 	@POST
 	@Path("/saveProfile")
-	@Produces("application/json")
-	public String saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
+	public Response saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
+		try {
+			checkPermission(access_token);
+		} catch (ThreeCixtyPermissionException e) {
+			Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to update the user profile").build();
+		}
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
@@ -121,7 +130,7 @@ public class SPEServices {
 				profile.setUid(uid);
 				String ret =  "{\"save\":\"" + ProfileInformationStorage.saveProfile(profile) + "\"}";
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.SUCCESSFUL);
-				return ret;
+				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -147,13 +156,12 @@ public class SPEServices {
 	 */
 	@GET
 	@Path("/getUID")
-	@Produces("application/json")
-	public String getUID(@HeaderParam("access_token") String access_token) {
+	public Response getUID(@HeaderParam("access_token") String access_token) {
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			return "{\"uid\":\"" + userAccessToken.getUid() + "\"}";
+			return Response.ok("{\"uid\":\"" + userAccessToken.getUid() + "\"}", MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -161,5 +169,12 @@ public class SPEServices {
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}
-	}	
+	}
+	
+	public static void checkPermission(String token) throws ThreeCixtyPermissionException {
+		AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(token);
+		if (accessToken == null || !accessToken.getScopeNames().contains(PROFILE_SCOPE_NAME)) {
+		    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
+		}
+	}
 }
