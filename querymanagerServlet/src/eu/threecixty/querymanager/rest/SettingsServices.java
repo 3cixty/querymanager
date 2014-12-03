@@ -36,8 +36,6 @@ public class SettingsServices {
 
 	
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
-
-	private static final String PROFILE_SCOPE_NAME = "Profile";
 	
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -211,9 +209,6 @@ public class SettingsServices {
 	}
 
 	private void checkPermission(String token) throws ThreeCixtyPermissionException {
-		AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(token);
-		if (accessToken == null || !accessToken.getScopeNames().contains(PROFILE_SCOPE_NAME)) {
-		    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
-		}
+		SPEServices.checkPermission(token);
 	}
 }
