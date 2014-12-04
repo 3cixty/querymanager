@@ -32,8 +32,6 @@ public class VirtuosoConnection {
 		static String USER;
 		static String PASS;
 		
-		// Graph to query
-		static String GRAPH;
 		
 		private static boolean firstTime = true;
 		
@@ -69,7 +67,6 @@ public class VirtuosoConnection {
 			} else {
 				throw new IOException("The property virtuoso.pass doesn't exist");
 			}
-			VirtuosoConnection.GRAPH = Configuration.PROFILE_GRAPH;
 			firstTime = false;
 		}
 
@@ -140,8 +137,6 @@ public class VirtuosoConnection {
 
 			Query sparql = QueryFactory
 					.create(query);
-			
-			sparql.addGraphURI(VirtuosoConnection.GRAPH);
 			
 			VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create(
 					sparql, virtGraph);
