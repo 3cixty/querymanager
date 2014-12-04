@@ -261,7 +261,6 @@ public class VirtuosoManager {
 			for (String graphUri: getPublicGraphs(stmt)) {
 				stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + graphUri + "', 'nobody', 1)");
 			}
-			stmt.executeBatch();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
