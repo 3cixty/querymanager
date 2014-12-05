@@ -122,18 +122,7 @@ public class VirtuosoManager {
 	public boolean existsAccount(String uid) {
 		if (uid == null || uid.equals("")) return false;
 		try {
-			// LIMIT 2 because LIMIT 1 always causes false for 'hasNext' even there is one result
-//			Query query4graph = QueryFactory.create(
-//					"SELECT * FROM <" + getGraph(uid) + "> WHERE { ?s ?p ?o . } LIMIT 2"
-//					);
 			VirtGraph virtGraph = getVirtGraph(uid);
-//			VirtuosoQueryExecution vqe =
-//					VirtuosoQueryExecutionFactory.create(query4graph, virtGraph);
-//			ResultSet qresult = vqe.execSelect();
-//
-//			boolean found = qresult.hasNext();
-//
-//			vqe.close();
 
 			virtGraph.close();
 			return true;
