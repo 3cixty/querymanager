@@ -3,6 +3,7 @@ package eu.threecixty.profile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -205,11 +206,14 @@ public class VirtuosoManager {
 			synchronized (_sync) {
 				if (spoolConn == null) {
 					Class.forName("virtuoso.jdbc4.Driver");
-					spoolConn = getVirtGraph().getConnection();
+					spoolConn = DriverManager.getConnection(VirtuosoConnection.DB_URL + "charset=UTF-8/roundrobin=1",
+							VirtuosoConnection.USER, VirtuosoConnection.PASS);
 				}
 			}
 		}catch(ClassNotFoundException ex){
-			ex.getMessage();
+			LOGGER.error(ex.getMessage());
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage());
 		}
 		return null;
 	}
