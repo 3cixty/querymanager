@@ -122,21 +122,22 @@ public class VirtuosoManager {
 		if (uid == null || uid.equals("")) return false;
 		try {
 			// LIMIT 2 because LIMIT 1 always causes false for 'hasNext' even there is one result
-			Query query4graph = QueryFactory.create(
-					"SELECT * FROM <" + getGraph(uid) + "> WHERE { ?s ?p ?o . } LIMIT 2"
-					);
+//			Query query4graph = QueryFactory.create(
+//					"SELECT * FROM <" + getGraph(uid) + "> WHERE { ?s ?p ?o . } LIMIT 2"
+//					);
 			VirtGraph virtGraph = getVirtGraph(uid);
-			VirtuosoQueryExecution vqe =
-					VirtuosoQueryExecutionFactory.create(query4graph, virtGraph);
-			ResultSet qresult = vqe.execSelect();
-
-			boolean found = qresult.hasNext();
-
-			vqe.close();
+//			VirtuosoQueryExecution vqe =
+//					VirtuosoQueryExecutionFactory.create(query4graph, virtGraph);
+//			ResultSet qresult = vqe.execSelect();
+//
+//			boolean found = qresult.hasNext();
+//
+//			vqe.close();
 
 			virtGraph.close();
-			return found;
+			return true;
 		} catch (Exception e) { // bad login
+			LOGGER.error("Bad login info for uid = " + uid);
 			return false;
 		}
 	}
