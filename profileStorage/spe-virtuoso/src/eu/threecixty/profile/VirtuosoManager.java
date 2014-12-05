@@ -215,7 +215,7 @@ public class VirtuosoManager {
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage());
 		}
-		return null;
+		return spoolConn;
 	}
 	
 	public void closeConnection() {
