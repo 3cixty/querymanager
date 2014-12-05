@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,6 +21,9 @@ import eu.threecixty.profile.oldmodels.Name;
  *
  */
 public class GoogleAccountUtils {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 GoogleAccountUtils.class.getName());
 	
 //	/**
 //	 * Validates a given access token, 
@@ -100,6 +104,7 @@ public class GoogleAccountUtils {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		if (user_id == null) return "";
 		return user_id;
