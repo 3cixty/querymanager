@@ -354,48 +354,7 @@ public class VirtuosoUserProfileStorage {
 	private static void saveTransportToKB(String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports) {
 		
 		try {
-			
-			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
-
-			ResultSet results = qRC.getReturnedResultSet();
-			
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				try {
-					RDFNode transport = qs.get("transport");
-
-					if (transport==null) break;
-					
-					QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsURIForTransport(transport.asResource().getURI()));
-					ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
-					
-					for ( ; resultsRegularTrips.hasNext(); ) {
-						QuerySolution qsRegularTrips = resultsRegularTrips.next();
-						try {
-							RDFNode regularTripURI = qsRegularTrips.get("regularTrip");
-							
-							if (regularTripURI!=null){
-								String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTripURI.asResource().getURI());
-								VirtuosoConnection.insertDeleteQuery(str);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-							LOGGER.error(e.getMessage());
-						}
-					}
-					String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
-					VirtuosoConnection.insertDeleteQuery(str);
-					
-					str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.asResource().getURI());
-					VirtuosoConnection.insertDeleteQuery(str);
-				
-				}catch (Exception e) {
-					e.printStackTrace();
-					LOGGER.error(e.getMessage());
-				}
-			}
-			String str = GetSetQueryStrings.removeTransport(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
+			String str = null;
 			
 			if (transports!=null&&!transports.isEmpty()){
 				Iterator<eu.threecixty.profile.oldmodels.Transport> iterators=transports.iterator();
