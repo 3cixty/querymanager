@@ -113,6 +113,32 @@ public class VirtuosoManager {
 		return true;
 	}
 
+	public void dropGraphs() {
+		Connection conn = getConnection();
+		try {
+			Statement stmt = conn.createStatement();
+			List <String> priavteGraphs = new ArrayList <String>();
+			try {
+				java.sql.ResultSet rs = stmt.executeQuery("DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()");
+				for ( ; rs.next(); ) {
+					String graphUri = rs.getString(1) ;
+					if (graphUri.startsWith(PREFIX_EACH_USER_PROFILE_GRAPH)) priavteGraphs.add(graphUri);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			for (String graphUri: priavteGraphs) {
+				try {
+				stmt.execute("sparql DROP SILENT GRAPH <" + graphUri + ">");
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			//stmt.executeBatch();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Checks whether or not there is an account associated with a given UID.

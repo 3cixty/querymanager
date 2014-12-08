@@ -170,11 +170,7 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 				+ "select ?givenname ?familyname from <" + getGraphName(uid) + ">"
 				+ " where {"
-					+ "?s a foaf:Person. "
-					+" ?s profile:userID \""+uid+"\". "
-					+ "?s schema:givenName ?givenname."
-					+ "?s schema:familyName ?familyname."
-					+ "}";
+				+ " <" + PROFILE_URI + uid + "> schema:givenName ?givenname ;  schema:familyName ?familyname. } ";
 		return query;
 	}
 	
@@ -397,13 +393,8 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 				+ "select ?uidknows "
 				+ " from <" + getGraphName(uid) + ">"
-				+ " where {"
-					+ "?s a foaf:Person. "
-					+" ?s profile:userID \""+uid+"\". "
-					+ "OPTIONAL {"
-						+ "?s schema:knows ?uidknows. "
-					+ "}"
-					+ "}";
+				+ " where"
+				+ "{ <" + PROFILE_URI + uid + "> schema:knows ?uidknows  } ";
 		return query;
 	}
 	

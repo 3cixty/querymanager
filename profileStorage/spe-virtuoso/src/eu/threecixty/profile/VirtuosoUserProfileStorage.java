@@ -701,8 +701,12 @@ public class VirtuosoUserProfileStorage {
 				
 			    RDFNode uidknows = qs.get("uidknows");
 			    
-			    if (uidknows!=null)
-			    	knows.add(uidknows.toString());
+			    if (uidknows!=null) {
+			    	String tmp = uidknows.toString();
+			    	int index = tmp.indexOf(PROFILE_URI);
+			    	if (index < 0) knows.add(tmp);
+			    	else knows.add(tmp.substring(index + PROFILE_URI.length()));
+			    }
 			} catch (Exception e) {
 				e.printStackTrace();
 				LOGGER.error(e.getMessage());
