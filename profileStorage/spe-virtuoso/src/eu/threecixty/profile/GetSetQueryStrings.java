@@ -401,8 +401,7 @@ public class GetSetQueryStrings {
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "OPTIONAL {"
-						+ "?s schema:knows ?knows. "
-						+ "?knows  profile:userID ?uidknows.  "
+						+ "?s schema:knows ?uidknows. "
 					+ "}"
 					+ "}";
 		return query;
