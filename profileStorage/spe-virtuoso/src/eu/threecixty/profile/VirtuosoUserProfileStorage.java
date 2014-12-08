@@ -130,45 +130,44 @@ public class VirtuosoUserProfileStorage {
 			String str = GetSetQueryStrings.removeAllKnows(uid);
 			VirtuosoConnection.insertDeleteQuery(str);
 			
+			if (knows == null || knows.size() == 0) return;
+			
 			//add new knows profiles
-			if (knows!=null){
-				if (knows!=null&&!knows.isEmpty()){
-					Iterator <String> iterators = knows.iterator();
-					for ( ; iterators.hasNext(); ){
-						String know=iterators.next();
-					
-						QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(know));
-	
-						ResultSet results = qRC.getReturnedResultSet();
-						if (!results.hasNext()){
-						//for ( ; results.hasNext(); ) {
-							//QuerySolution qs = results.next();
-							try {
-								
-							    //RDFNode uri = qs.get("uri");
-							    
-							    //if (uri==null){
-							    	str=GetSetQueryStrings.setUser(know);
-									VirtuosoConnection.insertDeleteQuery(str);
-									eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
-									profileIdentities.setHasSource("https://plus.google.com");
-									profileIdentities.setHasSourceCarrier("Google");
-									profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
-									profileIdentities.setHasUserAccountID(know);
-									profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
-									str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
-									VirtuosoConnection.insertDeleteQuery(str);
-							    //}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							
-						}
+			Iterator <String> iterators = knows.iterator();
+			for ( ; iterators.hasNext(); ){
+				String know=iterators.next();
+
+				QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(know));
+
+				ResultSet results = qRC.getReturnedResultSet();
+				if (!results.hasNext()){
+					//for ( ; results.hasNext(); ) {
+					//QuerySolution qs = results.next();
+					try {
+
+						//RDFNode uri = qs.get("uri");
+
+						//if (uri==null){
+						str=GetSetQueryStrings.setUser(know);
+						VirtuosoConnection.insertDeleteQuery(str);
+						eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
+						profileIdentities.setHasSource("https://plus.google.com");
+						profileIdentities.setHasSourceCarrier("Google");
+						profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
+						profileIdentities.setHasUserAccountID(know);
+						profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
+						str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
+						VirtuosoConnection.insertDeleteQuery(str);
+						//}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+
 				}
+			}
+
 			str = GetSetQueryStrings.setMultipleKnows(uid,knows);
 			VirtuosoConnection.insertDeleteQuery(str);
-			}
 			
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
@@ -257,6 +256,7 @@ public class VirtuosoUserProfileStorage {
 		
 			if (preference!=null){//likes!=null&&!likes.isEmpty()){
 				Set<eu.threecixty.profile.oldmodels.Likes> likes=preference.getHasLikes();
+				if (likes == null || likes.size() == 0) return;
 				str = GetSetQueryStrings.setMultipleLikes(uid, likes);
 				VirtuosoConnection.insertDeleteQuery(str);
 			}
@@ -332,7 +332,7 @@ public class VirtuosoUserProfileStorage {
 			if (preference!=null){
 			
 				Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences=preference.getHasTripPreference();
-				if (tripPreferences!=null&&!tripPreferences.isEmpty()){
+				if (tripPreferences!=null&& tripPreferences.size() > 0){
 					str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
 					VirtuosoConnection.insertDeleteQuery(str);
 				}
