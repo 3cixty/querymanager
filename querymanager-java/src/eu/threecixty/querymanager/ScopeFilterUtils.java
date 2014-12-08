@@ -30,6 +30,8 @@ public class ScopeFilterUtils {
 
 	private static final String [] PROFILE_URIS = {Configuration.SCHEMA_URI + "familyName",
 		Configuration.SCHEMA_URI + "givenName"};
+
+	private static final String [] KNOWS_URIS = {Configuration.SCHEMA_URI + "knows", Configuration.SCHEMA_URI + "follows"};
 	
 	/**
 	 * Checks whether or not a given query contains an explicit predicate for User Profile. 
@@ -37,26 +39,16 @@ public class ScopeFilterUtils {
 	 * @return
 	 */
 	public static boolean containExplicitProfilePredicate(Query query) {
-		ElementGroup body = (ElementGroup) query.getQueryPattern();
-		for (Element element: body.getElements()) {
-			if (element instanceof ElementTriplesBlock) {
-				ElementTriplesBlock etb = (ElementTriplesBlock) element;
-				Iterator <Triple> triples = etb.patternElts();
-				for ( ; triples.hasNext(); ) {
-					Triple triple = triples.next();
-					if (isProfileUriNode(triple.getPredicate())) return true;
-				}
-			} else if (element instanceof ElementPathBlock) {
-				ElementPathBlock epb = (ElementPathBlock) element;
-				Iterator <TriplePath> triplePaths = epb.patternElts();
-				for ( ; triplePaths.hasNext(); ) {
-					TriplePath tp = triplePaths.next();
-					if (isProfileUriNode(tp.getPredicate())) return true;
-				}
-			}
+		return findExplicitPredicateInUris(query, PROFILE_URIS);
+	}
 
-		}
-		return false;
+	/**
+	 * Checks whether or not a given query contains an explicit predicate for KNOWS or FOLLOWS. 
+	 * @param query
+	 * @return
+	 */
+	public static boolean containExplicitKnowsOrFollowsPredicate(Query query) {
+		return findExplicitPredicateInUris(query, KNOWS_URIS);
 	}
 	
 	/**
@@ -64,7 +56,20 @@ public class ScopeFilterUtils {
 	 * (familyName & givenName).
 	 * @param query
 	 */
-	public static void addFiltersToRestrictProfile(Query query) {
+	public static void addFilterToRestrictProfile(Query query) {
+		addFilterToRestrictUriPredicates(query, PROFILE_URIS);
+	}
+	
+	public static void addFilterToRestrictKnows(Query query) {
+		addFilterToRestrictUriPredicates(query, KNOWS_URIS);
+	}
+	
+	/**
+	 * Adds filters to a given query so that the query cannot get information about Profile scope
+	 * (familyName & givenName).
+	 * @param query
+	 */
+	private static void addFilterToRestrictUriPredicates(Query query, String [] uriPredicates) {
 		List <ElementFilter> elementFilters = new ArrayList <ElementFilter>();
 		ElementGroup body = (ElementGroup) query.getQueryPattern();
 		for (Element element: body.getElements()) { 
@@ -74,14 +79,14 @@ public class ScopeFilterUtils {
 				for ( ; triples.hasNext(); ) {
 					Triple triple = triples.next();
 					Node predicateNode = triple.getPredicate();
-					addFilterToRestrictProfileWhenNecessary(predicateNode, elementFilters);
+					addFilterToRestrictUriPredicates(predicateNode, uriPredicates, elementFilters);
 				}
 			} else if (element instanceof ElementPathBlock) {
 				ElementPathBlock epb = (ElementPathBlock) element;
 				Iterator <TriplePath> triplePaths = epb.patternElts();
 				for ( ; triplePaths.hasNext(); ) {
 					TriplePath tp = triplePaths.next();
-					addFilterToRestrictProfileWhenNecessary(tp.getPredicate(), elementFilters);
+					addFilterToRestrictUriPredicates(tp.getPredicate(), uriPredicates, elementFilters);
 				}
 			}
 		}
@@ -92,25 +97,54 @@ public class ScopeFilterUtils {
 	
 	/**
 	 * Adds filer to a given node when necessary to prevent SPARQL query from
-	 * getting familyName and givenName.
+	 * a given list of URI predicates.
 	 * @param predicateNode
-	 * @param elementFilters
+	 * @param results
 	 */
-	private static void addFilterToRestrictProfileWhenNecessary(Node predicateNode,
-			List <ElementFilter> elementFilters) {
+	private static void addFilterToRestrictUriPredicates(Node predicateNode, String [] uriPredicates,
+			List <ElementFilter> results) {
 		if (!predicateNode.isVariable()) return; //immediately return if a given node is not a variable
-		for (String predicareStr: PROFILE_URIS) {
+		for (String predicareStr: uriPredicates) {
 		    Expr expr = new E_NotEquals(new ExprVar(predicateNode.getName()),
 		    		NodeValue.makeNode(NodeFactory.createURI(predicareStr)));
 		    ElementFilter filter = new ElementFilter(expr);
-		    elementFilters.add(filter);
+		    results.add(filter);
 		}
 	}
+	
+	/**
+	 * Checks whether or not a given query contains a predicate found in a given list of URIs.
+	 * @param query
+	 * @param inUris
+	 * @return
+	 */
+	private static boolean findExplicitPredicateInUris(Query query, String [] inUris) {
+		ElementGroup body = (ElementGroup) query.getQueryPattern();
+		for (Element element: body.getElements()) {
+			if (element instanceof ElementTriplesBlock) {
+				ElementTriplesBlock etb = (ElementTriplesBlock) element;
+				Iterator <Triple> triples = etb.patternElts();
+				for ( ; triples.hasNext(); ) {
+					Triple triple = triples.next();
+					if (isNodeFromUris(triple.getPredicate(), inUris)) return true;
+				}
+			} else if (element instanceof ElementPathBlock) {
+				ElementPathBlock epb = (ElementPathBlock) element;
+				Iterator <TriplePath> triplePaths = epb.patternElts();
+				for ( ; triplePaths.hasNext(); ) {
+					TriplePath tp = triplePaths.next();
+					if (isNodeFromUris(tp.getPredicate(), inUris)) return true;
+				}
+			}
 
-	private static boolean isProfileUriNode(Node node) {
+		}
+		return false;
+	}
+
+	private static boolean isNodeFromUris(Node node, String[] uris) {
 		if (node.isURI()) {
 			String nodeUri = node.toString();
-			for (String uri: PROFILE_URIS) {
+			for (String uri: uris) {
 				if (uri.equals(nodeUri)) return true;
 			}
 		}
