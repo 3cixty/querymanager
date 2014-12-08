@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -36,6 +37,7 @@ import eu.threecixty.querymanager.EventMediaFormat;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
+import eu.threecixty.querymanager.ScopeFilterUtils;
 import eu.threecixty.querymanager.ThreeCixtyQuery;
 
 /**
@@ -112,7 +114,8 @@ public class QueryManagerServices {
 
 				try {
 					logInfo("Before augmenting and executing a query");
-					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat);
+					
+					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true, isLimitForProfile(userAccessToken));
 
 					// log calls
 					
@@ -389,7 +392,7 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()));
 
 			try {
-				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
+				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken));
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (ThreeCixtyPermissionException tcpe) {
@@ -440,7 +443,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
-				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON);
+				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken));
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (ThreeCixtyPermissionException tcpe) {
@@ -528,7 +531,8 @@ public class QueryManagerServices {
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter, EventMediaFormat eventMediaFormat) throws ThreeCixtyPermissionException {
+			String query, String filter, EventMediaFormat eventMediaFormat,
+			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException {
 
 		Query jenaQuery = createJenaQuery(query);
 		
@@ -539,6 +543,19 @@ public class QueryManagerServices {
 		/// XXX: hack for date ranges query
 		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
 		qm.setForDateRanges(isForDateRages);
+		
+		if (needToCheckPredicate) {
+			if (ScopeFilterUtils.containExplicitKnowsOrFollowsPredicate(jenaQuery)) {
+				throw new ThreeCixtyPermissionException("You are not allowed to access KNOWS or FOLLOWS list");
+			}
+			ScopeFilterUtils.addFilterToRestrictKnows(jenaQuery);
+
+			if (limitToProfile) {
+				if (ScopeFilterUtils.containExplicitProfilePredicate(jenaQuery))
+					throw new ThreeCixtyPermissionException("You are not allowed to access USER PROFILE");
+				ScopeFilterUtils.addFilterToRestrictProfile(jenaQuery);
+			}
+		}
 
 		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
 
@@ -651,6 +668,13 @@ public class QueryManagerServices {
 			e.printStackTrace();
 		}
     	return "";
+    }
+    
+    private boolean isLimitForProfile(AccessToken accessToken) {
+    	List <String> scopes = accessToken.getScopeNames();
+    	if (scopes == null || scopes.size() == 0) return true;
+    	if (scopes.contains(SPEServices.PROFILE_SCOPE_NAME)) return false;
+    	return true;
     }
     
 	/**

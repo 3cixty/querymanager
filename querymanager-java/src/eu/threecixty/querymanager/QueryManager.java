@@ -175,7 +175,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		logInfo("Query to be executed: " + query);
 
 		boolean ok = true;
-		if (uid == null) {
+		if (uid == null) { // only public graphs
 			String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
 
