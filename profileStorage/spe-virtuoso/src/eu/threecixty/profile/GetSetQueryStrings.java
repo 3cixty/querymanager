@@ -354,7 +354,7 @@ public class GetSetQueryStrings {
 		Iterator <String> iterators = knows.iterator();
 		for ( ; iterators.hasNext(); ){
 			String uidKnows=iterators.next();
-			query+= "  <"+PROFILE_URI+uid+"> schema:knows <"+PROFILE_URI+uidKnows+"> .";
+			query+= "  <"+PROFILE_URI+uid+"> schema:knows <" + (uidKnows.contains(PROFILE_URI) ? uidKnows : PROFILE_URI+uidKnows) + "> .";
 		}
 		query+= "}}";
 		return query;
