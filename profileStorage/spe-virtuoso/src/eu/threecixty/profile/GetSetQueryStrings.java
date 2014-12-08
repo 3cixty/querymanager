@@ -12,8 +12,7 @@ public class GetSetQueryStrings {
 	private static final String PREFIX = Configuration.PREFIXES;
 	
 	private static String makeUser(String uid) {
-		String query= " <"+PROFILE_URI+uid+"> rdf:type foaf:Person. "
-				+" <"+ PROFILE_URI+uid+"> profile:userID \""+uid+"\" . ";
+		String query= " <"+ PROFILE_URI+uid+"> profile:userID \""+uid+"\" . ";
 		return query;
 	}
 	/**
@@ -70,6 +69,7 @@ public class GetSetQueryStrings {
 	public static String getLastCrawlTime(String uid) {
 		String query=PREFIX
 				+ "select ?lastCrawlTime "
+				+ " from <" + getGraphName(uid) + ">"
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "//100900047095598983805
@@ -120,13 +120,9 @@ public class GetSetQueryStrings {
 	 */
 	public static String getGender(String uid) {
 		String query=PREFIX
-				+ "select ?gender "
-				+ " where {"
-					+ "?s a foaf:Person. "
-					+" ?s profile:userID ?uid. "
-					+ "?s schema:gender ?gender. "
-					+" FILTER (STR(?uid) = \""+uid+"\") "//100900047095598983805
-					+ "}";
+				+ "select ?gender from <" + getGraphName(uid) + ">"
+				+ " where "
+					+ "{ <" + PROFILE_URI + uid + "> schema:gender ?gender  } ";
 		return query;
 	}
 	/**
@@ -172,7 +168,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String getName(String uid) {
 		String query=PREFIX
-				+ "select ?givenname ?familyname "
+				+ "select ?givenname ?familyname from <" + getGraphName(uid) + ">"
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
@@ -242,6 +238,7 @@ public class GetSetQueryStrings {
 	public static String getAddress(String uid) {
 		String query=PREFIX
 				+ "select ?address ?townname ?countryname ?staddress ?pcode ?homeLocation ?geoLocation ?longitude ?lat "
+				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
@@ -399,6 +396,7 @@ public class GetSetQueryStrings {
 	public static String getKnows(String uid) {
 		String query=PREFIX
 				+ "select ?uidknows "
+				+ " from <" + getGraphName(uid) + ">"
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
@@ -490,6 +488,7 @@ public class GetSetQueryStrings {
 	public static String getProfileIdentities(String uid) {
 		String query=PREFIX
 				+ "select ?pi ?source ?piID ?uIM "
+				+ " from <" + getGraphName(uid) + ">"
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
@@ -562,6 +561,7 @@ public class GetSetQueryStrings {
 	public static String getLikes(String uid) {
 		String query=PREFIX
 				+ "select ?likes ?likeName ?liketype "
+				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
@@ -640,6 +640,7 @@ public class GetSetQueryStrings {
 	public static String getTransport(String uid) {
 		String query=PREFIX
 				+ "select ?transport "
+				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
@@ -1161,6 +1162,7 @@ public class GetSetQueryStrings {
 	public static String getTripPreferences(String uid) {
 		String query=PREFIX
 				+ "select ?tripPreference ?preferredMaxTotalDistance ?preferredTripDuration ?preferredTripTime ?preferredCity ?preferredCountry ?preferredWeatherCondition ?preferredMinTimeOfAccompany ?modality "
+				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\" . "
@@ -1261,6 +1263,7 @@ public class GetSetQueryStrings {
 	public static String getPlacePreferences(String uid) {
 		String query=PREFIX
 				+ "select ?placePreference ?natureOfPlace "
+				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
@@ -1305,7 +1308,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String createQueryToGetProfileImage(String uid) {
 		String query=PREFIX
-				+ "select ?profileImage "
+				+ "select ?profileImage from <" + getGraphName(uid) + ">"
 				+ " where "
 				+ "{ <" + PROFILE_URI + uid + "> foaf:img ?profileImage  } ";
 		return query;
