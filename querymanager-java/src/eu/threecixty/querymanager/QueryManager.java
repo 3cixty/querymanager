@@ -104,7 +104,6 @@ import eu.threecixty.profile.oldmodels.Rating;
 		augmentedQuery.getQuery().getQuery().setDistinct(true);
 		augmentedQueryStr = augmentedQuery.getQuery().getQuery().toString();
 		
-		augmentedQueryStr = "";
 		String originalQueryStr = originalQuery.convert2String();
 		try {
 			if (originalQuery != null && originalQueryStr.contains("http://schema.org/")) {
