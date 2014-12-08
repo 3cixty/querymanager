@@ -62,6 +62,9 @@ public class GoogleAccountUtils {
 			name.setGivenName(givenName);
 			name.setFamilyName(familyName);
 
+			if (json.has("gender")) {
+				profile.setHasGender(json.getString("gender"));
+			}
 			
 			// do this when login to 3cixty authorization say edit settings,
 			// select circles you want the app to get info form.
