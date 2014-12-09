@@ -54,7 +54,7 @@ public class GoogleAccountUtils {
 			
 			String picture = json.getString("picture");
 			
-			UserProfile profile = new UserProfile();
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(user_id);
 			profile.setHasUID(user_id);
 			profile.setProfileImage(picture);
 			Name name = new Name();
