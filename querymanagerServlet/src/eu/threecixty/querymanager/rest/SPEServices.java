@@ -49,7 +49,7 @@ public class SPEServices {
 		try {
 			checkPermission(access_token);
 		} catch (ThreeCixtyPermissionException e) {
-			Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to access the user profile").build();
+			return Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to access the user profile").build();
 		}
 		try {
 			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
