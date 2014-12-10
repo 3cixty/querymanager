@@ -77,7 +77,8 @@ public class VirtuosoManager {
 			if (firstTime) {
 				synchronized (_sync) {
 					if (firstTime) { // double-checked
-					    stmt.addBatch("DB.DBA.RDF_DEFAULT_USER_PERMS_SET ('nobody', 0)");
+						// the following line should be done by isql in Virtuoso to avoid bugs in listing known graphs
+					    //stmt.addBatch("DB.DBA.RDF_DEFAULT_USER_PERMS_SET ('nobody', 0)");
 					    setReadAccessToNobody(stmt);
 					    firstTime = false;
 					}
@@ -113,7 +114,8 @@ public class VirtuosoManager {
 		return true;
 	}
 
-	public void dropGraphs() {
+	// XXX: hack to drop private graphs caused by misunderstanding Virtuoso when developing private parts
+	public synchronized void dropGraphs() {
 		Connection conn = getConnection();
 		try {
 			Statement stmt = conn.createStatement();
@@ -138,6 +140,7 @@ public class VirtuosoManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		closeConnection();
 	}
 
 	/**
