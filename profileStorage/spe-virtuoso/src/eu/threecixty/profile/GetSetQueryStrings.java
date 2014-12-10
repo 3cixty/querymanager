@@ -7,7 +7,7 @@ import java.util.UUID;
 import eu.threecixty.Configuration;
 
 public class GetSetQueryStrings {
-	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
+	public static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 	
 	private static final String PREFIX = Configuration.PREFIXES;
 	
