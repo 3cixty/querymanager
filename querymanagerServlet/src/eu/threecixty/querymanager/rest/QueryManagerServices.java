@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -31,8 +32,10 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
+import eu.threecixty.profile.VirtuosoManager;
 import eu.threecixty.querymanager.EventMediaFormat;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
@@ -684,6 +687,19 @@ public class QueryManagerServices {
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
 		LOGGER.info(msg);
+	}
+	
+	@POST
+	@Path("/dropGraphs")
+	public Response dropGraphs(@HeaderParam("google_access_token") String access_token) {
+		// XXX: this API should be removed whenever we fix all problems for private graphs
+		String uid = GoogleAccountUtils.getUID(access_token);
+		if (uid == null || uid.equals("")) return Response.serverError().build();
+		if (!uid.equals("103918130978226832690")) return Response.serverError().build();
+		for (int i = 0; i < 100; i++) {
+			VirtuosoManager.getInstance().dropGraphs();
+		}
+		return Response.ok("drop graphs").build();
 	}
 
     public class KeyValuePair {
