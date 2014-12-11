@@ -39,12 +39,12 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("select  ?countryName\n");
 		buffer.append(" from <" + VirtuosoManager.getInstance().getGraph(uID) + "> ");
 		buffer.append("where {\n");
-		buffer.append("?meroot schema:address	?address .\n");
+		buffer.append(getPersonURI(uID) + " schema:address	?address .\n");
 		buffer.append("?address schema:addressCountry	?countryName .\n");
 		
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString(), uID);
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
 		if (jsonObj == null) return null;
 		
 		try {
@@ -72,13 +72,13 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("select  ?townName\n");
 		buffer.append(" from <" + VirtuosoManager.getInstance().getGraph(uID) + "> ");
 		buffer.append("where {\n");
-		buffer.append("?meroot schema:address	?address .\n");
+		buffer.append( getPersonURI(uID) + " schema:address	?address .\n");
 		buffer.append("?address schema:addressLocality	?townName .\n");
 		
 		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString(), uID);
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
 		if (jsonObj == null) return null;
 		
 		try {
@@ -105,13 +105,13 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("select  ?lon ?lat \n");
 		buffer.append(" from <" + VirtuosoManager.getInstance().getGraph(uID) + "> ");
 		buffer.append("where {\n");
-		buffer.append("?meroot schema:homeLocation	?homeLocation .\n");
+		buffer.append(getPersonURI(uID) + " schema:homeLocation	?homeLocation .\n");
 		buffer.append("?homeLocation schema:geo	?geo .\n");
 		buffer.append("?geo schema:latitude	?lat .\n");
 		buffer.append("?geo schema:longitude ?lon .\n");
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQuery(buffer.toString(), uID);
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
 		if (jsonObj == null) return null;
 		
 		try {
@@ -182,9 +182,10 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("SELECT  ?name \n");
 		buffer.append("FROM <" + VirtuosoManager.getInstance().getGraph(uID) + ">\n");
 		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
+		buffer.append(" FROM <http://3cixty.com/placesRating> \n");
 		buffer.append("where {\n");
 		
-		buffer.append("?meroot schema:knows	?knows .\n");
+		buffer.append(getPersonURI(uID) +  " schema:knows	?knows .\n");
 		
 		//buffer.append("?knows profile:userID	?friendsUID .\n"); // friends' UID
 		
@@ -252,6 +253,10 @@ public class ProfilerPlaceUtilsVirtuoso {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static String getPersonURI(String uid) {
+		return "<" + GetSetQueryStrings.PROFILE_URI + uid + ">";
 	}
 	
 	private ProfilerPlaceUtilsVirtuoso() {

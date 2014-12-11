@@ -104,8 +104,9 @@ public class VirtuosoUserProfileStorage {
 
 		try {
 			
-			if (!VirtuosoManager.getInstance().existsAccount(uid)) {
-				VirtuosoManager.getInstance().createAccount(uid);
+			if (!existUID(uid)) {
+				// comment the following line as we only have one private graph
+				//VirtuosoManager.getInstance().createAccount(uid);
 				String insertQuery = GetSetQueryStrings.setUser(uid);
 				VirtuosoConnection.insertDeleteQuery(insertQuery);
 			}
@@ -1100,6 +1101,7 @@ public class VirtuosoUserProfileStorage {
 		if (uid == null) return false;
 		StringBuilder qStr = new StringBuilder(Configuration.PROFILE_PREFIX);
 	    qStr.append("SELECT  DISTINCT  ?uid\n");
+	    qStr.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + "> \n");
 	    qStr.append("WHERE {\n\n");
 	    qStr.append("?root profile:userID ?uid .\n");
 	    qStr.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");

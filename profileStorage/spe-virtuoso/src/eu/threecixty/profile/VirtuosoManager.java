@@ -210,8 +210,10 @@ public class VirtuosoManager {
 	}
 	
 	public String getGraph(String uid) {
-		if (uid == null) return null;
-		return PREFIX_EACH_USER_PROFILE_GRAPH + uid;
+		// Use one private graph
+//		if (uid == null) return null;
+//		return PREFIX_EACH_USER_PROFILE_GRAPH + uid;
+		return PREFIX_EACH_USER_PROFILE_GRAPH;
 	}
 	
 	/**
