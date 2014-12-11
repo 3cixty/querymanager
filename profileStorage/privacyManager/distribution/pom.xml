@@ -5,14 +5,14 @@
 	<groupId>eu.3cixty.privacy</groupId>
 	<artifactId>privacymanager-packed</artifactId>
 	<name>Privacy manager distribution</name>
-	<version>1.2</version>
+	<version>1.3</version>
 	<packaging>pom</packaging>
 
 	<!-- set the packed privacy manager version here, assuming the base name 
 		for the JAR and POM is privacymanager-M.m.g.jar where M.m.g is the Maven 
 		version of the privacy manager artifact. -->
 	<properties>
-		<privacyManagerVersion>1.2</privacyManagerVersion>
+		<privacyManagerVersion>1.3</privacyManagerVersion>
 	</properties>
 
 	<build>

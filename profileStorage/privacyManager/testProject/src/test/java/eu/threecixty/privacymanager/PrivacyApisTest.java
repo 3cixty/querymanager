@@ -14,7 +14,6 @@ import org.theresis.humanization.privacy.generated.Domain;
 import org.theresis.humanization.privacy.generated.PrivacyContract;
 
 
-@SuppressWarnings("restriction")
 @RunWith(JUnit4.class)
 public class PrivacyApisTest {
 
@@ -45,11 +44,11 @@ public class PrivacyApisTest {
 		PrivacyContract.Contract.PropertyPaths.PropertyPath pp1 = new PrivacyContract.Contract.PropertyPaths.PropertyPath( );
 		pp1.setType("mandatory");
 		pp1.setValue(":/cactusType/label");
-		pps.getPropertyPath().add(pp1);
+		pps.getPropertyPathAndFilters().add(pp1);
 		PrivacyContract.Contract.PropertyPaths.PropertyPath pp2 = new PrivacyContract.Contract.PropertyPaths.PropertyPath( );
 		pp2.setType("optional");
 		pp2.setValue(":/flowerKind/label");
-		pps.getPropertyPath().add(pp2);
+		pps.getPropertyPathAndFilters().add(pp2);
 		pc_contract.setPropertyPaths(pps);
 		pc_contract.setTextDescription("Help !\nI kneed somebody, help !");
 		privacyContract.setContract( pc_contract );

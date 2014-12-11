@@ -13,7 +13,8 @@
 				<xs:element ref="app:application"/>
 				<xs:element name="contract">
 					<xs:annotation>
-						<xs:documentation>Defines the part of the user profile the application wants to access
+						<xs:documentation>Defines the part of the user profile the application wants to access or wants to publish.
+
 The decription must be done with SPARQL property paths (a sequence of property names).
 
 For non-SPARQL litterates, a textual description can be provided.
@@ -88,17 +89,17 @@ The default value is the 'optional' value</xs:documentation>
 													</xs:simpleContent>
 												</xs:complexType>
 											</xs:element>
-										</xs:sequence>
-									</xs:complexType>
-								</xs:element>
-								<xs:element name="filters" minOccurs="0">
-									<xs:annotation>
-										<xs:documentation>DO NOT USE
+											<xs:element name="filters" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>DO NOT USE
 </xs:documentation>
-									</xs:annotation>
-									<xs:complexType>
-										<xs:sequence maxOccurs="unbounded">
-											<xs:element name="filter" type="xs:string" nillable="false"/>
+												</xs:annotation>
+												<xs:complexType>
+													<xs:sequence maxOccurs="unbounded">
+														<xs:element name="filter" type="xs:string" nillable="false"/>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
 										</xs:sequence>
 									</xs:complexType>
 								</xs:element>
@@ -108,11 +109,43 @@ The default value is the 'optional' value</xs:documentation>
 									</xs:annotation>
 								</xs:element>
 							</xs:choice>
+							<xs:element name="publication" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Data published by the application.
+
+An applictaion can write any information in the profile : those information are private by default.
+
+To give access to those data to other applications, the public data must be expressed  in this part with SPARQL property paths.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="propertyPath">
+											<xs:annotation>
+												<xs:documentation>The SPARQL path to the value that the service wants to publish
+
+Example with the profile.ttl :
+ - An application that wants to publish the Tray elements must specify the following path:
+     profile:trayElement 
+
+ - An application that wants to publish the family name :
+       
+foaf:familyName
+</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string"/>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
-			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="3.0"/>
+			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="4.0"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:attribute name="type">

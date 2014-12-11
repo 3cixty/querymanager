@@ -39,8 +39,7 @@ import org.theresis.humanization.privacy.conf.PrivacyAuthorityConf;
 public class PrivacyAuthorityTest {
 
 	private static String					passwordSA		= "toto";
-	private static String					passwordAPI		= "titi";
-	private static String					passwordAdmin	= "tata";
+	private static String					passwordAdmin	= "toto";
 	private static CertificationRequestId	reqId			= null;
 	private static CertificationRequestId	reqIdUpdate		= null;
 	
@@ -48,7 +47,7 @@ public class PrivacyAuthorityTest {
 	public static void setUpBeforeClass() throws Exception {
 
 		PrivacyAuthorityConf.setPropertyFile("DefaultPrivacyAuthority.properties");
-		PrivacyDBInitialize.resetAndInit(passwordSA, passwordSA, passwordAPI, passwordAdmin);
+		PrivacyDBInitialize.resetAndInit(passwordSA, passwordSA, passwordAdmin);
 		reqId = null;
 		reqIdUpdate = null;
 	}
@@ -63,7 +62,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
+			auth = PrivacyCertAuthorityFactory.build( );
 			
 			CertificationAndPrivacyRequest.PocInformation 
 				poc = new CertificationAndPrivacyRequest.PocInformation("3cixty", "poalo sino", "poalo.sini@tin.it", "+336728972872");
@@ -100,7 +99,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
-			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
+			auth = PrivacyCertAuthorityFactory.build( );
 			
 			CertificationAndPrivacyRequest.PocInformation 
 				poc = new CertificationAndPrivacyRequest.PocInformation("3cixty", "poalo sino", "poalo.sini@tin.it", "+336728972872");
@@ -136,7 +135,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
-			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
+			auth = PrivacyCertAuthorityFactory.build( );
 			
 			RequestStatus reqStatus = auth.getRequestStatus( appKey, reqId );
 			
@@ -162,7 +161,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 
-			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
+			auth = PrivacyCertAuthorityFactory.build( );
 			
 			RequestStatus reqStatus = auth.getRequestStatus( appKey, new CertificationRequestId( UUID.randomUUID() ) );
 			
@@ -188,7 +187,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
+			auth = PrivacyCertAuthorityFactory.build( );
 						
 			FileInputStream certificateSigningRequest;
 			FileInputStream privacyContract;
@@ -220,7 +219,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
+			auth = PrivacyCertAuthorityFactory.build( );
 						
 			FileInputStream certificateSigningRequest;
 			FileInputStream privacyContract;
@@ -253,7 +252,7 @@ public class PrivacyAuthorityTest {
 		CertificationAndPrivacyRequest auth = null;
 		try {
 			
-			auth = PrivacyCertAuthorityFactory.build( passwordAPI );
+			auth = PrivacyCertAuthorityFactory.build( );
 						
 			FileInputStream certificateSigningRequest;
 			FileInputStream privacyContract;
