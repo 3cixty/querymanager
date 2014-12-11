@@ -70,38 +70,43 @@ public class GoogleAccountUtils {
 			// select circles you want the app to get info form.
 			// then select only me.
 			// finaly say authourize.
-			reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
-					+ accessToken);
-			json = new JSONObject(reqMsg);
-			
-			String nextPageToken = null;
-		 	Set<String> knows = new HashSet<String>();
-			
-		 	
-			if (json.has("nextPageToken")){		
-				while(json.has("nextPageToken")){
-					nextPageToken = json.getString("nextPageToken");
+			// XXX: quick fix as TI could not get ProfileImage. Need to deal with Android OAuth Client to be able to get knows from Android Google access token
+			try {
+				reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+						+ accessToken);
+				json = new JSONObject(reqMsg);
+
+				String nextPageToken = null;
+				Set<String> knows = new HashSet<String>();
+
+
+				if (json.has("nextPageToken")){		
+					while(json.has("nextPageToken")){
+						nextPageToken = json.getString("nextPageToken");
+						JSONArray jsonArray = json.getJSONArray("items");
+						int length=jsonArray.length();
+						for (int i = 0; i < length; i++) {
+							JSONObject jObject = jsonArray.getJSONObject(i);
+							knows.add(jObject.getString("id"));
+						}
+						reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+								+ accessToken+"&pageToken="+nextPageToken);
+						json = new JSONObject(reqMsg);
+					}
+				}
+				else{
 					JSONArray jsonArray = json.getJSONArray("items");
 					int length=jsonArray.length();
 					for (int i = 0; i < length; i++) {
-							JSONObject jObject = jsonArray.getJSONObject(i);
-							knows.add(jObject.getString("id"));
-					}
-					reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
-							+ accessToken+"&pageToken="+nextPageToken);
-					json = new JSONObject(reqMsg);
-				}
-			}
-			else{
-				JSONArray jsonArray = json.getJSONArray("items");
-				int length=jsonArray.length();
-				for (int i = 0; i < length; i++) {
 						JSONObject jObject = jsonArray.getJSONObject(i);
 						knows.add(jObject.getString("id"));
-				}
-			}			
-			
-			profile.setKnows(knows);
+					}
+				}			
+
+				profile.setKnows(knows);
+			} catch (Exception ex) {
+				LOGGER.error(ex.getMessage());
+			}
 
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
