@@ -40,7 +40,6 @@ import eu.threecixty.querymanager.EventMediaFormat;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
-import eu.threecixty.querymanager.ScopeFilterUtils;
 import eu.threecixty.querymanager.ThreeCixtyQuery;
 
 /**
@@ -547,18 +546,19 @@ public class QueryManagerServices {
 		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
 		qm.setForDateRanges(isForDateRages);
 		
-		if (needToCheckPredicate) {
-			if (ScopeFilterUtils.containExplicitKnowsOrFollowsPredicate(jenaQuery)) {
-				throw new ThreeCixtyPermissionException("You are not allowed to access KNOWS or FOLLOWS list");
-			}
-			ScopeFilterUtils.addFilterToRestrictKnows(jenaQuery);
-
-			if (limitToProfile) {
-				if (ScopeFilterUtils.containExplicitProfilePredicate(jenaQuery))
-					throw new ThreeCixtyPermissionException("You are not allowed to access USER PROFILE");
-				ScopeFilterUtils.addFilterToRestrictProfile(jenaQuery);
-			}
-		}
+		// now we only use one private graph and do not support private info in the query.
+//		if (needToCheckPredicate) {
+//			if (ScopeFilterUtils.containExplicitKnowsOrFollowsPredicate(jenaQuery)) {
+//				throw new ThreeCixtyPermissionException("You are not allowed to access KNOWS or FOLLOWS list");
+//			}
+//			ScopeFilterUtils.addFilterToRestrictKnows(jenaQuery);
+//
+//			if (limitToProfile) {
+//				if (ScopeFilterUtils.containExplicitProfilePredicate(jenaQuery))
+//					throw new ThreeCixtyPermissionException("You are not allowed to access USER PROFILE");
+//				ScopeFilterUtils.addFilterToRestrictProfile(jenaQuery);
+//			}
+//		}
 
 		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
 
