@@ -153,8 +153,8 @@ public class VirtuosoTrayStorage implements TrayManager {
 		StringBuffer buf = new StringBuffer(PREFIXES);
 		buf.append(" DELETE WHERE { GRAPH <").append(getGraphName(token)).append("> \n");
 		buf.append("{\n");
-		buf.append(personUri).append(" ").append(PROFILE_TRAY_ELEMENT_PREDICATE).append(" ?tray .\n");
 		buf.append(" ?tray ?p ?o .\n");
+		buf.append(personUri).append(" ").append(PROFILE_TRAY_ELEMENT_PREDICATE).append(" ?tray .\n");
 		buf.append("}}");
 		
 		try {
