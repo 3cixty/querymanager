@@ -25,7 +25,8 @@ public class Configuration {
 			+"prefix xsd:	<http://www.w3.org/2001/XMLSchema#> "
 			+ PROFILE_PREFIX
 			+"prefix frap:	<http://purl.org/frap#> "
-			+"prefix dc:	<http://purl.org/dc/elements/1.1/> ";
+			+"prefix dc:	<http://purl.org/dc/elements/1.1/> "
+			+ "prefix fn: <http://www.w3.org/2005/xpath-functions#>";
 
 
 	public synchronized static void setPath(String path) {
