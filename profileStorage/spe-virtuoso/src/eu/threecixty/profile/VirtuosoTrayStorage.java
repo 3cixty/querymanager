@@ -42,7 +42,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	private static final String PREFIX_RATING = "http://data.linkedevents.org/def/location#rating";
 	private static final String LONG_SCHEMA = "^^<http://www.w3.org/2001/XMLSchema#long>";
 	
-	private static final Pattern PATTERN = Pattern.compile("([a-z]*[A-Z]*[0-9]*[-]*)*");
+	private static final Pattern PATTERN = Pattern.compile("([a-z]*[A-Z]*[0-9]*[-]*[/]*[:]*[.]*)*");
 	
 	private static final String INVALID_TRAY_ELEMENT_EXCEPTION_MSG =
 			"The UID and tray element ID must conform to the following pattern: ([a-z]*[A-Z]*[0-9]*[-]*[/]*[:]*[.]*)*";
