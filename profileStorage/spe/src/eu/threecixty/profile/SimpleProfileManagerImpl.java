@@ -152,6 +152,12 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		return GoFlowImpl.getInstance();
 	}
 
+	@Override
+	public TrayManager getTrayManager() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/**
 	 * get MobidotIDs For the 3cixty Users
 	 * @return

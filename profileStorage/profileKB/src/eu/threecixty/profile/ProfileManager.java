@@ -212,6 +212,12 @@ public interface ProfileManager {
 	 * @return
 	 */
 	Partner getGoFlow();
+	
+	/**
+	 * Gets interface to deal with Tray element.
+	 * @return
+	 */
+	TrayManager getTrayManager();
 
 	
 	public class StartAndEndDate {

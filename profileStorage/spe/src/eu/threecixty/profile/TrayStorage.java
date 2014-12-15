@@ -22,13 +22,28 @@ import eu.threecixty.profile.Tray.OrderType;
  * @author Cong-Kinh NGUYEN
  *
  */
-public class TrayStorage {
+public class TrayStorage implements TrayManager {
 
+	private static final Object _sync = new Object();
+	
 	private static final String TRAY_FILENAME = "temporaryTrayFile.json";
 	
+	private static TrayStorage instance;
+	
 	private static String path;
+	
+	public static TrayManager getInstance() {
+		if (instance == null) {
+			synchronized (_sync) {
+				if (instance == null) {
+					instance = new TrayStorage();
+				}
+			}
+		}
+		return instance;
+	}
 
-	public synchronized static boolean addTray(Tray tray) {
+	public synchronized boolean addTray(Tray tray) {
 		if (tray == null) return false;
 		List <Tray> allTrays = getAllTrays();
 		if (checkTrayExisted(tray, allTrays)) {
@@ -38,7 +53,7 @@ public class TrayStorage {
 		return save(allTrays);
 	}
 	
-	public synchronized static boolean deleteTray(Tray tray) {
+	public synchronized boolean deleteTray(Tray tray) {
 		if (tray == null) return false;
 		List <Tray> allTrays = getAllTrays();
 
@@ -59,7 +74,7 @@ public class TrayStorage {
 		return save(allTrays);
 	}
 
-	public synchronized static boolean replaceUID(String junkID, String uid) {
+	public synchronized boolean replaceUID(String junkID, String uid) {
 		if (junkID == null || uid == null) return false;
 		List <Tray> allTrays = getAllTrays();
 		boolean changed = false;
@@ -73,7 +88,7 @@ public class TrayStorage {
 		return save(allTrays);
 	}
 
-	public synchronized static boolean update(Tray tray) {
+	public synchronized boolean updateTray(Tray tray) {
 		if (tray == null) return false;
 		List <Tray> allTrays = getAllTrays();
 		
@@ -94,7 +109,7 @@ public class TrayStorage {
 		return save(allTrays);
 	}
 	
-	public static List <Tray> getTrays(String uid, int offset, int limit,
+	public synchronized List <Tray> getTrays(String uid, int offset, int limit,
 			OrderType orderType, boolean eventsPast) {
 		List <Tray> trays = getTrays(uid);
 		int firstIndex = (offset < 0) ? 0: offset;
@@ -111,7 +126,7 @@ public class TrayStorage {
 		return getTraysWithOrderAndEventPast(limitedTrays, orderType, eventsPast);
 	}
 	
-	public synchronized static boolean cleanTrays(String token) {
+	public synchronized boolean cleanTrays(String token) {
 		List <Tray> allTrays = getAllTrays();
 		List <Tray> trays = getTrays(allTrays, token);
 		allTrays.removeAll(trays);
@@ -149,13 +164,13 @@ public class TrayStorage {
 		return trays;
 	}
 
-	public static List <Tray> getTrays(String uid) {
+	public synchronized List <Tray> getTrays(String uid) {
 		if (uid == null) return new ArrayList <Tray>();
 		List <Tray> allTrays = getAllTrays();
 		return getTrays(allTrays, uid);
 	}
 
-	public static Tray getTray(String uid, String trayId) {
+	public synchronized Tray getTray(String uid, String trayId) {
 		if (uid == null || trayId == null) return null;
 		List <Tray> trays = getTrays(uid);
 		for (Tray tmp: trays) {

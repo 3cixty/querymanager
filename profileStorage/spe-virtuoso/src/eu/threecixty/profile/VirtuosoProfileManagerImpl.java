@@ -221,4 +221,9 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	public Partner getGoFlow() {
 		return GoFlowImpl.getInstance();
 	}
+
+	@Override
+	public TrayManager getTrayManager() {
+		return VirtuosoTrayStorage.getInstance();
+	}
 }

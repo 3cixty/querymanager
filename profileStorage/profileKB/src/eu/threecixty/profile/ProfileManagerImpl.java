@@ -206,6 +206,12 @@ public class ProfileManagerImpl implements ProfileManager {
 		return null;
 	}
 
+	@Override
+	public TrayManager getTrayManager() {
+		if (profileManager != null) return profileManager.getTrayManager();
+		return null;
+	}
+
 	private ProfileManagerImpl() {
 		boolean found = false;
 		try {
