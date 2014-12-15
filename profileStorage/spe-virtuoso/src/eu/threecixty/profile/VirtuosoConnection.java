@@ -141,7 +141,7 @@ public class VirtuosoConnection {
 			VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create(
 					sparql, virtGraph);
 			
-			QueryReturnClass qRC= new QueryReturnClass();
+			QueryReturnClass qRC = new QueryReturnClass(virtGraph, vqe);
 			qRC.setResultSelectVar(sparql.getResultVars());
 			qRC.setReturnedResultSet(vqe.execSelect());
 			qRC.setQuery(sparql);

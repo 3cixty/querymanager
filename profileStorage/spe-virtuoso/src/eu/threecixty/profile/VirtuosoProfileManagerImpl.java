@@ -175,7 +175,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			//mapper.setMobidotID(mobidotID);
 			idMapping.add(mapper);
 		}
-
+		qRC.closeConnection();
 		return idMapping;
 	}
 	/**
@@ -208,7 +208,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			mapper.setLastCrawlTime(lastCrawlTime);
 			idCrawlTimeMapping.add(mapper);
 		}
-
+		qRC.closeConnection();
 		return idCrawlTimeMapping;
 	}
 

@@ -134,6 +134,7 @@ public class VirtuosoUserProfileStorage {
 			if (knows == null || knows.size() == 0) return;
 			
 			//add new knows profiles
+			// TODO: refactor code to use batch queries to insert data here
 			Iterator <String> iterators = knows.iterator();
 			for ( ; iterators.hasNext(); ){
 				String know=iterators.next();
@@ -165,6 +166,7 @@ public class VirtuosoUserProfileStorage {
 					}
 
 				}
+				qRC.closeConnection();
 			}
 
 			str = GetSetQueryStrings.setMultipleKnows(uid,knows);
@@ -483,7 +485,7 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 		to.setHasLikes(toLikes);
-
+		qRC.closeConnection();
 		return;
 	}
 	
@@ -510,7 +512,7 @@ public class VirtuosoUserProfileStorage {
 				LOGGER.error(e.getMessage());
 			}
 		}
-		
+		qRC.closeConnection();
 		return;
 	}
 	
@@ -537,7 +539,7 @@ public class VirtuosoUserProfileStorage {
 				LOGGER.error(e.getMessage());
 			}
 		}
-		
+		qRC.closeConnection();
 		return;
 	}
 	
@@ -572,7 +574,7 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 		to.setHasName(toName);
-		
+		qRC.closeConnection();
 		return;
 	}
 
@@ -583,7 +585,7 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void loadProfileImageToUserProfile(String uid, eu.threecixty.profile.UserProfile to) {
 		String query = GetSetQueryStrings.createQueryToGetProfileImage(uid);
-		QueryReturnClass qRC=VirtuosoConnection.query(query);
+		QueryReturnClass qRC = VirtuosoConnection.query(query);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		for ( ; results.hasNext(); ) {
@@ -591,6 +593,7 @@ public class VirtuosoUserProfileStorage {
 			to.setProfileImage(qs.get("profileImage").toString());
 			break;
 		}
+		qRC.closeConnection();
 	}
 	
 	/**
@@ -636,7 +639,7 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 		to.setHasAddress(toAddress);
-					
+		qRC.closeConnection();			
 		return;
 	}
 	
@@ -680,7 +683,7 @@ public class VirtuosoUserProfileStorage {
 			
 		}
 		toUserProfile.setHasProfileIdenties(oldProfiles);
-					
+		qRC.closeConnection();
 		return;
 	}
 
@@ -715,7 +718,7 @@ public class VirtuosoUserProfileStorage {
 			
 		}
 		toUserProfile.setKnows(knows);
-					
+		qRC.closeConnection();
 		return;
 	}
 
@@ -798,7 +801,7 @@ public class VirtuosoUserProfileStorage {
 		}
 		
 		toPrefs.setHasTransport(toTransports);
-					
+		qRC.closeConnection();
 		return;
 	}
 
@@ -930,7 +933,7 @@ public class VirtuosoUserProfileStorage {
 			}
 			
 		}
-		
+		qRC.closeConnection();
 		return;
 	}
 
@@ -1016,7 +1019,7 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 		to.setHasTripPreference(tripPreferences);
-
+		qRC.closeConnection();
 		return;
 	}
 	
@@ -1052,7 +1055,7 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 		to.setHasPlacePreference(placePreferences);
-
+		qRC.closeConnection();
 		return;
 	}
 
@@ -1107,19 +1110,23 @@ public class VirtuosoUserProfileStorage {
 	    qStr.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
 	    qStr.append("}");
 	    
-	    QueryReturnClass qRC=VirtuosoConnection.query(qStr.toString());
+	    QueryReturnClass qRC = VirtuosoConnection.query(qStr.toString());
 		ResultSet results = qRC.getReturnedResultSet();
-		
+		boolean found = false;
 		for ( ; results.hasNext(); ) {
 			QuerySolution qs = results.next();
 			RDFNode tmpuid = qs.get("uid");
 			if (tmpuid != null && !tmpuid.asLiteral().getString().equals("")) {
-				if (DEBUG_MOD) LOGGER.info("Found UID = " + uid + " in Virtuoso");
-				return true;
+				found = true;
+				break;
 			}
 		}
-		if (DEBUG_MOD) LOGGER.info("Not found UID = " + uid + " in Virtuoso. Here is the sparql query: " + qStr.toString());	
-		return false;
+		qRC.closeConnection();
+		if (DEBUG_MOD) {
+			if (found) LOGGER.info("Found UID = " + uid + " in Virtuoso");
+			else LOGGER.info("Not found UID = " + uid + " in Virtuoso. Here is the sparql query: " + qStr.toString());	
+		}
+		return found;
 	}
 	
 	private VirtuosoUserProfileStorage() {
