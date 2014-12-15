@@ -8,6 +8,10 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import virtuoso.jena.driver.VirtGraph;
+import virtuoso.jena.driver.VirtuosoUpdateFactory;
+import virtuoso.jena.driver.VirtuosoUpdateRequest;
+
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -69,28 +73,40 @@ public class VirtuosoUserProfileStorage {
 	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
 		if (profile == null) return false;
 		try {
+			// TODO: should save user profile in two different steps
+			// first step to use batch queries to delete all data which needs to be removed
+			// second step to use batch queries to insert all data
+			// now, I am doing the second steps.
 			if (DEBUG_MOD) LOGGER.info("begin saving user profile");
-			saveUIDInfoTOKB(profile.getHasUID());
 			
-			saveGenderToKB(profile.getHasUID(),profile.getHasGender());
+			VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+			VirtuosoUpdateRequest vur = null;
+			
+			saveUIDInfoTOKB(profile.getHasUID(), vur, virtGraph);
+			
+			saveGenderToKB(profile.getHasUID(),profile.getHasGender(), vur, virtGraph);
 					
-			saveNameInfoToKB(profile.getHasUID(),profile.getHasName());
+			saveNameInfoToKB(profile.getHasUID(),profile.getHasName(), vur, virtGraph);
 			
-			saveProfileImage(profile.getHasUID(), profile.getProfileImage());
+			saveProfileImage(profile.getHasUID(), profile.getProfileImage(), vur, virtGraph);
 			
-			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress());
+			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress(), vur, virtGraph);
 			
-			saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime());
+			saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime(), vur, virtGraph);
 			
-			saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties());
+			saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties(), vur, virtGraph);
 			
-			saveKnowsToKB(profile.getHasUID(), profile.getKnows());
+			saveKnowsToKB(profile.getHasUID(), profile.getKnows(), vur, virtGraph);
 			
-			savePreferenceToKB(profile.getHasUID(), profile.getPreferences());
+			savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), vur, virtGraph);
 			if (profile.getPreferences()==null)
-				saveTransportToKB(profile.getHasUID(), null);
+				saveTransportToKB(profile.getHasUID(), null, vur, virtGraph);
 			else
-				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport());
+				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), vur, virtGraph);
+			
+			if (vur != null) vur.exec();
+			
+			virtGraph.close();
 			
 			if (DEBUG_MOD) LOGGER.info("end saving user profile");
 		} catch (Exception e) {
@@ -100,22 +116,14 @@ public class VirtuosoUserProfileStorage {
 		return false;
 	}
 
-	private static void saveUIDInfoTOKB(String uid) {
+	private static void saveUIDInfoTOKB(String uid, VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 
-		try {
-			
-			if (!existUID(uid)) {
-				// comment the following line as we only have one private graph
-				//VirtuosoManager.getInstance().createAccount(uid);
-				String insertQuery = GetSetQueryStrings.setUser(uid);
-				VirtuosoConnection.insertDeleteQuery(insertQuery);
-			}
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+		if (!existUID(uid)) {
+			// comment the following line as we only have one private graph
+			//VirtuosoManager.getInstance().createAccount(uid);
+			String insertQuery = GetSetQueryStrings.setUser(uid);
+			addBatchQuery(insertQuery, vur, virtGraph);
 		}
-		
 	}
 
 	/**
@@ -124,7 +132,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 * @param mf
 	 */
-	private static void saveKnowsToKB(String uid, Set <String> knows) {
+	private static void saveKnowsToKB(String uid, Set <String> knows, VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 
 		try {
 			
@@ -139,7 +147,7 @@ public class VirtuosoUserProfileStorage {
 			for ( ; iterators.hasNext(); ){
 				String know=iterators.next();
 
-				QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(know));
+				QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(know)); // need to refactor here
 
 				ResultSet results = qRC.getReturnedResultSet();
 				if (!results.hasNext()){
@@ -151,7 +159,7 @@ public class VirtuosoUserProfileStorage {
 
 						//if (uri==null){
 						str=GetSetQueryStrings.setUser(know);
-						VirtuosoConnection.insertDeleteQuery(str);
+						addBatchQuery(str, vur, virtGraph);
 						eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
 						profileIdentities.setHasSource("https://plus.google.com");
 						profileIdentities.setHasSourceCarrier("Google");
@@ -159,7 +167,8 @@ public class VirtuosoUserProfileStorage {
 						profileIdentities.setHasUserAccountID(know);
 						profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
 						str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
-						VirtuosoConnection.insertDeleteQuery(str);
+						
+						addBatchQuery(str, vur, virtGraph);
 						//}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -170,7 +179,7 @@ public class VirtuosoUserProfileStorage {
 			}
 
 			str = GetSetQueryStrings.setMultipleKnows(uid,knows);
-			VirtuosoConnection.insertDeleteQuery(str);
+			addBatchQuery(str, vur, virtGraph);
 			
 		} catch ( IOException  ex) {
 			ex.printStackTrace();
@@ -184,7 +193,8 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 * @param kbUserProfile
 	 */
-	private static void saveProfileIdentitiesToKB(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities) {
+	private static void saveProfileIdentitiesToKB(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 		
 		try {
 			
@@ -193,7 +203,7 @@ public class VirtuosoUserProfileStorage {
 			
 			if (profileIdentities!=null&&!profileIdentities.isEmpty()){
 				str = GetSetQueryStrings.setMultipleProfileIdentities(uid, profileIdentities);
-				VirtuosoConnection.insertDeleteQuery(str);
+				addBatchQuery(str, vur, virtGraph);
 			}
 			return;
 
@@ -209,14 +219,14 @@ public class VirtuosoUserProfileStorage {
 	 * @param uid
 	 * @param time
 	 */
-	private static void saveGenderToKB(String uid, String gender) {
+	private static void saveGenderToKB(String uid, String gender, VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 		try {
 
 			String str = GetSetQueryStrings.removeGender(uid);
 			VirtuosoConnection.insertDeleteQuery(str);
 			if (gender!=null){
 				str = GetSetQueryStrings.setGender(uid, gender);
-				VirtuosoConnection.insertDeleteQuery(str);
+				addBatchQuery(str, vur, virtGraph);
 			}
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
@@ -229,7 +239,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param uid
 	 * @param time
 	 */
-	private static void saveLastCrawlTimeToKB(String uid, String time) {
+	private static void saveLastCrawlTimeToKB(String uid, String time, VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 		
 		try {
 		
@@ -237,7 +247,7 @@ public class VirtuosoUserProfileStorage {
 			VirtuosoConnection.insertDeleteQuery(str);
 			
 			str = GetSetQueryStrings.setLastCrawlTime(uid, time);
-			VirtuosoConnection.insertDeleteQuery(str);
+			addBatchQuery(str, vur, virtGraph);
 		}catch ( IOException  ex) {
 			ex.printStackTrace();
 			LOGGER.error(ex.getMessage());
@@ -250,7 +260,8 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param likes
 	 */
-	private static void saveLikesToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference ){//Set<eu.threecixty.profile.oldmodels.Likes> likes) {
+	private static void saveLikesToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph){//Set<eu.threecixty.profile.oldmodels.Likes> likes) {
 		
 		try {
 
@@ -261,7 +272,7 @@ public class VirtuosoUserProfileStorage {
 				Set<eu.threecixty.profile.oldmodels.Likes> likes=preference.getHasLikes();
 				if (likes == null || likes.size() == 0) return;
 				str = GetSetQueryStrings.setMultipleLikes(uid, likes);
-				VirtuosoConnection.insertDeleteQuery(str);
+				addBatchQuery(str, vur, virtGraph);
 			}
 			return;
 
@@ -281,14 +292,15 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 * @param mf
 	 */
-	private static void savePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference) {
+	private static void savePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 			//if (preference!=null){
 				
-				saveLikesToKB(uid,  preference);//.getHasLikes());
+				saveLikesToKB(uid,  preference, vur, virtGraph);//.getHasLikes());
 				
-				saveTripPreferenceToKB(uid, preference);//.getHasTripPreference());
+				saveTripPreferenceToKB(uid, preference, vur, virtGraph);//.getHasTripPreference());
 				 
-				savePlacePreferenceToKB(uid, preference);//.getHasPlacePreference());
+				savePlacePreferenceToKB(uid, preference, vur, virtGraph);//.getHasPlacePreference());
 			//}
 	}
 
@@ -298,7 +310,8 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param placePreferences
 	 */
-	private static void savePlacePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference){//Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
+	private static void savePlacePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph){//Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
 		
 		try {
 				String str = GetSetQueryStrings.removePlacePreferences(uid);
@@ -310,7 +323,7 @@ public class VirtuosoUserProfileStorage {
 						for ( ; iterators.hasNext(); ){ 
 							eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
 							str = GetSetQueryStrings.setPlacePreferences(uid, placePreference);
-							VirtuosoConnection.insertDeleteQuery(str);
+							addBatchQuery(str, vur, virtGraph);
 						}
 					}						
 				}
@@ -327,7 +340,8 @@ public class VirtuosoUserProfileStorage {
 	 * @param preferenceURI
 	 * @param tripPreferences
 	 */
-	private static void saveTripPreferenceToKB(String uid,eu.threecixty.profile.oldmodels.Preference preference){// Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
+	private static void saveTripPreferenceToKB(String uid,eu.threecixty.profile.oldmodels.Preference preference,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph){// Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
 		
 		try {
 			String str = GetSetQueryStrings.removeMultipleTripPreferences(uid);
@@ -338,6 +352,7 @@ public class VirtuosoUserProfileStorage {
 				if (tripPreferences!=null&& tripPreferences.size() > 0){
 					str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
 					VirtuosoConnection.insertDeleteQuery(str);
+					addBatchQuery(str, vur, virtGraph);
 				}
 			}
 			return;
@@ -354,52 +369,45 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 * @param mf
 	 */
-	private static void saveTransportToKB(String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports) {
+	private static void saveTransportToKB(String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 		
-		try {
-			String str = null;
-			
-			if (transports!=null&&!transports.isEmpty()){
-				Iterator<eu.threecixty.profile.oldmodels.Transport> iterators=transports.iterator();
-				for ( ; iterators.hasNext(); ){ 
-					eu.threecixty.profile.oldmodels.Transport transport=iterators.next();
-					if (transport.getHasTransportURI()==null||transport.getHasTransportURI().isEmpty()) {
-						transport.setHasTransportURI(PROFILE_URI+uid+"/Mobility/"+UUID.randomUUID().toString());
+		String str = null;
+		
+		if (transports!=null&&!transports.isEmpty()){
+			Iterator<eu.threecixty.profile.oldmodels.Transport> iterators=transports.iterator();
+			for ( ; iterators.hasNext(); ){ 
+				eu.threecixty.profile.oldmodels.Transport transport=iterators.next();
+				if (transport.getHasTransportURI()==null||transport.getHasTransportURI().isEmpty()) {
+					transport.setHasTransportURI(PROFILE_URI+uid+"/Mobility/"+UUID.randomUUID().toString());
+				}
+				
+				if (transport.getHasAccompanyings()!=null&&!transport.getHasAccompanyings().isEmpty()){
+					str = GetSetQueryStrings.setMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasAccompanyings());
+					addBatchQuery(str, vur, virtGraph);
+				}
+				
+				Set <eu.threecixty.profile.oldmodels.RegularTrip> setRegTrip=transport.getHasRegularTrip();
+				
+				Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iteratorsRegularTrip=setRegTrip.iterator();
+				for ( ; iteratorsRegularTrip.hasNext(); ){ 
+					eu.threecixty.profile.oldmodels.RegularTrip regularTrip=iteratorsRegularTrip.next();
+					if (regularTrip.getHasRegularTripURI()==null||regularTrip.getHasRegularTripURI().isEmpty()) {
+						regularTrip.setHasRegularTripURI(transport.getHasTransportURI()+"/RegularTrip/"+UUID.randomUUID().toString());
 					}
-					
-					if (transport.getHasAccompanyings()!=null&&!transport.getHasAccompanyings().isEmpty()){
-						str = GetSetQueryStrings.setMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasAccompanyings());
-						VirtuosoConnection.insertDeleteQuery(str);
+					if (regularTrip.getHasPersonalPlacesNew()!=null&&!regularTrip.getHasPersonalPlacesNew().isEmpty()){
+						str = GetSetQueryStrings.setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
+						addBatchQuery(str, vur, virtGraph);
 					}
-					
-					Set <eu.threecixty.profile.oldmodels.RegularTrip> setRegTrip=transport.getHasRegularTrip();
-					
-					Iterator <eu.threecixty.profile.oldmodels.RegularTrip> iteratorsRegularTrip=setRegTrip.iterator();
-					for ( ; iteratorsRegularTrip.hasNext(); ){ 
-						eu.threecixty.profile.oldmodels.RegularTrip regularTrip=iteratorsRegularTrip.next();
-						if (regularTrip.getHasRegularTripURI()==null||regularTrip.getHasRegularTripURI().isEmpty()) {
-							regularTrip.setHasRegularTripURI(transport.getHasTransportURI()+"/RegularTrip/"+UUID.randomUUID().toString());
-						}
-						if (regularTrip.getHasPersonalPlacesNew()!=null&&!regularTrip.getHasPersonalPlacesNew().isEmpty()){
-							str = GetSetQueryStrings.setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
-							VirtuosoConnection.insertDeleteQuery(str);
-						}
-					}
-					if ( transport.getHasRegularTrip()!=null&&!transport.getHasRegularTrip().isEmpty()){
-						str = GetSetQueryStrings.setMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasRegularTrip());
-						VirtuosoConnection.insertDeleteQuery(str);
-					}
-					
-					str = GetSetQueryStrings.setTransport(uid, transport.getHasTransportURI());
-					VirtuosoConnection.insertDeleteQuery(str);
-				}		
-			}
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+				}
+				if ( transport.getHasRegularTrip()!=null&&!transport.getHasRegularTrip().isEmpty()){
+					str = GetSetQueryStrings.setMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasRegularTrip());
+					addBatchQuery(str, vur, virtGraph);
+				}
+				
+				str = GetSetQueryStrings.setTransport(uid, transport.getHasTransportURI());
+				addBatchQuery(str, vur, virtGraph);
+			}		
 		}
 	}
 
@@ -409,7 +417,8 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 * @param mf
 	 */
-	private static void saveNameInfoToKB(String uid, eu.threecixty.profile.oldmodels.Name name) {
+	private static void saveNameInfoToKB(String uid, eu.threecixty.profile.oldmodels.Name name,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 		
 		try {
 			
@@ -419,7 +428,7 @@ public class VirtuosoUserProfileStorage {
 			if (name!=null){
 				//name.setHasNameURI(PROFILE_URI+uid+"/Name");
 				str = GetSetQueryStrings.setName(uid, name);
-				VirtuosoConnection.insertDeleteQuery(str);
+				addBatchQuery(str, vur, virtGraph);
 			}
 
 		} catch ( IOException  ex) {
@@ -433,7 +442,8 @@ public class VirtuosoUserProfileStorage {
 	 * @param profile
 	 * @param kbUserProfile
 	 */
-	private static void saveAddressInfoToKB(String uid,	eu.threecixty.profile.oldmodels.Address address) {
+	private static void saveAddressInfoToKB(String uid,	eu.threecixty.profile.oldmodels.Address address,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 	
 		try {
 		
@@ -443,7 +453,7 @@ public class VirtuosoUserProfileStorage {
 			if (address!=null){
 				address.setHasAddressURI(PROFILE_URI+uid+"/Address");
 				str = GetSetQueryStrings.setAddress(uid, address);
-				VirtuosoConnection.insertDeleteQuery(str);
+				addBatchQuery(str, vur, virtGraph);
 			}
 
 		} catch ( IOException  ex) {
@@ -1079,7 +1089,8 @@ public class VirtuosoUserProfileStorage {
 	 * @param uid
 	 * @param profileImageLink
 	 */
-	private static void saveProfileImage(String uid, String profileImageLink) {
+	private static void saveProfileImage(String uid, String profileImageLink,
+			VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
 		if (profileImageLink == null || profileImageLink.equals("")) return;
 		String queryToDeleteOldValue = GetSetQueryStrings.createQueryToDeleteProfileImage(uid);
 		try {
@@ -1088,11 +1099,7 @@ public class VirtuosoUserProfileStorage {
 			e.printStackTrace();
 		}
 		String queryToInsertValue = GetSetQueryStrings.createQueryToInsertProfileImage(uid, profileImageLink);
-		try {
-			VirtuosoConnection.insertDeleteQuery(queryToInsertValue);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		addBatchQuery(queryToInsertValue, vur, virtGraph);
 	}
 	
 	/**
@@ -1127,6 +1134,17 @@ public class VirtuosoUserProfileStorage {
 			else LOGGER.info("Not found UID = " + uid + " in Virtuoso. Here is the sparql query: " + qStr.toString());	
 		}
 		return found;
+	}
+	
+	/**
+	 * Adds a given query to execute batch queries.
+	 * @param query
+	 * @param vur
+	 * @param virtGraph
+	 */
+	private static void addBatchQuery(String query, VirtuosoUpdateRequest vur, VirtGraph virtGraph) {
+		if (vur == null) vur = VirtuosoUpdateFactory.create(query, virtGraph);
+		else vur.addUpdate(query);
 	}
 	
 	private VirtuosoUserProfileStorage() {
