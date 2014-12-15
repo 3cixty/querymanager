@@ -45,7 +45,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	private static final Pattern PATTERN = Pattern.compile("([a-z]*[A-Z]*[0-9]*[-]*)*");
 	
 	private static final String INVALID_TRAY_ELEMENT_EXCEPTION_MSG =
-			"The UID and tray element ID must conform to the following pattern: ([a-z]*[A-Z]*[0-9]*[-]*)*";
+			"The UID and tray element ID must conform to the following pattern: ([a-z]*[A-Z]*[0-9]*[-]*[/]*[:]*[.]*)*";
 
 	private static final Object _sync = new Object();
 
