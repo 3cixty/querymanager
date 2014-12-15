@@ -10,13 +10,13 @@ import com.googlecode.jsonrpc4j.JsonRpcMethod;
 import com.googlecode.jsonrpc4j.JsonRpcError;
 import com.googlecode.jsonrpc4j.JsonRpcErrors;
 
-
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.profile.InvalidTrayElement;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.Tray;
-import eu.threecixty.profile.TrayStorage;
 import eu.threecixty.profile.Tray.OrderType;
 
 public class TrayServices implements TrayServicesIntf {
@@ -57,7 +57,7 @@ public class TrayServices implements TrayServicesIntf {
 		} else {
 			tray.setUid(uid);
 		}
-		if (!TrayStorage.addTray(tray)) {
+		if (!ProfileManagerImpl.getInstance().getTrayManager().addTray(tray)) {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.TRAY_ADD_SERVICE, CallLoggingConstants.FAILED);
 			throw new Throwable();
 		}
@@ -134,7 +134,7 @@ public class TrayServices implements TrayServicesIntf {
 
 		String uid = GoogleAccountUtils.getUID(token);
 
-		Tray tray = TrayStorage.getTray((uid == null || uid.equals("")) ? token : uid, element_id);
+		Tray tray = ProfileManagerImpl.getInstance().getTrayManager().getTray((uid == null || uid.equals("")) ? token : uid, element_id);
 		if (tray == null) throw new Throwable();
 		
 		if (element_type != null && !element_type.equals("")) tray.setItemType(element_type);
@@ -143,7 +143,7 @@ public class TrayServices implements TrayServicesIntf {
 		
 		
 		if (delete) {
-			if (!TrayStorage.deleteTray(tray)) {
+			if (!ProfileManagerImpl.getInstance().getTrayManager().deleteTray(tray)) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.FAILED);
 				throw new Throwable();
 			}
@@ -173,7 +173,7 @@ public class TrayServices implements TrayServicesIntf {
 			tray.setRating(rating);
 		}
 		
-		if (!TrayStorage.update(tray)) {
+		if (!ProfileManagerImpl.getInstance().getTrayManager().updateTray(tray)) {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.FAILED);
 			throw new Throwable();
 		}
@@ -496,7 +496,7 @@ public class TrayServices implements TrayServicesIntf {
 
 		String uid = GoogleAccountUtils.getUID(token);
 		
-		List <Tray> trays = TrayStorage.getTrays((uid == null || uid.equals("")) ? token : uid,
+		List <Tray> trays = ProfileManagerImpl.getInstance().getTrayManager().getTrays((uid == null || uid.equals("")) ? token : uid,
 				offset, limit, orderType, show_past_events);
 		if (trays == null) {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
@@ -730,10 +730,14 @@ public class TrayServices implements TrayServicesIntf {
 	private boolean cleanTrays(String token) {
 		if (token == null || token.equals("")) return false;
 		String uid = GoogleAccountUtils.getUID(token);
-		if (uid == null || uid.equals("")) {
-			return TrayStorage.cleanTrays(token);
+		try {
+			if (uid == null || uid.equals("")) {
+				return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(token);
+			}
+			return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(uid);
+		} catch (InvalidTrayElement e) {
+			return false;
 		}
-		return TrayStorage.cleanTrays(uid);
 	}
     
 	/**
@@ -745,8 +749,12 @@ public class TrayServices implements TrayServicesIntf {
 		if (junkToken == null || junkToken.equals("")) return null;
 		String uid = GoogleAccountUtils.getUID(googleToken);
 		if (uid == null || uid.equals("")) return null;
-		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
-		return TrayStorage.getTrays(uid, 0, -1, OrderType.Desc, true);
+		try {
+			if (!ProfileManagerImpl.getInstance().getTrayManager().replaceUID(junkToken, uid)) return null;
+			return ProfileManagerImpl.getInstance().getTrayManager().getTrays(uid, 0, -1, OrderType.Desc, true);
+		} catch (InvalidTrayElement e) {
+			return null;
+		}
 	}
 
 	private void checkAppKey(String key) throws InvalidKeyException {

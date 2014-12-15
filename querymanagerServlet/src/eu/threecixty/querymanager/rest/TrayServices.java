@@ -15,15 +15,18 @@ import javax.ws.rs.core.Response;
 
 
 
+
+
 import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.InvalidTrayElement;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.Tray;
-import eu.threecixty.profile.TrayStorage;
 import eu.threecixty.profile.Tray.OrderType;
 
 /**
@@ -119,7 +122,12 @@ public class TrayServices {
     			} catch (ThreeCixtyPermissionException e) {
     				return Response.status(Response.Status.FORBIDDEN)
     						.entity(e.getMessage())
-    						.type(MediaType.APPLICATION_JSON_TYPE)
+    						.type(MediaType.TEXT_PLAIN)
+    						.build();
+    			} catch (InvalidTrayElement e) {
+    				return Response.status(Response.Status.BAD_REQUEST)
+    						.entity(e.getMessage())
+    						.type(MediaType.TEXT_PLAIN_TYPE)
     						.build();
     			}
     		}
@@ -148,7 +156,7 @@ public class TrayServices {
      * @param restTray
      * @return
      */
-	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException {
+	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
 		String itemId = restTray.getElement_id();
 		if (itemId == null) return false;
 		String itemTypeStr = restTray.getElement_type();
@@ -182,7 +190,7 @@ public class TrayServices {
 			}
 			tray.setUid(uid);
 		}
-		return TrayStorage.addTray(tray);
+		return ProfileManagerImpl.getInstance().getTrayManager().addTray(tray);
 	}
 	
 	/**
@@ -190,7 +198,7 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private List<Tray> getTrayElements(RestTrayObject restTray) throws ThreeCixtyPermissionException {
+	private List<Tray> getTrayElements(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
 		String access_token = restTray.getToken();
 		String uid = OAuthWrappers.findGoogleUIDFrom(access_token);
 
@@ -206,7 +214,7 @@ public class TrayServices {
 				: orderStr.equalsIgnoreCase("Desc") ? OrderType.Desc : OrderType.Asc;
 		boolean showPastEvents = (restTray.getShow_past_events() == null) ? true : restTray.getShow_past_events();
 		
-		return TrayStorage.getTrays((uid == null || uid.equals("")) ? access_token : uid,
+		return ProfileManagerImpl.getInstance().getTrayManager().getTrays((uid == null || uid.equals("")) ? access_token : uid,
 				offset, limit, orderType, showPastEvents);
 	}
 	
@@ -215,15 +223,15 @@ public class TrayServices {
 	 * @param restTray
 	 * @return List of trays associated with a given junk token
 	 */
-	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException {
+	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
 		String junkToken = restTray.getJunk_token();
 		if (junkToken == null || junkToken.equals("")) return null;
 		String threeCixtyToken = restTray.getThree_cixty_token();
 		String uid = OAuthWrappers.findGoogleUIDFrom(threeCixtyToken);
 		if (uid == null || uid.equals("")) return null;
-		if (!TrayStorage.replaceUID(junkToken, uid)) return null;
+		if (!ProfileManagerImpl.getInstance().getTrayManager().replaceUID(junkToken, uid)) return null;
 		checkPermission(threeCixtyToken);
-		return TrayStorage.getTrays(uid, 0, -1, OrderType.Desc, true);
+		return ProfileManagerImpl.getInstance().getTrayManager().getTrays(uid, 0, -1, OrderType.Desc, true);
 	}
 
 	/**
@@ -231,15 +239,15 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException {
+	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
 		String token = restTray.getToken();
 		if (token == null || token.equals("")) return false;
 		String uid = OAuthWrappers.findGoogleUIDFrom(token);
 		if (uid == null || uid.equals("")) {
-			return TrayStorage.cleanTrays(token);
+			return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(token);
 		}
 		checkPermission(token);
-		return TrayStorage.cleanTrays(uid);
+		return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(uid);
 	}
 
 	/**
@@ -247,7 +255,7 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException {
+	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
 		String itemId = restTray.getElement_id();
 		if (itemId == null || itemId.equals("")) return false;
 		String token = restTray.getToken();
@@ -259,7 +267,7 @@ public class TrayServices {
 		    checkPermission(token);
 		}
 		
-		Tray tray = TrayStorage.getTray((uid == null || uid.equals("")) ? token : uid, itemId);
+		Tray tray = ProfileManagerImpl.getInstance().getTrayManager().getTray((uid == null || uid.equals("")) ? token : uid, itemId);
 		if (tray == null) return false;
 		tray.setItemId(itemId);
 		
@@ -277,7 +285,7 @@ public class TrayServices {
 
 		
 		if (restTray.getDelete() != null && restTray.getDelete().booleanValue()) {
-			return TrayStorage.deleteTray(tray);
+			return ProfileManagerImpl.getInstance().getTrayManager().deleteTray(tray);
 		}
 		
 		boolean attended = (restTray.getAttend() == Boolean.TRUE);
@@ -302,7 +310,7 @@ public class TrayServices {
 			tray.setRating(restTray.getRating());
 		}
 		
-		return TrayStorage.update(tray);
+		return ProfileManagerImpl.getInstance().getTrayManager().updateTray(tray);
 	}
 	
 	private void checkPermission(String token) throws ThreeCixtyPermissionException {
