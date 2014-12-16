@@ -1,6 +1,5 @@
 package eu.threecixty.profile;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -75,45 +74,50 @@ public class VirtuosoUserProfileStorage {
 	public synchronized static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
 		if (profile == null) return false;
 		try {
-			// TODO: should save user profile in two different steps
-			// first step to use batch queries to delete all data which needs to be removed
-			// second step to use batch queries to insert all data
-			// now, I am doing the second steps.
+
 			if (DEBUG_MOD) LOGGER.info("begin saving user profile");
 			
-			List <String> queries = new LinkedList <String>();
+			List <String> queriesToInsertData = new LinkedList <String>();
+			List <String> queriesToRemoveData = new LinkedList <String>();
 			
 			VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
-			VirtuosoUpdateRequest vur = null;
+			VirtuosoUpdateRequest vurToInsertData = null;
 			
-			saveUIDInfoTOKB(profile.getHasUID(), queries);
+			saveUIDInfoTOKB(profile.getHasUID(), queriesToInsertData);
 			
-			saveGenderToKB(profile.getHasUID(),profile.getHasGender(), queries);
+			saveGenderToKB(profile.getHasUID(),profile.getHasGender(), queriesToRemoveData, queriesToInsertData);
 					
-			saveNameInfoToKB(profile.getHasUID(),profile.getHasName(), queries);
+			saveNameInfoToKB(profile.getHasUID(),profile.getHasName(), queriesToRemoveData, queriesToInsertData);
 			
-			saveProfileImage(profile.getHasUID(), profile.getProfileImage(), queries);
+			saveProfileImage(profile.getHasUID(), profile.getProfileImage(), queriesToRemoveData, queriesToInsertData);
 			
-			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress(), queries);
+			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress(), queriesToRemoveData, queriesToInsertData);
 			
-			saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime(), queries);
+			saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime(), queriesToRemoveData, queriesToInsertData);
 			
-			saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties(), queries);
+			saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties(), queriesToRemoveData, queriesToInsertData);
 			
-			saveKnowsToKB(profile.getHasUID(), profile.getKnows(), queries);
+			saveKnowsToKB(profile.getHasUID(), profile.getKnows(), queriesToRemoveData, queriesToInsertData);
 			
-			savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), queries);
+			savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), queriesToRemoveData, queriesToInsertData);
 			if (profile.getPreferences()==null)
-				saveTransportToKB(profile.getHasUID(), null, queries);
+				saveTransportToKB(profile.getHasUID(), null, queriesToRemoveData, queriesToInsertData);
 			else
-				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), queries);
+				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), queriesToRemoveData, queriesToInsertData);
 			
-			for (String query: queries) {
-				if (vur == null) vur = VirtuosoUpdateFactory.create(query, virtGraph);
-				else vur.addUpdate(query);
+			VirtuosoUpdateRequest vurToRemoveData = null;
+			for (String query: queriesToRemoveData) {
+				if (vurToRemoveData == null) vurToRemoveData = VirtuosoUpdateFactory.create(query, virtGraph);
+				else vurToRemoveData.addUpdate(query);
+			}
+			if (vurToRemoveData != null) vurToRemoveData.exec();
+			
+			for (String query: queriesToInsertData) {
+				if (vurToInsertData == null) vurToInsertData = VirtuosoUpdateFactory.create(query, virtGraph);
+				else vurToInsertData.addUpdate(query);
 			}
 			
-			if (vur != null) vur.exec();
+			if (vurToInsertData != null) vurToInsertData.exec();
 			
 			virtGraph.close();
 			
@@ -141,59 +145,53 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 * @param mf
 	 */
-	private static void saveKnowsToKB(String uid, Set <String> knows, List <String> queries) {
+	private static void saveKnowsToKB(String uid, Set <String> knows, List <String> queriesToRemoveData,
+			List <String> queriesToInsertData) {
 
-		try {
-			
-			String str = GetSetQueryStrings.removeAllKnows(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-			
-			if (knows == null || knows.size() == 0) return;
-			
-			//add new knows profiles
-			// TODO: refactor code to use batch queries to insert data here
-			Iterator <String> iterators = knows.iterator();
-			for ( ; iterators.hasNext(); ){
-				String know=iterators.next();
+		String str = GetSetQueryStrings.removeAllKnows(uid);
+		queriesToRemoveData.add(str);
+		
+		if (knows == null || knows.size() == 0) return;
+		
+		//add new knows profiles
+		// TODO: refactor code to use batch queries to insert data here
+		Iterator <String> iterators = knows.iterator();
+		for ( ; iterators.hasNext(); ){
+			String know=iterators.next();
 
-				QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(know)); // need to refactor here
+			QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getUserURI(know)); // need to refactor here
 
-				ResultSet results = qRC.getReturnedResultSet();
-				if (!results.hasNext()){
-					//for ( ; results.hasNext(); ) {
-					//QuerySolution qs = results.next();
-					try {
+			ResultSet results = qRC.getReturnedResultSet();
+			if (!results.hasNext()){
+				//for ( ; results.hasNext(); ) {
+				//QuerySolution qs = results.next();
+				try {
 
-						//RDFNode uri = qs.get("uri");
+					//RDFNode uri = qs.get("uri");
 
-						//if (uri==null){
-						str=GetSetQueryStrings.setUser(know);
-						queries.add(str);
-						eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
-						profileIdentities.setHasSource("https://plus.google.com");
-						profileIdentities.setHasSourceCarrier("Google");
-						profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
-						profileIdentities.setHasUserAccountID(know);
-						profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
-						str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
-						
-						queries.add(str);
-						//}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
+					//if (uri==null){
+					str=GetSetQueryStrings.setUser(know);
+					queriesToInsertData.add(str);
+					eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
+					profileIdentities.setHasSource("https://plus.google.com");
+					profileIdentities.setHasSourceCarrier("Google");
+					profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
+					profileIdentities.setHasUserAccountID(know);
+					profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
+					str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
+					
+					queriesToInsertData.add(str);
+					//}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				qRC.closeConnection();
-			}
 
-			str = GetSetQueryStrings.setMultipleKnows(uid,knows);
-			queries.add(str);
-			
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+			}
+			qRC.closeConnection();
 		}
+
+		str = GetSetQueryStrings.setMultipleKnows(uid,knows);
+		queriesToInsertData.add(str);
 	}
 
 	/**
@@ -203,24 +201,16 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 */
 	private static void saveProfileIdentitiesToKB(String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities,
-			List <String> queries) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
 		
-		try {
-			
-			String str = GetSetQueryStrings.removeAllProfileIdentitiesOfUser(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-			
-			if (profileIdentities!=null&&!profileIdentities.isEmpty()){
-				str = GetSetQueryStrings.setMultipleProfileIdentities(uid, profileIdentities);
-				queries.add(str);
-			}
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+		String str = GetSetQueryStrings.removeAllProfileIdentitiesOfUser(uid);
+		queriesToRemoveData.add(str);
+		
+		if (profileIdentities!=null&&!profileIdentities.isEmpty()){
+			str = GetSetQueryStrings.setMultipleProfileIdentities(uid, profileIdentities);
+			queriesToInsertData.add(str);
 		}
+		return;
 	}
 
 	/**
@@ -228,18 +218,13 @@ public class VirtuosoUserProfileStorage {
 	 * @param uid
 	 * @param time
 	 */
-	private static void saveGenderToKB(String uid, String gender, List <String> queries) {
-		try {
-
-			String str = GetSetQueryStrings.removeGender(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-			if (gender!=null){
-				str = GetSetQueryStrings.setGender(uid, gender);
-				queries.add(str);
-			}
-		}catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+	private static void saveGenderToKB(String uid, String gender,
+			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
+		String str = GetSetQueryStrings.removeGender(uid);
+		queriesToRemoveData.add(str);
+		if (gender!=null){
+			str = GetSetQueryStrings.setGender(uid, gender);
+			queriesToInsertData.add(str);
 		}
 	}
 	
@@ -248,19 +233,14 @@ public class VirtuosoUserProfileStorage {
 	 * @param uid
 	 * @param time
 	 */
-	private static void saveLastCrawlTimeToKB(String uid, String time, List <String> queries) {
+	private static void saveLastCrawlTimeToKB(String uid, String time, List <String> queriesToRemoveData,
+			List <String> queriesToInsertData) {
 		
-		try {
+		String str = GetSetQueryStrings.removeLastCrawlTime(uid);
+		queriesToRemoveData.add(str);
 		
-			String str = GetSetQueryStrings.removeLastCrawlTime(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-			
-			str = GetSetQueryStrings.setLastCrawlTime(uid, time);
-			queries.add(str);
-		}catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
-		}
+		str = GetSetQueryStrings.setLastCrawlTime(uid, time);
+		queriesToInsertData.add(str);
 	}
 	
 	/**
@@ -270,26 +250,18 @@ public class VirtuosoUserProfileStorage {
 	 * @param likes
 	 */
 	private static void saveLikesToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference,
-			List <String> queries){//Set<eu.threecixty.profile.oldmodels.Likes> likes) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData){//Set<eu.threecixty.profile.oldmodels.Likes> likes) {
 		
-		try {
+		String str = GetSetQueryStrings.removeAllLikesOfUser(uid);
+		queriesToRemoveData.add(str);
 
-			String str = GetSetQueryStrings.removeAllLikesOfUser(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-		
-			if (preference!=null){//likes!=null&&!likes.isEmpty()){
-				Set<eu.threecixty.profile.oldmodels.Likes> likes=preference.getHasLikes();
-				if (likes == null || likes.size() == 0) return;
-				str = GetSetQueryStrings.setMultipleLikes(uid, likes);
-				queries.add(str);
-			}
-			return;
-
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+		if (preference!=null){//likes!=null&&!likes.isEmpty()){
+			Set<eu.threecixty.profile.oldmodels.Likes> likes=preference.getHasLikes();
+			if (likes == null || likes.size() == 0) return;
+			str = GetSetQueryStrings.setMultipleLikes(uid, likes);
+			queriesToInsertData.add(str);
 		}
+		return;
 	}
 	
 	/**
@@ -302,14 +274,14 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 */
 	private static void savePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference,
-			List <String> queries) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
 			//if (preference!=null){
 				
-				saveLikesToKB(uid,  preference, queries);//.getHasLikes());
+				saveLikesToKB(uid,  preference, queriesToRemoveData, queriesToInsertData);//.getHasLikes());
 				
-				saveTripPreferenceToKB(uid, preference, queries);//.getHasTripPreference());
+				saveTripPreferenceToKB(uid, preference, queriesToRemoveData, queriesToInsertData);//.getHasTripPreference());
 				 
-				savePlacePreferenceToKB(uid, preference, queries);//.getHasPlacePreference());
+				savePlacePreferenceToKB(uid, preference, queriesToRemoveData, queriesToInsertData);//.getHasPlacePreference());
 			//}
 	}
 
@@ -320,27 +292,22 @@ public class VirtuosoUserProfileStorage {
 	 * @param placePreferences
 	 */
 	private static void savePlacePreferenceToKB(String uid, eu.threecixty.profile.oldmodels.Preference preference,
-			List <String> queries){//Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData){//Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences) {
 		
-		try {
-				String str = GetSetQueryStrings.removePlacePreferences(uid);
-				VirtuosoConnection.insertDeleteQuery(str);
-				if(preference!=null){
-					Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences=preference.getHasPlacePreference();
-					if (placePreferences!=null&&!placePreferences.isEmpty()){
-						Iterator <eu.threecixty.profile.oldmodels.PlacePreference> iterators=placePreferences.iterator();
-						for ( ; iterators.hasNext(); ){ 
-							eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
-							str = GetSetQueryStrings.setPlacePreferences(uid, placePreference);
-							queries.add(str);
-						}
-					}						
+		String str = GetSetQueryStrings.removePlacePreferences(uid);
+		queriesToRemoveData.add(str);
+		if(preference!=null){
+			Set<eu.threecixty.profile.oldmodels.PlacePreference> placePreferences=preference.getHasPlacePreference();
+			if (placePreferences!=null&&!placePreferences.isEmpty()){
+				Iterator <eu.threecixty.profile.oldmodels.PlacePreference> iterators=placePreferences.iterator();
+				for ( ; iterators.hasNext(); ){ 
+					eu.threecixty.profile.oldmodels.PlacePreference placePreference=iterators.next();
+					str = GetSetQueryStrings.setPlacePreferences(uid, placePreference);
+					queriesToInsertData.add(str);
 				}
-				return;
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+			}						
 		}
+		return;
 	}
 
 	/**
@@ -350,25 +317,20 @@ public class VirtuosoUserProfileStorage {
 	 * @param tripPreferences
 	 */
 	private static void saveTripPreferenceToKB(String uid,eu.threecixty.profile.oldmodels.Preference preference,
-			List <String> queries){// Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData){// Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences) {
 		
-		try {
-			String str = GetSetQueryStrings.removeMultipleTripPreferences(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-			if (preference!=null){
-			
-				Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences=preference.getHasTripPreference();
-				if (tripPreferences!=null&& tripPreferences.size() > 0){
-					str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
-					
-					queries.add(str);
-				}
+		String str = GetSetQueryStrings.removeMultipleTripPreferences(uid);
+		queriesToRemoveData.add(str);
+		if (preference!=null){
+		
+			Set<eu.threecixty.profile.oldmodels.TripPreference> tripPreferences=preference.getHasTripPreference();
+			if (tripPreferences!=null&& tripPreferences.size() > 0){
+				str = GetSetQueryStrings.setMultipleTripPreferences(uid, tripPreferences);
+				
+				queriesToInsertData.add(str);
 			}
-			return;
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
 		}
+		return;
 	}
 	
 	/**
@@ -379,7 +341,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 */
 	private static void saveTransportToKB(String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports,
-			List <String> queries) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
 		
 		String str = null;
 		
@@ -393,7 +355,7 @@ public class VirtuosoUserProfileStorage {
 				
 				if (transport.getHasAccompanyings()!=null&&!transport.getHasAccompanyings().isEmpty()){
 					str = GetSetQueryStrings.setMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasAccompanyings());
-					queries.add(str);
+					queriesToInsertData.add(str);
 				}
 				
 				Set <eu.threecixty.profile.oldmodels.RegularTrip> setRegTrip=transport.getHasRegularTrip();
@@ -406,16 +368,16 @@ public class VirtuosoUserProfileStorage {
 					}
 					if (regularTrip.getHasPersonalPlacesNew()!=null&&!regularTrip.getHasPersonalPlacesNew().isEmpty()){
 						str = GetSetQueryStrings.setMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTrip.getHasRegularTripURI(), regularTrip.getHasPersonalPlacesNew());
-						queries.add(str);
+						queriesToInsertData.add(str);
 					}
 				}
 				if ( transport.getHasRegularTrip()!=null&&!transport.getHasRegularTrip().isEmpty()){
 					str = GetSetQueryStrings.setMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.getHasTransportURI(), transport.getHasRegularTrip());
-					queries.add(str);
+					queriesToInsertData.add(str);
 				}
 				
 				str = GetSetQueryStrings.setTransport(uid, transport.getHasTransportURI());
-				queries.add(str);
+				queriesToInsertData.add(str);
 			}		
 		}
 	}
@@ -427,22 +389,15 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 */
 	private static void saveNameInfoToKB(String uid, eu.threecixty.profile.oldmodels.Name name,
-			List <String> queries) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
 		
-		try {
-			
-			String str = GetSetQueryStrings.removeName(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-			
-			if (name!=null){
-				//name.setHasNameURI(PROFILE_URI+uid+"/Name");
-				str = GetSetQueryStrings.setName(uid, name);
-				queries.add(str);
-			}
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+		String str = GetSetQueryStrings.removeName(uid);
+		queriesToRemoveData.add(str);
+		
+		if (name!=null){
+			//name.setHasNameURI(PROFILE_URI+uid+"/Name");
+			str = GetSetQueryStrings.setName(uid, name);
+			queriesToInsertData.add(str);
 		}
 	}
 
@@ -452,22 +407,15 @@ public class VirtuosoUserProfileStorage {
 	 * @param kbUserProfile
 	 */
 	private static void saveAddressInfoToKB(String uid,	eu.threecixty.profile.oldmodels.Address address,
-			List <String> queries) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
 	
-		try {
+		String str = GetSetQueryStrings.removeAddress(uid);
+		queriesToRemoveData.add(str);
 		
-			String str = GetSetQueryStrings.removeAddress(uid);
-			VirtuosoConnection.insertDeleteQuery(str);
-			
-			if (address!=null){
-				address.setHasAddressURI(PROFILE_URI+uid+"/Address");
-				str = GetSetQueryStrings.setAddress(uid, address);
-				queries.add(str);
-			}
-
-		} catch ( IOException  ex) {
-			ex.printStackTrace();
-			LOGGER.error(ex.getMessage());
+		if (address!=null){
+			address.setHasAddressURI(PROFILE_URI+uid+"/Address");
+			str = GetSetQueryStrings.setAddress(uid, address);
+			queriesToInsertData.add(str);
 		}
 	}
 
@@ -1099,16 +1047,13 @@ public class VirtuosoUserProfileStorage {
 	 * @param profileImageLink
 	 */
 	private static void saveProfileImage(String uid, String profileImageLink,
-			List <String> queries) {
+			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
 		if (profileImageLink == null || profileImageLink.equals("")) return;
 		String queryToDeleteOldValue = GetSetQueryStrings.createQueryToDeleteProfileImage(uid);
-		try {
-			VirtuosoConnection.insertDeleteQuery(queryToDeleteOldValue);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		queriesToRemoveData.add(queryToDeleteOldValue);
+
 		String queryToInsertValue = GetSetQueryStrings.createQueryToInsertProfileImage(uid, profileImageLink);
-		queries.add(queryToInsertValue);
+		queriesToInsertData.add(queryToInsertValue);
 	}
 	
 	/**
