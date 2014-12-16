@@ -154,7 +154,6 @@ public class VirtuosoUserProfileStorage {
 		if (knows == null || knows.size() == 0) return;
 		
 		//add new knows profiles
-		// TODO: refactor code to use batch queries to insert data here
 		Iterator <String> iterators = knows.iterator();
 		for ( ; iterators.hasNext(); ){
 			String know=iterators.next();
