@@ -66,14 +66,14 @@
       
     <dependency>
       <groupId>com.openlink.virtuoso</groupId>
-      <artifactId>virt_jena</artifactId>
-      <version>6.1.6</version>
+      <artifactId>virt_jena2</artifactId>
+      <version>1.0</version>
     </dependency>
     
     <dependency>
       <groupId>com.openlink.virtuoso</groupId>
-      <artifactId>virtjdbc3</artifactId>
-      <version>6.1.4</version>
+      <artifactId>virtjdbc4</artifactId>
+      <version>1.0</version>
     </dependency>
 
 </dependencies>

@@ -196,6 +196,12 @@ public interface ProfileManager {
 	Set<IDMapping> getIDMappings();
 	
 	/**
+	 * Map crawl times to User profile
+	 * @return
+	 */
+	Set<IDCrawlTimeMapping> getIDCrawlTimeMappings();
+	
+	/**
 	 * Gets Mobidot interface.
 	 * @return
 	 */
@@ -206,6 +212,13 @@ public interface ProfileManager {
 	 * @return
 	 */
 	Partner getGoFlow();
+	
+	/**
+	 * Gets interface to deal with Tray element.
+	 * @return
+	 */
+	TrayManager getTrayManager();
+
 	
 	public class StartAndEndDate {
 

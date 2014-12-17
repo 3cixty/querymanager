@@ -8,6 +8,8 @@ import eu.threecixty.profile.annotations.Description;
  *
  */
 public class UserPlaceRating {
+	@Description(hasText="UniqueID")
+	private String hasUserPlaceRatingURI="";
 	@Description(hasText="place details")
 	private PlaceDetail hasPlaceDetail;
 	@Description(hasText="User rating of the place")
@@ -18,6 +20,13 @@ public class UserPlaceRating {
 	// data is new 
 	private Boolean newForKB = null;
 	
+	
+	public String getHasUserPlaceRatingURI() {
+		return hasUserPlaceRatingURI;
+	}
+	public void setHasUserPlaceRatingURI(String hasUserPlaceRatingURI) {
+		this.hasUserPlaceRatingURI = hasUserPlaceRatingURI;
+	}
 	public PlaceDetail getHasPlaceDetail() {
 		return hasPlaceDetail;
 	}

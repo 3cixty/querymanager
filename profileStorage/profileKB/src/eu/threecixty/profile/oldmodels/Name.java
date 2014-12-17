@@ -8,6 +8,8 @@ import eu.threecixty.profile.annotations.Description;
  *
  */
 public class Name {
+	@Description(hasText="Name URI")
+	private String hasNameURI="";
 	@Description(hasText="first name")
 	private String givenName="";
 	@Description(hasText="middle name")
@@ -22,6 +24,15 @@ public class Name {
 	private String additionalName="";
 	@Description(hasText="nick name")
 	private String nickname="";
+	
+	
+	
+	public String getHasNameURI() {
+		return hasNameURI;
+	}
+	public void setHasNameURI(String hasNameURI) {
+		this.hasNameURI = hasNameURI;
+	}
 	public String getGivenName() {
 		return givenName;
 	}

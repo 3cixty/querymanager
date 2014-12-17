@@ -10,6 +10,8 @@ import eu.threecixty.profile.annotations.*;
  *
  */
 public class Preference {
+	@Description(hasText="UniqueID")
+	private String hasPreferenceURI="";
 	@Description(hasText = "Collection of likes the user has.")
 	private Set<Likes> hasLikes;
 	@Description(hasText = "Collection of user Entered rating the user is associated to.")
@@ -49,6 +51,17 @@ public class Preference {
 	
 	@MobidotInputs
 	private Set<Transport> hasTransport;
+
+	
+
+	public String getHasPreferenceURI() {
+		return hasPreferenceURI;
+	}
+
+
+	public void setHasPreferenceURI(String hasPreferenceURI) {
+		this.hasPreferenceURI = hasPreferenceURI;
+	}
 
 
 	public Set<Likes> getHasLikes() {

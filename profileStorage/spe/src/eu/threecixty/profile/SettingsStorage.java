@@ -24,7 +24,7 @@ public class SettingsStorage {
 	public synchronized static void save(ThreeCixtySettings settings) {
 		if (settings == null) return;
 		try {
-			UserProfile userProfile = new UserProfile();
+			UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(settings.getUid());
 			userProfile.setHasUID(settings.getUid());
 			
 			saveNameInfoToKB(settings, userProfile);

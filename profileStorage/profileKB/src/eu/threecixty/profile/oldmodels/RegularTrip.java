@@ -1,6 +1,8 @@
 package eu.threecixty.profile.oldmodels;
 
 
+import java.util.Set;
+
 import eu.threecixty.profile.annotations.Description;
  
 /**
@@ -10,6 +12,8 @@ import eu.threecixty.profile.annotations.Description;
  * @author Mobidot
 */
 public class RegularTrip {
+	@Description(hasText="UniqueURI")
+	private String hasRegularTripURI="";
 	@Description(hasText = "Trip name, formatted as [start street - end street, city] or "
 		+ "[start street, start city - end street, end city] or [place name 1 - place name 2], "
 		+ "to distinguish between trips")
@@ -31,7 +35,9 @@ public class RegularTrip {
     private Long hasRegularTripTotalCount; 
     @Description(hasText = "Important personal places along the trip route. In the simplest "
 		+ "form this could be start and end place only, but later also a school drop-off.")
-    private PersonalPlace[] hasPersonalPlaces; 
+    private  PersonalPlace[] hasPersonalPlaces;
+    //TODO: change to set
+    private  Set <PersonalPlace> hasPersonalPlacesNew; 
     @Description(hasText = "Modality used during trip: none, foot, bike, car, bus, ...")
     private ModalityType hasModalityType; 
     @Description(hasText = "Unique trip ID")
@@ -52,6 +58,15 @@ public class RegularTrip {
     private Long hasRegularTripLastChanged; 
     @Description(hasText = "Total travel time as function of the departure time")
     private String hasRegularTripTravelTimePattern="";
+	@Description(hasText = "Weather condition histogram")
+	private String hasRegularTripWeatherPattern;
+	
+    public String getHasRegularTripURI() {
+		return hasRegularTripURI;
+	}
+	public void setHasRegularTripURI(String hasRegularTripURI) {
+		this.hasRegularTripURI = hasRegularTripURI;
+	}
 	public String getHasRegularTripName() {
 		return hasRegularTripName;
 	}
@@ -100,6 +115,12 @@ public class RegularTrip {
 	}
 	public void setHasRegularTripTotalCount(Long hasRegularTripTotalCount) {
 		this.hasRegularTripTotalCount = hasRegularTripTotalCount;
+	}
+	public  Set <PersonalPlace> getHasPersonalPlacesNew() {
+		return hasPersonalPlacesNew;
+	}
+	public void setHasPersonalPlacesNew( Set <PersonalPlace> hasPersonalPlacesNew) {
+		this.hasPersonalPlacesNew = hasPersonalPlacesNew;
 	}
 	public PersonalPlace[] getHasPersonalPlaces() {
 		return hasPersonalPlaces;
@@ -167,6 +188,12 @@ public class RegularTrip {
 	public void setHasRegularTripTravelTimePattern(
 			String hasRegularTripTravelTimePattern) {
 		this.hasRegularTripTravelTimePattern = hasRegularTripTravelTimePattern;
+	}
+	public String getHasRegularTripWeatherPattern() {
+		return hasRegularTripWeatherPattern;
+	}
+	public void setHasRegularTripWeatherPattern(String hasRegularTripWeatherPattern) {
+		this.hasRegularTripWeatherPattern = hasRegularTripWeatherPattern;
 	}
     
     

@@ -16,6 +16,8 @@ public class ProfileInformation {
 	private String countryName;
 	private double latitude;
 	private double longitude;
+	
+	private String profileImage; // only support with Virtuoso
 
 	private Preference preference;
 
@@ -81,5 +83,13 @@ public class ProfileInformation {
 
 	public void setPreference(Preference preference) {
 		this.preference = preference;
+	}
+
+	public String getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
 	}
 }

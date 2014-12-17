@@ -10,39 +10,25 @@
   </parent>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>profileKB</artifactId>
-  <name>ProfileKB</name>
+  <artifactId>spe-virtuoso</artifactId>
+  <name>SPE Virtuoso</name>
   <packaging>jar</packaging>
   <version>1.0</version>
-  
-  <repositories>
-      <repository>
-          <id>mvn repo</id>
-          <url>http://repository.apache.org/content/groups/snapshots</url>
-      </repository>
-  </repositories>
-  
+
   <dependencies>
 
-<dependency>
-	<groupId>org.apache.jena</groupId>
-	<artifactId>jena-arq</artifactId>
-	<version>2.11.2</version>
-</dependency>
-
-
-    <!--  <dependency>
-	  <groupId>eu.3cixty</groupId>
-	  <artifactId>models</artifactId>
-	  <version>1.0</version>
-    </dependency>  -->
-            
     <dependency>
       <groupId>eu.3cixty</groupId>
-      <artifactId>3cixty-config</artifactId>
-      <version>1.0</version>
+      <artifactId>spe</artifactId>
+      <version>${project.version}</version>
+      
+      <exclusions>
+        <exclusion>
+          <groupId>eu.3cixty</groupId>
+          <artifactId>models</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-
             
     <dependency>
 	  <groupId>junit</groupId>

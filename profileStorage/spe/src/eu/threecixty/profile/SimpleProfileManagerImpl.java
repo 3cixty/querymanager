@@ -152,6 +152,12 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		return GoFlowImpl.getInstance();
 	}
 
+	@Override
+	public TrayManager getTrayManager() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/**
 	 * get MobidotIDs For the 3cixty Users
 	 * @return
@@ -192,5 +198,14 @@ class SimpleProfileManagerImpl implements ProfileManager {
 			}
 			qe.close();
 			return idMapping;
+	}
+
+	/**
+	 * XXX: We never integrate Crawler for RDF version.
+	 */
+	@Override
+	public Set<IDCrawlTimeMapping> getIDCrawlTimeMappings() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

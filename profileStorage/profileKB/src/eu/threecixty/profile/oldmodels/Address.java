@@ -9,8 +9,10 @@ import eu.threecixty.profile.annotations.Description;
  *
  */
 public class Address {
+	@Description(hasText="UniqueID")
+	private String hasAddressURI="";
 	@Description(hasText="Post office box")
-	private Long postOfficeBox;
+	private Long postOfficeBox=0L;
 	@Description(hasText="Street Address")
 	private String streetAddress="";
 	@Description(hasText="Name of the town")
@@ -19,13 +21,25 @@ public class Address {
 	private String postalCode="";
 	@Description(hasText="Country of residence")
 	private String countryName="";
+	@Description(hasText="HomeLocationURI")
+	private String hasHomeLocationURI="";
+	@Description(hasText="GeoCoordinatesURI")
+	private String hasGeoCoordinatesURI="";
 	@Description(hasText="longitude information. Uses http://www.w3.org/2006/vcard/ns#longitude")
 	private double longitute=0.0;
 	@Description(hasText="latitude information. Uses http://www.w3.org/2006/vcard/ns#latitude")
 	private double latitude=0.0;
+	
 	// For generating expression filter
 	private ThreeCixtyExpression threeCixtyExpr;
 	
+	
+	public String getHasAddressURI() {
+		return hasAddressURI;
+	}
+	public void setHasAddressURI(String hasAddressURI) {
+		this.hasAddressURI = hasAddressURI;
+	}
 	public Long getPostOfficeBox() {
 		return postOfficeBox;
 	}
@@ -56,6 +70,21 @@ public class Address {
 	public void setCountryName(String countryName) {
 		this.countryName = countryName;
 	}
+	
+	public String getHasHomeLocationURI() {
+		return hasHomeLocationURI;
+	}
+	public void setHasHomeLocationURI(String hasHomeLocationURI) {
+		this.hasHomeLocationURI = hasHomeLocationURI;
+	}
+	public String getHasGeoCoordinatesURI() {
+		return hasGeoCoordinatesURI;
+	}
+	public void setHasGeoCoordinatesURI(String hasGeoCoordinatesURI) {
+		this.hasGeoCoordinatesURI = hasGeoCoordinatesURI;
+	}
+	
+	
 	public double getLongitute() {
 		return longitute;
 	}

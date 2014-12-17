@@ -8,13 +8,24 @@ import eu.threecixty.profile.annotations.Description;
  *
  */
 public class ProfileIdentities {
+	@Description(hasText="ProfileIdentities URI")
+	private String hasProfileIdentitiesURI="";
 	@Description(hasText="User Social profile carrier other than 3cixty. @uses http://www.w3.org/2006/vcard/ns#url")
 	private String hasSource="";
+	@Description(hasText="User Social profile carrier other than 3cixty")
+	private String hasSourceCarrier="";
 	@Description(hasText="User ID on the Social profile carrier other than 3cixty")
     private String hasUserAccountID="";
 	@Description(hasText="User status on the profile identity being used. It tells whether the user is using the social media or not")
     private UserInteractionMode hasUserInteractionMode;
 	
+	
+	public String getHasProfileIdentitiesURI() {
+		return hasProfileIdentitiesURI;
+	}
+	public void setHasProfileIdentitiesURI(String hasProfileIdentitiesURI) {
+		this.hasProfileIdentitiesURI = hasProfileIdentitiesURI;
+	}
 	public String getHasSource() {
 		return hasSource;
 	}
@@ -32,6 +43,12 @@ public class ProfileIdentities {
 	}
 	public void setHasUserInteractionMode(UserInteractionMode hasUserInteractionMode) {
 		this.hasUserInteractionMode = hasUserInteractionMode;
+	}
+	public String getHasSourceCarrier() {
+		return hasSourceCarrier;
+	}
+	public void setHasSourceCarrier(String hasSourceCarrier) {
+		this.hasSourceCarrier = hasSourceCarrier;
 	}
 	
 }

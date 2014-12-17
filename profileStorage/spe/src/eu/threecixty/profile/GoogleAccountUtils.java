@@ -3,28 +3,38 @@ package eu.threecixty.profile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.oldmodels.Name;
 
 /**
  * Utility class to update account info.
  *
- * @author Cong-Kinh NGUYEN
+ * @author Rachit Agarwal
  *
  */
 public class GoogleAccountUtils {
 	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 GoogleAccountUtils.class.getName());
+	
 //	/**
-//	 * Validates a given access token, then extract Google info to update UserProfile if there is
+//	 * Validates a given access token, 
+//   * then extract Google info (name, knows) to update UserProfile if there is
 //	 * no information about this user.
 //	 * @param accessToken
 //	 * @return public user ID if the given access token is valid. Otherwise, the method returns an empty string.
 //	 */
 
 
-	public synchronized static String getUID(String accessToken) {
+	public static String getUID(String accessToken) {
 		if (accessToken == null) return "";
 		String user_id = null;
 		try {
@@ -39,19 +49,70 @@ public class GoogleAccountUtils {
 			String givenName = json.getString("given_name");
 			String familyName = json.getString("family_name");
 			
-			if (ProfileManagerImpl.getInstance().existUID(user_id)) return user_id; // no need to update info as it exists
+			// XXX: always save UserProfile to update with GoogleProfile
+			//if (ProfileManagerImpl.getInstance().existUID(user_id)) return user_id; // no need to update info as it exists
 			
-			UserProfile profile = new UserProfile();
+			String picture = json.getString("picture");
+			
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(user_id);
 			profile.setHasUID(user_id);
+			profile.setProfileImage(picture);
 			Name name = new Name();
 			profile.setHasName(name);
 			name.setGivenName(givenName);
 			name.setFamilyName(familyName);
 
+			if (json.has("gender")) {
+				profile.setHasGender(json.getString("gender"));
+			}
+			
+			// do this when login to 3cixty authorization say edit settings,
+			// select circles you want the app to get info form.
+			// then select only me.
+			// finaly say authourize.
+			// XXX: quick fix as TI could not get ProfileImage. Need to deal with Android OAuth Client to be able to get knows from Android Google access token
+			try {
+				reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+						+ accessToken);
+				json = new JSONObject(reqMsg);
+
+				String nextPageToken = null;
+				Set<String> knows = new HashSet<String>();
+
+
+				if (json.has("nextPageToken")){		
+					while(json.has("nextPageToken")){
+						nextPageToken = json.getString("nextPageToken");
+						JSONArray jsonArray = json.getJSONArray("items");
+						int length=jsonArray.length();
+						for (int i = 0; i < length; i++) {
+							JSONObject jObject = jsonArray.getJSONObject(i);
+							knows.add(jObject.getString("id"));
+						}
+						reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+								+ accessToken+"&pageToken="+nextPageToken);
+						json = new JSONObject(reqMsg);
+					}
+				}
+				else{
+					JSONArray jsonArray = json.getJSONArray("items");
+					int length=jsonArray.length();
+					for (int i = 0; i < length; i++) {
+						JSONObject jObject = jsonArray.getJSONObject(i);
+						knows.add(jObject.getString("id"));
+					}
+				}			
+
+				profile.setKnows(knows);
+			} catch (Exception ex) {
+				LOGGER.error(ex.getMessage());
+			}
+
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		if (user_id == null) return "";
 		return user_id;
