@@ -55,27 +55,31 @@ public class MobidotServices {
 	@GET
 	@Path("/getMobidotAccount")
 	public Response getAccount(@HeaderParam("access_token") String access_token) {
-		long starttime = System.currentTimeMillis();
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String appid = OAuthWrappers.retrieveApp(userAccessToken.getAppkey()).getAppNameSpace();
-			PartnerUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(userAccessToken.getUid());
-			PartnerAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, appid, ROLE);
-			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.MOBIDOT_GET_USER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			if (account != null) {
-				JSONObject jsonObj = new JSONObject();
-				jsonObj.put("username", account.getUsername());
-				jsonObj.put("password", account.getPassword());
-			    return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		try {
+			long starttime = System.currentTimeMillis();
+			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+				String appid = OAuthWrappers.retrieveApp(userAccessToken.getAppkey()).getAppNameSpace();
+				PartnerUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(userAccessToken.getUid());
+				PartnerAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, appid, ROLE);
+				CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.MOBIDOT_GET_USER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				if (account != null) {
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("username", account.getUsername());
+					jsonObj.put("password", account.getPassword());
+					return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+				} else {
+					return Response.ok("{}", MediaType.APPLICATION_JSON_TYPE).build();
+				}
 			} else {
-				return Response.ok("{}", MediaType.APPLICATION_JSON_TYPE).build();
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.MOBIDOT_GET_USER_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("The access token is invalid '" + access_token + "'")
+						.type(MediaType.TEXT_PLAIN)
+						.build());
 			}
-		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.MOBIDOT_GET_USER_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+		} catch (Exception e) {
+			return Response.serverError().build();
 		}
 	}
 
