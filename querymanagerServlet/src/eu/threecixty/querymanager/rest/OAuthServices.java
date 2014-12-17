@@ -190,37 +190,41 @@ public class OAuthServices {
 	@GET
 	@Path("/getApps")
 	public Response getApps(@QueryParam("google_access_token") String g_access_token, @DefaultValue("json") @QueryParam("format") String format) {
-		String uid = GoogleAccountUtils.getUID(g_access_token);
-		if (uid == null || uid.equals(""))
-			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
-		List <App> apps = OAuthWrappers.getApps(uid);
-		JSONArray root = new JSONArray();
-		for (App app: apps) {
-			JSONObject jsonObj = new JSONObject();
-			jsonObj.put("key", app.getKey());
-			jsonObj.put("id", app.getAppNameSpace());
-			jsonObj.put("name", app.getAppName() == null ? "" : app.getAppName());
-			jsonObj.put("description", app.getDescription() == null ? "" : app.getDescription());
-			Set <Scope> scopes = OAuthWrappers.getScopes(app);
-			List <String> strScopes = new ArrayList <String>();
-			for (Scope scope: scopes) {
-				strScopes.add(scope.getScopeName());
+		try {
+			String uid = GoogleAccountUtils.getUID(g_access_token);
+			if (uid == null || uid.equals(""))
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
+						.type(MediaType.APPLICATION_JSON_TYPE)
+						.build();
+			List <App> apps = OAuthWrappers.getApps(uid);
+			JSONArray root = new JSONArray();
+			for (App app: apps) {
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("key", app.getKey());
+				jsonObj.put("id", app.getAppNameSpace());
+				jsonObj.put("name", app.getAppName() == null ? "" : app.getAppName());
+				jsonObj.put("description", app.getDescription() == null ? "" : app.getDescription());
+				Set <Scope> scopes = OAuthWrappers.getScopes(app);
+				List <String> strScopes = new ArrayList <String>();
+				for (Scope scope: scopes) {
+					strScopes.add(scope.getScopeName());
+				}
+				jsonObj.put("scopes", strScopes);
+				jsonObj.put("redirect_uri", app.getRedirectUri() == null ? "" : app.getRedirectUri());
+				jsonObj.put("logo", app.getThumbnail() == null ? "" : app.getThumbnail());
+				root.put(jsonObj);
 			}
-			jsonObj.put("scopes", strScopes);
-			jsonObj.put("redirect_uri", app.getRedirectUri() == null ? "" : app.getRedirectUri());
-			jsonObj.put("logo", app.getThumbnail() == null ? "" : app.getThumbnail());
-			root.put(jsonObj);
+			if (format.equalsIgnoreCase("html")){
+				String jsonOutput = root.toString(4);
+				String htmlout = "<html><body><pre>" +jsonOutput +  "</pre></body></html>";
+				return Response.ok(htmlout, MediaType.TEXT_HTML).build();
+			}
+			else
+				return Response.ok(root.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		} catch (Exception e) {
+			return Response.serverError().build();
 		}
-		if (format.equalsIgnoreCase("html")){
-			String jsonOutput = root.toString(4);
-			String htmlout = "<html><body><pre>" +jsonOutput +  "</pre></body></html>";
-			return Response.ok(htmlout, MediaType.TEXT_HTML).build();
-		}
-		else
-			return Response.ok(root.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
@@ -248,36 +252,44 @@ public class OAuthServices {
 	@GET
 	@Path("/retrieveKeyInfo")
 	public Response retrieveKeyInfo(@HeaderParam("key") String key) {
-		App app = OAuthWrappers.retrieveApp(key);
-		if (app == null) {
-			return Response.status(Response.Status.OK)
-	        .entity(" {\"response\": \"not found\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
+		try {
+			App app = OAuthWrappers.retrieveApp(key);
+			if (app == null) {
+				return Response.status(Response.Status.OK)
+						.entity(" {\"response\": \"not found\"} ")
+						.type(MediaType.APPLICATION_JSON_TYPE)
+						.build();
+			}
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("response", "found");
+			jsonObj.put("appid", app.getAppNameSpace());
+			jsonObj.put("appname", app.getAppName());
+			return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		} catch (Exception e) {
+			return Response.serverError().build();
 		}
-		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("response", "found");
-		jsonObj.put("appid", app.getAppNameSpace());
-		jsonObj.put("appname", app.getAppName());
-		return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
 	@Path("/retrieveKeyInfoFromAccessToken")
 	public Response retrieveKeyInfoFromAccessToken(@HeaderParam("access_token") String access_token) {
-		AccessToken tokenInfo = OAuthWrappers.findAccessTokenFromDB(access_token);
-		if (tokenInfo == null) {
-			return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+		try {
+			AccessToken tokenInfo = OAuthWrappers.findAccessTokenFromDB(access_token);
+			if (tokenInfo == null) {
+				return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+			}
+			App app = OAuthWrappers.retrieveApp(tokenInfo.getAppkey());
+			if (app == null) {
+				return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+			}
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("response", "found");
+			jsonObj.put("appid", app.getAppNameSpace());
+			jsonObj.put("appname", app.getAppName());
+			return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		} catch (Exception e) {
+			return Response.serverError().build();
 		}
-		App app = OAuthWrappers.retrieveApp(tokenInfo.getAppkey());
-		if (app == null) {
-			return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
-		}
-		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("response", "found");
-		jsonObj.put("appid", app.getAppNameSpace());
-		jsonObj.put("appname", app.getAppName());
-		return Response.ok(jsonObj.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
