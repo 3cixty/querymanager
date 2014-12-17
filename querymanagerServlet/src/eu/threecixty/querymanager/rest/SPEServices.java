@@ -1,6 +1,9 @@
 package eu.threecixty.querymanager.rest;
 
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -22,6 +25,9 @@ import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
+import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.UserProfile;
+import eu.threecixty.querymanager.AdminValidator;
 
 /**
  * The class is an end point for Rest ProfileAPI to expose to other components.
@@ -86,6 +92,24 @@ public class SPEServices {
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		}
+	}
+	
+	@POST
+	@Path("/getAllProfiles")
+	public Response getProfiles(@FormParam("username") String username, @FormParam("password") String password) {
+		try {
+			AdminValidator admin=new AdminValidator();
+			if (admin.validate(username,password,CallLogServices.realPath)) {
+				List <UserProfile> allProfiles = ProfileManagerImpl.getInstance().getAllUserProfiles();
+				Gson gson = new Gson();
+				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
+			} else {
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
+			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return Response.serverError().build();
 	}
 	
 	/**
