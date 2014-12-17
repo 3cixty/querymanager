@@ -1,10 +1,8 @@
 package eu.threecixty.querymanager.rest;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -167,13 +165,9 @@ public class SPEServices {
 				}
 				return Response.ok("OK").build();
 			}
-		} catch (URISyntaxException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		return Response.serverError().build();
 	}
