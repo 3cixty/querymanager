@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 
 import org.protege.owl.codegeneration.WrappedIndividual;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -61,6 +61,23 @@ public class UserProfileStorage {
 
 	private static final String PROFILE_URI = "http://www.eu.3cixty.org/profile#";
 	
+	public static List <eu.threecixty.profile.UserProfile> getAllProfiles() {
+		List <eu.threecixty.profile.UserProfile> allProfiles = new LinkedList <eu.threecixty.profile.UserProfile>();
+		try {
+			MyFactory mf = getMyFactory();
+			for (UserProfile userProfile: mf.getAllUserProfileInstances()) {
+				String uid = null;
+				if (userProfile.hasHasUID()) uid = userProfile.getHasUID().iterator().next().toString();
+				if (uid == null) continue;
+				eu.threecixty.profile.UserProfile tmp = createUserProfileFromKB(userProfile, uid, mf);
+				allProfiles.add(tmp);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return allProfiles;
+	}
+	
 	/**
 	 * Loads profile information from the KB.
 	 * @param uid
@@ -70,6 +87,7 @@ public class UserProfileStorage {
 		if (uid == null || uid.equals("")) return null;
 		try {
 			MyFactory mf = getMyFactory();
+			
 			UserProfile userProfile = mf.getUserProfile(PROFILE_URI + uid);
 
 			if (userProfile == null) return null;
@@ -81,35 +99,7 @@ public class UserProfileStorage {
 				}
 			}
 			
-			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
-			toUserProfile.setHasUID(uid);
-			loadNameFromKBToUserProfile(mf, uid, userProfile, toUserProfile);
-			loadAddressInfoFromKBToUserProfile(mf, uid, userProfile, toUserProfile);
-			
-			loadProfileIdentitiesFromUserProfile(userProfile, toUserProfile);
-			loadKnowsFromUserProfile(userProfile, toUserProfile);
-
-			if (!userProfile.hasHasPreference()) {
-				return toUserProfile;
-			}
-			
-			eu.threecixty.profile.oldmodels.Preference toPrefs = new eu.threecixty.profile.oldmodels.Preference();
-			toUserProfile.setPreferences(toPrefs);
-
-			Preference kbPrefs = userProfile.getHasPreference().iterator().next();
-			
-			loadLikesFromKBToPI(kbPrefs, toPrefs);
-			
-			if (kbPrefs.hasHasUserEnteredRatings()) {
-				Set <eu.threecixty.profile.oldmodels.UserEnteredRating> toUserEnteredRatings = new HashSet <eu.threecixty.profile.oldmodels.UserEnteredRating>();
-			    UserEnteredRatings fromUserEnteredRating = kbPrefs.getHasUserEnteredRatings().iterator().next();
-			    UserEnteredRating toUserEnteredRating = new UserEnteredRating();
-			    loadUserEnteredRatingFromKBToPI(mf, fromUserEnteredRating, toUserEnteredRating);
-			    toUserEnteredRatings.add(toUserEnteredRating);
-			    toPrefs.setHasUserEnteredRating(toUserEnteredRatings);
-			}
-			
-			loadTransportFromKB(userProfile, toPrefs);
+			eu.threecixty.profile.UserProfile toUserProfile = createUserProfileFromKB(userProfile, uid, mf);
 			
 			return toUserProfile;
 		} catch (Exception e) {
@@ -159,6 +149,40 @@ public class UserProfileStorage {
 			}
 		}
 		return false;
+	}
+	
+	private static eu.threecixty.profile.UserProfile createUserProfileFromKB(UserProfile userProfile, String uid, MyFactory mf) {
+		eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
+		toUserProfile.setHasUID(uid);
+		loadNameFromKBToUserProfile(mf, uid, userProfile, toUserProfile);
+		loadAddressInfoFromKBToUserProfile(mf, uid, userProfile, toUserProfile);
+		
+		loadProfileIdentitiesFromUserProfile(userProfile, toUserProfile);
+		loadKnowsFromUserProfile(userProfile, toUserProfile);
+
+		if (!userProfile.hasHasPreference()) {
+			return toUserProfile;
+		}
+		
+		eu.threecixty.profile.oldmodels.Preference toPrefs = new eu.threecixty.profile.oldmodels.Preference();
+		toUserProfile.setPreferences(toPrefs);
+
+		Preference kbPrefs = userProfile.getHasPreference().iterator().next();
+		
+		loadLikesFromKBToPI(kbPrefs, toPrefs);
+		
+		if (kbPrefs.hasHasUserEnteredRatings()) {
+			Set <eu.threecixty.profile.oldmodels.UserEnteredRating> toUserEnteredRatings = new HashSet <eu.threecixty.profile.oldmodels.UserEnteredRating>();
+		    UserEnteredRatings fromUserEnteredRating = kbPrefs.getHasUserEnteredRatings().iterator().next();
+		    UserEnteredRating toUserEnteredRating = new UserEnteredRating();
+		    loadUserEnteredRatingFromKBToPI(mf, fromUserEnteredRating, toUserEnteredRating);
+		    toUserEnteredRatings.add(toUserEnteredRating);
+		    toPrefs.setHasUserEnteredRating(toUserEnteredRatings);
+		}
+		
+		loadTransportFromKB(userProfile, toPrefs);
+		
+		return toUserProfile;
 	}
 
 	/**

@@ -212,6 +212,12 @@ public class ProfileManagerImpl implements ProfileManager {
 		return null;
 	}
 
+	@Override
+	public List<UserProfile> getAllUserProfiles() {
+		if (profileManager != null) return profileManager.getAllUserProfiles();
+		return null;
+	}
+
 	private ProfileManagerImpl() {
 		boolean found = false;
 		try {

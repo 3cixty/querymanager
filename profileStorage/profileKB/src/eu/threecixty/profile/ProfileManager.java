@@ -219,6 +219,11 @@ public interface ProfileManager {
 	 */
 	TrayManager getTrayManager();
 
+	/**
+	 * Lists all user profiles in the KB.
+	 * @return
+	 */
+	List <UserProfile> getAllUserProfiles();
 	
 	public class StartAndEndDate {
 

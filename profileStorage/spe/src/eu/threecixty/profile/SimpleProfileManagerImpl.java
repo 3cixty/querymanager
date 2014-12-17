@@ -208,4 +208,9 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public List<UserProfile> getAllUserProfiles() {
+		return UserProfileStorage.getAllProfiles();
+	}
 }

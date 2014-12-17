@@ -226,4 +226,9 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	public TrayManager getTrayManager() {
 		return VirtuosoTrayStorage.getInstance();
 	}
+
+	@Override
+	public List<UserProfile> getAllUserProfiles() {
+		return VirtuosoUserProfileStorage.getAllUserProfiles();
+	}
 }

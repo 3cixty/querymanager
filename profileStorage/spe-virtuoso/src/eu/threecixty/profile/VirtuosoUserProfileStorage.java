@@ -32,6 +32,35 @@ public class VirtuosoUserProfileStorage {
 	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 
 	/**
+	 * Loads all user profiles. This API is intended to list all end users in the KB.
+	 * <br>
+	 * This API is not regularly called.
+	 * @return
+	 */
+	public static List <UserProfile> getAllUserProfiles() {
+		List <UserProfile> allProfiles = new LinkedList <UserProfile>();
+		String query = Configuration.PREFIXES + " SELECT ?uid from <" + VirtuosoManager.getInstance().getGraph("") 
+				+ ">\n"
+				+ " WHERE { \n"
+				+ "?s profile:userID ?uid"
+				+ " }";
+		
+		
+		QueryReturnClass qrc = VirtuosoConnection.query(query);
+		ResultSet rs = qrc.getReturnedResultSet();
+		for ( ; rs.hasNext(); ) {
+			QuerySolution qs = rs.next();
+			String uid = qs.getLiteral("uid").toString();
+			if (uid != null && !uid.trim().equals("")) {
+				UserProfile userProfile = loadProfile(uid);
+				allProfiles.add(userProfile);
+			}
+		}
+		qrc.closeConnection();
+		return allProfiles;
+	}
+	
+	/**
 	 * Loads profile information from the KB.
 	 * @param uid
 	 * @return
