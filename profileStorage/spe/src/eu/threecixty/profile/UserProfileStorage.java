@@ -1109,6 +1109,7 @@ public class UserProfileStorage {
 		to.setHasName(toName);
 		if (from.hasHas_name()) {
 			Name name = mf.getName(PROFILE_URI + uid + "Name");
+			if (name == null) return;
 			if (name.hasFamily_name()) {
 				toName.setFamilyName(name.getFamily_name().iterator().next().toString());
 			}
