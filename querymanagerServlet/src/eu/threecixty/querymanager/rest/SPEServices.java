@@ -1,8 +1,13 @@
 package eu.threecixty.querymanager.rest;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +21,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
@@ -38,6 +47,13 @@ import eu.threecixty.querymanager.AdminValidator;
 public class SPEServices {
 	
 	public static final String PROFILE_SCOPE_NAME = "Profile";
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 SPEServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -107,6 +123,56 @@ public class SPEServices {
 				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
 			}
 		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return Response.serverError().build();
+	}
+	
+	@POST
+	@Path("/copyProfiles")
+	public Response copyProfiles(@FormParam("username") String username, @FormParam("password") String password, @FormParam("version") String version) {
+		try {
+			AdminValidator admin=new AdminValidator();
+			if (!admin.validate(username,password,CallLogServices.realPath)) {
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
+			} else {
+				String urlToGetProfiles =  "http://localhost:8080/" + version + "/getAllProfiles";
+				URL url = new URL(urlToGetProfiles);
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				conn.setRequestMethod("POST");
+				conn.setDoOutput(true);
+				OutputStream out = conn.getOutputStream();
+				out.write(("username=" + username + "&password=" + password).getBytes());
+				out.close();
+				InputStream input = conn.getInputStream();
+				StringBuffer buf = new StringBuffer();
+				byte[] b = new byte[1024];
+				int readBytes = 0;
+				while ((readBytes = input.read(b)) >= 0) {
+					buf.append(new String(b, 0, readBytes));
+				}
+				input.close();
+				JSONArray arr = new JSONArray(buf.toString());
+				
+				Gson gson = new Gson();
+				
+				for (int i = 0; i < arr.length(); i++) {
+					JSONObject jsonObj = arr.getJSONObject(i);
+					String str = jsonObj.toString();
+					if (DEBUG_MOD) LOGGER.info("copying user " + str);
+					UserProfile userProfile = gson.fromJson(str, UserProfile.class);
+					boolean ok = ProfileManagerImpl.getInstance().saveProfile(userProfile);
+					if (DEBUG_MOD && ok) LOGGER.info("Successful to copy the user with uid = " + userProfile.getHasUID());
+					else LOGGER.info("Successful to copy the user: " + userProfile.getHasUID());
+				}
+				return Response.ok("OK").build();
+			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return Response.serverError().build();
