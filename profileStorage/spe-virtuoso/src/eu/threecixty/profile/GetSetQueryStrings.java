@@ -267,7 +267,7 @@ public class GetSetQueryStrings {
 			query+="<"+id+"> rdf:type schema:Place .";
 			String idgeo=id+"/GeoCoordinates";
 			query+="<"+id+"> schema:geo <"+idgeo+"> .";
-			query+="<"+idgeo+"> rdf:type schema:GeoCoordinates";
+			query+="<"+idgeo+"> rdf:type schema:GeoCoordinates .\n";
 			if (address.getLongitute()!=0)	
 				query+= "  <"+idgeo+"> schema:longitude " + address.getLongitute()+" .\n";
 			if (address.getLatitude()!=0)
