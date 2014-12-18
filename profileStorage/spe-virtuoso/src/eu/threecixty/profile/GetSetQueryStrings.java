@@ -269,9 +269,9 @@ public class GetSetQueryStrings {
 			query+="<"+id+"> schema:geo <"+idgeo+"> .";
 			query+="<"+idgeo+"> rdf:type schema:GeoCoordinates";
 			if (address.getLongitute()!=0)	
-				query+= "  <"+idgeo+"> schema:longitude \""+address.getLongitute()+"\" .";
+				query+= "  <"+idgeo+"> schema:longitude " + address.getLongitute()+" .\n";
 			if (address.getLatitude()!=0)
-				query+= "  <"+idgeo+"> schema:latitude \""+address.getLatitude()+"\" .";
+				query+= "  <"+idgeo+"> schema:latitude "+address.getLatitude()+" .\n";
 		}
 		return query;
 	}
