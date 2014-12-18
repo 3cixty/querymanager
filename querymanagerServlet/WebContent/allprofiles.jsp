@@ -4,11 +4,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>App Key Login</title>
+<title>User Profile & Tray Management</title>
 </head>
 <body>
 
-<form action="./getAllProfiles" method="post">
+<form id="formProfile" action="./getAllProfiles" method="post">
 
 <div>
     Username
@@ -23,9 +23,40 @@
 <div>
     <input type="password" name="password">
 </div>
+
 <div>
-    <input type="submit" name="submit" value="Login">
+    Migrate from servlet version (e.g: v2) to current servlet
 </div>
+<div>
+    <input type="text" name="version">
+</div>
+
+<div>
+    <input type="button" name="showProfiles" value="Show all user profiles" onclick="cmdShowProfiles();">
+    <input type="button" name="showTrays" value="Show all trays" onclick="cmdShowTrays();">
+    <input type="button" name="migrateData" value="Migrate data" onclick="cmdMigrateData();">
+</div>
+
+
+<script type="text/javascript">
+    function cmdShowProfiles() {
+    	var frm = document.getElementById("formProfile");
+    	frm.action = "./getAllProfiles";
+    	frm.submit();
+    }
+    
+    function cmdShowTrays() {
+    	var frm = document.getElementById("formProfile");
+    	frm.action = "./allTrays";
+    	frm.submit();
+    }
+    
+    function cmdMigrateData() {
+    	var frm = document.getElementById("formProfile");
+    	frm.action = "./copyProfiles";
+    	frm.submit();
+    }
+</script>
 
 </form>
 </body>
