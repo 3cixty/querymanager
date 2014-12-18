@@ -43,9 +43,7 @@
     </div>
 
     <div class="consent">
-      <label style="background-color: #283339; width: 80px;">
-      <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}"  align="middle" />
-      </label>
+      <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}"  style="background-color: #283339;"/>
       <img src="${pageContext.request.contextPath}/client/img/arrow.png" />
       <img alt="${client.resourceServer.name}"
         title="${client.resourceServer.name}"
