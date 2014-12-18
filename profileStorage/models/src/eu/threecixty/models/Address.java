@@ -26,7 +26,7 @@ public interface Address extends WrappedIndividual {
      * 
      * @returns a collection of values for the townName property.
      */
-    Collection<? extends String> getTownName();
+    Collection<? extends Object> getTownName();
 
     /**
      * Checks if the class has a townName property value.<p>
@@ -40,14 +40,14 @@ public interface Address extends WrappedIndividual {
      * 
      * @param newTownName the townName property value to be added
      */
-    void addTownName(String newTownName);
+    void addTownName(Object newTownName);
 
     /**
      * Removes a townName property value.<p>
      * 
      * @param oldTownName the townName property value to be removed.
      */
-    void removeTownName(String oldTownName);
+    void removeTownName(Object oldTownName);
 
 
 

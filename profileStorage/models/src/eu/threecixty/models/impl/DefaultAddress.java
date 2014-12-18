@@ -4,13 +4,11 @@ import eu.threecixty.models.*;
 
 import java.util.Collection;
 
-import org.protege.owl.codegeneration.WrappedIndividual;
 import org.protege.owl.codegeneration.impl.WrappedIndividualImpl;
 
 import org.protege.owl.codegeneration.inference.CodeGenerationInference;
 
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 
 /**
@@ -32,19 +30,19 @@ public class DefaultAddress extends WrappedIndividualImpl implements Address {
      * Data Property http://www.eu.3cixty.org/profile#townName
      */
      
-    public Collection<? extends String> getTownName() {
-		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_TOWNNAME, String.class);
+    public Collection<? extends Object> getTownName() {
+		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_TOWNNAME, Object.class);
     }
 
     public boolean hasTownName() {
 		return !getTownName().isEmpty();
     }
 
-    public void addTownName(String newTownName) {
+    public void addTownName(Object newTownName) {
 	    getDelegate().addPropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_TOWNNAME, newTownName);
     }
 
-    public void removeTownName(String oldTownName) {
+    public void removeTownName(Object oldTownName) {
 		getDelegate().removePropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_TOWNNAME, oldTownName);
     }
 
