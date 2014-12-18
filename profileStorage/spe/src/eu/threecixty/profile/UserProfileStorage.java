@@ -69,6 +69,7 @@ public class UserProfileStorage {
 				String uid = null;
 				if (userProfile.hasHasUID()) uid = userProfile.getHasUID().iterator().next().toString();
 				if (uid == null) continue;
+				uid = clean(uid);
 				eu.threecixty.profile.UserProfile tmp = createUserProfileFromKB(userProfile, uid, mf);
 				allProfiles.add(tmp);
 			}
@@ -154,12 +155,15 @@ public class UserProfileStorage {
 	private static eu.threecixty.profile.UserProfile createUserProfileFromKB(UserProfile userProfile, String uid, MyFactory mf) {
 		eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 		toUserProfile.setHasUID(uid);
+		
 		loadNameFromKBToUserProfile(mf, uid, userProfile, toUserProfile);
 		loadAddressInfoFromKBToUserProfile(mf, uid, userProfile, toUserProfile);
 		
 		loadProfileIdentitiesFromUserProfile(userProfile, toUserProfile);
 		loadKnowsFromUserProfile(userProfile, toUserProfile);
 
+		/*
+		
 		if (!userProfile.hasHasPreference()) {
 			return toUserProfile;
 		}
@@ -181,7 +185,7 @@ public class UserProfileStorage {
 		}
 		
 		loadTransportFromKB(userProfile, toPrefs);
-		
+		*/
 		return toUserProfile;
 	}
 
@@ -753,7 +757,7 @@ public class UserProfileStorage {
 		}
 		if (!isNullOrEmpty(fromAddress.getTownName())) {
 			if (addr.hasTownName()) {
-				String objTownName = addr.getTownName().iterator().next();
+				Object objTownName = addr.getTownName().iterator().next();
 				addr.removeTownName(objTownName);
 			}
 			addr.addTownName(fromAddress.getTownName());
@@ -891,7 +895,7 @@ public class UserProfileStorage {
 			toHotelDetail.setHasHotelStarCategory((Integer) fromHotelDetail.getHasHotelStarCategory().iterator().next());
 		}
 		if (fromHotelDetail.hasHasNatureOfPlace()) {
-			String nopStr = fromHotelDetail.getHasNatureOfPlace().iterator().next().toString();
+			String nopStr = clean(fromHotelDetail.getHasNatureOfPlace().iterator().next().toString());
 			toHotelDetail.setHasNatureOfPlace(eu.threecixty.profile.oldmodels.NatureOfPlace.valueOf(nopStr));
 		}
 		if (fromHotelDetail.hasHasNearByTransportMode()) {
@@ -901,7 +905,7 @@ public class UserProfileStorage {
 			toHotelDetail.setHasPlaceName(fromHotelDetail.getHasPlaceName().iterator().next());
 		}
 		if (fromHotelDetail.hasHasTypeOfFood()) {
-			String tofStr = fromHotelDetail.getHasTypeOfFood().iterator().next().toString();
+			String tofStr = clean(fromHotelDetail.getHasTypeOfFood().iterator().next().toString());
 			toHotelDetail.setHasTypeOfFood(eu.threecixty.profile.oldmodels.TypeOfFood.valueOf(tofStr));
 		}
 	}
@@ -988,10 +992,10 @@ public class UserProfileStorage {
 			eu.threecixty.profile.oldmodels.Rating toRating) {
 		if (fromRating.hasHasUserDefinedRating()) {
 			Object objRating = fromRating.getHasUserDefinedRating().iterator().next();
-			toRating.setHasUseDefinedRating(Double.parseDouble(objRating.toString()));
+			toRating.setHasUseDefinedRating(parse(objRating.toString()));
 		}
 		if (fromRating.hasHasUserInteractionMode()) {
-			String uimStr = fromRating.getHasUserInteractionMode().iterator().next().toString();
+			String uimStr = clean(fromRating.getHasUserInteractionMode().iterator().next().toString());
 			toRating.setHasUserInteractionMode(eu.threecixty.profile.oldmodels.UserInteractionMode.valueOf(uimStr));
 		}
 	}
@@ -1004,7 +1008,7 @@ public class UserProfileStorage {
 	private static void loadEventDetailFromKBToPI(EventDetails fromEventDetail,
 			EventDetail toEventDetail) {
 		if (fromEventDetail.hasHasEventName()) {
-			toEventDetail.setHasEventName(fromEventDetail.getHasEventName().iterator().next());
+			toEventDetail.setHasEventName(clean(fromEventDetail.getHasEventName().iterator().next().toString()));
 		}
 		if (fromEventDetail.hasAt_place()) {
 			Address fromAddress = fromEventDetail.getAt_place().iterator().next();
@@ -1013,7 +1017,7 @@ public class UserProfileStorage {
 			loadAddressFromKBToPI(fromAddress, toAddress);
 		}
 		if (fromEventDetail.hasHasNatureOfEvent()) {
-			String noeStr = fromEventDetail.getHasNatureOfEvent().iterator().next().toString();
+			String noeStr = clean(fromEventDetail.getHasNatureOfEvent().iterator().next().toString());
 			toEventDetail.setHasNatureOfEvent(eu.threecixty.profile.oldmodels.NatureOfEvent.valueOf(noeStr));
 		}
 		if (fromEventDetail.hasHasTemporalDetails()) {
@@ -1050,10 +1054,10 @@ public class UserProfileStorage {
 	private static void loadAddressFromKBToPI(Address fromAddress,
 			eu.threecixty.profile.oldmodels.Address toAddress) {
 		if (fromAddress.hasCountry_name()) {
-			toAddress.setCountryName(fromAddress.getCountry_name().iterator().next().toString());
+			toAddress.setCountryName(clean(fromAddress.getCountry_name().iterator().next().toString()));
 		}
 		if (fromAddress.hasTownName()) {
-			toAddress.setTownName(fromAddress.getTownName().iterator().next());
+			toAddress.setTownName(clean(fromAddress.getTownName().iterator().next().toString()));
 		}
 		if (fromAddress.hasStreet_address()) {
 			toAddress.setStreetAddress(fromAddress.getStreet_address().iterator().next().toString());
@@ -1092,7 +1096,7 @@ public class UserProfileStorage {
 			}
 			if (newLike.hasHasLikeType()) {
 				Object objLikeType = newLike.getHasLikeType().iterator().next();
-				oldLikes.setHasLikeType(LikeType.valueOf(objLikeType.toString()));
+				oldLikes.setHasLikeType(LikeType.valueOf(clean(objLikeType.toString())));
 			}
 			toLikes.add(oldLikes);
 		}
@@ -1111,10 +1115,10 @@ public class UserProfileStorage {
 			Name name = mf.getName(PROFILE_URI + uid + "Name");
 			if (name == null) return;
 			if (name.hasFamily_name()) {
-				toName.setFamilyName(name.getFamily_name().iterator().next().toString());
+				toName.setFamilyName(clean(name.getFamily_name().iterator().next().toString()));
 			}
 			if (name.hasGiven_name()) {
-				toName.setGivenName(name.getGiven_name().iterator().next().toString());
+				toName.setGivenName(clean(name.getGiven_name().iterator().next().toString()));
 			}
 		}
 	}
@@ -1131,19 +1135,19 @@ public class UserProfileStorage {
 		eu.threecixty.profile.oldmodels.Address toAddress = new eu.threecixty.profile.oldmodels.Address();
 		if (addr.hasCountry_name()) {
 			Object objCountryName = addr.getCountry_name().iterator().next();
-			toAddress.setCountryName(objCountryName.toString());
+			toAddress.setCountryName(clean(objCountryName.toString()));
 		}
 		if (addr.hasTownName()) {
-			String objTownName = addr.getTownName().iterator().next();
-			toAddress.setTownName(objTownName.toString());
+			Object objTownName = addr.getTownName().iterator().next();
+			toAddress.setTownName(clean(objTownName.toString()));
 		}
 		if (addr.hasLatitude()) {
 			Object objLatitude = addr.getLatitude().iterator().next();
-			toAddress.setLatitude(Double.parseDouble(objLatitude.toString()));
+			toAddress.setLatitude(parse(objLatitude.toString()));
 		}
 		if (addr.hasLongitude()) {
 			Object objLongitude = addr.getLongitude().iterator().next();
-			toAddress.setLongitute(Double.parseDouble(objLongitude.toString()));
+			toAddress.setLongitute(parse(objLongitude.toString()));
 		}
 		to.setHasAddress(toAddress);
 	}
@@ -1162,14 +1166,14 @@ public class UserProfileStorage {
 		for (ProfileIdentities pi: fromUserProfile.getHasProfileIdentities()) {
 			eu.threecixty.profile.oldmodels.ProfileIdentities tmpProfile = new eu.threecixty.profile.oldmodels.ProfileIdentities();
 			if (pi.hasHasSource()) {
-				tmpProfile.setHasSource(pi.getHasSource().iterator().next().toString());
+				tmpProfile.setHasSource(clean(pi.getHasSource().iterator().next().toString()));
 			}
 			if (pi.hasHasUserAccountID()) {
-				tmpProfile.setHasUserAccountID(pi.getHasUserAccountID().iterator().next().toString());
+				tmpProfile.setHasUserAccountID(clean(pi.getHasUserAccountID().iterator().next().toString()));
 			}
 			if (pi.hasHasUserInteractionMode()) {
 				tmpProfile.setHasUserInteractionMode(eu.threecixty.profile.oldmodels.UserInteractionMode.valueOf(
-						pi.getHasUserInteractionMode().iterator().next().toString()));
+						clean(pi.getHasUserInteractionMode().iterator().next().toString())));
 			}
 			oldProfiles.add(tmpProfile);
 		}
@@ -1187,7 +1191,7 @@ public class UserProfileStorage {
 		toUserProfile.setKnows(uids);
 		for (UserProfile tmpUP: fromUserProfile.getKnows()) {
 			if (!tmpUP.hasHasUID()) continue;
-			uids.add(tmpUP.getHasUID().iterator().next().toString());
+			uids.add(clean(tmpUP.getHasUID().iterator().next().toString()));
 		}
 	}
 
@@ -1384,6 +1388,26 @@ public class UserProfileStorage {
 		}
 		qe.close();
 		return false;
+	}
+	
+	/**
+	 * This method is used due to that string always includes "" for the first and last letter.
+	 * @param str
+	 * @return
+	 */
+	private static String clean(String str) {
+		//if (str != null && str.length() > 2) return str.substring(1, str.length() - 1);
+		if (str == null || str.length() <= 2) return str;
+		if (!str.startsWith("\"")) return str;
+		return str.substring(1, str.length() - 1);
+	}
+	
+	// "5.0"^^xsd:double
+	private static double parse(String str) {
+		if (str != null && str.length() > 14) {
+			return Double.parseDouble(str.substring(1, str.length() - 13));
+		}
+		return 0;
 	}
 	
 	private UserProfileStorage() {
