@@ -1162,10 +1162,10 @@ public class UserProfileStorage {
 		for (ProfileIdentities pi: fromUserProfile.getHasProfileIdentities()) {
 			eu.threecixty.profile.oldmodels.ProfileIdentities tmpProfile = new eu.threecixty.profile.oldmodels.ProfileIdentities();
 			if (pi.hasHasSource()) {
-				tmpProfile.setHasSource(pi.getHasSource().iterator().next());
+				tmpProfile.setHasSource(pi.getHasSource().iterator().next().toString());
 			}
 			if (pi.hasHasUserAccountID()) {
-				tmpProfile.setHasUserAccountID(pi.getHasUserAccountID().iterator().next());
+				tmpProfile.setHasUserAccountID(pi.getHasUserAccountID().iterator().next().toString());
 			}
 			if (pi.hasHasUserInteractionMode()) {
 				tmpProfile.setHasUserInteractionMode(eu.threecixty.profile.oldmodels.UserInteractionMode.valueOf(
