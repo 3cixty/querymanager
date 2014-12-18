@@ -4,13 +4,11 @@ import eu.threecixty.models.*;
 
 import java.util.Collection;
 
-import org.protege.owl.codegeneration.WrappedIndividual;
 import org.protege.owl.codegeneration.impl.WrappedIndividualImpl;
 
 import org.protege.owl.codegeneration.inference.CodeGenerationInference;
 
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 
 /**
@@ -113,19 +111,19 @@ public class DefaultEmployerInformation extends WrappedIndividualImpl implements
      * Data Property http://www.eu.3cixty.org/profile#hasEventName
      */
      
-    public Collection<? extends String> getHasEventName() {
-		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASEVENTNAME, String.class);
+    public Collection<? extends Object> getHasEventName() {
+		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASEVENTNAME, Object.class);
     }
 
     public boolean hasHasEventName() {
 		return !getHasEventName().isEmpty();
     }
 
-    public void addHasEventName(String newHasEventName) {
+    public void addHasEventName(Object newHasEventName) {
 	    getDelegate().addPropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASEVENTNAME, newHasEventName);
     }
 
-    public void removeHasEventName(String oldHasEventName) {
+    public void removeHasEventName(Object oldHasEventName) {
 		getDelegate().removePropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASEVENTNAME, oldHasEventName);
     }
 

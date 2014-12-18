@@ -26,7 +26,7 @@ public interface ProfileIdentities extends WrappedIndividual {
      * 
      * @returns a collection of values for the hasSource property.
      */
-    Collection<? extends String> getHasSource();
+    Collection<? extends Object> getHasSource();
 
     /**
      * Checks if the class has a hasSource property value.<p>
@@ -40,14 +40,14 @@ public interface ProfileIdentities extends WrappedIndividual {
      * 
      * @param newHasSource the hasSource property value to be added
      */
-    void addHasSource(String newHasSource);
+    void addHasSource(Object newHasSource);
 
     /**
      * Removes a hasSource property value.<p>
      * 
      * @param oldHasSource the hasSource property value to be removed.
      */
-    void removeHasSource(String oldHasSource);
+    void removeHasSource(Object oldHasSource);
 
 
 
@@ -60,7 +60,7 @@ public interface ProfileIdentities extends WrappedIndividual {
      * 
      * @returns a collection of values for the hasUserAccountID property.
      */
-    Collection<? extends String> getHasUserAccountID();
+    Collection<? extends Object> getHasUserAccountID();
 
     /**
      * Checks if the class has a hasUserAccountID property value.<p>
@@ -74,14 +74,14 @@ public interface ProfileIdentities extends WrappedIndividual {
      * 
      * @param newHasUserAccountID the hasUserAccountID property value to be added
      */
-    void addHasUserAccountID(String newHasUserAccountID);
+    void addHasUserAccountID(Object newHasUserAccountID);
 
     /**
      * Removes a hasUserAccountID property value.<p>
      * 
      * @param oldHasUserAccountID the hasUserAccountID property value to be removed.
      */
-    void removeHasUserAccountID(String oldHasUserAccountID);
+    void removeHasUserAccountID(Object oldHasUserAccountID);
 
 
 

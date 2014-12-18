@@ -125,7 +125,7 @@ public interface EmployerInformation extends EventDetails {
      * 
      * @returns a collection of values for the hasEventName property.
      */
-    Collection<? extends String> getHasEventName();
+    Collection<? extends Object> getHasEventName();
 
     /**
      * Checks if the class has a hasEventName property value.<p>
@@ -139,14 +139,14 @@ public interface EmployerInformation extends EventDetails {
      * 
      * @param newHasEventName the hasEventName property value to be added
      */
-    void addHasEventName(String newHasEventName);
+    void addHasEventName(Object newHasEventName);
 
     /**
      * Removes a hasEventName property value.<p>
      * 
      * @param oldHasEventName the hasEventName property value to be removed.
      */
-    void removeHasEventName(String oldHasEventName);
+    void removeHasEventName(Object oldHasEventName);
 
 
 

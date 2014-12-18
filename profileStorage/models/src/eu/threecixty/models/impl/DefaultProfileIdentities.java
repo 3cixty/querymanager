@@ -4,13 +4,11 @@ import eu.threecixty.models.*;
 
 import java.util.Collection;
 
-import org.protege.owl.codegeneration.WrappedIndividual;
 import org.protege.owl.codegeneration.impl.WrappedIndividualImpl;
 
 import org.protege.owl.codegeneration.inference.CodeGenerationInference;
 
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 
 /**
@@ -32,19 +30,19 @@ public class DefaultProfileIdentities extends WrappedIndividualImpl implements P
      * Data Property http://www.eu.3cixty.org/profile#hasSource
      */
      
-    public Collection<? extends String> getHasSource() {
-		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASSOURCE, String.class);
+    public Collection<? extends Object> getHasSource() {
+		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASSOURCE, Object.class);
     }
 
     public boolean hasHasSource() {
 		return !getHasSource().isEmpty();
     }
 
-    public void addHasSource(String newHasSource) {
+    public void addHasSource(Object newHasSource) {
 	    getDelegate().addPropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASSOURCE, newHasSource);
     }
 
-    public void removeHasSource(String oldHasSource) {
+    public void removeHasSource(Object oldHasSource) {
 		getDelegate().removePropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASSOURCE, oldHasSource);
     }
 
@@ -53,19 +51,19 @@ public class DefaultProfileIdentities extends WrappedIndividualImpl implements P
      * Data Property http://www.eu.3cixty.org/profile#hasUserAccountID
      */
      
-    public Collection<? extends String> getHasUserAccountID() {
-		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUSERACCOUNTID, String.class);
+    public Collection<? extends Object> getHasUserAccountID() {
+		return getDelegate().getPropertyValues(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUSERACCOUNTID, Object.class);
     }
 
     public boolean hasHasUserAccountID() {
 		return !getHasUserAccountID().isEmpty();
     }
 
-    public void addHasUserAccountID(String newHasUserAccountID) {
+    public void addHasUserAccountID(Object newHasUserAccountID) {
 	    getDelegate().addPropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUSERACCOUNTID, newHasUserAccountID);
     }
 
-    public void removeHasUserAccountID(String oldHasUserAccountID) {
+    public void removeHasUserAccountID(Object oldHasUserAccountID) {
 		getDelegate().removePropertyValue(getOwlIndividual(), Vocabulary.DATA_PROPERTY_HASUSERACCOUNTID, oldHasUserAccountID);
     }
 
