@@ -318,8 +318,9 @@ public class VirtuosoTrayStorage implements TrayManager {
 			JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
 			if (jsonArr.length() == 0) return trays;
 			for (int i = 0; i < jsonArr.length(); i++) {
-				Tray tray = createTray(jsonArr.getJSONObject(i));
-				String uid = getValue(jsonObject, "person").substring(
+				JSONObject tmp = jsonArr.getJSONObject(i);
+				Tray tray = createTray(tmp);
+				String uid = getValue(tmp, "person").substring(
 						GetSetQueryStrings.PROFILE_URI.length());
 				tray.setUid(uid);
 				trays.add(tray);
