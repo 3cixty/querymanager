@@ -18,8 +18,6 @@ import eu.threecixty.profile.Tray.OrderType;
 
 /**
  * This class is to deal with Tray Elements in Virtuoso.
- * <br>
- * Suppose that this class is only called when a user rally logs in. 
  *
  * @author Cong-Kinh NGUYEN
  *
@@ -293,6 +291,44 @@ public class VirtuosoTrayStorage implements TrayManager {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@Override
+	public List<Tray> getAllTrays() {
+		List <Tray> trays = new LinkedList <Tray>();
+		StringBuffer buf = new StringBuffer(PREFIXES).append(
+				" SELECT ?person ?trayId ?title ?type ?source  ?timestamp ?attend ?attendedDateTime ?imageUrl ?ratingValue \n");
+		buf.append(" FROM <").append(getGraphName("dba")).append(">\n");
+		buf.append("WHERE {\n");
+		buf.append("?person ").append(PROFILE_TRAY_ELEMENT_PREDICATE).append(" ?tray .\n");
+		buf.append("?tray ").append(TRAY_ID_PREDICATE).append(" ?trayId .\n");
+		buf.append("?tray ").append(TRAY_TITLE_PREDICATE).append(" ?title .\n");
+		buf.append("?tray ").append(TRAY_TYPE_PREDICATE).append(" ?type .\n");
+		buf.append("OPTIONAL { ?tray ").append(TRAY_SOURCE_PREDICATE).append(" ?source .} \n");
+		buf.append("OPTIONAL { ?tray ").append(TRAY_TIMESTAMP_PREDICATE).append(" ?timestamp .} \n");
+		buf.append("OPTIONAL { ?tray ").append(TRAY_ATTEND_PREDICATE).append(" ?attend .} \n");
+		buf.append("OPTIONAL { ?tray ").append(TRAY_ATTENDED_DATETIME_PREDICATE).append(" ?attendedDateTime .} \n");
+		buf.append("OPTIONAL { ?tray ").append(TRAY_IMAGE_URL_PREDICATE).append(" ?imageUrl .} \n");
+		buf.append("OPTIONAL { ?tray ").append(TRAY_RATING_PREDICATE).append(" ?rating .\n ?rating schema:ratingValue ?ratingValue .} \n");
+		buf.append("}");
+
+		JSONObject jsonObject = VirtuosoManager.getInstance().executeQueryWithDBA(buf.toString());
+		if (jsonObject == null) return trays;
+		try {
+			JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
+			if (jsonArr.length() == 0) return trays;
+			for (int i = 0; i < jsonArr.length(); i++) {
+				Tray tray = createTray(jsonArr.getJSONObject(i));
+				String uid = getValue(jsonObject, "person").substring(
+						GetSetQueryStrings.PROFILE_URI.length());
+				tray.setUid(uid);
+				trays.add(tray);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}	
+		
+		return trays;
 	}
 	
 	/**

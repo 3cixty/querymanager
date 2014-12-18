@@ -182,7 +182,7 @@ public class TrayStorage implements TrayManager {
 	}
 
 
-	public synchronized static List <Tray> getAllTrays() {
+	public synchronized List <Tray> getAllTrays() {
 		List <Tray> trays = new ArrayList <Tray>();
 		String content = getContent();
 		try {

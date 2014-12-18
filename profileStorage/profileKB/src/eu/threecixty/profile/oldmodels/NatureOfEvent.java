@@ -6,6 +6,7 @@ package eu.threecixty.profile.oldmodels;
  *
  */
 public enum NatureOfEvent {
+	Concert,
 	Music,
 	Art,
 	Conference,

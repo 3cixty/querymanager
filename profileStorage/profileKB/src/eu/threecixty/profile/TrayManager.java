@@ -79,4 +79,10 @@ public interface TrayManager {
 	 * @throws InvalidTrayElement
 	 */
 	List <Tray> getTrays(String uid) throws InvalidTrayElement;
+
+	/**
+	 * Gets all trays in the KB.
+	 * @return
+	 */
+	List <Tray> getAllTrays();
 }
