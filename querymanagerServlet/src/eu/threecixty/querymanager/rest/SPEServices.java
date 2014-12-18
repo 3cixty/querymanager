@@ -1,11 +1,13 @@
 package eu.threecixty.querymanager.rest;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,7 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
 import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.querymanager.AdminValidator;
 
@@ -135,35 +138,48 @@ public class SPEServices {
 				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
 			} else {
 				String urlToGetProfiles =  "http://localhost:8080/" + version + "/getAllProfiles";
-				URL url = new URL(urlToGetProfiles);
-				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-				conn.setRequestMethod("POST");
-				conn.setDoOutput(true);
-				OutputStream out = conn.getOutputStream();
-				out.write(("username=" + username + "&password=" + password).getBytes());
-				out.close();
-				InputStream input = conn.getInputStream();
-				StringBuffer buf = new StringBuffer();
-				byte[] b = new byte[1024];
-				int readBytes = 0;
-				while ((readBytes = input.read(b)) >= 0) {
-					buf.append(new String(b, 0, readBytes));
-				}
-				input.close();
-				JSONArray arr = new JSONArray(buf.toString());
+
+				URLConnection profileConn = getPostConnection(urlToGetProfiles, username, password);
+				String profileContent = getContent(profileConn);
+				JSONArray arrUserProfiles = new JSONArray(profileContent);
 				
 				Gson gson = new Gson();
-				
-				for (int i = 0; i < arr.length(); i++) {
-					JSONObject jsonObj = arr.getJSONObject(i);
+				int profileSuccNum = 0;
+				for (int i = 0; i < arrUserProfiles.length(); i++) {
+					JSONObject jsonObj = arrUserProfiles.getJSONObject(i);
 					String str = jsonObj.toString();
 					if (DEBUG_MOD) LOGGER.info("copying user " + str);
 					UserProfile userProfile = gson.fromJson(str, UserProfile.class);
 					boolean ok = ProfileManagerImpl.getInstance().saveProfile(userProfile);
-					if (DEBUG_MOD && ok) LOGGER.info("Successful to copy the user with uid = " + userProfile.getHasUID());
-					else LOGGER.info("Successful to copy the user: " + userProfile.getHasUID());
+					if (DEBUG_MOD) {
+						if (ok) LOGGER.info("Successful to copy the user with uid = " + userProfile.getHasUID());
+						else LOGGER.info("Failed to copy the user: " + userProfile.getHasUID());
+					}
+					if (ok) profileSuccNum++;
 				}
-				return Response.ok("OK").build();
+				
+				String urlToGetTrays =  "http://localhost:8080/" + version + "/allTrays";
+				URLConnection trayConn = getPostConnection(urlToGetTrays, username, password);
+				String trayContent = getContent(trayConn);
+				JSONArray arrTrays = new JSONArray(trayContent);
+				
+				int traySuccNum = 0;
+				for (int i = 0; i < arrTrays.length(); i++) {
+					JSONObject jsonObj = arrTrays.getJSONObject(i);
+					String str = jsonObj.toString();
+					if (DEBUG_MOD) LOGGER.info("copying tray " + str);
+					Tray tray = gson.fromJson(str, Tray.class);
+					boolean ok = ProfileManagerImpl.getInstance().getTrayManager().addTray(tray);
+					if (DEBUG_MOD) {
+						if (ok) LOGGER.info("Successful to copy the tray = " + str);
+						else LOGGER.info("Failed to copy the tray: " + str);
+					}
+					if (ok) traySuccNum++;
+				}
+				
+				return Response.ok("Successful to copy "
+				        + profileSuccNum + "/" + arrUserProfiles.length() + " user profiles, "
+				        + traySuccNum + "/" + arrTrays.length() + " trays").build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -260,5 +276,29 @@ public class SPEServices {
 		if (accessToken == null || !accessToken.getScopeNames().contains(PROFILE_SCOPE_NAME)) {
 		    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
 		}
+	}
+
+	private URLConnection getPostConnection(String urlStr,
+			String username, String password) throws IOException {
+		URL url = new URL(urlStr);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("POST");
+		conn.setDoOutput(true);
+		OutputStream out = conn.getOutputStream();
+		out.write(("username=" + username + "&password=" + password).getBytes());
+		out.close();
+		return conn;
+	}
+	
+	private String getContent(URLConnection conn) throws IOException {
+		InputStream input = conn.getInputStream();
+		StringBuffer buf = new StringBuffer();
+		byte[] b = new byte[1024];
+		int readBytes = 0;
+		while ((readBytes = input.read(b)) >= 0) {
+			buf.append(new String(b, 0, readBytes));
+		}
+		input.close();
+		return buf.toString();
 	}
 }

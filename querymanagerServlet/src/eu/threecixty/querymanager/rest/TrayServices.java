@@ -3,14 +3,18 @@ package eu.threecixty.querymanager.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 
 
 
@@ -28,6 +32,7 @@ import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.Tray.OrderType;
+import eu.threecixty.querymanager.AdminValidator;
 
 /**
  * This class is an end point to expose Rest TrayAPIs to other components.
@@ -47,7 +52,6 @@ public class TrayServices {
 	
 	private static final String ADD_EXCEPTION_MSG = "Invalid parameters or duplicated tray items";
 	private static final String INVALID_PARAMS_EXCEPTION_MSG = "Invalid parameters";
-	
 	
     @POST
     @Path("/tray")
@@ -136,6 +140,24 @@ public class TrayServices {
 
     }
 	
+	@POST
+	@Path("/allTrays")
+	public Response showAllTrays(@FormParam("username") String username, @FormParam("password") String password) {
+		try {
+			AdminValidator admin = new AdminValidator();
+			if (admin.validate(username, password, CallLogServices.realPath)) {
+				List <Tray> allProfiles = ProfileManagerImpl.getInstance().getTrayManager().getAllTrays();
+				Gson gson = new Gson();
+				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
+			} else {
+				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
+			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return Response.serverError().build();
+	}
+    
     private String getRestTrayString(InputStream input) {
     	if (input == null) return null;
     	StringBuffer buffer = new StringBuffer();
