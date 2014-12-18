@@ -43,7 +43,9 @@
     </div>
 
     <div class="consent">
-      <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}" class="imageSize" />
+      <label style="background-color: #283339">
+      <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}"  />
+      </label>
       <img src="${pageContext.request.contextPath}/client/img/arrow.png" />
       <img alt="${client.resourceServer.name}"
         title="${client.resourceServer.name}"
@@ -67,11 +69,11 @@
                  value="${availableScope}"/>
           <span class="consent-label">${availableScope}
             <c:if test="${availableScope eq profileScope}">
-             (<strong>Note that clicking "Grant Permissions" below while checking "Profile" will give this app the ability to read and modify your FirstName, LastName, and last known location in the 3cixty Platform</strong>)
+             (<strong>Note that checking this box will give this app the ability to read and modify your first name, last name, and last known location in the 3cixty Platform.</strong>)
             </c:if>
           </span><br/>
         </c:forEach>
-        <div><strong>Note that if you do not select any scopes, no private information can be read/modified by the requesting application.</strong></div>
+        <div><strong>If you do not select any scopes, no private information can be read or modified by the requesting application.</strong></div>
       </fieldset>
       <fieldset>
         <div class="form-actions">
