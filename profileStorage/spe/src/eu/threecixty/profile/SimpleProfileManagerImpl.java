@@ -154,8 +154,7 @@ class SimpleProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public TrayManager getTrayManager() {
-		// TODO Auto-generated method stub
-		return null;
+		return TrayStorage.getInstance();
 	}
 
 	/**
