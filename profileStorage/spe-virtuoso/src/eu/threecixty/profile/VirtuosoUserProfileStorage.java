@@ -152,6 +152,7 @@ public class VirtuosoUserProfileStorage {
 			virtGraph.close();
 			
 			if (DEBUG_MOD) LOGGER.info("end saving user profile");
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOGGER.error(e.getMessage());
