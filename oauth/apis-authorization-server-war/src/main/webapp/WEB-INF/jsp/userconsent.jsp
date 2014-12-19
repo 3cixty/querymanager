@@ -43,7 +43,10 @@
     </div>
 
     <div class="consent">
+    <!-- 
       <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}"  style="background-color: #283339;"/>
+       -->
+       <img alt="${client.name}" title="${client.name}" src="${client.thumbNailUrl}"  class="imageSize"/>
       <img src="${pageContext.request.contextPath}/client/img/arrow.png" />
       <img alt="${client.resourceServer.name}"
         title="${client.resourceServer.name}"
