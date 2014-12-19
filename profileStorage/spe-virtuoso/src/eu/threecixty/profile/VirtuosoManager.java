@@ -114,6 +114,37 @@ public class VirtuosoManager {
 		return true;
 	}
 
+	public boolean setNobody() {
+		Connection conn = getConnection();
+		if (conn == null) return false;
+		Statement stmt = null;
+		try {
+			conn.setAutoCommit(false);
+			stmt = conn.createStatement();
+
+			// the following line should be done by isql in Virtuoso to avoid bugs in listing known graphs
+			stmt.addBatch("DB.DBA.RDF_DEFAULT_USER_PERMS_SET ('nobody', 0)");
+			setReadAccessToNobody(stmt);
+					    			
+			stmt.executeBatch();
+			conn.commit();
+			stmt.close();
+			
+		} catch (SQLException e) {
+			try {
+				if (stmt != null) stmt.close();
+				conn.rollback();
+			} catch (SQLException e1) {
+				LOGGER.error(e1.getMessage());
+			}
+			closeConnection();
+			LOGGER.error(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+	
+	
 	// XXX: hack to drop private graphs caused by misunderstanding Virtuoso when developing private parts
 	public synchronized void dropGraphs() {
 		Connection conn = getConnection();
