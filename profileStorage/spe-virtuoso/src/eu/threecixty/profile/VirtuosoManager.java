@@ -115,6 +115,7 @@ public class VirtuosoManager {
 	}
 
 	public boolean setNobody() {
+		if (DEBUG_MOD) LOGGER.info("start to execute setNobody");
 		Connection conn = getConnection();
 		if (conn == null) return false;
 		Statement stmt = null;
@@ -124,13 +125,25 @@ public class VirtuosoManager {
 
 			// the following line should be done by isql in Virtuoso to avoid bugs in listing known graphs
 			stmt.addBatch("DB.DBA.RDF_DEFAULT_USER_PERMS_SET ('nobody', 0)");
-			setReadAccessToNobody(stmt);
+			try {
+				java.sql.ResultSet rs = stmt.executeQuery("DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()");
+				for ( ; rs.next(); ) {
+					String graphUri = rs.getString(1) ;
+					if (!graphUri.startsWith(PREFIX_EACH_USER_PROFILE_GRAPH)) {
+						stmt.addBatch("DB.DBA.RDF_GRAPH_USER_PERMS_SET ('" + graphUri + "', 'nobody', 1)");
+						if (DEBUG_MOD) LOGGER.info("nobody is set to access to the graph: " + graphUri);
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 					    			
 			stmt.executeBatch();
 			conn.commit();
 			stmt.close();
 			
 		} catch (SQLException e) {
+			LOGGER.error(e.getMessage());
 			try {
 				if (stmt != null) stmt.close();
 				conn.rollback();
@@ -138,7 +151,6 @@ public class VirtuosoManager {
 				LOGGER.error(e1.getMessage());
 			}
 			closeConnection();
-			LOGGER.error(e.getMessage());
 			return false;
 		}
 		return true;
