@@ -2,6 +2,7 @@ package eu.threecixty.profile;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -177,15 +178,17 @@ public class ProfilerPlaceUtilsVirtuoso {
 	public static List <String> getPlaceNamesFromRatingOfFriends(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
 
+		List <String> friendUids = getFriendUIDs(uID);
+		if (friendUids == null || friendUids.size() == 0) return null;
+		
 		StringBuffer buffer = new StringBuffer(PREFIXES);
 
 		buffer.append("SELECT  ?name \n");
-		buffer.append("FROM <" + VirtuosoManager.getInstance().getGraph(uID) + ">\n");
 		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
 		buffer.append(" FROM <http://3cixty.com/placesRating> \n");
 		buffer.append("where {\n");
 		
-		buffer.append(getPersonURI(uID) +  " schema:knows	?knows .\n");
+		//buffer.append(getPersonURI(uID) +  " schema:knows	?knows .\n");
 		
 		//buffer.append("?knows profile:userID	?friendsUID .\n"); // friends' UID
 		
@@ -196,8 +199,17 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("?review schema:creator ?creator . \n");
 		buffer.append("?creator schema:url ?creatorURI .\n");
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
-		buffer.append("FILTER(fn:ends-with(STR(?creatorURI), fn:substring(STR(?knows), "
-		        + GetSetQueryStrings.PROFILE_URI.length() + "))) \n");
+//		buffer.append("FILTER(fn:ends-with(STR(?creatorURI), fn:substring(STR(?knows), "
+//		        + GetSetQueryStrings.PROFILE_URI.length() + "))) \n");
+		buffer.append("FILTER(");
+		boolean first = true;
+		for (String friendUid: friendUids) {
+			if (first) {
+				buffer.append("(?creatorURI = <https://plus.google.com/" + friendUid + ">)");
+				first = false;
+			} else buffer.append("|| (?creatorURI = <https://plus.google.com/" + friendUid + ">)");
+		}
+		buffer.append(")");
 		buffer.append("}");
 
 	    return getPlaceNamesFromQuery(buffer.toString());
@@ -231,6 +243,36 @@ public class ProfilerPlaceUtilsVirtuoso {
 			e.printStackTrace();
 		}
 		return placeNames;
+	}
+	
+	public static List <String> getFriendUIDs(String uid) {
+		List <String> friendUids = new LinkedList <String>();
+		StringBuffer buffer = new StringBuffer(PREFIXES);
+
+		buffer.append("SELECT  ?friendUID \n");
+		buffer.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + ">\n");
+		buffer.append("where {\n");
+		
+		buffer.append(getPersonURI(uid) +  " schema:knows	?knows .\n");
+		
+		buffer.append("?knows profile:userID	?friendUID .\n"); // friend's UID
+		
+		buffer.append("}");
+		
+		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
+		if (jsonObj == null) return friendUids;
+		
+		try {
+			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+			for (int index = 0; index < jsonArr.length(); index++) {
+				friendUids.add(jsonArr.getJSONObject(index).getJSONObject("friendUID").getString("value"));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return friendUids;
 	}
 	
 	private static String getGoogleReviewCreator(String uid) {
