@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import eu.threecixty.CrawlSocialProfiles.CallGPlusProfileParser;
+//import eu.threecixty.CrawlSocialProfiles.CallGPlusProfileParser;
 import eu.threecixty.MobilityCrawlerCron.MobilityCrawlerCron;
 import eu.threecixty.profile.IDMapping;
 import eu.threecixty.profile.IDCrawlTimeMapping;
@@ -141,8 +141,12 @@ public class CrawlerCron {
 	 * Main entry to crawl info.
 	 */
 	private void crawl() {
+		//CallGPlusProfileParser is not used as the crawling of the reviews is done by localidata.
+		//only MobilityCrawlerCron is to be used.
 		MobilityCrawlerCron mobilityCrawlerCron = new MobilityCrawlerCron();
-		CallGPlusProfileParser callGPlusProfileParser = new CallGPlusProfileParser();
+		
+		//CallGPlusProfileParser callGPlusProfileParser = new CallGPlusProfileParser();
+		
 		// get all 3cixtyIDs, CrawlTimes and mobidotUserNames
 		Set<IDMapping> idMapping = ProfileManagerImpl.getInstance()
 				.getIDMappings();
@@ -168,14 +172,14 @@ public class CrawlerCron {
 			// for each user in 3cixty, crawl
 			while (iteratorMapping.hasNext()) {
 				IDMapping map = iteratorMapping.next();
-				UserProfile user = new UserProfile();
-				user.setHasUID(map.getThreeCixtyID());
+				UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID());
+				//UserProfile user = new UserProfile();
+				//user.setHasUID(map.getThreeCixtyID());
 
 				String lastCrawlTime = getCrawltimeforUserID(
 						idCrawlTimeMapping, map.getThreeCixtyID());
 				Preference pref = new Preference();
-				callGPlusProfileParser.getInfoAndReviews(currentTime, map,
-						user, lastCrawlTime, pref);
+				//callGPlusProfileParser.getInfoAndReviews(currentTime, map, user, lastCrawlTime, pref);
 				mobilityCrawlerCron.getmobility(map, user, idMapping,
 						getMobidotBaseurl(), getDomain(), getMobidotApiKey(),
 						lastCrawlTime, pref, currentTime);
