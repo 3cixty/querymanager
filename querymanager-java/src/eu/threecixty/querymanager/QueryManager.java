@@ -101,6 +101,11 @@ import eu.threecixty.profile.oldmodels.Rating;
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQuery.getQuery().getQuery().setDistinct(true);
+		if (!augmentedQuery.getQuery().getQuery().hasLimit()) {
+			if (!augmentedQuery.getQuery().getQuery().hasAggregators()) {
+				augmentedQuery.getQuery().getQuery().setLimit(20);
+			}
+		}
 		augmentedQueryStr = augmentedQuery.getQuery().getQuery().toString();
 		
 		String originalQueryStr = originalQuery.convert2String();
