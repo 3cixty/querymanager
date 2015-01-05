@@ -341,6 +341,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		// encode with Base64 to avoid SQL injection
 		String personUri = getPersonURI(tray);
 		String trayUri = getTrayURI(tray);
+		tray.setTimestamp(System.currentTimeMillis());
 		StringBuffer buf = new StringBuffer(PREFIXES).append(
 				"   INSERT DATA { GRAPH <").append(getGraphName(tray)).append("> \n");
 		buf.append(" {");
