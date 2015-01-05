@@ -372,8 +372,38 @@ public class VirtuosoUserProfileStorage {
 	 */
 	private static void saveTransportToKB(String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports,
 			List <String> queriesToRemoveData, List <String> queriesToInsertData) {
+
+		QueryReturnClass qRC=VirtuosoConnection.query(GetSetQueryStrings.getTransport(uid));
 		
-		String str = null;
+		ResultSet results = qRC.getReturnedResultSet();
+
+		for ( ; results.hasNext(); ) {
+			QuerySolution qs = results.next();
+			RDFNode transport = qs.get("transport");
+
+			if (transport==null) break;
+
+			QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsURIForTransport(transport.asResource().getURI()));
+			ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
+
+			for ( ; resultsRegularTrips.hasNext(); ) {
+				QuerySolution qsRegularTrips = resultsRegularTrips.next();
+				RDFNode regularTripURI = qsRegularTrips.get("regularTrip");
+
+				if (regularTripURI!=null){
+					String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTripURI.asResource().getURI());
+					queriesToRemoveData.add(str);
+				}
+			}
+			String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
+			queriesToRemoveData.add(str);
+
+			str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.asResource().getURI());
+			queriesToRemoveData.add(str);
+
+		}
+		String str = GetSetQueryStrings.removeTransport(uid);
+		queriesToRemoveData.add(str);
 		
 		if (transports!=null&&!transports.isEmpty()){
 			Iterator<eu.threecixty.profile.oldmodels.Transport> iterators=transports.iterator();
