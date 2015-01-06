@@ -406,7 +406,7 @@ public class OAuthServices {
 		        .build();
 		String uid = (String) session.getAttribute(UID_KEY);
 		// scope can be a 'null' string as its result is found in 3cixtycallback
-		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app)) {
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app) || uid == null) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)
