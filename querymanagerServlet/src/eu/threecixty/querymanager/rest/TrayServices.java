@@ -18,6 +18,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.google.gson.Gson;
 
@@ -104,7 +105,7 @@ public class TrayServices {
     									.tag(etag)
     									.build();
     						} else {
-    							return rb.cacheControl(cc).tag(etag).build();
+    							return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
     						}
     					}
     				} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
