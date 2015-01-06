@@ -13,6 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import virtuoso.jena.driver.VirtGraph;
+import virtuoso.jena.driver.VirtuosoUpdateFactory;
+import virtuoso.jena.driver.VirtuosoUpdateRequest;
 import eu.threecixty.Configuration;
 import eu.threecixty.profile.Tray.OrderType;
 
@@ -106,12 +109,20 @@ public class VirtuosoTrayStorage implements TrayManager {
 		List <Tray> trays = getTrays(junkID);
 		boolean ok = cleanTrays(junkID);
 		if (!ok) return false;
-		// TODO: should use batch queries here
+		VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+		VirtuosoUpdateRequest vurToInsertData = null;
 		for (Tray tray: trays) {
 			tray.setUid(uid);
-			ok = save(tray);
-			if (!ok) return false;
+			String query = createQueryToSave(tray);
+			
+			if (vurToInsertData == null) vurToInsertData = VirtuosoUpdateFactory.create(query, virtGraph);
+			else vurToInsertData.addUpdate(query);
 		}
+
+		if (vurToInsertData != null) {
+			vurToInsertData.exec();
+		}
+		
 		return true;
 	}
 
@@ -338,6 +349,20 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * @return
 	 */
 	private static boolean save(Tray tray) {
+
+		String query = createQueryToSave(tray);
+		
+		try {
+			VirtuosoConnection.insertDeleteQuery(query);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	private static String createQueryToSave(Tray tray) {
 		// encode with Base64 to avoid SQL injection
 		String personUri = getPersonURI(tray);
 		String trayUri = getTrayURI(tray);
@@ -368,15 +393,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		}
 
 		buf.append("}}");
-		
-		try {
-			VirtuosoConnection.insertDeleteQuery(buf.toString());
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return false;
+		return buf.toString();
 	}
 	
 	/**
