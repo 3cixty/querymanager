@@ -10,9 +10,10 @@
   <version>1.0</version>
   
   <dependencies>
+ 
 	<dependency>
 	  <groupId>eu.3cixty</groupId>
-	  <artifactId>spe</artifactId>
+	  <artifactId>profileKB</artifactId>
 	  <version>1.0</version>
     </dependency>
 
