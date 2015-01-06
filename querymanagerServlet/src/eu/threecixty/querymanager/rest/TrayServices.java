@@ -12,14 +12,12 @@ import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-
-
-
-
-
-
 
 import com.google.gson.Gson;
 
@@ -55,7 +53,7 @@ public class TrayServices {
 	
     @POST
     @Path("/tray")
-    public Response invokeTrayServices(InputStream input) {
+    public Response invokeTrayServices(InputStream input, @Context Request req) {
     	long starttime = System.currentTimeMillis();
     	String restTrayStr = getRestTrayString(input);
 		Gson gson = new Gson();
@@ -87,12 +85,27 @@ public class TrayServices {
     						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
     						return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
     					} else {
-    						String content = gson.toJson(trays);
-    						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
-    						return Response.status(Response.Status.OK)
-    								.entity(content)
-    								.type(MediaType.APPLICATION_JSON_TYPE)
-    								.build();
+    						long newestTimestamp = getNewestTimestamp(trays);
+    						EntityTag etag = new EntityTag(Long.valueOf(newestTimestamp).hashCode() + "");
+    						Response.ResponseBuilder rb = null;
+    				        //Verify if it matched with etag available in http request
+    				        rb = req.evaluatePreconditions(etag);
+					        //Create cache control header
+					         CacheControl cc = new CacheControl();
+					         //Set max age to one day
+					         cc.setMaxAge(86400);
+    						if (rb == null) { // changed
+    							String content = gson.toJson(trays);
+    							CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    							return Response.status(Response.Status.OK)
+    									.entity(content)
+    									.type(MediaType.APPLICATION_JSON_TYPE)
+    									.cacheControl(cc)
+    									.tag(etag)
+    									.build();
+    						} else {
+    							return rb.cacheControl(cc).tag(etag).build();
+    						}
     					}
     				} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
     					List <Tray> trays = loginTray(restTray);
@@ -333,6 +346,17 @@ public class TrayServices {
 		}
 		
 		return ProfileManagerImpl.getInstance().getTrayManager().updateTray(tray);
+	}
+	
+	private long getNewestTimestamp(List <Tray> trays) {
+		long ret = -1;
+		if (trays == null ||trays.size() == 0) return ret;
+		for (Tray tray: trays) {
+			if (tray.getTimestamp() > ret) {
+				ret = tray.getTimestamp();
+			}
+		}
+		return ret;
 	}
 	
 	private void checkPermission(String token) throws ThreeCixtyPermissionException {
