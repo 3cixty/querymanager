@@ -455,6 +455,8 @@ public class OAuthServices {
 	}
 	
 	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, App app) {
+		HttpSession session = httpRequest.getSession();
+		session.removeAttribute(APP_KEY);
 		try {
 			return Response.temporaryRedirect(new URI(app.getRedirectUri()
 					+ "#access_token=" + accessToken.getAccess_token()
