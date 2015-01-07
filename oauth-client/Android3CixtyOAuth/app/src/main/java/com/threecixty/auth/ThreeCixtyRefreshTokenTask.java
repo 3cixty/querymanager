@@ -26,7 +26,7 @@ public class ThreeCixtyRefreshTokenTask extends ThreeCixtyAbstractTask {
 		if (lastTokenInfo == null) return null;
 		try {
 			long creationTime = System.currentTimeMillis();
-			URLConnection conn = getUrlConnection(REFRESH_OAUTH_SERVICE);
+			URLConnection conn = getUrlConnection(REFRESH_OAUTH_SERVICE, context);
 			conn.setRequestProperty("refresh_token", lastTokenInfo.getRefresh_token());
 			InputStream input = conn.getInputStream();
 			tokenInfo = parse(input);

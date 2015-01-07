@@ -34,7 +34,7 @@ public class ThreeCixtyAccessTokenTask extends ThreeCixtyAbstractTask {
 	protected Void doInBackground(Void... params) {
 		try {
 			long creationTime = System.currentTimeMillis();
-			URLConnection conn = getUrlConnection(OAUTH_ANDROID_SERVICE);
+			URLConnection conn = getUrlConnection(OAUTH_ANDROID_SERVICE, activity);
 			
 			conn.setRequestProperty("google_access_token", encode(googleToken));
 			conn.setRequestProperty("key", encode(appkey));

@@ -35,7 +35,7 @@ public class ThreeCixtyRevokeTokenTask extends ThreeCixtyAbstractTask {
 	protected Void doInBackground(Void... params) {
 		if (token == null) return null;
 		try {
-		    URLConnection conn = getUrlConnection(REVOKE_OAUTH_SERVICE);
+		    URLConnection conn = getUrlConnection(REVOKE_OAUTH_SERVICE, context);
 		    if (REVOKE_OAUTH_SERVICE.startsWith("https")) {
 		    	((HttpsURLConnection) conn).setRequestMethod("POST");
 		    } else ((HttpURLConnection) conn).setRequestMethod("POST");
