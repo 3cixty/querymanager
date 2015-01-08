@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
             AsyncTask <Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
-                    URLConnection conn = ThreeCixtyAbstractTask.getUrlConnection(ThreeCixtyAbstractTask.GET_KEY_INFO_SERVICE_FROM_APPKEY);
+                    URLConnection conn = ThreeCixtyAbstractTask.getUrlConnection(ThreeCixtyAbstractTask.GET_KEY_INFO_SERVICE_FROM_APPKEY, MainActivity.this);
                     conn.setRequestProperty("key", appkey);
                     try {
                         String content = getContent(conn);
@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
             AsyncTask <Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
-                    URLConnection conn = ThreeCixtyAbstractTask.getUrlConnection(ThreeCixtyAbstractTask.GET_KEY_INFO_SERVICE_FROM_ACCESS_TOKEN);
+                    URLConnection conn = ThreeCixtyAbstractTask.getUrlConnection(ThreeCixtyAbstractTask.GET_KEY_INFO_SERVICE_FROM_ACCESS_TOKEN, MainActivity.this);
                     conn.setRequestProperty("access_token", accessToken);
                     try {
                         String content = getContent(conn);
