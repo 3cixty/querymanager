@@ -203,7 +203,6 @@ public class VirtuosoUserProfileStorage {
 					str=GetSetQueryStrings.setUser(know);
 					queriesToInsertData.add(str);
 					eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
-					profileIdentities.setHasSource("https://plus.google.com");
 					profileIdentities.setHasSourceCarrier("Google");
 					profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
 					profileIdentities.setHasUserAccountID(know);
@@ -688,14 +687,11 @@ public class VirtuosoUserProfileStorage {
 				
 				eu.threecixty.profile.oldmodels.ProfileIdentities tmpProfile = new eu.threecixty.profile.oldmodels.ProfileIdentities();
 				RDFNode uri = qs.get("pi");
-				RDFNode source = qs.get("source");
 				RDFNode piID = qs.get("piID");
 				RDFNode uIM = qs.get("uIM");
 			    
 			    if (uri!=null)
 			    	tmpProfile.setHasProfileIdentitiesURI(uri.asResource().getURI());
-			    if (source!=null)
-			    	tmpProfile.setHasSource(source.asResource().getURI());
 			    if (piID!=null)
 			    	tmpProfile.setHasUserAccountID(piID.toString());	
 			    if (uIM!=null)

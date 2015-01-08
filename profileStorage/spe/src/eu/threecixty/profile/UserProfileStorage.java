@@ -239,8 +239,8 @@ public class UserProfileStorage {
 	private static ProfileIdentities convertProfileIdentities(
 			eu.threecixty.profile.oldmodels.ProfileIdentities oldProfile, MyFactory mf, String uid) {
 		ProfileIdentities pi = mf.createProfileIdentities(PROFILE_URI
-				+ uid + oldProfile.getHasSource() + oldProfile.getHasUserAccountID());
-		if (oldProfile.getHasSource() != null) pi.addHasSource(oldProfile.getHasSource());
+				+ uid + oldProfile.getHasSourceCarrier() + oldProfile.getHasUserAccountID());
+		if (oldProfile.getHasSourceCarrier() != null) pi.addHasSource(oldProfile.getHasSourceCarrier());
 		if (oldProfile.getHasUserAccountID() != null) pi.addHasUserAccountID(oldProfile.getHasUserAccountID());
 		return pi;
 	}
@@ -1166,7 +1166,7 @@ public class UserProfileStorage {
 		for (ProfileIdentities pi: fromUserProfile.getHasProfileIdentities()) {
 			eu.threecixty.profile.oldmodels.ProfileIdentities tmpProfile = new eu.threecixty.profile.oldmodels.ProfileIdentities();
 			if (pi.hasHasSource()) {
-				tmpProfile.setHasSource(clean(pi.getHasSource().iterator().next().toString()));
+				tmpProfile.setHasSourceCarrier(clean(pi.getHasSource().iterator().next().toString()));
 			}
 			if (pi.hasHasUserAccountID()) {
 				tmpProfile.setHasUserAccountID(clean(pi.getHasUserAccountID().iterator().next().toString()));

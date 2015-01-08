@@ -10,8 +10,6 @@ import eu.threecixty.profile.annotations.Description;
 public class ProfileIdentities {
 	@Description(hasText="ProfileIdentities URI")
 	private String hasProfileIdentitiesURI="";
-	@Description(hasText="User Social profile carrier other than 3cixty. @uses http://www.w3.org/2006/vcard/ns#url")
-	private String hasSource="";
 	@Description(hasText="User Social profile carrier other than 3cixty")
 	private String hasSourceCarrier="";
 	@Description(hasText="User ID on the Social profile carrier other than 3cixty")
@@ -25,12 +23,6 @@ public class ProfileIdentities {
 	}
 	public void setHasProfileIdentitiesURI(String hasProfileIdentitiesURI) {
 		this.hasProfileIdentitiesURI = hasProfileIdentitiesURI;
-	}
-	public String getHasSource() {
-		return hasSource;
-	}
-	public void setHasSource(String hasSource) {
-		this.hasSource = hasSource;
 	}
 	public String getHasUserAccountID() {
 		return hasUserAccountID;
