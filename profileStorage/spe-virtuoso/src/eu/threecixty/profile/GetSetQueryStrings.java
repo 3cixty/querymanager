@@ -471,7 +471,7 @@ public class GetSetQueryStrings {
 	 */
 	public static String getProfileIdentities(String uid) {
 		String query=PREFIX
-				+ "select ?pi ?source ?piID ?uIM "
+				+ "select ?pi ?piID ?uIM "
 				+ " from <" + getGraphName(uid) + ">"
 				+ " where {"
 					+ "?s a foaf:Person. "
