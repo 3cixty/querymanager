@@ -474,11 +474,10 @@ public class GetSetQueryStrings {
 				+ "select ?pi ?piID ?uIM "
 				+ " from <" + getGraphName(uid) + ">"
 				+ " where {"
-					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s foaf:account ?pi. "
-					+ "?pi foaf:accountName ?piID."
-					+ "?pi profile:userInteractionMode ?uIM."
+					+ "?pi foaf:accountName ?piID. "
+					+ "?pi profile:userInteractionMode ?uIM. "
 					+ "}";
 		return query;
 	}
