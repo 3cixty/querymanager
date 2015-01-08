@@ -191,7 +191,6 @@ public class SettingsServices {
 		List <ProfileIdentities> profileIdentities = settings.getIdentities();
 		if (profileIdentities == null) profileIdentities = new ArrayList <ProfileIdentities>();
 		ProfileIdentities tmpProfile = new ProfileIdentities();
-		tmpProfile.setHasSource(source);
 		tmpProfile.setHasUserInteractionMode(UserInteractionMode.Active);
 		tmpProfile.setHasUserAccountID(accountId);
 		tmpProfile.setHasSourceCarrier(source);
