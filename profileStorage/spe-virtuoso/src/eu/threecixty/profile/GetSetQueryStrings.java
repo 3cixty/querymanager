@@ -400,8 +400,6 @@ public class GetSetQueryStrings {
 			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity) {
 		String query= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type foaf:OnLineAccount."
 				+ "  <"+PROFILE_URI+uid+"> foaf:account <"+profileIdentity.getHasProfileIdentitiesURI()+"> .";
-		if  (profileIdentity.getHasSource()!=null&&!profileIdentity.getHasSource().isEmpty())
-			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> foaf:accountServiceHomepage <"+profileIdentity.getHasSource()+"> .";
 		if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
 			query+= "  <"+profileIdentity.getHasProfileIdentitiesURI()+"> foaf:accountName \""+profileIdentity.getHasUserAccountID()+"\" .";
 		if  (profileIdentity.getHasUserInteractionMode().toString()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
@@ -458,12 +456,10 @@ public class GetSetQueryStrings {
 				+ " { ";
 				query+= " <"+PROFILE_URI+uid+"> foaf:account ?pi . "
 						+ " ?pi rdf:type foaf:OnlineAccount . "
-						+ " ?pi foaf:accountServiceHomepage ?accountServiceHomepage . "
 						+ " ?pi foaf:accountName ?accountName . "
 						+ " ?pi profile:userInteractionMode ?userInteractionMode . ";
 		query+= "}} Where { GRAPH <" + getGraphName(uid) + "> { <"+PROFILE_URI+uid+"> foaf:account ?pi . "
 						+ " ?pi rdf:type foaf:OnlineAccount . "
-						+ " ?pi foaf:accountServiceHomepage ?accountServiceHomepage . "
 						+ " ?pi foaf:accountName ?accountName . "
 						+ " ?pi profile:userInteractionMode ?userInteractionMode . }}";
 		return query;
@@ -481,7 +477,6 @@ public class GetSetQueryStrings {
 					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s foaf:account ?pi. "
-					+ "?pi foaf:accountServiceHomepage ?source."
 					+ "?pi foaf:accountName ?piID."
 					+ "?pi profile:userInteractionMode ?uIM."
 					+ "}";

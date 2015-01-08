@@ -154,9 +154,8 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     			+ "?root a foaf:Person . "
     			+ "?root profile:userID ?uid . "
     			+ "?root foaf:account ?pi . "
-			+ "?pi foaf:accountServiceHomepage ?source ."
 			+ "?pi foaf:accountName ?mobidotID ."
-			+ "Filter(STR(?source) =\"https://www.movesmarter.nl/portal\") . "
+			+ "Filter(STR(?source) =\"Mobidot\") . "
     			+ "}";
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		
