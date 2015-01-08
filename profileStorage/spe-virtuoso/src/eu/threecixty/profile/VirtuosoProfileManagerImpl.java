@@ -148,14 +148,15 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	 */
 	private Set<IDMapping> getMobidotIDsForUsers() {
         String queryString = "prefix foaf:	<http://xmlns.com/foaf/0.1/> "
-			+"prefix profile:	<http://3cixty.com/ontology/profile/> "
+			+"prefix profile:	<http://3cixty.com/ontology/profile/> \n"
+			+"prefix fn:	<http://www.w3.org/2005/xpath-functions#> \n"
     			+ "SELECT ?uid ?mobidotID "
     			+ "WHERE { "
     			+ "?root a foaf:Person . "
     			+ "?root profile:userID ?uid . "
     			+ "?root foaf:account ?pi . "
 			+ "?pi foaf:accountName ?mobidotID ."
-			+ "Filter(STR(?source) =\"Mobidot\") . "
+			+ "Filter(fn:ends-with(STR(?pi), \"Mobidot\")) . "
     			+ "}";
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		
