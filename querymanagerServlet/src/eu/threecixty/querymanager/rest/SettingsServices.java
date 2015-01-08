@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -17,7 +16,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
-
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -25,6 +23,7 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
+import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
 /**
  * This class is to store settings information into UserProfile.
@@ -36,6 +35,8 @@ public class SettingsServices {
 
 	
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
+
+	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 	
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -191,7 +192,10 @@ public class SettingsServices {
 		if (profileIdentities == null) profileIdentities = new ArrayList <ProfileIdentities>();
 		ProfileIdentities tmpProfile = new ProfileIdentities();
 		tmpProfile.setHasSource(source);
+		tmpProfile.setHasUserInteractionMode(UserInteractionMode.Active);
 		tmpProfile.setHasUserAccountID(accountId);
+		tmpProfile.setHasSourceCarrier(source);
+		tmpProfile.setHasProfileIdentitiesURI(PROFILE_URI+ settings.getUid() + "/Account/"+tmpProfile.getHasSourceCarrier());
 		// TODO: update private data from accessToken ?
 		profileIdentities.add(tmpProfile);
 		settings.setIdentities(profileIdentities);
