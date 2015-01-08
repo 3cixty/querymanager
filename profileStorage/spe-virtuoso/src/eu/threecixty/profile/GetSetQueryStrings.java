@@ -56,7 +56,6 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 				+ "select ?uri "
 				+ " where {"
-					+ "?uri a foaf:Person. "
 					+" ?uri profile:userID \""+uid+"\". "
 					+ "}";
 		return query;
@@ -71,7 +70,6 @@ public class GetSetQueryStrings {
 				+ "select ?lastCrawlTime "
 				+ " from <" + getGraphName(uid) + ">"
 				+ " where {"
-					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "//100900047095598983805
 					+ "?s profile:hasLastCrawlTime ?lastCrawlTime. "
 					+ "}";
@@ -313,7 +311,7 @@ public class GetSetQueryStrings {
 					+ "?geoLocation schema:latitude ?lat."
 					+ "?geoLocation schema:longitude ?longitude. "
 				+ "}} where { GRAPH <"+ getGraphName(uid)+"> "
-				+ "  {?s a foaf:Person. "
+				+ "  { "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s schema:address ?address. "
 					+ "?address rdf:type schema:PostalAddress . "
@@ -474,11 +472,10 @@ public class GetSetQueryStrings {
 				+ "select ?pi ?piID ?uIM "
 				+ " from <" + getGraphName(uid) + ">"
 				+ " where {"
-					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s foaf:account ?pi. "
-					+ "?pi foaf:accountName ?piID."
-					+ "?pi profile:userInteractionMode ?uIM."
+					+ "?pi foaf:accountName ?piID. "
+					+ "?pi profile:userInteractionMode ?uIM. "
 					+ "}";
 		return query;
 	}
@@ -546,7 +543,6 @@ public class GetSetQueryStrings {
 				+ "select ?likes ?likeName ?liketype "
 				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
-					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s profile:like ?likes. "
 					+ "?likes schema:likeName ?likeName."
@@ -625,7 +621,6 @@ public class GetSetQueryStrings {
 				+ "select ?transport "
 				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
-					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s profile:mobility ?transport. "
 					+ "}";
@@ -1120,7 +1115,6 @@ public class GetSetQueryStrings {
 				+ " { ";
 				query+= makeRemoveTripPreferenceQuery();
 		query+= "}} Where { GRAPH <" + getGraphName(uid) + "> {"
-				+ "?s a foaf:Person. \n"
 				+" ?s profile:userID \""+uid+"\" . \n"
 				+" ?s frap:holds ?tripPreference. \n"
 				+ "?tripPreference frap:about ?about . \n"
@@ -1147,7 +1141,6 @@ public class GetSetQueryStrings {
 				+ "select ?tripPreference ?preferredMaxTotalDistance ?preferredTripDuration ?preferredTripTime ?preferredCity ?preferredCountry ?preferredWeatherCondition ?preferredMinTimeOfAccompany ?modality "
 				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
-					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\" . "
 					+ "?s frap:holds ?tripPreference. "
 					+ "?tripPreference frap:about ?about . "
@@ -1228,7 +1221,6 @@ public class GetSetQueryStrings {
 			+ " { ";
 			query+= makeRemovePlacePreferenceQuery();
 		query+= "}} where { GRAPH <" + getGraphName(uid) + "> {"
-				+ " ?s a foaf:Person. "
 				+" ?s profile:userID \""+uid+"\". "
 				+" ?s frap:holds ?placePreference. "
 				+ "?placePreference frap:about ?about . "
@@ -1248,7 +1240,6 @@ public class GetSetQueryStrings {
 				+ "select ?placePreference ?natureOfPlace "
 				+ " from <" + getGraphName(uid) + "> "
 				+ " where {"
-					+ "?s a foaf:Person. "
 					+" ?s profile:userID \""+uid+"\". "
 					+ "?s frap:holds ?placePreference. "
 					+ "?placePreference frap:about ?about . "
