@@ -152,7 +152,6 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			+"prefix fn:	<http://www.w3.org/2005/xpath-functions#> \n"
     			+ "SELECT ?uid ?mobidotID "
     			+ "WHERE { "
-    			+ "?root a foaf:Person . "
     			+ "?root profile:userID ?uid . "
     			+ "?root foaf:account ?pi . "
 			+ "?pi foaf:accountName ?mobidotID ."
@@ -187,7 +186,6 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			+"prefix profile:	<http://3cixty.com/ontology/profile/> "
     			+ "SELECT ?uid ?lastCrawlTime "
     			+ "WHERE { "
-    			+ "?root a foaf:Person . "
     			+ "?root profile:userID ?uid . "
     			+ "?root profile:hasLastCrawlTime ?lastCrawlTime . "
       			+ "}";
