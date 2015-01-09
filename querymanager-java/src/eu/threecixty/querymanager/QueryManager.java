@@ -106,6 +106,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				augmentedQuery.getQuery().getQuery().setLimit(20);
 			}
 		}
+		
 		augmentedQueryStr = augmentedQuery.getQuery().getQuery().toString();
 		
 		String originalQueryStr = originalQuery.convert2String();
@@ -268,7 +269,6 @@ import eu.threecixty.profile.oldmodels.Rating;
 		}
 		augmentedQuery = new AugmentedQuery(query.cloneQuery());
 		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
-		QueryUtils.addFilterWithOrOperandForExprsIntoQuery(exprs, augmentedQuery.getQuery().getQuery());
 		if (augmentedQuery.getQuery().getQuery().hasAggregators()) return;
 		QueryUtils.addOrderToQuery(exprs, augmentedQuery.getQuery().getQuery());
 		QueryUtils.addVarNameResultsToQuery(exprs, augmentedQuery.getQuery().getQuery());
