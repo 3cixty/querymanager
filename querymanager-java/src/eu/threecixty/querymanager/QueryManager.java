@@ -268,8 +268,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 			logInfo("-------------------------------------------------------");
 		}
 		augmentedQuery = new AugmentedQuery(query.cloneQuery());
-		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
 		if (augmentedQuery.getQuery().getQuery().hasAggregators()) return;
+		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
 		QueryUtils.addOrderToQuery(exprs, augmentedQuery.getQuery().getQuery());
 		QueryUtils.addVarNameResultsToQuery(exprs, augmentedQuery.getQuery().getQuery());
 	}
