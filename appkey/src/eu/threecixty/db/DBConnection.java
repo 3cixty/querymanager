@@ -10,21 +10,13 @@ import java.util.Scanner;
 
 public class DBConnection {
 
-	private static final Object _sync = new Object();
-	private static DBConnection singleton;
-
 	private Connection conn;
 	
 	private String dbPwd = null;
 	private String pathToPwdPropertyFile = null;
 	
 	public static DBConnection getInstance() {
-		if (singleton == null) {
-			synchronized (_sync) {
-				if (singleton == null) singleton = new DBConnection();
-			}
-		}
-		return singleton;
+		return SingletonHolder.INSTANCE;
 	}
 
 	public void setPath(String pathToPwdPropertyFile) {
@@ -84,5 +76,10 @@ public class DBConnection {
 	}
 	
 	private DBConnection() {
+	}
+	
+	/**Singleton holder for lazy initiation*/
+	private static class SingletonHolder {
+		private static final DBConnection INSTANCE = new DBConnection();
 	}
 }
