@@ -8,6 +8,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
+import org.apache.log4j.Logger;
+
 //import eu.threecixty.CrawlSocialProfiles.CallGPlusProfileParser;
 import eu.threecixty.MobilityCrawlerCron.MobilityCrawlerCron;
 import eu.threecixty.profile.IDMapping;
@@ -33,6 +36,12 @@ import eu.threecixty.profile.oldmodels.Preference;
 public class CrawlerCron {
 
 	private long fONCE_PER_DAY = 1000 * 60 * 60 * 24;
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 CrawlerCron.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	private int fONE_DAY = 1;
 	private int fTHREE_AM = 3;
@@ -141,6 +150,7 @@ public class CrawlerCron {
 	 * Main entry to crawl info.
 	 */
 	private void crawl() {
+		if (DEBUG_MOD) LOGGER.info("Start crawling Mobidot data");
 		//CallGPlusProfileParser is not used as the crawling of the reviews is done by localidata.
 		//only MobilityCrawlerCron is to be used.
 		MobilityCrawlerCron mobilityCrawlerCron = new MobilityCrawlerCron();
@@ -172,6 +182,7 @@ public class CrawlerCron {
 			// for each user in 3cixty, crawl
 			while (iteratorMapping.hasNext()) {
 				IDMapping map = iteratorMapping.next();
+				if (DEBUG_MOD) LOGGER.info("UID = " + map.getThreeCixtyID() + ", Mobidot username = " + map.getMobidotUserName() + ", Mobidot ID = " + map.getMobidotID());
 				UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID());
 				//UserProfile user = new UserProfile();
 				//user.setHasUID(map.getThreeCixtyID());
@@ -184,12 +195,11 @@ public class CrawlerCron {
 						getMobidotBaseurl(), getDomain(), getMobidotApiKey(),
 						lastCrawlTime, pref, currentTime);
 
-				user.setHasLastCrawlTime(getDateTime().toString());
+				user.setHasLastCrawlTime(Long.toString(currentTime));
 
 				ProfileManagerImpl.getInstance().saveProfile(user);
 			}
-			System.out.println("All user sucessfully crawled at: "
-					+ getDateTime().toString());
+			if (DEBUG_MOD) LOGGER.info("Finish crawling Mobidot data");
 		} catch (Exception e) {
 			e.printStackTrace();
 			crawl();

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -30,6 +31,12 @@ import eu.threecixty.profile.oldmodels.TripPreference;
  */
 
 public class MobilityCrawlerCron {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 MobilityCrawlerCron.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	/**
 	 * check network
@@ -44,6 +51,7 @@ public class MobilityCrawlerCron {
 				input.close();
 			return true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -65,6 +73,7 @@ public class MobilityCrawlerCron {
 	private void extractAccompanying(IDMapping map, Set<IDMapping> idMapping,
 			String MobidotBaseurl, String APIKey, Long mobidotID,
 			Transport transport, TripPreference tripPreference) {
+		if (DEBUG_MOD) LOGGER.info("Start extracting Accompanying");
 		int length;
 		String urlStr;
 		urlStr = MobidotBaseurl + "measurement/Accompanies/" + mobidotID
@@ -78,6 +87,9 @@ public class MobilityCrawlerCron {
 		for (int i = 0; i < length; i++) {
 
 			JSONObject jsonobj = resultAccompany.getJSONObject(i);
+			
+			if (DEBUG_MOD) LOGGER.info("Accompanying received from Mobidot: " + jsonobj);
+			
 			Accompanying hasAccompany = storeAccompanyingDetailsInKB(
 					map.getThreeCixtyID(), jsonobj, idMapping);
 
@@ -90,6 +102,7 @@ public class MobilityCrawlerCron {
 		}
 		transport.setHasAccompanyings(accompanyings);
 		tripPreference.setHasPreferredMinTimeOfAccompany(minTime);
+		if (DEBUG_MOD) LOGGER.info("Finish extracting Accompanying");
 	}
 
 	/**
@@ -106,7 +119,9 @@ public class MobilityCrawlerCron {
 	 */
 	private void extractPersonalPlaces(String MobidotBaseurl, String APIKey,
 			Preference pref, Long mobidotID, Long fromTime) {
-
+		
+		if (DEBUG_MOD) LOGGER.info("Start extracting PersonalPlaces");
+		
 		int length;
 		String urlStr;
 
@@ -126,7 +141,10 @@ public class MobilityCrawlerCron {
 			placePreference.setHasPlaceDetailPreference(placeDetailPreference);
 			placePreferences.add(placePreference);
 			pref.setHasPlacePreference(placePreferences);
+			
+			if (DEBUG_MOD) LOGGER.info("Nature of Place: " + placeDetailPreference.getHasNatureOfPlace());
 		}
+		if (DEBUG_MOD) LOGGER.info("Finish extracting PersonalPlaces");
 	}
 
 	/**
@@ -144,6 +162,7 @@ public class MobilityCrawlerCron {
 	private RegularTrip extractRegularTrips(IDMapping map, UserProfile user,
 			String MobidotBaseurl, String APIKey, Long mobidotID,
 			Transport transport) {
+		if (DEBUG_MOD) LOGGER.info("Start extracting RegularTrips");
 		int length;
 		String urlStr = MobidotBaseurl + "personalmobility/RegularTrips/"
 				+ mobidotID + "?key=" + APIKey;
@@ -155,9 +174,12 @@ public class MobilityCrawlerCron {
 		RegularTrip maxRegularTrip = null;
 		for (int i = 0; i < length; i++) {
 			JSONObject jsonobj = resultRegularTrip.getJSONObject(i);
+			
+			if (DEBUG_MOD) LOGGER.info("RegularTrip received from Mobidot: " + jsonobj);
 
 			RegularTrip regularTrip = storeRegularTripsInKB(
 					map.getThreeCixtyID(), jsonobj, user);
+			
 			int count = (int) (long) regularTrip.getHasRegularTripTotalCount();
 			if (maxTimeRegularTripMade < count) {
 				maxTimeRegularTripMade = count;
@@ -165,6 +187,7 @@ public class MobilityCrawlerCron {
 			}
 			regularTrips.add(regularTrip);
 		}
+		if (DEBUG_MOD) LOGGER.info("Finish extracting RegularTrips");
 		transport.setHasRegularTrip(regularTrips);
 		return maxRegularTrip;
 	}
@@ -195,6 +218,7 @@ public class MobilityCrawlerCron {
 				input.close();
 				return Long.parseLong(sb.toString());
 			} catch (Exception e) {
+				e.printStackTrace();
 				return null;
 			}
 		}
