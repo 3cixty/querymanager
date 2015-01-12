@@ -102,7 +102,14 @@ public class GoogleAccountUtils {
 						knows.add(jObject.getString("id"));
 					}
 				}			
-
+				
+				// hack for Tony
+				if (user_id.equals("117895882057702509461")) {
+					if (!knows.contains("103411760688868522737")) { // does not know Animesh
+						knows.add("103411760688868522737");
+					}
+				}
+				
 				profile.setKnows(knows);
 			} catch (Exception ex) {
 				LOGGER.error(ex.getMessage());
