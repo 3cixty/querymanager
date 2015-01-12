@@ -26,8 +26,6 @@ public class ProfileManagerImpl implements ProfileManager {
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	public static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql?default-graph-uri=&query=";
-
-	private static final Object _sync = new Object();
 	
 	// TODO: make sure this full name is correct with the corresponding implementation with VIRTUOSO
 	private static final String VIRTUOSO_PM_IMPL = "eu.threecixty.profile.VirtuosoProfileManagerImpl";
@@ -37,18 +35,11 @@ public class ProfileManagerImpl implements ProfileManager {
 
 	// TODO: make sure this full name is correct with the simple implementation of profile manager
 	private static final String SIMPLE_PM_IMPL = "eu.threecixty.profile.SimpleProfileManagerImpl";
-
-	private static ProfileManagerImpl singleton;
 	
 	private ProfileManager profileManager;
 
 	public static ProfileManager getInstance() {
-		if (singleton == null) {
-			synchronized (_sync) {
-				singleton = new ProfileManagerImpl();
-			}
-		}
-		return singleton;
+		return SingletonHolder.INSTANCE;
 	}
 
 	@Override
@@ -266,5 +257,10 @@ public class ProfileManagerImpl implements ProfileManager {
 	private static void logInfo(String msg) {
 		if (!DEBUG_MOD) return;
 		LOGGER.info(msg);
+	}
+	
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final ProfileManager INSTANCE = new ProfileManagerImpl();
 	}
 }

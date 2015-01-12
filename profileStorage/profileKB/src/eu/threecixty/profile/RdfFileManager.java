@@ -15,11 +15,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  *
  */
 public class RdfFileManager {
-	private static final Object _sync = new Object();
 	
 	private static final String NULLPATH_EXCEPTION = "Path to RDF file is not set";
-	
-	private static RdfFileManager singleton;
 
 	/**Attribute which is absolute path to RDF file*/
 	private String absolutePath;
@@ -27,12 +24,7 @@ public class RdfFileManager {
 	private Model model = null;
 	
 	public static RdfFileManager getInstance() {
-		if (singleton == null) {
-			synchronized (_sync) {
-				if (singleton == null) singleton = new RdfFileManager();
-			}
-		}
-		return singleton;
+		return SingletonHolder.INSTANCE;
 	}
 
 	/**
@@ -57,7 +49,7 @@ public class RdfFileManager {
 	 */
 	public Model getRdfModel() {
 		if (model == null) {
-			synchronized (_sync) {
+			synchronized (this) {
 				if (model == null) {
 					if (absolutePath == null || "".equals(absolutePath)) {
 						throw new RuntimeException(NULLPATH_EXCEPTION);
@@ -84,5 +76,10 @@ public class RdfFileManager {
 	 * Prohibits instantiations.
 	 */
 	private RdfFileManager() {
+	}
+	
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final RdfFileManager INSTANCE = new RdfFileManager();
 	}
 }

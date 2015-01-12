@@ -26,33 +26,23 @@ import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
 public class VirtuosoManager {
 
 	
-	private static final Object _sync = new Object();
-	
 //	private static final String PASSWORD_FIXED = "Mil(ano3Cix)ty!";
 	
 	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixty.com/private/";
 	
 	private static boolean firstTime = true;
-	private static List <String> publicGraphs;
+	private volatile static List <String> publicGraphs;
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 VirtuosoManager.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
-
-	private static VirtuosoManager instance;
 	
-	private Connection spoolConn;
+	private volatile Connection spoolConn;
 	
-
 	public static VirtuosoManager getInstance() {
-		if (instance == null) {
-			synchronized (_sync) {
-				if (instance == null) instance = new VirtuosoManager();
-			}
-		}
-		return instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	
@@ -75,7 +65,7 @@ public class VirtuosoManager {
 
 			// firstly, no one has permission to access to the graph
 			if (firstTime) {
-				synchronized (_sync) {
+				synchronized (VirtuosoManager.class) {
 					if (firstTime) { // double-checked
 						// the following line should be done by isql in Virtuoso to avoid bugs in listing known graphs
 					    //stmt.addBatch("DB.DBA.RDF_DEFAULT_USER_PERMS_SET ('nobody', 0)");
@@ -266,7 +256,7 @@ public class VirtuosoManager {
 	public Connection getConnection() {
 		if (spoolConn != null) return spoolConn; 
 		try {
-			synchronized (_sync) {
+			synchronized (this) {
 				if (spoolConn == null) {
 					Class.forName("virtuoso.jdbc4.Driver");
 					spoolConn = DriverManager.getConnection(VirtuosoConnection.DB_URL + "charset=UTF-8/roundrobin=1",
@@ -282,7 +272,7 @@ public class VirtuosoManager {
 	}
 	
 	public void closeConnection() {
-		synchronized (_sync) {
+		synchronized (this) {
 			if (spoolConn != null) {
 				try {
 					spoolConn.close();
@@ -331,7 +321,7 @@ public class VirtuosoManager {
 
 	private List <String> getPublicGraphs(Statement stmt) {
 		if (publicGraphs != null) return publicGraphs;
-		synchronized (_sync) {
+		synchronized (this) {
 			if (publicGraphs == null) {
 				publicGraphs = new ArrayList <String>();
 				try {
@@ -355,5 +345,10 @@ public class VirtuosoManager {
 	}
 	
 	private VirtuosoManager() {
+	}
+
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final VirtuosoManager INSTANCE = new VirtuosoManager();
 	}
 }

@@ -6,22 +6,14 @@ import eu.threecixty.profile.PartnerUser.PartnerAccount;
 
 public class GoFlowImpl implements Partner {
 
-	private static final Object _sync = new Object();
 	private static final String GOFLOW_FILE = "goflow.json";
-	
-	private static Partner instance;
 	
 	private static String path;
 	
 	private Partner partnerIntf;
 
 	public static Partner getInstance() {
-		if (instance == null) {
-			synchronized (_sync) {
-				if (instance == null) instance = new GoFlowImpl();
-			}
-		}
-		return instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	public static void setPath(String path) {
@@ -65,5 +57,10 @@ public class GoFlowImpl implements Partner {
 
 	private GoFlowImpl() {
 		partnerIntf = new PartnerImpl(path, GOFLOW_FILE);
+	}
+	
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final Partner INSTANCE = new GoFlowImpl();
 	}
 }
