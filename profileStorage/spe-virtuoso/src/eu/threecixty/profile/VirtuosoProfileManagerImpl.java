@@ -23,17 +23,17 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	
 	@Override
 	public UserProfile getProfile(String uid) {
-		return VirtuosoUserProfileStorage.loadProfile(uid);
+		return VirtuosoUserProfileStorage.getInstance(uid).loadProfile();
 	}
 
 	@Override
 	public boolean saveProfile(UserProfile userProfile) {
-		return VirtuosoUserProfileStorage.saveProfile(userProfile);
+		return VirtuosoUserProfileStorage.getInstance(userProfile.getHasUID()).saveProfile(userProfile);
 	}
 
 	@Override
 	public boolean existUID(String uid) {
-		return VirtuosoUserProfileStorage.existUID(uid);
+		return VirtuosoUserProfileStorage.getInstance(uid).existUID();
 	}
 
 	@Override
@@ -227,6 +227,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<UserProfile> getAllUserProfiles() {
-		return VirtuosoUserProfileStorage.getAllUserProfiles();
+		//return VirtuosoUserProfileStorage.getAllUserProfiles();
+		return null;
 	}
 }
