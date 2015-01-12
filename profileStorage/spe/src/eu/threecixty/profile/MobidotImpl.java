@@ -11,22 +11,14 @@ import eu.threecixty.profile.PartnerUser.PartnerAccount;
  */
 public class MobidotImpl implements Partner {
 	
-	private static final Object _sync = new Object();
 	private static final String MOBIDOT_FILE = "mobidot.json";
-	
-	private static Partner instance;
 	
 	private static String path;
 	
 	private Partner partnerIntf;
 
 	public static Partner getInstance() {
-		if (instance == null) {
-			synchronized (_sync) {
-				if (instance == null) instance = new MobidotImpl();
-			}
-		}
-		return instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	public static void setPath(String path) {
@@ -70,5 +62,10 @@ public class MobidotImpl implements Partner {
 
 	private MobidotImpl() {
 		partnerIntf = new PartnerImpl(path, MOBIDOT_FILE);
+	}
+	
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final Partner INSTANCE = new MobidotImpl();
 	}
 }

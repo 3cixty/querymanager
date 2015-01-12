@@ -45,17 +45,9 @@ public class VirtuosoTrayStorage implements TrayManager {
 	private static final String INVALID_TRAY_ELEMENT_EXCEPTION_MSG =
 			"The UID and tray element ID must conform to the following pattern: ([a-z]*[A-Z]*[0-9]*[-]*[/]*[:]*[.]*)*";
 
-	private static final Object _sync = new Object();
-
-	private static TrayManager instance;
 
 	public static TrayManager getInstance() {
-		if (instance == null) {
-			synchronized (_sync) {
-				if (instance == null) instance = new VirtuosoTrayStorage();
-			}
-		}
-		return instance;
+		return SingletonHolder.INSTANCE;
 	}
 
 	public boolean addTray(Tray tray) throws InvalidTrayElement {
@@ -479,5 +471,10 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * Prohibits instantiations.
 	 */
 	private VirtuosoTrayStorage() {
+	}
+
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final TrayManager INSTANCE = new VirtuosoTrayStorage();
 	}
 }

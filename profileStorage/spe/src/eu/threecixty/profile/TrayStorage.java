@@ -23,24 +23,13 @@ import eu.threecixty.profile.Tray.OrderType;
  *
  */
 public class TrayStorage implements TrayManager {
-
-	private static final Object _sync = new Object();
 	
 	private static final String TRAY_FILENAME = "temporaryTrayFile.json";
-	
-	private static TrayStorage instance;
 	
 	private static String path;
 	
 	public static TrayManager getInstance() {
-		if (instance == null) {
-			synchronized (_sync) {
-				if (instance == null) {
-					instance = new TrayStorage();
-				}
-			}
-		}
-		return instance;
+		return SingletonHolder.INSTANCE;
 	}
 
 	public synchronized boolean addTray(Tray tray) {
@@ -296,5 +285,10 @@ public class TrayStorage implements TrayManager {
 	}
 	
 	private TrayStorage() {
+	}
+
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final TrayManager INSTANCE = new TrayStorage();
 	}
 }
