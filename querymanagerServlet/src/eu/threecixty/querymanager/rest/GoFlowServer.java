@@ -7,9 +7,6 @@ import java.util.Properties;
 import java.util.Random;
 
 public class GoFlowServer {
-
-	private static final Object _sync = new Object();
-	private static GoFlowServer instance;
 	
 	static String goflowUrl = "";
 	static String adminname = "";
@@ -21,12 +18,7 @@ public class GoFlowServer {
 	private static String pathToConfig;
 
 	public static GoFlowServer getInstance() {
-		if (instance == null) {
-			synchronized (_sync) {
-				if (instance == null) instance = new GoFlowServer();
-			}
-		}
-		return instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private GoFlowServer() {
@@ -170,4 +162,8 @@ public class GoFlowServer {
 		}
 	}
 
+	/**Singleton holder*/
+	private static class SingletonHolder {
+		private static final GoFlowServer INSTANCE = new GoFlowServer();
+	}
 }

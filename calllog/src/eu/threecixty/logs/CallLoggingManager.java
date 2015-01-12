@@ -4,20 +4,11 @@ import java.util.List;
 
 public class CallLoggingManager {
 
-	private static final Object _sync = new Object();
-
-	private static CallLoggingManager singleton;
-
 	private CallLoggingStorage storage;
 	
 
 	public static CallLoggingManager getInstance() {
-		if (singleton == null) {
-			synchronized (_sync) {
-				if (singleton == null) singleton = new CallLoggingManager();
-			}
-		}
-		return singleton;
+		return SingletonHolder.INSTANCE;
 	}
 
 	public boolean save(CallLogging stats) {
@@ -97,5 +88,10 @@ public class CallLoggingManager {
 
 	private CallLoggingManager() {
 		storage = new CallLoggingStorageImpl();
+	}
+	
+	/**Singleton holder for lazy initiation*/
+	private static class SingletonHolder {
+		private static final CallLoggingManager INSTANCE = new CallLoggingManager();
 	}
 }
