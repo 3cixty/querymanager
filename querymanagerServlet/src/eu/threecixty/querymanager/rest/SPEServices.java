@@ -1,14 +1,6 @@
 package eu.threecixty.querymanager.rest;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -22,10 +14,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
@@ -34,10 +22,6 @@ import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
-import eu.threecixty.profile.ProfileManagerImpl;
-import eu.threecixty.profile.Tray;
-import eu.threecixty.profile.UserProfile;
-import eu.threecixty.querymanager.AdminValidator;
 
 /**
  * The class is an end point for Rest ProfileAPI to expose to other components.
@@ -49,11 +33,11 @@ public class SPEServices {
 	
 	public static final String PROFILE_SCOPE_NAME = "Profile";
 	
-	 private static final Logger LOGGER = Logger.getLogger(
-			 SPEServices.class.getName());
+//	 private static final Logger LOGGER = Logger.getLogger(
+//			 SPEServices.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
-	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 //private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	
 	@Context 
@@ -111,82 +95,82 @@ public class SPEServices {
 		}
 	}
 	
-	@POST
-	@Path("/getAllProfiles")
-	public Response getProfiles(@FormParam("username") String username, @FormParam("password") String password) {
-		try {
-			AdminValidator admin=new AdminValidator();
-			if (admin.validate(username,password,CallLogServices.realPath)) {
-				List <UserProfile> allProfiles = ProfileManagerImpl.getInstance().getAllUserProfiles();
-				Gson gson = new Gson();
-				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
-			} else {
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
-			}
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return Response.serverError().build();
-	}
+//	@POST
+//	@Path("/getAllProfiles")
+//	public Response getProfiles(@FormParam("username") String username, @FormParam("password") String password) {
+//		try {
+//			AdminValidator admin=new AdminValidator();
+//			if (admin.validate(username,password,CallLogServices.realPath)) {
+//				List <UserProfile> allProfiles = ProfileManagerImpl.getInstance().getAllUserProfiles();
+//				Gson gson = new Gson();
+//				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
+//			} else {
+//				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
+//			}
+//		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+//		}
+//		return Response.serverError().build();
+//	}
 	
-	@POST
-	@Path("/copyProfiles")
-	public Response copyProfiles(@FormParam("username") String username, @FormParam("password") String password, @FormParam("version") String version) {
-		try {
-			AdminValidator admin=new AdminValidator();
-			if (!admin.validate(username,password,CallLogServices.realPath)) {
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
-			} else {
-				String urlToGetProfiles =  "http://localhost:8080/" + version + "/getAllProfiles";
-
-				URLConnection profileConn = getPostConnection(urlToGetProfiles, username, password);
-				String profileContent = getContent(profileConn);
-				JSONArray arrUserProfiles = new JSONArray(profileContent);
-				
-				Gson gson = new Gson();
-				int profileSuccNum = 0;
-				for (int i = 0; i < arrUserProfiles.length(); i++) {
-					JSONObject jsonObj = arrUserProfiles.getJSONObject(i);
-					String str = jsonObj.toString();
-					if (DEBUG_MOD) LOGGER.info("copying user " + str);
-					UserProfile userProfile = gson.fromJson(str, UserProfile.class);
-					boolean ok = ProfileManagerImpl.getInstance().saveProfile(userProfile);
-					if (DEBUG_MOD) {
-						if (ok) LOGGER.info("Successful to copy the user with uid = " + userProfile.getHasUID());
-						else LOGGER.info("Failed to copy the user: " + userProfile.getHasUID());
-					}
-					if (ok) profileSuccNum++;
-				}
-				
-				String urlToGetTrays =  "http://localhost:8080/" + version + "/allTrays";
-				URLConnection trayConn = getPostConnection(urlToGetTrays, username, password);
-				String trayContent = getContent(trayConn);
-				JSONArray arrTrays = new JSONArray(trayContent);
-				
-				int traySuccNum = 0;
-				for (int i = 0; i < arrTrays.length(); i++) {
-					JSONObject jsonObj = arrTrays.getJSONObject(i);
-					String str = jsonObj.toString();
-					if (DEBUG_MOD) LOGGER.info("copying tray " + str);
-					Tray tray = gson.fromJson(str, Tray.class);
-					boolean ok = ProfileManagerImpl.getInstance().getTrayManager().addTray(tray);
-					if (DEBUG_MOD) {
-						if (ok) LOGGER.info("Successful to copy the tray = " + str);
-						else LOGGER.info("Failed to copy the tray: " + str);
-					}
-					if (ok) traySuccNum++;
-				}
-				
-				return Response.ok("Successful to copy "
-				        + profileSuccNum + "/" + arrUserProfiles.length() + " user profiles, "
-				        + traySuccNum + "/" + arrTrays.length() + " trays").build();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOGGER.error(e.getMessage());
-		}
-		return Response.serverError().build();
-	}
+//	@POST
+//	@Path("/copyProfiles")
+//	public Response copyProfiles(@FormParam("username") String username, @FormParam("password") String password, @FormParam("version") String version) {
+//		try {
+//			AdminValidator admin=new AdminValidator();
+//			if (!admin.validate(username,password,CallLogServices.realPath)) {
+//				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
+//			} else {
+//				String urlToGetProfiles =  "http://localhost:8080/" + version + "/getAllProfiles";
+//
+//				URLConnection profileConn = getPostConnection(urlToGetProfiles, username, password);
+//				String profileContent = getContent(profileConn);
+//				JSONArray arrUserProfiles = new JSONArray(profileContent);
+//				
+//				Gson gson = new Gson();
+//				int profileSuccNum = 0;
+//				for (int i = 0; i < arrUserProfiles.length(); i++) {
+//					JSONObject jsonObj = arrUserProfiles.getJSONObject(i);
+//					String str = jsonObj.toString();
+//					if (DEBUG_MOD) LOGGER.info("copying user " + str);
+//					UserProfile userProfile = gson.fromJson(str, UserProfile.class);
+//					boolean ok = ProfileManagerImpl.getInstance().saveProfile(userProfile);
+//					if (DEBUG_MOD) {
+//						if (ok) LOGGER.info("Successful to copy the user with uid = " + userProfile.getHasUID());
+//						else LOGGER.info("Failed to copy the user: " + userProfile.getHasUID());
+//					}
+//					if (ok) profileSuccNum++;
+//				}
+//				
+//				String urlToGetTrays =  "http://localhost:8080/" + version + "/allTrays";
+//				URLConnection trayConn = getPostConnection(urlToGetTrays, username, password);
+//				String trayContent = getContent(trayConn);
+//				JSONArray arrTrays = new JSONArray(trayContent);
+//				
+//				int traySuccNum = 0;
+//				for (int i = 0; i < arrTrays.length(); i++) {
+//					JSONObject jsonObj = arrTrays.getJSONObject(i);
+//					String str = jsonObj.toString();
+//					if (DEBUG_MOD) LOGGER.info("copying tray " + str);
+//					Tray tray = gson.fromJson(str, Tray.class);
+//					boolean ok = ProfileManagerImpl.getInstance().getTrayManager().addTray(tray);
+//					if (DEBUG_MOD) {
+//						if (ok) LOGGER.info("Successful to copy the tray = " + str);
+//						else LOGGER.info("Failed to copy the tray: " + str);
+//					}
+//					if (ok) traySuccNum++;
+//				}
+//				
+//				return Response.ok("Successful to copy "
+//				        + profileSuccNum + "/" + arrUserProfiles.length() + " user profiles, "
+//				        + traySuccNum + "/" + arrTrays.length() + " trays").build();
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			LOGGER.error(e.getMessage());
+//		}
+//		return Response.serverError().build();
+//	}
 	
 	/**
 	 * Saves profile information to the KB.
@@ -278,27 +262,27 @@ public class SPEServices {
 		}
 	}
 
-	private URLConnection getPostConnection(String urlStr,
-			String username, String password) throws IOException {
-		URL url = new URL(urlStr);
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setRequestMethod("POST");
-		conn.setDoOutput(true);
-		OutputStream out = conn.getOutputStream();
-		out.write(("username=" + username + "&password=" + password).getBytes());
-		out.close();
-		return conn;
-	}
-	
-	private String getContent(URLConnection conn) throws IOException {
-		InputStream input = conn.getInputStream();
-		StringBuffer buf = new StringBuffer();
-		byte[] b = new byte[1024];
-		int readBytes = 0;
-		while ((readBytes = input.read(b)) >= 0) {
-			buf.append(new String(b, 0, readBytes));
-		}
-		input.close();
-		return buf.toString();
-	}
+//	private URLConnection getPostConnection(String urlStr,
+//			String username, String password) throws IOException {
+//		URL url = new URL(urlStr);
+//		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//		conn.setRequestMethod("POST");
+//		conn.setDoOutput(true);
+//		OutputStream out = conn.getOutputStream();
+//		out.write(("username=" + username + "&password=" + password).getBytes());
+//		out.close();
+//		return conn;
+//	}
+//	
+//	private String getContent(URLConnection conn) throws IOException {
+//		InputStream input = conn.getInputStream();
+//		StringBuffer buf = new StringBuffer();
+//		byte[] b = new byte[1024];
+//		int readBytes = 0;
+//		while ((readBytes = input.read(b)) >= 0) {
+//			buf.append(new String(b, 0, readBytes));
+//		}
+//		input.close();
+//		return buf.toString();
+//	}
 }

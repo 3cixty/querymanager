@@ -7,6 +7,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.CrawlerCron.CrawlerCron;
 import eu.threecixty.db.DBConnection;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoFlowImpl;
@@ -46,6 +47,10 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    GoFlowServer.setPath(realPath + File.separatorChar + "WEB-INF" + File.separatorChar + "goflow.properties");
 	    DBConnection.getInstance().setPath(realPath);
 	    OAuthWrappers.addScopesByDefault();
+	    
+	    // create timer for crawling Mobidot information
+	    CrawlerCron crawlerCron = new CrawlerCron();
+	    crawlerCron.run();
 	}
 
 }
