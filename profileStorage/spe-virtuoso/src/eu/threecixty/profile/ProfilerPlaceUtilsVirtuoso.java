@@ -131,21 +131,20 @@ public class ProfilerPlaceUtilsVirtuoso {
 
 
 	/**
-	 * Gets Place Names.
+	 * Actually, this method is to get a list of place Ids.
 	 * @param model
 	 * @param uID
 	 * @param rating
 	 * @return
 	 */
-	public static List <String> getPlaceNamesFromRating(String uID, float rating) {
+	public static List <String> getPlaceIdsFromRating(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
 		
 		StringBuffer buffer = new StringBuffer(PREFIXES);
 
-		buffer.append("SELECT  ?name \n");
+		buffer.append("SELECT  ?x \n");
 		buffer.append("where {\n");
 		buffer.append("?x schema:review ?review .\n");
-		buffer.append("?x schema:name ?name .\n");
 		buffer.append("?review schema:reviewRating	?reviewRating .\n");
 		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
 		buffer.append("?review schema:creator ?creator . \n");
@@ -153,7 +152,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
 		buffer.append("}");
 		
-		return getPlaceNamesFromQuery(buffer.toString());
+		return getPlaceIdsFromQuery(buffer.toString());
 	}
 
 
@@ -169,13 +168,13 @@ public class ProfilerPlaceUtilsVirtuoso {
 	}
 
 	/**
-	 * Gets both hotel and place names.
+	 * Gets place IDs.
 	 * @param model
 	 * @param uID
 	 * @param rating
 	 * @return
 	 */
-	public static List <String> getPlaceNamesFromRatingOfFriends(String uID, float rating) {
+	public static List <String> getPlaceIdsFromRatingOfFriends(String uID, float rating) {
 		if (uID == null || uID.equals("")) return null;
 
 		List <String> friendUids = getFriendUIDs(uID);
@@ -183,7 +182,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		
 		StringBuffer buffer = new StringBuffer(PREFIXES);
 
-		buffer.append("SELECT  ?name \n");
+		buffer.append("SELECT  ?x \n");
 		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
 		buffer.append(" FROM <http://3cixty.com/placesRating> \n");
 		buffer.append("where {\n");
@@ -193,7 +192,6 @@ public class ProfilerPlaceUtilsVirtuoso {
 		//buffer.append("?knows profile:userID	?friendsUID .\n"); // friends' UID
 		
 		buffer.append("?x schema:review ?review .\n");
-		buffer.append("?x schema:name ?name .\n");
 		buffer.append("?review schema:reviewRating	?reviewRating .\n");
 		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
 		buffer.append("?review schema:creator ?creator . \n");
@@ -212,7 +210,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append(")");
 		buffer.append("}");
 
-	    return getPlaceNamesFromQuery(buffer.toString());
+	    return getPlaceIdsFromQuery(buffer.toString());
 	}
 
 	/**
@@ -227,7 +225,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		return null;
 	}
 
-	private static List<String> getPlaceNamesFromQuery(String qStr) {
+	private static List<String> getPlaceIdsFromQuery(String qStr) {
 	    
 		List <String> placeNames = new ArrayList <String>();
 		
@@ -237,7 +235,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		try {
 			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
 			for (int index = 0; index < jsonArr.length(); index++) {
-				placeNames.add(jsonArr.getJSONObject(index).getJSONObject("name").getString("value"));
+				placeNames.add(jsonArr.getJSONObject(index).getJSONObject("x").getString("value"));
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

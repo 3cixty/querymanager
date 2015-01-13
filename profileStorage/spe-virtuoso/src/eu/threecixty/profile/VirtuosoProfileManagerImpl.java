@@ -68,7 +68,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<String> getPlaceNamesFromRating(String uid, float rating) {
-		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromRating(uid, rating);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRating(uid, rating);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	@Override
 	public List<String> getPlaceNamesFromRatingOfFriends(String uid,
 			float rating) {
-		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromRatingOfFriends(uid, rating);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRatingOfFriends(uid, rating);
 	}
 
 	@Override
