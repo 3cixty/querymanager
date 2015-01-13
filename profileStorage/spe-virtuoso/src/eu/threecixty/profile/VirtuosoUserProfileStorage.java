@@ -159,6 +159,7 @@ public class VirtuosoUserProfileStorage {
 			
 			VirtuosoUpdateRequest vurToRemoveData = null;
 			for (String query: queriesToRemoveData) {
+				if (DEBUG_MOD) LOGGER.info("query to remove data: " + query);
 				if (vurToRemoveData == null) vurToRemoveData = VirtuosoUpdateFactory.create(query, virtGraph);
 				else vurToRemoveData.addUpdate(query);
 			}
