@@ -145,6 +145,8 @@ public class SettingsServices {
 						&& pi_ids.size() > 0 && pi_ats != null && pi_ats.size() > 0
 						) {
 
+					if (settings.getIdentities() != null) settings.getIdentities().clear();
+					
 					for (int i = 0; i < sources.size(); i++) {
 						addProfileIdentities(sources.get(i), pi_ids.get(i), pi_ats.get(i), settings);
 					}
