@@ -32,14 +32,14 @@
     <input type="text" readonly="readonly" value="<%=settings.getUid()%>" name="uid">
 </div>
 <div>
- <span >First Name<font color="red">*</font></span>
+ <span >First Name<!--<font color="red">*</font>--></span>
 </div>
 <div>
-    <input type="text" name="firstName" value="<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>" required>
+    <input type="text" name="firstName" readonly="readonly"  value="<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>" required>
 </div>
-<div><span >Last Name<font color="red">*</font></span></div>
+<div><span >Last Name<!--<font color="red">*</font>--></span></div>
 <div>
-    <input type="text" name="lastName" value="<%=settings.getLastName() == null ? "" : settings.getLastName()%>" required>
+    <input type="text" name="lastName" readonly="readonly"  value="<%=settings.getLastName() == null ? "" : settings.getLastName()%>" required>
 </div>
 <div><span >Country</span></div>
 <div>
@@ -65,7 +65,7 @@
 </div>
 <div style="height: 10px;"></div>
 <div align="justify" style="font-size: 11px;"  >
-Disclaimer: The information marked by red star are required. For Mobidot account, if the user specifies it, it will help us crawl the mobility profile and associate mobility related preferences while augmenting the query. If the Mobidot account is not specified, we will not augment the query based on mobility preferences and we will not crawl the mobility profile of the user.
+Disclaimer: <!--The information marked by red star are required. -->For Mobidot account, if the user specifies it, it will help us crawl the mobility profile and associate mobility related preferences while augmenting the query. If the Mobidot account is not specified, we will not augment the query based on mobility preferences and we will not crawl the mobility profile of the user.
 </div>
 <div style="height: 10px;"></div>
 <div align="center"  >
