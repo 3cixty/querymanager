@@ -452,8 +452,8 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 				+ "  DELETE WHERE { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
-				query+= " <"+PROFILE_URI+uid+"> foaf:account ?pi . "
-						+ " ?pi ?p ?o . ";
+				query+= " ?pi ?p ?o . "
+				+ " <"+PROFILE_URI+uid+"> foaf:account ?pi . ";
 		query+= "}}";
 		return query;
 	}	
