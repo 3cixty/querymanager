@@ -61,7 +61,7 @@ public class SPEServiceTests extends HTTPCall {
 		userEnteredRatings.add(userEnteredRating);
 		
 		Set <UserEventRating> userEventRatings = new HashSet<UserEventRating>();
-		userEnteredRating.setHasUserEventRatin(userEventRatings);
+		userEnteredRating.setHasUserEventRating(userEventRatings);
 		UserEventRating userEventRating = createUserEventRating();
 		userEventRatings.add(userEventRating);
 		
@@ -366,7 +366,7 @@ public class SPEServiceTests extends HTTPCall {
 	}
 	
 	private void checkRating(Rating rating, Rating loadedRating) {
-		Assert.assertTrue(rating.getHasUseDefinedRating().equals(loadedRating.getHasUseDefinedRating()));
+		Assert.assertTrue(rating.getHasUseDefinedRating() == loadedRating.getHasUseDefinedRating());
 		Assert.assertTrue(rating.getHasUserInteractionMode() == loadedRating.getHasUserInteractionMode());
 		// current version of models no datetime voted
 	}
