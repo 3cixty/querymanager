@@ -94,6 +94,7 @@ public class SettingsStorage {
 				setOfProfileIdentities = new HashSet <ProfileIdentities>();
 				userProfile.setHasProfileIdenties(setOfProfileIdentities);
 			}
+			setOfProfileIdentities.clear();
 			setOfProfileIdentities.addAll(settings.getIdentities());
 		}
 	}
