@@ -102,8 +102,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public List<String> getPlaceNamesFromRating(String uid, float rating) {
-		if (profileManager != null) return profileManager.getPlaceNamesFromRating(uid, rating);
+	public List<String> getPlaceIdsFromRating(String uid, float rating) {
+		if (profileManager != null) return profileManager.getPlaceIdsFromRating(uid, rating);
 		return new ArrayList<String>();
 	}
 
@@ -115,9 +115,9 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public List<String> getPlaceNamesFromRatingOfFriends(String uid,
+	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
 			float rating) {
-		if (profileManager != null) return profileManager.getPlaceNamesFromRatingOfFriends(uid, rating);
+		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(uid, rating);
 		return new ArrayList <String>();
 	}
 

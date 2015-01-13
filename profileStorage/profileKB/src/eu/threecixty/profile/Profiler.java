@@ -243,18 +243,18 @@ public class Profiler implements IProfiler {
 		}
 
 		if (scoreRatedAtLeast != -1) {
-			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromRating(uID, scoreRatedAtLeast);
-			addPlaces(placeNames, places);
-			addScoreRequired(scoreRatedAtLeast);
+			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRating(uID, scoreRatedAtLeast);
+			addPlaces(placeIds, places);
+			//addScoreRequired(scoreRatedAtLeast);
 		}
 		if (numberOfTimeVisitedAtLeast != -1) {
 			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisited(uID, numberOfTimeVisitedAtLeast);
 			addPlaces(placeNames, places);
 		}
 		if (scoreRatedForFriendsAtLeast != -1) {
-			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
-			addPlaces(placeNames, places);
-			addScoreRequired(scoreRatedForFriendsAtLeast);
+			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
+			addPlaces(placeIds, places);
+			//addScoreRequired(scoreRatedForFriendsAtLeast);
 		}
 		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
 			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisitedOfFriends(uID, numberOfTimeVisitedForFriendsAtLeast);
@@ -317,12 +317,12 @@ public class Profiler implements IProfiler {
 
 	/**
 	 * Add places with 'Others' for NatureOfPlace.
-	 * @param placeNames
+	 * @param placeIds
 	 * @param places
 	 */
-	private void addPlaces(List<String> placeNames, Set<Place> places) {
-		if (placeNames != null) {
-			for (String placeName: placeNames) {
+	private void addPlaces(List<String> placeIds, Set<Place> places) {
+		if (placeIds != null) {
+			for (String placeName: placeIds) {
 				Place place = createPlace(placeName, NatureOfPlace.Others);
 				if (place != null) places.add(place);
 			}

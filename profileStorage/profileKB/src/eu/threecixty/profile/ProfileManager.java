@@ -86,14 +86,14 @@ public interface ProfileManager {
 	GpsCoordinate getCoordinate(String uid);
 
 	/**
-	 * Gets a list of place names which were rated with a score more than a given <code>rating</code> value. 
+	 * Gets a list of place IDs which were rated with a score more than a given <code>rating</code> value. 
 	 * @param uid
 	 * 				Google UID.
 	 * @param rating
 	 * 				Rating score.
-	 * @return A list of place names if Google UID is valid, <code>null</code> otherwise.
+	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceNamesFromRating(String uid, float rating);
+	List <String> getPlaceIdsFromRating(String uid, float rating);
 
 	/**
 	 * Gets a list of place names which were visited more than <code>number</code> times.
@@ -106,14 +106,14 @@ public interface ProfileManager {
 	List <String> getPlaceNamesFromNumberOfTimesVisited(String uid, int number);
 
 	/**
-	 * Gets a list of place names which were rated by friends with a score more than a given <code>rating</code>.
+	 * Gets a list of place IDs which were rated by friends with a score more than a given <code>rating</code>.
 	 * @param uid
 	 * 				Googel UID.
 	 * @param rating
 	 * 				Rating score
-	 * @return A list of place names if Google UID is valid, <code>null</code> otherwise.
+	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceNamesFromRatingOfFriends(String uid, float rating);
+	List <String> getPlaceIdsFromRatingOfFriends(String uid, float rating);
 	
 	/**
 	 * Gets a list of place names which were visited by friends more than <code>number</code> times.
