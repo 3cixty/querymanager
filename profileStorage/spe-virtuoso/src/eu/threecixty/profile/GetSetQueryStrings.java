@@ -450,16 +450,11 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeAllProfileIdentitiesOfUser(String uid){
 		String query=PREFIX
-				+ "  DELETE { GRAPH <"+ getGraphName(uid)+">"
+				+ "  DELETE WHERE { GRAPH <"+ getGraphName(uid)+">"
 				+ " { ";
 				query+= " <"+PROFILE_URI+uid+"> foaf:account ?pi . "
-						+ " ?pi rdf:type foaf:OnlineAccount . "
-						+ " ?pi foaf:accountName ?accountName . "
-						+ " ?pi profile:userInteractionMode ?userInteractionMode . ";
-		query+= "}} Where { GRAPH <" + getGraphName(uid) + "> { <"+PROFILE_URI+uid+"> foaf:account ?pi . "
-						+ " ?pi rdf:type foaf:OnlineAccount . "
-						+ " ?pi foaf:accountName ?accountName . "
-						+ " ?pi profile:userInteractionMode ?userInteractionMode . }}";
+						+ " ?pi ?p ?o . ";
+		query+= "}}";
 		return query;
 	}	
 	/**
