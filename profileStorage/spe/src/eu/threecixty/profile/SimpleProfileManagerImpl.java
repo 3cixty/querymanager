@@ -68,7 +68,7 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public List<String> getPlaceNamesFromRating(String uid, float rating) {
+	public List<String> getPlaceIdsFromRating(String uid, float rating) {
 		return ProfilerPlaceUtils.getPlaceNamesFromRating(getModel(), uid, rating);
 	}
 
@@ -79,7 +79,7 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public List<String> getPlaceNamesFromRatingOfFriends(String uid,
+	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
 			float rating) {
 		return ProfilerPlaceUtils.getPlaceNamesFromRatingOfFriends(getModel(), uid, rating);
 	}
