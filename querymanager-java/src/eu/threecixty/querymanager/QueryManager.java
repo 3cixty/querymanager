@@ -204,6 +204,13 @@ import eu.threecixty.profile.oldmodels.Rating;
 				if (jsonArrs.length() < 1) {
 					ok = false;
 				} else {
+					// add augmented to vars
+					if (numberOfOrders > 0) {
+						JSONObject jsonHead = json.getJSONObject("head");
+						jsonHead.getJSONArray("vars").put("augmented");
+					}
+					
+					// add augmented to item
 					for (int i = 0; i < jsonArrs.length(); i++) {
 						boolean augmented = false;
 						JSONObject jsonElement = jsonArrs.getJSONObject(i);
@@ -212,7 +219,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 							if (augmented) checkPropertyTrueAndRemove(jsonElement, "callret-" + col); // only remove
 							else augmented = checkPropertyTrueAndRemove(jsonElement, "callret-" + col);
 						}
-						jsonElement.put("augmented", augmented);
+						if (numberOfOrders > 0) jsonElement.put("augmented", augmented);
 					}
 					sb.setLength(0);
 					sb.append(json.toString());
