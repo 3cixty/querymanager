@@ -209,10 +209,11 @@ import eu.threecixty.profile.oldmodels.Rating;
 					if (numberOfOrders > 0) {
 						JSONObject jsonHead = json.getJSONObject("head");
 						List <Integer> indexesRemoved = new ArrayList <Integer>();
-						for (int index = 0; index <= numberOfOrders; index++) {
-							String tmp = "callret-" + index;
-							for (int i = 0; i < jsonHead.getJSONArray("vars").length(); i++) {
-								if (tmp.equals(jsonHead.getJSONArray("vars").get(i))) {
+						JSONArray subHeadArrs = jsonHead.getJSONArray("vars");
+						for (int i = 0; i < subHeadArrs.length(); i++) {
+							String varName = subHeadArrs.get(i).toString();
+							for (int index = 0; index <= numberOfOrders; index++) {
+								if (varName.equals("callret-" + index)) {
 									indexesRemoved.add(i);
 									break;
 								}
