@@ -204,6 +204,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				if (jsonArrs.length() < 1) {
 					ok = false;
 				} else {
+					if (DEBUG_MOD) LOGGER.info("Result received from Virtuoso: " + sb.toString());
 					// add augmented to vars
 					if (numberOfOrders > 0) {
 						JSONObject jsonHead = json.getJSONObject("head");
