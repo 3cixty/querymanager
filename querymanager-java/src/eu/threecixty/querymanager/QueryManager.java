@@ -208,21 +208,23 @@ import eu.threecixty.profile.oldmodels.Rating;
 					// add augmented to vars
 					if (numberOfOrders > 0) {
 						JSONObject jsonHead = json.getJSONObject("head");
-						List <Integer> indexesRemoved = new ArrayList <Integer>();
+						JSONArray newArrs = new JSONArray();
 						JSONArray subHeadArrs = jsonHead.getJSONArray("vars");
 						for (int i = 0; i < subHeadArrs.length(); i++) {
 							String varName = subHeadArrs.get(i).toString();
-							for (int index = 0; index <= numberOfOrders; index++) {
+							boolean found = false;
+							for (int index = 0; index <= 10; index++) {
 								if (varName.equals("callret-" + index)) {
-									indexesRemoved.add(i);
+									found = true;
 									break;
 								}
 							}
+							if (!found) {
+								newArrs.put(varName);
+							}
 						}
-						for (int index: indexesRemoved) {
-							jsonHead.getJSONArray("vars").remove(index);
-						}
-						jsonHead.getJSONArray("vars").put("augmented");
+						newArrs.put("augmented");
+						jsonHead.put("vars", newArrs);
 					}
 					
 					// add augmented to item
