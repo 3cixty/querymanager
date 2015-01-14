@@ -230,6 +230,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 					}
 					sb.setLength(0);
 					sb.append(json.toString());
+					if (DEBUG_MOD) LOGGER.info("Result to send back to request: " + sb.toString());
 				}
 			}
 //		} else {
