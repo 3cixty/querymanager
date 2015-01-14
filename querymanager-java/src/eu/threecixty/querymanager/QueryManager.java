@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.graph.Triple;
@@ -66,6 +67,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 	private String augmentedQueryStr;
 	private boolean isForEvents;
 	private boolean isForDateRanges;
+	
+	private int numberOfOrders;
 	
 	public QueryManager(String uid) {
 		this(uid, null);
@@ -125,10 +128,10 @@ import eu.threecixty.profile.oldmodels.Rating;
 			
 			StringBuilder sb = new StringBuilder();
 			
-			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, sb, uid);
+			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, sb, uid, numberOfOrders);
 			if (ok) return sb.toString();
 			
-			hasElementsForBindings(originalQueryStr, format, formatType, sb, uid);
+			hasElementsForBindings(originalQueryStr, format, formatType, sb, uid, numberOfOrders);
 			
 			return sb.toString();
 
@@ -158,7 +161,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		StringBuilder builder = new StringBuilder();
 		try {
-			hasElementsForBindings(query, format, formatType, builder, null);
+			hasElementsForBindings(query, format, formatType, builder, null, 0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -173,7 +176,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @throws IOException 
 	 */
 	private static boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
-			StringBuilder sb, String uid) throws IOException {
+			StringBuilder sb, String uid, int numberOfOrders) throws IOException {
 		sb.setLength(0);
 
 		logInfo("Query to be executed: " + query);
@@ -197,8 +200,19 @@ import eu.threecixty.profile.oldmodels.Rating;
 			if (EventMediaFormat.JSON == format) {
 				// check if there is one element at least
 				JSONObject json = new JSONObject(sb.toString());
-				if (json.getJSONObject("results").getJSONArray("bindings").length() < 1) {
+				JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+				if (jsonArrs.length() < 1) {
 					ok = false;
+				} else {
+					for (int i = 0; i < jsonArrs.length(); i++) {
+						JSONObject jsonElement = jsonArrs.getJSONObject(i);
+						setAugmentedProperty(jsonElement, "callret");
+						for (int col = 0; col <= numberOfOrders; col++) {
+							setAugmentedProperty(jsonElement, "callret-" + col);
+						}
+					}
+					sb.setLength(0);
+					sb.append(json.toString());
 				}
 			}
 //		} else {
@@ -212,6 +226,15 @@ import eu.threecixty.profile.oldmodels.Rating;
 		logInfo("Finished executing the query on Virtuoso: ok = " + ok);
 
 		return ok;
+	}
+	
+	private static void setAugmentedProperty(JSONObject jsonObject, String property) {
+		if (jsonObject.has(property)) {
+			String val = jsonObject.getJSONObject(property).getString("value");
+
+			jsonObject.put("augmented", val.equals("1"));
+			jsonObject.remove(property);
+		}
 	}
 
 	@Override
@@ -252,6 +275,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 //	}
 
 	public void performORAugmentation(List<Triple> triples, List<Expr> exprs) {
+		numberOfOrders = 0;
 		if (preference == null || query == null) return;
 		if (triples.size() == 0 && exprs.size() == 0) return;
 		if (DEBUG_MOD) {
@@ -272,6 +296,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		QueryUtils.addTriplesIntoQuery(triples, augmentedQuery.getQuery().getQuery());
 		QueryUtils.addOrderToQuery(exprs, augmentedQuery.getQuery().getQuery());
 		QueryUtils.addVarNameResultsToQuery(exprs, augmentedQuery.getQuery().getQuery());
+		numberOfOrders = exprs.size() + originalQuery.getQuery().getResultVars().size();
 	}
 
 	@Override
