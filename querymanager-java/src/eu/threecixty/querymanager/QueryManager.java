@@ -205,11 +205,14 @@ import eu.threecixty.profile.oldmodels.Rating;
 					ok = false;
 				} else {
 					for (int i = 0; i < jsonArrs.length(); i++) {
+						boolean augmented = false;
 						JSONObject jsonElement = jsonArrs.getJSONObject(i);
-						setAugmentedProperty(jsonElement, "callret");
+						augmented = checkPropertyTrueAndRemove(jsonElement, "callret");
 						for (int col = 0; col <= numberOfOrders; col++) {
-							setAugmentedProperty(jsonElement, "callret-" + col);
+							if (augmented) checkPropertyTrueAndRemove(jsonElement, "callret-" + col); // only remove
+							else augmented = checkPropertyTrueAndRemove(jsonElement, "callret-" + col);
 						}
+						jsonElement.put("augmented", augmented);
 					}
 					sb.setLength(0);
 					sb.append(json.toString());
@@ -228,13 +231,13 @@ import eu.threecixty.profile.oldmodels.Rating;
 		return ok;
 	}
 	
-	private static void setAugmentedProperty(JSONObject jsonObject, String property) {
+	private static boolean checkPropertyTrueAndRemove(JSONObject jsonObject, String property) {
 		if (jsonObject.has(property)) {
 			String val = jsonObject.getJSONObject(property).getString("value");
-
-			jsonObject.put("augmented", val.equals("1"));
 			jsonObject.remove(property);
+			return val.equals("1");
 		}
+		return false;
 	}
 
 	@Override
