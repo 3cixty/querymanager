@@ -207,19 +207,26 @@ import eu.threecixty.profile.oldmodels.Rating;
 					// add augmented to vars
 					if (numberOfOrders > 0) {
 						JSONObject jsonHead = json.getJSONObject("head");
+						List <Integer> indexesRemoved = new ArrayList <Integer>();
+						for (int index = 0; index <= numberOfOrders; index++) {
+							String tmp = "callret-" + index;
+							for (int i = 0; i < jsonHead.getJSONArray("vars").length(); i++) {
+								if (tmp.equals(jsonHead.getJSONArray("vars").get(i))) {
+									indexesRemoved.add(i);
+									break;
+								}
+							}
+						}
+						for (int index: indexesRemoved) {
+							jsonHead.getJSONArray("vars").remove(index);
+						}
 						jsonHead.getJSONArray("vars").put("augmented");
 					}
 					
 					// add augmented to item
 					for (int i = 0; i < jsonArrs.length(); i++) {
-						boolean augmented = false;
 						JSONObject jsonElement = jsonArrs.getJSONObject(i);
-						augmented = checkPropertyTrueAndRemove(jsonElement, "callret");
-						for (int col = 0; col <= numberOfOrders; col++) {
-							if (augmented) checkPropertyTrueAndRemove(jsonElement, "callret-" + col); // only remove
-							else augmented = checkPropertyTrueAndRemove(jsonElement, "callret-" + col);
-						}
-						if (numberOfOrders > 0) jsonElement.put("augmented", augmented);
+						cleanResultAndAddAugmented(jsonElement, numberOfOrders);
 					}
 					sb.setLength(0);
 					sb.append(json.toString());
@@ -236,6 +243,16 @@ import eu.threecixty.profile.oldmodels.Rating;
 		logInfo("Finished executing the query on Virtuoso: ok = " + ok);
 
 		return ok;
+	}
+	
+	private static void cleanResultAndAddAugmented(JSONObject jsonElement, int numberOfOrders) {
+		boolean augmented = false;
+		augmented = checkPropertyTrueAndRemove(jsonElement, "callret");
+		for (int index = 0; index <= numberOfOrders; index++) {
+			if (augmented) checkPropertyTrueAndRemove(jsonElement, "callret-" + index); // only remove
+			else augmented = checkPropertyTrueAndRemove(jsonElement, "callret-" + index);
+		}
+		if (numberOfOrders > 0) jsonElement.put("augmented", augmented);
 	}
 	
 	private static boolean checkPropertyTrueAndRemove(JSONObject jsonObject, String property) {
