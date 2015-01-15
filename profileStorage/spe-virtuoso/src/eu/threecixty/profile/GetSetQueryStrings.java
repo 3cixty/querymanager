@@ -299,30 +299,11 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeAddress(String uid){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
-				+ "  { ?s schema:address ?address."
-					+ "?address rdf:type schema:PostalAddress . "
-					+ "?address schema:postalCode ?pcode."
-					+ "?address schema:streetAddress ?staddress."
-					+ "?address schema:addressLocality ?townname."
-					+ "?address schema:addressCountry ?countryname."
-					+ "?s schema:homeLocation ?homeLocation."
-					+ "?homeLocation schema:geo ?geoLocation."
-					+ "?geoLocation schema:latitude ?lat."
-					+ "?geoLocation schema:longitude ?longitude. "
-				+ "}} where { GRAPH <"+ getGraphName(uid)+"> "
+				+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+"> "
 				+ "  { "
-					+" ?s profile:userID \""+uid+"\". "
-					+ "?s schema:address ?address. "
-					+ "?address rdf:type schema:PostalAddress . "
-					+ "OPTIONAL {?address schema:postalCode ?pcode.}"
-					+ "OPTIONAL {?address schema:streetAddress ?staddress.}"
-					+ "OPTIONAL {?address schema:addressLocality ?townname.}"
-					+ "OPTIONAL {?address schema:addressCountry ?countryname.}"
-					+ "OPTIONAL {?s schema:homeLocation ?homeLocation.}"
-					+ "OPTIONAL {?homeLocation schema:geo ?geoLocation.}"
-					+ "OPTIONAL {?geoLocation schema:latitude ?lat.}"
-					+ "OPTIONAL {?geoLocation schema:longitude ?longitude. } } }";
+                    + " ?address ?p ?o . "
+                    + " <"+PROFILE_URI+uid+"> schema:address ?address. "
+					+" } }";
 		return query;
 			
 			/*
@@ -515,16 +496,10 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeAllLikesOfUser(String uid){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
-			+ " { ";
-		query+= " <"+PROFILE_URI+uid+"> profile:like ?likes . "
-				+ " ?likes rdf:type profile:Like . "
-				+ " ?likes schema:likeName ?likeName . "
-				+ " ?likes dc:subject ?liketype . ";
-			query+= "}} Where{GRAPH <" + getGraphName(uid) + "> { <"+PROFILE_URI+uid+"> profile:like ?likes . "
-				+ " ?likes rdf:type profile:Like . "
-				+ " ?likes schema:likeName ?likeName . "
-				+ " ?likes dc:subject ?liketype . "
+			+ "   DELETE Where { GRAPH <" + getGraphName(uid) + "> "
+                + " { "
+                    + " ?likes ?p ?o . "
+                    + " <"+PROFILE_URI+uid+"> profile:like ?likes . "
 				+ " }}";
 		return query;
 	}
@@ -597,12 +572,11 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeTransport(String uid){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
+			+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+">"
 			+ " { "
-			+"  <"+PROFILE_URI+uid+"> profile:mobility ?o ."
-			+"  ?o rdf:type profile:Mobility .";
-			query+= "}} where {GRAPH <" + getGraphName(uid) + ">{  <"+PROFILE_URI+uid+"> profile:mobility ?o ."
-						+"  ?o rdf:type profile:Mobility .}}";
+                +"  ?mobility ?p ?o . "
+                +"  <"+PROFILE_URI+uid+"> profile:mobility ?mobility ."
+			+ " } } ";
 			return query;
 	}
 	
@@ -668,20 +642,11 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeMultipleAccompanyingAssociatedToSpecificTransport(String uid, String transportURI){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
-				+ " { ";
-		query+=" <"+transportURI+"> profile:accompany ?accompany. "
-				+ "?accompany rdf:type profile:Accompany. "
-				+ "?accompany profile:accompanyUser ?uid2 ."
-				+ "?accompany profile:score ?score ."
-				+ "?accompany profile:validity ?validity ."
-				+ "?accompany profile:time ?acctime .  ";
-			query+= "}} where {GRAPH <" + getGraphName(uid) + "> { <"+transportURI+"> profile:accompany ?accompany. "
-					+ "?accompany rdf:type profile:Accompany. "
-				+ "Optional {?accompany profile:accompanyUser ?uid2 .}"
-				+ "Optional {?accompany profile:score ?score .}"
-				+ "Optional {?accompany profile:validity ?validity .}"
-				+ "Optional {?accompany profile:time ?acctime .}}}";
+				+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+">"
+				+ " { "
+                    + "?accompany ?p ?o . "
+                    + " <"+transportURI+"> profile:accompany ?accompany. "
+				+ "}} ";
 			return query;
 	}
 
@@ -772,23 +737,7 @@ public class GetSetQueryStrings {
 		query+= "}}";
 		return query;
 	}
-	private static String makeRemovePersonalPlaceQuery(String regularTripURI) {
-		String query= "  <"+regularTripURI+"> profile:personalPlace ?pplace ."
-		+ "?pplace profile:externalIDs ?externalIDs ."
-		+ "?pplace profile:latitude ?latitude ."
-		+ "?pplace profile:longitude ?longitude ."
-		+ "?pplace profile:stayDuration ?stayDuration ."
-		+ "?pplace profile:accuracy ?accuracy ."
-		+ "?pplace profile:stayPercentage ?stayPercentage ."
-		+ "?pplace profile:postalCode ?pcode ."
-		+ "?pplace profile:weekDayPattern ?weekDayPattern ."
-		+ "?pplace profile:dayHourPattern ?dayHourPattern ."
-		+ "?pplace profile:type ?placeType ."
-		+ "?pplace rdfs:label ?placeName ."
-		+"  ?personalPlace rdf:type profile:PersonalPlace .";
-		return query;
-	}
-	
+		
 
 	/**
 	 * remove multiple personal places associated to a specific regular trip
@@ -798,24 +747,11 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(String uid, String regularTripURI){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
-				+ " { ";
-				query+= makeRemovePersonalPlaceQuery(regularTripURI);
-				query+= "}} Where {GRAPH <" + getGraphName(uid) + ">{"
+				+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+">"
+				+ " { "
+                + "?pplace ?p ?o ."
 				+"  <"+regularTripURI+"> profile:personalPlace ?pplace ."
-				+ "Optional {?pplace profile:externalIDs ?externalIDs .}"
-				+ "Optional {?pplace profile:latitude ?latitude .}"
-				+ "Optional {?pplace profile:longitude ?longitude .}"
-				+ "Optional {?pplace profile:stayDuration ?stayDuration .}"
-				+ "Optional {?pplace profile:accuracy ?accuracy .}"
-				+ "Optional {?pplace profile:stayPercentage ?stayPercentage .}"
-				+ "Optional {?pplace profile:postalCode ?pcode .}"
-				+ "Optional {?pplace profile:weekDayPattern ?weekDayPattern .}"
-				+ "Optional {?pplace profile:dayHourPattern ?dayHourPattern .}"
-				+ "Optional {?pplace profile:type ?placeType .}"
-				+ "Optional {?pplace rdfs:label ?placeName .}"
-				+"  ?personalPlace rdf:type profile:PersonalPlace .";
-				query+= "}}";
+				+ "}}";
 			return query;
 	}
 	
@@ -917,27 +853,6 @@ public class GetSetQueryStrings {
 	}
 	
 	
-	private static String makeRemoveRegularTripQuery(String transportUri) {
-		String query= "  <"+transportUri+"> profile:regularTrip ?regularTrip ."
-		+"?transport profile:regularTrip ?regularTrip. "
-		+ "?regularTrip profile:id ?tripID ."
-		+ "?regularTrip rdfs:label ?name ."
-		+ "?regularTrip profile:departureTime ?departureTime ."
-		+ "?regularTrip profile:departureTimeSD ?departuretimeSD ."
-		+ "?regularTrip profile:travelTime ?travelTime ."
-		+ "?regularTrip profile:travelTimeSD ?travelTimeSD ."
-		//+ "Optional {?regularTrip profile:hasRegularTripFastestTravelTime ?fastestTravelTime .}"
-		+ "?regularTrip profile:lastChanged ?lastChanged ."
-		+ "?regularTrip profile:totalDistance ?totalDistance ."
-		+ "?regularTrip profile:totalCount ?totalCount ."
-		+ "?regularTrip profile:tripModality ?modalityType ."
-		+ "?regularTrip profile:weekdayPattern ?weekdayPattern ."
-		+ "?regularTrip profile:dayhourPattern ?dayhourPattern ."
-		//+ "Optional {?regularTrip profile:hasRegularTripTimePattern ?timePattern .}"
-		+ "?regularTrip profile:weatherPattern ?weatherPattern .";
-		query+= "  ?regularTrip rdf:type profile:RegularTrip .";
-		return query;
-	}
 	/**
 	 * remove multiple regular trip associated to a specific transport of a user in the kb
 	 * @param transportUri
@@ -946,29 +861,11 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeMultipleRegularTripsAssociatedToSpecificTransport(String uid, String transportUri){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
-			+ " { ";
-				query+= makeRemoveRegularTripQuery(transportUri);
-		query+= "}} where {GRAPH <" + getGraphName(uid) + ">{"
-			+"  <"+transportUri+"> profile:regularTrip ?regularTrip ."
-			+"?transport profile:regularTrip ?regularTrip. "
-			+ "Optional {?regularTrip profile:id ?tripID .}"
-			+ "Optional {?regularTrip rdfs:label ?name .}"
-			+ "Optional {?regularTrip profile:departureTime ?departureTime .}"
-			+ "Optional {?regularTrip profile:departureTimeSD ?departuretimeSD .}"
-			+ "Optional {?regularTrip profile:travelTime ?travelTime .}"
-			+ "Optional {?regularTrip profile:travelTimeSD ?travelTimeSD .}"
-			//+ "Optional {?regularTrip profile:hasRegularTripFastestTravelTime ?fastestTravelTime .}"
-			+ "Optional {?regularTrip profile:lastChanged ?lastChanged .}"
-			+ "Optional {?regularTrip profile:totalDistance ?totalDistance .}"
-			+ "Optional {?regularTrip profile:totalCount ?totalCount .}"
-			+ "Optional {?regularTrip profile:tripModality ?modalityType .}"
-			+ "Optional {?regularTrip profile:weekdayPattern ?weekdayPattern .}"
-			+ "Optional {?regularTrip profile:dayhourPattern ?dayhourPattern .}"
-			//+ "Optional {?regularTrip profile:hasRegularTripTimePattern ?timePattern .}"
-			+ "Optional {?regularTrip profile:weatherPattern ?weatherPattern .}";
-			query+= "  ?regularTrip rdf:type profile:RegularTrip .";
-		query+= "}}";
+			+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+">"
+			+ " { "
+            + " ?regularTrip ?p ?o . "
+            +"  <"+transportUri+"> profile:regularTrip ?regularTrip ."
+			+ "}}";
 		return query;
 	}
 	/**
@@ -1083,21 +980,6 @@ public class GetSetQueryStrings {
 		return query;
 	}
 
-	private static String makeRemoveTripPreferenceQuery() {
-
-		String query= "?s frap:holds ?tripPreference. \n"
-				+ "?tripPreference frap:about ?about . \n"
-				+ "?about frap:filter ?filter . \n"
-				+ "?filter profile:hasPreferredMaxTotalDistance ?preferredMaxTotalDistance . \n"
-				+ "?filter profile:hasPreferredTripDuration ?preferredTripDuration . \n"
-				+ "?filter profile:hasPreferredTripTime ?preferredTripTime . \n"
-				+ "?filter profile:hasPreferredCity ?preferredCity . \n"
-				+ "?filter profile:hasPreferredCountry ?preferredCountry . \n"
-				+ "?filter profile:hasPreferredWeatherCondition ?preferredWeatherCondition . \n"
-				+ "?filter profile:hasPreferredMinTimeOfAccompany ?preferredMinTimeOfAccompany . \n"
-				+ "?filter profile:hasModalityType ?modality . \n";
-		return query;
-	}
 	/**
 	 * remove multiple Trip preferences of the user in the kb
 	 * @param uid
@@ -1106,23 +988,13 @@ public class GetSetQueryStrings {
 	 */
 	public static String removeMultipleTripPreferences(String uid){
 		String query=PREFIX
-				+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
-				+ " { ";
-				query+= makeRemoveTripPreferenceQuery();
-		query+= "}} Where { GRAPH <" + getGraphName(uid) + "> {"
-				+" ?s profile:userID \""+uid+"\" . \n"
-				+" ?s frap:holds ?tripPreference. \n"
-				+ "?tripPreference frap:about ?about . \n"
-				+ "?about frap:filter ?filter . \n"
-				+ " Optional {?filter profile:hasPreferredMaxTotalDistance ?preferredMaxTotalDistance .} \n"
-				+ " Optional {?filter profile:hasPreferredTripDuration ?preferredTripDuration .} \n"
-				+ " Optional {?filter profile:hasPreferredTripTime ?preferredTripTime .} \n"
-				+ " Optional {?filter profile:hasPreferredCity ?preferredCity .} \n"
-				+ " Optional {?filter profile:hasPreferredCountry ?preferredCountry .} \n"
-				+ " Optional {?filter profile:hasPreferredWeatherCondition ?preferredWeatherCondition .} \n"
-				+ " Optional {?filter profile:hasPreferredMinTimeOfAccompany ?preferredMinTimeOfAccompany .} \n"
-				+ " Optional {?filter profile:hasModalityType ?modality .} \n";
-				query+= "}}";
+				+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+">"
+				+ " { "
+                + " ?filter ?p ?o . \n"
+                + " ?about frap:filter ?filter . \n"
+                + " ?tripPreference frap:about ?about . \n"
+                + " <"+PROFILE_URI+uid+"> frap:holds ?tripPreference. \n"
+				+ " }}";
 		System.out.println(query);
 		return query;
 	}
@@ -1196,14 +1068,6 @@ public class GetSetQueryStrings {
 		return query;
 	}
 	
-	private static String makeRemovePlacePreferenceQuery() {
-		
-		String query=  "?s frap:holds ?placePreference. "
-				+ "?placePreference frap:about ?about . "
-				+ "?about frap:filter ?filter . "
-				+ "?filter profile:hasNatureOfPlace ?natureOfPlace .";
-		return query;
-	}
 	/**
 	 * remove place preference of the user in the kb
 	 * @param uid
@@ -1212,16 +1076,13 @@ public class GetSetQueryStrings {
 	 */
 	public static String removePlacePreferences(String uid){
 		String query=PREFIX
-			+ "   DELETE { GRAPH <"+ getGraphName(uid)+">"
-			+ " { ";
-			query+= makeRemovePlacePreferenceQuery();
-		query+= "}} where { GRAPH <" + getGraphName(uid) + "> {"
-				+" ?s profile:userID \""+uid+"\". "
-				+" ?s frap:holds ?placePreference. "
-				+ "?placePreference frap:about ?about . "
-				+ "?about frap:filter ?filter . "
-				+ "Optional {?filter profile:hasNatureOfPlace ?natureOfPlace .}";
-				query+= "}}";
+			+ "   DELETE Where { GRAPH <"+ getGraphName(uid)+">"
+			+ " { "
+            + " ?filter ?p ?o ."
+            + " ?about frap:filter ?filter . "
+            + " ?placePreference frap:about ?about . "
+            + " <"+PROFILE_URI+uid+"> frap:holds ?placePreference. "
+			+ "}}";
 		return query;
 	}
 
