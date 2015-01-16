@@ -65,7 +65,8 @@
         <version>2.17</version>
         <configuration>
           <includes>
-            <include>**/PerformanceTests.java</include>
+            <!-->include>**/PerformanceTests.java</include -->
+            <include>**/StressTests.java</include>
           </includes>
         </configuration>
       </plugin>
