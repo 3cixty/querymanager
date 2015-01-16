@@ -31,7 +31,7 @@ public class StressTests extends HTTPCall {
 	 * This method is to make sure 5 different connections to a same user can get the same data for his profile (first & last name).
 	 * Since every time, our API removes and updates user profile. It is critical to make sure data for a user is consistent.
 	 */
-	@Test
+	//@Test
 	public void testConsistentUserProfile() throws Exception {
 		int numberOfThread = 5;
 		final CountDownLatch latch = new CountDownLatch(numberOfThread);
@@ -55,6 +55,40 @@ public class StressTests extends HTTPCall {
 		latch.await();
 	}
 	
+	@Test
+	public void testLoadUserProfile() throws Exception {
+		final int numberOfThread = 50;
+		final CountDownLatch latch = new CountDownLatch(numberOfThread);
+		final String accessToken = getAccessToken(googleAccessToken);
+		Runnable runnable = new Runnable() {
+			
+			public void run() {
+				try {
+					String strUrl = SERVER + "getProfile";
+					HttpURLConnection conn = createConnection(strUrl, "GET",
+							new String[]{"access_token"}, new String[] {accessToken});
+					int responseCode = conn.getResponseCode();
+					
+					if (responseCode != 200) Assert.fail();
+
+					String content = getContent(conn);
+					
+					if (content == null || content.equals("")) Assert.fail();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					System.out.println("number of Thread still remains" + latch.getCount());
+					latch.countDown();
+				}
+			}
+		};
+		
+		for (int i = 0; i < numberOfThread; i++) {
+			new Thread(runnable).start();
+		}
+		
+		latch.await();
+	}
 	
 
 	private void connect(String googleAccessToken) throws Exception {
