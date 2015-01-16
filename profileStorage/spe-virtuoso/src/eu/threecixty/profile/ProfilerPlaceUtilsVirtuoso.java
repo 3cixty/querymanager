@@ -25,6 +25,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	
 	private static final String PREFIXES = Configuration.PREFIXES;
 	private static final String FROM_GOOGLE_PLACE_GRAPH = "FROM <http://3cixty.com/googleplaces>\n";
+	private static final String FROM_PLACE_RATINGS_GRAPH = "FROM <http://3cixty.com/placesRating>\n";
 	
 	/**
 	 * Gets country name.
@@ -143,6 +144,8 @@ public class ProfilerPlaceUtilsVirtuoso {
 		StringBuffer buffer = new StringBuffer(PREFIXES);
 
 		buffer.append("SELECT  ?x \n");
+		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
+		buffer.append(FROM_PLACE_RATINGS_GRAPH);
 		buffer.append("where {\n");
 		buffer.append("?x schema:review ?review .\n");
 		buffer.append("?review schema:reviewRating	?reviewRating .\n");
@@ -184,7 +187,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 
 		buffer.append("SELECT  ?x \n");
 		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
-		buffer.append(" FROM <http://3cixty.com/placesRating> \n");
+		buffer.append(FROM_PLACE_RATINGS_GRAPH);
 		buffer.append("where {\n");
 		
 		//buffer.append(getPersonURI(uID) +  " schema:knows	?knows .\n");
