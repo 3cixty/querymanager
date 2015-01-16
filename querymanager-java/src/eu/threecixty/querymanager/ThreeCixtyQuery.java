@@ -151,7 +151,7 @@ public class ThreeCixtyQuery {
 			if (placeDetail.getHasNatureOfPlace() != null) {
 				addExprsAndTriplesFromAttributeNameAndPropertyName(placeDetail, "hasPlaceName",
 						placeDetail.getHasNatureOfPlace().toString().toLowerCase(), exprs, triples,
-						ThreeCixtyExpression.StringEqual, isForEvents);
+						ThreeCixtyExpression.URiExpr, isForEvents);
 			}
 
 			Address address = placeDetail.getHasAddress();
