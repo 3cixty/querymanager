@@ -371,8 +371,13 @@ public class QueryUtils {
 	    if (methodName != null) {
 	    	Method method = NodeValue.class.getMethod(methodName, fieldTypeClass);
 	    	NodeValue node = (NodeValue) method.invoke(null, fieldInstanceValue);
-	    	Expr expr = createExprForVariableAndNode(varName, node, threeCixyExpr);
-	    	results.add(expr);
+	    	if (threeCixyExpr == ThreeCixtyExpression.URiExpr) {
+	    		String exprStr = "?" + varName + " = <" + fieldInstanceValue + ">";
+	    		results.add(ExprUtils.parse(exprStr));
+	    	} else {
+	    	    Expr expr = createExprForVariableAndNode(varName, node, threeCixyExpr);
+	    	    results.add(expr);
+	    	}
 	    } else {
 	    	// for DateTime, List, Set. The other types are not supported
 	    	if (fieldTypeClass == Date.class) {
