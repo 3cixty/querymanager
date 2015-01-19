@@ -62,15 +62,21 @@ public class SPEServices {
 			return Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to access the user profile").build();
 		}
 		try {
+			if (DEBUG_MOD) LOGGER.info("Before finding access token in DB");
 			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+			if (DEBUG_MOD) LOGGER.info("After finding access token in DB");
 			long starttime = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Before verifying access token in oauth server");
 			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+				if (DEBUG_MOD) LOGGER.info("After verifying access token in oauth server");
 				String uid = null;
 				HttpSession session = httpRequest.getSession();
 				uid = userAccessToken.getUid();
 				session.setAttribute("uid", uid);
 				String key = userAccessToken.getAppkey();
+				if (DEBUG_MOD) LOGGER.info("Before loading user profile");
 				ProfileInformation profile = ProfileInformationStorage.loadProfile(uid);
+				if (DEBUG_MOD) LOGGER.info("After loading user profile");
 				if (profile == null) {
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.FAILED);
 					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -84,6 +90,7 @@ public class SPEServices {
 				if (DEBUG_MOD) LOGGER.info("Successful to getProfile API");
 				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
 			} else {
+				if (DEBUG_MOD) LOGGER.info("After verifying access token in oauth server");
 				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity("The access token is invalid '" + access_token + "'")
