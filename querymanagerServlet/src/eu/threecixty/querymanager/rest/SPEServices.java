@@ -14,6 +14,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
@@ -33,11 +35,11 @@ public class SPEServices {
 	
 	public static final String PROFILE_SCOPE_NAME = "Profile";
 	
-//	 private static final Logger LOGGER = Logger.getLogger(
-//			 SPEServices.class.getName());
+	 private static final Logger LOGGER = Logger.getLogger(
+			 SPEServices.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
-	 //private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	
 	@Context 
@@ -53,6 +55,7 @@ public class SPEServices {
 	@GET
 	@Path("/getProfile")
 	public Response getProfile(@HeaderParam("access_token") String access_token) {
+		if (DEBUG_MOD) LOGGER.info("Enter into getProfile API");
 		try {
 			checkPermission(access_token);
 		} catch (ThreeCixtyPermissionException e) {
@@ -78,6 +81,7 @@ public class SPEServices {
 				Gson gson = new Gson();
 				String ret = gson.toJson(profile);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				if (DEBUG_MOD) LOGGER.info("Successful to getProfile API");
 				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
 			} else {
 				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
