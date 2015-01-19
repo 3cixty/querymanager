@@ -68,6 +68,7 @@ public class VirtuosoUserProfileStorage {
 	public static eu.threecixty.profile.UserProfile loadProfile(String uid) {
 		if (uid == null || uid.equals("")) return null;		
 		try {
+			if (DEBUG_MOD) LOGGER.info("Start loading user profile");
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
 			
@@ -86,6 +87,8 @@ public class VirtuosoUserProfileStorage {
 			loadKnowsFromKBToUserProfile(uid, toUserProfile);
 			
 			loadPreferencesFromKBToUserProfile(uid, toUserProfile);
+			
+			if (DEBUG_MOD) LOGGER.info("Finish loading user profile");
 			
 			return toUserProfile;
 		} catch (Exception e) {
