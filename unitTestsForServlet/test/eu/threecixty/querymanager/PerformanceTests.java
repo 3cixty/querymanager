@@ -1,19 +1,7 @@
 package eu.threecixty.querymanager;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -21,13 +9,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 
-public class PerformanceTests {
+public class PerformanceTests extends HTTPCall {
 
 	private static final String GOOGLE_ACCESS_TOKEN = ""; // your Google access token
-	
-	private static final String KEY = "687eedc0-17a4-4835-bee6-43ac9394cd04"; // for dev server
-	
-	private static final String SERVER = "https://dev.3cixty.com/v2/";
 	
 	@BeforeClass
 	public static void setup() {
@@ -39,7 +23,7 @@ public class PerformanceTests {
 	@Test
 	public void testMeasureGet3cixtyAccessToken() throws Exception {
 		
-		String accessToken = getAccessToken();
+		String accessToken = getAccessToken(GOOGLE_ACCESS_TOKEN);
 		
 		if (accessToken == null || accessToken.equals("")) Assert.fail();
 		
@@ -48,7 +32,7 @@ public class PerformanceTests {
 		
 		long startTime = System.currentTimeMillis();
 		
-		accessToken = getAccessToken();
+		accessToken = getAccessToken(GOOGLE_ACCESS_TOKEN);
 		
 		long endTime = System.currentTimeMillis();
 		
@@ -60,7 +44,7 @@ public class PerformanceTests {
 	@Test
 	public void testMeasureRevoke3cixtyAccessToken() throws Exception {
 		
-		String accessToken = getAccessToken();
+		String accessToken = getAccessToken(GOOGLE_ACCESS_TOKEN);
 		
 		if (accessToken == null || accessToken.equals("")) Assert.fail();
 		long startTime = System.currentTimeMillis();
@@ -142,7 +126,7 @@ public class PerformanceTests {
 	
 	@Test
 	public void testMeasureSPOQueryForPoIsWithAugmentationBasedOnMyExprience() throws Exception {
-		String accessToken = getAccessToken();
+		String accessToken = getAccessToken(GOOGLE_ACCESS_TOKEN);
 		if (accessToken == null || accessToken.equals("")) Assert.fail();
 		
 		long startTime = System.currentTimeMillis();
@@ -167,7 +151,7 @@ public class PerformanceTests {
 	
 	@Test
 	public void testMeasureSPOQueryForPoIsWithAugmentationBasedOnMyFriends() throws Exception {
-		String accessToken = getAccessToken();
+		String accessToken = getAccessToken(GOOGLE_ACCESS_TOKEN);
 		if (accessToken == null || accessToken.equals("")) Assert.fail();
 		
 		long startTime = System.currentTimeMillis();
@@ -274,96 +258,5 @@ public class PerformanceTests {
 		String responseKey = "response";
 		if (!jsonObj.has(responseKey)) return false;
 		return jsonObj.getString(responseKey).equals("successful");
-	}
-	
-
-	private String getAccessToken() throws Exception {
-		
-		HttpURLConnection conn = createConnection(SERVER + "getAccessToken", "GET",
-				new String[] {"google_access_token", "key", "scope"},
-				new String[] {GOOGLE_ACCESS_TOKEN, KEY, "Profile,Wishlist"});
-		
-		conn.setDoOutput(false);
-		
-		int responseCode = conn.getResponseCode();
-		
-		if (responseCode != 200) Assert.fail();
-		
-		String content = getContent(conn);
-		
-		JSONObject jsonObj = new JSONObject(content);
-		
-		if (jsonObj.has("access_token")) {
-			return jsonObj.getString("access_token");
-		}
-		return null;
-	}
-	
-	private String getContent(HttpURLConnection conn) throws IOException {
-		return getContent(conn.getInputStream());
-	}
-	
-	private String getContent(InputStream input) throws IOException {
-		StringBuffer response = new StringBuffer();
-		BufferedReader in = new BufferedReader(
-		        new InputStreamReader(input));
-		String inputLine;
-		if (response != null) {
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-		}
-		in.close();
-		input.close();
-		return response.toString();
-	}
-	
-	private HttpURLConnection createConnection(String urlStr, String httpMethod,
-			String [] paramNames, String[] paramValues) throws Exception {
-		HttpURLConnection conn = null;
-		if (urlStr.startsWith("https")) {
-			conn = createConnection(new URL(urlStr));
-		} else {
-			conn =  (HttpURLConnection)(new URL(urlStr)).openConnection();
-		}
-		conn.setRequestMethod(httpMethod.equalsIgnoreCase("POST") ? "POST" : "GET");
-		if (paramNames != null) {
-		    for (int i = 0; i < paramNames.length; i++) {
-		    	conn.setRequestProperty(paramNames[i], paramValues[i]);
-		    }
-		}
-		return conn;
-	}
-	
-	private HttpsURLConnection createConnection(URL url) throws Exception {
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        InputStream caInput = PerformanceTests.class.getResourceAsStream("/3cixty.com.crt");
-        Certificate ca;
-        try {
-            ca = cf.generateCertificate(caInput);
-        } finally {
-            caInput.close();
-        }
-
-        // Create a KeyStore containing our trusted CAs
-        String keyStoreType = KeyStore.getDefaultType();
-        KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-        keyStore.load(null, null);
-        keyStore.setCertificateEntry("ca", ca);
-
-        // Create a TrustManager that trusts the CAs in our KeyStore
-        String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-        tmf.init(keyStore);
-
-        // Create an SSLContext that uses our TrustManager
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, tmf.getTrustManagers(), null);
-        
-        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-        
-        conn.setSSLSocketFactory(sslContext.getSocketFactory());
-        return conn;
 	}
 }
