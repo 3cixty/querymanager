@@ -43,14 +43,19 @@ public class VirtuosoUserProfileStorage {
 	private String uid;
 	
 	
-	public static synchronized VirtuosoUserProfileStorage getInstance(String uid) {
+	public static VirtuosoUserProfileStorage getInstance(String uid) {
 		VirtuosoUserProfileStorage storage = loadedStorages.get(uid);
 		if (storage == null) {
-			storage = new VirtuosoUserProfileStorage();
-			storage.uid = uid;
-			loadedStorages.put(uid, storage);
+			synchronized (loadedStorages) {
+				storage = loadedStorages.get(uid);
+				if (storage == null) storage = new VirtuosoUserProfileStorage();
+				storage.uid = uid;
+				loadedStorages.put(uid, storage);
+			}
 		}
-		lastUsedTimes.put(uid, System.currentTimeMillis());
+		synchronized (lastUsedTimes) {
+			lastUsedTimes.put(uid, System.currentTimeMillis());
+		}
 		return storage;
 	}
 
@@ -88,28 +93,32 @@ public class VirtuosoUserProfileStorage {
 	 * @param uid
 	 * @return
 	 */	
-	public synchronized eu.threecixty.profile.UserProfile loadProfile() {
+	public eu.threecixty.profile.UserProfile loadProfile() {
 		if (uid == null || uid.equals("")) return null;		
 		try {
 			if (DEBUG_MOD) LOGGER.info("Start loading user profile");
+
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
+
+			synchronized (this) {
 			
-			loadGenderFromKBToUserProfile(uid,toUserProfile);
-			
-			loadNameFromKBToUserProfile(uid, toUserProfile);
-			
-			loadProfileImageToUserProfile(uid, toUserProfile);
-			
-			loadAddressInfoFromKBToUserProfile(uid, toUserProfile);
-			
-			loadLastCrawlTimeFromKBToUserProfile(uid,toUserProfile);
-			
-			loadProfileIdentitiesFromUserProfile(uid, toUserProfile);
-			
-			loadKnowsFromKBToUserProfile(uid, toUserProfile);
-			
-			loadPreferencesFromKBToUserProfile(uid, toUserProfile);
+				loadGenderFromKBToUserProfile(uid,toUserProfile);
+
+				loadNameFromKBToUserProfile(uid, toUserProfile);
+
+				loadProfileImageToUserProfile(uid, toUserProfile);
+
+				loadAddressInfoFromKBToUserProfile(uid, toUserProfile);
+
+				loadLastCrawlTimeFromKBToUserProfile(uid,toUserProfile);
+
+				loadProfileIdentitiesFromUserProfile(uid, toUserProfile);
+
+				loadKnowsFromKBToUserProfile(uid, toUserProfile);
+
+				loadPreferencesFromKBToUserProfile(uid, toUserProfile);
+			}
 			
 			if (DEBUG_MOD) LOGGER.info("Finish loading user profile");
 			
@@ -126,7 +135,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param profile
 	 * @return
 	 */
-	public synchronized boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
+	public boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
 		if (profile == null) return false;
 		try {
 
@@ -138,45 +147,48 @@ public class VirtuosoUserProfileStorage {
 			VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
 			VirtuosoUpdateRequest vurToInsertData = null;
 			
-			saveUIDInfoTOKB(profile.getHasUID(), queriesToInsertData);
+			synchronized (this) {
 			
-			saveGenderToKB(profile.getHasUID(),profile.getHasGender(), queriesToRemoveData, queriesToInsertData);
-					
-			saveNameInfoToKB(profile.getHasUID(),profile.getHasName(), queriesToRemoveData, queriesToInsertData);
-			
-			saveProfileImage(profile.getHasUID(), profile.getProfileImage(), queriesToRemoveData, queriesToInsertData);
-			
-			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress(), queriesToRemoveData, queriesToInsertData);
-			
-			saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime(), queriesToRemoveData, queriesToInsertData);
-			
-			saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties(), queriesToRemoveData, queriesToInsertData);
-			
-			saveKnowsToKB(profile.getHasUID(), profile.getKnows(), queriesToRemoveData, queriesToInsertData);
-			
-			savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), queriesToRemoveData, queriesToInsertData);
-			if (profile.getPreferences()==null)
-				saveTransportToKB(profile.getHasUID(), null, queriesToRemoveData, queriesToInsertData);
-			else
-				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), queriesToRemoveData, queriesToInsertData);
-			
-			VirtuosoUpdateRequest vurToRemoveData = null;
-			for (String query: queriesToRemoveData) {
-				if (DEBUG_MOD) LOGGER.info("query to remove data: " + query);
-				if (vurToRemoveData == null) vurToRemoveData = VirtuosoUpdateFactory.create(query, virtGraph);
-				else vurToRemoveData.addUpdate(query);
+				saveUIDInfoTOKB(profile.getHasUID(), queriesToInsertData);
+
+				saveGenderToKB(profile.getHasUID(),profile.getHasGender(), queriesToRemoveData, queriesToInsertData);
+
+				saveNameInfoToKB(profile.getHasUID(),profile.getHasName(), queriesToRemoveData, queriesToInsertData);
+
+				saveProfileImage(profile.getHasUID(), profile.getProfileImage(), queriesToRemoveData, queriesToInsertData);
+
+				saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress(), queriesToRemoveData, queriesToInsertData);
+
+				saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime(), queriesToRemoveData, queriesToInsertData);
+
+				saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties(), queriesToRemoveData, queriesToInsertData);
+
+				saveKnowsToKB(profile.getHasUID(), profile.getKnows(), queriesToRemoveData, queriesToInsertData);
+
+				savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), queriesToRemoveData, queriesToInsertData);
+				if (profile.getPreferences()==null)
+					saveTransportToKB(profile.getHasUID(), null, queriesToRemoveData, queriesToInsertData);
+				else
+					saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), queriesToRemoveData, queriesToInsertData);
+
+				VirtuosoUpdateRequest vurToRemoveData = null;
+				for (String query: queriesToRemoveData) {
+					if (DEBUG_MOD) LOGGER.info("query to remove data: " + query);
+					if (vurToRemoveData == null) vurToRemoveData = VirtuosoUpdateFactory.create(query, virtGraph);
+					else vurToRemoveData.addUpdate(query);
+				}
+				if (vurToRemoveData != null) vurToRemoveData.exec();
+
+				for (String query: queriesToInsertData) {
+					if (DEBUG_MOD) LOGGER.info("query to insert data: " + query);
+					if (vurToInsertData == null) vurToInsertData = VirtuosoUpdateFactory.create(query, virtGraph);
+					else vurToInsertData.addUpdate(query);
+				}
+
+				if (vurToInsertData != null) vurToInsertData.exec();
+
+				virtGraph.close();
 			}
-			if (vurToRemoveData != null) vurToRemoveData.exec();
-			
-			for (String query: queriesToInsertData) {
-				if (DEBUG_MOD) LOGGER.info("query to insert data: " + query);
-				if (vurToInsertData == null) vurToInsertData = VirtuosoUpdateFactory.create(query, virtGraph);
-				else vurToInsertData.addUpdate(query);
-			}
-			
-			if (vurToInsertData != null) vurToInsertData.exec();
-			
-			virtGraph.close();
 			
 			if (DEBUG_MOD) LOGGER.info("end saving user profile");
 			return true;
