@@ -168,6 +168,15 @@ public class VirtuosoUserProfileStorage {
 			//VirtuosoManager.getInstance().createAccount(uid);
 			String insertQuery = GetSetQueryStrings.setUser(uid);
 			queries.add(insertQuery);
+            
+            eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
+            profileIdentities.setHasSourceCarrier("Google");
+            profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/Account/"+profileIdentities.getHasSourceCarrier());
+            profileIdentities.setHasUserAccountID(uid);
+            profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
+            String str=GetSetQueryStrings.setProfileIdentities(uid, profileIdentities);
+            
+            queries.add(str);
 		}
 	}
 
