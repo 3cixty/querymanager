@@ -19,7 +19,7 @@ import eu.threecixty.profile.ProfileInformation;
  */
 public class StressTests extends HTTPCall {
 
-	private String googleAccessToken = "ya29._QBDEEIXwjSpgkYMqUFvu1nvqkRjlWOLu06p89jveyq53uQ9oPY4x0fLiZNUMjR6lpWNPEXBolXzlg";
+	private String googleAccessToken = "ya29.AAG9kcKZw6AWhdXTwPEuxPsQs_jWAuJESxS04teOYd5p6V0IJkFylYAhWC6kOJvT6Fpj03oYDTMu9g";
 	
 	@BeforeClass
 	public static void setup() {
