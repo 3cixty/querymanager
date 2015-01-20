@@ -44,6 +44,9 @@ public class VirtuosoUserProfileStorage {
 	
 	
 	public static VirtuosoUserProfileStorage getInstance(String uid) {
+		if (uid != null) {// TODO: to be removed
+			return new VirtuosoUserProfileStorage();
+		}
 		VirtuosoUserProfileStorage storage = loadedStorages.get(uid);
 		if (storage == null) {
 			synchronized (loadedStorages) {
