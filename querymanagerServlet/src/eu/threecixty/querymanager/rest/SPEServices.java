@@ -56,14 +56,14 @@ public class SPEServices {
 	@Path("/getProfile")
 	public Response getProfile(@HeaderParam("access_token") String access_token) {
 		if (DEBUG_MOD) LOGGER.info("Enter into getProfile API");
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		try {
-			checkPermission(access_token);
+			checkPermission(userAccessToken);
 		} catch (ThreeCixtyPermissionException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to access the user profile").build();
 		}
 		try {
 			if (DEBUG_MOD) LOGGER.info("Before finding access token in DB");
-			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			if (DEBUG_MOD) LOGGER.info("After finding access token in DB");
 			long starttime = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Before verifying access token in oauth server");
@@ -194,13 +194,13 @@ public class SPEServices {
 	@POST
 	@Path("/saveProfile")
 	public Response saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		try {
-			checkPermission(access_token);
+			checkPermission(userAccessToken);
 		} catch (ThreeCixtyPermissionException e) {
 			Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to update the user profile").build();
 		}
 		long starttime = System.currentTimeMillis();
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			HttpSession session = httpRequest.getSession();
 			String uid = userAccessToken.getUid();
@@ -266,8 +266,7 @@ public class SPEServices {
 		}
 	}
 	
-	public static void checkPermission(String token) throws ThreeCixtyPermissionException {
-		AccessToken accessToken = OAuthWrappers.findAccessTokenFromDB(token);
+	public static void checkPermission(AccessToken accessToken) throws ThreeCixtyPermissionException {
 		if (accessToken == null || !accessToken.getScopeNames().contains(PROFILE_SCOPE_NAME)) {
 		    throw new ThreeCixtyPermissionException("{\"error\": \"no permission\"}");
 		}
