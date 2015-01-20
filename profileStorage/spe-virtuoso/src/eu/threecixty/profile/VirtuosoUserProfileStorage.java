@@ -101,6 +101,14 @@ public class VirtuosoUserProfileStorage {
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
 
+			if (uid.equals("106653519498411283193")) { // for 3cixty@gmail.com
+				eu.threecixty.profile.oldmodels.Name toName = new eu.threecixty.profile.oldmodels.Name();
+				toName.setFamilyName("ThreeCixty");
+				toName.setGivenName("ThreeCixty");
+				toUserProfile.setHasName(toName);
+				return toUserProfile;
+			}
+			
 			synchronized (this) {
 			
 				loadGenderFromKBToUserProfile(uid,toUserProfile);
