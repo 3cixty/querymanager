@@ -53,7 +53,7 @@ public class SettingsServices {
 			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 				try {
-					checkPermission(access_token);
+					checkPermission(userAccessToken);
 				} catch (ThreeCixtyPermissionException e1) {
 					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
 							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
@@ -111,7 +111,7 @@ public class SettingsServices {
 			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 				try {
-					checkPermission(access_token);
+					checkPermission(userAccessToken);
 				} catch (ThreeCixtyPermissionException e1) {
 					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
 							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
@@ -213,7 +213,7 @@ public class SettingsServices {
 		return true;
 	}
 
-	private void checkPermission(String token) throws ThreeCixtyPermissionException {
-		SPEServices.checkPermission(token);
+	private void checkPermission(AccessToken accessToken) throws ThreeCixtyPermissionException {
+		SPEServices.checkPermission(accessToken);
 	}
 }
