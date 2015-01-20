@@ -44,18 +44,20 @@ public class VirtuosoUserProfileStorage {
 	
 	
 	public static VirtuosoUserProfileStorage getInstance(String uid) {
-		if (uid != null) {// TODO: to be removed
-			VirtuosoUserProfileStorage ret = new VirtuosoUserProfileStorage();
-			ret.uid = uid;
-			return ret;
-		}
+//		if (uid != null) {// TODO: to be removed
+//			VirtuosoUserProfileStorage ret = new VirtuosoUserProfileStorage();
+//			ret.uid = uid;
+//			return ret;
+//		}
 		VirtuosoUserProfileStorage storage = loadedStorages.get(uid);
 		if (storage == null) {
 			synchronized (loadedStorages) {
 				storage = loadedStorages.get(uid);
-				if (storage == null) storage = new VirtuosoUserProfileStorage();
-				storage.uid = uid;
-				loadedStorages.put(uid, storage);
+				if (storage == null) {
+					storage = new VirtuosoUserProfileStorage();
+					storage.uid = uid;
+					loadedStorages.put(uid, storage);
+				}
 			}
 		}
 		synchronized (lastUsedTimes) {
@@ -106,13 +108,13 @@ public class VirtuosoUserProfileStorage {
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
 
-			if (uid.equals("106653519498411283193")) { // for 3cixty@gmail.com
-				eu.threecixty.profile.oldmodels.Name toName = new eu.threecixty.profile.oldmodels.Name();
-				toName.setFamilyName("ThreeCixty");
-				toName.setGivenName("ThreeCixty");
-				toUserProfile.setHasName(toName);
-				return toUserProfile;
-			}
+//			if (uid.equals("106653519498411283193")) { // for 3cixty@gmail.com
+//				eu.threecixty.profile.oldmodels.Name toName = new eu.threecixty.profile.oldmodels.Name();
+//				toName.setFamilyName("ThreeCixty");
+//				toName.setGivenName("ThreeCixty");
+//				toUserProfile.setHasName(toName);
+//				return toUserProfile;
+//			}
 			
 			synchronized (this) {
 			
