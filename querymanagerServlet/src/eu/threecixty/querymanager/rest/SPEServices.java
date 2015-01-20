@@ -55,13 +55,7 @@ public class SPEServices {
 	@GET
 	@Path("/getProfile")
 	public Response getProfile(@HeaderParam("access_token") String access_token) {
-		//if (DEBUG_MOD) LOGGER.info("Enter into getProfile API");
-//		if (access_token != null) { // TODO: should be removed after stressTesting
-//			ProfileInformation profile = ProfileInformationStorage.loadProfile("106653519498411283193"); // 3cixty@gmail.com
-//			Gson gson = new Gson();
-//			String ret = gson.toJson(profile);
-//			return Response.ok(ret, MediaType.APPLICATION_JSON).build();
-//		}
+		if (DEBUG_MOD) LOGGER.info("Enter into getProfile API");
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		try {
 			checkPermission(userAccessToken);
