@@ -24,7 +24,8 @@ public class HTTPCall {
 	
 	protected static final String KEY = "687eedc0-17a4-4835-bee6-43ac9394cd04"; // for dev server
 	
-	protected static final String SERVER = "https://dev.3cixty.com/v2/";
+	protected static final String SERVER = "https://dev.3cixty.com/v2-test-1/";
+	//protected static final String SERVER = "http://localhost:8080/v2/";
 
 	protected void sendPost(String url, String params) throws Exception {
 		sendPost(url, params, null);
@@ -100,7 +101,7 @@ public class HTTPCall {
 		conn.setDoOutput(false);
 		
 		int responseCode = conn.getResponseCode();
-		
+		System.out.println(responseCode);
 		if (responseCode != 200) Assert.fail();
 		
 		String content = getContent(conn);
@@ -151,6 +152,12 @@ public class HTTPCall {
 	}
 	
 	protected HttpsURLConnection createConnection(URL url) throws Exception {
+        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+        
+        return conn;
+	}
+	
+	protected static void initSSL() throws Exception {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         InputStream caInput = PerformanceTests.class.getResourceAsStream("/3cixty.com.crt");
         Certificate ca;
@@ -174,10 +181,8 @@ public class HTTPCall {
         // Create an SSLContext that uses our TrustManager
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, tmf.getTrustManagers(), null);
-        
-        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-        
-        conn.setSSLSocketFactory(sslContext.getSocketFactory());
-        return conn;
+        SSLContext.setDefault(sslContext);
 	}
+	
+	
 }
