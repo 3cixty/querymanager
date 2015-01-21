@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,6 +40,37 @@ public class GoogleAccountUtils {
 		if (accessToken == null) return "";
 		String user_id = null;
 		try {
+			
+			if (!accessToken.equals("")) { // TODO: remove after testing
+				String uid = String.valueOf(System.nanoTime()); // random uid
+				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
+				profile.setHasUID(uid);
+				String picture = "https://www.google.fr/images/srpr/logo11w.png";
+				profile.setProfileImage(picture);
+				Name name = new Name();
+				profile.setHasName(name);
+				String givenName = "GN" + RandomStringUtils.random(20);
+				String familyName = RandomStringUtils.random(20) + "FN";
+				name.setGivenName(givenName);
+				name.setFamilyName(familyName);
+				
+				Random random = new Random();
+				int val = random.nextInt(2);
+				if (val == 0) {
+					profile.setHasGender("Female");
+				} else {
+					profile.setHasGender("Male");
+				}
+				
+				Set<String> knows = new HashSet<String>();
+				
+				knows.add("103411760688868522737"); // this would be useful to test augmentation query
+				
+				ProfileManagerImpl.getInstance().saveProfile(profile);
+				
+				return uid;
+			}
+			
 			// due to error asked by Christian
 //			String reqMsg = readUrl(
 //					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
