@@ -203,6 +203,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				    ok = hasElement(sb, numberOfOrders);
 				} catch (JSONException e) { // check if there are some backslashes
 					String newString = sb.toString().replace("\\","\\\\");
+					if (DEBUG_MOD) LOGGER.info(newString);
 					sb.setLength(0);
 					sb.append(newString);
 					ok = hasElement(sb, numberOfOrders);
