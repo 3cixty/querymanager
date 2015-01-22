@@ -64,7 +64,7 @@ public class StressTests extends HTTPCall {
 		latch.await();
 	}
 	
-	@Test
+	//@Test
 	public void testLoadUserProfile() throws Exception {
 		final int numberOfThreads = 100;
 		final int numberOfLoops = 100;
@@ -111,27 +111,30 @@ public class StressTests extends HTTPCall {
 		latch.await();
 	}
 	
-	//@Test
+	@Test
 	public void testQueryWithoutAugmentation() throws Exception {
-		final int numberOfThreads = 200;
+		final int numberOfThreads = 100;
+		final int numberOfLoops = 100;
 		final CountDownLatch latch = new CountDownLatch(numberOfThreads);
 		Runnable runnable = new Runnable() {
 			
 			public void run() {
 				try {
-					String query = "SELECT * WHERE { ?s ?p ?o . } LIMIT 25";
-					String strUrl = SERVER + "executeQuery?format=json&query=" + URLEncoder.encode(query, "UTF-8");
-					HttpURLConnection conn = createConnection(strUrl, "GET",
-							new String[]{"key"}, new String[] {KEY});
-					int responseCode = conn.getResponseCode();
-					
-					if (responseCode != 200) Assert.fail();
+					for (int i = 0; i < numberOfLoops; i++) {
+						String query = "SELECT * WHERE { ?s ?p ?o . } LIMIT 25";
+						String strUrl = SERVER + "executeQuery?format=json&query=" + URLEncoder.encode(query, "UTF-8");
+						System.out.println("create connection i = " + i);
+						HttpURLConnection conn = createConnection(strUrl, "GET",
+								new String[]{"key"}, new String[] {KEY});
+						int responseCode = conn.getResponseCode();
+						if (responseCode != 200) Assert.fail();
 
-					String content = getContent(conn);
-					
-					JSONObject jsonObj = new JSONObject(content);
-					
-					if (!jsonObj.has("results")) Assert.fail();
+						String content = getContent(conn);
+
+						JSONObject jsonObj = new JSONObject(content);
+
+						if (!jsonObj.has("results")) Assert.fail();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
