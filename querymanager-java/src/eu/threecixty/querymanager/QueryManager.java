@@ -194,7 +194,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 			byte [] b = new byte[1024];
 			int readBytes = 0;
 			while ((readBytes = input.read(b)) >= 0) {
-				sb.append(new String(b, 0, readBytes));
+				sb.append(new String(b, 0, readBytes, "UTF-8"));
 			}
 			input.close();
 
@@ -203,6 +203,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				    ok = hasElement(sb, numberOfOrders);
 				} catch (JSONException e) { // check if there are some backslashes
 					String newString = sb.toString().replace("\\","\\\\");
+					newString = newString.replace("\\\\\"", "\\\\\\\"");
 					if (DEBUG_MOD) LOGGER.info(newString);
 					sb.setLength(0);
 					sb.append(newString);
