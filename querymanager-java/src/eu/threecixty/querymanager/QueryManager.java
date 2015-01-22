@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.graph.Triple;
@@ -198,43 +199,13 @@ import eu.threecixty.profile.oldmodels.Rating;
 			input.close();
 
 			if (EventMediaFormat.JSON == format) {
-				// check if there is one element at least
-				JSONObject json = new JSONObject(sb.toString());
-				JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
-				if (jsonArrs.length() < 1) {
-					ok = false;
-				} else {
-					if (DEBUG_MOD) LOGGER.info("Result received from Virtuoso: " + sb.toString());
-					// add augmented to vars
-					if (numberOfOrders > 0) {
-						JSONObject jsonHead = json.getJSONObject("head");
-						JSONArray newArrs = new JSONArray();
-						JSONArray subHeadArrs = jsonHead.getJSONArray("vars");
-						for (int i = 0; i < subHeadArrs.length(); i++) {
-							String varName = subHeadArrs.get(i).toString();
-							boolean found = false;
-							for (int index = 0; index <= 10; index++) {
-								if (varName.equals("callret-" + index)) {
-									found = true;
-									break;
-								}
-							}
-							if (!found) {
-								newArrs.put(varName);
-							}
-						}
-						newArrs.put("augmented");
-						jsonHead.put("vars", newArrs);
-					}
-					
-					// add augmented to item
-					for (int i = 0; i < jsonArrs.length(); i++) {
-						JSONObject jsonElement = jsonArrs.getJSONObject(i);
-						cleanResultAndAddAugmented(jsonElement, numberOfOrders);
-					}
+				try {
+				    ok = hasElement(sb, numberOfOrders);
+				} catch (JSONException e) { // check if there are some backslashes
+					String newString = sb.toString().replaceAll("\\","\\\\");
 					sb.setLength(0);
-					sb.append(json.toString());
-					if (DEBUG_MOD) LOGGER.info("Result to send back to request: " + sb.toString());
+					sb.append(newString);
+					ok = hasElement(sb, numberOfOrders);
 				}
 			}
 //		} else {
@@ -248,6 +219,48 @@ import eu.threecixty.profile.oldmodels.Rating;
 		logInfo("Finished executing the query on Virtuoso: ok = " + ok);
 
 		return ok;
+	}
+	
+	private static boolean hasElement(StringBuilder sb, int numberOfOrders) {
+		// check if there is one element at least
+		JSONObject json = new JSONObject(sb.toString());
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+		if (jsonArrs.length() < 1) {
+			return false;
+		} else {
+			if (DEBUG_MOD) LOGGER.info("Result received from Virtuoso: " + sb.toString());
+			// add augmented to vars
+			if (numberOfOrders > 0) {
+				JSONObject jsonHead = json.getJSONObject("head");
+				JSONArray newArrs = new JSONArray();
+				JSONArray subHeadArrs = jsonHead.getJSONArray("vars");
+				for (int i = 0; i < subHeadArrs.length(); i++) {
+					String varName = subHeadArrs.get(i).toString();
+					boolean found = false;
+					for (int index = 0; index <= 10; index++) {
+						if (varName.equals("callret-" + index)) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						newArrs.put(varName);
+					}
+				}
+				newArrs.put("augmented");
+				jsonHead.put("vars", newArrs);
+			}
+			
+			// add augmented to item
+			for (int i = 0; i < jsonArrs.length(); i++) {
+				JSONObject jsonElement = jsonArrs.getJSONObject(i);
+				cleanResultAndAddAugmented(jsonElement, numberOfOrders);
+			}
+			sb.setLength(0);
+			sb.append(json.toString());
+			if (DEBUG_MOD) LOGGER.info("Result to send back to request: " + sb.toString());
+		}
+		return true;
 	}
 	
 	private static void cleanResultAndAddAugmented(JSONObject jsonElement, int numberOfOrders) {
