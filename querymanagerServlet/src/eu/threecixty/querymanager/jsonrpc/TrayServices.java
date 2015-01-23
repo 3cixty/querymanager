@@ -16,6 +16,7 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.InvalidTrayElement;
 import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.Tray.OrderType;
 
@@ -727,7 +728,7 @@ public class TrayServices implements TrayServicesIntf {
 	 * @param restTray
 	 * @return
 	 */
-	private boolean cleanTrays(String token) {
+	private boolean cleanTrays(String token) throws TooManyConnections {
 		if (token == null || token.equals("")) return false;
 		String uid = GoogleAccountUtils.getUID(token);
 		try {
@@ -745,7 +746,7 @@ public class TrayServices implements TrayServicesIntf {
 	 * @param restTray
 	 * @return List of trays associated with a given junk token
 	 */
-	private List<Tray> loginTray(String junkToken, String googleToken) {
+	private List<Tray> loginTray(String junkToken, String googleToken) throws TooManyConnections {
 		if (junkToken == null || junkToken.equals("")) return null;
 		String uid = GoogleAccountUtils.getUID(googleToken);
 		if (uid == null || uid.equals("")) return null;
