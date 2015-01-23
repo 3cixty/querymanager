@@ -86,10 +86,12 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("}}");
 		
 		try {
-			VirtuosoConnection.insertDeleteQuery(buf.toString());
+			VirtuosoManager.getInstance().executeUpdateQuery(buf.toString());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		return false;
 	}
@@ -152,10 +154,12 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("}}");
 		
 		try {
-			VirtuosoConnection.insertDeleteQuery(buf.toString());
+			VirtuosoManager.getInstance().executeUpdateQuery(buf.toString());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		return false;
 	}
@@ -348,7 +352,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * @param tray
 	 * @return
 	 */
-	private static boolean save(Tray tray) {
+	private static boolean save(Tray tray) throws TooManyConnections {
 		// encode with Base64 to avoid SQL injection
 		String personUri = getPersonURI(tray);
 		String trayUri = getTrayURI(tray);
@@ -380,10 +384,12 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("}}");
 		
 		try {
-			VirtuosoConnection.insertDeleteQuery(buf.toString());
+			VirtuosoManager.getInstance().executeUpdateQuery(buf.toString());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		
 		return false;

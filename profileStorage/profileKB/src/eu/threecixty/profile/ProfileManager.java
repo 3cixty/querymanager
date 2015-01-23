@@ -19,7 +19,7 @@ public interface ProfileManager {
 	 * 				The Goolge UID.
 	 * @return <code>UserProfile</code> if the corresponding user exists in the KB, <code>false</code> otherwise.
 	 */
-	UserProfile getProfile(String uid);
+	UserProfile getProfile(String uid) throws TooManyConnections;
 
 	/**
 	 * Saves a given user profile into the KB.
@@ -27,7 +27,7 @@ public interface ProfileManager {
 	 * 				The user profile.
 	 * @return <code>true</code> if the method is successful to save data, <code>false</code> otherwise. 
 	 */
-	boolean saveProfile(UserProfile userProfile);
+	boolean saveProfile(UserProfile userProfile) throws TooManyConnections;
 
 	/**
 	 * Checks whether or not a given Google UID exists in the KB.
@@ -35,7 +35,7 @@ public interface ProfileManager {
 	 * 				The Google UID.
 	 * @return <code>true</code> if the given Google UID exists in the KB, <code>false</code> otherwise.
 	 */
-	boolean existUID(String uid);
+	boolean existUID(String uid) throws TooManyConnections;
 
 	/**
 	 * Gets minimum number of times visited.

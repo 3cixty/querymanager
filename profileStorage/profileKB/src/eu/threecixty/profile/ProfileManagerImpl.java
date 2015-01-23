@@ -43,19 +43,19 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public UserProfile getProfile(String uid) {
+	public UserProfile getProfile(String uid) throws TooManyConnections {
 		if (profileManager != null) return profileManager.getProfile(uid);
 		return null;
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile) {
+	public boolean saveProfile(UserProfile userProfile) throws TooManyConnections {
 		if (profileManager != null) return profileManager.saveProfile(userProfile);
 		return false;
 	}
 
 	@Override
-	public boolean existUID(String uid) {
+	public boolean existUID(String uid) throws TooManyConnections {
 		if (profileManager != null) return profileManager.existUID(uid);
 		return false;
 	}

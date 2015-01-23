@@ -22,18 +22,30 @@ import eu.threecixty.profile.UserProfile;
 class VirtuosoProfileManagerImpl implements ProfileManager {
 	
 	@Override
-	public UserProfile getProfile(String uid) {
-		return VirtuosoUserProfileStorage.loadProfile(uid);
+	public UserProfile getProfile(String uid) throws TooManyConnections {
+		try {
+			return VirtuosoUserProfileStorage.loadProfile(uid);
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile) {
-		return VirtuosoUserProfileStorage.saveProfile(userProfile);
+	public boolean saveProfile(UserProfile userProfile) throws TooManyConnections {
+		try {
+			return VirtuosoUserProfileStorage.saveProfile(userProfile);
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 
 	@Override
-	public boolean existUID(String uid) {
-		return VirtuosoUserProfileStorage.existUID(uid);
+	public boolean existUID(String uid) throws TooManyConnections {
+		try {
+			return VirtuosoUserProfileStorage.existUID(uid);
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 
 	@Override
@@ -160,22 +172,26 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     			+ "}";
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		
-		QueryReturnClass qRC=VirtuosoConnection.query(queryString);
+		QueryReturnClass qRC;
+		try {
+			qRC = VirtuosoManager.getInstance().query(queryString);
+			ResultSet results = qRC.getReturnedResultSet();
 
-		ResultSet results = qRC.getReturnedResultSet();
-
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			String UID = qs.getLiteral("uid").getString();
-			String mobidotUserName = qs.getLiteral("mobidotID").getString();
-			//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
-			IDMapping mapper=new IDMapping();
-			mapper.setThreeCixtyID(UID);
-			mapper.setMobidotUserName(mobidotUserName);
-			//mapper.setMobidotID(mobidotID);
-			idMapping.add(mapper);
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				String UID = qs.getLiteral("uid").getString();
+				String mobidotUserName = qs.getLiteral("mobidotID").getString();
+				//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
+				IDMapping mapper=new IDMapping();
+				mapper.setThreeCixtyID(UID);
+				mapper.setMobidotUserName(mobidotUserName);
+				//mapper.setMobidotID(mobidotID);
+				idMapping.add(mapper);
+			}
+			qRC.closeConnection();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		qRC.closeConnection();
 		return idMapping;
 	}
 	/**
@@ -194,21 +210,25 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
 	    
 			
-		QueryReturnClass qRC=VirtuosoConnection.query(queryString);
+		QueryReturnClass qRC;
+		try {
+			qRC = VirtuosoManager.getInstance().query(queryString);
+			ResultSet results = qRC.getReturnedResultSet();
 
-		ResultSet results = qRC.getReturnedResultSet();
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				String UID = qs.getLiteral("uid").getString();
+				String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
 
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			String UID = qs.getLiteral("uid").getString();
-			String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
-
-			IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
-			mapper.setThreeCixtyID(UID);
-			mapper.setLastCrawlTime(lastCrawlTime);
-			idCrawlTimeMapping.add(mapper);
+				IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
+				mapper.setThreeCixtyID(UID);
+				mapper.setLastCrawlTime(lastCrawlTime);
+				idCrawlTimeMapping.add(mapper);
+			}
+			qRC.closeConnection();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		qRC.closeConnection();
 		return idCrawlTimeMapping;
 	}
 
@@ -229,6 +249,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<UserProfile> getAllUserProfiles() {
-		return VirtuosoUserProfileStorage.getAllUserProfiles();
+		try {
+			return VirtuosoUserProfileStorage.getAllUserProfiles();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

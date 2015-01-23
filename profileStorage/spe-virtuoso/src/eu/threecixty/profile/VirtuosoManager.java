@@ -16,6 +16,8 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
 import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
+import virtuoso.jena.driver.VirtuosoUpdateFactory;
+import virtuoso.jena.driver.VirtuosoUpdateRequest;
 
 
 public class VirtuosoManager {
@@ -47,7 +49,83 @@ public class VirtuosoManager {
 		return jsonObject;
 	}
 
+	/**
+	 * Execute an Insert or Delete query in virtuoso KB
+	 * @param type
+	 * @param Query
+	 * @throws IOException
+	 * @throws InterruptedException 
+	 */
+	public void executeUpdateQuery(String Query) throws IOException, InterruptedException {
+		VirtuosoConnection.processConfigFile();
+		VirtGraph virtGraph = getVirtGraph();
 
+		VirtuosoUpdateRequest vur = VirtuosoUpdateFactory
+				.create(Query, virtGraph);
+		vur.exec();
+		
+		releaseVirtGraph(virtGraph);
+	}
+//	/**
+//	 * Update a record
+//	 * @param deleteOldDataQuery
+//	 * @param insertNewDataQuery
+//	 * @throws IOException
+//	 * @throws InterruptedException 
+//	 */
+//	public void updateQuery(String deleteOldDataQuery, String insertNewDataQuery) throws IOException, InterruptedException {
+//		VirtuosoConnection.processConfigFile();
+//		VirtGraph virtGraph = getVirtGraph();
+//		/*System.out.println("\nexecute: Delete From GRAPH "+ virtuosoConnection.GRAPH
+//					+ " { <aa> <bb> 'cc' ."
+//					+ " <aa1> <bb1> <123> . "
+//					+ "<aa2> <bb2> 456. "
+//					+ "}");
+//		System.out.println("\nexecute: Insert Into GRAPH "+ virtuosoConnection.GRAPH
+//				+ " { <aa3> <bb3> 'cc3' ."
+//				+ " <aa4> <bb4> <0123> . "
+//				+ "<aa5> <bb5> 0456. "
+//				+ "}");*/
+//		
+//		if (DEBUG_MOD) LOGGER.info("delete query = " + deleteOldDataQuery + "\n insert query = " + insertNewDataQuery);
+//		
+//		VirtuosoUpdateRequest vur = VirtuosoUpdateFactory
+//				.create(deleteOldDataQuery, virtGraph);
+//		vur.exec();
+//		vur = VirtuosoUpdateFactory
+//				.create(insertNewDataQuery, virtGraph);
+//		vur.exec();
+//		
+//		releaseVirtGraph(virtGraph);
+//	}
+	
+	/**
+	 * Query a graph
+	 * @param query
+	 * @throws InterruptedException 
+	 */
+	public QueryReturnClass query(String query) throws InterruptedException {
+		try {
+			VirtuosoConnection.processConfigFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		VirtGraph virtGraph = getVirtGraph();
+
+		Query sparql = QueryFactory
+				.create(query);
+		
+		VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create(
+				sparql, virtGraph);
+		
+		QueryReturnClass qRC = new QueryReturnClass(virtGraph, vqe);
+		qRC.setResultSelectVar(sparql.getResultVars());
+		qRC.setReturnedResultSet(vqe.execSelect());
+		qRC.setQuery(sparql);
+		
+		return qRC;
+	}
+	
 	
 	/**
 	 * Gets VirtGraph with DBA user.
