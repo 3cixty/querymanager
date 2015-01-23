@@ -14,7 +14,7 @@ public interface IProfiler {
 	 * Populate KB of UserProfiles using Profiling Techniques
 	 * 
 	 */
-	void PopulateProfile();
+	void PopulateProfile() throws TooManyConnections;
 
 	/**
 	 * Requires number of times visited at least.

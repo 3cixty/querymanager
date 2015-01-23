@@ -15,7 +15,7 @@ public interface TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	boolean addTray(Tray tray) throws InvalidTrayElement;
+	boolean addTray(Tray tray) throws InvalidTrayElement, TooManyConnections;
 	
 	/**
 	 * Deletes a given tray element out of the KB.
@@ -23,7 +23,7 @@ public interface TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	boolean deleteTray(Tray tray) throws InvalidTrayElement;
+	boolean deleteTray(Tray tray) throws InvalidTrayElement, TooManyConnections;
 	
 	/**
 	 * Replaces a given junk token with a given real Google UID.
@@ -32,7 +32,7 @@ public interface TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	boolean replaceUID(String junkID, String uid) throws InvalidTrayElement;
+	boolean replaceUID(String junkID, String uid) throws InvalidTrayElement, TooManyConnections;
 	
 	/**
 	 * Updates a given tray element.
@@ -40,7 +40,7 @@ public interface TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	boolean updateTray(Tray tray) throws InvalidTrayElement;
+	boolean updateTray(Tray tray) throws InvalidTrayElement, TooManyConnections;
 	
 	/**
 	 * Gets a tray element from a given UID and trayID.
@@ -49,7 +49,7 @@ public interface TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	Tray getTray(String uid, String trayId) throws InvalidTrayElement;
+	Tray getTray(String uid, String trayId) throws InvalidTrayElement, TooManyConnections;
 	
 	/**
 	 * Gets a list of tray elements.
@@ -62,7 +62,7 @@ public interface TrayManager {
 	 * @throws InvalidTrayElement
 	 */
 	List <Tray> getTrays(String uid, int offset, int limit,
-			OrderType orderType, boolean eventsPast) throws InvalidTrayElement;
+			OrderType orderType, boolean eventsPast) throws InvalidTrayElement, TooManyConnections;
 	
 	/**
 	 * Cleans all tray elements with a given token.
@@ -70,7 +70,7 @@ public interface TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	boolean cleanTrays(String token) throws InvalidTrayElement;
+	boolean cleanTrays(String token) throws InvalidTrayElement, TooManyConnections;
 	
 	/**
 	 * Gets a list of tray elements.
@@ -78,11 +78,11 @@ public interface TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	List <Tray> getTrays(String uid) throws InvalidTrayElement;
+	List <Tray> getTrays(String uid) throws InvalidTrayElement, TooManyConnections;
 
 	/**
 	 * Gets all trays in the KB.
 	 * @return
 	 */
-	List <Tray> getAllTrays();
+	List <Tray> getAllTrays() throws TooManyConnections;
 }

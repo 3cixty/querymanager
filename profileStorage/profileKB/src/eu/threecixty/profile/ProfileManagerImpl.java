@@ -85,24 +85,24 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String getCountryName(String uid) {
+	public String getCountryName(String uid) throws TooManyConnections {
 		if (profileManager != null) return profileManager.getCountryName(uid);
 		return null;
 	}
 
 	@Override
-	public String getTownName(String uid) {
+	public String getTownName(String uid) throws TooManyConnections {
 		if (profileManager != null) return profileManager.getTownName(uid);
 		return null;
 	}
 	
-	public GpsCoordinate getCoordinate(String uid) {
+	public GpsCoordinate getCoordinate(String uid) throws TooManyConnections {
 		if (profileManager != null) return profileManager.getCoordinate(uid);
 		return null;
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(String uid, float rating) {
+	public List<String> getPlaceIdsFromRating(String uid, float rating) throws TooManyConnections {
 		if (profileManager != null) return profileManager.getPlaceIdsFromRating(uid, rating);
 		return new ArrayList<String>();
 	}
@@ -116,7 +116,7 @@ public class ProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
-			float rating) {
+			float rating) throws TooManyConnections {
 		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(uid, rating);
 		return new ArrayList <String>();
 	}

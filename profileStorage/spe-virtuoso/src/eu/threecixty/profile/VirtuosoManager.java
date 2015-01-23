@@ -2,6 +2,7 @@ package eu.threecixty.profile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -18,9 +19,6 @@ import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
 
 
 public class VirtuosoManager {
-
-	
-//	private static final String PASSWORD_FIXED = "Mil(ano3Cix)ty!";
 	
 	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixty.com/private/";
 	
@@ -30,17 +28,22 @@ public class VirtuosoManager {
 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 
+	 private static final Semaphore SEMAPHORE = new Semaphore(100, true); // TODO: to be put in a property file
+	 
+	 public static final String BUSY_EXCEPTION = "Server is too busy at the moment";
+	 
 	
 	public static VirtuosoManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	public JSONObject executeQueryWithDBA(String queryStr) {
+	public JSONObject executeQueryWithDBA(String queryStr) throws InterruptedException {
 		JSONObject jsonObject = null;
 		VirtGraph virtGraphDBA = getVirtGraph();
 		if (virtGraphDBA == null) return null;
 		jsonObject = executeQuery(queryStr, virtGraphDBA);
-		virtGraphDBA.close();
+		releaseVirtGraph(virtGraphDBA);
 		return jsonObject;
 	}
 
@@ -49,11 +52,18 @@ public class VirtuosoManager {
 	/**
 	 * Gets VirtGraph with DBA user.
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public VirtGraph getVirtGraph() {
+	public VirtGraph getVirtGraph() throws InterruptedException {
+		SEMAPHORE.acquire();
 		VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL,
 				VirtuosoConnection.USER, VirtuosoConnection.PASS);
 		return graph;
+	}
+
+	public void releaseVirtGraph(VirtGraph virtGraph) {
+		virtGraph.close();
+		SEMAPHORE.release();
 	}
 	
 	public String getGraph(String uid) {

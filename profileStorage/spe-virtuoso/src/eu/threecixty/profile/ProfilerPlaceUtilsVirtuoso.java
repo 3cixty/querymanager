@@ -33,7 +33,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static String getCountryName(String uID) {
+	public static String getCountryName(String uID) throws TooManyConnections {
 		if (uID == null || uID.equals("")) return null;
 		
 		StringBuffer buffer = new StringBuffer(PREFIXES);
@@ -46,15 +46,20 @@ public class ProfilerPlaceUtilsVirtuoso {
 		
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
-		if (jsonObj == null) return null;
-		
+		JSONObject jsonObj;
 		try {
-			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
-			if (jsonArr.length() == 0) return null;
-			return jsonArr.getJSONObject(0).getJSONObject("countryName").getString("value");
-		} catch (JSONException e) {
-			e.printStackTrace();
+			jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
+			if (jsonObj == null) return null;
+
+			try {
+				JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+				if (jsonArr.length() == 0) return null;
+				return jsonArr.getJSONObject(0).getJSONObject("countryName").getString("value");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		
 		return null;
@@ -66,7 +71,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static String getTownName(String uID) {
+	public static String getTownName(String uID) throws TooManyConnections {
 		if (uID == null || uID.equals("")) return null;
 
 		StringBuffer buffer = new StringBuffer(PREFIXES);
@@ -80,15 +85,20 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("FILTER (STR(?uid) = \"" + uID + "\") . \n\n");
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
-		if (jsonObj == null) return null;
-		
+		JSONObject jsonObj;
 		try {
-			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
-			if (jsonArr.length() == 0) return null;
-			return jsonArr.getJSONObject(0).getJSONObject("townName").getString("value");
-		} catch (JSONException e) {
-			e.printStackTrace();
+			jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
+			if (jsonObj == null) return null;
+			
+			try {
+				JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+				if (jsonArr.length() == 0) return null;
+				return jsonArr.getJSONObject(0).getJSONObject("townName").getString("value");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		
 		return null;
@@ -99,7 +109,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 * @param uID
 	 * 				User identity.
 	 */
-	public static GpsCoordinate getCoordinates(String uID) {
+	public static GpsCoordinate getCoordinates(String uID) throws TooManyConnections {
 		if (uID == null || uID.equals("")) return null;
 		
 		StringBuffer buffer = new StringBuffer(PREFIXES);
@@ -113,18 +123,23 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("?geo schema:longitude ?lon .\n");
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
-		if (jsonObj == null) return null;
-		
+		JSONObject jsonObj;
 		try {
-			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
-			if (jsonArr.length() == 0) return null;
-			double lat = Double.parseDouble(jsonArr.getJSONObject(0).getJSONObject("lat").getString("value"));
-			double lon = Double.parseDouble(jsonArr.getJSONObject(0).getJSONObject("lon").getString("value"));
-			GpsCoordinate coordinate = new GpsCoordinate(lat, lon);
-			return coordinate;
-		} catch (JSONException e) {
-			e.printStackTrace();
+			jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
+			if (jsonObj == null) return null;
+			
+			try {
+				JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+				if (jsonArr.length() == 0) return null;
+				double lat = Double.parseDouble(jsonArr.getJSONObject(0).getJSONObject("lat").getString("value"));
+				double lon = Double.parseDouble(jsonArr.getJSONObject(0).getJSONObject("lon").getString("value"));
+				GpsCoordinate coordinate = new GpsCoordinate(lat, lon);
+				return coordinate;
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		
 		return null;
@@ -138,7 +153,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 * @param rating
 	 * @return
 	 */
-	public static List <String> getPlaceIdsFromRating(String uID, float rating) {
+	public static List <String> getPlaceIdsFromRating(String uID, float rating) throws TooManyConnections {
 		if (uID == null || uID.equals("")) return null;
 		
 		StringBuffer buffer = new StringBuffer(PREFIXES);
@@ -177,7 +192,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	 * @param rating
 	 * @return
 	 */
-	public static List <String> getPlaceIdsFromRatingOfFriends(String uID, float rating) {
+	public static List <String> getPlaceIdsFromRatingOfFriends(String uID, float rating) throws TooManyConnections {
 		if (uID == null || uID.equals("")) return null;
 
 		List <String> friendUids = getFriendUIDs(uID);
@@ -228,25 +243,30 @@ public class ProfilerPlaceUtilsVirtuoso {
 		return null;
 	}
 
-	private static List<String> getPlaceIdsFromQuery(String qStr) {
+	private static List<String> getPlaceIdsFromQuery(String qStr) throws TooManyConnections {
 	    
 		List <String> placeNames = new ArrayList <String>();
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(qStr);
-		if (jsonObj == null) return placeNames;
-		
+		JSONObject jsonObj;
 		try {
-			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
-			for (int index = 0; index < jsonArr.length(); index++) {
-				placeNames.add(jsonArr.getJSONObject(index).getJSONObject("x").getString("value"));
+			jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(qStr);
+			if (jsonObj == null) return placeNames;
+			
+			try {
+				JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+				for (int index = 0; index < jsonArr.length(); index++) {
+					placeNames.add(jsonArr.getJSONObject(index).getJSONObject("x").getString("value"));
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-		} catch (JSONException e) {
-			e.printStackTrace();
+			return placeNames;
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
-		return placeNames;
 	}
 	
-	public static List <String> getFriendUIDs(String uid) {
+	public static List <String> getFriendUIDs(String uid) throws TooManyConnections {
 		List <String> friendUids = new LinkedList <String>();
 		StringBuffer buffer = new StringBuffer(PREFIXES);
 
@@ -260,20 +280,25 @@ public class ProfilerPlaceUtilsVirtuoso {
 		
 		buffer.append("}");
 		
-		JSONObject jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
-		if (jsonObj == null) return friendUids;
-		
+		JSONObject jsonObj;
 		try {
-			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
-			for (int index = 0; index < jsonArr.length(); index++) {
-				friendUids.add(jsonArr.getJSONObject(index).getJSONObject("friendUID").getString("value"));
+			jsonObj = VirtuosoManager.getInstance().executeQueryWithDBA(buffer.toString());
+			if (jsonObj == null) return friendUids;
+			
+			try {
+				JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+				for (int index = 0; index < jsonArr.length(); index++) {
+					friendUids.add(jsonArr.getJSONObject(index).getJSONObject("friendUID").getString("value"));
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-		} catch (JSONException e) {
-			e.printStackTrace();
+			
+			
+			return friendUids;
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
-		
-		
-		return friendUids;
 	}
 	
 	private static String getGoogleReviewCreator(String uid) {

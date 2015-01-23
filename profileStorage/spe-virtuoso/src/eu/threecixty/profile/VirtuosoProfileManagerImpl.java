@@ -57,17 +57,17 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String getCountryName(String uid) {
+	public String getCountryName(String uid) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getCountryName(uid);
 	}
 
 	@Override
-	public String getTownName(String uid) {
+	public String getTownName(String uid) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getTownName(uid);
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(String uid, float rating) {
+	public List<String> getPlaceIdsFromRating(String uid, float rating) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRating(uid, rating);
 	}
 
@@ -79,7 +79,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
-			float rating) {
+			float rating) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRatingOfFriends(uid, rating);
 	}
 
@@ -128,7 +128,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public GpsCoordinate getCoordinate(String uid) {
+	public GpsCoordinate getCoordinate(String uid) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getCoordinates( uid);
 	}
 
