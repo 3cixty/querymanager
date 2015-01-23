@@ -175,6 +175,9 @@ public class VirtuosoManager {
 	}
 
 
+	public int getAvailablePermits() {
+		return SEMAPHORE.availablePermits();
+	}
 	
 	private VirtuosoManager() {
 	}
