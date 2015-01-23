@@ -8,14 +8,15 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
 import org.apache.log4j.Logger;
+
 
 //import eu.threecixty.CrawlSocialProfiles.CallGPlusProfileParser;
 import eu.threecixty.MobilityCrawlerCron.MobilityCrawlerCron;
 import eu.threecixty.profile.IDMapping;
 import eu.threecixty.profile.IDCrawlTimeMapping;
 import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.oldmodels.Preference;
 
@@ -184,25 +185,29 @@ public class CrawlerCron {
 		while (iteratorMapping.hasNext()) {
 			IDMapping map = iteratorMapping.next();
 			if (DEBUG_MOD) LOGGER.info("UID = " + map.getThreeCixtyID() + ", Mobidot username = " + map.getMobidotUserName() + ", Mobidot ID = " + map.getMobidotID());
-			UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID());
-			//UserProfile user = new UserProfile();
-			//user.setHasUID(map.getThreeCixtyID());
-
-			String lastCrawlTime = getCrawltimeforUserID(
-					idCrawlTimeMapping, map.getThreeCixtyID());
-			Preference pref = new Preference();
-			//callGPlusProfileParser.getInfoAndReviews(currentTime, map, user, lastCrawlTime, pref);
 			try {
-				mobilityCrawlerCron.getmobility(map, user, idMapping,
-						getMobidotBaseurl(), getDomain(), getMobidotApiKey(),
-						lastCrawlTime, pref, currentTime);
-			} catch (Exception e) {
-				e.printStackTrace();
+				UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID());
+				//UserProfile user = new UserProfile();
+				//user.setHasUID(map.getThreeCixtyID());
+
+				String lastCrawlTime = getCrawltimeforUserID(
+						idCrawlTimeMapping, map.getThreeCixtyID());
+				Preference pref = new Preference();
+				//callGPlusProfileParser.getInfoAndReviews(currentTime, map, user, lastCrawlTime, pref);
+				try {
+					mobilityCrawlerCron.getmobility(map, user, idMapping,
+							getMobidotBaseurl(), getDomain(), getMobidotApiKey(),
+							lastCrawlTime, pref, currentTime);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				user.setHasLastCrawlTime(Long.toString(currentTime));
+
+				ProfileManagerImpl.getInstance().saveProfile(user);
+			} catch (TooManyConnections e) {
+				if (DEBUG_MOD) LOGGER.info(e.getMessage());
 			}
-
-			user.setHasLastCrawlTime(Long.toString(currentTime));
-
-			ProfileManagerImpl.getInstance().saveProfile(user);
 		}
 		if (DEBUG_MOD) LOGGER.info("Finish crawling Mobidot data");
 	}
