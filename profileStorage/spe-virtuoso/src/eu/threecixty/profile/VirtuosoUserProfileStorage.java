@@ -403,6 +403,7 @@ public class VirtuosoUserProfileStorage {
 					queriesToRemoveData.add(str);
 				}
 			}
+			qRCRegularTrips.closeConnection();
 			String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
 			queriesToRemoveData.add(str);
 
@@ -410,6 +411,8 @@ public class VirtuosoUserProfileStorage {
 			queriesToRemoveData.add(str);
 
 		}
+		qRC.closeConnection();
+		
 		String str = GetSetQueryStrings.removeTransport(uid);
 		queriesToRemoveData.add(str);
 		
