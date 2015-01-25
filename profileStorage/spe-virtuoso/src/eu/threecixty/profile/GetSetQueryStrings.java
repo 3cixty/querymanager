@@ -403,7 +403,7 @@ public class GetSetQueryStrings {
 		if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
 			query+= " <"+profileIdentity.getHasProfileIdentitiesURI()+"> foaf:accountName \""+profileIdentity.getHasUserAccountID()+"\" . \n";
 		
-		if  (profileIdentity.getHasUserInteractionMode().toString()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
+		if  (profileIdentity.getHasUserInteractionMode()!=null&&!profileIdentity.getHasUserInteractionMode().toString().isEmpty())
 			query+= " <"+profileIdentity.getHasProfileIdentitiesURI()+"> profile:userInteractionMode \""+profileIdentity.getHasUserInteractionMode()+"\" . \n";
 		return query;
 	}
@@ -497,7 +497,7 @@ public class GetSetQueryStrings {
 		if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
 			query+= "  <"+like.getHasLikesURI()+"> schema:likeName \""+like.getHasLikeName()+"\" . \n";
 		
-		if (like.getHasLikeType().toString()!=null&&!like.getHasLikeType().toString().isEmpty())
+		if (like.getHasLikeType()!=null&&!like.getHasLikeType().toString().isEmpty())
 			query+= "  <"+like.getHasLikesURI()+"> dc:subject \""+like.getHasLikeType()+"\" . \n";
 		
 		return query;
