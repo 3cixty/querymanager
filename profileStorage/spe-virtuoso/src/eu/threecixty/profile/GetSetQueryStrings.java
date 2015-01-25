@@ -397,7 +397,7 @@ public class GetSetQueryStrings {
 	 */
 	private static String makeProfileItentitiesQuery(String uid,
 			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity) {
-		String query= " <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type foaf:OnLineAccount. \n"
+		String query= " <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type foaf:OnlineAccount. \n"
 					+ " <"+PROFILE_URI+uid+"> foaf:account <"+profileIdentity.getHasProfileIdentitiesURI()+"> . \n";
 		
 		if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
