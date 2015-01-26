@@ -132,7 +132,7 @@ public class TrayServices {
     						.type(MediaType.TEXT_PLAIN_TYPE)
     						.build();
     			} catch (TooManyConnections e) {
-    				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    				return Response.status(Response.Status.SERVICE_UNAVAILABLE)
     						.entity(e.getMessage())
     						.type(MediaType.TEXT_PLAIN_TYPE)
     						.build();
