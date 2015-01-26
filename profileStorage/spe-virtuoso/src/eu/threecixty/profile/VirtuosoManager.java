@@ -2,7 +2,6 @@ package eu.threecixty.profile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -12,6 +11,7 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
+import com.hp.hpl.jena.shared.JenaException;
 
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
@@ -31,7 +31,7 @@ public class VirtuosoManager {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	 
-	 private static final Semaphore SEMAPHORE = new Semaphore(100, true); // TODO: to be put in a property file
+	 //private static final Semaphore SEMAPHORE = new Semaphore(100, true); // TODO: to be put in a property file
 	 
 	 public static final String BUSY_EXCEPTION = "Server is too busy at the moment";
 	 
@@ -133,15 +133,19 @@ public class VirtuosoManager {
 	 * @throws InterruptedException 
 	 */
 	public VirtGraph getVirtGraph() throws InterruptedException {
-		SEMAPHORE.acquire();
-		VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL,
-				VirtuosoConnection.USER, VirtuosoConnection.PASS);
-		return graph;
+		//SEMAPHORE.acquire();
+		try {
+			VirtGraph graph = new VirtGraph (VirtuosoConnection.DB_URL,
+					VirtuosoConnection.USER, VirtuosoConnection.PASS);
+			return graph;
+		} catch (JenaException e) {
+			throw new InterruptedException();
+		}
 	}
 
 	public void releaseVirtGraph(VirtGraph virtGraph) {
 		virtGraph.close();
-		SEMAPHORE.release();
+		//SEMAPHORE.release();
 	}
 	
 	public String getGraph(String uid) {
@@ -176,7 +180,8 @@ public class VirtuosoManager {
 
 
 	public int getAvailablePermits() {
-		return SEMAPHORE.availablePermits();
+		//return SEMAPHORE.availablePermits();
+		return 100;
 	}
 	
 	private VirtuosoManager() {
