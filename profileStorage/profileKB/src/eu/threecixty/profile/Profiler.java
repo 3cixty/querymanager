@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.ProfileManager.StartAndEndDate;
 import eu.threecixty.profile.oldmodels.Area;
@@ -49,7 +48,7 @@ public class Profiler implements IProfiler {
 	}
 	
 	@Override
-	public void PopulateProfile() {
+	public void PopulateProfile() throws TooManyConnections {
 		
 		pref = new Preference();
 		
@@ -231,7 +230,7 @@ public class Profiler implements IProfiler {
 		return null;
 	}
 
-	private void addPlaces() {
+	private void addPlaces() throws TooManyConnections {
 		Set <Place> places = new HashSet <Place>();
 		if (currentCountryRequired) {
 			Place place = createPlace(ProfileManagerImpl.getInstance().getCountryName(uID), NatureOfPlace.Country);

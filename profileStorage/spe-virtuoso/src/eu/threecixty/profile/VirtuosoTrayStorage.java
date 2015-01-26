@@ -50,13 +50,17 @@ public class VirtuosoTrayStorage implements TrayManager {
 		return SingletonHolder.INSTANCE;
 	}
 
-	public boolean addTray(Tray tray) throws InvalidTrayElement {
+	public boolean addTray(Tray tray) throws InvalidTrayElement, TooManyConnections {
 		if (tray == null) return false;
 		if (!checkValidTray(tray)) {
 			throw new InvalidTrayElement(INVALID_TRAY_ELEMENT_EXCEPTION_MSG);
 		}
-		if (checkTrayExisted(tray)) {
-			return false;
+		try {
+			if (checkTrayExisted(tray)) {
+				return false;
+			}
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		return save(tray);
 	}
@@ -67,7 +71,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * @return
 	 * @throws InvalidTrayElement
 	 */
-	public boolean deleteTray(Tray tray) throws InvalidTrayElement {
+	public boolean deleteTray(Tray tray) throws InvalidTrayElement, TooManyConnections {
 		if (tray == null) return false;
 		if (!checkValidTray(tray)) {
 			throw new InvalidTrayElement(INVALID_TRAY_ELEMENT_EXCEPTION_MSG);
@@ -82,15 +86,17 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("}}");
 		
 		try {
-			VirtuosoConnection.insertDeleteQuery(buf.toString());
+			VirtuosoManager.getInstance().executeUpdateQuery(buf.toString());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		return false;
 	}
 
-	public boolean replaceUID(String junkID, String uid) throws InvalidTrayElement {
+	public boolean replaceUID(String junkID, String uid) throws InvalidTrayElement, TooManyConnections {
 		if (junkID == null || uid == null) return false;
 		if (!containValidCharacters(junkID) || !containValidCharacters(uid)) {
 			throw new InvalidTrayElement(INVALID_TRAY_ELEMENT_EXCEPTION_MSG);
@@ -107,7 +113,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		return true;
 	}
 
-	public boolean updateTray(Tray tray) throws InvalidTrayElement {
+	public boolean updateTray(Tray tray) throws InvalidTrayElement, TooManyConnections {
 		if (tray == null) return false;
 		if (!checkValidTray(tray)) {
 			throw new InvalidTrayElement(INVALID_TRAY_ELEMENT_EXCEPTION_MSG);
@@ -119,7 +125,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	}
 	
 	public List <Tray> getTrays(String uid, int offset, int limit,
-			OrderType orderType, boolean eventsPast) {
+			OrderType orderType, boolean eventsPast) throws TooManyConnections {
 		List <Tray> trays = getTrays(uid);
 		int firstIndex = (offset < 0) ? 0: offset;
 		if (firstIndex >= trays.size()) {
@@ -135,7 +141,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		return getTraysWithOrderAndEventPast(limitedTrays, orderType, eventsPast);
 	}
 	
-	public boolean cleanTrays(String token) throws InvalidTrayElement {
+	public boolean cleanTrays(String token) throws InvalidTrayElement, TooManyConnections {
 		if (!containValidCharacters(token)) {
 			throw new InvalidTrayElement(INVALID_TRAY_ELEMENT_EXCEPTION_MSG);
 		}
@@ -148,10 +154,12 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("}}");
 		
 		try {
-			VirtuosoConnection.insertDeleteQuery(buf.toString());
+			VirtuosoManager.getInstance().executeUpdateQuery(buf.toString());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		return false;
 	}
@@ -187,7 +195,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		return trays;
 	}
 
-	public List <Tray> getTrays(String uid) {
+	public List <Tray> getTrays(String uid) throws TooManyConnections {
 		List <Tray> trays = new LinkedList <Tray>();
 		if (uid == null) return trays;
 		if (!containValidCharacters(uid)) return trays;
@@ -208,21 +216,26 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("OPTIONAL { ?tray ").append(TRAY_RATING_PREDICATE).append(" ?rating .\n ?rating schema:ratingValue ?ratingValue .} \n");
 		buf.append("}");
 
-		JSONObject jsonObject = VirtuosoManager.getInstance().executeQueryWithDBA(buf.toString());
-		if (jsonObject == null) return trays;
+		JSONObject jsonObject;
 		try {
-			JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
-			if (jsonArr.length() == 0) return trays;
-			for (int i = 0; i < jsonArr.length(); i++) {
-				Tray tray = createTray(jsonArr.getJSONObject(i));
-				tray.setUid(uid);
-				trays.add(tray);
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}	
-		
-		return trays;
+			jsonObject = VirtuosoManager.getInstance().executeQueryWithDBA(buf.toString());
+			if (jsonObject == null) return trays;
+			try {
+				JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
+				if (jsonArr.length() == 0) return trays;
+				for (int i = 0; i < jsonArr.length(); i++) {
+					Tray tray = createTray(jsonArr.getJSONObject(i));
+					tray.setUid(uid);
+					trays.add(tray);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}	
+			
+			return trays;
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 
 	// ?trayId ?title ?type ?source  ?timestamp ?attend ?attendedDateTime ?imageUrl ?ratingValue
@@ -249,7 +262,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		return tray;
 	}
 
-	public Tray getTray(String uid, String trayId) {
+	public Tray getTray(String uid, String trayId) throws TooManyConnections {
 		if (uid == null || trayId == null) return null;
 		
 		if (!containValidCharacters(uid) || !containValidCharacters(trayId)) return null;
@@ -271,22 +284,27 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("OPTIONAL { ").append(trayUri).append(" ").append(TRAY_RATING_PREDICATE).append(" ?rating .\n ?rating schema:ratingValue ?ratingValue .} \n");
 		buf.append("}");
 
-		JSONObject jsonObject = VirtuosoManager.getInstance().executeQueryWithDBA(buf.toString());
-		if (jsonObject == null) return null;
+		JSONObject jsonObject;
 		try {
-			JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
-			if (jsonArr.length() == 0) return null;
-			Tray tray = createTray(jsonArr.getJSONObject(0));
-			tray.setUid(uid);
-			return tray;
-		} catch (JSONException e) {
-			e.printStackTrace();
+			jsonObject = VirtuosoManager.getInstance().executeQueryWithDBA(buf.toString());
+			if (jsonObject == null) return null;
+			try {
+				JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
+				if (jsonArr.length() == 0) return null;
+				Tray tray = createTray(jsonArr.getJSONObject(0));
+				tray.setUid(uid);
+				return tray;
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			return null;
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
-		return null;
 	}
 	
 	@Override
-	public List<Tray> getAllTrays() {
+	public List<Tray> getAllTrays() throws TooManyConnections {
 		List <Tray> trays = new LinkedList <Tray>();
 		StringBuffer buf = new StringBuffer(PREFIXES).append(
 				" SELECT ?person ?trayId ?title ?type ?source  ?timestamp ?attend ?attendedDateTime ?imageUrl ?ratingValue \n");
@@ -304,24 +322,29 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("OPTIONAL { ?tray ").append(TRAY_RATING_PREDICATE).append(" ?rating .\n ?rating schema:ratingValue ?ratingValue .} \n");
 		buf.append("}");
 
-		JSONObject jsonObject = VirtuosoManager.getInstance().executeQueryWithDBA(buf.toString());
-		if (jsonObject == null) return trays;
+		JSONObject jsonObject;
 		try {
-			JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
-			if (jsonArr.length() == 0) return trays;
-			for (int i = 0; i < jsonArr.length(); i++) {
-				JSONObject tmp = jsonArr.getJSONObject(i);
-				Tray tray = createTray(tmp);
-				String uid = getValue(tmp, "person").substring(
-						GetSetQueryStrings.PROFILE_URI.length());
-				tray.setUid(uid);
-				trays.add(tray);
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}	
-		
-		return trays;
+			jsonObject = VirtuosoManager.getInstance().executeQueryWithDBA(buf.toString());
+			if (jsonObject == null) return trays;
+			try {
+				JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
+				if (jsonArr.length() == 0) return trays;
+				for (int i = 0; i < jsonArr.length(); i++) {
+					JSONObject tmp = jsonArr.getJSONObject(i);
+					Tray tray = createTray(tmp);
+					String uid = getValue(tmp, "person").substring(
+							GetSetQueryStrings.PROFILE_URI.length());
+					tray.setUid(uid);
+					trays.add(tray);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}	
+			
+			return trays;
+		} catch (InterruptedException e1) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 	
 	/**
@@ -329,7 +352,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * @param tray
 	 * @return
 	 */
-	private static boolean save(Tray tray) {
+	private static boolean save(Tray tray) throws TooManyConnections {
 		// encode with Base64 to avoid SQL injection
 		String personUri = getPersonURI(tray);
 		String trayUri = getTrayURI(tray);
@@ -361,10 +384,12 @@ public class VirtuosoTrayStorage implements TrayManager {
 		buf.append("}}");
 		
 		try {
-			VirtuosoConnection.insertDeleteQuery(buf.toString());
+			VirtuosoManager.getInstance().executeUpdateQuery(buf.toString());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 		
 		return false;
@@ -374,8 +399,9 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * Checks whether or not a given tray exists in the KB.
 	 * @param tray
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	private static boolean checkTrayExisted(Tray tray) {
+	private static boolean checkTrayExisted(Tray tray) throws InterruptedException {
 		String trayUri = getTrayURI(tray);
 		StringBuffer buf = new StringBuffer(PREFIXES).append(" SELECT * \n");
 		buf.append(" FROM <").append(getGraphName(tray)).append(">\n");

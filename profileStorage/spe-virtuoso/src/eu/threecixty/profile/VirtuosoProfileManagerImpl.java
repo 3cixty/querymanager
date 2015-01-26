@@ -22,18 +22,30 @@ import eu.threecixty.profile.UserProfile;
 class VirtuosoProfileManagerImpl implements ProfileManager {
 	
 	@Override
-	public UserProfile getProfile(String uid) {
-		return VirtuosoUserProfileStorage.getInstance(uid).loadProfile();
+	public UserProfile getProfile(String uid) throws TooManyConnections {
+		try {
+			return VirtuosoUserProfileStorage.getInstance(uid).loadProfile();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile) {
-		return VirtuosoUserProfileStorage.getInstance(userProfile.getHasUID()).saveProfile(userProfile);
+	public boolean saveProfile(UserProfile userProfile) throws TooManyConnections {
+		try {
+			return VirtuosoUserProfileStorage.getInstance(userProfile.getHasUID()).saveProfile(userProfile);
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 
 	@Override
-	public boolean existUID(String uid) {
-		return VirtuosoUserProfileStorage.getInstance(uid).existUID();
+	public boolean existUID(String uid) throws TooManyConnections {
+		try {
+			return VirtuosoUserProfileStorage.getInstance(uid).existUID();
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		}
 	}
 
 	@Override
@@ -57,17 +69,17 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String getCountryName(String uid) {
+	public String getCountryName(String uid) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getCountryName(uid);
 	}
 
 	@Override
-	public String getTownName(String uid) {
+	public String getTownName(String uid) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getTownName(uid);
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(String uid, float rating) {
+	public List<String> getPlaceIdsFromRating(String uid, float rating) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRating(uid, rating);
 	}
 
@@ -79,7 +91,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
-			float rating) {
+			float rating) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRatingOfFriends(uid, rating);
 	}
 
@@ -128,7 +140,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public GpsCoordinate getCoordinate(String uid) {
+	public GpsCoordinate getCoordinate(String uid) throws TooManyConnections {
 		return ProfilerPlaceUtilsVirtuoso.getCoordinates( uid);
 	}
 
@@ -160,22 +172,26 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     			+ "}";
 		Set<IDMapping> idMapping=new HashSet<IDMapping>();
 		
-		QueryReturnClass qRC=VirtuosoConnection.query(queryString);
+		QueryReturnClass qRC;
+		try {
+			qRC = VirtuosoManager.getInstance().query(queryString);
+			ResultSet results = qRC.getReturnedResultSet();
 
-		ResultSet results = qRC.getReturnedResultSet();
-
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			String UID = qs.getLiteral("uid").getString();
-			String mobidotUserName = qs.getLiteral("mobidotID").getString();
-			//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
-			IDMapping mapper=new IDMapping();
-			mapper.setThreeCixtyID(UID);
-			mapper.setMobidotUserName(mobidotUserName);
-			//mapper.setMobidotID(mobidotID);
-			idMapping.add(mapper);
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				String UID = qs.getLiteral("uid").getString();
+				String mobidotUserName = qs.getLiteral("mobidotID").getString();
+				//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
+				IDMapping mapper=new IDMapping();
+				mapper.setThreeCixtyID(UID);
+				mapper.setMobidotUserName(mobidotUserName);
+				//mapper.setMobidotID(mobidotID);
+				idMapping.add(mapper);
+			}
+			qRC.closeConnection();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		qRC.closeConnection();
 		return idMapping;
 	}
 	/**
@@ -194,21 +210,25 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
 	    
 			
-		QueryReturnClass qRC=VirtuosoConnection.query(queryString);
+		QueryReturnClass qRC;
+		try {
+			qRC = VirtuosoManager.getInstance().query(queryString);
+			ResultSet results = qRC.getReturnedResultSet();
 
-		ResultSet results = qRC.getReturnedResultSet();
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				String UID = qs.getLiteral("uid").getString();
+				String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
 
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			String UID = qs.getLiteral("uid").getString();
-			String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
-
-			IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
-			mapper.setThreeCixtyID(UID);
-			mapper.setLastCrawlTime(lastCrawlTime);
-			idCrawlTimeMapping.add(mapper);
+				IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
+				mapper.setThreeCixtyID(UID);
+				mapper.setLastCrawlTime(lastCrawlTime);
+				idCrawlTimeMapping.add(mapper);
+			}
+			qRC.closeConnection();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		qRC.closeConnection();
 		return idCrawlTimeMapping;
 	}
 
@@ -229,7 +249,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<UserProfile> getAllUserProfiles() {
-		//return VirtuosoUserProfileStorage.getAllUserProfiles();
+//		try {
+//			return VirtuosoUserProfileStorage.getAllUserProfiles();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		return null;
 	}
 }
