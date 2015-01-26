@@ -20,51 +20,40 @@ public class SettingsStorage {
 	/**
 	 * Saves given settings information into KB.
 	 * @param settings
+	 * @throws TooManyConnections 
 	 */
-	public synchronized static void save(ThreeCixtySettings settings) {
+	public static void save(ThreeCixtySettings settings) throws TooManyConnections {
 		if (settings == null) return;
-		try {
-			UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(settings.getUid());
-			userProfile.setHasUID(settings.getUid());
-			
-			saveNameInfoToKB(settings, userProfile);
-			saveAddressInfoToKB(settings, userProfile);
-			addProfileIdentitiesIntoUserProfile(settings, userProfile);
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(settings.getUid());
+		userProfile.setHasUID(settings.getUid());
 
-			ProfileManagerImpl.getInstance().saveProfile(userProfile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		saveNameInfoToKB(settings, userProfile);
+		saveAddressInfoToKB(settings, userProfile);
+		addProfileIdentitiesIntoUserProfile(settings, userProfile);
+
+		ProfileManagerImpl.getInstance().saveProfile(userProfile);
 	}
 
 	/**
 	 * Loads settings information persisted in the KB.
 	 * @param uid
 	 * @return
+	 * @throws TooManyConnections 
 	 */
-	public static ThreeCixtySettings load(String uid) {
+	public static ThreeCixtySettings load(String uid) throws TooManyConnections {
 		if (!isNotNullOrEmpty(uid)) return null;
-		try {
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
+		if (userProfile == null) return null;
 
-			UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
-			if (userProfile == null) return null;
+		ThreeCixtySettings settings = new ThreeCixtySettings();
+		settings.setUid(uid);
 
-			ThreeCixtySettings settings = new ThreeCixtySettings();
-			settings.setUid(uid);
-			
-			loadProfileIdentitiesFromUserProfile(userProfile, settings);
-			
-			loadNameFromKBToPI(uid, userProfile, settings);
-			loadAddressInfoFromKBToPI(uid, userProfile, settings);
-			//loadAddressInfoAndNameFromUserProfile(uid, settings);
+		loadProfileIdentitiesFromUserProfile(userProfile, settings);
 
-//			loadEventPreferenceFromUserProfile(userProfile, settings);
-			return settings;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return null;
+		loadNameFromKBToPI(uid, userProfile, settings);
+		loadAddressInfoFromKBToPI(uid, userProfile, settings);
+
+		return settings;
 	}
 
 	/**
@@ -98,43 +87,6 @@ public class SettingsStorage {
 			setOfProfileIdentities.addAll(settings.getIdentities());
 		}
 	}
-
-//	/**
-//	 * Loads event preference information from KB (user profile) to a given settings instance.
-//	 * @param userProfile
-//	 * @param settings
-//	 */
-//	private static void loadEventPreferenceFromUserProfile(
-//			UserProfile userProfile, ThreeCixtySettings settings) {
-//		if (!userProfile.hasHasPreference()) return;
-//		Preference pref = userProfile.getHasPreference().iterator().next();
-//		if (!pref.hasHasEventPreference()) return;
-//		EventPreference ep = pref.getHasEventPreference().iterator().next();
-//		if (!ep.hasHasEventDetailPreference()) return;
-//		EventDetailPreference edp = ep.getHasEventDetailPreference().iterator().next();
-//		
-//		eu.threecixty.profile.oldmodels.EventDetailPreference oldEdp = null;
-//		if (settings.getEventDetailPreference() != null) oldEdp = settings.getEventDetailPreference();
-//		else oldEdp = new eu.threecixty.profile.oldmodels.EventDetailPreference();
-//		
-//		if (edp.hasHasPreferredStartDate()) {
-//			Date startDate = (Date) edp.getHasPreferredStartDate().iterator().next();
-//			if (startDate != null) oldEdp.setHasPreferredStartDate(startDate);
-//		}
-//		if (edp.hasHasPreferredEndDate()) {
-//			Date endDate = (Date) edp.getHasPreferredEndDate().iterator().next();
-//			if (endDate != null) oldEdp.setHasPreferredEndDate(endDate);
-//		}
-//		if (edp.hasHasNatureOfEvent()) {
-//			String noeStr = edp.getHasNatureOfEvent().iterator().next().toString();
-//			try {
-//			    eu.threecixty.profile.oldmodels.NatureOfEvent oldNoe = eu.threecixty.profile.oldmodels.NatureOfEvent.valueOf(noeStr);
-//			    oldEdp.setHasNatureOfEvent(oldNoe);
-//			} catch (Exception e) {
-//			}
-//		}
-//		settings.setEventDetailPreference(oldEdp);
-//	}
 	
 	/**
 	 * Loads first name and last name from KB to profile information.

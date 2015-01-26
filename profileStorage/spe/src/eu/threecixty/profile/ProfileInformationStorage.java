@@ -15,60 +15,54 @@ public class ProfileInformationStorage {
 	 * Loads profile information from the KB.
 	 * @param uid
 	 * @return
+	 * @throws TooManyConnections 
 	 */
-	public static ProfileInformation loadProfile(String uid) {
+	public static ProfileInformation loadProfile(String uid) throws TooManyConnections {
 		if (uid == null || uid.equals("")) return null;
-		try {
-			UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
 
-			if (userProfile == null) return null;
-			
-			ProfileInformation profileInfo = new ProfileInformation();
-			profileInfo.setUid(uid);
-			loadNameFromKBToPI(uid, userProfile, profileInfo);
-			loadAddressInfoFromKBToPI(uid, userProfile, profileInfo);
-			profileInfo.setProfileImage(userProfile.getProfileImage());
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
 
-			if (userProfile.getPreferences() == null) {
-				return profileInfo;
-			}
-			
-			profileInfo.setPreference(userProfile.getPreferences());
-			
+		if (userProfile == null) return null;
+
+		ProfileInformation profileInfo = new ProfileInformation();
+		profileInfo.setUid(uid);
+		loadNameFromKBToPI(uid, userProfile, profileInfo);
+		loadAddressInfoFromKBToPI(uid, userProfile, profileInfo);
+		profileInfo.setProfileImage(userProfile.getProfileImage());
+
+		if (userProfile.getPreferences() == null) {
 			return profileInfo;
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		return null;
+
+		profileInfo.setPreference(userProfile.getPreferences());
+
+		return profileInfo;
 	}
 
 	/**
 	 * Saves profile information to the KB.
 	 * @param profile
 	 * @return
+	 * @throws TooManyConnections 
 	 */
-	public synchronized static boolean saveProfile(ProfileInformation profile) {
+	public static boolean saveProfile(ProfileInformation profile) throws TooManyConnections {
 		if (profile == null) return false;
-		try {
-			UserProfile kbUserProfile = new UserProfile();
-			kbUserProfile.setHasUID(profile.getUid());
-			
-			saveNameInfoToKB(profile, kbUserProfile);
-			
-			saveAddressInfoToKB(profile, kbUserProfile);
-			if (profile.getPreference() != null) {
-				kbUserProfile.setPreferences(profile.getPreference());
-			}
-			if (!isNullOrEmpty(profile.getProfileImage())) {
-				kbUserProfile.setProfileImage(profile.getProfileImage());
-			}
-			
-			ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+
+		UserProfile kbUserProfile = new UserProfile();
+		kbUserProfile.setHasUID(profile.getUid());
+
+		saveNameInfoToKB(profile, kbUserProfile);
+
+		saveAddressInfoToKB(profile, kbUserProfile);
+		if (profile.getPreference() != null) {
+			kbUserProfile.setPreferences(profile.getPreference());
 		}
-		return false;
+		if (!isNullOrEmpty(profile.getProfileImage())) {
+			kbUserProfile.setProfileImage(profile.getProfileImage());
+		}
+
+		ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
+		return true;
 	}
 
 	/**
