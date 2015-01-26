@@ -19,7 +19,7 @@ public interface ProfileManager {
 	 * 				The Goolge UID.
 	 * @return <code>UserProfile</code> if the corresponding user exists in the KB, <code>false</code> otherwise.
 	 */
-	UserProfile getProfile(String uid);
+	UserProfile getProfile(String uid) throws TooManyConnections;
 
 	/**
 	 * Saves a given user profile into the KB.
@@ -27,7 +27,7 @@ public interface ProfileManager {
 	 * 				The user profile.
 	 * @return <code>true</code> if the method is successful to save data, <code>false</code> otherwise. 
 	 */
-	boolean saveProfile(UserProfile userProfile);
+	boolean saveProfile(UserProfile userProfile) throws TooManyConnections;
 
 	/**
 	 * Checks whether or not a given Google UID exists in the KB.
@@ -35,7 +35,7 @@ public interface ProfileManager {
 	 * 				The Google UID.
 	 * @return <code>true</code> if the given Google UID exists in the KB, <code>false</code> otherwise.
 	 */
-	boolean existUID(String uid);
+	boolean existUID(String uid) throws TooManyConnections;
 
 	/**
 	 * Gets minimum number of times visited.
@@ -67,7 +67,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return Country name if there exists in the KB, <code>null</code> otherwise. 
 	 */
-	String getCountryName(String uid);
+	String getCountryName(String uid) throws TooManyConnections;
 
 	/**
 	 * Gets town name.
@@ -75,7 +75,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return Town name if there exists in the KB, <code>null</code> otherwise.
 	 */
-	String getTownName(String uid);
+	String getTownName(String uid) throws TooManyConnections;
 
 	/**
 	 * Gets GPS coordinates.
@@ -83,7 +83,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return GPS coordinates information.
 	 */
-	GpsCoordinate getCoordinate(String uid);
+	GpsCoordinate getCoordinate(String uid) throws TooManyConnections;
 
 	/**
 	 * Gets a list of place IDs which were rated with a score more than a given <code>rating</code> value. 
@@ -93,7 +93,7 @@ public interface ProfileManager {
 	 * 				Rating score.
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRating(String uid, float rating);
+	List <String> getPlaceIdsFromRating(String uid, float rating) throws TooManyConnections;
 
 	/**
 	 * Gets a list of place names which were visited more than <code>number</code> times.
@@ -113,7 +113,7 @@ public interface ProfileManager {
 	 * 				Rating score
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRatingOfFriends(String uid, float rating);
+	List <String> getPlaceIdsFromRatingOfFriends(String uid, float rating) throws TooManyConnections;
 	
 	/**
 	 * Gets a list of place names which were visited by friends more than <code>number</code> times.

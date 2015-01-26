@@ -46,7 +46,7 @@ public class QueryReturnClass {
 			vqe = null;
 		}
 		if (virtGraph != null) {
-			virtGraph.close();
+			VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
 			virtGraph = null;
 		}
 	}
