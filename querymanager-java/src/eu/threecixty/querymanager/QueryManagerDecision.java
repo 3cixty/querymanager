@@ -10,6 +10,7 @@ import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.oldmodels.Period;
 
 /**
@@ -33,7 +34,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	public static String run(IProfiler profiler, IQueryManager qm, String filter,
-			EventMediaFormat format) {
+			EventMediaFormat format) throws TooManyConnections {
 		if (profiler != null && filter != null) {
 			if (!filter.equals(FRIENDS)) {
 				if (filter.equalsIgnoreCase(LOCATION)) {
@@ -75,7 +76,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static String filterBasedOnLocation(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) {
+			EventMediaFormat format) throws TooManyConnections {
 		
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
@@ -119,7 +120,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static String filterBasedOnEnteredRating(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) {
+			EventMediaFormat format) throws TooManyConnections {
 		// TODO: find minimum values from preferences
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
@@ -145,7 +146,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static String filterBasedOnFriends(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) {
+			EventMediaFormat format) throws TooManyConnections {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
@@ -176,7 +177,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static String filterBasedOnPreferredEvent(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) {
+			EventMediaFormat format) throws TooManyConnections {
 		// TODO
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
@@ -202,7 +203,7 @@ public class QueryManagerDecision {
 	 * @param exprs
 	 */
 	private static void findTriplesAndExprs(IProfiler profiler, IQueryManager qm,
-			List <Triple> triples, List <Expr> exprs) {
+			List <Triple> triples, List <Expr> exprs) throws TooManyConnections {
 		profiler.PopulateProfile();
 		qm.requestPreferences(profiler);
 		qm.addTriplesAndExprsToLists(triples, exprs);
