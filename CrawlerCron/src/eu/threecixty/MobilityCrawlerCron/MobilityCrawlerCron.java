@@ -244,47 +244,50 @@ public class MobilityCrawlerCron {
 			Set<IDMapping> idMapping, String MobidotBaseurl, String Domain,
 			String APIKey, String lastRuntime, Preference pref, Long currentTime) {
 
+		
 		Long mobidotID = getMobidotIDforUsername(map.getMobidotUserName(),
 				MobidotBaseurl, Domain, APIKey);
-		map.setMobidotID(mobidotID);
-
-		Transport transport = new Transport();
-
-		// extract and set Regular trips
-		RegularTrip maxRegularTrip = extractRegularTrips(map, user,
-				MobidotBaseurl, APIKey, mobidotID, transport);
-
-		Long fromTime = currentTime - 604800L;
-
-		// Extract and set Radius of gyration
-		String urlStr = MobidotBaseurl + "measurement/Radius/" + mobidotID
-				+ "/from/" + fromTime.toString() + "/to/"
-				+ currentTime.toString() + "?key=" + APIKey
-				+ "&nBins=3&cog=dynamic";
-		String[] radius = getRadiusforMobiditID(urlStr);
-		Double distance = Double.parseDouble(radius[1]);
-
-		//set MobilityRelatedPreferences
-		TripPreference tripPreference = new TripPreference();
-		MobilityInferences mobilityInferences = new MobilityInferences();
-		mobilityInferences.setTripPreferences(maxRegularTrip, tripPreference,
-				distance / 1000, user.getHasAddress());
-		Set<TripPreference> tripPreferences = new HashSet<TripPreference>();
-		tripPreferences.add(tripPreference);
-		pref.setHasTripPreference(tripPreferences);
-
-		// Extract and set Accompanying details
-		extractAccompanying(map, idMapping, MobidotBaseurl, APIKey, mobidotID,
-				transport, tripPreference);
-
-		// Extract and set Personal Places
-		extractPersonalPlaces(MobidotBaseurl, APIKey, pref, mobidotID, fromTime);
-
-		Set<Transport> transports = new HashSet<Transport>();
-		transports.add(transport);
-
-		pref.setHasTransport(transports);
-		user.setPreferences(pref);
+		if (mobidotID!=null) {
+			map.setMobidotID(mobidotID);
+	
+			Transport transport = new Transport();
+	
+			// extract and set Regular trips
+			RegularTrip maxRegularTrip = extractRegularTrips(map, user,
+					MobidotBaseurl, APIKey, mobidotID, transport);
+	
+			Long fromTime = currentTime - 604800L;
+	
+			// Extract and set Radius of gyration
+			String urlStr = MobidotBaseurl + "measurement/Radius/" + mobidotID
+					+ "/from/" + fromTime.toString() + "/to/"
+					+ currentTime.toString() + "?key=" + APIKey
+					+ "&nBins=3&cog=dynamic";
+			String[] radius = getRadiusforMobiditID(urlStr);
+			Double distance = Double.parseDouble(radius[1]);
+	
+			//set MobilityRelatedPreferences
+			TripPreference tripPreference = new TripPreference();
+			MobilityInferences mobilityInferences = new MobilityInferences();
+			mobilityInferences.setTripPreferences(maxRegularTrip, tripPreference,
+					distance / 1000, user.getHasAddress());
+			Set<TripPreference> tripPreferences = new HashSet<TripPreference>();
+			tripPreferences.add(tripPreference);
+			pref.setHasTripPreference(tripPreferences);
+	
+			// Extract and set Accompanying details
+			extractAccompanying(map, idMapping, MobidotBaseurl, APIKey, mobidotID,
+					transport, tripPreference);
+	
+			// Extract and set Personal Places
+			extractPersonalPlaces(MobidotBaseurl, APIKey, pref, mobidotID, fromTime);
+	
+			Set<Transport> transports = new HashSet<Transport>();
+			transports.add(transport);
+	
+			pref.setHasTransport(transports);
+			user.setPreferences(pref);
+		}
 	}
 
 	/**
@@ -505,8 +508,10 @@ public class MobilityCrawlerCron {
 		Iterator<IDMapping> iteratorMapping = idMapping.iterator();
 		while (iteratorMapping.hasNext()) {
 			IDMapping map = iteratorMapping.next();
-			if (map.getMobidotID().equals(mobidotID)) {
-				return map.getThreeCixtyID();
+			if (map.getMobidotID()!=null){
+				if (map.getMobidotID().equals(mobidotID)) {
+					return map.getThreeCixtyID();
+				}
 			}
 		}
 		return null;

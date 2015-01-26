@@ -40,13 +40,17 @@ public class MobilityInferences {
 				index = i;
 			}
 		}
-		String[] weatherPattern=maxRegularTrip.getHasRegularTripWeatherPattern().split("\\+");
-		float maxWeatherpercentage=0;
-		for (int i=0;i<weatherPattern.length;i++){
-			String[] weatherPatternValues=	weatherPattern[i].split(":");
-			if (maxWeatherpercentage<Float.parseFloat(weatherPatternValues[1])){
-				maxWeatherpercentage=Float.parseFloat(weatherPatternValues[1]);
-				tripPreference.setHasPreferredWeatherCondition(weatherMapping(weatherPatternValues[0]));
+		if (maxRegularTrip.getHasRegularTripWeatherPattern()!=null || !maxRegularTrip.getHasRegularTripWeatherPattern().isEmpty())
+		{
+			String[] weatherPattern=maxRegularTrip.getHasRegularTripWeatherPattern().split("\\+");
+		
+			float maxWeatherpercentage=0;
+			for (int i=0;i<weatherPattern.length;i++){
+				String[] weatherPatternValues=	weatherPattern[i].split(":");
+				if (maxWeatherpercentage<Float.parseFloat(weatherPatternValues[1])){
+					maxWeatherpercentage=Float.parseFloat(weatherPatternValues[1]);
+					tripPreference.setHasPreferredWeatherCondition(weatherMapping(weatherPatternValues[0]));
+				}
 			}
 		}
 		//preferred start time of the trip
