@@ -3,13 +3,10 @@ package eu.threecixty.querymanager.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.CacheControl;
@@ -20,6 +17,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+
 import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
@@ -29,9 +27,9 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.InvalidTrayElement;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.RestTrayObject;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.Tray.OrderType;
-import eu.threecixty.querymanager.AdminValidator;
 
 /**
  * This class is an end point to expose Rest TrayAPIs to other components.
@@ -147,30 +145,35 @@ public class TrayServices {
     						.entity(e.getMessage())
     						.type(MediaType.TEXT_PLAIN_TYPE)
     						.build();
-    			}
+    			} catch (TooManyConnections e) {
+    				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    						.entity(e.getMessage())
+    						.type(MediaType.TEXT_PLAIN_TYPE)
+    						.build();
+				}
     		}
     	}
 	    return Response.status(Response.Status.OK).entity("{\"response\": \"OK\" }").type(MediaType.APPLICATION_JSON_TYPE).build();
 
     }
 	
-	@POST
-	@Path("/allTrays")
-	public Response showAllTrays(@FormParam("username") String username, @FormParam("password") String password) {
-		try {
-			AdminValidator admin = new AdminValidator();
-			if (admin.validate(username, password, CallLogServices.realPath)) {
-				List <Tray> allProfiles = ProfileManagerImpl.getInstance().getTrayManager().getAllTrays();
-				Gson gson = new Gson();
-				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
-			} else {
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
-			}
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return Response.serverError().build();
-	}
+//	@POST
+//	@Path("/allTrays")
+//	public Response showAllTrays(@FormParam("username") String username, @FormParam("password") String password) {
+//		try {
+//			AdminValidator admin = new AdminValidator();
+//			if (admin.validate(username, password, CallLogServices.realPath)) {
+//				List <Tray> allProfiles = ProfileManagerImpl.getInstance().getTrayManager().getAllTrays();
+//				Gson gson = new Gson();
+//				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
+//			} else {
+//				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
+//			}
+//		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+//		}
+//		return Response.serverError().build();
+//	}
     
     private String getRestTrayString(InputStream input) {
     	if (input == null) return null;
@@ -192,7 +195,8 @@ public class TrayServices {
      * @param restTray
      * @return
      */
-	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
+	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException,
+	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
 		if (itemId == null) return false;
 		String itemTypeStr = restTray.getElement_type();
@@ -234,7 +238,8 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private List<Tray> getTrayElements(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
+	private List<Tray> getTrayElements(RestTrayObject restTray) throws ThreeCixtyPermissionException,
+	        InvalidTrayElement, TooManyConnections {
 		String access_token = restTray.getToken();
 		String uid = OAuthWrappers.findGoogleUIDFrom(access_token);
 
@@ -259,7 +264,8 @@ public class TrayServices {
 	 * @param restTray
 	 * @return List of trays associated with a given junk token
 	 */
-	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
+	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
+	        InvalidTrayElement, TooManyConnections {
 		String junkToken = restTray.getJunk_token();
 		if (junkToken == null || junkToken.equals("")) return null;
 		String threeCixtyToken = restTray.getThree_cixty_token();
@@ -275,7 +281,8 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
+	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException,
+	        InvalidTrayElement, TooManyConnections {
 		String token = restTray.getToken();
 		if (token == null || token.equals("")) return false;
 		String uid = OAuthWrappers.findGoogleUIDFrom(token);
@@ -291,7 +298,8 @@ public class TrayServices {
 	 * @param restTray
 	 * @return
 	 */
-	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException, InvalidTrayElement {
+	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
+	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
 		if (itemId == null || itemId.equals("")) return false;
 		String token = restTray.getToken();

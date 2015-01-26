@@ -33,6 +33,7 @@ import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.querymanager.EventMediaFormat;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
@@ -138,6 +139,11 @@ public class QueryManagerServices {
 					CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY + query);
 					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 					        .entity(tcpe.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				} catch (TooManyConnections e) {
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -395,9 +401,15 @@ public class QueryManagerServices {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY);
 				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity(tcpe.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (TooManyConnections e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -446,9 +458,15 @@ public class QueryManagerServices {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY );
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY );
 				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity(tcpe.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (TooManyConnections e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -531,7 +549,7 @@ public class QueryManagerServices {
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
 			String query, String filter, EventMediaFormat eventMediaFormat,
-			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException {
+			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException, TooManyConnections {
 
 		Query jenaQuery = createJenaQuery(query);
 		
