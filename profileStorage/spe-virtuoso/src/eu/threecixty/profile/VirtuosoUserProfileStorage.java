@@ -204,6 +204,15 @@ public class VirtuosoUserProfileStorage {
 			//VirtuosoManager.getInstance().createAccount(uid);
 			String insertQuery = GetSetQueryStrings.setUser(uid);
 			queries.add(insertQuery);
+            
+            eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
+            profileIdentities.setHasSourceCarrier("Google");
+            profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/Account/"+profileIdentities.getHasSourceCarrier());
+            profileIdentities.setHasUserAccountID(uid);
+            profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
+            String str=GetSetQueryStrings.setProfileIdentities(uid, profileIdentities);
+            
+            queries.add(str);
 		}
 	}
 
@@ -421,20 +430,12 @@ public class VirtuosoUserProfileStorage {
 
 			if (transport==null) break;
 
-			QueryReturnClass qRCRegularTrips = VirtuosoManager.getInstance().query(GetSetQueryStrings.getRegularTripsURIForTransport(transport.asResource().getURI()));
-			ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
 
-			for ( ; resultsRegularTrips.hasNext(); ) {
-				QuerySolution qsRegularTrips = resultsRegularTrips.next();
-				RDFNode regularTripURI = qsRegularTrips.get("regularTrip");
+			String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToATransport(uid, transport.asResource().getURI());
+            		queriesToRemoveData.add(str);
+			
+			str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
 
-				if (regularTripURI!=null){
-					String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTripURI.asResource().getURI());
-					queriesToRemoveData.add(str);
-				}
-			}
-			qRCRegularTrips.closeConnection();
-			String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
 			queriesToRemoveData.add(str);
 
 			str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.asResource().getURI());
