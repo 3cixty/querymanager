@@ -392,7 +392,7 @@ public class VirtuosoUserProfileStorage {
 
 			if (transport==null) break;
 
-			QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsURIForTransport(transport.asResource().getURI()));
+			/*QueryReturnClass qRCRegularTrips=VirtuosoConnection.query(GetSetQueryStrings.getRegularTripsURIForTransport(transport.asResource().getURI()));
 			ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
 
 			for ( ; resultsRegularTrips.hasNext(); ) {
@@ -403,8 +403,11 @@ public class VirtuosoUserProfileStorage {
 					String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToSpecificRegularTrip(uid, regularTripURI.asResource().getURI());
 					queriesToRemoveData.add(str);
 				}
-			}
-			String str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
+			}*/
+			String str = GetSetQueryStrings.removeMultiplePersonalPlacesAssociatedToATransport(uid, transport.asResource().getURI());
+            		queriesToRemoveData.add(str);
+			
+			str = GetSetQueryStrings.removeMultipleRegularTripsAssociatedToSpecificTransport(uid, transport.asResource().getURI());
 			queriesToRemoveData.add(str);
 
 			str = GetSetQueryStrings.removeMultipleAccompanyingAssociatedToSpecificTransport(uid, transport.asResource().getURI());
