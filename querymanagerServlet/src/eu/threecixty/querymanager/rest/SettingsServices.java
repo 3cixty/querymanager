@@ -22,6 +22,7 @@ import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
@@ -86,6 +87,9 @@ public class SettingsServices {
 			}
 		} catch (IOException e2) {
 			e2.printStackTrace();
+		} catch (TooManyConnections e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 
@@ -174,6 +178,9 @@ public class SettingsServices {
 			}
 		} catch (IOException e2) {
 			e2.printStackTrace();
+		} catch (TooManyConnections e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 

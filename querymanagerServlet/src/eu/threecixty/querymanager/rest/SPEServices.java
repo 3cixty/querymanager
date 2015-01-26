@@ -22,6 +22,7 @@ import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
+import eu.threecixty.profile.TooManyConnections;
 
 /**
  * The class is an end point for Rest ProfileAPI to expose to other components.
@@ -58,40 +59,38 @@ public class SPEServices {
 		} catch (ThreeCixtyPermissionException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("You are not allowed to access the user profile").build();
 		}
-		try {
-			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-			long starttime = System.currentTimeMillis();
-			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-				String uid = null;
-				HttpSession session = httpRequest.getSession();
-				uid = userAccessToken.getUid();
-				session.setAttribute("uid", uid);
-				String key = userAccessToken.getAppkey();
-				ProfileInformation profile = ProfileInformationStorage.loadProfile(uid);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		long starttime = System.currentTimeMillis();
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String uid = null;
+			HttpSession session = httpRequest.getSession();
+			uid = userAccessToken.getUid();
+			session.setAttribute("uid", uid);
+			String key = userAccessToken.getAppkey();
+			ProfileInformation profile;
+			try {
+				profile = ProfileInformationStorage.loadProfile(uid);
+
 				if (profile == null) {
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.FAILED);
 					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity("There is no information of your profile in the KB")
-					        .type(MediaType.TEXT_PLAIN)
-					        .build());
+							.entity("There is no information of your profile in the KB")
+							.type(MediaType.TEXT_PLAIN)
+							.build());
 				}
 				Gson gson = new Gson();
 				String ret = gson.toJson(profile);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
-			} else {
-				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity("The access token is invalid '" + access_token + "'")
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
+			} catch (TooManyConnections e) {
+				return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(e.getMessage()).build();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity(e.getMessage())
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+					.entity("The access token is invalid '" + access_token + "'")
+					.type(MediaType.TEXT_PLAIN)
+					.build());
 		}
 	}
 	
@@ -202,25 +201,23 @@ public class SPEServices {
 				        .build());
 			}
 			Gson gson = new Gson();
+			ProfileInformation profile = gson.fromJson(profileStr, ProfileInformation.class);
+			if (profile == null) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.FAILED);
+				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("There is no information of your profile in the KB")
+						.type(MediaType.TEXT_PLAIN)
+						.build());
+			}
+			profile.setUid(uid);
+			String ret;
 			try {
-				ProfileInformation profile = gson.fromJson(profileStr, ProfileInformation.class);
-				if (profile == null) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.FAILED);
-					throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity("There is no information of your profile in the KB")
-					        .type(MediaType.TEXT_PLAIN)
-					        .build());
-				}
-				profile.setUid(uid);
-				String ret =  "{\"save\":\"" + ProfileInformationStorage.saveProfile(profile) + "\"}";
+				ret = "{\"save\":\"" + ProfileInformationStorage.saveProfile(profile) + "\"}";
+
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build());
+			} catch (TooManyConnections e) {
+				return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(e.getMessage()).build();
 			}
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);

@@ -142,7 +142,7 @@ public class QueryManagerServices {
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				} catch (TooManyConnections e) {
-					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
@@ -408,7 +408,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -465,7 +465,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
