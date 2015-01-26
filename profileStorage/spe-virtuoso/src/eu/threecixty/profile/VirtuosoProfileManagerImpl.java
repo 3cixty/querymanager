@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.IDCrawlTimeMapping;
@@ -159,77 +160,89 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	 * @return
 	 */
 	private Set<IDMapping> getMobidotIDsForUsers() {
-        String queryString = "prefix foaf:	<http://xmlns.com/foaf/0.1/> "
-			+"prefix profile:	<http://3cixty.com/ontology/profile/> \n"
-			+"prefix fn:	<http://www.w3.org/2005/xpath-functions#> \n"
-    			+ "SELECT ?uid ?mobidotID "
-    			+ " FROM <" + VirtuosoManager.getInstance().getGraph("root") + "> \n"
-    			+ "WHERE { "
-    			+ "?root profile:userID ?uid . "
-    			+ "?root foaf:account ?pi . "
-			+ "?pi foaf:accountName ?mobidotID ."
-			+ "Filter(fn:ends-with(STR(?pi), \"Mobidot\")) . "
-    			+ "}";
-		Set<IDMapping> idMapping=new HashSet<IDMapping>();
-		
-		QueryReturnClass qRC;
+        String queryString = " prefix foaf: <http://xmlns.com/foaf/0.1/> \n"
+        +" prefix profile: <http://3cixty.com/ontology/profile/> \n"
+        +" prefix fn: <http://www.w3.org/2005/xpath-functions#> \n"
+        + " SELECT ?uid ?mobidotID \n"
+        + " FROM <" + VirtuosoManager.getInstance().getGraph("root") + "> \n"
+        + " WHERE { \n"
+        + " ?root profile:userID ?uid . \n"
+        + " ?root foaf:account ?pi . \n"
+        + " ?pi foaf:accountName ?mobidotID . \n"
+        + " Filter(fn:ends-with(STR(?pi), \"Mobidot\")) . \n"
+        + " }";
+        Set<IDMapping> idMapping=new HashSet<IDMapping>();
+        
+        QueryReturnClass qRC;
 		try {
 			qRC = VirtuosoManager.getInstance().query(queryString);
-			ResultSet results = qRC.getReturnedResultSet();
-
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				String UID = qs.getLiteral("uid").getString();
-				String mobidotUserName = qs.getLiteral("mobidotID").getString();
-				//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
-				IDMapping mapper=new IDMapping();
-				mapper.setThreeCixtyID(UID);
-				mapper.setMobidotUserName(mobidotUserName);
-				//mapper.setMobidotID(mobidotID);
-				idMapping.add(mapper);
-			}
-			qRC.closeConnection();
+			
+	        ResultSet results = qRC.getReturnedResultSet();
+	        
+	        for ( ; results.hasNext(); ) {
+	            QuerySolution qs = results.next();
+	            RDFNode UID = qs.get("uid");
+	            RDFNode mobidotUserName = qs.get("mobidotID");
+	            if (UID!=null && mobidotUserName!=null){
+	                //String UID = qs.getLiteral("uid").getString();
+	                //String mobidotUserName = qs.getLiteral("mobidotID").getString();
+	                //Long mobidotID= getMobidotIDforUsername(mobidotUserName);
+	                IDMapping mapper=new IDMapping();
+	                mapper.setThreeCixtyID(UID.toString());
+	                mapper.setMobidotUserName(mobidotUserName.toString());
+	                ////mapper.setMobidotID(mobidotID);
+	                idMapping.add(mapper);
+	            }
+	        }
+	        qRC.closeConnection();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return idMapping;
+        
+        return idMapping;
 	}
 	/**
 	 * get Crawl Times For the 3cixty Users
 	 * @return
 	 */
 	private Set<IDCrawlTimeMapping> getCrawlTimesForUsers() {
-        String queryString = "prefix foaf:	<http://xmlns.com/foaf/0.1/> "
-			+"prefix profile:	<http://3cixty.com/ontology/profile/> "
-    			+ "SELECT ?uid ?lastCrawlTime "
-    			+ " FROM <" + VirtuosoManager.getInstance().getGraph("root") + "> \n"
-    			+ "WHERE { "
-    			+ "?root profile:userID ?uid . "
-    			+ "?root profile:hasLastCrawlTime ?lastCrawlTime . "
-      			+ "}";
-		Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
-	    
-			
-		QueryReturnClass qRC;
+        String queryString = " prefix foaf: <http://xmlns.com/foaf/0.1/> \n"
+        +" prefix profile: <http://3cixty.com/ontology/profile/> \n"
+        + " SELECT ?uid ?lastCrawlTime \n"
+        + " FROM <" + VirtuosoManager.getInstance().getGraph("root") + "> \n"
+        + " WHERE { \n"
+        + " ?root profile:userID ?uid . \n"
+        + " ?root profile:hasLastCrawlTime ?lastCrawlTime . \n"
+        + " }";
+        Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
+        
+        
+        QueryReturnClass qRC;
 		try {
 			qRC = VirtuosoManager.getInstance().query(queryString);
-			ResultSet results = qRC.getReturnedResultSet();
-
-			for ( ; results.hasNext(); ) {
-				QuerySolution qs = results.next();
-				String UID = qs.getLiteral("uid").getString();
-				String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
-
-				IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
-				mapper.setThreeCixtyID(UID);
-				mapper.setLastCrawlTime(lastCrawlTime);
-				idCrawlTimeMapping.add(mapper);
-			}
-			qRC.closeConnection();
+			
+	        ResultSet results = qRC.getReturnedResultSet();
+	        
+	        for ( ; results.hasNext(); ) {
+	            QuerySolution qs = results.next();
+	            RDFNode UID = qs.get("uid");
+	            RDFNode lastCrawlTime = qs.get("lastCrawlTime");
+	            if (UID!=null && lastCrawlTime!=null){
+	                //String UID = qs.getLiteral("uid").getString();
+	                //String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
+	                
+	                IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
+	                mapper.setThreeCixtyID(UID.toString());
+	                mapper.setLastCrawlTime(lastCrawlTime.toString());
+	                idCrawlTimeMapping.add(mapper);
+	            }
+	        }
+	        qRC.closeConnection();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return idCrawlTimeMapping;
+        
+        return idCrawlTimeMapping;
 	}
 
 	@Override
