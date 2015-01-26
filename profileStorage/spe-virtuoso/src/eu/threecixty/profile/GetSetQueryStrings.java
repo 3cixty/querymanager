@@ -255,8 +255,8 @@ public class GetSetQueryStrings {
 	 */
 	private static String makeAddressQuery(String uid,
 			eu.threecixty.profile.oldmodels.Address address) {
-		String query= " <"+address.getHasAddressURI()+"> rdf:type schema:PostalAddress. \n"
-					+ " <"+PROFILE_URI+uid+"> schema:address <"+address.getHasAddressURI()+"> . \n";
+		String query= //" <"+address.getHasAddressURI()+"> rdf:type schema:PostalAddress. \n"
+					 " <"+PROFILE_URI+uid+"> schema:address <"+address.getHasAddressURI()+"> . \n";
 		
 		if (address.getCountryName()!=null&&!address.getCountryName().isEmpty())
 			query+= " <"+address.getHasAddressURI()+"> schema:addressCountry \""+address.getCountryName()+"\". \n";
@@ -274,12 +274,12 @@ public class GetSetQueryStrings {
 			String id=address.getHasAddressURI()+"/HomeLocation";
 			
 			query+=" <"+PROFILE_URI+uid+"> schema:homeLocation <"+id+"> . \n";
-			query+=" <"+id+"> rdf:type schema:Place . \n";
+			//query+=" <"+id+"> rdf:type schema:Place . \n";
 			
 			String idgeo=id+"/GeoCoordinates";
 			
 			query+=" <"+id+"> schema:geo <"+idgeo+"> . \n";
-			query+=" <"+idgeo+"> rdf:type schema:GeoCoordinates . \n";
+			//query+=" <"+idgeo+"> rdf:type schema:GeoCoordinates . \n";
 			
 			if (address.getLongitute()!=0)	
 				query+= " <"+idgeo+"> schema:longitude " + address.getLongitute()+" . \n";
@@ -397,8 +397,8 @@ public class GetSetQueryStrings {
 	 */
 	private static String makeProfileItentitiesQuery(String uid,
 			eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentity) {
-		String query= " <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type foaf:OnlineAccount. \n"
-					+ " <"+PROFILE_URI+uid+"> foaf:account <"+profileIdentity.getHasProfileIdentitiesURI()+"> . \n";
+		String query= //" <"+profileIdentity.getHasProfileIdentitiesURI()+"> rdf:type foaf:OnlineAccount. \n"
+					 " <"+PROFILE_URI+uid+"> foaf:account <"+profileIdentity.getHasProfileIdentitiesURI()+"> . \n";
 		
 		if  (profileIdentity.getHasUserAccountID()!=null&&!profileIdentity.getHasUserAccountID().isEmpty())
 			query+= " <"+profileIdentity.getHasProfileIdentitiesURI()+"> foaf:accountName \""+profileIdentity.getHasUserAccountID()+"\" . \n";
@@ -491,8 +491,8 @@ public class GetSetQueryStrings {
 	 */
 	private static String makeLikeQuery(String uid,
 			eu.threecixty.profile.oldmodels.Likes like) {
-		String query=" <"+like.getHasLikesURI()+"> rdf:type profile:Like. \n"
-					+" <"+PROFILE_URI+uid+"> profile:like <"+like.getHasLikesURI()+"> . \n";
+		String query=//" <"+like.getHasLikesURI()+"> rdf:type profile:Like. \n"
+					" <"+PROFILE_URI+uid+"> profile:like <"+like.getHasLikesURI()+"> . \n";
 		
 		if (like.getHasLikeName()!=null&&!like.getHasLikeName().isEmpty())
 			query+= "  <"+like.getHasLikesURI()+"> schema:likeName \""+like.getHasLikeName()+"\" . \n";
@@ -565,8 +565,8 @@ public class GetSetQueryStrings {
 	 * @return
 	 */
 	private static String makeTransportQuery(String uid, String transportUri) {
-		String query =" <"+transportUri+"> rdf:type profile:Mobility . \n"
-					+ " <"+PROFILE_URI+uid+"> profile:mobility <"+transportUri+"> . \n";
+		String query =//" <"+transportUri+"> rdf:type profile:Mobility . \n"
+					 " <"+PROFILE_URI+uid+"> profile:mobility <"+transportUri+"> . \n";
 		return query;
 	}
 	/**
@@ -662,7 +662,7 @@ public class GetSetQueryStrings {
 		if (accompany.getHasAccompanyTime()!=null&&accompany.getHasAccompanyTime()>0)
 			query+= " <"+accompany.getHasAccompanyURI()+"> profile:time \""+accompany.getHasAccompanyTime()+"\"^^<http://www.w3.org/2001/XMLSchema#long> . \n";
 		
-		query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompany. \n";
+		//query+="  <"+accompany.getHasAccompanyURI()+"> rdf:type profile:Accompany. \n";
 		return query;
 	}
 	
@@ -790,7 +790,7 @@ public class GetSetQueryStrings {
 		if (personalPlace.getHasPersonalPlaceName()!=null&&!personalPlace.getHasPersonalPlaceName().isEmpty())
 			query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdfs:label \""+personalPlace.getHasPersonalPlaceName()+"\" .\n";
 
-		query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .\n";
+		//query+= "  <"+personalPlace.getHasPersonalPlaceURI()+"> rdf:type profile:PersonalPlace .\n";
 		return query;
 	}
 	/**
@@ -914,7 +914,7 @@ public class GetSetQueryStrings {
 		if (regularTrip.getHasRegularTripWeatherPattern()!=null&&!regularTrip.getHasRegularTripWeatherPattern().isEmpty())
 			query+= "  <"+regularTrip.getHasRegularTripURI()+"> profile:weatherPattern \""+regularTrip.getHasRegularTripWeatherPattern()+"\" . \n";
 		
-		query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip . \n";
+		//query+= "  <"+regularTrip.getHasRegularTripURI()+"> rdf:type profile:RegularTrip . \n";
 		return query;
 	}
 		
@@ -1021,11 +1021,11 @@ public class GetSetQueryStrings {
 		String aboutSt=uri+"/aboutblankNode";
 		String filterSt=uri+"/filterblankNode";
 		String query= " <"+PROFILE_URI+uid+"> frap:holds <"+uri+"> . \n"
-					+ " <"+uri+"> rdf:type frap:Preference . \n"
+					//+ " <"+uri+"> rdf:type frap:Preference . \n"
 					+ " <"+uri+"> frap:about <"+aboutSt+"> . \n"
-					+ " <"+aboutSt+">  rdf:type frap:Pattern . \n"
-					+ " <"+aboutSt+">  frap:filter <"+filterSt+"> . \n"
-					+ " <"+filterSt+"> rdf:type frap:Filter . \n";
+					//+ " <"+aboutSt+">  rdf:type frap:Pattern . \n"
+					+ " <"+aboutSt+">  frap:filter <"+filterSt+"> . \n";
+					//+ " <"+filterSt+"> rdf:type frap:Filter . \n";
 		
 		if (tripPreference.getHasPreferredMaxTotalDistance()!=null&&tripPreference.getHasPreferredMaxTotalDistance()>0)
 			query+= " <"+filterSt+"> profile:hasPreferredMaxTotalDistance \""+tripPreference.getHasPreferredMaxTotalDistance()+"\"^^<http://www.w3.org/2001/XMLSchema#double> . \n";
@@ -1132,13 +1132,13 @@ public class GetSetQueryStrings {
 		String uri=placePreference.getHasPlacePreferenceURI();
 		String aboutSt=uri+"/aboutblankNode";
 		String filterSt=uri+"/filterblankNode";
-		String query= " <"+PROFILE_URI+uid+"> frap:holds <"+uri+"> .\n"
-					+ " <"+uri+"> rdf:type frap:Preference . \n";
+		String query= " <"+PROFILE_URI+uid+"> frap:holds <"+uri+"> .\n";
+					//+ " <"+uri+"> rdf:type frap:Preference . \n";
 		
 		query+=" <"+placePreference.getHasPlacePreferenceURI()+"> frap:about <"+aboutSt+"> . \n"
-			+ " <"+aboutSt+"> rdf:type frap:Pattern . \n"
-			+ " <"+aboutSt+"> frap:filter <"+filterSt+"> . \n"
-			+ " <"+filterSt+"> rdf:type frap:Filter . \n";
+			//+ " <"+aboutSt+"> rdf:type frap:Pattern . \n"
+			+ " <"+aboutSt+"> frap:filter <"+filterSt+"> . \n";
+			//+ " <"+filterSt+"> rdf:type frap:Filter . \n";
 		
 			if (placePreference.getHasPlaceDetailPreference()!=null){
 				if (placePreference.getHasPlaceDetailPreference().getHasNatureOfPlace()!=null) 
