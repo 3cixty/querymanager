@@ -7,6 +7,7 @@ import java.util.UUID;
 import eu.threecixty.Configuration;
 
 public class GetSetQueryStrings {
+    
 	public static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 	
 	private static final String PREFIX = Configuration.PREFIXES;
@@ -619,8 +620,7 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 			+ " DELETE Where { "
 			+ " GRAPH <"+ getGraphName(uid)+"> { \n"
-                + " ?mobility ?p ?o . \n"
-                + " <"+PROFILE_URI+uid+"> profile:mobility ?mobility . \n"
+                + " <"+PROFILE_URI+uid+"> profile:mobility ?o . \n"
 			+ " } \n"
 			+ "} ";
 			return query;
@@ -834,6 +834,30 @@ public class GetSetQueryStrings {
 				+ "}";
 			return query;
 	}
+    
+    /**
+     * remove multiple personal places associated to a transport
+      * @param uid
+     * @param transportURI
+     * @return
+     */
+    public static String removeMultiplePersonalPlacesAssociatedToATransport(String uid, String transportURI){
+        String query=PREFIX
+        + " DELETE { \n"
+        + " GRAPH <"+ getGraphName(uid)+"> { \n"
+        + " ?pplace ?p ?o . \n"
+        + " ?regularTrip profile:personalPlace ?pplace .\n"
+        + "}\n"
+        + "}\n"
+        + "Where { \n"
+        + " GRAPH <"+ getGraphName(uid)+"> { \n"
+        + " ?pplace ?p ?o . \n"
+        + " ?regularTrip profile:personalPlace ?pplace .\n"
+        + " <"+ transportURI+"> profile:regularTrip ?regularTrip .\n"
+        + "}\n"
+        + "}";
+        return query;
+    }
 	
 	/**
 	 * make Get Personal Places Query
