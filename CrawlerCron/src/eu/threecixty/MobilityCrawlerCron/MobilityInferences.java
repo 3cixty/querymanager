@@ -40,7 +40,7 @@ public class MobilityInferences {
 				index = i;
 			}
 		}
-		if (maxRegularTrip.getHasRegularTripWeatherPattern()!=null || !maxRegularTrip.getHasRegularTripWeatherPattern().isEmpty())
+		if (maxRegularTrip.getHasRegularTripWeatherPattern()!=null && !maxRegularTrip.getHasRegularTripWeatherPattern().isEmpty())
 		{
 			String[] weatherPattern=maxRegularTrip.getHasRegularTripWeatherPattern().split("\\+");
 		
