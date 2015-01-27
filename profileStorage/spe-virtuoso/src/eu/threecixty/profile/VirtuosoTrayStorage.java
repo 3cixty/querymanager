@@ -360,8 +360,8 @@ public class VirtuosoTrayStorage implements TrayManager {
 				"   INSERT DATA { GRAPH <").append(getGraphName(tray)).append("> \n");
 		buf.append(" {");
 		buf.append(personUri).append(" ").append(PROFILE_TRAY_ELEMENT_PREDICATE).append(" ").append(trayUri).append(" .\n");
-		buf.append(trayUri).append(" ").append(TRAY_ID_PREDICATE).append(" \"" + tray.getItemId() + "\"").append(" .\n");
-		buf.append(trayUri).append(" ").append(TRAY_TITLE_PREDICATE).append(" \" " + CodeBaseUtils.encode(tray.getElement_title()) + " \"").append(" .\n");
+		buf.append(trayUri).append(" ").append(TRAY_ID_PREDICATE).append(" <" + tray.getItemId() + ">").append(" .\n");
+		buf.append(trayUri).append(" ").append(TRAY_TITLE_PREDICATE).append(" \"" + CodeBaseUtils.encode(tray.getElement_title()) + "\"").append(" .\n");
 		buf.append(trayUri).append(" ").append(TRAY_TYPE_PREDICATE).append(" \"" + CodeBaseUtils.encode(tray.getItemType()) + "\"").append(" .\n");
 		buf.append(trayUri).append(" ").append(TRAY_TIMESTAMP_PREDICATE).append(" \"").append(tray.getTimestamp()).append("\"").append(LONG_SCHEMA).append(" .\n");
 		if (!isNullOrEmpty(tray.getSource())) {
