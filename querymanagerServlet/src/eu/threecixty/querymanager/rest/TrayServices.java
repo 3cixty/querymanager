@@ -184,12 +184,12 @@ public class TrayServices {
 	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
-		if (itemId == null) return false;
+		if (itemId == null || itemId.equals("")) return false;
 		String itemTypeStr = restTray.getElement_type();
 		if (itemTypeStr == null) return false;
 
 		String token = restTray.getToken();
-		if (token == null) return false;
+		if (token == null || token.equals("")) return false;
 		
 		String source = restTray.getSource();
 		if (source == null) return false;
