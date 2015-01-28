@@ -27,6 +27,14 @@ public class HTTPCall {
 	
 	protected static final String SERVER = "https://dev.3cixty.com/v2-test-1/";
 	//protected static final String SERVER = "http://localhost:8080/v2/";
+	
+	protected static final int THREADS_10 = 10;
+	protected static final int THREADS_100 = 100;
+	protected static final int THREADS_200 = 200;
+//	protected static final int THREADS_800 = 800;
+//	protected static final int THREADS_1000 = 1000;
+//	protected static final int THREADS_5000 = 5000;
+//	protected static final int THREADS_10000 = 10000;
 
 	protected void sendPost(String url, String params) throws Exception {
 		sendPost(url, params, null);
