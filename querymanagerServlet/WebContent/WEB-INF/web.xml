@@ -10,6 +10,7 @@
 
 	<listener>
 		<listener-class>eu.threecixty.querymanager.ThreeCixtyContextListener</listener-class>
+		<listener-class>net.bull.javamelody.SessionListener</listener-class>
 	</listener>
 
 	<!-- Auto scan REST service -->
@@ -40,13 +41,7 @@
 	  <url-pattern>/json-nospring/*</url-pattern>
     </servlet-mapping>
 
-	<!--
-	we can map many url-patterns 
-	<servlet-mapping>
-		<servlet-name>resteasy-servlet</servlet-name>
-		<url-pattern>/v2/*</url-pattern>
-	</servlet-mapping>  
-     -->
+
     <filter>
             <!-- The CORS filter with parameters -->
             <filter-name>CORS</filter-name>
@@ -113,4 +108,13 @@
         <filter-name>Resteasy</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    
+        <filter>
+                <filter-name>monitoring</filter-name>
+                <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
+        </filter>
+        <filter-mapping>
+                <filter-name>monitoring</filter-name>
+                <url-pattern>/*</url-pattern>
+        </filter-mapping>
 </web-app>
