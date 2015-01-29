@@ -13,6 +13,9 @@ public class Constants {
 	public static final String OFFSET_LINK_TO_SETTINGS_PAGE = OFFSET_LINK_TO_ERROR_PAGE;
 	
 	public static final String OFFSET_LINK_TO_AUTH_PAGE = OFFSET_LINK_TO_ERROR_PAGE;
+	
+	public static final String WISH_LIST_SCOPE_NAME = "WishList";
+	public static final String PROFILE_SCOPE_NAME = "Profile";
 
 	private Constants() {
 	}

@@ -691,7 +691,7 @@ public class QueryManagerServices {
     private boolean isLimitForProfile(AccessToken accessToken) {
     	List <String> scopes = accessToken.getScopeNames();
     	if (scopes == null || scopes.size() == 0) return true;
-    	if (scopes.contains(SPEServices.PROFILE_SCOPE_NAME)) return false;
+    	if (scopes.contains(Constants.PROFILE_SCOPE_NAME)) return false;
     	return true;
     }
     
