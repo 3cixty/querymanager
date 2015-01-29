@@ -92,6 +92,13 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
+
+		if (!checkValidScope(scope)) {
+			return Response.status(Response.Status.BAD_REQUEST)
+			        .entity(" {\"response\": \"failed\", \"reason\": \"Scope is invalid\"} ")
+			        .type(MediaType.APPLICATION_JSON_TYPE)
+			        .build();
+		}
 		App app = OAuthWrappers.retrieveApp(appkey);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
@@ -498,6 +505,18 @@ public class OAuthServices {
 			return true;
 		}
 		return false;
+	}
+	
+	private boolean checkValidScope(String scope) {
+		if (scope != null && !scope.equals("")) {
+			String[] primitiveScopes = scope.split(",");
+			for (String primitiveScope: primitiveScopes) {
+				String tmp = primitiveScope.trim();
+				if ((!tmp.equals(Constants.WISH_LIST_SCOPE_NAME)
+						&& (!tmp.equals(Constants.PROFILE_SCOPE_NAME)))) return false;
+			}
+		}
+		return true;
 	}
 	
 	private CacheControl cacheControlNoStore() {
