@@ -39,7 +39,7 @@ public class FakeTokenTests extends HTTPCall {
 		testGetAccessTokenWithFakeGoogleToken(THREADS_200);
 	}
 	
-	@Test
+
 	public void testGetAccessTokenWithFakeGoogleToken500() {
 		testGetAccessTokenWithFakeGoogleToken(500);
 	}
@@ -75,7 +75,7 @@ public class FakeTokenTests extends HTTPCall {
 	
 	
 	private void testGetAccessTokenWithFakeGoogleToken(int numberOfThreads) {
-		final int loops = 100;
+		final int loops = 2;
 		final CountDownLatch latch = new CountDownLatch(numberOfThreads);
 		Runnable runnable = new Runnable() {
 
