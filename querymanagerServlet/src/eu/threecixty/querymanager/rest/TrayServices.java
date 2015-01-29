@@ -39,7 +39,7 @@ import eu.threecixty.profile.Tray.OrderType;
  */
 @Path("/" + Constants.PREFIX_NAME)
 public class TrayServices {
-	private static final String WISH_LIST_SCOPE_NAME = "WishList";
+	private static final String WISH_LIST_SCOPE_NAME = Constants.WISH_LIST_SCOPE_NAME;
 	
 	private static final String ADD_ACTION = "add_tray_element";
 	private static final String GET_ACTION = "get_tray_elements";

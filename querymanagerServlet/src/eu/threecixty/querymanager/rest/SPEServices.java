@@ -32,7 +32,7 @@ import eu.threecixty.profile.TooManyConnections;
 @Path("/" + Constants.PREFIX_NAME)
 public class SPEServices {
 	
-	public static final String PROFILE_SCOPE_NAME = "Profile";
+	private static final String PROFILE_SCOPE_NAME = Constants.PROFILE_SCOPE_NAME;
 	
 //	 private static final Logger LOGGER = Logger.getLogger(
 //			 SPEServices.class.getName());
