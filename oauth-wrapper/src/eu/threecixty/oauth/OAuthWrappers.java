@@ -135,6 +135,15 @@ public class OAuthWrappers {
 		return null;
 	}
 
+	/**
+	 * Before calling this method, make sure 'scope' only contains valid "scope". 
+	 * @param uid
+	 * @param accessToken
+	 * @param refreshToken
+	 * @param scope
+	 * @param app
+	 * @return
+	 */
 	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken,
 			String scope, App app) {
 		User user = OAuthModelsUtils.getUser(uid);

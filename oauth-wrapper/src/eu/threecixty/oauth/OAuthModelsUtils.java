@@ -472,22 +472,6 @@ public class OAuthModelsUtils {
 			String scope, User user, App app) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
 		try {
-			List <Scope> listOfScopes = new ArrayList <Scope>();
-			
-			if (scope != null) {
-				if (!scope.equals("null")) { // 'null' means no check at all for scopes
-					if (scope.indexOf(',') >= 0) { // a list of scopes
-						String [] tmpScopeNames = scope.split(",");
-						for (String tmpScopeName: tmpScopeNames) {
-							Scope objScope = getScope(tmpScopeName.trim());
-							if (objScope != null) listOfScopes.add(objScope);
-						}
-					} else { // one scope
-						Scope objScope = getScope(scope.trim());
-						if (objScope != null) listOfScopes.add(objScope);
-					}
-				}
-			}
 			
 			Session session = HibernateUtil.getSessionFactory().openSession();
 
@@ -497,7 +481,7 @@ public class OAuthModelsUtils {
 			userAccessToken.setApp(app);
 			userAccessToken.setRefreshToken(refreshToken);
 			
-			userAccessToken.getScopes().addAll(listOfScopes);
+			userAccessToken.setScope(scope);
 
 			session.beginTransaction();
 
@@ -555,7 +539,6 @@ public class OAuthModelsUtils {
 				return false;
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
-			userAccessToken.getScopes().clear();
 			userAccessToken.getUser().getUserAccessTokens().remove(userAccessToken);
 			session.beginTransaction();
 			session.delete(userAccessToken);
@@ -617,9 +600,9 @@ public class OAuthModelsUtils {
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
 			AccessToken ac = new AccessToken();
-			for (Scope scope: userAccessToken.getScopes()) {
-				ac.getScopeNames().add(scope.getScopeName());
-			}
+			
+			findScope(userAccessToken, ac);
+			
 			ac.setAppClientKey(userAccessToken.getApp().getClientId());
 			ac.setAccess_token(userAccessToken.getAccessToken());
 			ac.setRefresh_token(userAccessToken.getRefreshToken());
@@ -661,9 +644,9 @@ public class OAuthModelsUtils {
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
 			AccessToken ac = new AccessToken();
-			for (Scope scope: userAccessToken.getScopes()) {
-				ac.getScopeNames().add(scope.getScopeName());
-			}
+
+			findScope(userAccessToken, ac);
+			
 			ac.setAppClientKey(userAccessToken.getApp().getClientId());
 			ac.setAppClientPwd(userAccessToken.getApp().getPassword());
 			ac.setRefresh_token(refreshToken);
@@ -689,9 +672,9 @@ public class OAuthModelsUtils {
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
 			AccessToken ac = new AccessToken();
-			for (Scope scope: userAccessToken.getScopes()) {
-				ac.getScopeNames().add(scope.getScopeName());
-			}
+			
+			findScope(userAccessToken, ac);
+			
 			ac.setAppClientKey(userAccessToken.getApp().getClientId());
 			ac.setAppClientPwd(userAccessToken.getApp().getPassword());
 			ac.setAccess_token(accessToken);
@@ -703,6 +686,15 @@ public class OAuthModelsUtils {
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+	
+	private static void findScope(UserAccessToken userAccessToken, AccessToken result) {
+		if (userAccessToken.getScope() != null && !userAccessToken.getScope().equals("")) {
+			String[] scopes = userAccessToken.getScope().split(",");
+			for (String tmpScope: scopes) {
+				result.getScopeNames().add(tmpScope);
+			}
 		}
 	}
 

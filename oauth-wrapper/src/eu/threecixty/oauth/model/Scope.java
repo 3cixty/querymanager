@@ -29,7 +29,6 @@ public class Scope implements java.io.Serializable {
 	private String description;
 	
 	private Set<App> apps = new HashSet <App>();
-	private Set<UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -67,14 +66,5 @@ public class Scope implements java.io.Serializable {
 
 	public void setApps(Set<App> apps) {
 		this.apps = apps;
-	}
-
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "scopes")
-	public Set<UserAccessToken> getUserAccessTokens() {
-		return userAccessTokens;
-	}
-
-	public void setUserAccessTokens(Set<UserAccessToken> userAccessTokens) {
-		this.userAccessTokens = userAccessTokens;
 	}
 }
