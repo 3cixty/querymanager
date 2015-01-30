@@ -186,7 +186,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	            if (UID!=null && mobidotID!=null){
 	                IDMapping mapper=new IDMapping();
 	                mapper.setThreeCixtyID(UID.toString());
-	                mapper.setMobidotID(Long.parseLong(mobidotID.toString()));
+	                mapper.setMobidotID(mobidotID.toString());
 	                idMapping.add(mapper);
 	            }
 	        }

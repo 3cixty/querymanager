@@ -4,7 +4,7 @@ public class IDMapping {
 
 		private String threeCixtyID;
 		private String mobidotUserName;
-		private Long mobidotID;
+		private String mobidotID;
 		public String getThreeCixtyID() {
 			return threeCixtyID;
 		}
@@ -17,10 +17,10 @@ public class IDMapping {
 		public void setMobidotUserName(String mobidotUserName) {
 			this.mobidotUserName = mobidotUserName;
 		}
-		public Long getMobidotID() {
+		public String getMobidotID() {
 			return mobidotID;
 		}
-		public void setMobidotID(Long mobidotID) {
+		public void setMobidotID(String mobidotID) {
 			this.mobidotID = mobidotID;
 		}
 		
