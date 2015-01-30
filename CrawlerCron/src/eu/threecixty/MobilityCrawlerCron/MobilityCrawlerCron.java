@@ -71,7 +71,7 @@ public class MobilityCrawlerCron {
 	 * 
 	 */
 	private void extractAccompanying(IDMapping map, Set<IDMapping> idMapping,
-			String MobidotBaseurl, String APIKey, Long mobidotID,
+			String MobidotBaseurl, String APIKey, String mobidotID,
 			Transport transport, TripPreference tripPreference) {
 		if (DEBUG_MOD) LOGGER.info("Start extracting Accompanying");
 		int length;
@@ -118,7 +118,7 @@ public class MobilityCrawlerCron {
 	 * 
 	 */
 	private void extractPersonalPlaces(String MobidotBaseurl, String APIKey,
-			Preference pref, Long mobidotID, Long fromTime) {
+			Preference pref, String mobidotID, Long fromTime) {
 		
 		if (DEBUG_MOD) LOGGER.info("Start extracting PersonalPlaces");
 		
@@ -160,7 +160,7 @@ public class MobilityCrawlerCron {
 	 * 
 	 */
 	private RegularTrip extractRegularTrips(IDMapping map, UserProfile user,
-			String MobidotBaseurl, String APIKey, Long mobidotID,
+			String MobidotBaseurl, String APIKey, String mobidotID,
 			Transport transport) {
 		if (DEBUG_MOD) LOGGER.info("Start extracting RegularTrips");
 		int length;
@@ -210,7 +210,7 @@ public class MobilityCrawlerCron {
 			Set<IDMapping> idMapping, String MobidotBaseurl, String Domain,
 			String APIKey, Preference pref, Long currentTime) {
 		
-		Long mobidotID=map.getMobidotID();
+		String mobidotID=map.getMobidotID();
 		
 		if (mobidotID!=null) {
 			//map.setMobidotID(mobidotID);
@@ -473,7 +473,7 @@ public class MobilityCrawlerCron {
 		while (iteratorMapping.hasNext()) {
 			IDMapping map = iteratorMapping.next();
 			if (map.getMobidotID()!=null){
-				if (map.getMobidotID().equals(mobidotID)) {
+				if (map.getMobidotID()==mobidotID.toString()) {
 					return map.getThreeCixtyID();
 				}
 			}
