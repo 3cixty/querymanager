@@ -10,14 +10,11 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-
-//import eu.threecixty.CrawlSocialProfiles.CallGPlusProfileParser;
 import eu.threecixty.MobilityCrawlerCron.MobilityCrawlerCron;
 import eu.threecixty.profile.IDMapping;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
-import eu.threecixty.profile.oldmodels.Preference;
 
 /**
  * Features runs at 3am Pulls Movesmarter data (Personal Places, Radius, Regular
@@ -117,15 +114,6 @@ public class CrawlerCron {
 	}
 
 	/**
-	 * Get seconds since 1970 in String
-	 * 
-	 * @return: String
-	 */
-	private Long getDateTime() {
-		return GregorianCalendar.getInstance().getTimeInMillis() / 1000;
-	}
-
-	/**
 	 * Main entry to crawl info.
 	 */
 	private void crawl() {
@@ -136,7 +124,7 @@ public class CrawlerCron {
 		//only MobilityCrawlerCron is to be used.
 		MobilityCrawlerCron mobilityCrawlerCron = new MobilityCrawlerCron();
 		
-		// get all 3cixtyIDs, CrawlTimes and mobidotIDs
+		// get all 3cixtyIDs and mobidotIDs
 		Set<IDMapping> idMapping = ProfileManagerImpl.getInstance()
 				.getIDMappings();
 
@@ -147,34 +135,26 @@ public class CrawlerCron {
 		while (iteratorMapping.hasNext()) {
 			IDMapping map = iteratorMapping.next();
 			if (DEBUG_MOD) LOGGER.info("UID = " + map.getThreeCixtyID() + ", Mobidot ID = " + map.getMobidotID());
-			
+
 			try {
 				UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID());
-				
-				Preference pref = new Preference();
-				
-				long currentTime = getDateTime();
 								
 				try {
-					
 					mobilityCrawlerCron.getmobility(map, user, idMapping,
-							getMobidotBaseurl(), getDomain(), getMobidotApiKey(),
-							pref, currentTime);
-					if (DEBUG_MOD) LOGGER.info("Finish crawling Mobidot data of user: "+ map.getThreeCixtyID());
+							getMobidotBaseurl(), getDomain(), getMobidotApiKey());
+					if (DEBUG_MOD) LOGGER.info("Finished crawling Mobidot data of user: "+ map.getThreeCixtyID());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
-				user.setHasLastCrawlTime(Long.toString(currentTime));
-
 				ProfileManagerImpl.getInstance().saveProfile(user);
-				if (DEBUG_MOD) LOGGER.info("Finish saving Mobidot data of user: "+ map.getThreeCixtyID());
-				
+				if (DEBUG_MOD) LOGGER.info("Finished saving Mobidot data of user: "+ map.getThreeCixtyID());
+
 			} catch (TooManyConnections e) {
 				if (DEBUG_MOD) LOGGER.info(e.getMessage());
 			}
 		}
-		if (DEBUG_MOD) LOGGER.info("Finish crawling Mobidot data");
+		if (DEBUG_MOD) LOGGER.info("Finished crawling Mobidot data");
 
 	}
 }

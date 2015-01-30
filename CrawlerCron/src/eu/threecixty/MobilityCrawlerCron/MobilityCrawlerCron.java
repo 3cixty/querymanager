@@ -2,6 +2,7 @@ package eu.threecixty.MobilityCrawlerCron;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -142,7 +143,7 @@ public class MobilityCrawlerCron {
 			placePreferences.add(placePreference);
 			pref.setHasPlacePreference(placePreferences);
 			
-			if (DEBUG_MOD) LOGGER.info("Nature of Place: " + placeDetailPreference.getHasNatureOfPlace());
+			//if (DEBUG_MOD) LOGGER.info("Nature of Place: " + placeDetailPreference.getHasNatureOfPlace());
 		}
 		if (DEBUG_MOD) LOGGER.info("Finish extracting PersonalPlaces");
 	}
@@ -193,6 +194,15 @@ public class MobilityCrawlerCron {
 	}
 
 	/**
+	 * Get seconds since 1970 in String
+	 * 
+	 * @return: String
+	 */
+	private Long getDateTime() {
+		return GregorianCalendar.getInstance().getTimeInMillis() / 1000;
+	}
+	
+	/**
 	 * Calls Movesmarter APIs to get data
 	 * 
 	 * @param: IDMapping map,
@@ -200,23 +210,23 @@ public class MobilityCrawlerCron {
 	 * @param: Set<IDMapping> idMapping,
 	 * @param: String MobidotBaseurl,
 	 * @param: String Domain,
-	 * @param: String APIKey,
-	 * @param: Preference,
-	 * @param: Long currentTime,
-	 * @author Rachit@inria
+	 * @param: String APIKey
 	 * 
 	 */
 	public void getmobility(IDMapping map, UserProfile user,
 			Set<IDMapping> idMapping, String MobidotBaseurl, String Domain,
-			String APIKey, Preference pref, Long currentTime) {
+			String APIKey) {
 		
 		String mobidotID=map.getMobidotID();
 		
 		if (mobidotID!=null) {
 			//map.setMobidotID(mobidotID);
-	
+			Preference pref = new Preference();
+			
 			Transport transport = new Transport();
-	
+			
+			Long currentTime = getDateTime();
+			
 			// extract and set Regular trips
 			RegularTrip maxRegularTrip = extractRegularTrips(map, user,
 					MobidotBaseurl, APIKey, mobidotID, transport);
@@ -251,7 +261,10 @@ public class MobilityCrawlerCron {
 			transports.add(transport);
 	
 			pref.setHasTransport(transports);
+			
 			user.setPreferences(pref);
+			
+			user.setHasLastCrawlTime(currentTime.toString());
 		}
 	}
 
