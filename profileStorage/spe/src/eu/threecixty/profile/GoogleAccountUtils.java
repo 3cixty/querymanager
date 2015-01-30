@@ -43,6 +43,7 @@ public class GoogleAccountUtils {
 			
 			if (!accessToken.equals("")) { // TODO: remove after testing
 				String uid = String.valueOf(System.nanoTime()); // random uid
+				/*
 				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
 				profile.setHasUID(uid);
 				String picture = "https://www.google.fr/images/srpr/logo11w.png";
@@ -67,7 +68,7 @@ public class GoogleAccountUtils {
 				knows.add("103411760688868522737"); // this would be useful to test augmentation query
 				
 				ProfileManagerImpl.getInstance().saveProfile(profile);
-				
+				*/
 				return uid;
 			}
 			
