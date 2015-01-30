@@ -64,10 +64,10 @@ public class StressTests extends HTTPCall {
 		latch.await();
 	}
 	
-	//@Test
+	@Test
 	public void testLoadUserProfile() throws Exception {
-		final int numberOfThreads = 100;
-		final int numberOfLoops = 100;
+		final int numberOfThreads = 200;
+		final int numberOfLoops = 200;
 		final CountDownLatch latch = new CountDownLatch(numberOfThreads);
 		final String accessToken = getAccessToken(googleAccessToken);
 		Runnable runnable = new Runnable() {
@@ -111,7 +111,7 @@ public class StressTests extends HTTPCall {
 		latch.await();
 	}
 	
-	@Test
+	//@Test
 	public void testQueryWithoutAugmentation() throws Exception {
 		final int numberOfThreads = 100;
 		final int numberOfLoops = 100;

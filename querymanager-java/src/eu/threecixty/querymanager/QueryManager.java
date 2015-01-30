@@ -223,7 +223,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		return ok;
 	}
 	
-	private static boolean hasElement(StringBuilder sb, int numberOfOrders) {
+	private static boolean hasElement(StringBuilder sb, int numberOfOrders) throws JSONException {
 		// check if there is one element at least
 		JSONObject json = new JSONObject(sb.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -265,7 +265,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		return true;
 	}
 	
-	private static void cleanResultAndAddAugmented(JSONObject jsonElement, int numberOfOrders) {
+	private static void cleanResultAndAddAugmented(JSONObject jsonElement, int numberOfOrders) throws JSONException {
 		boolean augmented = false;
 		augmented = checkPropertyTrueAndRemove(jsonElement, "callret");
 		for (int index = 0; index <= numberOfOrders; index++) {
@@ -275,7 +275,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		if (numberOfOrders > 0) jsonElement.put("augmented", augmented);
 	}
 	
-	private static boolean checkPropertyTrueAndRemove(JSONObject jsonObject, String property) {
+	private static boolean checkPropertyTrueAndRemove(JSONObject jsonObject, String property) throws JSONException {
 		if (jsonObject.has(property)) {
 			String val = jsonObject.getJSONObject(property).getString("value");
 			jsonObject.remove(property);
