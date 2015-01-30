@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 //import eu.threecixty.CrawlSocialProfiles.CallGPlusProfileParser;
 import eu.threecixty.MobilityCrawlerCron.MobilityCrawlerCron;
 import eu.threecixty.profile.IDMapping;
-import eu.threecixty.profile.IDCrawlTimeMapping;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
@@ -127,77 +126,41 @@ public class CrawlerCron {
 	}
 
 	/**
-	 * Get last crawl time for the user
-	 * 
-	 * @param: Set<IDCrawlTimeMapping> idCrawlTimeMapping
-	 * @param: String uid
-	 * @return: String
-	 */
-	private String getCrawltimeforUserID(
-			Set<IDCrawlTimeMapping> idCrawlTimeMapping, String uid) {
-		Iterator<IDCrawlTimeMapping> iteratorMapping = idCrawlTimeMapping
-				.iterator();
-
-		while (iteratorMapping.hasNext()) {
-			IDCrawlTimeMapping map = iteratorMapping.next();
-			if (map.getThreeCixtyID() == uid) {
-				return map.getLastCrawlTime();
-			}
-		}
-		return "0";
-	}
-
-	/**
 	 * Main entry to crawl info.
 	 */
 	private void crawl() {
+		
 		if (DEBUG_MOD) LOGGER.info("Start crawling Mobidot data");
+		
 		//CallGPlusProfileParser is not used as the crawling of the reviews is done by localidata.
 		//only MobilityCrawlerCron is to be used.
 		MobilityCrawlerCron mobilityCrawlerCron = new MobilityCrawlerCron();
 		
-		//CallGPlusProfileParser callGPlusProfileParser = new CallGPlusProfileParser();
-		
-		// get all 3cixtyIDs, CrawlTimes and mobidotUserNames
+		// get all 3cixtyIDs, CrawlTimes and mobidotIDs
 		Set<IDMapping> idMapping = ProfileManagerImpl.getInstance()
 				.getIDMappings();
-		Set<IDCrawlTimeMapping> idCrawlTimeMapping = ProfileManagerImpl
-				.getInstance().getIDCrawlTimeMappings();
 
 		Iterator<IDMapping> iteratorMapping = idMapping.iterator();
-		while (iteratorMapping.hasNext()) {
-			IDMapping map = iteratorMapping.next();
-			try {
-				map.setMobidotID(mobilityCrawlerCron.getMobidotIDforUsername(
-						map.getMobidotUserName(), getMobidotBaseurl(),
-						getDomain(), getMobidotApiKey()));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-
-		long currentTime = getDateTime();
-
-
+		
 		iteratorMapping = idMapping.iterator();
 		// for each user in 3cixty, crawl
 		while (iteratorMapping.hasNext()) {
 			IDMapping map = iteratorMapping.next();
-			if (DEBUG_MOD) LOGGER.info("UID = " + map.getThreeCixtyID() + ", Mobidot username = " + map.getMobidotUserName() + ", Mobidot ID = " + map.getMobidotID());
+			if (DEBUG_MOD) LOGGER.info("UID = " + map.getThreeCixtyID() + ", Mobidot ID = " + map.getMobidotID());
+			
 			try {
 				UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID());
-				//UserProfile user = new UserProfile();
-				//user.setHasUID(map.getThreeCixtyID());
-
-				String lastCrawlTime = getCrawltimeforUserID(
-						idCrawlTimeMapping, map.getThreeCixtyID());
+				
 				Preference pref = new Preference();
-				//callGPlusProfileParser.getInfoAndReviews(currentTime, map, user, lastCrawlTime, pref);
+				
+				long currentTime = getDateTime();
+								
 				try {
+					
 					mobilityCrawlerCron.getmobility(map, user, idMapping,
 							getMobidotBaseurl(), getDomain(), getMobidotApiKey(),
-							lastCrawlTime, pref, currentTime);
+							pref, currentTime);
+					if (DEBUG_MOD) LOGGER.info("Finish crawling Mobidot data of user: "+ map.getThreeCixtyID());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -205,10 +168,13 @@ public class CrawlerCron {
 				user.setHasLastCrawlTime(Long.toString(currentTime));
 
 				ProfileManagerImpl.getInstance().saveProfile(user);
+				if (DEBUG_MOD) LOGGER.info("Finish saving Mobidot data of user: "+ map.getThreeCixtyID());
+				
 			} catch (TooManyConnections e) {
 				if (DEBUG_MOD) LOGGER.info(e.getMessage());
 			}
 		}
 		if (DEBUG_MOD) LOGGER.info("Finish crawling Mobidot data");
+
 	}
 }

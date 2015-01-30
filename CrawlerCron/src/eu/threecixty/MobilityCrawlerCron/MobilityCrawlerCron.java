@@ -193,39 +193,6 @@ public class MobilityCrawlerCron {
 	}
 
 	/**
-	 * get mobidotID from the mobidotUserName
-	 * 
-	 * @param String
-	 *            mobidotusername,
-	 * @param: String MobidotBaseurl,
-	 * @param: String APIKey,
-	 * @return Long mobidotID
-	 */
-	public Long getMobidotIDforUsername(String mobidotusername,
-			String MobidotBaseurl, String Domain, String APIKey) {
-		if (CheckNetwork()) {
-			String urlStr = MobidotBaseurl + "identitymanager/userIdForUser/"
-					+ Domain + "/" + mobidotusername + "?key=" + APIKey;
-			StringBuilder sb = new StringBuilder();
-			try {
-				URL url = new URL(urlStr);
-				InputStream input = url.openStream();
-				byte[] b = new byte[1024];
-				int readBytes = 0;
-				while ((readBytes = input.read(b)) >= 0) {
-					sb.append(new String(b, 0, readBytes));
-				}
-				input.close();
-				return Long.parseLong(sb.toString());
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * Calls Movesmarter APIs to get data
 	 * 
 	 * @param: IDMapping map,
@@ -234,7 +201,6 @@ public class MobilityCrawlerCron {
 	 * @param: String MobidotBaseurl,
 	 * @param: String Domain,
 	 * @param: String APIKey,
-	 * @param: String lastRuntime,
 	 * @param: Preference,
 	 * @param: Long currentTime,
 	 * @author Rachit@inria
@@ -242,13 +208,12 @@ public class MobilityCrawlerCron {
 	 */
 	public void getmobility(IDMapping map, UserProfile user,
 			Set<IDMapping> idMapping, String MobidotBaseurl, String Domain,
-			String APIKey, String lastRuntime, Preference pref, Long currentTime) {
-
+			String APIKey, Preference pref, Long currentTime) {
 		
-		Long mobidotID = getMobidotIDforUsername(map.getMobidotUserName(),
-				MobidotBaseurl, Domain, APIKey);
+		Long mobidotID=map.getMobidotID();
+		
 		if (mobidotID!=null) {
-			map.setMobidotID(mobidotID);
+			//map.setMobidotID(mobidotID);
 	
 			Transport transport = new Transport();
 	
@@ -294,9 +259,8 @@ public class MobilityCrawlerCron {
 	 * get Radius Info for specified user. The urlStr is the call for specific
 	 * movesmarter facility.
 	 * 
-	 * @param String
-	 *            urlStr,
-	 * @return String[]
+	 * @param String urlStr,
+	 * @return String []
 	 */
 	public String[] getRadiusforMobiditID(String urlStr) {
 		if (CheckNetwork()) {
