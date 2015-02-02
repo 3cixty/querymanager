@@ -107,8 +107,14 @@ public class VirtuosoTrayStorage implements TrayManager {
 		// TODO: should use batch queries here
 		for (Tray tray: trays) {
 			tray.setUid(uid);
-			ok = save(tray);
-			if (!ok) return false;
+			try {
+				if (!checkTrayExisted(tray)) {
+				    ok = save(tray);
+				    if (!ok) return false;
+				}
+			} catch (InterruptedException e) {
+				throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+			}
 		}
 		return true;
 	}
