@@ -201,7 +201,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		if (!containValidCharacters(uid)) return trays;
 		String personUri = getPersonURI(uid);
 		StringBuffer buf = new StringBuffer(PREFIXES).append(
-				" SELECT ?trayId ?title ?type ?source  ?timestamp ?attend ?attendedDateTime ?imageUrl ?ratingValue \n");
+				" SELECT DISTINCT ?trayId ?title ?type ?source  ?timestamp ?attend ?attendedDateTime ?imageUrl ?ratingValue \n");
 		buf.append(" FROM <").append(getGraphName(uid)).append(">\n");
 		buf.append("WHERE {");
 		buf.append(personUri).append(" ").append(PROFILE_TRAY_ELEMENT_PREDICATE).append(" ?tray .\n");
