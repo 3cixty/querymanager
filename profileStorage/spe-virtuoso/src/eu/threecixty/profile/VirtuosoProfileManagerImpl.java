@@ -208,7 +208,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
         + " FROM <" + VirtuosoManager.getInstance().getGraph("root") + "> \n"
         + " WHERE { \n"
         + " ?root profile:userID ?uid . \n"
-        + " ?root profile:hasLastCrawlTime ?lastCrawlTime . \n"
+        + " ?root profile:lastCrawlTime ?lastCrawlTime . \n"
         + " }";
         Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
         

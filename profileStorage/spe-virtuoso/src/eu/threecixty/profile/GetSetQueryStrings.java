@@ -70,7 +70,7 @@ public class GetSetQueryStrings {
 				+ " select ?lastCrawlTime \n"
 				+ " from <" + getGraphName(uid) + "> \n"
 				+ " where { \n"
-					+ " <"+PROFILE_URI+uid+"> profile:hasLastCrawlTime ?lastCrawlTime. \n"
+					+ " <"+PROFILE_URI+uid+"> profile:lastCrawlTime ?lastCrawlTime. \n"
 					+ "}";
 		return query;
 	}
@@ -87,7 +87,7 @@ public class GetSetQueryStrings {
 
 					if (time==null || time.isEmpty()) time="0";
 					
-					query+= "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime \""+time+"\" . \n"
+					query+= "<"+PROFILE_URI+uid+"> profile:lastCrawlTime \""+time+"\" . \n"
 				+ " } \n"
 				+ " }";
 			return query;
@@ -101,7 +101,7 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 			+ " DELETE Where { \n"
 			+ " GRAPH <"+ getGraphName(uid)+"> { \n"
-				+ "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime ?o . \n"
+				+ "<"+PROFILE_URI+uid+"> profile:lastCrawlTime ?o . \n"
 			+ " } \n"
 			+ " }";
 			return query;
