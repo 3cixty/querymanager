@@ -113,10 +113,12 @@ public class VirtuosoTrayStorage implements TrayManager {
 			VirtuosoUpdateRequest vurToInsertData = null;
 			for (Tray tray: trays) {
 				tray.setUid(uid);
-				String query = createQueryToSave(tray);
+				if (!checkTrayExisted(tray)) {
+				    String query = createQueryToSave(tray);
 				
-				if (vurToInsertData == null) vurToInsertData = VirtuosoUpdateFactory.create(query, virtGraph);
-				else vurToInsertData.addUpdate(query);
+				    if (vurToInsertData == null) vurToInsertData = VirtuosoUpdateFactory.create(query, virtGraph);
+				    else vurToInsertData.addUpdate(query);
+				}
 			}
 
 			if (vurToInsertData != null) {
