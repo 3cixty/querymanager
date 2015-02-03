@@ -105,7 +105,7 @@ public class HTTPCall {
 		
 		HttpURLConnection conn = createConnection(SERVER + "getAccessToken", "GET",
 				new String[] {"google_access_token", "key", "scope"},
-				new String[] {googleAccessToken, KEY, "Profile,Wishlist"});
+				new String[] {googleAccessToken, KEY, "Profile,WishList"});
 		
 		conn.setDoOutput(false);
 		
