@@ -512,8 +512,8 @@ public class OAuthServices {
 			String[] primitiveScopes = scope.split(",");
 			for (String primitiveScope: primitiveScopes) {
 				String tmp = primitiveScope.trim();
-				if ((!tmp.equals(Constants.WISH_LIST_SCOPE_NAME)
-						&& (!tmp.equals(Constants.PROFILE_SCOPE_NAME)))) return false;
+				if ((!tmp.equalsIgnoreCase(Constants.WISH_LIST_SCOPE_NAME)
+						&& (!tmp.equalsIgnoreCase(Constants.PROFILE_SCOPE_NAME)))) return false;
 			}
 		}
 		return true;
