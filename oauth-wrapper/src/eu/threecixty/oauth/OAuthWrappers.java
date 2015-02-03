@@ -1,22 +1,21 @@
 package eu.threecixty.oauth;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource.Builder;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.oauth.model.App;
@@ -62,6 +61,9 @@ public class OAuthWrappers {
 	private static final String resourceServerSecret = ResourceServerUtils.getResourceServerSecret();
 
 	private static final String ENDPOINT_TO_UPDATE_CLIENT_FOR_APP = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/3cixty/updateClientIdForApp";
+	
+	private static final String HTTP_GET = "GET";
+	private static final String HTTP_POST = "POST";
 	
 //	/**
 //	 * Gets user access token.
@@ -324,19 +326,16 @@ public class OAuthWrappers {
 	public static String getBasicAuth() {
 		if (firstTimeForClientCoolApp) {
 			try {
-				Client client = Client.create();
-
 				String auth = "Basic ".concat(new String(Base64.encodeBase64(resourceServerKey.concat(":")
 						.concat(resourceServerSecret).getBytes())));
-				Builder builder = client.resource(ENDPOINT_TO_CREATE_CLIENT_FOR_ASKING_TOKEN
+				
+				StringBuilder sb = new StringBuilder();
+				makeHttpCall(ENDPOINT_TO_CREATE_CLIENT_FOR_ASKING_TOKEN
 						+ "?clientId=" + clientId
 						+ "&clientSecret=" + URLEncoder.encode(clientSecret, "UTF-8")
-						+ "&redirect_uri=" + URLEncoder.encode(CLIENT_REDIRECT_URI, "UTF-8"))
-						.header(AUTHORIZATION, auth)
-						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-				ClientResponse clientResponse = builder.get(ClientResponse.class);
+						+ "&redirect_uri=" + URLEncoder.encode(CLIENT_REDIRECT_URI, "UTF-8"), auth, HTTP_GET, null, sb);
 
-				String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+				String jsonStr = sb.toString();
 				JSONObject jsonObj = new JSONObject(jsonStr);
 				if (jsonObj.has("response")) {
 					if (jsonObj.getString("response").equals("successful")) {
@@ -365,109 +364,95 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	private static AccessToken tokenInfo(String accessToken) {
-		Client client = Client.create();
 
 	    String auth = "Basic ".concat(new String(Base64.encodeBase64(resourceServerKey.concat(":")
 	            .concat(resourceServerSecret).getBytes())));
-	    Builder builder = client.resource(ENDPOINT_TO_VALIDATE_ACCESS_TOKEN + accessToken).header(AUTHORIZATION, auth)
-	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-	    ClientResponse clientResponse = builder.get(ClientResponse.class);
+	    StringBuilder sb = new StringBuilder();
+	    makeHttpCall(ENDPOINT_TO_VALIDATE_ACCESS_TOKEN + accessToken, auth, HTTP_GET, null, sb);
 	    try {
-			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
-			JSONObject jsonObj = new JSONObject(jsonStr);
-			if (!jsonObj.has("expires_in")) {
-				return null;
-			}
-			long currentTime = Calendar.getInstance().getTimeInMillis();
-			long expiredTime = jsonObj.getLong("expires_in");
-			if (expiredTime != 0) { // 0 means infinity
-			    if (currentTime > expiredTime) return null;
-			}
-			AccessToken tokenInfo = new AccessToken();
-			tokenInfo.setExpires_in((int)((expiredTime - currentTime) / 1000));
-			tokenInfo.setAccess_token(accessToken);
-			return tokenInfo;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+	    	String jsonStr = sb.toString();
+	    	JSONObject jsonObj = new JSONObject(jsonStr);
+	    	if (!jsonObj.has("expires_in")) {
+	    		return null;
+	    	}
+	    	long currentTime = Calendar.getInstance().getTimeInMillis();
+	    	long expiredTime = jsonObj.getLong("expires_in");
+	    	if (expiredTime != 0) { // 0 means infinity
+	    		if (currentTime > expiredTime) return null;
+	    	}
+	    	AccessToken tokenInfo = new AccessToken();
+	    	tokenInfo.setExpires_in((int)((expiredTime - currentTime) / 1000));
+	    	tokenInfo.setAccess_token(accessToken);
+		    return tokenInfo;
+	    } catch (JSONException e) {
+	    	e.printStackTrace();
+	    }
+	    return null;
 	}
 	
 	private static String createAccessTokenUsingOAuthServer() {
-		Client client = Client.create();
-	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
-	    formData.add("grant_type", "client_credentials");
 
+	    String postParams = "grant_type=client_credentials";
+	    
 	    String auth = getBasicAuth();
-	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
-	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
+	    StringBuilder sb = new StringBuilder();
+	    makeHttpCall(ENDPOINT_TO_POST_ACCESS_TOKEN, auth, HTTP_POST, postParams, sb);
+	    
 	    try {
-			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			String jsonStr = sb.toString();
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has(ACCES_TOKEN_KEY)) {
 				return jsonObj.getString(ACCES_TOKEN_KEY);
 			}
-		} catch (IOException e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	public static AccessToken createAccessTokenForMobileApp(App app, String scope) {
-		Client client = Client.create();
-	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
-	    formData.add("grant_type", "client_credentials");
-	    formData.add("scope", scope);
 	    
-	    // check ThreeCixtyResourceServer
+	    String postParams = "grant_type=client_credentials&scope=" + scope;
+	    
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
 				app.getClientId().concat(":")
 				.concat(app.getPassword()).getBytes())));
+		
+	    StringBuilder sb = new StringBuilder();
+	    makeHttpCall(ENDPOINT_TO_POST_ACCESS_TOKEN, auth, HTTP_POST, postParams, sb);
 	    
-	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
-	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-	    
-	    
-	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
-			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			String jsonStr = sb.toString();
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			AccessToken newAccessToken = getAccessToken(jsonObj);
 			if (newAccessToken == null) return null;
 			addScopeNames(scope, newAccessToken.getScopeNames());
 			return newAccessToken;
-		} catch (IOException e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 	
 	private static AccessToken refreshAccessTokenUsingOAuthServer(AccessToken lastAccessToken) {
-		Client client = Client.create();
-	    MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
-	    formData.add("grant_type", "refresh_token");
-	    formData.add("refresh_token", lastAccessToken.getRefresh_token());
 	    
-	    // check ThreeCixtyResourceServer
+	    String postParams = "grant_type=refresh_token&refresh_token" + lastAccessToken.getRefresh_token();
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
 				lastAccessToken.getAppClientKey().concat(":")
 				.concat(lastAccessToken.getAppClientPwd()).getBytes())));
+		
+	    StringBuilder sb = new StringBuilder();
+	    makeHttpCall(ENDPOINT_TO_POST_ACCESS_TOKEN, auth, HTTP_POST, postParams, sb);
 	    
-	    Builder builder = client.resource(ENDPOINT_TO_POST_ACCESS_TOKEN).header(AUTHORIZATION, auth)
-	            .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-	    
-	    
-	    ClientResponse clientResponse = builder.post(ClientResponse.class, formData);
 	    try {
-			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			String jsonStr = sb.toString();
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			AccessToken newAccessToken = getAccessToken(jsonObj);
 			if (newAccessToken == null) return null;
 			// keep the same scopes
 			newAccessToken.getScopeNames().addAll(lastAccessToken.getScopeNames());
 			return newAccessToken;
-		} catch (IOException e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -493,18 +478,16 @@ public class OAuthWrappers {
 
 	private static String createClientIdForApp(String clientId,
 			String app_name, List<String> scopeNames, String thumbNailUrl) {
-		Client client = Client.create();
-	    Builder builder;
 		try {
-			builder = client.resource(ENDPOINT_TO_CREATE_CLIENT_FOR_APP + "?clientId=" + clientId
+			
+		    StringBuilder sb = new StringBuilder();
+		    makeHttpCall(ENDPOINT_TO_CREATE_CLIENT_FOR_APP + "?clientId=" + clientId
 					+ "&app_name=" + URLEncoder.encode(app_name, "UTF-8")
 					+ "&scope=" + URLEncoder.encode(join(scopeNames), "UTF-8")
-					+ "&thumbNailUrl=" + URLEncoder.encode(thumbNailUrl, "UTF-8"))
-					.header(AUTHORIZATION, getBasicAuth());
-			
-	        ClientResponse clientResponse = builder.get(ClientResponse.class);
+					+ "&thumbNailUrl=" + URLEncoder.encode(thumbNailUrl, "UTF-8"),
+					getBasicAuth(), HTTP_GET, null, sb);
 
-			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			String jsonStr = sb.toString();
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has("response")) {
 				String res = jsonObj.getString("response");
@@ -515,7 +498,9 @@ public class OAuthWrappers {
 			} else {
 				return null;
 			}
-		} catch (IOException e) {
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -523,18 +508,15 @@ public class OAuthWrappers {
 
 	private static boolean updateClientIdForApp(String clientId,
 			String app_name, List<String> scopeNames, String thumbNailUrl) {
-		Client client = Client.create();
-	    Builder builder;
 		try {
-			builder = client.resource(ENDPOINT_TO_UPDATE_CLIENT_FOR_APP)
-					.header(AUTHORIZATION, getBasicAuth());
-			
-	        ClientResponse clientResponse = builder.post(ClientResponse.class,  "clientId=" + clientId
+			String postParams = "clientId=" + clientId
 					+ "&app_name=" + URLEncoder.encode(app_name, "UTF-8")
 					+ "&scope=" + URLEncoder.encode(join(scopeNames), "UTF-8")
-					+ "&thumbNailUrl=" + URLEncoder.encode(thumbNailUrl, "UTF-8"));
+					+ "&thumbNailUrl=" + URLEncoder.encode(thumbNailUrl, "UTF-8");
+		    StringBuilder sb = new StringBuilder();
+		    makeHttpCall(ENDPOINT_TO_UPDATE_CLIENT_FOR_APP, getBasicAuth(), HTTP_POST, postParams, sb);
 
-			String jsonStr = IOUtils.toString(clientResponse.getEntityInputStream());
+			String jsonStr = sb.toString();
 			JSONObject jsonObj = new JSONObject(jsonStr);
 			if (jsonObj.has("response")) {
 				String res = jsonObj.getString("response");
@@ -549,6 +531,46 @@ public class OAuthWrappers {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	private static void makeHttpCall(String urlStr, String authorizationValue, String httpMethod,
+			String httpParams, StringBuilder result) {
+		OutputStream output = null;
+		InputStream input = null;
+		try {
+			URL url = new URL(urlStr);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestProperty(AUTHORIZATION, authorizationValue);
+			conn.setRequestMethod(httpMethod);
+			if (HTTP_POST.equals(httpMethod) && (httpParams != null)) {
+				conn.setDoOutput(true);
+				output = conn.getOutputStream();
+				output.write(httpParams.getBytes());
+			}
+			input = conn.getInputStream();
+			byte[] b = new byte[1024];
+			int readBytes = 0;
+			while ((readBytes = input.read(b)) >= 0) {
+				result.append(new String(b, 0, readBytes));
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (output != null)
+				try {
+					output.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			if (input != null)
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
 	}
 
 	private static void addScopeNames(String scope, List<String> results) {
