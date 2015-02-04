@@ -23,7 +23,7 @@ public class HTTPCall {
 	private static final String USER_AGENT = "Mozilla/5.0";
 	
 	//protected static final String KEY = "687eedc0-17a4-4835-bee6-43ac9394cd04"; // for dev server
-	protected static final String KEY = "cf9acc9b-a6ae-4d26-8f07-e37d582448ff"; // for dev server, test db
+	protected static final String KEY = "aa2605d7-859e-430d-a303-2054d9953f5b"; // for dev server, test db
 	
 	protected static final String SERVER = "https://dev.3cixty.com/v2-test-1/";
 	//protected static final String SERVER = "http://localhost:8080/v2/";
