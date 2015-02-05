@@ -8,7 +8,6 @@ import javax.servlet.annotation.WebListener;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.CrawlerCron.CrawlerCron;
-import eu.threecixty.db.DBConnection;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoFlowImpl;
 import eu.threecixty.profile.MobidotImpl;
@@ -23,7 +22,6 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	private static final String FOLDER_ROOT = "3cixtyData";
 
 	public void contextDestroyed(ServletContextEvent context) {
-		DBConnection.getInstance().closeConnection();
 	}
 
 	public void contextInitialized(ServletContextEvent context) {
@@ -45,7 +43,6 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    MobidotImpl.setPath(pathTo3CixtyDataFolder);
 	    GoFlowImpl.setPath(pathTo3CixtyDataFolder);
 	    GoFlowServer.setPath(realPath + File.separatorChar + "WEB-INF" + File.separatorChar + "goflow.properties");
-	    DBConnection.getInstance().setPath(realPath);
 	    OAuthWrappers.addScopesByDefault();
 	    
 	    // create timer for crawling Mobidot information

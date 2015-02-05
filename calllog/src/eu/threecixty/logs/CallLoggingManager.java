@@ -1,5 +1,6 @@
 package eu.threecixty.logs;
 
+import java.util.Date;
 import java.util.List;
 
 public class CallLoggingManager {
@@ -29,7 +30,7 @@ public class CallLoggingManager {
 		CallLogging logging = new CallLogging();
 		logging.setKey(appkey);
 		logging.setServiceName(serviceName);
-		logging.setStartTime(starttime);
+		logging.setStartTime(new Date(starttime));
 		int timeConsumed = (int) ((endtime - starttime) / 1000); // in second
 		logging.setTimeConsumed(timeConsumed);
 		return save(logging);
@@ -49,7 +50,7 @@ public class CallLoggingManager {
 		CallLogging logging = new CallLogging();
 		logging.setKey(appkey);
 		logging.setServiceName(serviceName);
-		logging.setStartTime(starttime);
+		logging.setStartTime(new Date(starttime));
 		int timeConsumed = (int) ((endtime - starttime) / 1000); // in second
 		logging.setTimeConsumed(timeConsumed);
 		logging.setDescription(description);
