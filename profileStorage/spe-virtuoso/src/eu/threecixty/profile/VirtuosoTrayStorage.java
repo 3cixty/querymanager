@@ -13,6 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import virtuoso.jena.driver.VirtGraph;
+import virtuoso.jena.driver.VirtuosoUpdateFactory;
+import virtuoso.jena.driver.VirtuosoUpdateRequest;
 import eu.threecixty.Configuration;
 import eu.threecixty.profile.Tray.OrderType;
 
@@ -104,19 +107,28 @@ public class VirtuosoTrayStorage implements TrayManager {
 		List <Tray> trays = getTrays(junkID);
 		boolean ok = cleanTrays(junkID);
 		if (!ok) return false;
-		// TODO: should use batch queries here
-		for (Tray tray: trays) {
-			tray.setUid(uid);
-			try {
+		VirtGraph virtGraph;
+		try {
+			virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+			VirtuosoUpdateRequest vurToInsertData = null;
+			for (Tray tray: trays) {
+				tray.setUid(uid);
 				if (!checkTrayExisted(tray)) {
-				    ok = save(tray);
-				    if (!ok) return false;
+				    String query = createQueryToSave(tray);
+				
+				    if (vurToInsertData == null) vurToInsertData = VirtuosoUpdateFactory.create(query, virtGraph);
+				    else vurToInsertData.addUpdate(query);
 				}
-			} catch (InterruptedException e) {
-				throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 			}
+
+			if (vurToInsertData != null) {
+				vurToInsertData.exec();
+			}
+			
+			return true;
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
-		return true;
 	}
 
 	public boolean updateTray(Tray tray) throws InvalidTrayElement, TooManyConnections {
@@ -359,9 +371,26 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * @return
 	 */
 	private static boolean save(Tray tray) throws TooManyConnections {
+
+		String query = createQueryToSave(tray);
+		
+		try {
+			VirtuosoManager.getInstance().executeUpdateQuery(query);
+			return true;
+		} catch (InterruptedException e) {
+			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	private static String createQueryToSave(Tray tray) {
 		// encode with Base64 to avoid SQL injection
 		String personUri = getPersonURI(tray);
 		String trayUri = getTrayURI(tray);
+		tray.setTimestamp(System.currentTimeMillis());
 		StringBuffer buf = new StringBuffer(PREFIXES).append(
 				"   INSERT DATA { GRAPH <").append(getGraphName(tray)).append("> \n");
 		buf.append(" {");
@@ -388,17 +417,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 		}
 
 		buf.append("}}");
-		
-		try {
-			VirtuosoManager.getInstance().executeUpdateQuery(buf.toString());
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
-		}
-		
-		return false;
+		return buf.toString();
 	}
 	
 	/**

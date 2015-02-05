@@ -25,7 +25,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	@Override
 	public UserProfile getProfile(String uid) throws TooManyConnections {
 		try {
-			return VirtuosoUserProfileStorage.loadProfile(uid);
+			return VirtuosoUserProfileStorage.getInstance(uid).loadProfile();
 		} catch (InterruptedException e) {
 			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
@@ -34,7 +34,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	@Override
 	public boolean saveProfile(UserProfile userProfile) throws TooManyConnections {
 		try {
-			return VirtuosoUserProfileStorage.saveProfile(userProfile);
+			return VirtuosoUserProfileStorage.getInstance(userProfile.getHasUID()).saveProfile(userProfile);
 		} catch (InterruptedException e) {
 			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
@@ -43,7 +43,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	@Override
 	public boolean existUID(String uid) throws TooManyConnections {
 		try {
-			return VirtuosoUserProfileStorage.existUID(uid);
+			return VirtuosoUserProfileStorage.getInstance(uid).existUID();
 		} catch (InterruptedException e) {
 			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
@@ -258,11 +258,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<UserProfile> getAllUserProfiles() {
-		try {
-			return VirtuosoUserProfileStorage.getAllUserProfiles();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			return VirtuosoUserProfileStorage.getAllUserProfiles();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		return null;
 	}
 }
