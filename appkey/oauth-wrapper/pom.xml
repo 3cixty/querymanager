@@ -44,9 +44,9 @@
 
 
     <dependency>
-	  <groupId>eu.3cixty</groupId>
-	  <artifactId>dbconnection</artifactId>
-	  <version>1.0</version>
+	  <groupId>mysql</groupId>
+	  <artifactId>mysql-connector-java</artifactId>
+	  <version>5.1.34</version>
     </dependency>
 
 	<!-- Hibernate core -->
