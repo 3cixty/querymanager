@@ -23,7 +23,7 @@ public class HTTPCall {
 	private static final String USER_AGENT = "Mozilla/5.0";
 	
 	//protected static final String KEY = "687eedc0-17a4-4835-bee6-43ac9394cd04"; // for dev server
-	protected static final String KEY = "fe67f4e4-b5fa-40c8-838b-5f88360eec6b"; // for dev server, test db
+	protected static final String KEY = "aa2605d7-859e-430d-a303-2054d9953f5b"; // for dev server, test db
 	
 	protected static final String SERVER = "https://dev.3cixty.com/v2-test-1/";
 	//protected static final String SERVER = "http://localhost:8080/v2/";
@@ -105,7 +105,7 @@ public class HTTPCall {
 		
 		HttpURLConnection conn = createConnection(SERVER + "getAccessToken", "GET",
 				new String[] {"google_access_token", "key", "scope"},
-				new String[] {googleAccessToken, KEY, "Profile,Wishlist"});
+				new String[] {googleAccessToken, KEY, "Profile,WishList"});
 		
 		conn.setDoOutput(false);
 		

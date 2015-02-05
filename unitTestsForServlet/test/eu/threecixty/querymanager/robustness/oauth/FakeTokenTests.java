@@ -24,24 +24,25 @@ public class FakeTokenTests extends HTTPCall {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testGetAccessTokenWithFakeGoogleToken10() {
 		testGetAccessTokenWithFakeGoogleToken(THREADS_10);
 	}
 	
-	@Test
+	//@Test
 	public void testGetAccessTokenWithFakeGoogleToken100() {
 		testGetAccessTokenWithFakeGoogleToken(THREADS_100);
 	}
 	
-	@Test
+	//@Test
 	public void testGetAccessTokenWithFakeGoogleToken200() {
 		testGetAccessTokenWithFakeGoogleToken(THREADS_200);
 	}
 	
 
+	@Test
 	public void testGetAccessTokenWithFakeGoogleToken500() {
-		testGetAccessTokenWithFakeGoogleToken(500);
+		testGetAccessTokenWithFakeGoogleToken(1000);
 	}
 	
 	public void testRevokeAccessTokenWithFakeToken() {
@@ -57,7 +58,7 @@ public class FakeTokenTests extends HTTPCall {
 					HttpURLConnection conn;
 					try {
 						conn = createConnection(strUrl, "GET",
-								new String[]{"google_access_token", "key", "scope"}, new String[] {fakeGoogleAccessToken, KEY, "Profile,Wishlist"});
+								new String[]{"google_access_token", "key", "scope"}, new String[] {fakeGoogleAccessToken, KEY, "Profile,WishList"});
 						int responseCode = conn.getResponseCode();
 						//Assert.assertEquals(responseCode, HttpURLConnection.HTTP_BAD_REQUEST);
 						Assert.assertEquals(responseCode, HttpURLConnection.HTTP_OK);
@@ -75,7 +76,7 @@ public class FakeTokenTests extends HTTPCall {
 	
 	
 	private void testGetAccessTokenWithFakeGoogleToken(int numberOfThreads) {
-		final int loops = 2;
+		final int loops = 1;
 		final CountDownLatch latch = new CountDownLatch(numberOfThreads);
 		Runnable runnable = new Runnable() {
 
@@ -83,15 +84,21 @@ public class FakeTokenTests extends HTTPCall {
 				for (int i = 0; i < loops; i++) {
 					String fakeGoogleAccessToken = RandomStringUtils.randomAscii(20);
 					String strUrl = SERVER + "getAccessToken";
-					HttpURLConnection conn;
+					HttpURLConnection conn = null;
 					try {
 						conn = createConnection(strUrl, "GET",
-								new String[]{"google_access_token", "key", "scope"}, new String[] {fakeGoogleAccessToken, KEY, "Profile,Wishlist"});
+								new String[]{"google_access_token", "key", "scope"}, new String[] {fakeGoogleAccessToken, KEY, "Profile,WishList"});
 						int responseCode = conn.getResponseCode();
-						Assert.assertEquals(responseCode, HttpURLConnection.HTTP_BAD_REQUEST);
+						if (responseCode != 200) {
+							String error = getContent(conn.getErrorStream());
+							System.out.println(error);
+						}
+						//Assert.assertEquals(responseCode, HttpURLConnection.HTTP_BAD_REQUEST);
+						Assert.assertEquals(responseCode, HttpURLConnection.HTTP_OK);
 					} catch (Exception e) {
 						e.printStackTrace();
 					} finally {
+						if (conn != null) conn.disconnect();
 						latch.countDown();
 					}
 				}
