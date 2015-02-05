@@ -11,6 +11,11 @@
         <property name="hibernate.connection.username">3cixty</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">1000</property>
+        <property name="hibernate.c3p0.timeout">300</property>
+        <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
         <property name="show_sql">true</property>
         <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
         <mapping class="eu.threecixty.oauth.model.Scope"></mapping>
