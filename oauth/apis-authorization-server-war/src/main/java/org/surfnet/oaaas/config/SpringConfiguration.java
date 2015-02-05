@@ -70,6 +70,7 @@ public class SpringConfiguration {
     dataSource.setPassword(env.getProperty("jdbc.password"));
     dataSource.setTestOnBorrow(true);
     dataSource.setValidationQuery("SELECT 1");
+    dataSource.setMaxActive(1000);
     return dataSource;
   }
 
