@@ -182,15 +182,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	        for ( ; results.hasNext(); ) {
 	            QuerySolution qs = results.next();
 	            RDFNode UID = qs.get("uid");
-	            RDFNode mobidotUserName = qs.get("mobidotID");
-	            if (UID!=null && mobidotUserName!=null){
-	                //String UID = qs.getLiteral("uid").getString();
-	                //String mobidotUserName = qs.getLiteral("mobidotID").getString();
-	                //Long mobidotID= getMobidotIDforUsername(mobidotUserName);
+	            RDFNode mobidotID = qs.get("mobidotID");
+	            if (UID!=null && mobidotID!=null){
 	                IDMapping mapper=new IDMapping();
 	                mapper.setThreeCixtyID(UID.toString());
-	                mapper.setMobidotUserName(mobidotUserName.toString());
-	                ////mapper.setMobidotID(mobidotID);
+	                mapper.setMobidotID(mobidotID.toString());
 	                idMapping.add(mapper);
 	            }
 	        }
@@ -212,7 +208,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
         + " FROM <" + VirtuosoManager.getInstance().getGraph("root") + "> \n"
         + " WHERE { \n"
         + " ?root profile:userID ?uid . \n"
-        + " ?root profile:hasLastCrawlTime ?lastCrawlTime . \n"
+        + " ?root profile:lastCrawlTime ?lastCrawlTime . \n"
         + " }";
         Set<IDCrawlTimeMapping> idCrawlTimeMapping=new HashSet<IDCrawlTimeMapping>();
         

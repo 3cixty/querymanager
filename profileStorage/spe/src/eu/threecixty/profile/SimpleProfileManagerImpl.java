@@ -191,7 +191,7 @@ class SimpleProfileManagerImpl implements ProfileManager {
 				//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
 				IDMapping mapper=new IDMapping();
 				mapper.setThreeCixtyID(UID);
-				mapper.setMobidotUserName(mobidotUserName);
+				mapper.setMobidotID(mobidotUserName);
 				//mapper.setMobidotID(mobidotID);
 				idMapping.add(mapper);
 			}

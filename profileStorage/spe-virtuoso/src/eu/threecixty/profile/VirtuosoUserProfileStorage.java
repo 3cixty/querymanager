@@ -800,7 +800,7 @@ public class VirtuosoUserProfileStorage {
 				
 				toTransport.setHasTransportURI(transport.asResource().getURI());
 				
-				QueryReturnClass qRCRegularTrips = VirtuosoManager.getInstance().query(GetSetQueryStrings.getRegularTripsForTransport(transport.asResource().getURI()));
+				QueryReturnClass qRCRegularTrips = VirtuosoManager.getInstance().query(GetSetQueryStrings.getRegularTripsForTransport(uid,transport.asResource().getURI()));
 				ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
 				
 				Set <eu.threecixty.profile.oldmodels.RegularTrip> toRegularTrips = new HashSet <eu.threecixty.profile.oldmodels.RegularTrip>();
@@ -809,7 +809,7 @@ public class VirtuosoUserProfileStorage {
 					QuerySolution qsRegularTrips = resultsRegularTrips.next();
 					try {
 						eu.threecixty.profile.oldmodels.RegularTrip toRegularTrip = new eu.threecixty.profile.oldmodels.RegularTrip();
-						loadRegularTripFromKB(qsRegularTrips, toRegularTrip);
+						loadRegularTripFromKB(uid, qsRegularTrips, toRegularTrip);
 				    	toRegularTrips.add(toRegularTrip);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -819,7 +819,7 @@ public class VirtuosoUserProfileStorage {
 				
 				qRCRegularTrips.closeConnection();
 				
-				QueryReturnClass qRCAccompanying = VirtuosoManager.getInstance().query(GetSetQueryStrings.getAccompanyingForTransport(transport.asResource().getURI()));
+				QueryReturnClass qRCAccompanying = VirtuosoManager.getInstance().query(GetSetQueryStrings.getAccompanyingForTransport(uid,transport.asResource().getURI()));
 				ResultSet resultsAccompanying = qRCAccompanying.getReturnedResultSet();
 				
 				Set <eu.threecixty.profile.oldmodels.Accompanying> toAccompanyings = new HashSet <eu.threecixty.profile.oldmodels.Accompanying>();
@@ -855,11 +855,12 @@ public class VirtuosoUserProfileStorage {
 
 	/**
 	 * Loads regular trip from the KB.
-	 * @param regularTrip
+	 * @param uid
+	 * @param qs
 	 * @param toRegularTrip
 	 * @throws InterruptedException 
 	 */
-	private static void loadRegularTripFromKB(QuerySolution qs,
+	private static void loadRegularTripFromKB(String uid, QuerySolution qs,
 			eu.threecixty.profile.oldmodels.RegularTrip toRegularTrip) throws InterruptedException {
 		
 		RDFNode regularTripURI = qs.get("regularTrip");
@@ -915,21 +916,22 @@ public class VirtuosoUserProfileStorage {
     	Set <eu.threecixty.profile.oldmodels.PersonalPlace> toPersonalPlaces = new HashSet <eu.threecixty.profile.oldmodels.PersonalPlace>();
 		
     	if (regularTripURI!=null)
-    		loadPersonalPlaceFromKBToRegularTrips(regularTripURI.asResource().getURI(),toPersonalPlaces);
+    		loadPersonalPlaceFromKBToRegularTrips(uid, regularTripURI.asResource().getURI(),toPersonalPlaces);
     	
     	toRegularTrip.setHasPersonalPlacesNew(toPersonalPlaces);
 	}
 
 	/**
 	 * Loads personal place from the KB.
+	 * @param uid
 	 * @param personalPlace
 	 * @param toPersonalPlace
 	 * @throws InterruptedException 
 	 */
-	private static void loadPersonalPlaceFromKBToRegularTrips(String regularTripURI,
+	private static void loadPersonalPlaceFromKBToRegularTrips(String uid, String regularTripURI,
 			Set <eu.threecixty.profile.oldmodels.PersonalPlace> toPersonalPlaces) throws InterruptedException {
 
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getPersonalPlacesForRegularTrips(regularTripURI));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getPersonalPlacesForRegularTrips(uid,regularTripURI));
 
 		ResultSet results = qRC.getReturnedResultSet();
 		

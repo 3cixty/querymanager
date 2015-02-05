@@ -54,6 +54,7 @@ public class GetSetQueryStrings {
 	public static String getUserURI(String uid){
 		String query=PREFIX
 				+ "select ?uri \n"
+				+ " from <" + getGraphName(uid) + "> \n"
 				+ " where { \n"
 					+" ?uri profile:userID \""+uid+"\". \n"
 					+ "}";
@@ -69,7 +70,7 @@ public class GetSetQueryStrings {
 				+ " select ?lastCrawlTime \n"
 				+ " from <" + getGraphName(uid) + "> \n"
 				+ " where { \n"
-					+ " <"+PROFILE_URI+uid+"> profile:hasLastCrawlTime ?lastCrawlTime. \n"
+					+ " <"+PROFILE_URI+uid+"> profile:lastCrawlTime ?lastCrawlTime. \n"
 					+ "}";
 		return query;
 	}
@@ -86,7 +87,7 @@ public class GetSetQueryStrings {
 
 					if (time==null || time.isEmpty()) time="0";
 					
-					query+= "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime \""+time+"\" . \n"
+					query+= "<"+PROFILE_URI+uid+"> profile:lastCrawlTime \""+time+"\" . \n"
 				+ " } \n"
 				+ " }";
 			return query;
@@ -100,7 +101,7 @@ public class GetSetQueryStrings {
 		String query=PREFIX
 			+ " DELETE Where { \n"
 			+ " GRAPH <"+ getGraphName(uid)+"> { \n"
-				+ "<"+PROFILE_URI+uid+"> profile:hasLastCrawlTime ?o . \n"
+				+ "<"+PROFILE_URI+uid+"> profile:lastCrawlTime ?o . \n"
 			+ " } \n"
 			+ " }";
 			return query;
@@ -159,7 +160,8 @@ public class GetSetQueryStrings {
 	 */
 	public static String getName(String uid) {
 		String query=PREFIX
-				+ " select ?givenname ?familyname from <" + getGraphName(uid) + "> \n"
+				+ " select ?givenname ?familyname \n"
+				+ " from <" + getGraphName(uid) + "> \n"
 				+ " where { \n"
 				+ " <" + PROFILE_URI + uid + "> schema:givenName ?givenname ;  "
 											+ "	schema:familyName ?familyname. \n"
@@ -711,12 +713,14 @@ public class GetSetQueryStrings {
 
 	/**
 	 * select accompanies of a user associated to a given transport
+	 * @param uid
 	 * @param transportURI
 	 * @return
 	 */
-	public static String getAccompanyingForTransport(String transportURI) {
+	public static String getAccompanyingForTransport(String uid, String transportURI) {
 		String query=PREFIX
 				+ " select ?accompany ?uid2 ?score ?validity ?acctime \n"
+				+ " from <" + getGraphName(uid) + "> \n"
 					+ " where { \n"
 					+ " <"+transportURI+"> profile:accompany ?accompany. \n"
 					+ " Optional {?accompany profile:accompanyUser ?uid2 .} \n"
@@ -880,12 +884,14 @@ public class GetSetQueryStrings {
 	
 	/**
 	 * select personal places associated for a regular trip of the user
+	 * @param uid
 	 * @param regularTripURI
 	 * @return
 	 */
-	public static String getPersonalPlacesForRegularTrips(String regularTripURI) {
+	public static String getPersonalPlacesForRegularTrips(String uid, String regularTripURI) {
 		String query=PREFIX
 				+ "select ?pplace ?externalIDs ?latitude ?longitude ?stayDuration ?accuracy ?stayPercentage ?pcode ?weekDayPattern ?dayHourPattern ?placeType ?placeName \n"
+				+ " from <" + getGraphName(uid) + "> \n"
 				+ " where { \n"
 					+ " <"+regularTripURI+"> profile:personalPlace ?pplace . \n";
 					query+=makeGetPersonalPlacesQuery();
@@ -1007,12 +1013,14 @@ public class GetSetQueryStrings {
 	
 	/**
 	 * select regular trip associated to a specific transport of a user in the kb
+	 * @param uid
 	 * @param transportURI
 	 * @return
 	 */
-	public static String getRegularTripsForTransport(String transportURI) {
+	public static String getRegularTripsForTransport(String uid, String transportURI) {
 		String query=PREFIX
 				+ " select ?regularTrip ?tripID ?name ?departureTime ?departureTimeSD ?travelTime ?travelTimeSD ?lastChanged ?totalDistance ?totalCount ?modalityType ?weekdayPattern ?dayhourPattern  ?weatherPattern \n"
+				+ " from <" + getGraphName(uid) + "> \n"
 				+ " where { \n";
 					query+=makeGetRegularTripsQuery(transportURI);
 				query+= "}";
@@ -1021,12 +1029,14 @@ public class GetSetQueryStrings {
 	
 	/**
 	 * select regular trip associated to a specific transport of a user in the kb
+	 * @param uid
 	 * @param transportURI
 	 * @return
 	 */
-	public static String getRegularTripsURIForTransport(String transportURI) {
+	public static String getRegularTripsURIForTransport(String uid, String transportURI) {
 		String query=PREFIX
 				+ " select ?regularTrip \n"
+				+ " from <" + getGraphName(uid) + "> \n"
 				+ " where { \n"
 					+ " <"+transportURI+"> profile:regularTrip ?regularTrip. \n"
 				+ "}";
@@ -1117,7 +1127,6 @@ public class GetSetQueryStrings {
 	                + " <"+PROFILE_URI+uid+"> frap:holds ?tripPreference. \n"
 				+ " }\n"
 				+ "}";
-		System.out.println(query);
 		return query;
 	}
 	/**
@@ -1141,6 +1150,7 @@ public class GetSetQueryStrings {
 					+ " Optional {?filter profile:hasPreferredWeatherCondition ?preferredWeatherCondition .} \n"
 					+ " Optional {?filter profile:hasPreferredMinTimeOfAccompany ?preferredMinTimeOfAccompany .} \n"
 					+ " Optional {?filter profile:hasModalityType ?modality .} \n"
+					+ " Filter (fn:contains(STR(?tripPreference),\"TripPreference\")) \n"
 				+ " }";
 		return query;
 	}
@@ -1222,6 +1232,7 @@ public class GetSetQueryStrings {
 					+ " ?placePreference frap:about ?about . \n"
 					+ " ?about frap:filter ?filter . \n"
 					+ " Optional {?filter profile:hasNatureOfPlace ?natureOfPlace .} \n"
+					+ " Filter (fn:contains(STR(?placePreference),\"PlacePreference\")) \n"
 					+ "}";
 		return query;
 	}
