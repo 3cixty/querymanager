@@ -1,0 +1,45 @@
+package eu.threecixty.profile.oldmodels;
+
+import eu.threecixty.profile.annotations.Uses;
+
+@Uses(hasText="http://vocab.org/relationship/.html")
+public enum Relationship {
+	Acquaintance,
+	Ambivalent,
+	Ancestor,
+	Antagonist,
+	Apprentice,
+	BestFriend,
+	Brother,
+	Child,
+	CloseFriend,
+	Collaborator,
+	Colleague,
+	Daughter,
+	Descendant,
+	Employee,
+	Employer,
+	Enemy,
+	Engaged,
+	Father,
+	Friend,
+	Follower,
+	GrandChild,
+	GrandParent,
+	GoodFriend,
+	HasMet,
+	KnowsByReputation,
+	KnowsByPassing,
+	LivesWith,
+	Mentor,
+	Mother,
+	Neighbor,
+	NotFriendAnymore,
+	Parent,
+	Sibling,
+	Sister,
+	Son,
+	Spouse,
+	Others,
+	None
+}

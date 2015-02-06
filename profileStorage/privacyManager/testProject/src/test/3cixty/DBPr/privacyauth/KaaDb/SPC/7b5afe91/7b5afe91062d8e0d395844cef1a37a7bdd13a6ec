@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:PrivacyContract xmlns="eu.3cixty.application" xmlns:ns2="eu.3cixty.privacy" schemaVersion="4.0">
+    <application>
+        <name>service2</name>
+        <description>...</description>
+        <version>1.0</version>
+        <author>...</author>
+        <type>Web</type>
+        <domains>
+            <domain>Tourism</domain>
+            <domain>Food</domain>
+            <domain>Entertainment</domain>
+        </domains>
+    </application>
+    <ns2:contract>
+        <ns2:namespaces>
+            <ns2:namespace>
+                <ns2:prefix>profile</ns2:prefix>
+                <ns2:uri>http://3cixty.eurecom.fr/ontology/profile/</ns2:uri>
+            </ns2:namespace>
+        </ns2:namespaces>
+        <ns2:propertyPaths>
+            <ns2:propertyPath label="Whist list" ns2:type="optional">profile:trayElement</ns2:propertyPath>
+        </ns2:propertyPaths>
+        <ns2:publication>
+            <ns2:propertyPath></ns2:propertyPath>
+        </ns2:publication>
+    </ns2:contract>
+</ns2:PrivacyContract>

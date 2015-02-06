@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 rel. 2 sp2 (http://www.altova.com) by USER USER (Thales Services SAS) -->
+<xs:schema xmlns:pvc="eu.3cixty.privacy" xmlns:app="eu.3cixty.application" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="eu.3cixty.privacy" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="eu.3cixty.application" schemaLocation="Application.xsd"/>
+	<xs:element name="UserPrivacyContract">
+		<xs:annotation>
+			<xs:documentation>Contract between an application using the privacy platform and a user
+			This contract must be a restriction of the application privacy contract.
+
+Each user using an application of the privacy platform, must have a UserprivacyContract with this application. Otherwise, the application will not access the user data.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="app:application"/>
+				<xs:element name="contract">
+					<xs:annotation>
+						<xs:documentation>Defines the contract between the user and the application.
+
+The user must defines levels of access for different groups:
+
+- for an application using his data for himself
+
+- for an applictaion used by a friend of him : THIS PART IS NOT CURRENTLY USED
+
+- for an application used by someone that is not part of the 2 previous groups.
+
+The decription must be done with an extension of the SPARQL property paths (a sequence of property names with constraints).
+</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="namespaces" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>A sequence of abbreviated forms of namespace used in the propertyPaths elements</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="namespace">
+											<xs:annotation>
+												<xs:documentation>Description of the namespace :
+ - a prefix that is the abbreviated form
+ - an uri that is the expanded form
+
+Example:
+ - prefix = profile
+ - uri = http://3cixty.eurecom.fr/ontology/profile/</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="prefix" type="xs:string"/>
+													<xs:element name="uri" type="xs:string"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:sequence>
+								<xs:element name="trustGroups">
+									<xs:annotation>
+										<xs:documentation>A sequence of groups for which the privacy is defined</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence maxOccurs="unbounded">
+											<xs:element name="trustGroup">
+												<xs:annotation>
+													<xs:documentation>The SPARQL path to the value that the service wants to access.
+
+Example with the profile.ttl :
+ - An application that wants to access Tray elements must specify the following path:
+     profile:trayElement 
+
+ - An application that wants to access to the accountName in a Tray :
+       
+profile:trayElement/profile:hasAccount/foaf:accountName
+
+pvc:type
+ - 2 values available : optional or mandatory
+ - the default value is the 'optional' value</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="propertyPaths">
+															<xs:annotation>
+																<xs:documentation>A sequence of SPARQL property paths</xs:documentation>
+															</xs:annotation>
+															<xs:complexType>
+																<xs:sequence maxOccurs="unbounded">
+																	<xs:element name="propertyPath">
+																		<xs:annotation>
+																			<xs:documentation>A extended SPARQL path to the value that the service wants to access. This property path could be equal to a property path of the application privacy contract, or be a restriction of this path.
+
+Example with the profile.ttl :
+
+ - An application that wants to access Tray elements has specified the following path:
+     profile:trayElement 
+
+- The uset could restrict the access by specifying the follwing path
+ profile:trayElement[profile:hasRating/schema:ratingValue "1"]</xs:documentation>
+																		</xs:annotation>
+																		<xs:complexType>
+																			<xs:simpleContent>
+																				<xs:extension base="xs:string">
+																					<xs:attribute name="agreement" type="xs:boolean" use="optional" default="false">
+																						<xs:annotation>
+																							<xs:documentation>True if the user has accepted the property path.
+
+Otherwise false.</xs:documentation>
+																						</xs:annotation>
+																					</xs:attribute>
+																				</xs:extension>
+																			</xs:simpleContent>
+																		</xs:complexType>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="filters" minOccurs="0">
+															<xs:annotation>
+																<xs:documentation>A sequence of SPARQL filtering constraints, to add constraints between variables of the property paths.
+
+Example :
+pp1 : foaf:knows ?user1
+pp2: foaf:knows ?user2
+
+filter : ?user1 != ?user2</xs:documentation>
+															</xs:annotation>
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="filter" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>One filtering expression</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+													</xs:sequence>
+													<xs:attribute name="id" type="xs:string" use="required" fixed="[[[ Self Trust Group ]]]">
+														<xs:annotation>
+															<xs:documentation>Identifier of the group.
+only one group is actually defined :
+
+- [[[ Self Trust Group ]]]
+The user himself
+</xs:documentation>
+														</xs:annotation>
+													</xs:attribute>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:sequence>
+					</xs:complexType>
+					<xs:key name="groupKey">
+						<xs:selector xpath="*/pvc:trustGroup"/>
+						<xs:field xpath="@id"/>
+					</xs:key>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="3.0"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

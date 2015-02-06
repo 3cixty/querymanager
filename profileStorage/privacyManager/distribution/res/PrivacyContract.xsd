@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 rel. 2 sp2 (http://www.altova.com) by USER USER (Thales Services SAS) -->
+<xs:schema xmlns:pvc="eu.3cixty.privacy" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:app="eu.3cixty.application" targetNamespace="eu.3cixty.privacy" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="eu.3cixty.application" schemaLocation="Application.xsd"/>
+	<xs:element name="PrivacyContract">
+		<xs:annotation>
+			<xs:documentation>Contract proposal of an application using the privacy platform.
+			This contract will be discussed with the privacy authority
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="app:application"/>
+				<xs:element name="contract">
+					<xs:annotation>
+						<xs:documentation>Defines the part of the user profile the application wants to access or wants to publish.
+
+The decription must be done with SPARQL property paths (a sequence of property names).
+
+For non-SPARQL litterates, a textual description can be provided.
+The privacy authority will contact you later to assist you in the the SPARQL property paths redaction.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="namespaces" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>A sequence of abbreviated forms of namespace used in the propertyPaths elements</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="namespace">
+											<xs:annotation>
+												<xs:documentation>Description of the namespace :
+ - a prefix that is the abbreviated form
+ - an uri that is the expanded form
+
+Example:
+ - prefix = profile
+ - uri = http://3cixty.eurecom.fr/ontology/profile/</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="prefix" type="xs:string"/>
+													<xs:element name="uri" type="xs:string"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:choice>
+								<xs:element name="propertyPaths">
+									<xs:annotation>
+										<xs:documentation>A sequence of SPARQL property paths with a type attribute that specifies if the data is mandatory or optional to your service execution</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence maxOccurs="unbounded">
+											<xs:element name="propertyPath">
+												<xs:annotation>
+													<xs:documentation>The SPARQL path to the value that the service wants to access.
+
+Example with the profile.ttl :
+ - An application that wants to access Tray elements must specify the following path:
+     profile:trayElement 
+
+ - An application that wants to access to the accountName in a Tray :
+       
+profile:trayElement/profile:hasAccount/foaf:accountName
+</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+													<xs:simpleContent>
+														<xs:extension base="xs:string">
+															<xs:attribute ref="pvc:type" use="optional" default="optional">
+																<xs:annotation>
+																	<xs:documentation> 2 values available : 
+ - optional : the returned value could be empty
+ - mandatory : the returned value must not be empty
+
+The default value is the 'optional' value</xs:documentation>
+																</xs:annotation>
+															</xs:attribute>
+															<xs:attribute name="label" type="xs:string" use="required">
+																<xs:annotation>
+																	<xs:documentation>String to be displayed to the user, that explains clearly the  accessed data by the property path</xs:documentation>
+																</xs:annotation>
+															</xs:attribute>
+														</xs:extension>
+													</xs:simpleContent>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="filters" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>DO NOT USE
+</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+													<xs:sequence maxOccurs="unbounded">
+														<xs:element name="filter" type="xs:string" nillable="false"/>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="textDescription" type="xs:string" nillable="false">
+									<xs:annotation>
+										<xs:documentation>Specify as accurately as possible, your required data</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:choice>
+							<xs:element name="publication" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Data published by the application.
+
+An applictaion can write any information in the profile : those information are private by default.
+
+To give access to those data to other applications, the public data must be expressed  in this part with SPARQL property paths.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="propertyPath">
+											<xs:annotation>
+												<xs:documentation>The SPARQL path to the value that the service wants to publish
+
+Example with the profile.ttl :
+ - An application that wants to publish the Tray elements must specify the following path:
+     profile:trayElement 
+
+ - An application that wants to publish the family name :
+       
+foaf:familyName
+</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string"/>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="4.0"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:attribute name="type">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="mandatory"/>
+				<xs:enumeration value="optional"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+</xs:schema>
