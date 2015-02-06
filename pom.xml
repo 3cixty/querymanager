@@ -10,9 +10,12 @@
   <version>1.0</version>
   
   <modules>
+    <module>appkey</module>
+    <module>profileStorage</module>
+    <module>CrawlerCron</module>
     <module>calllog</module>
     <module>querymanager-java</module>
-	<module>querymanagerServlet</module>
+    <module>querymanagerServlet</module>
   </modules>
   
   <build>
