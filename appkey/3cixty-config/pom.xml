@@ -5,7 +5,7 @@
   
   <groupId>eu.3cixty</groupId>
   <artifactId>3cixty-config</artifactId>
-  <name>OAuth Utils</name>
+  <name>OAuth Configuration</name>
   <packaging>jar</packaging>
   <version>1.0</version>
   
