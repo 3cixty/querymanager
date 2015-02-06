@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>eu.3cixty</groupId>
+    <artifactId>querymanager-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+  
+  <groupId>eu.3cixty</groupId>
+  <artifactId>unitTestsForServlet</artifactId>
+  <name>Unit Tests for Servlet</name>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  
+  <dependencies>
+    
+    <dependency>
+	  <groupId>eu.3cixty</groupId>
+	  <artifactId>spe</artifactId>
+	  <version>1.0</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>org.json</groupId>
+	  <artifactId>json</artifactId>
+	  <version>20140107</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.github.briandilley.jsonrpc4j</groupId>
+        <artifactId>jsonrpc4j</artifactId>
+        <version>1.1</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.11</version>
+	  <scope>test</scope>
+    </dependency>
+            
+</dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+	<resources>
+		<resource>
+			<directory>resources</directory>
+		</resource>
+	</resources>
+    <testResources>
+      <testResource>
+        <directory>test-resources</directory>
+      </testResource>
+    </testResources>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.17</version>
+        <configuration>
+          <includes>
+            <!-->include>**/PerformanceTests.java</include -->
+            <!--include>**/StressTests.java</include-->
+            <include>**/oauth/*Tests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+    
+  </build>
+</project>

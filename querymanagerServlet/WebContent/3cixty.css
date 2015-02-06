@@ -1,0 +1,27 @@
+
+input[type="text"] {
+	width: 100%;
+	font-size: 13px;
+}
+
+input:valid {
+	background: white;
+}
+input:invalid {
+	background: red;
+}
+
+.app_namespace {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.app_description {
+	font-size: 15px;
+	font-weight:normal;
+}
+
+.app_requirement_note {
+	font-size: 13px;
+	font-family: courier;
+}
