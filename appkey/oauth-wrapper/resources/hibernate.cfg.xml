@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.bytecode.use_reflection_optimizer">false</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.password">3cixtydatabase001</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/3cixty?autoReconnect=true</property>
+        <property name="hibernate.connection.username">3cixty</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="show_sql">true</property>
+        <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+        <mapping class="eu.threecixty.oauth.model.Scope"></mapping>
+        <mapping class="eu.threecixty.oauth.model.App"></mapping>
+        <mapping class="eu.threecixty.oauth.model.Developer"></mapping>
+        <mapping class="eu.threecixty.oauth.model.User"></mapping>
+        <mapping class="eu.threecixty.oauth.model.UserAccessToken"></mapping>
+        <!-- quick fix for calllog, TODO: need to restructure modules -->
+        <mapping class="eu.threecixty.logs.CallLogging"></mapping>
+    </session-factory>
+</hibernate-configuration>
