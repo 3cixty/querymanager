@@ -1,13 +1,8 @@
 package eu.threecixty.profile;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -75,7 +70,7 @@ public class GoogleAccountUtils {
 			// due to error asked by Christian
 //			String reqMsg = readUrl(
 //					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
-			String reqMsg = readUrl(
+			String reqMsg = Utils.readUrl(
 					"https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken);
 			JSONObject json = new JSONObject(reqMsg);
 			user_id = json.getString("id");
@@ -106,7 +101,7 @@ public class GoogleAccountUtils {
 			// finaly say authourize.
 			// XXX: quick fix as TI could not get ProfileImage. Need to deal with Android OAuth Client to be able to get knows from Android Google access token
 			try {
-				reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+				reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
 						+ accessToken);
 				json = new JSONObject(reqMsg);
 
@@ -123,7 +118,7 @@ public class GoogleAccountUtils {
 							JSONObject jObject = jsonArray.getJSONObject(i);
 							knows.add(jObject.getString("id"));
 						}
-						reqMsg = readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+						reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
 								+ accessToken+"&pageToken="+nextPageToken);
 						json = new JSONObject(reqMsg);
 					}
@@ -161,7 +156,7 @@ public class GoogleAccountUtils {
 	
 	public static int getValidationTime(String accessToken) {
 		try {
-			String reqMsg = readUrl(
+			String reqMsg = Utils.readUrl(
 					"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken);
 			JSONObject json = new JSONObject(reqMsg);
 			int time = json.getInt("expires_in");
@@ -173,30 +168,7 @@ public class GoogleAccountUtils {
 		return 0;
 	}
 
-	/**
-	 * Gets content from a given URL string.
-	 *
-	 * @param urlString
-	 * @return
-	 * @throws Exception
-	 */
-	private static String readUrl(String urlString) throws Exception {
-	    BufferedReader reader = null;
-	    try {
-	        URL url = new URL(urlString);
-	        reader = new BufferedReader(new InputStreamReader(url.openStream()));
-	        StringBuffer buffer = new StringBuffer();
-	        int read;
-	        char[] chars = new char[1024];
-	        while ((read = reader.read(chars)) != -1)
-	            buffer.append(chars, 0, read); 
 
-	        return buffer.toString();
-	    } finally {
-	        if (reader != null)
-	            reader.close();
-	    }
-	}
 	
 	private GoogleAccountUtils() {
 	}
