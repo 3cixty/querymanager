@@ -27,6 +27,8 @@ public class Configuration {
 			+"prefix frap:	<http://purl.org/frap#> "
 			+"prefix dc:	<http://purl.org/dc/elements/1.1/> "
 			+ "prefix fn: <http://www.w3.org/2005/xpath-functions#>";
+	
+	public static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 
 
 	public synchronized static void setPath(String path) {
