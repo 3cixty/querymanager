@@ -3,6 +3,11 @@ package eu.threecixty.profile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Set;
+
+import eu.threecixty.Configuration;
+import eu.threecixty.profile.oldmodels.ProfileIdentities;
+import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
 /**
  * This is a utility class.
@@ -16,6 +21,8 @@ public class Utils {
 	private static final String FACEBOOK_PREFIX = "11";
 	private static final String NO_SOCIAL_NETWORK_PREFIX = "99";
 	
+	private static final String PROFILE_URI = Configuration.PROFILE_URI;
+	
 	public static String gen3cixtyUID(String originalUID, UidSource source) {
 		if (source == null || originalUID == null) return null;
 		if (source == UidSource.GOOGLE) {
@@ -26,6 +33,27 @@ public class Utils {
 		return NO_SOCIAL_NETWORK_PREFIX + originalUID;
 	}
 
+	protected static void setProfileIdentities(String _3cixtyUID, String uid, String source,
+			Set<ProfileIdentities> profileIdentities) {
+		boolean found = false;
+		for (ProfileIdentities pi: profileIdentities) {
+			if (uid.equals(pi.getHasUserAccountID())) {
+				found = true;
+				break;
+			}
+		}
+		if (found) return; // already existed
+		
+		ProfileIdentities pi = new ProfileIdentities();
+		pi.setHasSourceCarrier(source);
+		pi.setHasUserAccountID(uid);
+		
+		pi.setHasUserInteractionMode(UserInteractionMode.Active);
+		pi.setHasProfileIdentitiesURI(PROFILE_URI+ _3cixtyUID + "/Account/" + pi.getHasSourceCarrier());
+		
+		profileIdentities.add(pi);
+	}
+	
 	/**
 	 * Gets content from a given URL string.
 	 *

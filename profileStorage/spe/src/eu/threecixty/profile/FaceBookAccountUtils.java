@@ -5,11 +5,9 @@ import java.util.Set;
 
 import org.json.JSONObject;
 
-import eu.threecixty.Configuration;
 import eu.threecixty.profile.Utils.UidSource;
 import eu.threecixty.profile.oldmodels.Name;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
-import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
 /**
  * This class is to get information from FB user access token.
@@ -21,8 +19,7 @@ public class FaceBookAccountUtils {
 	
 	private static final String FACE_BOOK_ACCESS_TOKEN_VALIDATION = "https://graph.facebook.com/me?access_token=";
 	private static final String FACEBOOK_PROFILE_IMAGE_PREFIX = "https://graph.facebook.com/v2.2/me/picture?access_token=";
-	
-	private static final String PROFILE_URI = Configuration.PROFILE_URI;
+
 
 	public static String getUID(String accessToken) {
 		if (accessToken == null) return "";
@@ -61,7 +58,7 @@ public class FaceBookAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			setFaceBookProfileIdentities(_3cixtyUID, uid, profileIdentities);
+			Utils.setProfileIdentities(_3cixtyUID, uid, "FaceBook", profileIdentities);
 			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
@@ -72,26 +69,7 @@ public class FaceBookAccountUtils {
 		return null;
 	}
 	
-	private static void setFaceBookProfileIdentities(String _3cixtyUID, String uid,
-			Set<ProfileIdentities> profileIdentities) {
-		boolean found = false;
-		for (ProfileIdentities pi: profileIdentities) {
-			if (uid.equals(pi.getHasUserAccountID())) {
-				found = true;
-				break;
-			}
-		}
-		if (found) return; // already existed
-		
-		ProfileIdentities pi = new ProfileIdentities();
-		pi.setHasSourceCarrier("FaceBook");
-		pi.setHasUserAccountID(uid);
-		
-		pi.setHasUserInteractionMode(UserInteractionMode.Active);
-		pi.setHasProfileIdentitiesURI(PROFILE_URI+ _3cixtyUID + "/Account/" + pi.getHasSourceCarrier());
-		
-		profileIdentities.add(pi);
-	}
+
 
 	private static void findKnows(String acessToken, Set <String> knowsResult) {
 		// TODO: need to be done: for now, we can only get friends access token if your friends and you are using 3cixty

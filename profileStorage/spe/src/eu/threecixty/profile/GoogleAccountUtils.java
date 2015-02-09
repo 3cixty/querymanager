@@ -9,7 +9,9 @@ import org.json.JSONObject;
 
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.UserProfile;
+import eu.threecixty.profile.Utils.UidSource;
 import eu.threecixty.profile.oldmodels.Name;
+import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 /**
  * Utility class to update account info.
@@ -83,8 +85,10 @@ public class GoogleAccountUtils {
 			
 			String picture = json.getString("picture");
 			
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(user_id);
-			profile.setHasUID(user_id);
+			String _3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
+			
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID);
+			profile.setHasUID(_3cixtyUID);
 			profile.setProfileImage(picture);
 			Name name = new Name();
 			profile.setHasName(name);
@@ -94,6 +98,7 @@ public class GoogleAccountUtils {
 			if (json.has("gender")) {
 				profile.setHasGender(json.getString("gender"));
 			}
+			
 			
 			// do this when login to 3cixty authorization say edit settings,
 			// select circles you want the app to get info form.
@@ -143,6 +148,14 @@ public class GoogleAccountUtils {
 			} catch (Exception ex) {
 				LOGGER.error(ex.getMessage());
 			}
+
+			Set <ProfileIdentities> profileIdentities = null;
+			if (profile.getHasProfileIdenties() == null) {
+				profileIdentities = new HashSet <ProfileIdentities>();
+				profile.setHasProfileIdenties(profileIdentities);
+			} else profileIdentities = profile.getHasProfileIdenties();
+			
+			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
 
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
