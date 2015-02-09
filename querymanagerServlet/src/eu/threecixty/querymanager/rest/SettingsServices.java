@@ -16,6 +16,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -37,7 +38,7 @@ public class SettingsServices {
 	
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
 
-	private static final String PROFILE_URI = "http://data.linkedevents.org/person/";
+	private static final String PROFILE_URI = Configuration.PROFILE_URI;
 	
 	@Context 
 	private HttpServletRequest httpRequest;
