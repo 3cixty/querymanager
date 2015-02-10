@@ -80,7 +80,9 @@ public class FaceBookAccountUtils {
 
 
 	private static void findKnows(String url, String accessToken, Set <String> knowsResult) {
-		// Note: we can only get friends' UID if your friends and you are using 3cixty
+		// XXX: Note: we can only get friends' UID if your friends and you are using 3cixty.
+		// We can consider using 'taggable_friends' or 'invitable_friends' to get friends' UID,
+		// but to be considered later when we have time
 		try {
 			String content = Utils.readUrl(url + accessToken);
 			JSONObject json = new JSONObject(content);
