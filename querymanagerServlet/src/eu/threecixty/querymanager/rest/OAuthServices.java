@@ -373,6 +373,8 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		
+		session.setAttribute(APP_KEY, app);
+		
 		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside)
 				: FaceBookAccountUtils.getUID(accessTokenFromOutside);
 		
