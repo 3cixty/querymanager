@@ -32,6 +32,7 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.utils.ScopeUtils;
+import eu.threecixty.profile.FaceBookAccountUtils;
 import eu.threecixty.profile.GoogleAccountUtils;
 
 @Path("/" + Constants.VERSION_2)
@@ -359,7 +360,8 @@ public class OAuthServices {
 	
 	@GET
 	@Path("/redirect_uri")
-	public Response redirect_uri(@QueryParam("google_access_token") String google_access_token) {
+	public Response redirect_uri(@QueryParam("access_token_outside") String accessTokenFromOutside,
+			@DefaultValue("Google") @QueryParam("source") String source) {
 		HttpSession session = httpRequest.getSession();
 		App app = (App) session.getAttribute(APP_KEY);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
@@ -367,11 +369,12 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		
-		String uid = GoogleAccountUtils.getUID(google_access_token);
+		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside)
+				: FaceBookAccountUtils.getUID(accessTokenFromOutside);
 		
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Google or Facebook access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		

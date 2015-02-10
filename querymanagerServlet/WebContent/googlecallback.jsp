@@ -34,7 +34,7 @@
     	if (token == null) {
     		window.location = "<%=Configuration.get3CixtyRoot()%>/error.jsp";
     	} else {
-        	window.location = '<%=OAuthServices.REDIRECT_URI%>?google_access_token=' + token;
+        	window.location = '<%=OAuthServices.REDIRECT_URI%>?access_token_outside=' + token + '&source=Google';
     	}
     }
     
