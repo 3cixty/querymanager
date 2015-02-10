@@ -3,6 +3,7 @@ package eu.threecixty.profile;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.threecixty.profile.Utils.UidSource;
@@ -19,6 +20,7 @@ public class FaceBookAccountUtils {
 	
 	private static final String FACE_BOOK_ACCESS_TOKEN_VALIDATION = "https://graph.facebook.com/me?access_token=";
 	private static final String FACEBOOK_PROFILE_IMAGE_PREFIX = "https://graph.facebook.com/v2.2/me/picture?access_token=";
+	private static final String FACEBOOK_FRIENDS_PREFIX = "https://graph.facebook.com/v2.2/me/friends?fields=id&format=json&method=get&pretty=0&suppress_http_code=1&access_token=";
 
 
 	public static String getUID(String accessToken) {
@@ -60,6 +62,12 @@ public class FaceBookAccountUtils {
 			
 			Utils.setProfileIdentities(_3cixtyUID, uid, "FaceBook", profileIdentities);
 			
+			Set <String> knows = new HashSet <String>(); // always refresh 'knows'
+			
+			findKnows(FACEBOOK_FRIENDS_PREFIX, accessToken, knows);
+
+			profile.setKnows(knows);
+			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 			return _3cixtyUID;
@@ -71,8 +79,25 @@ public class FaceBookAccountUtils {
 	
 
 
-	private static void findKnows(String acessToken, Set <String> knowsResult) {
-		// TODO: need to be done: for now, we can only get friends access token if your friends and you are using 3cixty
+	private static void findKnows(String url, String accessToken, Set <String> knowsResult) {
+		// Note: we can only get friends' UID if your friends and you are using 3cixty
+		try {
+			String content = Utils.readUrl(url + accessToken);
+			JSONObject json = new JSONObject(content);
+			JSONArray arr = json.getJSONArray("data");
+			int len = arr.length();
+			if (len == 0) return;
+			for (int i = 0; i < len; i++) {
+				JSONObject tmpJson = arr.getJSONObject(i);
+				String know = tmpJson.getString("id");
+				if (knowsResult.contains(know)) continue;
+				knowsResult.add(know);
+			}
+			String nextURL = json.getJSONObject("paging").getString("next");
+			findKnows(nextURL + "&access_token=", accessToken, knowsResult);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static String getProfileImage(String accessToken) {
