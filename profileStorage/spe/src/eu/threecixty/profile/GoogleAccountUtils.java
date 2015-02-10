@@ -36,6 +36,7 @@ public class GoogleAccountUtils {
 	public static String getUID(String accessToken) {
 		if (accessToken == null) return "";
 		String user_id = null;
+		String _3cixtyUID = null;
 		try {
 			/*
 			if (!accessToken.equals("")) { // TODO: remove after testing
@@ -85,7 +86,7 @@ public class GoogleAccountUtils {
 			
 			String picture = json.getString("picture");
 			
-			String _3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
+			_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
 			
 			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID);
 			profile.setHasUID(_3cixtyUID);
@@ -163,8 +164,8 @@ public class GoogleAccountUtils {
 			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 		}
-		if (user_id == null) return "";
-		return user_id;
+		if (_3cixtyUID == null) return "";
+		return _3cixtyUID;
 	}
 	
 	public static int getValidationTime(String accessToken) {
