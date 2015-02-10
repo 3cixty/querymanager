@@ -365,9 +365,13 @@ public class OAuthServices {
 	@GET
 	@Path("/redirect_uri")
 	public Response redirect_uri(@QueryParam("access_token_outside") String accessTokenFromOutside,
-			@DefaultValue("Google") @QueryParam("source") String source) {
+			@DefaultValue("Google") @QueryParam("source") String source, @QueryParam("key") String key) {
 		HttpSession session = httpRequest.getSession();
 		App app = (App) session.getAttribute(APP_KEY);
+		if (app== null) {
+		    app = OAuthWrappers.retrieveApp(key);
+		    session.setAttribute(OAuthServices.APP_KEY, app);
+		}
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Session is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)

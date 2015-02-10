@@ -13,8 +13,6 @@
 <body>
 <%
     String key = request.getParameter("key");
-    App app = OAuthWrappers.retrieveApp(key);
-    session.setAttribute(OAuthServices.APP_KEY, app);
 %>
 <script>
   var fbClicked = false;
