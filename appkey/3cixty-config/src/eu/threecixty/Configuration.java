@@ -63,6 +63,10 @@ public class Configuration {
 		return getProperty("VIRTUOSO_JDBC");
 	}
 	
+	public static String getFacebookAppID() {
+		return getProperty("FB_APP_ID");
+	}
+	
 	private static String getProperty(String key) {
 		if (props == null) load();
 		String purpose = props.getProperty("PURPOSE");
