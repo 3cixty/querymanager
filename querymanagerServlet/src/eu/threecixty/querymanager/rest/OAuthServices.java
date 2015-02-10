@@ -321,10 +321,15 @@ public class OAuthServices {
 	public Response auth(@QueryParam("key") String appkey) {
 		HttpSession session = httpRequest.getSession();
 		App app = (App) session.getAttribute(APP_KEY);
+		if (app == null) {
+			app = OAuthWrappers.retrieveApp(appkey);
+		}
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
+		
+		session.setAttribute(APP_KEY, app);
 		try {
 			//return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "auth.jsp")).build();
 			return Response.temporaryRedirect(new URI("https://accounts.google.com/o/oauth2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fplus.login&state=%2Fprofile&redirect_uri="
