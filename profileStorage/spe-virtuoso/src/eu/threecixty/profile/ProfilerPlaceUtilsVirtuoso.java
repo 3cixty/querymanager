@@ -28,6 +28,8 @@ public class ProfilerPlaceUtilsVirtuoso {
 	private static final String FROM_PLACE_RATINGS_GRAPH = "FROM <http://3cixty.com/placesRating>\n";
 	private static final String FROM_USERPROFILE_MANUAL_GRAPH = "FROM <http://3cixty.com/userprofile>\n";
 	
+	private static final int GOOGLE_PREFIX_LENGTH = Utils.GOOGLE_PREFIX.length();
+	
 	/**
 	 * Gets country name.
 	 *
@@ -157,8 +159,11 @@ public class ProfilerPlaceUtilsVirtuoso {
 	public static List <String> getPlaceIdsFromRating(String uID, float rating) throws TooManyConnections {
 		if (uID == null || uID.equals("")) return null;
 		
+		String googleUID = getGoogleUid(uID);
+		if (googleUID == null) return new ArrayList <String>();
+		
 		StringBuffer buffer = new StringBuffer(PREFIXES);
-
+		
 		buffer.append("SELECT  ?x \n");
 		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
 		buffer.append(FROM_PLACE_RATINGS_GRAPH);
@@ -168,7 +173,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("?review schema:reviewRating	?reviewRating .\n");
 		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
 		buffer.append("?review schema:creator ?creator . \n");
-		buffer.append("?creator schema:url " + getGoogleReviewCreator(uID) + ".\n");
+		buffer.append("?creator schema:url " + getGoogleReviewCreator(googleUID) + ".\n");
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
 		buffer.append("}");
 		
@@ -223,10 +228,12 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("FILTER(");
 		boolean first = true;
 		for (String friendUid: friendUids) {
+			String googleFriendUID = getGoogleUid(friendUid);
+			if (googleFriendUID == null) continue;
 			if (first) {
-				buffer.append("(?creatorURI = <https://plus.google.com/" + friendUid + ">)");
+				buffer.append("(?creatorURI = <https://plus.google.com/" + googleFriendUID + ">)");
 				first = false;
-			} else buffer.append("|| (?creatorURI = <https://plus.google.com/" + friendUid + ">)");
+			} else buffer.append("|| (?creatorURI = <https://plus.google.com/" + googleFriendUID + ">)");
 		}
 		buffer.append(")");
 		buffer.append("}");
@@ -328,6 +335,11 @@ public class ProfilerPlaceUtilsVirtuoso {
 	
 	private static String getPersonURI(String uid) {
 		return "<" + GetSetQueryStrings.PROFILE_URI + uid + ">";
+	}
+	
+	private static String getGoogleUid(String _3cixtyUID) {
+		if (!_3cixtyUID.startsWith(Utils.GOOGLE_PREFIX)) return null;
+		return _3cixtyUID.substring(GOOGLE_PREFIX_LENGTH);
 	}
 	
 	private ProfilerPlaceUtilsVirtuoso() {

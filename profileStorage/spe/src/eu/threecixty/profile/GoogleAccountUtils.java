@@ -122,7 +122,8 @@ public class GoogleAccountUtils {
 						int length=jsonArray.length();
 						for (int i = 0; i < length; i++) {
 							JSONObject jObject = jsonArray.getJSONObject(i);
-							knows.add(jObject.getString("id"));
+							String know3cixtyUID = Utils.gen3cixtyUID(jObject.getString("id"), Utils.UidSource.GOOGLE);
+							knows.add(know3cixtyUID);
 						}
 						reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
 								+ accessToken+"&pageToken="+nextPageToken);
@@ -134,14 +135,16 @@ public class GoogleAccountUtils {
 					int length=jsonArray.length();
 					for (int i = 0; i < length; i++) {
 						JSONObject jObject = jsonArray.getJSONObject(i);
-						knows.add(jObject.getString("id"));
+						String know3cixtyUID = Utils.gen3cixtyUID(jObject.getString("id"), Utils.UidSource.GOOGLE);
+						knows.add(know3cixtyUID);
 					}
 				}			
 				
 				// hack for Tony
-				if (user_id.equals("117895882057702509461")) {
-					if (!knows.contains("103411760688868522737")) { // does not know Animesh
-						knows.add("103411760688868522737");
+				if (user_id.contains("117895882057702509461")) {
+					String animeshGoogleUID = Utils.gen3cixtyUID("103411760688868522737", Utils.UidSource.GOOGLE);
+					if (!knows.contains(animeshGoogleUID)) { // does not know Animesh
+						knows.add(animeshGoogleUID);
 					}
 				}
 				

@@ -60,7 +60,7 @@ public class FaceBookAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			Utils.setProfileIdentities(_3cixtyUID, uid, "FaceBook", profileIdentities);
+			Utils.setProfileIdentities(_3cixtyUID, uid, "Facebook", profileIdentities);
 			
 			Set <String> knows = new HashSet <String>(); // always refresh 'knows'
 			
@@ -91,7 +91,7 @@ public class FaceBookAccountUtils {
 			if (len == 0) return;
 			for (int i = 0; i < len; i++) {
 				JSONObject tmpJson = arr.getJSONObject(i);
-				String know = tmpJson.getString("id");
+				String know = Utils.gen3cixtyUID(tmpJson.getString("id"), Utils.UidSource.FACEBOOK);
 				if (knowsResult.contains(know)) continue;
 				knowsResult.add(know);
 			}
