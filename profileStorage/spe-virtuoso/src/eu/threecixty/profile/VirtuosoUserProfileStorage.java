@@ -22,7 +22,6 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import eu.threecixty.Configuration;
-import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
 public class VirtuosoUserProfileStorage {
 	
@@ -204,15 +203,6 @@ public class VirtuosoUserProfileStorage {
 			//VirtuosoManager.getInstance().createAccount(uid);
 			String insertQuery = GetSetQueryStrings.setUser(uid);
 			queries.add(insertQuery);
-            
-            eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
-            profileIdentities.setHasSourceCarrier("Google");
-            profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+uid+"/Account/"+profileIdentities.getHasSourceCarrier());
-            profileIdentities.setHasUserAccountID(uid);
-            profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
-            String str=GetSetQueryStrings.setProfileIdentities(uid, profileIdentities);
-            
-            queries.add(str);
 		}
 	}
 
@@ -240,24 +230,12 @@ public class VirtuosoUserProfileStorage {
 
 			ResultSet results = qRC.getReturnedResultSet();
 			if (!results.hasNext()){
-				//for ( ; results.hasNext(); ) {
-				//QuerySolution qs = results.next();
+
 				try {
 
-					//RDFNode uri = qs.get("uri");
-
-					//if (uri==null){
 					str=GetSetQueryStrings.setUser(know);
 					queriesToInsertData.add(str);
-					eu.threecixty.profile.oldmodels.ProfileIdentities profileIdentities=new eu.threecixty.profile.oldmodels.ProfileIdentities();
-					profileIdentities.setHasSourceCarrier("Google");
-					profileIdentities.setHasProfileIdentitiesURI(PROFILE_URI+know+"/Account/"+profileIdentities.getHasSourceCarrier());
-					profileIdentities.setHasUserAccountID(know);
-					profileIdentities.setHasUserInteractionMode(UserInteractionMode.Active);
-					str=GetSetQueryStrings.setProfileIdentities(know, profileIdentities);
-					
-					queriesToInsertData.add(str);
-					//}
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
