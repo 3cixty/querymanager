@@ -202,7 +202,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 				try {
 				    ok = hasElement(sb, numberOfOrders);
 				} catch (JSONException e) { // check if there are some backslashes
-					String newString = sb.toString().replace("\\","\\\\");
+					String newString = sb.toString().replace("\\U", "\\u");
+					newString = newString.replace("\\","\\\\");
 					newString = newString.replace("\\\\\"", "\\\\\\\"");
 					if (DEBUG_MOD) LOGGER.info(newString);
 					sb.setLength(0);
