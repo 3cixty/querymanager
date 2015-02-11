@@ -225,17 +225,23 @@ public class ProfilerPlaceUtilsVirtuoso {
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
 //		buffer.append("FILTER(fn:ends-with(STR(?creatorURI), fn:substring(STR(?knows), "
 //		        + GetSetQueryStrings.PROFILE_URI.length() + "))) \n");
-		buffer.append("FILTER(");
+		
+		StringBuilder tmpBuilder = new StringBuilder();
 		boolean first = true;
 		for (String friendUid: friendUids) {
 			String googleFriendUID = getGoogleUid(friendUid);
 			if (googleFriendUID == null) continue;
 			if (first) {
-				buffer.append("(?creatorURI = <https://plus.google.com/" + googleFriendUID + ">)");
+				tmpBuilder.append("(?creatorURI = <https://plus.google.com/" + googleFriendUID + ">)");
 				first = false;
-			} else buffer.append("|| (?creatorURI = <https://plus.google.com/" + googleFriendUID + ">)");
+			} else tmpBuilder.append("|| (?creatorURI = <https://plus.google.com/" + googleFriendUID + ">)");
 		}
-		buffer.append(")");
+		if (!first) {
+		    buffer.append("FILTER(").append(tmpBuilder.toString());
+		    buffer.append(")");
+		} else { // all friends are facebook UIDs
+			return null;
+		}
 		buffer.append("}");
 
 	    return getPlaceIdsFromQuery(buffer.toString());
