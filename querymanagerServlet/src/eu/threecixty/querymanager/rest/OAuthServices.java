@@ -87,41 +87,28 @@ public class OAuthServices {
 	@Path("/getAccessToken")
 	public Response getAccessToken(@HeaderParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey,
 			@DefaultValue("") @HeaderParam("scope") String scope) {
-		String uid = GoogleAccountUtils.getUID(g_access_token);
-		if (uid == null || uid.equals(""))
+		String _3cixtyUid = GoogleAccountUtils.getUID(g_access_token);
+		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 
-		if (!checkValidScope(scope)) {
+		return getAccessTokenFromUid(_3cixtyUid, appkey, scope);
+	}
+	
+	@GET
+	@Path("/getAccessTokenForFB")
+	public Response getAccessTokenForFB(@HeaderParam("fb_access_token") String fb_access_token, @HeaderParam("key") String appkey,
+			@DefaultValue("") @HeaderParam("scope") String scope) {
+		String _3cixtyUid = FaceBookAccountUtils.getUID(fb_access_token);
+		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
-			        .entity(" {\"response\": \"failed\", \"reason\": \"Scope is invalid\"} ")
-			        .type(MediaType.APPLICATION_JSON_TYPE)
-			        .build();
-		}
-		App app = OAuthWrappers.retrieveApp(appkey);
-		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Facebook access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		AccessToken accessToken = OAuthWrappers.createAccessTokenForMobileApp(app, scope);
-		if (accessToken == null) {
-			return Response.status(Response.Status.BAD_REQUEST)
-	        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
-	        .type(MediaType.APPLICATION_JSON_TYPE)
-	        .build();
-		}
-		// scope can be a 'null' string as its result is found in 3cixtycallback
-		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken.getAccess_token(), accessToken.getRefresh_token(), scope, app)) {
-			return Response.status(Response.Status.BAD_REQUEST)
-			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
-			        .type(MediaType.APPLICATION_JSON_TYPE)
-			        .build();
-		}
-		Gson gson = new Gson();
-		return Response.status(Response.Status.OK).entity(
-				gson.toJson(accessToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
+
+		return getAccessTokenFromUid(_3cixtyUid, appkey, scope);
 	}
 
 	@GET
@@ -480,6 +467,39 @@ public class OAuthServices {
 		}
 		return null;
 	}
+	
+	
+	private Response getAccessTokenFromUid(String _3cixtyUID, String appkey, String scope) {
+		if (!checkValidScope(scope)) {
+			return Response.status(Response.Status.BAD_REQUEST)
+			        .entity(" {\"response\": \"failed\", \"reason\": \"Scope is invalid\"} ")
+			        .type(MediaType.APPLICATION_JSON_TYPE)
+			        .build();
+		}
+		App app = OAuthWrappers.retrieveApp(appkey);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		AccessToken accessToken = OAuthWrappers.createAccessTokenForMobileApp(app, scope);
+		if (accessToken == null) {
+			return Response.status(Response.Status.BAD_REQUEST)
+	        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
+	        .type(MediaType.APPLICATION_JSON_TYPE)
+	        .build();
+		}
+		// scope can be a 'null' string as its result is found in 3cixtycallback
+		if (!OAuthWrappers.storeAccessTokenWithUID(_3cixtyUID, accessToken.getAccess_token(), accessToken.getRefresh_token(), scope, app)) {
+			return Response.status(Response.Status.BAD_REQUEST)
+			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
+			        .type(MediaType.APPLICATION_JSON_TYPE)
+			        .build();
+		}
+		Gson gson = new Gson();
+		return Response.status(Response.Status.OK).entity(
+				gson.toJson(accessToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
+	}
+	
 
 	private String join(List<String> scopeNames, String strJoined) {
 		if (scopeNames.size() == 0) return "null";
