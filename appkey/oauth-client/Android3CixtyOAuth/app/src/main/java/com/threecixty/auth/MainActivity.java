@@ -3,14 +3,22 @@ package com.threecixty.auth;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.facebook.Session;
+import com.facebook.SessionState;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -19,8 +27,11 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
 	public static final int THREE_CIXTY_PERMISSION_REQUEST = 200;
 	public static final int GOOGLE_PERMISSION_REQUEST = 1000;
@@ -36,10 +47,14 @@ public class MainActivity extends Activity {
 	
 	private String accessToken;
     private String accountName;
-	
+
+    private Session.StatusCallback statusCallback =
+            new SessionStatusCallback();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_main);
 		
 		Intent callerIntent = getIntent();
@@ -50,6 +65,9 @@ public class MainActivity extends Activity {
 		if (callerIntent.hasExtra(EXTRA_TOKEN_KEY)) accessToken = callerIntent.getStringExtra(EXTRA_TOKEN_KEY);
 		
 		final Button cmdLogin = (Button) findViewById(R.id.login);
+        final Button cmdSignInToFb= (Button) findViewById(R.id.sign_in_to_fb);
+
+
 		if (appkey != null) { // get 3Cixty token
 
             AsyncTask <Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
@@ -67,7 +85,7 @@ public class MainActivity extends Activity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (JSONException e) {
-                        e.printStackTrace();;
+                        e.printStackTrace();
                     }
                     return null;
                 }
@@ -84,8 +102,24 @@ public class MainActivity extends Activity {
                                     goWithAskingForPermission();
                                 }
                             });
+                            cmdSignInToFb.setOnClickListener(new View.OnClickListener() {
+
+                                @Override
+                                public void onClick(View v) {
+
+                                    Session session = Session.getActiveSession();
+                                    if (session != null && !session.isOpened() && !session.isClosed()) {
+                                        session.openForRead(new Session.OpenRequest(MainActivity.this)
+                                                .setPermissions(Arrays.asList("public_profile"))
+                                                .setCallback(statusCallback));
+                                    } else {
+                                        Session.openActiveSession(MainActivity.this, true, statusCallback);
+                                    }
+                                }
+                            });
                         } else {
                             cmdLogin.setEnabled(false);
+                            cmdSignInToFb.setEnabled(false);
                             TokenInfo tokenInfo = OAuthManager.getInstance().getToken(MainActivity.this, appid);
                             if (OAuthManager.getInstance().hasValidToken(tokenInfo)) {
                                 quitOAuthActivity(tokenInfo);
@@ -115,7 +149,7 @@ public class MainActivity extends Activity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (JSONException e) {
-                        e.printStackTrace();;
+                        e.printStackTrace();
                     }
                     return null;
                 }
@@ -131,8 +165,11 @@ public class MainActivity extends Activity {
                 }
             };
             task.execute();
-
 		}
+
+
+
+        printKeyHash(this);
 	}
 	
 	@Override
@@ -188,7 +225,7 @@ public class MainActivity extends Activity {
 
     protected String getContent(URLConnection conn) throws IOException {
         byte[] bytes = new byte[1024];
-        int readBytes = 0;
+        int readBytes;
         InputStream input = conn.getInputStream();
         StringBuilder builder = new StringBuilder();
         while ((readBytes = input.read(bytes)) >= 0) {
@@ -215,4 +252,61 @@ public class MainActivity extends Activity {
 		}
 		
 	}
+
+
+    public static String printKeyHash(Activity context) {
+        PackageInfo packageInfo;
+        String key = null;
+        try {
+            //getting application package name, as defined in manifest
+            String packageName = context.getApplicationContext().getPackageName();
+
+            //Retriving package info
+            packageInfo = context.getPackageManager().getPackageInfo(packageName,
+                    PackageManager.GET_SIGNATURES);
+
+            Log.e("Package Name=", context.getApplicationContext().getPackageName());
+
+            for (Signature signature : packageInfo.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                key = new String(Base64.encode(md.digest(), 0));
+
+                // String key = new String(Base64.encodeBytes(md.digest()));
+                Log.e("Key Hash=", key);
+            }
+        } catch (PackageManager.NameNotFoundException e1) {
+            Log.e("Name not found", e1.toString());
+        }
+        catch (NoSuchAlgorithmException e) {
+            Log.e("No such an algorithm", e.toString());
+        } catch (Exception e) {
+            Log.e("Exception", e.toString());
+        }
+
+        return key;
+    }
+
+
+    private class SessionStatusCallback implements Session.StatusCallback {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            if (state.isOpened()) {
+
+                ScopesActivity.setAppkey(appkey);
+                ScopesActivity.setAppName(appName);
+                ScopesActivity.setCallback(new CallbackImpl());
+                ScopesActivity.setToken(session.getAccessToken());
+                ScopesActivity.setAppid(appid);
+                ScopesActivity.setTokenSource(ThreeCixtyAccessTokenTask.FACEBOOK_SOURCE);
+                Intent intent = new Intent(MainActivity.this, ScopesActivity.class);
+                startActivityForResult(intent, MainActivity.THREE_CIXTY_PERMISSION_REQUEST);
+
+                Log.i("auth", "Logged in...");
+                System.out.println(session.getAccessToken());
+            } else if (state.isClosed()) {
+                Log.i("auth", "Logged out...");
+            }
+        }
+    }
 }

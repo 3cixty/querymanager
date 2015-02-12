@@ -23,12 +23,14 @@ import android.os.AsyncTask;
 public abstract class ThreeCixtyAbstractTask extends AsyncTask<Void, Void, Void> {
 
 	protected static final String SERVER = "https://api.3cixty.com";
+    protected static final String SERVLET_CONTEXT = "v2";
 
-	protected static final String OAUTH_ANDROID_SERVICE = SERVER + "/v2/getAccessToken";
-	protected static final String REFRESH_OAUTH_SERVICE = SERVER + "/v2/token";
+	protected static final String OAUTH_ANDROID_SERVICE = SERVER + "/" + SERVLET_CONTEXT + "/getAccessToken"; // for Google access token
+    protected static final String OAUTH_ANDROID_SERVICE_FB = SERVER + "/" + SERVLET_CONTEXT + "/getAccessTokenForFB"; // for Facebook access token
+	protected static final String REFRESH_OAUTH_SERVICE = SERVER + "/" + SERVLET_CONTEXT + "/token";
 
-    protected static final String GET_KEY_INFO_SERVICE_FROM_APPKEY = SERVER + "/v2/retrieveKeyInfo";
-    protected static final String GET_KEY_INFO_SERVICE_FROM_ACCESS_TOKEN = SERVER + "/v2/retrieveKeyInfoFromAccessToken";
+    protected static final String GET_KEY_INFO_SERVICE_FROM_APPKEY = SERVER + "/" + SERVLET_CONTEXT + "/retrieveKeyInfo";
+    protected static final String GET_KEY_INFO_SERVICE_FROM_ACCESS_TOKEN = SERVER + "/" + SERVLET_CONTEXT + "/retrieveKeyInfoFromAccessToken";
 
 	protected static URLConnection getUrlConnection(String urlStr, Context context) {
 

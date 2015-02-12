@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">3Cixty Auth</string>
+    <string name="app_name">3cixty Auth</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello World!</string>
-    <string name="title_activity_scopes">3Cixty scopes</string>
-    <string name="title_activity_main">3Cixty Auth</string>
-
+    <string name="title_activity_scopes">3cixty scopes</string>
+    <string name="title_activity_main">3cixty auth</string>
+    <string name="facebook_app_id">844981388908686</string>
 </resources>

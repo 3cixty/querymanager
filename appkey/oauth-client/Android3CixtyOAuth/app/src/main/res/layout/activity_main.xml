@@ -10,8 +10,23 @@
     android:orientation="vertical">
 
     <TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:text="3Cixty platform uses Google account to verify the user!!!" />
+        android:text="3cixty platform uses Google or Facebook account to verify the user!!!" />
 
     <Button android:layout_width="wrap_content" android:layout_height="wrap_content" 
-        android:text="Login to 3Cixty platform" android:id="@+id/login"/>
+        android:text="Sign in to Google" android:id="@+id/login" android:layout_gravity="center_horizontal" />
+<!--
+    <com.facebook.widget.LoginButton
+        xmlns:fb="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/authButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        fb:login_text="Sign in to Facebook"
+        />
+        -->
+
+
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Sign in to Facebook" android:id="@+id/sign_in_to_fb" android:layout_gravity="center_horizontal" />
 </LinearLayout>

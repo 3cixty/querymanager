@@ -61,8 +61,9 @@ public class GoogleAuthTask extends AsyncTask<Void, Void, Void> {
 			ScopesActivity.setAppkey(appkey);
 			ScopesActivity.setAppName(appName);
 			ScopesActivity.setCallback(callback);
-			ScopesActivity.setGoogleToken(token);
+			ScopesActivity.setToken(token);
             ScopesActivity.setAppid(appId);
+            ScopesActivity.setTokenSource(ThreeCixtyAccessTokenTask.GOOGLE_SOURCE);
 			Intent intent = new Intent(context, ScopesActivity.class);
 			context.startActivityForResult(intent, MainActivity.THREE_CIXTY_PERMISSION_REQUEST);
 		} else {
