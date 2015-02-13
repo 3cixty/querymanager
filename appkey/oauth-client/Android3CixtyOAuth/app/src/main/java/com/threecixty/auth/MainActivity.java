@@ -195,6 +195,8 @@ public class MainActivity extends FragmentActivity {
             }
         }
 
+        Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+
 	}
 
 	private void goWithAskingForPermission() {
