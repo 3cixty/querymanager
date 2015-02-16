@@ -22,6 +22,9 @@ public class OAuthModelsUtils {
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 OAuthModelsUtils.class.getName());
+	 
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	protected static boolean addUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
@@ -105,6 +108,7 @@ public class OAuthModelsUtils {
 
 	protected static boolean addDeveloper(String uid) {
 		if (isNullOrEmpty(uid)) return false;
+		if (DEBUG_MOD) LOGGER.info("developer UID = " + uid);
 		Session session = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
