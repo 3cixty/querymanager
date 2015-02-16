@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -19,10 +20,14 @@ import eu.threecixty.oauth.model.UserAccessToken;
 
 public class OAuthModelsUtils {
 	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 OAuthModelsUtils.class.getName());
+	
 	protected static boolean addUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
 			User user = new User();
@@ -35,14 +40,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 	
 	protected static boolean existUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM User U WHERE U.uid = ? AND U.class = '" + User.class.getSimpleName() + "'";
 			Query query = session.createQuery(hql);
@@ -50,14 +58,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return results.size() > 0;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static User getUser(String uid) {
 		if (isNullOrEmpty(uid)) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM User U WHERE U.uid = ? AND U.class ='" + User.class.getSimpleName() + "'";
 			Query query = session.createQuery(hql);
@@ -65,6 +76,8 @@ public class OAuthModelsUtils {
 			session.close();
 			if (results.size() > 0) return (User) results.get(0);
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 		return null;
@@ -72,8 +85,9 @@ public class OAuthModelsUtils {
 
 	protected static boolean saveOrUpdate(User user) {
 		if (user == null) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
 
@@ -83,14 +97,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean addDeveloper(String uid) {
 		if (isNullOrEmpty(uid)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
 			Developer developer = new Developer();
@@ -103,14 +120,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean existDeveloper(String uid) {
 		if (isNullOrEmpty(uid)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM Developer D WHERE D.uid  = ? AND D.class = '"
 			        + Developer.class.getSimpleName() + "' ";
@@ -119,14 +139,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return results.size() > 0;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 	
 	protected static Developer getDeveloper(String uid) {
 		if (isNullOrEmpty(uid)) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM Developer D WHERE D.uid = ? AND D.class = '"
 			        + Developer.class.getSimpleName() + "' ";
@@ -135,6 +158,8 @@ public class OAuthModelsUtils {
 			session.close();
 			if (results.size() > 0) return (Developer) results.get(0);
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 		return null;
@@ -142,8 +167,9 @@ public class OAuthModelsUtils {
 
 	protected static boolean saveOrUpdate(Developer developer) {
 		if (developer == null) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
 
@@ -153,14 +179,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 	
 	protected static boolean addScope(String scopeName, String description) {
 		if (isNullOrEmpty(scopeName) || isNullOrEmpty(description)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
 			Scope scope = new Scope();
@@ -174,14 +203,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean existScope(String scopeName) {
 		if (isNullOrEmpty(scopeName)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM Scope S WHERE S.scopeName = ?";
 			Query query = session.createQuery(hql);
@@ -189,14 +221,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return results.size() > 0;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean deleteScope(String scopeName) {
 		if (isNullOrEmpty(scopeName)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM Scope S WHERE S.scopeName = ?";
 			Query query = session.createQuery(hql);
@@ -211,14 +246,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static List <Scope> listScopes() {
 		List <Scope> scopes = new ArrayList <Scope>();
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM Scope";
 			Query query = session.createQuery(hql);
@@ -229,14 +267,17 @@ public class OAuthModelsUtils {
 			}
 			session.close();
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 		}
 		return scopes;
 	}
 
 	protected static Scope getScope(String scopeName) {
 		if (isNullOrEmpty(scopeName)) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM Scope S WHERE S.scopeName = ?";
 			Query query = session.createQuery(hql);
@@ -245,7 +286,8 @@ public class OAuthModelsUtils {
 			if (results.size() == 0) return null;
 			return (Scope) results.get(0);
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
@@ -264,11 +306,12 @@ public class OAuthModelsUtils {
 			String category, Developer developer, List<String> scopeNames, String redirect_uri) {
 		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
+		Session session = null;
 		try {
 			Set <Scope> scopes = OAuthModelsUtils.getScopes(scopeNames);
 			if (scopes.size() == 0) return false;
 			
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
 
@@ -290,19 +333,20 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean updateApp(String uid, String appid, String appname, String description,
 			String category, List<String> scopeNames, String redirect_uri, String thumbNail) {
-		
+		Session session = null;
 		try {
 			Developer developer = getDeveloper(uid);
 			if (developer == null) return false;
 
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM App A WHERE A.developer = ? AND A.appNameSpace = ?";
 			Query query = session.createQuery(hql);
@@ -341,15 +385,17 @@ public class OAuthModelsUtils {
 			
 			return true;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean deleteApp(App app) {
 		if (app == null) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			session.beginTransaction();
 
@@ -362,14 +408,17 @@ public class OAuthModelsUtils {
 			
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean existApp(String key) {
 		if (isNullOrEmpty(key)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM App A WHERE A.key = ?";
 			Query query = session.createQuery(hql);
@@ -379,15 +428,17 @@ public class OAuthModelsUtils {
 			
 			return results.size() > 0;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static App getApp(String key) {
 		if (isNullOrEmpty(key)) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM App A WHERE A.key = :key";
 			Query query = session.createQuery(hql);
@@ -396,18 +447,20 @@ public class OAuthModelsUtils {
 			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
 
 	protected static List <App> getApps(String uid) {
 		List <App> apps = new ArrayList <App>();
+		Session session = null;
 		try {
 			Developer developer = getDeveloper(uid);
 			if (developer == null) return apps;
 
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM App A WHERE A.developer = ? ";
 			Query query = session.createQuery(hql);
@@ -418,18 +471,20 @@ public class OAuthModelsUtils {
 				apps.add((App) obj);
 			}
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 		}
 		return apps;
 	}
 
 	protected static App retrieveApp(String uid, String appid) {
 		if (isNullOrEmpty(appid)) return null;
+		Session session = null;
 		try {
 			Developer developer = OAuthModelsUtils.getDeveloper(uid);
 			if (developer == null) return null;
 			
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 			
 			String hql = "FROM App A WHERE A.developer = ? AND A.appNameSpace = ?";
 			Query query = session.createQuery(hql);
@@ -439,6 +494,8 @@ public class OAuthModelsUtils {
 			if (results.size() == 0) return null;
 			return (App) results.get(0);
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
@@ -446,8 +503,9 @@ public class OAuthModelsUtils {
 	protected static Set <Scope> getScopes(App app) {
 		if (app == null) return null;
 		Set <Scope> scopes = new HashSet <Scope>();
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM App A WHERE A.id = :id";
 			Query query = session.createQuery(hql);
@@ -463,7 +521,8 @@ public class OAuthModelsUtils {
 			session.close();
 			return scopes;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
@@ -471,9 +530,10 @@ public class OAuthModelsUtils {
 	protected static boolean addUserAccessToken(String accessToken, String refreshToken,
 			String scope, User user, App app) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
+		Session session = null;
 		try {
 			
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			UserAccessToken userAccessToken = new UserAccessToken();
 			userAccessToken.setAccessToken(accessToken);
@@ -491,15 +551,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
-			e.getStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 	
 	protected static boolean saveOrUpdateUserAccessToken(AccessToken lastAccessToken, AccessToken newAccessToken) {
 		if (lastAccessToken == null || newAccessToken == null) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
 			Query query = session.createQuery(hql);
@@ -522,14 +584,16 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 	
 	protected static boolean deleteUserAccessToken(String accessToken) {
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
 			Query query = session.createQuery(hql);
@@ -547,14 +611,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return true;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static boolean existUserAccessToken(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
 			Query query = session.createQuery(hql);
@@ -562,14 +629,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return results.size() > 0;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static String findGoogleUIDFromAccessToken(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
 			Query query = session.createQuery(hql);
@@ -582,14 +652,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return uid;
 		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
 	
 	protected static AccessToken findTokenInfoFromDB(User user, App app) {
 		if (user == null || app == null) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.user = ? AND U.app = ?";
 			Query query = session.createQuery(hql);
@@ -609,15 +682,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return ac;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
 
 	protected static boolean retrieveUserAccessTokenViaRefreshToken(String refreshToken) {
 		if (isNullOrEmpty(refreshToken)) return false;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
 			Query query = session.createQuery(hql);
@@ -625,15 +700,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return results.size() > 0;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return false;
 		}
 	}
 
 	protected static AccessToken findTokenInfoFromRefreshToken(String refreshToken) {
 		if (isNullOrEmpty(refreshToken)) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.refreshToken = ?";
 			Query query = session.createQuery(hql);
@@ -653,15 +730,17 @@ public class OAuthModelsUtils {
 			session.close();
 			return ac;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
 
 	protected static AccessToken findTokenInfoFromAccessToken(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return null;
+		Session session = null;
 		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
 			Query query = session.createQuery(hql);
@@ -684,7 +763,8 @@ public class OAuthModelsUtils {
 			session.close();
 			return ac;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
 			return null;
 		}
 	}
