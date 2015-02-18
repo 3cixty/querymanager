@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
@@ -71,10 +72,10 @@ public class TrayServices {
     public Response invokeTrayServices(InputStream input, @Context Request req) {
     	long starttime = System.currentTimeMillis();
     	String restTrayStr = getRestTrayString(input);
-		Gson gson = new Gson();
 		RestTrayObject restTray = null;
 		if (restTrayStr != null) {
 			try {
+				Gson gson = new Gson();
 				restTray = gson.fromJson(restTrayStr, RestTrayObject.class);
 			} catch (Exception e) {}
 		}
@@ -110,7 +111,7 @@ public class TrayServices {
 					         //Set max age to one day
 					         cc.setMaxAge(86400);
     						if (rb == null) { // changed
-    							String content = gson.toJson(trays);
+    							String content = JSONObject.wrap(trays).toString();
     							
     							if (DEBUG_MOD) LOGGER.info(content);
     							
@@ -131,7 +132,7 @@ public class TrayServices {
     						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.FAILED);
     						return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
     					} else {
-    						String content = gson.toJson(trays);
+    						String content = JSONObject.wrap(trays).toString();
     						CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_LOGIN_SERVICE, CallLoggingConstants.SUCCESSFUL);
     						return Response.status(Response.Status.OK)
     								.entity(content)
@@ -151,7 +152,7 @@ public class TrayServices {
     					}
     					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.SUCCESSFUL);
     				} else if (GET_ACTION_IN_DETAILS.equalsIgnoreCase(action)) {
-    					return get_tray_elements_details(restTray, req, starttime, gson);
+    					return get_tray_elements_details(restTray, req, starttime);
     				} else {
     					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
     					return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
@@ -378,7 +379,7 @@ public class TrayServices {
 		return ProfileManagerImpl.getInstance().getTrayManager().updateTray(tray);
 	}
 	
-	private Response get_tray_elements_details(RestTrayObject restTray, Request req, long starttime, Gson gson)
+	private Response get_tray_elements_details(RestTrayObject restTray, Request req, long starttime)
 			throws ThreeCixtyPermissionException, InvalidTrayElement, TooManyConnections {
 		List <Tray> trays = getTrayElements(restTray);
 		if (trays == null) {
@@ -401,7 +402,7 @@ public class TrayServices {
 				} catch (IOException e) {
 					throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 				}
-				String content = gson.toJson(trayDetailsList);
+				String content = JSONObject.wrap(trayDetailsList).toString();
 				
 				if (DEBUG_MOD) LOGGER.info(content);
 				
