@@ -134,7 +134,7 @@ public class ElementDetailsUtils {
 		ElementPoIDetails tmpPoIDetails = null;
 		for (int i = 0; i  < len; i++) {
 			JSONObject tmpObj = jsonArrs.getJSONObject(i);
-			String currentId = tmpObj.getString("poi");
+			String currentId = tmpObj.get("poi").toString();
 			if (currentId == null) continue;
 			if (!currentId.equals(oldPoiId)) { // new one
 				tmpPoIDetails = createPoIDetails(tmpObj);
