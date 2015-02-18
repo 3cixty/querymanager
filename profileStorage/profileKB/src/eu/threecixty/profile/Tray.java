@@ -22,69 +22,20 @@ public class Tray {
 	
 	private String image_url;
 	
-	public String getItemId() {
+	public String getElement_id() {
 		return element_id;
 	}
 
-	public void setItemId(String itemId) {
-		this.element_id = itemId;
+	public void setElement_id(String element_id) {
+		this.element_id = element_id;
 	}
 
-	public String getItemType() {
+	public String getElement_type() {
 		return element_type;
 	}
 
-	public void setItemType(String itemType) {
-		this.element_type = itemType;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	public String getUid() {
-		return token;
-	}
-
-	public void setUid(String uid) {
-		this.token = uid;
-	}
-	
-	
-	public String getSource() {
-		return source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public boolean isAttended() {
-		return attend;
-	}
-
-	public void setAttended(boolean attended) {
-		this.attend = attended;
-	}
-
-	public String getDateTimeAttended() {
-		return attend_datetime;
-	}
-
-	public void setDateTimeAttended(String dateTimeAttended) {
-		this.attend_datetime = dateTimeAttended;
-	}
-
-	public int getRating() {
-		return rating;
-	}
-
-	public void setRating(int rating) {
-		this.rating = rating;
+	public void setElement_type(String element_type) {
+		this.element_type = element_type;
 	}
 
 	public String getElement_title() {
@@ -95,6 +46,54 @@ public class Tray {
 		this.element_title = element_title;
 	}
 
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public boolean isAttend() {
+		return attend;
+	}
+
+	public void setAttend(boolean attend) {
+		this.attend = attend;
+	}
+
+	public String getAttend_datetime() {
+		return attend_datetime;
+	}
+
+	public void setAttend_datetime(String attend_datetime) {
+		this.attend_datetime = attend_datetime;
+	}
+
+	public int getRating() {
+		return rating;
+	}
+
+	public void setRating(int rating) {
+		this.rating = rating;
+	}
+
 	public String getImage_url() {
 		return image_url;
 	}
@@ -102,7 +101,7 @@ public class Tray {
 	public void setImage_url(String image_url) {
 		this.image_url = image_url;
 	}
-	
+
 	public enum OrderType {
 		Desc, Asc
 	}
