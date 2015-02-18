@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.POST;
@@ -17,19 +19,21 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-
 import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.ElementDetails;
+import eu.threecixty.profile.ElementDetailsUtils;
 import eu.threecixty.profile.InvalidTrayElement;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.Tray.OrderType;
+import eu.threecixty.profile.VirtuosoManager;
 
 /**
  * This class is an end point to expose Rest TrayAPIs to other components.
@@ -42,9 +46,13 @@ public class TrayServices {
 	
 	private static final String ADD_ACTION = "add_tray_element";
 	private static final String GET_ACTION = "get_tray_elements";
+	private static final String GET_ACTION_IN_DETAILS = "get_tray_elements_in_details";
 	private static final String LOGIN_ACTION = "login_tray";
 	private static final String EMPTY_ACTION = "empty_tray";
 	private static final String UPDATE_ACTION = "update_tray_element";
+	
+	private static final String EVENT_TYPE = "Event";
+	private static final String POI_TYPE = "Poi";
 
 	
 	private static final String ADD_EXCEPTION_MSG = "Invalid parameters or duplicated tray items";
@@ -131,6 +139,8 @@ public class TrayServices {
     						return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
     					}
     					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_UPDATE_SERVICE, CallLoggingConstants.SUCCESSFUL);
+    				} else if (GET_ACTION_IN_DETAILS.equalsIgnoreCase(action)) {
+    					return get_tray_elements_details(restTray, req, starttime, gson);
     				} else {
     					CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
     					return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
@@ -357,6 +367,58 @@ public class TrayServices {
 		return ProfileManagerImpl.getInstance().getTrayManager().updateTray(tray);
 	}
 	
+	private Response get_tray_elements_details(RestTrayObject restTray, Request req, long starttime, Gson gson)
+			throws ThreeCixtyPermissionException, InvalidTrayElement, TooManyConnections {
+		List <Tray> trays = getTrayElements(restTray);
+		if (trays == null) {
+			CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
+			return createResponseException(INVALID_PARAMS_EXCEPTION_MSG);
+		} else {
+			long newestTimestamp = getNewestTimestamp(trays);
+			EntityTag etag = new EntityTag(Long.valueOf(newestTimestamp).hashCode() + "");
+			Response.ResponseBuilder rb = null;
+	        //Verify if it matched with etag available in http request
+	        rb = req.evaluatePreconditions(etag);
+	        //Create cache control header
+	         CacheControl cc = new CacheControl();
+	         //Set max age to one day
+	         cc.setMaxAge(86400);
+			if (rb == null) { // changed
+				List <ElementDetails> trayDetailsList = new ArrayList <ElementDetails>();
+				try {
+					findTrayDetails(trays, trayDetailsList);
+				} catch (IOException e) {
+					throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
+				}
+				String content = gson.toJson(trayDetailsList);
+				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.status(Response.Status.OK)
+						.entity(content)
+						.type(MediaType.APPLICATION_JSON_TYPE)
+						.cacheControl(cc)
+						.tag(etag)
+						.build();
+			} else {
+				return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
+			}
+		}
+	}
+	
+	private void findTrayDetails(List<Tray> trays,
+			List<ElementDetails> trayDetailsList) throws IOException {
+		List <String> eventIds = new LinkedList <String>();
+		List <String> poiIds = new LinkedList <String>();
+		for (Tray tray: trays) {
+			if (tray.getItemType().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getItemId());
+			else if (tray.getItemType().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getItemId());
+		}
+
+		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
+		if (elementEventsDetails != null) trayDetailsList.addAll(elementEventsDetails);
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
+		if (elementPoIsDetails != null) trayDetailsList.addAll(elementPoIsDetails);
+	}
+
 	private long getNewestTimestamp(List <Tray> trays) {
 		long ret = -1;
 		if (trays == null ||trays.size() == 0) return ret;
