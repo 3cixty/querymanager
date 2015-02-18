@@ -235,8 +235,8 @@ public class TrayServices {
 		String element_title = restTray.getElement_title();
 		
 		Tray tray = new Tray();
-		tray.setItemId(itemId);
-		tray.setItemType(itemTypeStr);
+		tray.setElement_id(itemId);
+		tray.setElement_type(itemTypeStr);
 		tray.setSource(source);
 		tray.setTimestamp(System.currentTimeMillis());
 		tray.setElement_title(element_title);
@@ -244,13 +244,13 @@ public class TrayServices {
 		
 		String uid = OAuthWrappers.findGoogleUIDFrom(token);
 		if (uid == null || uid.equals("")) {
-			tray.setUid(token);
+			tray.setToken(token);
 		} else {
 			if (uid != null && !"".equals(uid)) {
 				// check user permission
 				checkPermission(token);
 			}
-			tray.setUid(uid);
+			tray.setToken(uid);
 		}
 		return ProfileManagerImpl.getInstance().getTrayManager().addTray(tray);
 	}
@@ -335,10 +335,10 @@ public class TrayServices {
 		
 		Tray tray = ProfileManagerImpl.getInstance().getTrayManager().getTray((uid == null || uid.equals("")) ? token : uid, itemId);
 		if (tray == null) return false;
-		tray.setItemId(itemId);
+		tray.setElement_id(itemId);
 		
 		String itemTypeStr = restTray.getElement_type();
-		if (itemTypeStr != null) tray.setItemType(itemTypeStr);
+		if (itemTypeStr != null) tray.setElement_type(itemTypeStr);
 		
 		String source = restTray.getSource();
 		if (source != null) tray.setSource(source);
@@ -347,7 +347,7 @@ public class TrayServices {
 		if (element_title != null) tray.setElement_title(element_title);
 
 		tray.setTimestamp(System.currentTimeMillis());
-		tray.setUid((uid == null || uid.equals("")) ? token : uid);
+		tray.setToken((uid == null || uid.equals("")) ? token : uid);
 
 		
 		if (restTray.getDelete() != null && restTray.getDelete().booleanValue()) {
@@ -367,10 +367,10 @@ public class TrayServices {
 				e.printStackTrace();
 			}
 			if (!okDatetime) return false;
-			tray.setDateTimeAttended(datetimeAttendedStr);
+			tray.setAttend_datetime(datetimeAttendedStr);
 		}
 		
-		tray.setAttended(attended);
+		tray.setAttend(attended);
 		
 		if (restTray.getRating() > 0) {
 			tray.setRating(restTray.getRating());
@@ -424,8 +424,8 @@ public class TrayServices {
 		List <String> eventIds = new LinkedList <String>();
 		List <String> poiIds = new LinkedList <String>();
 		for (Tray tray: trays) {
-			if (tray.getItemType().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getItemId());
-			else if (tray.getItemType().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getItemId());
+			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
+			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
 		}
 
 		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
