@@ -201,6 +201,7 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(title)) eventDetails.setName(title);
 		String desc = getAttributeValue(json, "description");
 		if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
+		System.out.println(desc);
 		String category = getAttributeValue(json, "category");
 		if (!isNullOrEmpty(category)) eventDetails.setCategory(category);
 		String lat = getAttributeValue(json, "lat");
