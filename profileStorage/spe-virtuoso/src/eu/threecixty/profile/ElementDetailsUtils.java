@@ -8,14 +8,27 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This is a utility class to get a list of events or PoIs in details as requested by TI team.
+ * @author Cong-Kinh Nguyen
+ *
+ */
 public class ElementDetailsUtils {
 	
+	private static final String COMMENT_ATTRIBUTE = "reviewBody"; // to get comment
+	
+	/**
+	 * Creates a list of events with info in details from a given list of IDs.
+	 * @param eventIds
+	 * @return
+	 * @throws IOException
+	 */
 	public static List <ElementDetails> createEventsDetails(List <String> eventIds) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
 		queryBuff.append("WHERE {\n");
-		queryBuff.append("OPTIONAL{ ?item dc:title ?title.} \n");
+		queryBuff.append("?item dc:title ?title. \n");
 		queryBuff.append("OPTIONAL{ ?item dc:description ?description.} \n");
 		queryBuff.append("OPTIONAL{ ?item lode:hasCategory ?category.} \n");
 		queryBuff.append("OPTIONAL{ ?item ?p ?inSpace. \n");
@@ -66,15 +79,115 @@ public class ElementDetailsUtils {
 		return elementsDetails;
 	}
 	
-	
+	/**
+	 * Creates a list of PoIs with info in details from a given list of IDs.
+	 * @param poiIds
+	 * @return
+	 * @throws IOException
+	 */
 	public static List <ElementDetails> createPoIsDetails(List <String> poiIds) throws IOException {
-		// TODO
-		return null;
+		if (poiIds == null || poiIds.size() == 0) return null;
+
+		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
+		queryBuff.append("WHERE {\n");
+		queryBuff.append(" ?poi schema:name ?name. \n");
+		queryBuff.append("OPTIONAL{ ?poi locationOnt:businessType ?businessType. \n");
+		queryBuff.append("          ?businessType skos:prefLabel ?category . } \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
+		queryBuff.append("          ?location schema:streetAddress ?address .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:geo ?geo . \n");
+		queryBuff.append("          ?geo schema:latitude ?lat . \n");
+		queryBuff.append("          ?geo schema:longitude ?lon .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
+		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
+		queryBuff.append(" OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
+		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
+		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:telephone ?telephone .} \n");
+		
+		queryBuff.append("FILTER (");
+		boolean first = true;
+		for (String poiId: poiIds) {
+			if (first) {
+				first = false;
+				queryBuff.append("(?poi = <").append(poiId).append(">)");
+			} else {
+				queryBuff.append("|| (?poi = <").append(poiId).append(">)");
+			}
+		}
+		queryBuff.append(") \n");
+		queryBuff.append("}");
+		
+		StringBuilder result = new StringBuilder();
+		
+		VirtuosoManager.getInstance().executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", result);
+
+		JSONObject json = new JSONObject(
+				VirtuosoManager.getInstance().cleanResultReceivedFromVirtuoso(result.toString()));
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+		int len = jsonArrs.length();
+		if (len < 1) return null;
+
+		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
+		String oldPoiId = null;
+		ElementPoIDetails tmpPoIDetails = null;
+		for (int i = 0; i  < len; i++) {
+			JSONObject tmpObj = jsonArrs.getJSONObject(i);
+			String currentId = tmpObj.getString("poi");
+			if (currentId == null) continue;
+			if (!currentId.equals(oldPoiId)) { // new one
+				tmpPoIDetails = createPoIDetails(tmpObj);
+				elementsDetails.add(tmpPoIDetails);
+			} else {
+				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
+				if (!isNullOrEmpty(comment)) tmpPoIDetails.getReviews().add(comment);
+			}
+		}
+		return elementsDetails;
 	}
 	
-	private static ElementPoIDetails createPoIDetails(String itemId) {
-		// TODO
-		return null;
+	private static ElementPoIDetails createPoIDetails(JSONObject json) {
+		ElementPoIDetails poiDetails = new ElementPoIDetails();
+		String id = getAttributeValue(json, "poi");
+		if (isNullOrEmpty(id)) return null;
+		poiDetails.setId(id);
+		String name = getAttributeValue(json, "name");
+		if (!isNullOrEmpty(name)) poiDetails.setName(name);
+		String category = getAttributeValue(json, "category");
+		if (!isNullOrEmpty(category)) poiDetails.setCategory(category);
+		String lat = getAttributeValue(json, "lat");
+		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
+		String lon = getAttributeValue(json, "lon");
+		if (!isNullOrEmpty(lon)) poiDetails.setLon(lon);
+		String street = getAttributeValue(json, "street");
+		if (!isNullOrEmpty(street)) poiDetails.setAddress(street);
+		String locality = getAttributeValue(json, "locality");
+		if (!isNullOrEmpty(locality)) poiDetails.setLocality(locality);
+		String image_url = getAttributeValue(json, "image_url");
+		if (!isNullOrEmpty(image_url)) poiDetails.setImage_url(image_url);
+		String source = getAttributeValue(json, "source");
+		if (!isNullOrEmpty(source)) poiDetails.setSource(source);
+		String aggregateRatingStr = getAttributeValue(json, "aggregateRating");
+		try {
+		    if (!isNullOrEmpty(aggregateRatingStr)) poiDetails.setAggregate_rating(
+		    		Double.parseDouble(aggregateRatingStr));
+		} catch (Exception e) {}
+		String reviewCountsStr = getAttributeValue(json, "reviewCounts");
+		try {
+			if (!isNullOrEmpty(reviewCountsStr)) {
+				String [] reviews = reviewCountsStr.trim().split(" ");
+				poiDetails.setReview_counts(Integer.parseInt(reviews[0]));
+			}
+		} catch (Exception e) {}
+		String telephone = getAttributeValue(json, "telephone");
+		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
+		List <String> comments = new LinkedList <String>();
+		String comment = getAttributeValue(json, COMMENT_ATTRIBUTE);
+		if (!isNullOrEmpty(comment) && !comments.contains(comment)) comments.add(comment);
+		poiDetails.setReviews(comments);
+		return poiDetails;
+		
 	}
 	
 	private static ElementEventDetails createEventDetails(JSONObject json) {
