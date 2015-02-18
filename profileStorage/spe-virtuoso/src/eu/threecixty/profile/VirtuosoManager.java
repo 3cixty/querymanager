@@ -2,6 +2,9 @@ package eu.threecixty.profile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -30,6 +33,8 @@ public class VirtuosoManager {
 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 
+	 private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 	 
 	 //private static final Semaphore SEMAPHORE = new Semaphore(100, true); // TODO: to be put in a property file
 	 
@@ -66,38 +71,7 @@ public class VirtuosoManager {
 		
 		releaseVirtGraph(virtGraph);
 	}
-//	/**
-//	 * Update a record
-//	 * @param deleteOldDataQuery
-//	 * @param insertNewDataQuery
-//	 * @throws IOException
-//	 * @throws InterruptedException 
-//	 */
-//	public void updateQuery(String deleteOldDataQuery, String insertNewDataQuery) throws IOException, InterruptedException {
-//		VirtuosoConnection.processConfigFile();
-//		VirtGraph virtGraph = getVirtGraph();
-//		/*System.out.println("\nexecute: Delete From GRAPH "+ virtuosoConnection.GRAPH
-//					+ " { <aa> <bb> 'cc' ."
-//					+ " <aa1> <bb1> <123> . "
-//					+ "<aa2> <bb2> 456. "
-//					+ "}");
-//		System.out.println("\nexecute: Insert Into GRAPH "+ virtuosoConnection.GRAPH
-//				+ " { <aa3> <bb3> 'cc3' ."
-//				+ " <aa4> <bb4> <0123> . "
-//				+ "<aa5> <bb5> 0456. "
-//				+ "}");*/
-//		
-//		if (DEBUG_MOD) LOGGER.info("delete query = " + deleteOldDataQuery + "\n insert query = " + insertNewDataQuery);
-//		
-//		VirtuosoUpdateRequest vur = VirtuosoUpdateFactory
-//				.create(deleteOldDataQuery, virtGraph);
-//		vur.exec();
-//		vur = VirtuosoUpdateFactory
-//				.create(insertNewDataQuery, virtGraph);
-//		vur.exec();
-//		
-//		releaseVirtGraph(virtGraph);
-//	}
+
 	
 	/**
 	 * Query a graph
@@ -151,7 +125,25 @@ public class VirtuosoManager {
 	public String getGraph(String uid) {
 		return PREFIX_EACH_USER_PROFILE_GRAPH;
 	}
+
+	public void executeQueryViaSPARQL(String query, String format, StringBuilder result) throws IOException {
+		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
+		urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
+
+		URL url = new URL(urlStr);
+
+		InputStream input = url.openStream();
+		byte [] b = new byte[1024];
+		int readBytes = 0;
+		while ((readBytes = input.read(b)) >= 0) {
+			result.append(new String(b, 0, readBytes, "UTF-8"));
+		}
+		input.close();
+	}
 	
+	public String cleanResultReceivedFromVirtuoso(String result) {
+		return result.replace("\\U", "\\u");
+	}
 	
 	private JSONObject executeQuery(String queryStr, VirtGraph virtGraph) {
 		if (DEBUG_MOD) LOGGER.info("Query to be executed: " + queryStr);
