@@ -222,7 +222,7 @@ public class ElementDetailsUtils {
 
 	private static String getAttributeValue(JSONObject jsonObject, String attr) throws JSONException {
 		if (jsonObject.has(attr)) {
-			return jsonObject.getJSONObject(attr).getString("value");
+			return jsonObject.getJSONObject(attr).get("value").toString();
 		}
 		return null;
 	}
