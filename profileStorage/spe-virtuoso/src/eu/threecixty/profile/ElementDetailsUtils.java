@@ -142,6 +142,7 @@ public class ElementDetailsUtils {
 			} else {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
 				if (!isNullOrEmpty(comment)) tmpPoIDetails.getReviews().add(comment);
+				System.out.println(comment);
 			}
 			oldPoiId = currentId;
 		}
