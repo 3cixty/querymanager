@@ -481,18 +481,18 @@ public class MobilityCrawlerCron {
 	 * @param Set<IDMapping> idMapping,
 	 * @return String 3cixtyID
 	 */
-	public String reverseMap(Long mobidotID, Set<IDMapping> idMapping) {
-		Iterator<IDMapping> iteratorMapping = idMapping.iterator();
-		while (iteratorMapping.hasNext()) {
-			IDMapping map = iteratorMapping.next();
-			if (map.getMobidotID()!=null){
-				if (map.getMobidotID()==mobidotID.toString()) {
-					return map.getThreeCixtyID();
-				}
-			}
-		}
-		return null;
-	}
+    public String reverseMap(Long mobidotID, Set<IDMapping> idMapping) {
+        Iterator<IDMapping> iteratorMapping = idMapping.iterator();
+        while (iteratorMapping.hasNext()) {
+            IDMapping map = iteratorMapping.next();
+            if (map.getMobidotID()!=null){
+                if (map.getMobidotID().equals(mobidotID.toString())) {
+                    return map.getThreeCixtyID();
+                }
+            }
+        }
+        return null;
+    }
 
 	/**
 	 * create the accompany object to store in KB
@@ -502,23 +502,37 @@ public class MobilityCrawlerCron {
 	 * @param idMapping
 	 * @return accompany object
 	 */
-	public Accompanying storeAccompanyingDetailsInKB(String uID,
-			JSONObject jsonobj, Set<IDMapping> idMapping) {
-		String ID = reverseMap(jsonobj.getLong("userid2"), idMapping);
-		if (ID != null) {
-			Accompanying accompany = new Accompanying();
-			accompany.setHasAccompanyId(jsonobj.getLong("id"));
-			accompany.setHasAccompanyUserid2ST(ID);
-			accompany.setHasAccompanyUserid1ST(uID);
-			accompany.setHasAccompanyScore(jsonobj.getDouble("score"));
-			// start time of the accompany
-			accompany.setHasAccompanyTime(jsonobj.getLong("time"));
-			// duration of the accompany
-			accompany.setHasAccompanyValidity(jsonobj.getLong("validity"));
-			return accompany;
-		}
-		return null;
-	}
+    public Accompanying storeAccompanyingDetailsInKB(String uID,
+                                                     JSONObject jsonobj, Set<IDMapping> idMapping) {
+        String IDUser2 = reverseMap(jsonobj.getLong("userid2"), idMapping);
+        String IDUser1 = reverseMap(jsonobj.getLong("userid1"), idMapping);
+        
+        if (IDUser1 != null && IDUser1.equals(uID)){
+            Accompanying accompany = new Accompanying();
+            accompany.setHasAccompanyId(jsonobj.getLong("id"));
+            accompany.setHasAccompanyUserid2ST(IDUser2);
+            accompany.setHasAccompanyUserid1ST(IDUser1);
+            accompany.setHasAccompanyScore(jsonobj.getDouble("score"));
+            // start time of the accompany
+            accompany.setHasAccompanyTime(jsonobj.getLong("time"));
+            // duration of the accompany
+            accompany.setHasAccompanyValidity(jsonobj.getLong("validity"));
+            return accompany;
+        }
+        if (IDUser2 != null && IDUser2.equals(uID)){
+            Accompanying accompany = new Accompanying();
+            accompany.setHasAccompanyId(jsonobj.getLong("id"));
+            accompany.setHasAccompanyUserid2ST(IDUser1);
+            accompany.setHasAccompanyUserid1ST(IDUser2);
+            accompany.setHasAccompanyScore(jsonobj.getDouble("score"));
+            // start time of the accompany
+            accompany.setHasAccompanyTime(jsonobj.getLong("time"));
+            // duration of the accompany
+            accompany.setHasAccompanyValidity(jsonobj.getLong("validity"));
+            return accompany;
+        }
+        return null;
+    }
 
 	/**
 	 * create the regular trip object to store in KB
