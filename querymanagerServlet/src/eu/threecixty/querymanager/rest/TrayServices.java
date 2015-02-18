@@ -19,6 +19,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 
 import eu.threecixty.logs.CallLoggingConstants;
@@ -57,6 +59,12 @@ public class TrayServices {
 	
 	private static final String ADD_EXCEPTION_MSG = "Invalid parameters or duplicated tray items";
 	private static final String INVALID_PARAMS_EXCEPTION_MSG = "Invalid parameters";
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 TrayServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
     @POST
     @Path("/tray")
@@ -103,6 +111,9 @@ public class TrayServices {
 					         cc.setMaxAge(86400);
     						if (rb == null) { // changed
     							String content = gson.toJson(trays);
+    							
+    							if (DEBUG_MOD) LOGGER.info(content);
+    							
     							CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
     							return Response.status(Response.Status.OK)
     									.entity(content)
@@ -391,6 +402,9 @@ public class TrayServices {
 					throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 				}
 				String content = gson.toJson(trayDetailsList);
+				
+				if (DEBUG_MOD) LOGGER.info(content);
+				
 				CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.status(Response.Status.OK)
 						.entity(content)
