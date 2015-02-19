@@ -32,15 +32,6 @@
 		</listener-class>
 	</listener>
 
-    <servlet>
-	  <servlet-name>json-nospring</servlet-name>
-	  <servlet-class>eu.threecixty.querymanager.jsonrpc.TrayServicesServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-	  <servlet-name>json-nospring</servlet-name>
-	  <url-pattern>/json-nospring/*</url-pattern>
-    </servlet-mapping>
-
 
     <filter>
             <!-- The CORS filter with parameters -->
