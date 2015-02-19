@@ -18,7 +18,6 @@
         <mapping class="eu.threecixty.oauth.model.Developer"></mapping>
         <mapping class="eu.threecixty.oauth.model.User"></mapping>
         <mapping class="eu.threecixty.oauth.model.UserAccessToken"></mapping>
-        <!-- quick fix for calllog, TODO: need to restructure modules -->
         <mapping class="eu.threecixty.logs.CallLogging"></mapping>
     </session-factory>
 </hibernate-configuration>
