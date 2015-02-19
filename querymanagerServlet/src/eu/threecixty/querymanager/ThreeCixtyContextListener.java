@@ -10,10 +10,10 @@ import eu.threecixty.Configuration;
 import eu.threecixty.CrawlerCron.CrawlerCron;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoFlowImpl;
+import eu.threecixty.profile.GoFlowServer;
 import eu.threecixty.profile.MobidotImpl;
 import eu.threecixty.profile.RdfFileManager;
 import eu.threecixty.profile.TrayStorage;
-import eu.threecixty.querymanager.rest.GoFlowServer;
 import eu.threecixty.querymanager.rest.QueryManagerServices;
 import eu.threecixty.querymanager.rest.CallLogServices;
 
