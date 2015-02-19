@@ -244,7 +244,7 @@ public class QueryManagerServices {
 			if (pois != null && !pois.equals("")) {
 				List <String> poiIds = createList(pois);
 				try {
-					List <ElementDetails> poisDetails = ElementDetailsUtils.createEventsDetails(poiIds);
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
 					}
