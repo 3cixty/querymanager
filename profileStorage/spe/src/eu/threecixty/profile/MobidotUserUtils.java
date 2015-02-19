@@ -10,9 +10,9 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
-public class CreateMobidotUser {
+public class MobidotUserUtils {
 	private static final Logger LOGGER = Logger.getLogger(
-			CreateMobidotUser.class.getName());
+			MobidotUserUtils.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
@@ -101,5 +101,8 @@ public class CreateMobidotUser {
 				e.printStackTrace();
 				return null;
 			}
+	 }
+	 
+	 private MobidotUserUtils() {
 	 }
 }

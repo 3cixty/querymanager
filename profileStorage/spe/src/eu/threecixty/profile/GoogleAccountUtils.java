@@ -161,9 +161,9 @@ public class GoogleAccountUtils {
 			
 			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
 
-			AddPartnerAccount.addMobidotID(_3cixtyUID, user_id, profile.getHasName(), profileIdentities);
+			PartnerAccountUtils.addMobidotID(_3cixtyUID, user_id, profile.getHasName(), profileIdentities);
 			
-			AddPartnerAccount.addGoflowID(_3cixtyUID, user_id, profileIdentities);
+			PartnerAccountUtils.addGoflowID(_3cixtyUID, user_id, profileIdentities);
 			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			

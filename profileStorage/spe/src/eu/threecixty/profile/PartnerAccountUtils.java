@@ -7,7 +7,7 @@ import java.util.UUID;
 import eu.threecixty.profile.PartnerUser.PartnerAccount;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
-public class AddPartnerAccount {
+public class PartnerAccountUtils {
 	
 	protected static void addMobidotID(String _3cixtyUID,String uid, eu.threecixty.profile.oldmodels.Name name, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities) throws InterruptedException {
 		//check if partner ID exists in kb, if yes do not create it. it is implied that json has it.
@@ -20,10 +20,10 @@ public class AddPartnerAccount {
 		    	PartnerUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(uid);
 				PartnerAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, appid, null);
 				
-				mobidotID=CreateMobidotUser.getMobidotID(uid);
+				mobidotID=MobidotUserUtils.getMobidotID(uid);
 				String password = "3cixtyI$InExpo)!_"+UUID.randomUUID().toString();
 				//call movesmarter platform to create users
-				if (mobidotID == null) mobidotID=CreateMobidotUser.createMobidotUser(uid,name,password);					
+				if (mobidotID == null) mobidotID=MobidotUserUtils.createMobidotUser(uid,name,password);					
 				
 				if (account==null) account = new PartnerAccount(uid, password, appid, "User");
 				
