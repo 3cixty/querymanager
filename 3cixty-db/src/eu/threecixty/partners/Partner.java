@@ -1,8 +1,8 @@
-package eu.threecixty.profile;
+package eu.threecixty.partners;
 
 import java.util.List;
 
-import eu.threecixty.profile.PartnerUser.PartnerAccount;
+import eu.threecixty.partners.PartnerUser.PartnerAccount;
 
 public interface Partner {
 

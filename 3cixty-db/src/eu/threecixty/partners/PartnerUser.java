@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.partners;
 
 import java.util.List;
 

@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.partners.Partner;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**

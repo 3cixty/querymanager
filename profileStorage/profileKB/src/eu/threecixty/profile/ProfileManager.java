@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import eu.threecixty.partners.Partner;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**

@@ -2,7 +2,11 @@ package eu.threecixty.profile;
 
 import java.util.List;
 
-import eu.threecixty.profile.PartnerUser.PartnerAccount;
+import eu.threecixty.partners.Partner;
+import eu.threecixty.partners.PartnerUser;
+import eu.threecixty.partners.PartnerUser.PartnerAccount;
+
+
 
 /**
  * This class is to store all the 3Cixty's mobidot users in a file. 

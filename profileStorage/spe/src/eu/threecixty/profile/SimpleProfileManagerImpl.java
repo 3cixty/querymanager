@@ -13,6 +13,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
+import eu.threecixty.partners.Partner;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**

@@ -10,7 +10,10 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import eu.threecixty.profile.PartnerUser.PartnerAccount;
+import eu.threecixty.partners.Partner;
+import eu.threecixty.partners.PartnerUser;
+import eu.threecixty.partners.PartnerUser.PartnerAccount;
+
 
 public class PartnerImpl implements Partner {
 

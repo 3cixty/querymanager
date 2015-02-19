@@ -2,7 +2,10 @@ package eu.threecixty.profile;
 
 import java.util.List;
 
-import eu.threecixty.profile.PartnerUser.PartnerAccount;
+import eu.threecixty.partners.Partner;
+import eu.threecixty.partners.PartnerUser;
+import eu.threecixty.partners.PartnerUser.PartnerAccount;
+
 
 public class GoFlowImpl implements Partner {
 

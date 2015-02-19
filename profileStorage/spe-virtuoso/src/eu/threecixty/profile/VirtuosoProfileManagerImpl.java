@@ -9,6 +9,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
+import eu.threecixty.partners.Partner;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.IDCrawlTimeMapping;
 import eu.threecixty.profile.IDMapping;

@@ -18,12 +18,11 @@ import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.oauth.model.App;
+import eu.threecixty.partners.PartnerUser;
+import eu.threecixty.partners.PartnerUser.PartnerAccount;
 import eu.threecixty.profile.GoFlowServer;
 import eu.threecixty.profile.GoogleAccountUtils;
-import eu.threecixty.profile.PartnerUser;
 import eu.threecixty.profile.ProfileManagerImpl;
-import eu.threecixty.profile.PartnerUser.PartnerAccount;
-
 @Path("/" + Constants.VERSION_2)
 public class GoFlowServices {
 
