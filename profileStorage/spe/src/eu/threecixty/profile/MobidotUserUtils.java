@@ -59,6 +59,7 @@ public class MobidotUserUtils {
 			wr.write(userObj.toString());
 
 			wr.flush();
+			wr.close();
 				
 			if (DEBUG_MOD) LOGGER.info("Finished creating mobidot user");
 			 
