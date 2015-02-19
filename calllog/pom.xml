@@ -25,7 +25,7 @@
     
     <dependency>
       <groupId>eu.3cixty</groupId>
-      <artifactId>oauth-wrapper</artifactId>
+      <artifactId>3cixty-db</artifactId>
       <version>1.0</version>
     </dependency>
 

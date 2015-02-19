@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>oauth-utils</artifactId>
-  <name>OAuth Utils</name>
+  <artifactId>3cixty-common</artifactId>
+  <name>3cixty common</name>
   <packaging>jar</packaging>
   <version>1.0</version>
   

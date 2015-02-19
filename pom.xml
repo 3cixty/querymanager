@@ -10,6 +10,8 @@
   <version>1.0</version>
   
   <modules>
+    <module>3cixty-config</module>
+    <module>3cixty-common</module>
     <module>3cixty-db</module>
     <module>appkey</module>
     <module>profileStorage</module>

@@ -10,8 +10,6 @@
   <version>1.0</version>
   
   <modules>
-    <module>3cixty-config</module>
-    <module>oauth-common</module>
     <module>3cixty-oauth-integration</module>
     <module>oauth</module>
 
