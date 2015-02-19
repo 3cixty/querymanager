@@ -43,11 +43,23 @@ public class Utils {
 			}
 		}
 		if (found) return; // already existed
+		addProfileIdentities(_3cixtyUID, uid, source, profileIdentities);
+		/*ProfileIdentities pi = new ProfileIdentities();
+		pi.setHasSourceCarrier(source);
+		pi.setHasUserAccountID(uid);
+		
+		pi.setHasUserInteractionMode(UserInteractionMode.Active);
+		pi.setHasProfileIdentitiesURI(PROFILE_URI+ _3cixtyUID + "/Account/" + pi.getHasSourceCarrier());
+		
+		profileIdentities.add(pi);*/
+	}
+	
+	protected static void addProfileIdentities(String _3cixtyUID, String uid, String source,
+			Set<ProfileIdentities> profileIdentities) {
 		
 		ProfileIdentities pi = new ProfileIdentities();
 		pi.setHasSourceCarrier(source);
 		pi.setHasUserAccountID(uid);
-		
 		pi.setHasUserInteractionMode(UserInteractionMode.Active);
 		pi.setHasProfileIdentitiesURI(PROFILE_URI+ _3cixtyUID + "/Account/" + pi.getHasSourceCarrier());
 		

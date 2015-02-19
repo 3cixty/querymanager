@@ -68,6 +68,10 @@ public class FaceBookAccountUtils {
 
 			profile.setKnows(knows);
 			
+			AddPartnerAccount.addMobidotID(_3cixtyUID, uid, profile.getHasName(), profileIdentities);
+			
+			AddPartnerAccount.addGoflowID(_3cixtyUID, uid, profileIdentities);
+			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 			return _3cixtyUID;
