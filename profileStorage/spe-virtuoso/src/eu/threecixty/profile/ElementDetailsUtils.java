@@ -161,7 +161,7 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
 		String lon = getAttributeValue(json, "lon");
 		if (!isNullOrEmpty(lon)) poiDetails.setLon(lon);
-		String street = getAttributeValue(json, "street");
+		String street = getAttributeValue(json, "address");
 		if (!isNullOrEmpty(street)) poiDetails.setAddress(street);
 		String locality = getAttributeValue(json, "locality");
 		if (!isNullOrEmpty(locality)) poiDetails.setLocality(locality);
