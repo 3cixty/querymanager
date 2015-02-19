@@ -12,7 +12,6 @@
   <modules>
     <module>3cixty-config</module>
     <module>oauth-common</module>
-    <module>oauth-wrapper</module>
     <module>3cixty-oauth-integration</module>
     <module>oauth</module>
 

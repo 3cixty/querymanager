@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>eu.3cixty</groupId>
-  <artifactId>oauth-wrapper</artifactId>
-  <name>OAuth Wrapper</name>
+  <artifactId>3cixty-db</artifactId>
+  <name>3cixty DB</name>
   <packaging>jar</packaging>
   <version>1.0</version>
   
