@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.partners;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,12 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import eu.threecixty.partners.Partner;
-import eu.threecixty.partners.PartnerUser;
 import eu.threecixty.partners.PartnerUser.PartnerAccount;
+
+
 
 
 public class PartnerImpl implements Partner {
@@ -20,7 +17,7 @@ public class PartnerImpl implements Partner {
 	private String path;
 	private String filename;
 
-	protected PartnerImpl(String path, String filename) {
+	public PartnerImpl(String path, String filename) {
 		this.path = path;
 		this.filename = filename;
 	}
@@ -80,8 +77,9 @@ public class PartnerImpl implements Partner {
 	public List<PartnerUser> getUsers() {
 		String content = getContent();
 		if (content == null || content.length() == 0) return new ArrayList <PartnerUser>();
-		Gson gson = new Gson();
-		return gson.fromJson(content, new TypeToken<List<PartnerUser>>(){}.getType());
+//		Gson gson = new Gson();
+//		return gson.fromJson(content, new TypeToken<List<PartnerUser>>(){}.getType());
+		return null;
 	}
 
 	@Override
@@ -111,10 +109,10 @@ public class PartnerImpl implements Partner {
 		if (file.exists()) file.delete();
 		try {
 			file.createNewFile();
-			Gson gson = new Gson();
-			FileOutputStream output = new FileOutputStream(file);
-			output.write(gson.toJson(mobidotUsers).getBytes("UTF-8"));
-			output.close();
+//			Gson gson = new Gson();
+//			FileOutputStream output = new FileOutputStream(file);
+//			output.write(gson.toJson(mobidotUsers).getBytes("UTF-8"));
+//			output.close();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
