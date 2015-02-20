@@ -2,7 +2,6 @@ package eu.threecixty.partners;
 
 import java.util.List;
 
-import eu.threecixty.partners.PartnerUser.PartnerAccount;
 
 public interface Partner {
 

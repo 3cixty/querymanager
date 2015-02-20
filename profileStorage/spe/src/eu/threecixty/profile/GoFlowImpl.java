@@ -3,9 +3,9 @@ package eu.threecixty.profile;
 import java.util.List;
 
 import eu.threecixty.partners.Partner;
+import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerImpl;
 import eu.threecixty.partners.PartnerUser;
-import eu.threecixty.partners.PartnerUser.PartnerAccount;
 
 
 public class GoFlowImpl implements Partner {

@@ -18,8 +18,8 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerUser;
-import eu.threecixty.partners.PartnerUser.PartnerAccount;
 import eu.threecixty.profile.ProfileManagerImpl;
 
 @Path("/" + Constants.VERSION_2)

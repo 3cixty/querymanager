@@ -5,8 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import eu.threecixty.partners.Partner;
+import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerUser;
-import eu.threecixty.partners.PartnerUser.PartnerAccount;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 public class PartnerAccountUtils {
