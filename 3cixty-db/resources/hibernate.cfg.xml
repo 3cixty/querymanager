@@ -19,5 +19,7 @@
         <mapping class="eu.threecixty.oauth.model.User"></mapping>
         <mapping class="eu.threecixty.oauth.model.UserAccessToken"></mapping>
         <mapping class="eu.threecixty.logs.CallLogging"></mapping>
+        <mapping class="eu.threecixty.partners.PartnerAccount"></mapping>
+        <mapping class="eu.threecixty.partners.PartnerUser"></mapping>
     </session-factory>
 </hibernate-configuration>

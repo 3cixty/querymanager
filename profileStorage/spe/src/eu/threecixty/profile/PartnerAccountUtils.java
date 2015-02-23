@@ -1,105 +1,85 @@
 package eu.threecixty.profile;
 
-import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
 
 import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerUser;
-import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 public class PartnerAccountUtils {
+	protected static final String MOBIDOT_APP_ID = "MobidotAppID";
 	
-	protected static void addMobidotID(String _3cixtyUID,String uid, eu.threecixty.profile.oldmodels.Name name, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities) throws InterruptedException {
-		//check if partner ID exists in kb, if yes do not create it. it is implied that json has it.
-		if (!existID("Mobidot", uid, profileIdentities)){
-			// add it to user profile
-		    try{
-		    	String appid="3cixtyBackend";
-		    	String mobidotID=null;
-				Partner partner=ProfileManagerImpl.getInstance().getMobidot();
-		    	PartnerUser mobidotUser = ProfileManagerImpl.getInstance().getMobidot().getUser(uid);
-				PartnerAccount account = ProfileManagerImpl.getInstance().getMobidot().findAccount(mobidotUser, appid, null);
-				
-				mobidotID=MobidotUserUtils.getMobidotID(uid);
-				String password = "3cixtyI$InExpo)!_"+UUID.randomUUID().toString();
-				//call movesmarter platform to create users
-				if (mobidotID == null) mobidotID=MobidotUserUtils.createMobidotUser(uid,name,password);					
-				
-				if (account==null) account = new PartnerAccount(uid, password, appid, "User");
-				
-				boolean ok= setAccountFromUID(uid, account, mobidotUser, partner);
-				if (ok) Utils.addProfileIdentities(_3cixtyUID, mobidotID, "Mobidot", profileIdentities);
-
-			}catch(Exception e)	{
-				e.printStackTrace();
-			}
+	
+	/**
+	 * Try to create a Mobidot user if it doesn't exist on Movesmarter server.
+	 * @param _3cixty
+	 * @param firstName
+	 * @param lastName
+	 * @return Mobidot's account if existed
+	 */
+	public static PartnerAccount retrieveOrAddMobidotUser(String _3cixtyUID, String firstName, String lastName) {
+		Partner partner = ProfileManagerImpl.getInstance().getPartner();
+    	PartnerUser mobidotUser = partner.getUser(_3cixtyUID);
+		PartnerAccount account = partner.findAccount(mobidotUser, MOBIDOT_APP_ID, null);
+		
+		if (account != null) { // already exist in 3cixty's DB
+			return account;
 		}
-	}
-	protected static void addGoflowID(String _3cixtyUID, String uid, Set <eu.threecixty.profile.oldmodels.ProfileIdentities> profileIdentities) throws InterruptedException {
-		//check if partner ID exists in kb, if yes do not create it it is implied that json has it.
-		if (!existID("GoFlow", uid, profileIdentities)){
-			// call goflow and add to json file. This also checks if the user exists or not
-			// check if there is no account existed at GoFlow server, then go to create an account
-			try{
-				String appid="3cixtyBackend";
-				Partner partner=ProfileManagerImpl.getInstance().getGoFlow();
-				PartnerUser goflowUser = ProfileManagerImpl.getInstance().getGoFlow().getUser(uid);
-				PartnerAccount account = ProfileManagerImpl.getInstance().getGoFlow().findAccount(goflowUser, appid, null);
-				String password=null;
-				
-				if (account == null) {
-					password=GoFlowServer.getInstance().createEndUser(appid, uid);
-					if (password!=null) {
-						account = new PartnerAccount(uid, password, appid, "User");
-					}
-				}
-				boolean ok=setAccountFromUID(uid, account, goflowUser, partner);
-				if (ok) Utils.addProfileIdentities(_3cixtyUID, uid, "GoFlow", profileIdentities);
-			}catch(Exception e){
-				e.printStackTrace();
-			}
+		
+		if (mobidotUser == null) {
+			mobidotUser = new PartnerUser();
+			mobidotUser.setUid(_3cixtyUID);
 		}
-	}
-
-	private static boolean setAccountFromUID(String uid, PartnerAccount account, PartnerUser partnerUser, Partner partner) {
+		String password = "3cixtyI$InExpo)!_" + UUID.randomUUID().toString();
 		try {
-			
-			boolean ok = false;
-
-			if (partnerUser == null) partnerUser = new PartnerUser(uid);
-			if (partnerUser.getAccounts() == null) partnerUser.setPartnerAccounts(
-					new ArrayList <PartnerAccount>());
-
-			if (account!=null){
-				if (account.getPassword()!=null && account.getUsername()!=null && account.getAppId()!=null && account.getRole()!=null){
-					if (account.getPassword()!="" && account.getUsername()!="" && account.getAppId()!="" && account.getRole()!=""){
-						partnerUser.getAccounts().add(account);
-						ok = partner.updateUser(partnerUser);
-					}
-				}
-			}
-			if (ok) return true;
-			
-			return false;
-			
+		    String mobidotID = MobidotUserUtils.createMobidotUser(_3cixtyUID, firstName, lastName, password);
+		    if (mobidotID == null || mobidotID.equals("")) return null;
+		    account = new PartnerAccount();
+			account.setAppId(MOBIDOT_APP_ID);
+			account.setPassword(password);
+			account.setUsername(mobidotID);
+			account.setRole("User");
+			account.setPartnerUser(mobidotUser);
+			partner.addAccount(account); // persist in 3cixty's DB
+			return account;
 		} catch (Exception e) {
-			return false;
+			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	
-	private static boolean existID(String partnerName, String uid, Set<ProfileIdentities> profileIdentities) {
-		if (uid == null) return false;
-		boolean found=false;
-		for (ProfileIdentities pi: profileIdentities) {
-			if (uid.equals(pi.getHasUserAccountID()) && partnerName.equals(pi.getHasSourceCarrier())) {
-				found = true;
-				break;
-			}
+	public static PartnerAccount retrieveOrAddGoflowUser(String _3cixtyUID, String appId) {
+		Partner partner = ProfileManagerImpl.getInstance().getPartner();
+    	PartnerUser mobidotUser = partner.getUser(_3cixtyUID);
+		PartnerAccount account = partner.findAccount(mobidotUser, appId, null);
+		
+		if (account != null) { // already exist in 3cixty's DB
+			return account;
 		}
-		if (found) return true;
-		else return false;
+		
+		if (mobidotUser == null) {
+			mobidotUser = new PartnerUser();
+			mobidotUser.setUid(_3cixtyUID);
+		}
+		String password = GoFlowServer.getInstance().createEndUser(appId, _3cixtyUID);
+		if (password == null) {
+			return null;
+		}
+		try {
+		    account = new PartnerAccount();
+			account.setAppId(appId);
+			account.setPassword(password);
+			account.setUsername(_3cixtyUID);
+			account.setRole("User");
+			account.setPartnerUser(mobidotUser);
+			partner.addAccount(account); // persist in 3cixty's DB
+			return account;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private PartnerAccountUtils() {
 	}
 }

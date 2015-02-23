@@ -1,57 +1,86 @@
 package eu.threecixty.partners;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import eu.threecixty.db.HibernateUtil;
 
 
 
 public class PartnerImpl implements Partner {
-
-	private String path;
-	private String filename;
-
-	public PartnerImpl(String path, String filename) {
-		this.path = path;
-		this.filename = filename;
-	}
 	
-	@Override
-	public synchronized boolean addUser(PartnerUser user) {
-		if (user == null) return false;
-		List <PartnerUser> mobidotUsers = getUsers();
-		int index = findIndexOfUID(user.getUid(), mobidotUsers);
-		if (index >= 0) return false;
-		mobidotUsers.add(user);
-		return save(mobidotUsers);
+	private static final Logger LOGGER = Logger.getLogger(
+			 PartnerImpl.class.getName());
+	
+	private static final Partner instance = new PartnerImpl();
+	
+	public static Partner getInstance() {
+		return instance;
 	}
-
+	 
 	@Override
-	public synchronized boolean updateUser(PartnerUser user) {
+	public boolean addUser(PartnerUser user) {
 		if (user == null) return false;
-		List <PartnerUser> mobidotUsers = getUsers();
-		int index = findIndexOfUID(user.getUid(), mobidotUsers);
-		if (index >= 0) {
-			mobidotUsers.set(index, user); // update accounts
-		} else {
-			mobidotUsers.add(user);
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			String hql = "FROM PartnerUser P WHERE P.uid = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, user.getUid()).list();
+			if (results.size() > 0) {
+				session.close();
+				return false;
+			}
+			session.beginTransaction();
+			session.save(user);
+			session.getTransaction().commit();
+			session.close();
+			return true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
 		}
-		return save(mobidotUsers);
+		if (session != null) session.close();
+		return false;
 	}
 
 	@Override
-	public synchronized boolean deleteUser(PartnerUser user) {
+	public boolean updateUser(PartnerUser user) {
 		if (user == null) return false;
-		List <PartnerUser> mobidotUsers = getUsers();
-		if (mobidotUsers == null) return false;
-		int index = findIndexOfUID(user.getUid(), mobidotUsers);
-		if (index < 0) return false;
-		mobidotUsers.remove(index);
-		return save(mobidotUsers);
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction();
+			session.update(user);
+			session.getTransaction().commit();
+			session.close();
+			return true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		}
+		if (session != null) session.close();
+		return false;
+	}
+
+	@Override
+	public boolean deleteUser(PartnerUser user) {
+		if (user == null) return false;
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction();
+			session.delete(user);
+			session.getTransaction().commit();
+			session.close();
+			return true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		}
+		if (session != null) session.close();
+		return false;
 	}
 
 	@Override
@@ -63,86 +92,74 @@ public class PartnerImpl implements Partner {
 	@Override
 	public PartnerUser getUser(String uid) {
 		if (uid == null) return null;
-		List <PartnerUser> mobidotUsers = getUsers();
-		if (mobidotUsers == null) return null;
-		for (PartnerUser mobidotUser: mobidotUsers) {
-			if (uid.equals(mobidotUser.getUid())) return mobidotUser;
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			String hql = "FROM PartnerUser P WHERE P.uid = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, uid).list();
+			if (results.size() == 0) {
+				session.close();
+				return null;
+			}
+			PartnerUser user = (PartnerUser) results.get(0);
+			session.close();
+			return user;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
 		}
-		return null;
-	}
-
-	@Override
-	public List<PartnerUser> getUsers() {
-		String content = getContent();
-		if (content == null || content.length() == 0) return new ArrayList <PartnerUser>();
-//		Gson gson = new Gson();
-//		return gson.fromJson(content, new TypeToken<List<PartnerUser>>(){}.getType());
+		if (session != null) session.close();
 		return null;
 	}
 
 	@Override
 	public PartnerAccount findAccount(PartnerUser user, String appid, String role) {
 		if (user == null || appid == null) return null;
-		for (PartnerAccount account: user.getAccounts()) {
-			if (role == null) { // without checking role
-				if (appid.equals(account.getAppId())) return account;
-			} else {
-			    if (appid.equals(account.getAppId()) && role.equals(account.getRole())) return account;
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			PartnerUser freshUser = (PartnerUser) session.get(PartnerUser.class, user.getId());
+			PartnerAccount result = null;
+			for (PartnerAccount account: freshUser.getAccounts()) {
+				if (role == null) { // without checking role
+					if (appid.equals(account.getAppId())) {
+						result = account;
+						break;
+					}
+				} else {
+					if (appid.equals(account.getAppId()) && role.equals(account.getRole())) {
+						result = account;
+						break;
+					}
+				}
 			}
+			session.close();
+			return result;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
 		}
+		if (session != null) session.close();
 		return null;
 	}
-	
-	private int findIndexOfUID(String uid, List <PartnerUser> users) {
-		int len = users.size();
-		for (int index = 0; index < len; index++) {
-			if (uid.equals(users.get(index).getUid())) return index;
-		}
-		return -1;
-	}
 
-	private synchronized boolean save(List<PartnerUser> mobidotUsers) {
-		if (path == null) return false;
-		File file = new File(path + File.separatorChar + filename);
-		if (file.exists()) file.delete();
+	@Override
+	public boolean addAccount(PartnerAccount account) {
+		if (account == null) return false;
+		Session session = null;
 		try {
-			file.createNewFile();
-//			Gson gson = new Gson();
-//			FileOutputStream output = new FileOutputStream(file);
-//			output.write(gson.toJson(mobidotUsers).getBytes("UTF-8"));
-//			output.close();
+			session = HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction();
+			session.saveOrUpdate(account);
+			session.getTransaction().commit();
+			session.close();
 			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
 		}
+		if (session != null) session.close();
 		return false;
 	}
-
 	
-	private synchronized String getContent() {
-		if (path == null) return null;
-		StringBuffer buffer = new StringBuffer();
-		File file = new File(path + File.separatorChar + filename);
-		if (!file.exists()) return null;
-		FileInputStream input = null;
-		try {
-			input = new FileInputStream(file);
-			byte [] b = new byte[1024];
-			int readBytes = 0;
-			while ((readBytes = input.read(b)) >= 0) {
-				buffer.append(new String(b, 0, readBytes, "UTF-8"));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (input != null)
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		}
-		if (buffer.length() == 0) return null;
-		return buffer.toString();
+	private PartnerImpl() {
 	}
 }

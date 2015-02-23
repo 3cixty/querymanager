@@ -33,7 +33,7 @@ public class GoogleAccountUtils {
 //	 */
 
 
-	public static String getUID(String accessToken) {
+	public static String getUID(String accessToken, String appId) {
 		if (accessToken == null) return "";
 		String user_id = null;
 		String _3cixtyUID = null;
@@ -160,10 +160,8 @@ public class GoogleAccountUtils {
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
 			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
-
-			PartnerAccountUtils.addMobidotID(_3cixtyUID, user_id, profile.getHasName(), profileIdentities);
 			
-			PartnerAccountUtils.addGoflowID(_3cixtyUID, user_id, profileIdentities);
+			Utils.checkAndCreatePartnerAccounts(_3cixtyUID, appId, givenName, familyName, profileIdentities);
 			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			

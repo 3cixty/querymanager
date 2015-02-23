@@ -203,16 +203,10 @@ public interface ProfileManager {
 	Set<IDCrawlTimeMapping> getIDCrawlTimeMappings();
 	
 	/**
-	 * Gets Mobidot interface.
+	 * Gets partner interface.
 	 * @return
 	 */
-	Partner getMobidot();
-	
-	/**
-	 * Gets GoFlow interface.
-	 * @return
-	 */
-	Partner getGoFlow();
+	Partner getPartner();
 	
 	/**
 	 * Gets interface to deal with Tray element.

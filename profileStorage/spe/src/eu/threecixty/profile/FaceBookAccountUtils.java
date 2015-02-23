@@ -23,7 +23,7 @@ public class FaceBookAccountUtils {
 	private static final String FACEBOOK_FRIENDS_PREFIX = "https://graph.facebook.com/v2.2/me/friends?fields=id&format=json&method=get&pretty=0&suppress_http_code=1&access_token=";
 
 
-	public static String getUID(String accessToken) {
+	public static String getUID(String accessToken, String appId) {
 		if (accessToken == null) return "";
 		try {
 			String content = Utils.readUrl(FACE_BOOK_ACCESS_TOKEN_VALIDATION + accessToken);
@@ -68,9 +68,7 @@ public class FaceBookAccountUtils {
 
 			profile.setKnows(knows);
 			
-			PartnerAccountUtils.addMobidotID(_3cixtyUID, uid, profile.getHasName(), profileIdentities);
-			
-			PartnerAccountUtils.addGoflowID(_3cixtyUID, uid, profileIdentities);
+			Utils.checkAndCreatePartnerAccounts(_3cixtyUID, appId, firstName, lastName, profileIdentities);
 			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			

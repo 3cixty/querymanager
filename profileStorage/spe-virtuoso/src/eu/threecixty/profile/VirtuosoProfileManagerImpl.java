@@ -10,6 +10,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import eu.threecixty.partners.Partner;
+import eu.threecixty.partners.PartnerImpl;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.IDCrawlTimeMapping;
 import eu.threecixty.profile.IDMapping;
@@ -243,13 +244,8 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public Partner getMobidot() {
-		return MobidotImpl.getInstance();
-	}
-
-	@Override
-	public Partner getGoFlow() {
-		return GoFlowImpl.getInstance();
+	public Partner getPartner() {
+		return PartnerImpl.getInstance();
 	}
 
 	@Override

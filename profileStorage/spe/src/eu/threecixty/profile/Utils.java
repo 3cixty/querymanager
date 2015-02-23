@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Set;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
@@ -18,8 +19,11 @@ public class Utils {
 	
 	/**A prefix of two characters is really enough for future: 99 social networks*/
 	protected static final String GOOGLE_PREFIX = "10";
+	
 	private static final String FACEBOOK_PREFIX = "11";
 	private static final String NO_SOCIAL_NETWORK_PREFIX = "99";
+	
+	private static final String MOBIDOT_SOURCE = "Mobidot";
 	
 	private static final String PROFILE_URI = Configuration.PROFILE_URI;
 	
@@ -31,6 +35,17 @@ public class Utils {
 			return FACEBOOK_PREFIX + originalUID;
 		}
 		return NO_SOCIAL_NETWORK_PREFIX + originalUID;
+	}
+	
+	protected static void checkAndCreatePartnerAccounts(String _3cixtyUID, String appId,
+			String givenName, String familyName, Set <ProfileIdentities> profileIdentities) {
+		if (appId == null || appId.equals("")) return;
+		PartnerAccount paMobidot = PartnerAccountUtils.retrieveOrAddMobidotUser(_3cixtyUID, givenName, familyName);
+		if (paMobidot != null) {
+			Utils.setProfileIdentities(_3cixtyUID, paMobidot.getUsername(), Utils.MOBIDOT_SOURCE, profileIdentities);
+		}
+		
+		PartnerAccountUtils.retrieveOrAddGoflowUser(_3cixtyUID, appId);
 	}
 
 	protected static void setProfileIdentities(String _3cixtyUID, String uid, String source,

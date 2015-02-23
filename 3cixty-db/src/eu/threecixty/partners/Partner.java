@@ -1,7 +1,5 @@
 package eu.threecixty.partners;
 
-import java.util.List;
-
 
 public interface Partner {
 
@@ -10,7 +8,8 @@ public interface Partner {
 	boolean deleteUser(PartnerUser user);
 	boolean exist(String uid);
 	PartnerUser getUser(String uid);
-	List <PartnerUser> getUsers();
 	
 	PartnerAccount findAccount(PartnerUser user, String appid, String role);
+	
+	boolean addAccount(PartnerAccount account);
 }
