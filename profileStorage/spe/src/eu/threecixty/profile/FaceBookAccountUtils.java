@@ -68,8 +68,6 @@ public class FaceBookAccountUtils {
 
 			profile.setKnows(knows);
 			
-			Utils.checkAndCreatePartnerAccounts(_3cixtyUID, appId, firstName, lastName, profileIdentities);
-			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 			return _3cixtyUID;

@@ -13,11 +13,10 @@ public class PartnerAccountUtils {
 	/**
 	 * Try to create a Mobidot user if it doesn't exist on Movesmarter server.
 	 * @param _3cixty
-	 * @param firstName
-	 * @param lastName
+	 * @param displayName
 	 * @return Mobidot's account if existed
 	 */
-	public static PartnerAccount retrieveOrAddMobidotUser(String _3cixtyUID, String firstName, String lastName) {
+	public static PartnerAccount retrieveOrAddMobidotUser(String _3cixtyUID, String displayName) {
 		Partner partner = ProfileManagerImpl.getInstance().getPartner();
     	PartnerUser mobidotUser = partner.getUser(_3cixtyUID);
 		PartnerAccount account = partner.findAccount(mobidotUser, MOBIDOT_APP_ID, null);
@@ -33,7 +32,7 @@ public class PartnerAccountUtils {
 		}
 		String password = "3cixtyI$InExpo)!_" + UUID.randomUUID().toString();
 		try {
-		    String mobidotID = MobidotUserUtils.createMobidotUser(_3cixtyUID, firstName, lastName, password);
+		    String mobidotID = MobidotUserUtils.createMobidotUser(_3cixtyUID, displayName, password);
 		    if (mobidotID == null || mobidotID.equals("")) return null;
 		    account = new PartnerAccount();
 			account.setAppId(MOBIDOT_APP_ID);

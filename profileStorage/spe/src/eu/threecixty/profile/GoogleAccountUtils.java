@@ -161,8 +161,6 @@ public class GoogleAccountUtils {
 			
 			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
 			
-			Utils.checkAndCreatePartnerAccounts(_3cixtyUID, appId, givenName, familyName, profileIdentities);
-			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 		} catch (Exception e) {

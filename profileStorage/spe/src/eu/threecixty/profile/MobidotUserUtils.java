@@ -30,12 +30,12 @@ public class MobidotUserUtils {
 	  * @return
 	  * @throws Exception
 	  */
-	 public static String createMobidotUser(String uid, String firstName, String lastName, String password) throws Exception{
+	 public static String createMobidotUser(String uid, String displayName, String password) throws Exception{
 			if (DEBUG_MOD) LOGGER.info("Start creating Mobidot user");
 			
 			JSONObject userObj = new JSONObject();
 			userObj.put("userName",uid);
-			userObj.put("displayName", firstName + " " + lastName);
+			userObj.put("displayName", displayName);
 			userObj.put("email", uid+"@3cixty.com");
 			userObj.put("profile", new JSONObject());
 			

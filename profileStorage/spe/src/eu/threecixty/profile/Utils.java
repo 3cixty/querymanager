@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.Set;
 
 import eu.threecixty.Configuration;
-import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
@@ -23,8 +22,6 @@ public class Utils {
 	private static final String FACEBOOK_PREFIX = "11";
 	private static final String NO_SOCIAL_NETWORK_PREFIX = "99";
 	
-	private static final String MOBIDOT_SOURCE = "Mobidot";
-	
 	private static final String PROFILE_URI = Configuration.PROFILE_URI;
 	
 	public static String gen3cixtyUID(String originalUID, UidSource source) {
@@ -36,19 +33,8 @@ public class Utils {
 		}
 		return NO_SOCIAL_NETWORK_PREFIX + originalUID;
 	}
-	
-	protected static void checkAndCreatePartnerAccounts(String _3cixtyUID, String appId,
-			String givenName, String familyName, Set <ProfileIdentities> profileIdentities) {
-		if (appId == null || appId.equals("")) return;
-		PartnerAccount paMobidot = PartnerAccountUtils.retrieveOrAddMobidotUser(_3cixtyUID, givenName, familyName);
-		if (paMobidot != null) {
-			Utils.setProfileIdentities(_3cixtyUID, paMobidot.getUsername(), Utils.MOBIDOT_SOURCE, profileIdentities);
-		}
-		
-		PartnerAccountUtils.retrieveOrAddGoflowUser(_3cixtyUID, appId);
-	}
 
-	protected static void setProfileIdentities(String _3cixtyUID, String uid, String source,
+	public static void setProfileIdentities(String _3cixtyUID, String uid, String source,
 			Set<ProfileIdentities> profileIdentities) {
 		boolean found = false;
 		for (ProfileIdentities pi: profileIdentities) {
@@ -59,14 +45,6 @@ public class Utils {
 		}
 		if (found) return; // already existed
 		addProfileIdentities(_3cixtyUID, uid, source, profileIdentities);
-		/*ProfileIdentities pi = new ProfileIdentities();
-		pi.setHasSourceCarrier(source);
-		pi.setHasUserAccountID(uid);
-		
-		pi.setHasUserInteractionMode(UserInteractionMode.Active);
-		pi.setHasProfileIdentitiesURI(PROFILE_URI+ _3cixtyUID + "/Account/" + pi.getHasSourceCarrier());
-		
-		profileIdentities.add(pi);*/
 	}
 	
 	protected static void addProfileIdentities(String _3cixtyUID, String uid, String source,

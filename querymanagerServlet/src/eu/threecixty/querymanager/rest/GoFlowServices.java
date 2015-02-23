@@ -36,7 +36,7 @@ public class GoFlowServices {
 	 * @return
 	 */
 	@GET
-	@Path("/createOrRetrieveGoFlowUser")
+	@Path("/getGoflowAccount")
 	public Response getUser(@HeaderParam("access_token") String access_token) {
 		return getAccount(access_token, END_USER_ROLE);
 	}
