@@ -112,7 +112,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 			virtGraph = VirtuosoManager.getInstance().getVirtGraph();
 			VirtuosoUpdateRequest vurToInsertData = null;
 			for (Tray tray: trays) {
-				tray.setUid(uid);
+				tray.setToken(uid);
 				if (!checkTrayExisted(tray)) {
 				    String query = createQueryToSave(tray);
 				
@@ -243,7 +243,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 				if (jsonArr.length() == 0) return trays;
 				for (int i = 0; i < jsonArr.length(); i++) {
 					Tray tray = createTray(jsonArr.getJSONObject(i));
-					tray.setUid(uid);
+					tray.setToken(uid);
 					trays.add(tray);
 				}
 			} catch (JSONException e) {
@@ -260,15 +260,15 @@ public class VirtuosoTrayStorage implements TrayManager {
 	private static Tray createTray(JSONObject jsonObject) {
 		Tray tray = new Tray();
 		try {
-			tray.setItemId(getValue(jsonObject, "trayId"));
-			tray.setItemType(CodeBaseUtils.decode(getValue(jsonObject, "type")));
+			tray.setElement_id(getValue(jsonObject, "trayId"));
+			tray.setElement_type(CodeBaseUtils.decode(getValue(jsonObject, "type")));
 			tray.setTimestamp(Long.parseLong(getValue(jsonObject, "timestamp")));
 			
 			if (jsonObject.has("source"))  tray.setSource(CodeBaseUtils.decode(getValue(jsonObject, "source")));
 			if (jsonObject.has("title")) tray.setElement_title(CodeBaseUtils.decode(getValue(jsonObject, "title")));
 
-		    if (jsonObject.has("attend")) tray.setAttended(Boolean.parseBoolean(getValue(jsonObject, "attend")));
-		    if (jsonObject.has("attendedDateTime")) tray.setDateTimeAttended(getValue(jsonObject, "attendedDateTime"));
+		    if (jsonObject.has("attend")) tray.setAttend(Boolean.parseBoolean(getValue(jsonObject, "attend")));
+		    if (jsonObject.has("attendedDateTime")) tray.setAttend_datetime(getValue(jsonObject, "attendedDateTime"));
 		    if (jsonObject.has("ratingValue")) {
 		    	String ratingStr = ((JSONObject) jsonObject.get("ratingValue")).getString("value");
 		    	if (ratingStr != null && !ratingStr.trim().equals("")) tray.setRating(Integer.parseInt(ratingStr));
@@ -310,7 +310,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 				JSONArray jsonArr = jsonObject.getJSONObject("results").getJSONArray("bindings");
 				if (jsonArr.length() == 0) return null;
 				Tray tray = createTray(jsonArr.getJSONObject(0));
-				tray.setUid(uid);
+				tray.setToken(uid);
 				return tray;
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -352,7 +352,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 					Tray tray = createTray(tmp);
 					String uid = getValue(tmp, "person").substring(
 							GetSetQueryStrings.PROFILE_URI.length());
-					tray.setUid(uid);
+					tray.setToken(uid);
 					trays.add(tray);
 				}
 			} catch (JSONException e) {
@@ -395,18 +395,18 @@ public class VirtuosoTrayStorage implements TrayManager {
 				"   INSERT DATA { GRAPH <").append(getGraphName(tray)).append("> \n");
 		buf.append(" {");
 		buf.append(personUri).append(" ").append(PROFILE_TRAY_ELEMENT_PREDICATE).append(" ").append(trayUri).append(" .\n");
-		buf.append(trayUri).append(" ").append(TRAY_ID_PREDICATE).append(" <" + tray.getItemId() + ">").append(" .\n");
+		buf.append(trayUri).append(" ").append(TRAY_ID_PREDICATE).append(" <" + tray.getElement_id() + ">").append(" .\n");
 		buf.append(trayUri).append(" ").append(TRAY_TITLE_PREDICATE).append(" \"" + CodeBaseUtils.encode(tray.getElement_title()) + "\"").append(" .\n");
-		buf.append(trayUri).append(" ").append(TRAY_TYPE_PREDICATE).append(" \"" + CodeBaseUtils.encode(tray.getItemType()) + "\"").append(" .\n");
+		buf.append(trayUri).append(" ").append(TRAY_TYPE_PREDICATE).append(" \"" + CodeBaseUtils.encode(tray.getElement_type()) + "\"").append(" .\n");
 		buf.append(trayUri).append(" ").append(TRAY_TIMESTAMP_PREDICATE).append(" \"").append(tray.getTimestamp()).append("\"").append(LONG_SCHEMA).append(" .\n");
 		if (!isNullOrEmpty(tray.getSource())) {
 			buf.append(trayUri).append(" ").append(TRAY_SOURCE_PREDICATE).append(" \"" + CodeBaseUtils.encode(tray.getSource()) + "\"").append(" .\n");
 		}
 		
-		buf.append(trayUri).append(" ").append(TRAY_ATTEND_PREDICATE).append(" ").append(tray.isAttended()).append(" .\n");
+		buf.append(trayUri).append(" ").append(TRAY_ATTEND_PREDICATE).append(" ").append(tray.isAttend()).append(" .\n");
 		
-		if (!isNullOrEmpty(tray.getDateTimeAttended())) {
-			buf.append(trayUri).append(" ").append(TRAY_ATTENDED_DATETIME_PREDICATE).append(" \"" + tray.getDateTimeAttended() + "\"").append(" .\n");
+		if (!isNullOrEmpty(tray.getAttend_datetime())) {
+			buf.append(trayUri).append(" ").append(TRAY_ATTENDED_DATETIME_PREDICATE).append(" \"" + tray.getAttend_datetime() + "\"").append(" .\n");
 		}
 		if (!isNullOrEmpty(tray.getImage_url())) {
 			buf.append(trayUri).append(" ").append(TRAY_IMAGE_URL_PREDICATE).append(" \"" + CodeBaseUtils.encode(tray.getImage_url()) + "\"").append(" .\n");
@@ -457,7 +457,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	}
 
 	private static String getPersonURI(Tray tray) {
-		return getPersonURI(tray.getUid());
+		return getPersonURI(tray.getToken());
 	}
 	
 	private static String getPersonURI(String uid) {
@@ -465,7 +465,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	}
 	
 	private static String getTrayURI(Tray tray) {
-		return getTrayUri(tray.getUid(), tray.getItemId());
+		return getTrayUri(tray.getToken(), tray.getElement_id());
 	}
 	
 	private static String getTrayUri(String uid, String trayId) {
@@ -479,8 +479,8 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 */
 	private static boolean checkValidTray(Tray tray) {
 		// only check for uid and trayId to avoid SQL injection
-		if (!containValidCharacters(tray.getUid())) return false;
-		return containValidCharacters(tray.getItemId());
+		if (!containValidCharacters(tray.getToken())) return false;
+		return containValidCharacters(tray.getElement_id());
 	}
 	
 	/**
@@ -506,7 +506,7 @@ public class VirtuosoTrayStorage implements TrayManager {
 	 * @return
 	 */
 	private static String getGraphName(Tray tray) {
-		return VirtuosoManager.getInstance().getGraph(tray.getUid());
+		return VirtuosoManager.getInstance().getGraph(tray.getToken());
 	}
 	
 	/**

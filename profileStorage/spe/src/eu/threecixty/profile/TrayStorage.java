@@ -49,9 +49,9 @@ public class TrayStorage implements TrayManager {
 		int index = -1;
 		for (int i = 0; i < allTrays.size(); i++) {
 			Tray tmpTray = allTrays.get(i);
-			if (checkEquality(tray.getItemId(), tmpTray.getItemId())) {
-				if (tray.getUid() != null && !tray.getUid().equals("")) {
-					if (tray.getUid().equals(tmpTray.getUid())) {
+			if (checkEquality(tray.getElement_id(), tmpTray.getElement_id())) {
+				if (tray.getToken()!= null && !tray.getToken().equals("")) {
+					if (tray.getToken().equals(tmpTray.getToken())) {
 						index = i;
 						break;
 					}
@@ -68,9 +68,9 @@ public class TrayStorage implements TrayManager {
 		List <Tray> allTrays = getAllTrays();
 		boolean changed = false;
 		for (Tray tray: allTrays) {
-			if (junkID.equals(tray.getUid())) {
+			if (junkID.equals(tray.getToken())) {
 				changed = true;
-				tray.setUid(uid);
+				tray.setToken(uid);
 			}
 		}
 		if (!changed) return true;
@@ -84,9 +84,9 @@ public class TrayStorage implements TrayManager {
 		int index = -1;
 		for (int i = 0; i < allTrays.size(); i++) {
 			Tray tmpTray = allTrays.get(i);
-			if (checkEquality(tray.getItemId(), tmpTray.getItemId())) {
-				if (tray.getUid() != null && !tray.getUid().equals("")) {
-					if (tray.getUid().equals(tmpTray.getUid())) {
+			if (checkEquality(tray.getElement_id(), tmpTray.getElement_id())) {
+				if (tray.getToken() != null && !tray.getToken().equals("")) {
+					if (tray.getToken().equals(tmpTray.getToken())) {
 						index = i;
 						break;
 					}
@@ -163,7 +163,7 @@ public class TrayStorage implements TrayManager {
 		if (uid == null || trayId == null) return null;
 		List <Tray> trays = getTrays(uid);
 		for (Tray tmp: trays) {
-			if (trayId.equals(tmp.getItemId())) {
+			if (trayId.equals(tmp.getElement_id())) {
 				return tmp;
 			}
 		}
@@ -179,14 +179,14 @@ public class TrayStorage implements TrayManager {
 		for(int i = 0 ; i < array.length(); i++){
 		    JSONObject jsonObj = (JSONObject)array.get(i);
 		    Tray tray = new Tray();
-		    tray.setItemId(jsonObj.getString("element_id"));
-		    tray.setItemType(jsonObj.getString("element_type"));
+		    tray.setElement_id(jsonObj.getString("element_id"));
+		    tray.setElement_type(jsonObj.getString("element_type"));
 		    tray.setTimestamp(jsonObj.getLong("timestamp"));
-		    tray.setUid(jsonObj.getString("token"));
+		    tray.setToken(jsonObj.getString("token"));
 		    tray.setSource(jsonObj.getString("source"));
 		    
-		    if (jsonObj.has("attend")) tray.setAttended(jsonObj.getBoolean("attend"));
-		    if (jsonObj.has("attend_datetime")) tray.setDateTimeAttended(jsonObj.getString("attend_datetime"));
+		    if (jsonObj.has("attend")) tray.setAttend(jsonObj.getBoolean("attend"));
+		    if (jsonObj.has("attend_datetime")) tray.setAttend_datetime(jsonObj.getString("attend_datetime"));
 		    if (jsonObj.has("rating")) tray.setRating(jsonObj.getInt("rating"));
 		    if (jsonObj.has("element_title")) tray.setElement_title(jsonObj.getString("element_title"));
 		    if (jsonObj.has("image_url")) tray.setImage_url(jsonObj.getString("image_url"));
@@ -234,7 +234,7 @@ public class TrayStorage implements TrayManager {
 		List <Tray> rets = new ArrayList <Tray>();
 		if (token == null) return rets;
 		for (Tray tray: allTrays) {
-			if (token.equals(tray.getUid())) rets.add(tray);
+			if (token.equals(tray.getToken())) rets.add(tray);
 		}
 		return rets;
 	}
@@ -268,10 +268,10 @@ public class TrayStorage implements TrayManager {
 
 	private static boolean checkTrayExisted(Tray tray, List<Tray> allTrays) {
 		for (Tray tmpTray: allTrays) {
-			if (checkEquality(tray.getItemId(), tmpTray.getItemId()) &&
-					(tray.getItemType().equals(tmpTray.getItemType()))) {
-				if (tray.getUid() != null && !tray.getUid().equals("")) {
-					if (tray.getUid().equals(tmpTray.getUid())) return true;
+			if (checkEquality(tray.getElement_id(), tmpTray.getElement_id()) &&
+					(tray.getElement_type().equals(tmpTray.getElement_type()))) {
+				if (tray.getToken() != null && !tray.getToken().equals("")) {
+					if (tray.getToken().equals(tmpTray.getToken())) return true;
 				}
 			}
 		}

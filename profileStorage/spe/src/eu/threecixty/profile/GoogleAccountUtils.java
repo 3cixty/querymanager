@@ -33,7 +33,7 @@ public class GoogleAccountUtils {
 //	 */
 
 
-	public static String getUID(String accessToken) {
+	public static String getUID(String accessToken, String appId) {
 		if (accessToken == null) return "";
 		String user_id = null;
 		String _3cixtyUID = null;
@@ -160,7 +160,7 @@ public class GoogleAccountUtils {
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
 			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
-
+			
 			ProfileManagerImpl.getInstance().saveProfile(profile);
 			
 		} catch (Exception e) {

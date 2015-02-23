@@ -1,4 +1,4 @@
-package eu.threecixty.querymanager.rest;
+package eu.threecixty.profile;
 
 import java.io.FileInputStream;
 import java.io.IOException;

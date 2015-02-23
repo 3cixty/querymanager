@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +26,7 @@ import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.IProfiler;
-import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.VirtuosoManager;
 import eu.threecixty.profile.oldmodels.Event;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Place;
@@ -36,9 +34,6 @@ import eu.threecixty.profile.oldmodels.Preference;
 import eu.threecixty.profile.oldmodels.Rating;
 
  public class QueryManager implements IQueryManager {
-	 //private static final String EVENTMEDIA_URL_PREFIX = "http://eventmedia.eurecom.fr/sparql?default-graph-uri=&query=";
-	 //private static final String EVENTMEDIA_URL_PREFIX = "http://3cixty.eurecom.fr/sparql?default-graph-uri=&query=";
-	 private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 	 private static final String PREFIX_PROFILE_ADDED = "PREFIX profile:<http://www.eu.3cixty.org/profile#> ";
 	 
 	 private static final Logger LOGGER = Logger.getLogger(
@@ -185,24 +180,13 @@ import eu.threecixty.profile.oldmodels.Rating;
 		boolean ok = true;
 		// only make queries to public graphs
 //		if (uid == null) { // only public graphs
-			String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
-			urlStr += "&format=" + URLEncoder.encode(formatType, "UTF-8");
-
-			URL url = new URL(urlStr);
-
-			InputStream input = url.openStream();
-			byte [] b = new byte[1024];
-			int readBytes = 0;
-			while ((readBytes = input.read(b)) >= 0) {
-				sb.append(new String(b, 0, readBytes, "UTF-8"));
-			}
-			input.close();
+		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, formatType, sb);
 
 			if (EventMediaFormat.JSON == format) {
 				try {
 				    ok = hasElement(sb, numberOfOrders);
 				} catch (JSONException e) { // check if there are some backslashes
-					String newString = sb.toString().replace("\\U", "\\u");
+					String newString = VirtuosoManager.getInstance().cleanResultReceivedFromVirtuoso(sb.toString());
 					//newString = newString.replace("\\","\\\\");
 					//newString = newString.replace("\\\\\"", "\\\\\\\"");
 					if (DEBUG_MOD) LOGGER.info(newString);

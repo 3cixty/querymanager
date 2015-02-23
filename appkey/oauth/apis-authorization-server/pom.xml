@@ -137,7 +137,7 @@
     
     <dependency>
       <groupId>eu.3cixty</groupId>
-      <artifactId>oauth-utils</artifactId>
+      <artifactId>3cixty-common</artifactId>
       <version>1.0</version>
     </dependency>
     

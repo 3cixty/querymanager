@@ -49,12 +49,6 @@
     </dependency>
 
     <dependency>
-      <groupId>eu.3cixty</groupId>
-      <artifactId>oauth-wrapper</artifactId>
-	  <version>1.0</version>
-    </dependency>
-
-    <dependency>
 	  <groupId>xml-apis</groupId>
 	  <artifactId>xml-apis</artifactId>
 	  <version>1.4.01</version>
@@ -95,12 +89,6 @@
       <groupId>com.thetransactioncompany</groupId>
       <artifactId>cors-filter</artifactId>
       <version>1.8</version>
-    </dependency>
-
-    <dependency>
-        <groupId>com.github.briandilley.jsonrpc4j</groupId>
-        <artifactId>jsonrpc4j</artifactId>
-        <version>1.1</version>
     </dependency>
 
     <dependency>

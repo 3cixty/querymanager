@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -22,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
@@ -31,6 +33,8 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.ElementDetails;
+import eu.threecixty.profile.ElementDetailsUtils;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.TooManyConnections;
@@ -201,6 +205,57 @@ public class QueryManagerServices {
 				return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
 						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 			}
+		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build();
+		}
+	}
+	
+	/**
+	 * Make query to get elements in details.
+	 * @param key
+	 * @param events
+	 * @param pois
+	 * @return
+	 */
+	@GET
+	@Path("/getElementsInDetails")
+	public Response getElementsInDetails(@HeaderParam("key") String key, 
+			@QueryParam("events") String events, @QueryParam("pois") String pois) {
+		long starttime = System.currentTimeMillis();
+		if (OAuthWrappers.validateAppKey(key)) {
+			logInfo("App key is validated");
+
+			JSONObject result = new JSONObject();
+			if (events != null && !events.equals("")) {
+				List <String> eventIds = createList(events);
+				try {
+					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
+					if (eventsDetails != null) {
+						result.put("Events", eventsDetails);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (pois != null && !pois.equals("")) {
+				List <String> poiIds = createList(pois);
+				try {
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
+					if (poisDetails != null) {
+						result.put("POIs", poisDetails);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+			
+			return Response.ok(result.toString(), MediaType.APPLICATION_JSON_TYPE ).build();
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -693,6 +748,15 @@ public class QueryManagerServices {
     	if (scopes == null || scopes.size() == 0) return true;
     	if (scopes.contains(Constants.PROFILE_SCOPE_NAME)) return false;
     	return true;
+    }
+    
+    private List <String> createList(String idsStr) {
+    	String [] arrIds = idsStr.split(",");
+    	List <String> results = new LinkedList <String>();
+    	for (String id: arrIds) {
+    		results.add(id.trim());
+    	}
+    	return results;
     }
     
 	/**

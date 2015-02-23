@@ -87,28 +87,38 @@ public class OAuthServices {
 	@Path("/getAccessToken")
 	public Response getAccessToken(@HeaderParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey,
 			@DefaultValue("") @HeaderParam("scope") String scope) {
-		String _3cixtyUid = GoogleAccountUtils.getUID(g_access_token);
+		App app = OAuthWrappers.retrieveApp(appkey);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		String _3cixtyUid = GoogleAccountUtils.getUID(g_access_token, app.getAppNameSpace());
 		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 
-		return getAccessTokenFromUid(_3cixtyUid, appkey, scope);
+		return getAccessTokenFromUid(_3cixtyUid, app, scope);
 	}
 	
 	@GET
 	@Path("/getAccessTokenForFB")
 	public Response getAccessTokenForFB(@HeaderParam("fb_access_token") String fb_access_token, @HeaderParam("key") String appkey,
 			@DefaultValue("") @HeaderParam("scope") String scope) {
-		String _3cixtyUid = FaceBookAccountUtils.getUID(fb_access_token);
+		App app = OAuthWrappers.retrieveApp(appkey);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		String _3cixtyUid = FaceBookAccountUtils.getUID(fb_access_token, app.getAppNameSpace());
 		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Facebook access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 
-		return getAccessTokenFromUid(_3cixtyUid, appkey, scope);
+		return getAccessTokenFromUid(_3cixtyUid, app, scope);
 	}
 
 	@GET
@@ -126,7 +136,7 @@ public class OAuthServices {
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		String uid = GoogleAccountUtils.getUID(g_access_token);
+		String uid = GoogleAccountUtils.getUID(g_access_token, null);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -163,7 +173,7 @@ public class OAuthServices {
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		String uid = GoogleAccountUtils.getUID(googleAccessToken);
+		String uid = GoogleAccountUtils.getUID(googleAccessToken, null);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -186,7 +196,7 @@ public class OAuthServices {
 	@Path("/getApps")
 	public Response getApps(@QueryParam("google_access_token") String g_access_token, @DefaultValue("json") @QueryParam("format") String format) {
 		try {
-			String uid = GoogleAccountUtils.getUID(g_access_token);
+			String uid = GoogleAccountUtils.getUID(g_access_token, null);
 			if (uid == null || uid.equals(""))
 				return Response.status(Response.Status.BAD_REQUEST)
 						.entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -225,7 +235,7 @@ public class OAuthServices {
 	@GET
 	@Path("/retrieveAppKey")
 	public Response retrieveAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid) {
-		String uid = GoogleAccountUtils.getUID(g_access_token);
+		String uid = GoogleAccountUtils.getUID(g_access_token, null);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -357,8 +367,8 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		
-		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside)
-				: FaceBookAccountUtils.getUID(accessTokenFromOutside);
+		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside, app.getAppNameSpace())
+				: FaceBookAccountUtils.getUID(accessTokenFromOutside, app.getAppNameSpace());
 		
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
@@ -469,18 +479,13 @@ public class OAuthServices {
 	}
 	
 	
-	private Response getAccessTokenFromUid(String _3cixtyUID, String appkey, String scope) {
+	private Response getAccessTokenFromUid(String _3cixtyUID, App app, String scope) {
 		if (!checkValidScope(scope)) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Scope is invalid\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		App app = OAuthWrappers.retrieveApp(appkey);
-		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
-		        .type(MediaType.APPLICATION_JSON_TYPE)
-		        .build();
 		AccessToken accessToken = OAuthWrappers.createAccessTokenForMobileApp(app, scope);
 		if (accessToken == null) {
 			return Response.status(Response.Status.BAD_REQUEST)

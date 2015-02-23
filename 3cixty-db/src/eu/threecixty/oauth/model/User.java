@@ -30,7 +30,7 @@ public class User implements java.io.Serializable {
 	private static final long serialVersionUID = -7879877349825721983L;
 
 	private Integer id;
-	private String uid; // which associates with Google user_id
+	private String uid; // which associates with 3cixty user_id
 
 	private Set <UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 

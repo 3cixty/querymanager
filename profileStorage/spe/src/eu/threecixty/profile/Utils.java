@@ -18,6 +18,7 @@ public class Utils {
 	
 	/**A prefix of two characters is really enough for future: 99 social networks*/
 	protected static final String GOOGLE_PREFIX = "10";
+	
 	private static final String FACEBOOK_PREFIX = "11";
 	private static final String NO_SOCIAL_NETWORK_PREFIX = "99";
 	
@@ -33,7 +34,7 @@ public class Utils {
 		return NO_SOCIAL_NETWORK_PREFIX + originalUID;
 	}
 
-	protected static void setProfileIdentities(String _3cixtyUID, String uid, String source,
+	public static void setProfileIdentities(String _3cixtyUID, String uid, String source,
 			Set<ProfileIdentities> profileIdentities) {
 		boolean found = false;
 		for (ProfileIdentities pi: profileIdentities) {
@@ -43,11 +44,15 @@ public class Utils {
 			}
 		}
 		if (found) return; // already existed
+		addProfileIdentities(_3cixtyUID, uid, source, profileIdentities);
+	}
+	
+	protected static void addProfileIdentities(String _3cixtyUID, String uid, String source,
+			Set<ProfileIdentities> profileIdentities) {
 		
 		ProfileIdentities pi = new ProfileIdentities();
 		pi.setHasSourceCarrier(source);
 		pi.setHasUserAccountID(uid);
-		
 		pi.setHasUserInteractionMode(UserInteractionMode.Active);
 		pi.setHasProfileIdentitiesURI(PROFILE_URI+ _3cixtyUID + "/Account/" + pi.getHasSourceCarrier());
 		

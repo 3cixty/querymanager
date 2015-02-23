@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.partners.Partner;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**
@@ -186,14 +187,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public Partner getMobidot() {
-		if (profileManager != null) return profileManager.getMobidot();
-		return null;
-	}
-
-	@Override
-	public Partner getGoFlow() {
-		if (profileManager != null) return profileManager.getGoFlow();
+	public Partner getPartner() {
+		if (profileManager != null) return profileManager.getPartner();
 		return null;
 	}
 
