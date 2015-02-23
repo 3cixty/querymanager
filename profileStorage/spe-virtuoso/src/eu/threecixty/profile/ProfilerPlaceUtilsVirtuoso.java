@@ -286,15 +286,22 @@ public class ProfilerPlaceUtilsVirtuoso {
 		List <String> friendUids = new LinkedList <String>();
 		StringBuffer buffer = new StringBuffer(PREFIXES);
 
-		buffer.append("SELECT  ?friendUID \n");
-		buffer.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + ">\n");
-		buffer.append("where {\n");
-		
-		buffer.append(getPersonURI(uid) +  " schema:knows	?knows .\n");
-		
-		buffer.append("?knows profile:userID	?friendUID .\n"); // friend's UID
-		
-		buffer.append("}");
+        buffer.append("SELECT  Distinct ?friendUID \n");
+        buffer.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + ">\n");
+        buffer.append("where {\n");
+        buffer.append(" {\n");
+        buffer.append(getPersonURI(uid) +  " schema:knows	?knows .\n");
+        
+        buffer.append("?knows profile:userID	?friendUID .\n"); // friend's UID
+        
+        buffer.append("}");
+        buffer.append("UNION {\n");
+        buffer.append(getPersonURI(uid) +  " profile:mobility	?mobility .\n");
+        
+        buffer.append("?mobility profile:accompany	?accompany .\n");
+        buffer.append("?accompany profile:accompanyUser	?friendUID .\n");// Accompanying friend's UID
+        buffer.append("}");
+        buffer.append("}");
 		
 		JSONObject jsonObj;
 		try {
