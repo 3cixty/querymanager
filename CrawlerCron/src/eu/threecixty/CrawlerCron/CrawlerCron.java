@@ -3,7 +3,9 @@ package eu.threecixty.CrawlerCron;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import eu.threecixty.MobilityCrawlerCron.MobilityCrawlerCron;
 import eu.threecixty.profile.IDMapping;
+import eu.threecixty.profile.ProfileManager;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
@@ -147,7 +150,9 @@ public class CrawlerCron {
 					e.printStackTrace();
 				}
 
-				ProfileManagerImpl.getInstance().saveProfile(user);
+				Map <String, Boolean> attrs = getAttributesForCrawlingMobidotInfor();
+				
+				ProfileManagerImpl.getInstance().saveProfile(user, attrs);
 				if (DEBUG_MOD) LOGGER.info("Finished saving Mobidot data of user: "+ map.getThreeCixtyID());
 
 			} catch (TooManyConnections e) {
@@ -156,5 +161,13 @@ public class CrawlerCron {
 		}
 		if (DEBUG_MOD) LOGGER.info("Finished crawling Mobidot data");
 
+	}
+	
+	private Map <String, Boolean> getAttributesForCrawlingMobidotInfor() {
+		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+		attrs.put(ProfileManager.ATTRIBUTE_PREFERENCE, true);
+		attrs.put(ProfileManager.ATTRIBUTE_TRANSPORT, true);
+		attrs.put(ProfileManager.ATTRIBUTE_LAST_CRAWL_TIME, true);
+		return attrs;
 	}
 }

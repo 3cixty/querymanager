@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.protege.owl.codegeneration.WrappedIndividual;
@@ -114,10 +115,10 @@ public class UserProfileStorage {
 	 * @param profile
 	 * @return
 	 */
-	public static boolean saveProfile(eu.threecixty.profile.UserProfile profile) {
+	public static boolean saveProfile(eu.threecixty.profile.UserProfile profile, Map <String, Boolean> attributes) {
 		if (profile == null) return false;
 		synchronized (_sync) {
-
+			
 
 			try {
 				MyFactory mf = getMyFactory();
@@ -130,16 +131,26 @@ public class UserProfileStorage {
 				if (!kbUserProfile.hasHasUID()) {
 					kbUserProfile.addHasUID(profile.getHasUID());
 				}
+				
+				if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_NAME)) {
+				    saveNameInfoToKB(profile, kbUserProfile, mf);
+				}
 
-				saveNameInfoToKB(profile, kbUserProfile, mf);
+				if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_ADDRESS)) {
+				    saveAddressInfoToKB(profile, kbUserProfile, mf);
+				}
 
-				saveAddressInfoToKB(profile, kbUserProfile, mf);
+				if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES)) {
+				    saveProfileIdentitiesToKB(profile, mf, kbUserProfile);
+				}
+				if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_KNOWS)) {
+				    saveKnowsToKB(profile, kbUserProfile, mf);
+				}
 
-				saveProfileIdentitiesToKB(profile, mf, kbUserProfile);
-				saveKnowsToKB(profile, kbUserProfile, mf);
-
-				if (profile.getPreferences() != null) {
-					savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), kbUserProfile, mf);
+				if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PREFERENCE)) {
+				    if (profile.getPreferences() != null) {
+					    savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), kbUserProfile, mf);
+				    }
 				}
 
 				mf.saveOwlOntology();

@@ -2,6 +2,7 @@ package eu.threecixty.profile;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.partners.Partner;
@@ -13,6 +14,15 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
  *
  */
 public interface ProfileManager {
+	public static final String ATTRIBUTE_KNOWS = "knows";
+	public static final String ATTRIBUTE_NAME = "name";
+	public static final String ATTRIBUTE_ADDRESS = "address";
+	public static final String ATTRIBUTE_PROFILE_IDENTITIES = "profileIdentities";
+	public static final String ATTRIBUTE_GENDER = "gender";
+	public static final String ATTRIBUTE_PROFILE_IMAGE = "profileImage";
+	public static final String ATTRIBUTE_LAST_CRAWL_TIME = "lastCrawlTime";
+	public static final String ATTRIBUTE_TRANSPORT = "transport";
+	public static final String ATTRIBUTE_PREFERENCE = "preference";
 
 	/**
 	 * Gets user profile from KB.
@@ -26,9 +36,13 @@ public interface ProfileManager {
 	 * Saves a given user profile into the KB.
 	 * @param userProfile
 	 * 				The user profile.
+	 * @param attributes
+	 * 				The attributes which indicate what attribute is persisted. If the given map is null,
+	 * 				all attributes are persisted into DB. Be careful about using this parameter as it will
+	 *  			affect 3cixty's performance. 
 	 * @return <code>true</code> if the method is successful to save data, <code>false</code> otherwise. 
 	 */
-	boolean saveProfile(UserProfile userProfile) throws TooManyConnections;
+	boolean saveProfile(UserProfile userProfile, Map <String, Boolean> attributes) throws TooManyConnections;
 
 	/**
 	 * Checks whether or not a given Google UID exists in the KB.
@@ -219,6 +233,14 @@ public interface ProfileManager {
 	 * @return
 	 */
 	List <UserProfile> getAllUserProfiles();
+	
+	/**
+	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.
+	 * @param attributes
+	 * @param attrChecked
+	 * @return
+	 */
+	boolean checkAttributeToStore(Map <String, Boolean> attributes, String attrChecked);
 	
 	public class StartAndEndDate {
 

@@ -3,6 +3,7 @@ package eu.threecixty.profile;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -50,8 +51,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile) throws TooManyConnections {
-		if (profileManager != null) return profileManager.saveProfile(userProfile);
+	public boolean saveProfile(UserProfile userProfile, Map <String, Boolean> attributes) throws TooManyConnections {
+		if (profileManager != null) return profileManager.saveProfile(userProfile, attributes);
 		return false;
 	}
 
@@ -202,6 +203,11 @@ public class ProfileManagerImpl implements ProfileManager {
 	public List<UserProfile> getAllUserProfiles() {
 		if (profileManager != null) return profileManager.getAllUserProfiles();
 		return null;
+	}
+	
+	public boolean checkAttributeToStore(Map <String, Boolean> attributes, String attrChecked) {
+		if (attributes == null) return true;
+		return Boolean.TRUE.equals(attributes.get(attrChecked));
 	}
 
 	private ProfileManagerImpl() {

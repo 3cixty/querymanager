@@ -135,7 +135,7 @@ public class VirtuosoUserProfileStorage {
 	 * @return
 	 * @throws InterruptedException 
 	 */
-	public synchronized boolean saveProfile(eu.threecixty.profile.UserProfile profile) throws InterruptedException {
+	public synchronized boolean saveProfile(eu.threecixty.profile.UserProfile profile, Map <String, Boolean> attributes) throws InterruptedException {
 		if (profile == null) return false;
 		//try {
 
@@ -149,25 +149,44 @@ public class VirtuosoUserProfileStorage {
 			
 			saveUIDInfoTOKB(profile.getHasUID(), queriesToInsertData);
 
-			saveGenderToKB(profile.getHasUID(),profile.getHasGender(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_GENDER)) {
+			    saveGenderToKB(profile.getHasUID(),profile.getHasGender(), queriesToRemoveData, queriesToInsertData);
+			}
 
-			saveNameInfoToKB(profile.getHasUID(),profile.getHasName(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_NAME)) {
+			    saveNameInfoToKB(profile.getHasUID(),profile.getHasName(), queriesToRemoveData, queriesToInsertData);
+			}
 
-			saveProfileImage(profile.getHasUID(), profile.getProfileImage(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PROFILE_IMAGE)) {
+			    saveProfileImage(profile.getHasUID(), profile.getProfileImage(), queriesToRemoveData, queriesToInsertData);
+			}
 
-			saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_ADDRESS)) {
+			    saveAddressInfoToKB(profile.getHasUID(),profile.getHasAddress(), queriesToRemoveData, queriesToInsertData);
+			}
 
-			saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_LAST_CRAWL_TIME)) {
+			    saveLastCrawlTimeToKB(profile.getHasUID(), profile.getHasLastCrawlTime(), queriesToRemoveData, queriesToInsertData);
+			}
 
-			saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES)) {
+			    saveProfileIdentitiesToKB(profile.getHasUID(), profile.getHasProfileIdenties(), queriesToRemoveData, queriesToInsertData);
+			}
 
-			saveKnowsToKB(profile.getHasUID(), profile.getKnows(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_KNOWS)) {
+			    saveKnowsToKB(profile.getHasUID(), profile.getKnows(), queriesToRemoveData, queriesToInsertData);
+			}
 
-			savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), queriesToRemoveData, queriesToInsertData);
-			if (profile.getPreferences()==null)
-				saveTransportToKB(profile.getHasUID(), null, queriesToRemoveData, queriesToInsertData);
-			else
-				saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), queriesToRemoveData, queriesToInsertData);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PREFERENCE)) {
+			    savePreferenceToKB(profile.getHasUID(), profile.getPreferences(), queriesToRemoveData, queriesToInsertData);
+			}
+			
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_TRANSPORT)) {
+			    if (profile.getPreferences()==null)
+				    saveTransportToKB(profile.getHasUID(), null, queriesToRemoveData, queriesToInsertData);
+			    else
+				    saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), queriesToRemoveData, queriesToInsertData);
+			}
 
 			VirtuosoUpdateRequest vurToRemoveData = null;
 			for (String query: queriesToRemoveData) {

@@ -3,6 +3,7 @@ package eu.threecixty.profile;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.hp.hpl.jena.query.Query;
@@ -30,8 +31,8 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile) {
-		return UserProfileStorage.saveProfile(userProfile);
+	public boolean saveProfile(UserProfile userProfile, Map <String, Boolean> attributes) {
+		return UserProfileStorage.saveProfile(userProfile, attributes);
 	}
 
 	@Override
@@ -208,5 +209,11 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	@Override
 	public List<UserProfile> getAllUserProfiles() {
 		return UserProfileStorage.getAllProfiles();
+	}
+
+	@Override
+	public boolean checkAttributeToStore(Map<String, Boolean> attributes, String attribute) {
+		// XXX: always use code from ProfileManagerImpl for this method.
+		return false;
 	}
 }

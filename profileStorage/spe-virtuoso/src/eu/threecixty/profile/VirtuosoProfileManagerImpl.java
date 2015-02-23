@@ -3,6 +3,7 @@ package eu.threecixty.profile;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.hp.hpl.jena.query.QuerySolution;
@@ -34,9 +35,9 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public boolean saveProfile(UserProfile userProfile) throws TooManyConnections {
+	public boolean saveProfile(UserProfile userProfile, Map <String, Boolean> attributes) throws TooManyConnections {
 		try {
-			return VirtuosoUserProfileStorage.getInstance(userProfile.getHasUID()).saveProfile(userProfile);
+			return VirtuosoUserProfileStorage.getInstance(userProfile.getHasUID()).saveProfile(userProfile, attributes);
 		} catch (InterruptedException e) {
 			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
@@ -261,5 +262,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 //			e.printStackTrace();
 //		}
 		return null;
+	}
+	
+	@Override
+	public boolean checkAttributeToStore(Map<String, Boolean> attributes, String attribute) {
+		// XXX: always use code from ProfileManagerImpl for this method.
+		return false;
 	}
 }

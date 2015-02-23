@@ -1,6 +1,8 @@
 package eu.threecixty.profile;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -161,7 +163,14 @@ public class GoogleAccountUtils {
 			
 			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
 			
-			ProfileManagerImpl.getInstance().saveProfile(profile);
+			Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+			attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
+			attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
+			attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
+			attrs.put(ProfileManager.ATTRIBUTE_KNOWS, true);
+			attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
+			
+			ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

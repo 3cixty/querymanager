@@ -1,8 +1,10 @@
 package eu.threecixty.profile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.profile.oldmodels.Address;
@@ -30,8 +32,13 @@ public class SettingsStorage {
 		saveNameInfoToKB(settings, userProfile);
 		saveAddressInfoToKB(settings, userProfile);
 		addProfileIdentitiesIntoUserProfile(settings, userProfile);
+		
+		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
+		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
 
-		ProfileManagerImpl.getInstance().saveProfile(userProfile);
+		ProfileManagerImpl.getInstance().saveProfile(userProfile, attrs);
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package eu.threecixty.profile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.Name;
 
@@ -61,7 +64,12 @@ public class ProfileInformationStorage {
 			kbUserProfile.setProfileImage(profile.getProfileImage());
 		}
 
-		ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
+		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
+		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
+		
+		ProfileManagerImpl.getInstance().saveProfile(kbUserProfile, attrs);
 		return true;
 	}
 

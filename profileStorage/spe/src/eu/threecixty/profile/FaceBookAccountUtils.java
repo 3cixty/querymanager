@@ -1,6 +1,8 @@
 package eu.threecixty.profile;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -68,7 +70,9 @@ public class FaceBookAccountUtils {
 
 			profile.setKnows(knows);
 			
-			ProfileManagerImpl.getInstance().saveProfile(profile);
+			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
+			
+			ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 			
 			return _3cixtyUID;
 		} catch (Exception e) {

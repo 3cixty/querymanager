@@ -3,6 +3,8 @@ package eu.threecixty.profile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.Configuration;
@@ -82,6 +84,16 @@ public class Utils {
 	        if (reader != null)
 	            reader.close();
 	    }
+	}
+	
+	protected static Map <String, Boolean> getAttributesToStoreForCrawlingSocialProfile() {
+		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
+		attrs.put(ProfileManager.ATTRIBUTE_KNOWS, true);
+		attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
+		return attrs;
 	}
 	
 	private Utils() {
