@@ -46,12 +46,12 @@ public class PartnerUser implements java.io.Serializable {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "partnerUser")
-	public List<PartnerAccount> getAccounts() {
+	public List<PartnerAccount> getPartnerAccounts() {
 		return partnerAccounts;
 	}
 
-	public void setPartnerAccounts(List<PartnerAccount> accounts) {
-		this.partnerAccounts = accounts;
+	public void setPartnerAccounts(List<PartnerAccount> partnerAccounts) {
+		this.partnerAccounts = partnerAccounts;
 	}
 	
 	@Id

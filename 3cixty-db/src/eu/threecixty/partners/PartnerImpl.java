@@ -120,7 +120,7 @@ public class PartnerImpl implements Partner {
 			session = HibernateUtil.getSessionFactory().openSession();
 			PartnerUser freshUser = (PartnerUser) session.get(PartnerUser.class, user.getId());
 			PartnerAccount result = null;
-			for (PartnerAccount account: freshUser.getAccounts()) {
+			for (PartnerAccount account: freshUser.getPartnerAccounts()) {
 				if (role == null) { // without checking role
 					if (appid.equals(account.getAppId())) {
 						result = account;
