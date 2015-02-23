@@ -29,6 +29,7 @@ public class PartnerAccountUtils {
 		if (mobidotUser == null) {
 			mobidotUser = new PartnerUser();
 			mobidotUser.setUid(_3cixtyUID);
+			partner.addUser(mobidotUser); // persist user in 3cixty's DB
 		}
 		String password = "3cixtyI$InExpo)!_" + UUID.randomUUID().toString();
 		try {
@@ -40,7 +41,7 @@ public class PartnerAccountUtils {
 			account.setUsername(mobidotID);
 			account.setRole("User");
 			account.setPartnerUser(mobidotUser);
-			partner.addAccount(account); // persist in 3cixty's DB
+			partner.addAccount(account); // persist account in 3cixty's DB
 			return account;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -60,6 +61,7 @@ public class PartnerAccountUtils {
 		if (mobidotUser == null) {
 			mobidotUser = new PartnerUser();
 			mobidotUser.setUid(_3cixtyUID);
+			partner.addUser(mobidotUser); // persist user in 3cixty's DB
 		}
 		String password = GoFlowServer.getInstance().createEndUser(appId, _3cixtyUID);
 		if (password == null) {
@@ -72,7 +74,7 @@ public class PartnerAccountUtils {
 			account.setUsername(_3cixtyUID);
 			account.setRole("User");
 			account.setPartnerUser(mobidotUser);
-			partner.addAccount(account); // persist in 3cixty's DB
+			partner.addAccount(account); // persist account in 3cixty's DB
 			return account;
 		} catch (Exception e) {
 			e.printStackTrace();
