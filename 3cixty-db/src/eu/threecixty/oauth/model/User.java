@@ -30,7 +30,8 @@ public class User implements java.io.Serializable {
 	private static final long serialVersionUID = -7879877349825721983L;
 
 	private Integer id;
-	private String uid; // which associates with Google user_id
+	private String uid; // which associates with 3cixty user_id
+	private String displayName;
 
 	private Set <UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 
@@ -69,5 +70,14 @@ public class User implements java.io.Serializable {
 
 	public void setUserAccessTokens(Set<UserAccessToken> userAccessTokens) {
 		this.userAccessTokens = userAccessTokens;
+	}
+
+	@Column(name = "uid", unique = false, nullable = true, length = 255)
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 }
