@@ -1,6 +1,5 @@
 package eu.threecixty.profile;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -163,12 +162,7 @@ public class GoogleAccountUtils {
 			
 			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
 			
-			Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-			attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
-			attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
-			attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
-			attrs.put(ProfileManager.ATTRIBUTE_KNOWS, true);
-			attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
+			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			
 			ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 			
