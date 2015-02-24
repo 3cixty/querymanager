@@ -22,6 +22,8 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.profile.oldmodels.Address;
+import eu.threecixty.profile.oldmodels.Name;
 
 public class VirtuosoUserProfileStorage {
 	
@@ -103,15 +105,8 @@ public class VirtuosoUserProfileStorage {
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
 			
-			loadGenderFromKBToUserProfile(uid,toUserProfile);
-
-			loadNameFromKBToUserProfile(uid, toUserProfile);
-
-			loadProfileImageToUserProfile(uid, toUserProfile);
-
-			loadAddressInfoFromKBToUserProfile(uid, toUserProfile);
-
-			loadLastCrawlTimeFromKBToUserProfile(uid,toUserProfile);
+			// load unique info for each profile: use a query instead of 5 ones to improve performance
+			loadGenderNameImageAddressLastcrawl(uid, toUserProfile);
 
 			loadProfileIdentitiesFromUserProfile(uid, toUserProfile);
 
@@ -558,163 +553,73 @@ public class VirtuosoUserProfileStorage {
 	}
 	
 	/**
-	 * load gender from the kb
+	 * Loads unique info (gender, name, profile image, address, last crawl time) for each user profile to
+	 * avoid using 5 queries for performance improvement.
 	 * @param uid
-	 * @param to
+	 * @param toUserProfile
 	 * @throws InterruptedException 
 	 */
-	private void loadGenderFromKBToUserProfile(String uid,
-			UserProfile to) throws InterruptedException {
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getGender(uid));
+	private void loadGenderNameImageAddressLastcrawl(String uid,
+			UserProfile toUserProfile) throws InterruptedException {
+		// TODO Auto-generated method stub
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(
+				GetSetQueryStrings.createQueryToGetGenderNameImageAddressLastcrawl(uid));
 
 		ResultSet results = qRC.getReturnedResultSet();
+		Address toAddress = null;
 		
 		for ( ; results.hasNext(); ) {
 			QuerySolution qs = results.next();
 			try {
+				// Gender info
 				RDFNode gender = qs.get("gender");
-			   
-			    if (gender!=null)
-			    	to.setHasGender(gender.toString());	
-			} catch (Exception e) {
-				e.printStackTrace();
-				LOGGER.error(e.getMessage());
-			}
-		}
-		qRC.closeConnection();
-		return;
-	}
-	
-	/**
-	 * load last crawl time from the kb
-	 * @param uid
-	 * @param to
-	 * @throws InterruptedException 
-	 */
-	private void loadLastCrawlTimeFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile to) throws InterruptedException {
-		
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getLastCrawlTime(uid));
-
-		ResultSet results = qRC.getReturnedResultSet();
-		
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			try {
-				RDFNode lastCrawlTime = qs.get("lastCrawlTime");
-			   
-			    if (lastCrawlTime!=null)
-			    	to.setHasLastCrawlTime(lastCrawlTime.toString());	
-			} catch (Exception e) {
-				e.printStackTrace();
-				LOGGER.error(e.getMessage());
-			}
-		}
-		qRC.closeConnection();
-		return;
-	}
-	
-	/**
-	 * Loads first name and last name from KB to profile information.
-	 * @param from
-	 * @param to
-	 * @throws InterruptedException 
-	 */
-	private void loadNameFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile to) throws InterruptedException {
-		
-		eu.threecixty.profile.oldmodels.Name toName = new eu.threecixty.profile.oldmodels.Name();
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getName(uid));
-
-		ResultSet results = qRC.getReturnedResultSet();
-		
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			try {
-				//RDFNode nameuri = qs.get("name");
+			    if (gender!=null) toUserProfile.setHasGender(gender.toString());	
+				
+			    // Name info
 				RDFNode gn = qs.get("givenname");
 				RDFNode fn = qs.get("familyname");
-			    
-			    //if (nameuri!=null)
-			    //	toName.setHasNameURI(nameuri.asResource().getURI());
-			    if (fn!=null)
-			    	toName.setFamilyName(fn.toString());
-			    if (gn!=null)
-			    	toName.setGivenName(gn.toString());	
-			} catch (Exception e) {
-				e.printStackTrace();
-				LOGGER.error(e.getMessage());
-			}
-		}
-		to.setHasName(toName);
-		qRC.closeConnection();
-		return;
-	}
-
-	/**
-	 * Loads profile image from Virtuoso.
-	 * @param uid
-	 * @param to
-	 * @throws InterruptedException 
-	 */
-	private void loadProfileImageToUserProfile(String uid, eu.threecixty.profile.UserProfile to) throws InterruptedException {
-
-		String query = GetSetQueryStrings.createQueryToGetProfileImage(uid);
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(query);
-
-		ResultSet results = qRC.getReturnedResultSet();
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			to.setProfileImage(qs.get("profileImage").toString());
-			break;
-		}
-		qRC.closeConnection();
-	}
-	
-	/**
-	 * Loads address information from KB (user profile).
-	 * @param from
-	 * @param to
-	 * @throws InterruptedException 
-	 */
-	private void loadAddressInfoFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile to) throws InterruptedException {
-		
-		eu.threecixty.profile.oldmodels.Address toAddress = new eu.threecixty.profile.oldmodels.Address();
+				if (gn != null || fn != null) {
+					Name toName = new Name();
+					toUserProfile.setHasName(toName);
+					if (gn != null) toName.setGivenName(gn.toString());
+					if (fn != null) toName.setFamilyName(fn.toString());
+				}
 				
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getAddress(uid));
-
-		ResultSet results = qRC.getReturnedResultSet();
-		
-		for ( ; results.hasNext(); ) {
-			QuerySolution qs = results.next();
-			try {//?homeLocation ?geoLocation 
+				// Profile Image info
+				RDFNode in = qs.get("profileImage");
+				if (in != null) toUserProfile.setProfileImage(in.toString());
+			    
+				// Address info
 				RDFNode addressuri = qs.get("address");
 				RDFNode cname = qs.get("countryname");
 			    RDFNode tname = qs.get("townname");
-			    RDFNode homeLocationURI = qs.get("homeLocation");
-			    RDFNode geoLocationURI = qs.get("geoLocation");
 			    RDFNode lon = qs.get("longitude");
 			    RDFNode lat = qs.get("lat");
-			    if (addressuri!=null)
+			    if (addressuri!=null) {
+			    	toAddress = new Address();
+			    	toUserProfile.setHasAddress(toAddress);
 			    	toAddress.setHasAddressURI(addressuri.asResource().getURI());
-			    if (cname!=null)
-			    	toAddress.setCountryName(cname.toString());
-			    if (tname!=null)
-			    	toAddress.setTownName(tname.toString());
-			    if (homeLocationURI!=null)
-			    	toAddress.setHasHomeLocationURI(homeLocationURI.asResource().getURI());
-			    if (geoLocationURI!=null)
-			    	toAddress.setHasGeoCoordinatesURI(geoLocationURI.asResource().getURI());
-			    if (lon!=null)
-			    	toAddress.setLongitute(Double.parseDouble(lon.asLiteral().getString()));
-			    if (lat!=null)
-			    	toAddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));	
+			    }
+			    if (cname!=null) toAddress.setCountryName(cname.toString());
+			    if (tname!=null) toAddress.setTownName(tname.toString());
+			    try {
+			        if (lon!=null) toAddress.setLongitute(Double.parseDouble(lon.asLiteral().getString()));
+			    } catch (Exception e) {}
+			    try {
+			        if (lat!=null) toAddress.setLatitude(Double.parseDouble(lat.asLiteral().getString()));
+			    } catch (Exception e) {}
+			    
+			    // Last crawl info
+			    RDFNode lcn = qs.get("lastCrawlTime");
+			    if (lcn != null) toUserProfile.setHasLastCrawlTime(lcn.toString());	
+			    
+			    break;
 			} catch (Exception e) {
 				e.printStackTrace();
 				LOGGER.error(e.getMessage());
 			}
 		}
-		to.setHasAddress(toAddress);
-		qRC.closeConnection();			
-		return;
+		qRC.closeConnection();
 	}
 	
 	/**

@@ -107,6 +107,34 @@ public class GetSetQueryStrings {
 			return query;
 	}
 		
+	
+	public static String createQueryToGetGenderNameImageAddressLastcrawl(String uid) {
+		String query = PREFIX
+				+ " select distinct ?gender ?givenname ?familyname ?profileImage ?address ?townname ?countryname ?staddress ?pcode ?longitude ?lat ?lastCrawlTime \n"
+				+ " from <" + getGraphName(uid) + "> \n" 
+				+ " where { \n"
+					+ " OPTIONAL { <" + PROFILE_URI + uid + "> schema:gender ?gender. } \n"
+					+ " OPTIONAL { <" + PROFILE_URI + uid + "> schema:givenName ?givenname. } \n"
+					+ " OPTIONAL { <" + PROFILE_URI + uid + "> schema:familyName ?familyname. } \n"
+					+ " OPTIONAL { <" + PROFILE_URI + uid + "> foaf:img ?profileImage . } \n"
+					
+				    + " OPTIONAL { <" + PROFILE_URI + uid + "> schema:address ?address . \n"
+					+ "            ?address schema:postalCode ?pcode .} \n"
+				    + " OPTIONAL { <" + PROFILE_URI + uid + "> schema:address ?address . \n"
+					+ "            ?address schema:streetAddress ?staddress .} \n"
+					+ " OPTIONAL { <" + PROFILE_URI + uid + "> schema:address ?address . \n"
+					+ "            ?address schema:addressLocality ?townname .} \n"
+					+ " OPTIONAL { <" + PROFILE_URI + uid + "> schema:address ?address . \n"
+					+ "            ?address schema:addressCountry ?countryname .} \n"
+					+ " OPTIONAL { <" + PROFILE_URI + uid + "> schema:homeLocation ?homeLocation . \n"
+					+ "            ?homeLocation schema:geo ?geoLocation . \n"
+					+ "            ?geoLocation schema:latitude ?lat . \n"
+					+ "            ?geoLocation schema:longitude ?longitude .} \n"
+					+ " OPTIONAL { <"+PROFILE_URI+uid+"> profile:lastCrawlTime ?lastCrawlTime. } \n"
+				+ "} \n";
+		return query;
+	}
+	
 	/**
 	 * select gender
 	 * @param uid
