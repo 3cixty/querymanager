@@ -49,12 +49,12 @@ public class Utils {
 		addProfileIdentities(_3cixtyUID, uid, source, profileIdentities);
 	}
 	
-	protected static void addProfileIdentities(String _3cixtyUID, String uid, String source,
+	protected static void addProfileIdentities(String _3cixtyUID, String partnerAccountId, String source,
 			Set<ProfileIdentities> profileIdentities) {
 		
 		ProfileIdentities pi = new ProfileIdentities();
 		pi.setHasSourceCarrier(source);
-		pi.setHasUserAccountID(uid);
+		pi.setHasUserAccountID(partnerAccountId);
 		pi.setHasUserInteractionMode(UserInteractionMode.Active);
 		pi.setHasProfileIdentitiesURI(PROFILE_URI+ _3cixtyUID + "/Account/" + pi.getHasSourceCarrier());
 		

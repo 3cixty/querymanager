@@ -37,7 +37,8 @@ public class PartnerAccountUtils {
 		    account = new PartnerAccount();
 			account.setAppId(MOBIDOT_APP_ID);
 			account.setPassword(password);
-			account.setUsername(mobidotID);
+			account.setUsername(_3cixtyUID);
+			account.setUser_id(mobidotID);
 			account.setRole("User");
 			account.setPartnerUser(mobidotUser);
 			partner.addAccount(account); // persist account in 3cixty's DB

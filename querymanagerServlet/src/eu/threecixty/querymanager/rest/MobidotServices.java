@@ -74,6 +74,6 @@ public class MobidotServices {
 			profileIdentities = new HashSet <ProfileIdentities>();
 			profile.setHasProfileIdenties(profileIdentities);
 		} else profileIdentities = profile.getHasProfileIdenties();
-		Utils.setProfileIdentities(uid, uid, MOBIDOT_SOURCE, profileIdentities);
+		Utils.setProfileIdentities(uid, account.getUser_id(), MOBIDOT_SOURCE, profileIdentities);
 	}
 }
