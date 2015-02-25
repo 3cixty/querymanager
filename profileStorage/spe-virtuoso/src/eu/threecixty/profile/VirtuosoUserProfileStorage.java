@@ -97,7 +97,7 @@ public class VirtuosoUserProfileStorage {
 	 * @return
 	 * @throws InterruptedException 
 	 */	
-	public synchronized eu.threecixty.profile.UserProfile loadProfile() throws InterruptedException {
+	public synchronized eu.threecixty.profile.UserProfile loadProfile(Map <String, Boolean> attributes) throws InterruptedException {
 		if (uid == null || uid.equals("")) return null;		
 		//try {
 			if (DEBUG_MOD) LOGGER.info("Start loading user profile");
@@ -106,13 +106,20 @@ public class VirtuosoUserProfileStorage {
 			toUserProfile.setHasUID(uid);
 			
 			// load unique info for each profile: use a query instead of 5 ones to improve performance
-			loadGenderNameImageAddressLastcrawl(uid, toUserProfile);
+			// since the following method loads five kinds of information, so we always load these kinds
+			loadGenderNameImageAddressLastcrawl(uid, attributes, toUserProfile);
 
-			loadProfileIdentitiesFromUserProfile(uid, toUserProfile);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES)) {
+			    loadProfileIdentitiesFromUserProfile(uid, toUserProfile);
+			}
 
-			loadKnowsFromKBToUserProfile(uid, toUserProfile);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_KNOWS)) {
+			    loadKnowsFromKBToUserProfile(uid, toUserProfile);
+			}
 
-			loadPreferencesFromKBToUserProfile(uid, toUserProfile);
+			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PREFERENCE)) {
+			    loadPreferencesFromKBToUserProfile(uid, toUserProfile);
+			}
 			
 			if (DEBUG_MOD) LOGGER.info("Finish loading user profile");
 			
@@ -559,9 +566,15 @@ public class VirtuosoUserProfileStorage {
 	 * @param toUserProfile
 	 * @throws InterruptedException 
 	 */
-	private void loadGenderNameImageAddressLastcrawl(String uid,
+	private void loadGenderNameImageAddressLastcrawl(String uid, Map <String, Boolean> attributes,
 			UserProfile toUserProfile) throws InterruptedException {
-		// TODO Auto-generated method stub
+		if (!ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_GENDER)
+				&& !ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_NAME)
+				&& !ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PROFILE_IMAGE)
+				&& !ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_ADDRESS)
+				&& !ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_LAST_CRAWL_TIME)) {
+			return;
+		}
 		QueryReturnClass qRC = VirtuosoManager.getInstance().query(
 				GetSetQueryStrings.createQueryToGetGenderNameImageAddressLastcrawl(uid));
 

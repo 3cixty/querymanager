@@ -26,8 +26,8 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 class SimpleProfileManagerImpl implements ProfileManager {
 	
 	@Override
-	public UserProfile getProfile(String uid) {
-		return UserProfileStorage.loadProfile(uid);
+	public UserProfile getProfile(String uid, Map <String, Boolean> attributes) {
+		return UserProfileStorage.loadProfile(uid, attributes);
 	}
 
 	@Override

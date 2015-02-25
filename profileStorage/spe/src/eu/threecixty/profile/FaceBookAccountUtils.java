@@ -43,8 +43,8 @@ public class FaceBookAccountUtils {
 			
 			String _3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
 			
-			
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID);
+			Map <String, Boolean> attrsToLoad = Utils.getAttributesToLoadProfileFromGoogleFB();
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, attrsToLoad);
 			profile.setHasUID(_3cixtyUID);
 			if (picture != null) profile.setProfileImage(picture);
 			Name name = new Name();

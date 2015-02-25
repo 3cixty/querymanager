@@ -96,6 +96,15 @@ public class Utils {
 		return attrs;
 	}
 	
+	protected static Map <String, Boolean> getAttributesToLoadProfileFromGoogleFB() {
+		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
+		attrs.put(ProfileManager.ATTRIBUTE_KNOWS, true);
+		attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
+		return attrs;
+	}
+	
 	private Utils() {
 	}
 	

@@ -27,10 +27,15 @@ public interface ProfileManager {
 	/**
 	 * Gets user profile from KB.
 	 * @param uid
-	 * 				The Goolge UID.
+	 * 				The 3cixty UID.
+	 * @param attributes
+	 * 				The attributes which indicate what attributes are loaded. If a given <code>attributes</code>
+	 * 				is null, all attributes are loaded from Virtuoso. Be careful about using this parameter as it
+	 * 				will affect 3cixty's performance (should only load what you really want).
+	 * 
 	 * @return <code>UserProfile</code> if the corresponding user exists in the KB, <code>false</code> otherwise.
 	 */
-	UserProfile getProfile(String uid) throws TooManyConnections;
+	UserProfile getProfile(String uid, Map <String, Boolean> attributes) throws TooManyConnections;
 
 	/**
 	 * Saves a given user profile into the KB.
