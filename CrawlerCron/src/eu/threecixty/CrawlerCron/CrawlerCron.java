@@ -140,7 +140,9 @@ public class CrawlerCron {
 			if (DEBUG_MOD) LOGGER.info("UID = " + map.getThreeCixtyID() + ", Mobidot ID = " + map.getMobidotID());
 
 			try {
-				UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID());
+				Map <String, Boolean> attrs = getAttributesForCrawlingMobidotInfor();
+				
+				UserProfile user = ProfileManagerImpl.getInstance().getProfile(map.getThreeCixtyID(), attrs);
 								
 				try {
 					mobilityCrawlerCron.getmobility(map, user, idMapping,
@@ -149,8 +151,6 @@ public class CrawlerCron {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
-				Map <String, Boolean> attrs = getAttributesForCrawlingMobidotInfor();
 				
 				ProfileManagerImpl.getInstance().saveProfile(user, attrs);
 				if (DEBUG_MOD) LOGGER.info("Finished saving Mobidot data of user: "+ map.getThreeCixtyID());

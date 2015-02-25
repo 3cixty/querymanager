@@ -26,9 +26,9 @@ import eu.threecixty.profile.UserProfile;
 class VirtuosoProfileManagerImpl implements ProfileManager {
 	
 	@Override
-	public UserProfile getProfile(String uid) throws TooManyConnections {
+	public UserProfile getProfile(String uid, Map <String, Boolean> attrs) throws TooManyConnections {
 		try {
-			return VirtuosoUserProfileStorage.getInstance(uid).loadProfile();
+			return VirtuosoUserProfileStorage.getInstance(uid).loadProfile(attrs);
 		} catch (InterruptedException e) {
 			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}

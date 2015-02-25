@@ -23,7 +23,9 @@ public class ProfileInformationStorage {
 	public static ProfileInformation loadProfile(String uid) throws TooManyConnections {
 		if (uid == null || uid.equals("")) return null;
 
-		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
+		Map <String, Boolean> attrs = getAttributesForProfileInfo();
+		
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid, attrs);
 
 		if (userProfile == null) return null;
 
@@ -64,10 +66,7 @@ public class ProfileInformationStorage {
 			kbUserProfile.setProfileImage(profile.getProfileImage());
 		}
 
-		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
-		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
+		Map <String, Boolean> attrs = getAttributesForProfileInfo();
 		
 		ProfileManagerImpl.getInstance().saveProfile(kbUserProfile, attrs);
 		return true;
@@ -188,6 +187,14 @@ public class ProfileInformationStorage {
 		if (addr.getLongitute() > 0) {
 			to.setLongitude(addr.getLongitute());
 		}
+	}
+	
+	private static Map <String, Boolean> getAttributesForProfileInfo() {
+		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
+		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
+		return attrs;
 	}
 	
 	/**

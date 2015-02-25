@@ -89,7 +89,8 @@ public class GoogleAccountUtils {
 			
 			_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
 			
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID);
+			Map <String, Boolean> attrsToLoad = Utils.getAttributesToLoadProfileFromGoogleFB();
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, attrsToLoad);
 			profile.setHasUID(_3cixtyUID);
 			profile.setProfileImage(picture);
 			Name name = new Name();

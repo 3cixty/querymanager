@@ -85,7 +85,7 @@ public class UserProfileStorage {
 	 * @param uid
 	 * @return
 	 */
-	public static eu.threecixty.profile.UserProfile loadProfile(String uid) {
+	public static eu.threecixty.profile.UserProfile loadProfile(String uid, Map <String, Boolean> attributes) {
 		if (uid == null || uid.equals("")) return null;
 		try {
 			MyFactory mf = getMyFactory();

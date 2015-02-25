@@ -26,17 +26,15 @@ public class SettingsStorage {
 	 */
 	public static void save(ThreeCixtySettings settings) throws TooManyConnections {
 		if (settings == null) return;
-		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(settings.getUid());
+		
+		Map <String, Boolean> attrs = getAttributesForSetting();
+		
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(settings.getUid(), attrs);
 		userProfile.setHasUID(settings.getUid());
 
 		saveNameInfoToKB(settings, userProfile);
 		saveAddressInfoToKB(settings, userProfile);
 		addProfileIdentitiesIntoUserProfile(settings, userProfile);
-		
-		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
-		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
 
 		ProfileManagerImpl.getInstance().saveProfile(userProfile, attrs);
 	}
@@ -49,7 +47,10 @@ public class SettingsStorage {
 	 */
 	public static ThreeCixtySettings load(String uid) throws TooManyConnections {
 		if (!isNotNullOrEmpty(uid)) return null;
-		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
+		
+		Map <String, Boolean> attrs = getAttributesForSetting();
+		
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid, attrs);
 		if (userProfile == null) return null;
 
 		ThreeCixtySettings settings = new ThreeCixtySettings();
@@ -184,6 +185,14 @@ public class SettingsStorage {
 		if (settings.getCurrentLongitude() != 0) {
 			addr.setLongitute(settings.getCurrentLongitude());
 		}
+	}
+	
+	private static Map <String, Boolean> getAttributesForSetting() {
+		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
+		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
+		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
+		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
+		return attrs;
 	}
 
 	/**

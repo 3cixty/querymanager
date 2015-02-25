@@ -45,8 +45,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public UserProfile getProfile(String uid) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getProfile(uid);
+	public UserProfile getProfile(String uid, Map <String, Boolean> attributes) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getProfile(uid, attributes);
 		return null;
 	}
 
