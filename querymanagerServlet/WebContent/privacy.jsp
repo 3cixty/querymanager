@@ -37,7 +37,7 @@ By using the 3cixty platform, you are consenting to our processing of your infor
     <div class="left">
         <h3>How do we use this information?</h3>
     </div>
-    <div class="right">This information is used to personalize content. Moreover, based on public reviews of your friends list, we recommend you about places you might be interesting.</div>
+    <div class="right">This information is used to personalize content. Moreover, based on public reviews of your friends list, we recommend you about places you might be interested in.</div>
 </div>
 
 <div>
