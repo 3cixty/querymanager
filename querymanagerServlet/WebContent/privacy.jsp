@@ -29,34 +29,34 @@ By using the 3cixty platform, you are consenting to our processing of your infor
 </p>
 
 <div>
-    <div class="left"><h2>What kinds of information do we collect?</h2></div>
+    <div class="left"><h3>What kinds of information do we collect?</h3></div>
     <div class="right">We collect information about your First Name, Last Name, Gender, Friends List, and UserID.</div>
 </div>
 
 <div>
     <div class="left">
-        <h2>How do we use this information?</h2>
+        <h3>How do we use this information?</h3>
     </div>
     <div class="right">This information is used to personalize content. Moreover, based on public reviews of your friends list, we recommend you about places you might be interesting.</div>
 </div>
 
 <div>
     <div class="left">
-        <h2>How is this information shared?</h2>
+        <h3>How is this information shared?</h3>
     </div>
     <div class="right">Your information (First Name, Last Name, and UserID) can be shared to 3cixty applications (trusted third parties) using our platform.</div>
 </div>
 
 <div>
     <div class="left">
-        <h2>How can I manage or delete information about me?</h2>
+        <h3>How can I manage or delete information about me?</h3>
     </div>
     <div class="right">If you are a user who has been using 3cixty applications, please contact with <a href="mailto:3cixty@gmail.com" target="_top">3cixty@gmail.com</a> to specify your request.</div>
 </div>
 
 <div>
     <div class="left">
-        <h2>How do we respond to legal requests or prevent harm?</h2>
+        <h3>How do we respond to legal requests or prevent harm?</h3>
     </div>
     <div class="right">
     3cixty cooperates with government and law enforcement officials or private parties to enforce and comply with the law. We may disclose information about you to government or law enforcement officials or private parties as we, in our sole discretion, believe necessary or appropriate to respond to claims, legal process, to protect the property and rights of 3cixty or a third party, the safety of the public or any person, to prevent or stop any illegal, unethical, or legally actionable activity, or to comply with the law.
@@ -65,7 +65,7 @@ By using the 3cixty platform, you are consenting to our processing of your infor
 
 <div>
     <div class="left">
-        <h2>How will we notify you of changes to this policy?</h2>
+        <h3>How will we notify you of changes to this policy?</h3>
     </div>
     <div class="right">This Privacy Policy may be updated from time to time for any reason; each version will apply to information collected while it was in place. We will notify you of any material changes to our Privacy Policy by posting the new Privacy Policy on our platform. You are advised to consult this Privacy Policy regularly for any changes.</div>
 </div>
