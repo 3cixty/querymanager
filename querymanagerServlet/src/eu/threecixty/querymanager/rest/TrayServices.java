@@ -429,9 +429,19 @@ public class TrayServices {
 		}
 
 		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
-		if (elementEventsDetails != null) trayDetailsList.addAll(elementEventsDetails);
+		if (elementEventsDetails != null) {
+			for (ElementDetails eventDetails: elementEventsDetails) {
+				eventDetails.setType(EVENT_TYPE);
+			}
+			trayDetailsList.addAll(elementEventsDetails);
+		}
 		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
-		if (elementPoIsDetails != null) trayDetailsList.addAll(elementPoIsDetails);
+		if (elementPoIsDetails != null) {
+			for (ElementDetails poiDetails: elementPoIsDetails) {
+				poiDetails.setType(POI_TYPE);
+			}
+			trayDetailsList.addAll(elementPoIsDetails);
+		}
 	}
 
 	private long getNewestTimestamp(List <Tray> trays) {

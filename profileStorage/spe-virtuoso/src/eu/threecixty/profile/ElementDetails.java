@@ -11,6 +11,7 @@ public class ElementDetails {
 	private String locality;
 	private String image_url;
 	private String source;
+	private String type;
 
 	public String getId() {
 		return id;
@@ -68,6 +69,12 @@ public class ElementDetails {
 		this.source = source;
 	}
 	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 	public int hashCode() {
 		if (id == null) return -1;
 		return id.hashCode();
