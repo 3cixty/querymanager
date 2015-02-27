@@ -485,7 +485,6 @@ public class QueryManagerServices {
 	 * @param access_token
 	 * @param offset
 	 * @param limit
-	 * @param preference
 	 * @param filter1
 	 * @param filter2
 	 * @param key
@@ -495,7 +494,7 @@ public class QueryManagerServices {
 	@Path("/getEventsInDetails")
 	public Response getItemsInDetails(@HeaderParam("access_token") String access_token,
 			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
+			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
 		
@@ -526,7 +525,7 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()));
 
 			try {
-				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference,false, isLimitForProfile(userAccessToken));
+				Map <String, Boolean> result = executeQuery(profiler, qm, query, null, false, isLimitForProfile(userAccessToken));
 				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet());
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
