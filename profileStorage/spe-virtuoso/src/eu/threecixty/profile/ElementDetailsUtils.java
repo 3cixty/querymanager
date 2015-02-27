@@ -1,8 +1,10 @@
 package eu.threecixty.profile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -129,22 +131,25 @@ public class ElementDetailsUtils {
 		int len = jsonArrs.length();
 		if (len < 1) return null;
 
-		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
-		String oldPoiId = null;
-		ElementPoIDetails tmpPoIDetails = null;
+		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
+		
+		ElementDetails tmpPoIDetails = null;
 		for (int i = 0; i  < len; i++) {
 			JSONObject tmpObj = jsonArrs.getJSONObject(i);
 			String currentId = tmpObj.get("poi").toString();
 			if (currentId == null) continue;
-			if (!currentId.equals(oldPoiId)) { // new one
+			tmpPoIDetails = maps.get(currentId);
+			if (tmpPoIDetails == null) {
 				tmpPoIDetails = createPoIDetails(tmpObj);
-				elementsDetails.add(tmpPoIDetails);
+				maps.put(currentId, tmpPoIDetails);
 			} else {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
-				if (!isNullOrEmpty(comment)) tmpPoIDetails.getReviews().add(comment);
+				if (!isNullOrEmpty(comment)) ((ElementPoIDetails) tmpPoIDetails).getReviews().add(comment);
 			}
-			oldPoiId = currentId;
 		}
+		
+		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
+		elementsDetails.addAll(maps.values());
 		return elementsDetails;
 	}
 	
