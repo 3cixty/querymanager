@@ -144,7 +144,10 @@ public class ElementDetailsUtils {
 				maps.put(currentId, tmpPoIDetails);
 			} else {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
-				if (!isNullOrEmpty(comment)) ((ElementPoIDetails) tmpPoIDetails).getReviews().add(comment);
+				if (!isNullOrEmpty(comment)) {
+					List <String> comments = ((ElementPoIDetails) tmpPoIDetails).getReviews();
+					if (!comments.contains(comment)) comments.add(comment);
+				}
 			}
 		}
 		
