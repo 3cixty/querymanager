@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createEventsDetails(List <String> eventIds) throws IOException {
+	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
@@ -85,7 +86,7 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createPoIsDetails(List <String> poiIds) throws IOException {
+	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");

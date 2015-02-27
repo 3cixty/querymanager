@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.sparql.expr.Expr;
@@ -38,18 +39,45 @@ public class QueryManagerDecision {
 		if (profiler != null && filter != null) {
 			if (!filter.equals(FRIENDS)) {
 				if (filter.equalsIgnoreCase(LOCATION)) {
-					return filterBasedOnLocation(profiler, qm, format);
+					return (String) filterBasedOnLocation(profiler, qm, format, true);
 				} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
-					return filterBasedOnEnteredRating(profiler, qm, format);
+					return (String) filterBasedOnEnteredRating(profiler, qm, format, true);
 				} else if (filter.equalsIgnoreCase(PREFERRED)) {
-					return filterBasedOnPreferredEvent(profiler, qm, format);
+					return (String) filterBasedOnPreferredEvent(profiler, qm, format, true);
 				}
 			} else {
-				return filterBasedOnFriends(profiler, qm, format);
+				return (String) filterBasedOnFriends(profiler, qm, format, true);
 			}
 		}
 		
 		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+	}
+	
+	/**
+	 * Augments and executes the query found in a given query manager.
+	 * @param profiler
+	 * @param qm
+	 * @param filter
+	 * @param format
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map <String, Boolean> run(IProfiler profiler, IQueryManager qm, String filter) throws TooManyConnections {
+		if (profiler != null && filter != null) {
+			if (!filter.equals(FRIENDS)) {
+				if (filter.equalsIgnoreCase(LOCATION)) {
+					return (Map<String, Boolean>) filterBasedOnLocation(profiler, qm, EventMediaFormat.JSON, false);
+				} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
+					return (Map<String, Boolean>) filterBasedOnEnteredRating(profiler, qm, EventMediaFormat.JSON, false);
+				} else if (filter.equalsIgnoreCase(PREFERRED)) {
+					return (Map<String, Boolean>) filterBasedOnPreferredEvent(profiler, qm, EventMediaFormat.JSON, false);
+				}
+			} else {
+				return (Map<String, Boolean>) filterBasedOnFriends(profiler, qm, EventMediaFormat.JSON, false);
+			}
+		}
+		
+		return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
 	}
 
 	/**
@@ -75,8 +103,8 @@ public class QueryManagerDecision {
 	 * @param format
 	 * @return
 	 */
-	private static String filterBasedOnLocation(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) throws TooManyConnections {
+	private static Object filterBasedOnLocation(IProfiler profiler, IQueryManager qm,
+			EventMediaFormat format, boolean isResultInString) throws TooManyConnections {
 		
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
@@ -101,15 +129,13 @@ public class QueryManagerDecision {
 		
 		QueryUtils.removeDoubleExpressions(exprs);
 
-		if (exprs.size() == 0) {
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
-		} else if (exprs.size() == 1) {
+		if (exprs.size() == 1) {
 			qm.performORAugmentation(triples, exprs);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
-		} else {
+		} else if (exprs.size() > 1) {
 			qm.performORAugmentation(triples, exprs);
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
 		}
+		if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
 	}
 
 	/**
@@ -119,8 +145,8 @@ public class QueryManagerDecision {
 	 * @param format
 	 * @return
 	 */
-	private static String filterBasedOnEnteredRating(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) throws TooManyConnections {
+	private static Object filterBasedOnEnteredRating(IProfiler profiler, IQueryManager qm,
+			EventMediaFormat format, boolean isResultInString) throws TooManyConnections {
 		// TODO: find minimum values from preferences
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
@@ -135,7 +161,8 @@ public class QueryManagerDecision {
 		QueryUtils.removeDoubleExpressions(exprs);
 
 		qm.performORAugmentation(triples, exprs);
-		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
 	}
 
 	/**
@@ -145,8 +172,8 @@ public class QueryManagerDecision {
 	 * @param format
 	 * @return
 	 */
-	private static String filterBasedOnFriends(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) throws TooManyConnections {
+	private static Object filterBasedOnFriends(IProfiler profiler, IQueryManager qm,
+			EventMediaFormat format, boolean isResultInString) throws TooManyConnections {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
@@ -166,7 +193,8 @@ public class QueryManagerDecision {
 		QueryUtils.removeDoubleExpressions(exprs);
 
 		qm.performORAugmentation(triples, exprs);
-		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
 	}
 
 	/**
@@ -176,9 +204,8 @@ public class QueryManagerDecision {
 	 * @param format
 	 * @return
 	 */
-	private static String filterBasedOnPreferredEvent(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format) throws TooManyConnections {
-		// TODO
+	private static Object filterBasedOnPreferredEvent(IProfiler profiler, IQueryManager qm,
+			EventMediaFormat format, boolean isResultInString) throws TooManyConnections {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
@@ -192,7 +219,8 @@ public class QueryManagerDecision {
 		QueryUtils.removeDoubleExpressions(exprs);
 
 		qm.performORAugmentation(triples, exprs);
-		return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+		else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
 	}
 
 	/**
