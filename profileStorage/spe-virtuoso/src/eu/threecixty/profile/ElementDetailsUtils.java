@@ -104,8 +104,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
 		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating . \n");
-		queryBuff.append("          ?aggregateRating schema:reviewRating ?reviewRating . \n");
-		queryBuff.append("          ?reviewRating schema:ratingValue ?ratingValue .} \n");
+		queryBuff.append("          { ?aggregateRating schema:reviewRating ?reviewRating .  \n");
+		queryBuff.append("            ?reviewRating schema:ratingValue ?ratingValue . \n");
+		queryBuff.append("          } UNION { ?aggregateRating schema:ratingValue ?ratingValue . } } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
 		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
 		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
