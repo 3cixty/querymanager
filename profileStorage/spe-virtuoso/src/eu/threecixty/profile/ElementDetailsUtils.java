@@ -103,7 +103,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("          ?geo schema:longitude ?lon .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
 		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
-		queryBuff.append(" OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating . \n");
+		queryBuff.append("          ?aggregateRating schema:reviewRating ?reviewRating . \n");
+		queryBuff.append("          ?reviewRating schema:ratingValue ?ratingValue .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
 		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
 		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
@@ -178,7 +180,7 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(image_url)) poiDetails.setImage_url(image_url);
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) poiDetails.setSource(source);
-		String aggregateRatingStr = getAttributeValue(json, "aggregateRating");
+		String aggregateRatingStr = getAttributeValue(json, "ratingValue");
 		try {
 		    if (!isNullOrEmpty(aggregateRatingStr)) poiDetails.setAggregate_rating(
 		    		Double.parseDouble(aggregateRatingStr));
@@ -189,7 +191,9 @@ public class ElementDetailsUtils {
 				String [] reviews = reviewCountsStr.trim().split(" ");
 				poiDetails.setReview_counts(Integer.parseInt(reviews[0]));
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
 		List <String> comments = new LinkedList <String>();
