@@ -157,6 +157,14 @@ public class ElementDetailsUtils {
 			}
 		}
 		
+		for (String key: maps.keySet()) {
+			ElementDetails tmp = maps.get(key);
+			ElementPoIDetails poi = (ElementPoIDetails) tmp;
+			if (poi.getReview_counts() == 0) {
+				if (poi.getReviews() != null) poi.setReview_counts(poi.getReviews().size());
+			}
+		}
+		
 		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		elementsDetails.addAll(maps.values());
 		return elementsDetails;
