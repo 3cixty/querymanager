@@ -124,6 +124,8 @@ public class ElementDetailsUtils {
 		queryBuff.append(") \n");
 		queryBuff.append("}");
 		
+		System.out.println(queryBuff.toString());
+		
 		StringBuilder result = new StringBuilder();
 		
 		VirtuosoManager.getInstance().executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", result);
