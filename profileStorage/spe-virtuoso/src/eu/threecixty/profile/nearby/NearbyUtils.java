@@ -146,7 +146,7 @@ public class NearbyUtils {
 		
 		builder.append("        ?poi schema:geo ?geo . \n");
 		builder.append("        ?geo schema:latitude ?lat . \n");
-		builder.append("        ?geo schema:longitude ?lon .} \n");
+		builder.append("        ?geo schema:longitude ?lon . \n");
 		builder.append("OPTIONAL { ?poi lode:poster ?image_url.} \n");
 		builder.append("FILTER (");
 		boolean firstTime = true;
