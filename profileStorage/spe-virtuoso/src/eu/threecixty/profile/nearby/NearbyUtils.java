@@ -12,7 +12,54 @@ import eu.threecixty.profile.VirtuosoManager;
 
 public class NearbyUtils {
 
+	public static List <NearbyElement> getNearbyLocationElements(double lat, double lon, String category,
+			double distance, int offset, int limit) throws IOException {
+		List <NearbyElement> results = new LinkedList <NearbyElement>();
+		
+		StringBuilder builder = null;
+		if (distance < 0) {
+			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
+		} else {
+			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
+		}
+
+		builder.append("WHERE { \n");
+		builder.append("        ?poi a dul:Place . \n");
+		
+		if (!isNullOrEmpty(category)) {
+			builder.append("?poi locationOnt:businessType ?businessType. \n");
+			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
+			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
+			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
+			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("FILTER (STR(?category) = \"" + category + "\")");
+		}
+		
+		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+		
+		builder.append("        ?poi schema:geo ?geoPoi . \n");
+		builder.append("        ?geoPoi geo:geometry ?geo. \n");
+
+		builder.append("} \n");
+		builder.append("ORDER BY ?distance \n");
+		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
+		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
+		
+		findNearbyLocations(builder.toString(), results);
+		
+		return results;
+	}
 	
+	/**
+	 * Gets nearby locations based on a given location ID and other parameters.
+	 * @param locId
+	 * @param category
+	 * @param distance
+	 * @param offset
+	 * @param limit
+	 * @return
+	 * @throws IOException
+	 */
 	public static List <NearbyElement> getNearbyLocationElements(String locId, String category,
 			double distance, int offset, int limit) throws IOException {
 		List <NearbyElement> results = new LinkedList <NearbyElement>();
@@ -49,9 +96,14 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
+		findNearbyLocations(builder.toString(), results);
 		
+		return results;
+	}
+	
+	private static void findNearbyLocations(String query, List <NearbyElement> results) throws IOException {
         StringBuilder resultBuilder = new StringBuilder();
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(builder.toString(), "application/sparql-results+json", resultBuilder);
+		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -61,11 +113,9 @@ public class NearbyUtils {
 			NearbyElement tmp = createNearbyLocation(jsonElement);
 			if (tmp != null) results.add(tmp);
 		}
-		if (results.size() == 0) return results;
+		if (results.size() == 0) return;
 		
 		findOtherInformationForNearbyLocations(results);
-		
-		return results;
 	}
 	
 	
