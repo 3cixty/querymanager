@@ -21,8 +21,8 @@ import eu.threecixty.profile.nearby.NearbyUtils;
 public class NearbyServices {
 
 	@GET
-	@Path("/getNearbyLocations")
-	public Response getNearbyLocations(@QueryParam("locationId") String locationId,
+	@Path("/getNearbyPoIs")
+	public Response getNearbyPoIs(@QueryParam("poi") String poiID,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("category") String category,
@@ -34,7 +34,7 @@ public class NearbyServices {
 		if (category == null || category.equals("")) tmpCat = null;
 		else tmpCat = category;
 		try {
-			List <NearbyElement> nearbyElements = NearbyUtils.getNearbyLocationElements(locationId, tmpCat, distance, offset, limit);
+			List <NearbyElement> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCat, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -43,8 +43,8 @@ public class NearbyServices {
 	}
 	
 	@GET
-	@Path("/getNearbyLocationsBasedOnGPS")
-	public Response getNearbyLocationsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
+	@Path("/getNearbyPoIsBasedOnGPS")
+	public Response getNearbyPoIsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("category") String category,
@@ -56,7 +56,7 @@ public class NearbyServices {
 		if (category == null || category.equals("")) tmpCat = null;
 		else tmpCat = category;
 		try {
-			List <NearbyElement> nearbyElements = NearbyUtils.getNearbyLocationElements(lat, lon, tmpCat, distance, offset, limit);
+			List <NearbyElement> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCat, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();

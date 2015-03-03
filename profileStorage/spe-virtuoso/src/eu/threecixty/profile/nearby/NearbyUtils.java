@@ -12,7 +12,7 @@ import eu.threecixty.profile.VirtuosoManager;
 
 public class NearbyUtils {
 
-	public static List <NearbyElement> getNearbyLocationElements(double lat, double lon, String category,
+	public static List <NearbyElement> getNearbyPoIElements(double lat, double lon, String category,
 			double distance, int offset, int limit) throws IOException {
 		List <NearbyElement> results = new LinkedList <NearbyElement>();
 		
@@ -45,7 +45,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		findNearbyLocations(builder.toString(), results);
+		findNearbyPoIs(builder.toString(), results);
 		
 		return results;
 	}
@@ -60,7 +60,7 @@ public class NearbyUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <NearbyElement> getNearbyLocationElements(String locId, String category,
+	public static List <NearbyElement> getNearbyPoIElements(String locId, String category,
 			double distance, int offset, int limit) throws IOException {
 		List <NearbyElement> results = new LinkedList <NearbyElement>();
 		if (isNullOrEmpty(locId)) return results;
@@ -96,12 +96,12 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		findNearbyLocations(builder.toString(), results);
+		findNearbyPoIs(builder.toString(), results);
 		
 		return results;
 	}
 	
-	private static void findNearbyLocations(String query, List <NearbyElement> results) throws IOException {
+	private static void findNearbyPoIs(String query, List <NearbyElement> results) throws IOException {
         StringBuilder resultBuilder = new StringBuilder();
 		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
 		
@@ -110,12 +110,12 @@ public class NearbyUtils {
 		int len = jsonArrs.length();
 		for (int i = 0; i < len; i++) {
 			JSONObject jsonElement = jsonArrs.getJSONObject(i);
-			NearbyElement tmp = createNearbyLocation(jsonElement);
+			NearbyElement tmp = createNearbyPoI(jsonElement);
 			if (tmp != null) results.add(tmp);
 		}
 		if (results.size() == 0) return;
 		
-		findOtherInformationForNearbyLocations(results);
+		findOtherInformationForNearbyPoIs(results);
 	}
 	
 	
@@ -124,7 +124,7 @@ public class NearbyUtils {
 	 * @param results
 	 * @throws IOException 
 	 */
-	private static void findOtherInformationForNearbyLocations(
+	private static void findOtherInformationForNearbyPoIs(
 			List<NearbyElement> results) throws IOException {
 		StringBuilder builder = new StringBuilder("SELECT DISTINCT ?poi ?element_title ?description ?category ?lat ?lon ?image_url \n");
 		builder.append("WHERE { \n");
@@ -170,13 +170,13 @@ public class NearbyUtils {
 		int len = jsonArrs.length();
 		for (int i = 0; i < len; i++) {
 			JSONObject jsonElement = jsonArrs.getJSONObject(i);
-			findOtherInformationForNearbyLocations(jsonElement, results);
+			findOtherInformationForNearbyPoIs(jsonElement, results);
 		}
 	}
 
 
 
-	private static void findOtherInformationForNearbyLocations(
+	private static void findOtherInformationForNearbyPoIs(
 			JSONObject jsonElement, List<NearbyElement> results) {
 		String poiId = getAttributeValue(jsonElement, "poi");
 		if (isNullOrEmpty(poiId)) return;
@@ -201,11 +201,11 @@ public class NearbyUtils {
 
 
 	/**
-	 * This method only creates location ID + distance.
+	 * This method only creates PoI ID + distance.
 	 * @param jsonElement
 	 * @return
 	 */
-	private static NearbyElement createNearbyLocation(JSONObject jsonElement) {
+	private static NearbyElement createNearbyPoI(JSONObject jsonElement) {
 		String conditionStr = getAttributeValue(jsonElement, "condition");
 		int condition = Integer.parseInt(conditionStr);
 		if (condition == 0) return null;
