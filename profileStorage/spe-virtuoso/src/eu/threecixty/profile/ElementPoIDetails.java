@@ -8,6 +8,8 @@ public class ElementPoIDetails extends ElementDetails {
 	private int review_counts;
 	private List <String> reviews;
 	
+	private Boolean augmented;
+	
 	public String getTelephone() {
 		return telephone;
 	}
@@ -31,5 +33,11 @@ public class ElementPoIDetails extends ElementDetails {
 	}
 	public void setReviews(List<String> reviews) {
 		this.reviews = reviews;
+	}
+	public Boolean getAugmented() {
+		return augmented;
+	}
+	public void setAugmented(Boolean augmented) {
+		this.augmented = augmented;
 	}
 }

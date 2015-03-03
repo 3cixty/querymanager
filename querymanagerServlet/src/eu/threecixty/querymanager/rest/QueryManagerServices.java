@@ -35,6 +35,7 @@ import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ElementDetails;
 import eu.threecixty.profile.ElementDetailsUtils;
+import eu.threecixty.profile.ElementPoIDetails;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.TooManyConnections;
@@ -477,6 +478,87 @@ public class QueryManagerServices {
 		}
 	}
 	
+	
+	/**
+	 * Gets Events in details.
+	 *
+	 * @param access_token
+	 * @param offset
+	 * @param limit
+	 * @param filter1
+	 * @param filter2
+	 * @param key
+	 * @return
+	 */
+	@GET
+	@Path("/getEventsInDetails")
+	public Response getItemsInDetails(@HeaderParam("access_token") String access_token,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("{}") @QueryParam("filter1") String filter1,
+			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
+		
+		long starttime = System.currentTimeMillis();
+
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String user_id =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
+
+			Gson gson = new Gson();
+			KeyValuePair pair1 = null;
+			KeyValuePair pair2 = null;
+			try {
+				pair1 = gson.fromJson(filter1, KeyValuePair.class);
+			} catch (Exception e) {}
+			try {
+				pair2 = gson.fromJson(filter2, KeyValuePair.class);
+			} catch (Exception e) {}
+
+			IProfiler profiler = new Profiler(user_id);
+			QueryManager qm = new QueryManager(user_id);
+
+			String query = createSelectSparqlQuery(offset, limit,
+					(pair1 == null ? null : pair1.getGroupBy()),
+					(pair1 == null ? null : pair1.getValue()),
+					(pair2 == null ? null : pair2.getGroupBy()),
+					(pair2 == null ? null : pair2.getValue()));
+
+			try {
+				Map <String, Boolean> result = executeQuery(profiler, qm, query, null, false, isLimitForProfile(userAccessToken));
+				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet());
+				
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				String content = JSONObject.wrap(elementsInDetails).toString();
+				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (ThreeCixtyPermissionException tcpe) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(tcpe.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (TooManyConnections e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (IOException e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The access token is invalid '" + access_token + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+	
 	/**
 	 * Gets PoIs in details.
 	 *
@@ -534,6 +616,74 @@ public class QueryManagerServices {
 		}
 	}
 	
+	/**
+	 * Gets PoIs in details.
+	 *
+	 * @param access_token
+	 * @param offset
+	 * @param limit
+	 * @param preference
+	 * @param category
+	 * @return
+	 */
+	@GET
+	@Path("/getPoIsInDetails")
+	public Response getPoIsInDetails(@HeaderParam("access_token") String access_token,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
+			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("0") @QueryParam("minRating") int minRating,
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating) {
+		
+		long starttime = System.currentTimeMillis();
+
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String user_id =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
+
+			IProfiler profiler = new Profiler(user_id);
+			QueryManager qm = new QueryManager(user_id);
+
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
+
+			try {
+				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference, false, isLimitForProfile(userAccessToken));
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet());
+				for (ElementDetails poi: poisInDetails) {
+					((ElementPoIDetails) poi).setAugmented(result.get(poi.getId()));
+				}
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				String content = JSONObject.wrap(poisInDetails).toString();
+				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (ThreeCixtyPermissionException tcpe) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY );
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(tcpe.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (TooManyConnections e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (IOException e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The access token is invalid '" + access_token + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+	
 
 	@GET
 	@Path("/getItemsWithoutAccessToken")
@@ -574,6 +724,56 @@ public class QueryManagerServices {
 			        .build());
 		}
 	}
+	
+	@GET
+	@Path("/getEventsInDetailsWithoutAccessToken")
+	public Response getEventsInDetailsWithoutUserInfo(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("{}") @QueryParam("filter1") String filter1,
+			@DefaultValue("{}") @QueryParam("filter2") String filter2, @HeaderParam("key") String key) {
+		
+		long starttime = System.currentTimeMillis();
+
+		if (OAuthWrappers.validateAppKey(key)) {
+
+				Gson gson = new Gson();
+				KeyValuePair pair1 = null;
+				KeyValuePair pair2 = null;
+				try {
+					pair1 = gson.fromJson(filter1, KeyValuePair.class);
+				} catch (Exception e) {}
+				try {
+					pair2 = gson.fromJson(filter2, KeyValuePair.class);
+				} catch (Exception e) {}
+
+				String query = createSelectSparqlQuery(offset, limit,
+						(pair1 == null ? null : pair1.getGroupBy()),
+						(pair1 == null ? null : pair1.getValue()),
+						(pair2 == null ? null : pair2.getGroupBy()),
+						(pair2 == null ? null : pair2.getValue()));
+
+				List <String> eventIds = QueryManager.getElementIDs(query);
+				try {
+					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+					String content = JSONObject.wrap(eventsDetails).toString();
+					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
+				} catch (IOException e) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
+					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity(e.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
+		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
 
 	@GET
 	@Path("/getPoIsWithoutAccessToken")
@@ -593,6 +793,44 @@ public class QueryManagerServices {
 			String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("The key is invalid '" + key + "'")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
+	
+	@GET
+	@Path("/getPoIsInDetailsWithoutAccessToken")
+	public Response getPoIsInDetailsWithoutUserInfo(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("0") @QueryParam("minRating") int minRating,
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@HeaderParam("key") String key) {
+		
+		long starttime = System.currentTimeMillis();
+
+		if (OAuthWrappers.validateAppKey(key)) {
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
+
+			List <String> poiIds = QueryManager.getElementIDs(query);
+			try {
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
+				
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				String content = JSONObject.wrap(poisInDetails).toString();
+				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
 		} else {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -636,6 +874,27 @@ public class QueryManagerServices {
 		
 		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat);
 		return  result;
+	}
+	
+	private Map <String, Boolean> executeQuery(IProfiler profiler, IQueryManager qm,
+			String query, String filter,
+			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException, TooManyConnections {
+
+		Query jenaQuery = createJenaQuery(query);
+		
+		// XXX: is for events
+		boolean isForEvents = (query.indexOf("lode:Event") > 0);
+		qm.setForEvents(isForEvents);
+		
+		/// XXX: hack for date ranges query
+		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
+		qm.setForDateRanges(isForDateRages);
+
+		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
+
+		qm.setQuery(threecixtyQuery);
+		
+		return QueryManagerDecision.run(profiler, qm, filter);
 	}
 
 	private String createGroupQuery(String group, int offset, int limit,

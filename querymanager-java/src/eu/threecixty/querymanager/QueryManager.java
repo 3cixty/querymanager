@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -142,6 +145,60 @@ import eu.threecixty.profile.oldmodels.Rating;
 			return "ERROR:" + e.getMessage();
 		}
 	}
+	
+	public Map<String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery) {
+		String formatType = "application/sparql-results+json";
+		augmentedQuery.getQuery().getQuery().setDistinct(true);
+		if (!augmentedQuery.getQuery().getQuery().hasLimit()) {
+			if (!augmentedQuery.getQuery().getQuery().hasAggregators()) {
+				augmentedQuery.getQuery().getQuery().setLimit(20);
+			}
+		}
+		
+		augmentedQueryStr = augmentedQuery.getQuery().getQuery().toString();
+		
+		String originalQueryStr = originalQuery.convert2String();
+		if (originalQuery != null && originalQueryStr.contains("http://schema.org/")) {
+		    augmentedQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
+		            + removePrefixes(augmentedQueryStr);
+		    originalQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
+		    		+ removePrefixes(originalQueryStr);
+		} else {
+			augmentedQueryStr = removePrefixes(augmentedQueryStr);
+			originalQueryStr = removePrefixes(originalQueryStr);
+		}
+		
+		logInfo("Augmented query: " + augmentedQueryStr);
+		
+		StringBuilder sb = new StringBuilder();
+
+		
+		Map <String, Boolean> maps = new HashMap <String, Boolean>();
+		
+		try {
+			VirtuosoManager.getInstance().executeQueryViaSPARQL(augmentedQueryStr, formatType, sb);
+			JSONObject json = new JSONObject(sb.toString());
+			JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+			
+			int len = jsonArrs.length();
+			for (int i = 0; i < len; i++) {
+				JSONObject jsonElement = jsonArrs.getJSONObject(i);
+				boolean hightLighted = isItemAugmented(jsonElement, numberOfOrders);
+				String elementId = null;
+				if (jsonElement.has("event")) {
+				    elementId = jsonElement.getJSONObject("event").get("value").toString();
+				} else if (jsonElement.has("venue")) {
+					elementId = jsonElement.getJSONObject("venue").get("value").toString();
+				}
+				if (elementId != null) {
+					maps.put(elementId, hightLighted);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return maps;
+	}
 
 	/**
 	 * Executes query without creating a new instance of QueryManager.
@@ -162,6 +219,43 @@ import eu.threecixty.profile.oldmodels.Rating;
 			e.printStackTrace();
 		}
 		return builder.toString();
+	}
+	
+	/**
+	 * Get a list of Element IDs (Events or PoIs) from Virtuoso for a given SPARQL query. This method supposes that the
+	 * given query was created by QueryManagerServices from line 742-769.
+	 *
+	 * @param query
+	 * @return
+	 */
+	public static List <String> getElementIDs(String query) {
+
+		String formatType = "application/sparql-results+json";
+
+		StringBuilder sb = new StringBuilder();
+		
+		List <String> elementIds = new LinkedList <String>();
+		
+		try {
+			VirtuosoManager.getInstance().executeQueryViaSPARQL(query, formatType, sb);
+			JSONObject json = new JSONObject(sb.toString());
+			JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+			
+			int len = jsonArrs.length();
+			for (int i = 0; i < len; i++) {
+				JSONObject jsonElement = jsonArrs.getJSONObject(i);
+				String elementId = null;
+				if (jsonElement.has("event")) {
+				    elementId = jsonElement.getJSONObject("event").get("value").toString();
+				} else if (jsonElement.has("venue")) {
+					elementId = jsonElement.getJSONObject("venue").get("value").toString();
+				}
+				if (elementId != null) elementIds.add(elementId);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return elementIds;
 	}
 
 	/**
@@ -260,10 +354,27 @@ import eu.threecixty.profile.oldmodels.Rating;
 		if (numberOfOrders > 0) jsonElement.put("augmented", augmented);
 	}
 	
+	private static boolean isItemAugmented(JSONObject jsonElement, int numberOfOrders) {
+		boolean augmented = checkPropertyTrue(jsonElement, "callret");
+		for (int index = 0; index <= numberOfOrders; index++) {
+			if (augmented) break;
+			else augmented = checkPropertyTrue(jsonElement, "callret-" + index);
+		}
+		return augmented;
+	}
+	
 	private static boolean checkPropertyTrueAndRemove(JSONObject jsonObject, String property) throws JSONException {
 		if (jsonObject.has(property)) {
 			String val = jsonObject.getJSONObject(property).getString("value");
 			jsonObject.remove(property);
+			return val.equals("1");
+		}
+		return false;
+	}
+	
+	private static boolean checkPropertyTrue(JSONObject jsonObject, String property) {
+		if (jsonObject.has(property)) {
+			String val = jsonObject.getJSONObject(property).getString("value");
 			return val.equals("1");
 		}
 		return false;

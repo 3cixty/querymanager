@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createEventsDetails(List <String> eventIds) throws IOException {
+	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
@@ -87,7 +88,7 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createPoIsDetails(List <String> poiIds) throws IOException {
+	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
@@ -102,7 +103,10 @@ public class ElementDetailsUtils {
 		queryBuff.append("          ?geo schema:longitude ?lon .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
 		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
-		queryBuff.append(" OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating . \n");
+		queryBuff.append("          { ?aggregateRating schema:reviewRating ?reviewRating .  \n");
+		queryBuff.append("            ?reviewRating schema:ratingValue ?ratingValue . \n");
+		queryBuff.append("          } UNION { ?aggregateRating schema:ratingValue ?ratingValue . } } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
 		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
 		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
@@ -120,6 +124,8 @@ public class ElementDetailsUtils {
 		}
 		queryBuff.append(") \n");
 		queryBuff.append("}");
+		
+		System.out.println(queryBuff.toString());
 		
 		StringBuilder result = new StringBuilder();
 		
@@ -151,6 +157,14 @@ public class ElementDetailsUtils {
 			}
 		}
 		
+		for (String key: maps.keySet()) {
+			ElementDetails tmp = maps.get(key);
+			ElementPoIDetails poi = (ElementPoIDetails) tmp;
+			if (poi.getReview_counts() == 0) {
+				if (poi.getReviews() != null) poi.setReview_counts(poi.getReviews().size());
+			}
+		}
+		
 		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		elementsDetails.addAll(maps.values());
 		return elementsDetails;
@@ -177,7 +191,7 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(image_url)) poiDetails.setImage_url(image_url);
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) poiDetails.setSource(source);
-		String aggregateRatingStr = getAttributeValue(json, "aggregateRating");
+		String aggregateRatingStr = getAttributeValue(json, "ratingValue");
 		try {
 		    if (!isNullOrEmpty(aggregateRatingStr)) poiDetails.setAggregate_rating(
 		    		Double.parseDouble(aggregateRatingStr));
@@ -188,7 +202,9 @@ public class ElementDetailsUtils {
 				String [] reviews = reviewCountsStr.trim().split(" ");
 				poiDetails.setReview_counts(Integer.parseInt(reviews[0]));
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
 		List <String> comments = new LinkedList <String>();
