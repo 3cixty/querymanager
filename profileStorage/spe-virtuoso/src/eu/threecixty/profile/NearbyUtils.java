@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class NearbyUtils {
 
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String category,
-			double distance, int offset, int limit) throws IOException {
+			double distance, int offset, int limit, String notId) throws IOException {
 		
 		StringBuilder builder = null;
 		if (distance < 0) {
@@ -45,6 +45,10 @@ public class NearbyUtils {
 		builder.append("              ?inSpace geo:long ?eventLon . }\n");
 		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
 
+		if (!isNullOrEmpty(notId)) {
+			builder.append("FILTER (?event != <" + notId + ">) \n");
+		}
+		
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
@@ -88,7 +92,7 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(lat, lon, category, distance, offset, limit);
+		return getNearbyEvents(lat, lon, category, distance, offset, limit, id);
 	}
 	
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String category,
