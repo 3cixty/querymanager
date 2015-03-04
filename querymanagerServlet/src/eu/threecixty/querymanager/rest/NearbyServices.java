@@ -63,4 +63,48 @@ public class NearbyServices {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Server is too busy at the moment. Please try it later").build();
 		}
 	}
+	
+	@GET
+	@Path("/getNearbyEvents")
+	public Response getNearbyEvents(@QueryParam("event") String event,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@HeaderParam("key") String key) {
+		
+		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
+		String tmpCat;
+		if (category == null || category.equals("")) tmpCat = null;
+		else tmpCat = category;
+		try {
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(event, tmpCat, distance, offset, limit);
+			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Server is too busy at the moment. Please try it later").build();
+		}
+	}
+	
+	@GET
+	@Path("/getNearbyEventsBasedOnGPS")
+	public Response getNearbyEventsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@HeaderParam("key") String key) {
+		
+		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
+		String tmpCat;
+		if (category == null || category.equals("")) tmpCat = null;
+		else tmpCat = category;
+		try {
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCat, distance, offset, limit);
+			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Server is too busy at the moment. Please try it later").build();
+		}
+	}
 }

@@ -12,11 +12,93 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+//TODO: need to remove condition with new Virtuoso updated
 public class NearbyUtils {
 
-	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String category,
+	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String category,
 			double distance, int offset, int limit) throws IOException {
 		
+		StringBuilder builder = null;
+		if (distance < 0) {
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
+		} else {
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
+		}
+
+		builder.append("WHERE { \n");
+		builder.append("        ?event a lode:Event . \n");
+		
+		if (!isNullOrEmpty(category)) {
+			
+			builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
+			builder.append("OPTIONAL { ?event lode:hasCategory ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
+			builder.append("OPTIONAL { ?event lode:hasCategory ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
+			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("FILTER (STR(?category) = \"" + category + "\")");
+		}
+		
+		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+		
+		builder.append("OPTIONAL { ?event ?p ?inSpace. \n");
+		builder.append("              ?inSpace geo:lat ?eventLat .\n");
+		builder.append("              ?inSpace geo:long ?eventLon . }\n");
+		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
+
+		builder.append("} \n");
+		builder.append("ORDER BY ?distance \n");
+		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
+		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
+		
+		return getNearbyEvents(builder.toString());
+	}
+	
+	public static List <ElementDetails> getNearbyEvents(String eventId, String category,
+			double distance, int offset, int limit) throws IOException {
+		if (isNullOrEmpty(eventId)) return new LinkedList <ElementDetails>();
+		StringBuilder builder = null;
+		if (distance < 0) {
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance >= 0) as ?condition) \n");
+		} else {
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
+		}
+
+		builder.append("WHERE { \n");
+		builder.append("        ?event a lode:Event . \n");
+		
+		if (!isNullOrEmpty(category)) {
+			
+			builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
+			builder.append("OPTIONAL { ?event lode:hasCategory ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
+			builder.append("OPTIONAL { ?event lode:hasCategory ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
+			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("FILTER (STR(?category) = \"" + category + "\")");
+		}
+		
+		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+		
+		builder.append("OPTIONAL { ?event lode:inSpace ?inSpace. \n");
+		builder.append("              ?inSpace geo:lat ?eventLat .\n");
+		builder.append("              ?inSpace geo:long ?eventLon . }\n");
+		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
+
+		builder.append("        <").append(eventId).append("> lode:inSpace ?inSpaceFixed . \n");
+		builder.append("        ?inSpaceFixed  geo:lat ?eventLatFixed . \n");
+		builder.append("        ?inSpaceFixed  geo:lon ?eventLonFixed . \n");
+		builder.append("BIND(bif:st_point(xsd:decimal(?eventLonFixed), xsd:decimal(?eventLatFixed)) as ?geoFixed) .\n");
+		builder.append("        FILTER ( <").append(eventId).append("> != ?event ) . \n");
+		
+		builder.append("} \n");
+		builder.append("ORDER BY ?distance \n");
+		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
+		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
+		
+		return getNearbyEvents(builder.toString());
+	}
+	
+	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String category,
+			double distance, int offset, int limit) throws IOException {
+		// TODO: need to remove condition with new Virtuoso updated
 		StringBuilder builder = null;
 		if (distance < 0) {
 			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
@@ -98,6 +180,41 @@ public class NearbyUtils {
 
 	}
 	
+	public static int countNearbyPoIs(String locId, String category, double distance) {
+		if (isNullOrEmpty(locId)) return 0;
+		
+		StringBuilder builder = null;
+		if (distance < 0) {
+			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance >= 0) as ?condition) \n");
+		} else {
+			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
+		}
+
+		builder.append("WHERE { \n");
+		builder.append("        ?poi a dul:Place . \n");
+		
+		if (!isNullOrEmpty(category)) {
+			builder.append("?poi locationOnt:businessType ?businessType. \n");
+			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
+			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
+			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
+			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("FILTER (STR(?category) = \"" + category + "\")");
+		}
+		
+		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+		
+		builder.append("        ?poi schema:geo ?geoPoi . \n");
+		builder.append("        ?geoPoi geo:geometry ?geo. \n");
+		builder.append("        <").append(locId).append("> schema:geo ?geoPoiFixed . \n");
+		builder.append("        ?geoPoiFixed geo:geometry ?geoFixed . \n");
+		builder.append("        FILTER ( <").append(locId).append("> != ?poi ) . \n");
+		builder.append("} \n");
+		builder.append("ORDER BY ?distance \n");
+		
+		return 0;
+	}
+	
 	private static List <ElementDetails> getNearbyPoIs(String query) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
@@ -108,14 +225,37 @@ public class NearbyUtils {
 		int len = jsonArrs.length();
 		for (int i = 0; i < len; i++) {
 			JSONObject jsonElement = jsonArrs.getJSONObject(i);
-			findNearbyPoI(jsonElement, maps);
+			findNearbyElement(jsonElement, maps, "poi");
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
 		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet());
 		
 		for (ElementDetails elementDetails: results) {
-			((ElementPoIDetails) elementDetails).setDistance(maps.get(elementDetails.getId()));
+			elementDetails.setDistance(maps.get(elementDetails.getId()));
+		}
+		Collections.sort(results, new ElementDistance());
+		return results;
+	}
+	
+	private static List <ElementDetails> getNearbyEvents(String query) throws IOException {
+		Map <String, Double> maps = new HashMap <String, Double>();
+        StringBuilder resultBuilder = new StringBuilder();
+		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
+		
+		JSONObject json = new JSONObject(resultBuilder.toString());
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+		int len = jsonArrs.length();
+		for (int i = 0; i < len; i++) {
+			JSONObject jsonElement = jsonArrs.getJSONObject(i);
+			findNearbyElement(jsonElement, maps, "event");
+		}
+		if (maps.size() == 0) return new LinkedList <ElementDetails>();
+		
+		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(maps.keySet());
+		
+		for (ElementDetails elementDetails: results) {
+			elementDetails.setDistance(maps.get(elementDetails.getId()));
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
@@ -208,16 +348,16 @@ public class NearbyUtils {
 	 * @param jsonElement
 	 * @return
 	 */
-	private static void findNearbyPoI(JSONObject jsonElement, Map <String, Double> maps) {
+	private static void findNearbyElement(JSONObject jsonElement, Map <String, Double> maps, String attributeID) {
 		String conditionStr = getAttributeValue(jsonElement, "condition");
 		int condition = Integer.parseInt(conditionStr);
 		if (condition == 0) return;
 		
-		String poiId = getAttributeValue(jsonElement, "poi");
+		String elementId = getAttributeValue(jsonElement, attributeID);
 		
 		String distanceStr = getAttributeValue(jsonElement, "distance");
 		if (!isNullOrEmpty(distanceStr)) {
-			maps.put(poiId, Double.valueOf(distanceStr));
+			maps.put(elementId, Double.valueOf(distanceStr));
 		}
 	}
 	
