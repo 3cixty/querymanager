@@ -100,7 +100,7 @@ public class NearbyServices {
 		if (category == null || category.equals("")) tmpCat = null;
 		else tmpCat = category;
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCat, distance, offset, limit);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCat, distance, offset, limit, null);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
