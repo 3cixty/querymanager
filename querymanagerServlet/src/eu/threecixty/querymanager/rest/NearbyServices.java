@@ -14,8 +14,8 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.profile.nearby.NearbyElement;
-import eu.threecixty.profile.nearby.NearbyUtils;
+import eu.threecixty.profile.ElementDetails;
+import eu.threecixty.profile.NearbyUtils;
 
 @Path("/" + Constants.PREFIX_NAME)
 public class NearbyServices {
@@ -34,7 +34,7 @@ public class NearbyServices {
 		if (category == null || category.equals("")) tmpCat = null;
 		else tmpCat = category;
 		try {
-			List <NearbyElement> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCat, distance, offset, limit);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCat, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -56,7 +56,7 @@ public class NearbyServices {
 		if (category == null || category.equals("")) tmpCat = null;
 		else tmpCat = category;
 		try {
-			List <NearbyElement> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCat, distance, offset, limit);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCat, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
