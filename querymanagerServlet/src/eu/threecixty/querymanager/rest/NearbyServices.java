@@ -66,7 +66,7 @@ public class NearbyServices {
 	
 	@GET
 	@Path("/getNearbyEvents")
-	public Response getNearbyEvents(@QueryParam("event") String event,
+	public Response getNearbyEvents(@QueryParam("id") String id,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("category") String category,
@@ -78,7 +78,7 @@ public class NearbyServices {
 		if (category == null || category.equals("")) tmpCat = null;
 		else tmpCat = category;
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(event, tmpCat, distance, offset, limit);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(id, tmpCat, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -53,47 +53,42 @@ public class NearbyUtils {
 		return getNearbyEvents(builder.toString());
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String eventId, String category,
+	public static List <ElementDetails> getNearbyEvents(String id, String category,
 			double distance, int offset, int limit) throws IOException {
-		if (isNullOrEmpty(eventId)) return new LinkedList <ElementDetails>();
-		StringBuilder builder = null;
-		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance >= 0) as ?condition) \n");
-		} else {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
-		}
+		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
+		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
 
 		builder.append("WHERE { \n");
-		builder.append("        ?event a lode:Event . \n");
+		builder.append("{ \n");
+		builder.append("?event a lode:Event . \n");
+		builder.append("?event lode:inSpace ?inSpace. \n");
+		builder.append("?inSpace geo:lat ?lat . \n");
+		builder.append("?inSpace geo:long ?lon  . \n");
+		builder.append("FILTER (?event = <"  + id + ">) \n");
 		
-		if (!isNullOrEmpty(category)) {
-			
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
-			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
-			builder.append("FILTER (STR(?category) = \"" + category + "\")");
-		}
+		builder.append("} UNION { \n");
+		builder.append(" ?poi a dul:Place . \n");
+		builder.append("?poi schema:geo ?geoPoi . \n");
+		builder.append("?geoPoi schema:latitude ?lat. \n");
+		builder.append("?geoPoi schema:longitude ?lon. \n");
+		builder.append("FILTER (?poi = <" + id + ">) \n");
 		
-		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+		builder.append("}} \n");
 		
-		builder.append("OPTIONAL { ?event lode:inSpace ?inSpace. \n");
-		builder.append("              ?inSpace geo:lat ?eventLat .\n");
-		builder.append("              ?inSpace geo:long ?eventLon . }\n");
-		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
-
-		builder.append("        <").append(eventId).append("> lode:inSpace ?inSpaceFixed . \n");
-		builder.append("        ?inSpaceFixed  geo:lat ?eventLatFixed . \n");
-		builder.append("        ?inSpaceFixed  geo:lon ?eventLonFixed . \n");
-		builder.append("BIND(bif:st_point(xsd:decimal(?eventLonFixed), xsd:decimal(?eventLatFixed)) as ?geoFixed) .\n");
-		builder.append("        FILTER ( <").append(eventId).append("> != ?event ) . \n");
+        StringBuilder resultBuilder = new StringBuilder();
+		VirtuosoManager.getInstance().executeQueryViaSPARQL(builder.toString(), "application/sparql-results+json", resultBuilder); 
+		JSONObject json = new JSONObject(resultBuilder.toString());
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+		int len = jsonArrs.length();
+		if (len == 0) return new LinkedList <ElementDetails>();
+		double lat = 0, lon = 0;
+		JSONObject jsonElement = jsonArrs.getJSONObject(0);
+		String latStr = getAttributeValue(jsonElement, "lat");
+		lat = Double.parseDouble(latStr);
+		String lonStr = getAttributeValue(jsonElement, "lon");
+		lon = Double.parseDouble(lonStr);
 		
-		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
-		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
-		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
-		
-		return getNearbyEvents(builder.toString());
+		return getNearbyEvents(lat, lon, category, distance, offset, limit);
 	}
 	
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String category,
