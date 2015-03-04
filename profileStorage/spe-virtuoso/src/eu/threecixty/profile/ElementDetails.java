@@ -12,6 +12,8 @@ public class ElementDetails {
 	private String image_url;
 	private String source;
 	private String type;
+	
+	private Double distance; // this attribute is used for nearby elements (Event/PoI)
 
 	public String getId() {
 		return id;
@@ -74,6 +76,13 @@ public class ElementDetails {
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public Double getDistance() {
+		return distance;
+	}
+	public void setDistance(Double distance) {
+		this.distance = distance;
 	}
 	public int hashCode() {
 		if (id == null) return -1;
