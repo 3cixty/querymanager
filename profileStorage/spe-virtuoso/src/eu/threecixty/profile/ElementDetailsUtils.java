@@ -29,12 +29,19 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
-		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
+		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT ?item ?title ?description ?lat ?lon ?street ?locality ?beginTime ?endTime ?image_url ?source \n");
 		queryBuff.append("WHERE {\n");
-		queryBuff.append("?item dc:title ?title. \n");
-		queryBuff.append("OPTIONAL{ ?item dc:description ?description.} \n");
-		queryBuff.append("OPTIONAL{ ?item lode:hasCategory ?category.} \n");
-		queryBuff.append("OPTIONAL{ ?item ?p ?inSpace. \n");
+		queryBuff.append("?item a lode:Event . \n");
+		queryBuff.append("OPTIONAL { ?item dc:title  ?title_en.  FILTER (langMatches(lang(?title_en), \"en\"))  } \n");
+		queryBuff.append("OPTIONAL { ?item dc:title  ?title_it.  FILTER (langMatches(lang(?title_it), \"it\"))  } \n");
+		queryBuff.append("OPTIONAL { ?item dc:title  ?title_empty.  FILTER (langMatches(lang(?title_empty), \"\"))  } \n");
+		queryBuff.append("BIND(COALESCE(?title_en, ?title_it, ?title_empty) AS ?title) \n");
+		queryBuff.append("OPTIONAL { ?item dc:description ?description_en. FILTER (langMatches(lang(?description_en), \"en\")) } \n");
+		queryBuff.append("OPTIONAL { ?item dc:description ?description_it. FILTER (langMatches(lang(?description_it), \"it\")) } \n");
+		queryBuff.append("OPTIONAL { ?item dc:description ?description_empty. FILTER (langMatches(lang(?description_empty), \"\")) } \n");
+		queryBuff.append("BIND(COALESCE(?description_en, ?description_it, ?description_empty) AS ?description) \n");
+		queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category.} \n");
+		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
 		queryBuff.append("              ?inSpace geo:long ?lon . }\n");
 		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place. \n");
@@ -93,7 +100,11 @@ public class ElementDetailsUtils {
 
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
 		queryBuff.append("WHERE {\n");
-		queryBuff.append(" ?poi schema:name ?name. \n");
+		queryBuff.append(" ?poi a dul:Place .  \n");
+		queryBuff.append("OPTIONAL { ?poi schema:name ?name_en. FILTER (langMatches(lang(?name_en), \"en\")) } \n");
+		queryBuff.append("OPTIONAL { ?poi schema:name ?name_it. FILTER (langMatches(lang(?name_it), \"it\")) } \n");
+		queryBuff.append("OPTIONAL { ?poi schema:name ?name_empty. FILTER (langMatches(lang(?name_empty), \"en\")) } \n");
+		queryBuff.append("BIND(COALESCE(?name_en, ?name_it, ?name_empty) AS ?name) \n");
 		queryBuff.append("OPTIONAL{ ?poi locationOnt:businessType ?businessType. \n");
 		queryBuff.append("          ?businessType skos:prefLabel ?category . } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
