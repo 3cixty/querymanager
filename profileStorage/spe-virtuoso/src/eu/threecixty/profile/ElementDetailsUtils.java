@@ -32,12 +32,14 @@ public class ElementDetailsUtils {
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT * \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
-		queryBuff.append("OPTIONAL { { ?item dc:title  ?title.  FILTER (langMatches(lang(?title), \"en\"))  } \n");
-		queryBuff.append("UNION { ?item dc:title  ?title.  FILTER (langMatches(lang(?title), \"it\"))  } \n");
-		queryBuff.append("UNION { ?item dc:title  ?title.  FILTER (langMatches(lang(?title), \"\"))  } } \n");
-		queryBuff.append("OPTIONAL { { ?item dc:description ?description. FILTER (langMatches(lang(?description), \"en\")) } \n");
-		queryBuff.append("UNION { ?item dc:description ?description. FILTER (langMatches(lang(?description), \"it\")) } \n");
-		queryBuff.append("UNION { ?item dc:description ?description. FILTER (langMatches(lang(?description), \"\")) }  }\n");
+		queryBuff.append("OPTIONAL { ?item dc:title  ?title_en.  FILTER (langMatches(lang(?title_en), \"en\"))  } \n");
+		queryBuff.append("OPTIONAL { ?item dc:title  ?title_it.  FILTER (langMatches(lang(?title_it), \"it\"))  } \n");
+		queryBuff.append("OPTIONAL { ?item dc:title  ?title_empty.  FILTER (langMatches(lang(?title_empty), \"\"))  } \n");
+
+		queryBuff.append("OPTIONAL { ?item dc:description ?description_en. FILTER (langMatches(lang(?description_en), \"en\")) } \n");
+		queryBuff.append("OPTIONAL { ?item dc:description ?description_it. FILTER (langMatches(lang(?description_it), \"it\")) } \n");
+		queryBuff.append("OPTIONAL { ?item dc:description ?description_empty. FILTER (langMatches(lang(?description_empty), \"\")) } \n");
+
 		queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category.} \n");
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
@@ -99,9 +101,10 @@ public class ElementDetailsUtils {
 		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
-		queryBuff.append("OPTIONAL { { ?poi schema:name ?name. FILTER (langMatches(lang(?name), \"en\")) } \n");
-		queryBuff.append(" UNION { ?poi schema:name ?name. FILTER (langMatches(lang(?name), \"it\")) } \n");
-		queryBuff.append(" UNION { ?poi schema:name ?name. FILTER (langMatches(lang(?name), \"\")) }  }\n");
+		queryBuff.append("OPTIONAL { ?poi schema:name ?name_en. FILTER (langMatches(lang(?name_en), \"en\")) } \n");
+		queryBuff.append("OPTIONAL { ?poi schema:name ?name_it. FILTER (langMatches(lang(?name_it), \"it\")) } \n");
+		queryBuff.append("OPTIONAL { ?poi schema:name ?name_empty. FILTER (langMatches(lang(?name_empty), \"\")) } \n");
+		
 		queryBuff.append("OPTIONAL{ ?poi locationOnt:businessType ?businessType. \n");
 		queryBuff.append("          ?businessType skos:prefLabel ?category . } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
@@ -111,10 +114,13 @@ public class ElementDetailsUtils {
 		queryBuff.append("          ?geo schema:longitude ?lon .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
 		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating . \n");
-		queryBuff.append("          { ?aggregateRating schema:reviewRating ?reviewRating .  \n");
-		queryBuff.append("            ?reviewRating schema:ratingValue ?ratingValue . \n");
-		queryBuff.append("          } UNION { ?aggregateRating schema:ratingValue ?ratingValue . } } \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating2 . \n");
+		queryBuff.append("          ?aggregateRating2 schema:ratingValue ?ratingValue2 . } \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating3 . \n");
+		queryBuff.append("          ?aggregateRating3 schema:reviewRating ?reviewRating3 .  \n");
+		queryBuff.append("           ?reviewRating3 schema:ratingValue ?ratingValue3 .}  \n");
+		
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
 		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
 		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
@@ -183,8 +189,12 @@ public class ElementDetailsUtils {
 		String id = getAttributeValue(json, "poi");
 		if (isNullOrEmpty(id)) return null;
 		poiDetails.setId(id);
-		String name = getAttributeValue(json, "name");
+		
+		String name = getAttributeValue(json, "name_en");
+		if (isNullOrEmpty(name)) name = getAttributeValue(json, "name_it");
+		if (isNullOrEmpty(name)) name = getAttributeValue(json, "name_empty");
 		if (!isNullOrEmpty(name)) poiDetails.setName(name);
+		
 		String category = getAttributeValue(json, "category");
 		if (!isNullOrEmpty(category)) poiDetails.setCategory(category);
 		String lat = getAttributeValue(json, "lat");
@@ -199,7 +209,12 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(image_url)) poiDetails.setImage_url(image_url);
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) poiDetails.setSource(source);
-		String aggregateRatingStr = getAttributeValue(json, "ratingValue");
+
+		String aggregateRatingStr = getAttributeValue(json, "ratingValue1");
+		if (isNullOrEmpty(aggregateRatingStr)) {
+			aggregateRatingStr = getAttributeValue(json, "ratingValue2");
+			if (isNullOrEmpty(aggregateRatingStr)) getAttributeValue(json, "ratingValue3");
+		}
 		try {
 		    if (!isNullOrEmpty(aggregateRatingStr)) poiDetails.setAggregate_rating(
 		    		Double.parseDouble(aggregateRatingStr));
@@ -228,10 +243,17 @@ public class ElementDetailsUtils {
 		String id = getAttributeValue(json, "item");
 		if (isNullOrEmpty(id)) return null;
 		eventDetails.setId(id);
-		String title = getAttributeValue(json, "title");
+		
+		String title = getAttributeValue(json, "title_en");
+		if (isNullOrEmpty(title)) title = getAttributeValue(json, "title_it");
+		if (isNullOrEmpty(title)) title = getAttributeValue(json, "title_empty");
 		if (!isNullOrEmpty(title)) eventDetails.setName(title);
-		String desc = getAttributeValue(json, "description");
+		
+		String desc = getAttributeValue(json, "description_en");
+		if (isNullOrEmpty(desc)) desc = getAttributeValue(json, "description_it");
+		if (isNullOrEmpty(desc)) desc = getAttributeValue(json, "description_empty");
 		if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
+		
 		String category = getAttributeValue(json, "category");
 		if (!isNullOrEmpty(category)) eventDetails.setCategory(category);
 		String lat = getAttributeValue(json, "lat");
