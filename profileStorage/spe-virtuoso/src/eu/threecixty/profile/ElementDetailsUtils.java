@@ -213,21 +213,23 @@ public class ElementDetailsUtils {
 		String aggregateRatingStr = getAttributeValue(json, "ratingValue1");
 		if (isNullOrEmpty(aggregateRatingStr)) {
 			aggregateRatingStr = getAttributeValue(json, "ratingValue2");
-			if (isNullOrEmpty(aggregateRatingStr)) getAttributeValue(json, "ratingValue3");
+			if (isNullOrEmpty(aggregateRatingStr)) aggregateRatingStr = getAttributeValue(json, "ratingValue3");
 		}
 		try {
 		    if (!isNullOrEmpty(aggregateRatingStr)) poiDetails.setAggregate_rating(
 		    		Double.parseDouble(aggregateRatingStr));
 		} catch (Exception e) {}
-		String reviewCountsStr = getAttributeValue(json, "reviewCounts");
-		try {
-			if (!isNullOrEmpty(reviewCountsStr)) {
-				String [] reviews = reviewCountsStr.trim().split(" ");
-				poiDetails.setReview_counts(Integer.parseInt(reviews[0]));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
+		// seems incorrect
+//		String reviewCountsStr = getAttributeValue(json, "reviewCounts");
+//		try {
+//			if (!isNullOrEmpty(reviewCountsStr)) {
+//				String [] reviews = reviewCountsStr.trim().split(" ");
+//				poiDetails.setReview_counts(Integer.parseInt(reviews[0]));
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
 		List <String> comments = new LinkedList <String>();
