@@ -1,7 +1,6 @@
 package eu.threecixty.profile;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,21 +68,22 @@ public class Utils {
 	 * @throws Exception
 	 */
 	protected static String readUrl(String urlString) throws Exception {
-	    BufferedReader reader = null;
+		StringBuffer buffer = new StringBuffer();
+		InputStream reader = null;
 	    try {
 	        URL url = new URL(urlString);
-	        reader = new BufferedReader(new InputStreamReader(url.openStream()));
-	        StringBuffer buffer = new StringBuffer();
+	        reader = url.openStream();
+	        
 	        int read;
-	        char[] chars = new char[1024];
+	        byte[] chars = new byte[1024];
 	        while ((read = reader.read(chars)) != -1)
-	            buffer.append(chars, 0, read); 
+	            buffer.append(new String(chars, 0, read, "UTF-8")); 
 
-	        return buffer.toString();
 	    } finally {
 	        if (reader != null)
 	            reader.close();
 	    }
+	    return buffer.toString();
 	}
 	
 	protected static Map <String, Boolean> getAttributesToStoreForCrawlingSocialProfile() {
