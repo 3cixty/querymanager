@@ -211,14 +211,15 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(source)) poiDetails.setSource(source);
 
 		String aggregateRatingStr = getAttributeValue(json, "ratingValue1");
-		if (isNullOrEmpty(aggregateRatingStr)) {
-			aggregateRatingStr = getAttributeValue(json, "ratingValue2");
-			if (isNullOrEmpty(aggregateRatingStr)) aggregateRatingStr = getAttributeValue(json, "ratingValue3");
-		}
+		if (isNullOrEmpty(aggregateRatingStr)) aggregateRatingStr = getAttributeValue(json, "ratingValue2");
+		if (isNullOrEmpty(aggregateRatingStr)) aggregateRatingStr = getAttributeValue(json, "ratingValue3");
+
 		try {
 		    if (!isNullOrEmpty(aggregateRatingStr)) poiDetails.setAggregate_rating(
-		    		Double.parseDouble(aggregateRatingStr));
-		} catch (Exception e) {}
+		    		Double.parseDouble(aggregateRatingStr.trim()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		// seems incorrect
 //		String reviewCountsStr = getAttributeValue(json, "reviewCounts");
