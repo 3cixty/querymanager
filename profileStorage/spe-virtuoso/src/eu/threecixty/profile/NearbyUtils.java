@@ -21,9 +21,9 @@ public class NearbyUtils {
 		
 		StringBuilder builder = null;
 		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
 		} else {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
 		}
 
 		builder.append("WHERE { \n");
@@ -100,9 +100,9 @@ public class NearbyUtils {
 		// TODO: need to remove condition with new Virtuoso updated
 		StringBuilder builder = null;
 		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
+			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
 		} else {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lat) + ", " + Double.toString(lon) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
+			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
 		}
 
 		builder.append("WHERE { \n");
