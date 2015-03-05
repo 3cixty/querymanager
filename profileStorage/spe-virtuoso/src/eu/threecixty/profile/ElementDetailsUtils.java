@@ -210,16 +210,10 @@ public class ElementDetailsUtils {
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) poiDetails.setSource(source);
 
-		String aggregateRatingStr = getAttributeValue(json, "ratingValue1");
-		if (isNullOrEmpty(aggregateRatingStr)) aggregateRatingStr = getAttributeValue(json, "ratingValue2");
-		if (isNullOrEmpty(aggregateRatingStr)) aggregateRatingStr = getAttributeValue(json, "ratingValue3");
-
-		try {
-		    if (!isNullOrEmpty(aggregateRatingStr)) poiDetails.setAggregate_rating(
-		    		Double.parseDouble(aggregateRatingStr.trim()));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		double ratingValue = getRatingValue(json, "ratingValue1");
+		if (ratingValue == 0) ratingValue = getRatingValue(json, "ratingValue2");
+		if (ratingValue == 0) ratingValue = getRatingValue(json, "ratingValue3");
+		if (ratingValue > 0) poiDetails.setAggregate_rating(ratingValue);
 		
 		// seems incorrect
 //		String reviewCountsStr = getAttributeValue(json, "reviewCounts");
@@ -276,6 +270,15 @@ public class ElementDetailsUtils {
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		return eventDetails;
+	}
+	
+	private static double getRatingValue(JSONObject json, String attributeName) {
+		String aggregateRatingStr = getAttributeValue(json, attributeName);
+		try {
+		    if (!isNullOrEmpty(aggregateRatingStr)) return Double.parseDouble(aggregateRatingStr);
+		} catch (Exception e) {
+		}
+		return 0;
 	}
 
 	private static String getAttributeValue(JSONObject jsonObject, String attr) throws JSONException {
