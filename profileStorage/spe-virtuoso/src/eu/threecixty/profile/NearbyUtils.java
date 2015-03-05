@@ -31,10 +31,9 @@ public class NearbyUtils {
 		
 		if (!isNullOrEmpty(category)) {
 			
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
-			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("OPTIONAL { { ?event lode:hasCategory ?category.  FILTER (langMatches(lang(?category), \"en\"))} \n");
+			builder.append("UNION { ?event lode:hasCategory ?category.  FILTER (langMatches(lang(?category), \"it\"))} \n");
+			builder.append("UNION { ?event lode:hasCategory ?category.  FILTER (langMatches(lang(?category), \"\"))}  }\n");
 			builder.append("FILTER (STR(?category) = \"" + category + "\")");
 		}
 		
@@ -110,10 +109,9 @@ public class NearbyUtils {
 		
 		if (!isNullOrEmpty(category)) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
-			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("OPTIONAL { { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"en\"))} \n");
+			builder.append("UNION { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"it\"))} \n");
+			builder.append("UNION { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"\"))} } \n");
 			builder.append("FILTER (STR(?category) = \"" + category + "\")");
 		}
 		
@@ -156,10 +154,9 @@ public class NearbyUtils {
 		
 		if (!isNullOrEmpty(category)) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
-			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("OPTIONAL { { ?businessType skos:prefLabel ?categor.  FILTER (langMatches(lang(?category), \"en\"))} \n");
+			builder.append("UNION { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"it\"))} \n");
+			builder.append("UNION { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"\"))} } \n");
 			builder.append("FILTER (STR(?category) = \"" + category + "\")");
 		}
 		
@@ -194,10 +191,9 @@ public class NearbyUtils {
 		
 		if (!isNullOrEmpty(category)) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
-			builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
+			builder.append("OPTIONAL { { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"en\"))} \n");
+			builder.append("UNION { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"it\"))} \n");
+			builder.append("UNION { ?businessType skos:prefLabel ?category.  FILTER (langMatches(lang(?category), \"\"))} } \n");
 			builder.append("FILTER (STR(?category) = \"" + category + "\")");
 		}
 		
