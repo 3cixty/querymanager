@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
@@ -90,8 +91,7 @@ public class SPEServices {
 							.type(MediaType.TEXT_PLAIN)
 							.build());
 				}
-				Gson gson = new Gson();
-				String ret = gson.toJson(profile);
+				String ret = JSONObject.wrap(profile).toString();
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				if (DEBUG_MOD) LOGGER.info("Successful to getProfile API");
 				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
@@ -222,6 +222,12 @@ public class SPEServices {
 						.type(MediaType.TEXT_PLAIN)
 						.build());
 			}
+			// double-check in case where there is UTF8 encoded data
+			JSONObject json = new JSONObject(profileStr);
+			if (json.has("firstName")) profile.setLastName(json.getString("firstName"));
+			if (json.has("lastName")) profile.setLastName(json.getString("lastName"));
+			if (json.has("townName")) profile.setTownName(json.getString("townName"));
+			if (json.has("countryName")) profile.setCountryName(json.getString("countryName"));
 			profile.setUid(uid);
 			String ret;
 			try {
