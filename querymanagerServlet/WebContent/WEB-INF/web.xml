@@ -36,7 +36,8 @@
     <filter>
             <!-- The CORS filter with parameters -->
             <filter-name>CORS</filter-name>
-            <filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>
+            <!-- use custom CORS filter to dynamically add CORSConfiguration -->
+            <filter-class>eu.threecixty.querymanager.filter.DynamicCORSFilter</filter-class>
 
             <!-- Note: All parameters are options, if omitted the CORS
                  Filter will fall back to the respective default values.

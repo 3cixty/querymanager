@@ -34,6 +34,7 @@ import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.utils.ScopeUtils;
 import eu.threecixty.profile.FaceBookAccountUtils;
 import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.querymanager.filter.DynamicCORSFilter;
 
 @Path("/" + Constants.VERSION_2)
 public class OAuthServices {
@@ -148,6 +149,14 @@ public class OAuthServices {
 		if (appKey != null && !appKey.equals("")) {
 			boolean ok = GoFlowServices.registerAppFromUID(uid, appKey);
 			if (ok) {
+				// add CORS configuration if existed
+				if (redirect_uri != null && !redirect_uri.trim().equals("")) {
+					DynamicCORSFilter currentFilter = DynamicCORSFilter.getCurrentFilter();
+					if (currentFilter != null) {
+						String rootRedirectUri = getRootRedirectUri(redirect_uri.trim());
+						if (rootRedirectUri != null) currentFilter.addConfiguration(rootRedirectUri);
+					}
+				}
 			    return Response.ok(" {\"key\": \"" + appKey + "\"} ", MediaType.APPLICATION_JSON_TYPE).build();
 			} else {
 				return Response.ok(" {\"response\": \"Cannot register App on GoFlow server\"} ", MediaType.APPLICATION_JSON_TYPE).build();
@@ -552,6 +561,13 @@ public class OAuthServices {
 		CacheControl cacheControl = new CacheControl();
 		cacheControl.setNoStore(true);
 		return cacheControl;
+	}
+	
+	private String getRootRedirectUri(String redirect_uri) {
+		int index = redirect_uri.lastIndexOf("/"); // redirect_uri must contain protocol, scheme (http://, https://)
+		if (index == 7 || index == 9) return redirect_uri;
+		if (index < 9) return null;
+		return redirect_uri.substring(0, index);
 	}
 
 	private class DeveloperScope {
