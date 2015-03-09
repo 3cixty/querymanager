@@ -44,7 +44,7 @@ public class NearbyUtils {
 		builder.append("              ?inSpace geo:long ?eventLon . }\n");
 		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
 
-		builder.append(" OPTIONAL{ ?item lode:atTime ?time.");
+		builder.append(" OPTIONAL{ ?event lode:atTime ?time.");
 		builder.append("              ?time time:hasEnd ?end .\n");
 		builder.append("              ?end time:inXSDDateTime ?endTime .}\n");
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
