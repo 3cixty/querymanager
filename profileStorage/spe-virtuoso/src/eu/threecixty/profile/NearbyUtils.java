@@ -47,7 +47,7 @@ public class NearbyUtils {
 		builder.append(" OPTIONAL{ ?item lode:atTime ?time.");
 		builder.append("              ?time time:hasEnd ?end .\n");
 		builder.append("              ?end time:inXSDDateTime ?endTime .}\n");
-		builder.append("BIND (now() AS ?thisMillisecond) .");
+		builder.append("BIND (now() AS ?thisMillisecond) . \n");
 		
 		builder.append("FILTER (?endTime > ?thisMillisecond) \n");
 
@@ -59,6 +59,8 @@ public class NearbyUtils {
 		builder.append("ORDER BY ?distance \n");
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
+		
+		System.out.println(builder.toString());
 		
 		return getNearbyEvents(builder.toString());
 	}
