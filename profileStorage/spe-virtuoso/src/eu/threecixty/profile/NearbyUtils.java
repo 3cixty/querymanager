@@ -360,9 +360,11 @@ public class NearbyUtils {
 		int condition = Integer.parseInt(conditionStr);
 		if (condition == 0) return;
 		
-		String timeConditionStr = getAttributeValue(jsonElement, "timeCondition");
-		int timecondition = Integer.parseInt(timeConditionStr);
-		if (timecondition == 0) return;
+		if (jsonElement.has("timeCondition")) {
+		    String timeConditionStr = getAttributeValue(jsonElement, "timeCondition");
+		    int timecondition = Integer.parseInt(timeConditionStr);
+		    if (timecondition == 0) return;
+		}
 		
 		String elementId = getAttributeValue(jsonElement, attributeID);
 		
