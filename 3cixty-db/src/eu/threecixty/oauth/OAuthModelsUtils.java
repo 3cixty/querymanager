@@ -3,6 +3,7 @@ package eu.threecixty.oauth;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -771,6 +772,27 @@ public class OAuthModelsUtils {
 			if (session != null) session.close();
 			return null;
 		}
+	}
+	
+	protected static List <String> getAllRedirectUris() {
+		List <String> allRedirectUris = new LinkedList <String>();
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			String hql = "FROM App";
+			Query query = session.createQuery(hql);
+			List <?> results = query.list();
+			for (Object result: results) {
+				App app = (App) result;
+				if (app.getRedirectUri() != null && !app.getRedirectUri().equals(""))
+					allRedirectUris.add(app.getRedirectUri());
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return allRedirectUris;
 	}
 	
 	private static void findScope(UserAccessToken userAccessToken, AccessToken result) {

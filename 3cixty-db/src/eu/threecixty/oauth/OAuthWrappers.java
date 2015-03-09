@@ -434,6 +434,10 @@ public class OAuthWrappers {
 		return null;
 	}
 	
+	public static List <String> getAllRedirectUris() {
+		return OAuthModelsUtils.getAllRedirectUris();
+	}
+	
 	private static AccessToken refreshAccessTokenUsingOAuthServer(AccessToken lastAccessToken) {
 	    
 	    String postParams = "grant_type=refresh_token&refresh_token" + lastAccessToken.getRefresh_token();
