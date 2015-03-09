@@ -21,9 +21,9 @@ public class NearbyUtils {
 		
 		StringBuilder builder = null;
 		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance >= 0) as ?condition) ((?dtEndTime > ?thisMillisecond) as ?timeCondition) \n");
 		} else {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
+			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) ((?dtEndTime > ?thisMillisecond) as ?timeCondition) \n");
 		}
 
 		builder.append("WHERE { \n");
@@ -44,12 +44,13 @@ public class NearbyUtils {
 		builder.append("              ?inSpace geo:long ?eventLon . }\n");
 		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
 
-		builder.append(" OPTIONAL{ ?event lode:atTime ?time.");
+		builder.append(" OPTIONAL{ ?event lode:atTime ?time. \n");
 		builder.append("              ?time time:hasEnd ?end .\n");
-		builder.append("              ?end time:inXSDDateTime ?endTime .}\n");
+		builder.append("              ?end time:inXSDDateTime ?endTime .\n");
+		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . } \n");
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
 		
-		builder.append("FILTER (?endTime > ?thisMillisecond) \n");
+		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
 
 		if (!isNullOrEmpty(notId)) {
 			builder.append("FILTER (?event != <" + notId + ">) \n");
@@ -358,6 +359,10 @@ public class NearbyUtils {
 		String conditionStr = getAttributeValue(jsonElement, "condition");
 		int condition = Integer.parseInt(conditionStr);
 		if (condition == 0) return;
+		
+		String timeConditionStr = getAttributeValue(jsonElement, "timeCondition");
+		int timecondition = Integer.parseInt(timeConditionStr);
+		if (timecondition == 0) return;
 		
 		String elementId = getAttributeValue(jsonElement, attributeID);
 		
