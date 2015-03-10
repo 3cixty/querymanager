@@ -154,11 +154,8 @@ public class QueryManagerServices {
 				}
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
 
@@ -207,11 +204,8 @@ public class QueryManagerServices {
 						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build();
+			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 	
@@ -258,11 +252,8 @@ public class QueryManagerServices {
 			
 			return Response.ok(result.toString(), MediaType.APPLICATION_JSON_TYPE ).build();
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build();
+			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 	
@@ -283,11 +274,8 @@ public class QueryManagerServices {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 
@@ -308,11 +296,8 @@ public class QueryManagerServices {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 
@@ -365,11 +350,8 @@ public class QueryManagerServices {
 			        .type(MediaType.TEXT_PLAIN)
 			        .build());
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 
@@ -398,11 +380,8 @@ public class QueryManagerServices {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 	
@@ -470,11 +449,8 @@ public class QueryManagerServices {
 				        .build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
 	
@@ -551,11 +527,8 @@ public class QueryManagerServices {
 				        .build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
 	
@@ -608,11 +581,8 @@ public class QueryManagerServices {
 				        .build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
 	
@@ -676,11 +646,8 @@ public class QueryManagerServices {
 				        .build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
 	
@@ -717,11 +684,8 @@ public class QueryManagerServices {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 	
@@ -767,11 +731,8 @@ public class QueryManagerServices {
 					        .build();
 				}
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 
@@ -794,11 +755,8 @@ public class QueryManagerServices {
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 	
@@ -832,11 +790,8 @@ public class QueryManagerServices {
 				        .build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The key is invalid '" + key + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
 		}
 	}
 
@@ -1016,6 +971,20 @@ public class QueryManagerServices {
     		results.add(id.trim());
     	}
     	return results;
+    }
+    
+    private Response createResponseForAccessToken(String access_token) {
+    	return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity("The access token is invalid, access_token = " + access_token)
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
+    }
+    
+    private Response createResponseForInvalidKey(String key) {
+		return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity("The key is invalid, key = " + key)
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
     }
     
 	/**

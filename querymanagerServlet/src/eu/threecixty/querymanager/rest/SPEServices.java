@@ -99,11 +99,8 @@ public class SPEServices {
 				return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(e.getMessage()).build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					.entity("The access token is invalid '" + access_token + "'")
-					.type(MediaType.TEXT_PLAIN)
-					.build());
+			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
 	
@@ -239,11 +236,8 @@ public class SPEServices {
 				return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(e.getMessage()).build();
 			}
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (access_token != null && !access_token.equals(""))  CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_SAVE_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
 	
@@ -263,13 +257,17 @@ public class SPEServices {
 			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok("{\"uid\":\"" + userAccessToken.getUid() + "\"}", MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
-			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-			        .entity("The access token is invalid '" + access_token + "'")
-			        .type(MediaType.TEXT_PLAIN)
-			        .build());
+			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_UID_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
 		}
 	}
+	
+    private Response createResponseForAccessToken(String access_token) {
+    	return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity("The access token is invalid, access_token = " + access_token)
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
+    }
 	
 	public static void checkPermission(AccessToken accessToken) throws ThreeCixtyPermissionException {
 		if (accessToken == null || !accessToken.getScopeNames().contains(PROFILE_SCOPE_NAME)) {

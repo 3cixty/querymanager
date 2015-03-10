@@ -84,8 +84,8 @@ public class TrayServices {
 			return createResponseException("Failed to understand your tray request");
     	} else {
     		if (!OAuthWrappers.validateAppKey(restTray.getKey())) {
-    			CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_APP_KEY + restTray.getKey());
-    			return createResponseException("The key is invalid '" + restTray.getKey() + "'");
+    			if (restTray.getKey() != null && !restTray.getKey().equals("")) CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_APP_KEY + restTray.getKey());
+    			return createResponseException("The key is invalid, key = " + restTray.getKey());
     		} else {
     			try {
     				String action = restTray.getAction();
