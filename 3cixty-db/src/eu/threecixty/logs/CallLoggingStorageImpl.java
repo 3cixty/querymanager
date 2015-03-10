@@ -99,7 +99,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 	    	logging.setKey((String) row[0]);
 	    	loggingDisplay.setCallLogging(logging);
 	    	loggingDisplay.setDateCall((String) row[1]);;
-	    	loggingDisplay.setNumberOfCalls((Integer) row[2]);
+	    	loggingDisplay.setNumberOfCalls(((java.math.BigInteger) row[2]).intValue());
 	    	loggings.add(loggingDisplay);
 		}
 		
