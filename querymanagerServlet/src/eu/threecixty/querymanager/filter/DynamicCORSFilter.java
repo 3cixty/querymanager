@@ -34,7 +34,8 @@ public class DynamicCORSFilter extends CORSFilter {
 		List <String> allRedirectUris = OAuthWrappers.getAllRedirectUris();
 		
 		for (String allowedOrigin: allRedirectUris) {
-			addConfiguration(allowedOrigin);
+			String processedStr = getRootRedirectUri(allowedOrigin);
+			if (processedStr != null) addConfiguration(processedStr);
 		}
 	}
 
@@ -45,6 +46,13 @@ public class DynamicCORSFilter extends CORSFilter {
 		} catch (OriginException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private String getRootRedirectUri(String redirect_uri) {
+		int index = redirect_uri.lastIndexOf("/"); // redirect_uri must contain protocol, scheme (http://, https://)
+		if (index == 7 || index == 9) return redirect_uri;
+		if (index < 9) return null;
+		return redirect_uri.substring(0, index);
 	}
 	
 	public static DynamicCORSFilter getCurrentFilter() {
