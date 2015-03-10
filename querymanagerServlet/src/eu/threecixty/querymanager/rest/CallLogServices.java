@@ -17,7 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Context;
 
-
+import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingDisplay;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.querymanager.AdminValidator;
@@ -47,9 +47,9 @@ public class CallLogServices  {
 			if (admin.validate(username,password,realPath)) {
 				HttpSession session = httpRequest.getSession();
 				session.setAttribute("admin", true);
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_DASHBOARD_PAGE +"dashboard.jsp")).build();
+				return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() +"/dashboard.jsp")).build();
 			} else {
-				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
+				return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/errorLogin.jsp")).build();
 			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -87,7 +87,7 @@ public class CallLogServices  {
     public Response logoutAdmin() {
         try {
             httpRequest.getSession().invalidate();
-            return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_AUTH_PAGE + "appkeyadmin_login.jsp")).build();
+            return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/appkeyadmin_login.jsp")).build();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
