@@ -73,7 +73,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 			int minTimeConsumed, int maxTimeConsumed) {
 		List <CallLoggingDisplay> loggings = new ArrayList<CallLoggingDisplay>();
 		
-		String sql = "SELECT "+ APPKEY_TABLE_NAME+".app_name AS appName, " //TODO checktable name
+		String sql = "SELECT "+ APPKEY_TABLE_NAME+".app_name AS app_name, " //TODO checktable name
 				+ "DATE_FORMAT(DATE_SUB("+TABLE_NAME +".starttime, INTERVAL 1 Month),'%Y,%m,%d') AS starttime, "
 				+ "COUNT("+APPKEY_TABLE_NAME +".app_name) AS numberOfCalls "
 				+ "FROM " + TABLE_NAME +"," + APPKEY_TABLE_NAME
