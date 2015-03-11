@@ -10,6 +10,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerImpl;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
@@ -268,5 +269,48 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	public boolean checkAttributeToStore(Map<String, Boolean> attributes, String attribute) {
 		// XXX: always use code from ProfileManagerImpl for this method.
 		return false;
+	}
+
+	@Override
+	public String find3cixtyUID(String uid, String profileImage) {
+		// TODO Auto-generated method stub
+		StringBuilder qStr = new StringBuilder(Configuration.PROFILE_PREFIX);
+	    qStr.append("SELECT  DISTINCT *\n");
+	    qStr.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + "> \n");
+	    qStr.append("WHERE {\n\n");
+	    qStr.append("?root profile:userID ?_3cixtyUid .\n");
+    	
+	    qStr.append("OPTIONAL { \n");
+    	qStr.append("           ?root foaf:account ?pi. \n");
+    	qStr.append("           ?pi foaf:accountName ?uid . \n");
+    	qStr.append("         } \n");
+    	
+    	qStr.append("OPTIONAL { \n");
+    	qStr.append("           ?root foaf:img ?profileImage . \n");
+    	qStr.append("         } \n");
+    	
+    	qStr.append("FILTER (str(?uid) = \"" + uid + "\" || str(?profileImage) = \"" + profileImage + "\") ");
+
+	    qStr.append("}");
+	    System.out.println(qStr.toString());
+	    QueryReturnClass qRC = null;
+	    String _3cixtyUID = null;
+		try {
+			qRC = VirtuosoManager.getInstance().query(qStr.toString());
+			ResultSet results = qRC.getReturnedResultSet();
+			for ( ; results.hasNext(); ) {
+				QuerySolution qs = results.next();
+				RDFNode tmpuid = qs.get("_3cixtyUid");
+				if (tmpuid != null && !tmpuid.asLiteral().getString().equals("")) {
+					_3cixtyUID = tmpuid.asLiteral().getString();
+					break;
+				}
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			if (qRC != null) qRC.closeConnection();
+		}
+		return _3cixtyUID;
 	}
 }

@@ -41,7 +41,9 @@ public class FaceBookAccountUtils {
 			//       2. need to check email to know whether or not there is a profile corresponding with this uid
 			// The following code is supposed that FaceBook info is independent with Google info.
 			
-			String _3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
+			//String _3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
+			String _3cixtyUID = ProfileManagerImpl.getInstance().find3cixtyUID(uid, picture);
+			if (_3cixtyUID == null) _3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
 			
 			Map <String, Boolean> attrsToLoad = Utils.getAttributesToLoadProfileFromGoogleFB();
 			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, attrsToLoad);

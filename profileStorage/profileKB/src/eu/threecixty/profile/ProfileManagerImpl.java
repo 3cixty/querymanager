@@ -209,6 +209,12 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (attributes == null) return true;
 		return Boolean.TRUE.equals(attributes.get(attrChecked));
 	}
+	
+	@Override
+	public String find3cixtyUID(String uid, String profileImage) {
+		if (profileManager != null) return profileManager.find3cixtyUID(uid, profileImage);
+		return null;
+	}
 
 	private ProfileManagerImpl() {
 		boolean found = false;

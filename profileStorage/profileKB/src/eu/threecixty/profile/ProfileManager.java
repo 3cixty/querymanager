@@ -240,6 +240,15 @@ public interface ProfileManager {
 	List <UserProfile> getAllUserProfiles();
 	
 	/**
+	 * Finds 3cixty UID from a given UDI (Google or Facebook), and a given profile image.
+	 *
+	 * @param uid
+	 * @param profileImage
+	 * @return
+	 */
+	String find3cixtyUID(String uid, String profileImage);
+	
+	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.
 	 * @param attributes
 	 * @param attrChecked

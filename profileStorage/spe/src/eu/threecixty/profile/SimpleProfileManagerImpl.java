@@ -216,4 +216,10 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		// XXX: always use code from ProfileManagerImpl for this method.
 		return false;
 	}
+
+	@Override
+	public String find3cixtyUID(String arg0, String arg2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
