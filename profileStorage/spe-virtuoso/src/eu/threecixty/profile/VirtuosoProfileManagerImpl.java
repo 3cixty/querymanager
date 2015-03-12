@@ -273,9 +273,8 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public String find3cixtyUID(String uid, String profileImage) {
-		// TODO Auto-generated method stub
-		StringBuilder qStr = new StringBuilder(Configuration.PROFILE_PREFIX);
-	    qStr.append("SELECT  DISTINCT *\n");
+		StringBuilder qStr = new StringBuilder(Configuration.PREFIXES);
+	    qStr.append("\nSELECT  DISTINCT *\n");
 	    qStr.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + "> \n");
 	    qStr.append("WHERE {\n\n");
 	    qStr.append("?root profile:userID ?_3cixtyUid .\n");
