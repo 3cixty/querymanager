@@ -25,16 +25,16 @@ public class NearbyServices {
 	public Response getNearbyPoIs(@QueryParam("poi") String poiID,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
 			@HeaderParam("key") String key) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
-		String tmpCat;
-		if (category == null || category.equals("")) tmpCat = null;
-		else tmpCat = category;
+		String [] tmpCats;
+		if (categories == null || categories.equals("")) tmpCats = null;
+		else tmpCats = categories.split(",");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCat, distance, offset, limit);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCats, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -47,16 +47,16 @@ public class NearbyServices {
 	public Response getNearbyPoIsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
 			@HeaderParam("key") String key) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
-		String tmpCat;
-		if (category == null || category.equals("")) tmpCat = null;
-		else tmpCat = category;
+		String [] tmpCats;
+		if (categories == null || categories.equals("")) tmpCats = null;
+		else tmpCats = categories.split(",");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCat, distance, offset, limit);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -69,16 +69,16 @@ public class NearbyServices {
 	public Response getNearbyEvents(@QueryParam("id") String id,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
 			@HeaderParam("key") String key) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
-		String tmpCat;
-		if (category == null || category.equals("")) tmpCat = null;
-		else tmpCat = category;
+		String [] tmpCats;
+		if (categories == null || categories.equals("")) tmpCats = null;
+		else tmpCats = categories.split("");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(id, tmpCat, distance, offset, limit);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(id, tmpCats, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -91,16 +91,16 @@ public class NearbyServices {
 	public Response getNearbyEventsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
 			@HeaderParam("key") String key) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
-		String tmpCat;
-		if (category == null || category.equals("")) tmpCat = null;
-		else tmpCat = category;
+		String [] tmpCats;
+		if (categories == null || categories.equals("")) tmpCats = null;
+		else tmpCats = categories.split("");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCat, distance, offset, limit, null);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats, distance, offset, limit, null);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -16,7 +16,7 @@ import org.json.JSONObject;
 //TODO: need to remove condition with new Virtuoso updated
 public class NearbyUtils {
 
-	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String category,
+	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories,
 			double distance, int offset, int limit, String notId) throws IOException {
 		
 		StringBuilder builder = null;
@@ -29,12 +29,13 @@ public class NearbyUtils {
 		builder.append("WHERE { \n");
 		builder.append("        ?event a lode:Event . \n");
 		
-		if (!isNullOrEmpty(category)) {
+		if (categories != null && categories.length > 0) {
 			
 			builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
 			builder.append("OPTIONAL { ?event lode:hasCategory ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
 			builder.append("OPTIONAL { ?event lode:hasCategory ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\")) }\n");
-			builder.append("FILTER ((STR(?category_en) = \"" + category + "\") || (STR(?category_it) = \"" + category + "\") || (STR(?category_empty) = \"" + category + "\"))");
+
+			filterCategories(categories, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -66,7 +67,7 @@ public class NearbyUtils {
 		return getNearbyEvents(builder.toString());
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String id, String category,
+	public static List <ElementDetails> getNearbyEvents(String id, String[] categories,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
 		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
@@ -101,10 +102,10 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(lat, lon, category, distance, offset, limit, id);
+		return getNearbyEvents(lat, lon, categories, distance, offset, limit, id);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String category,
+	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories,
 			double distance, int offset, int limit) throws IOException {
 		// TODO: need to remove condition with new Virtuoso updated
 		StringBuilder builder = null;
@@ -117,13 +118,13 @@ public class NearbyUtils {
 		builder.append("WHERE { \n");
 		builder.append("        ?poi a dul:Place . \n");
 		
-		if (!isNullOrEmpty(category)) {
+		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
 			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
 			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
 			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\")) } \n");
-			builder.append("FILTER ((STR(?category_en) = \"" + category + "\") || (STR(?category_it) = \"" + category + "\") || (STR(?category_empty) = \"" + category + "\"))");
-
+			
+			filterCategories(categories, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -149,7 +150,7 @@ public class NearbyUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> getNearbyPoIElements(String locId, String category,
+	public static List <ElementDetails> getNearbyPoIElements(String locId, String[] categories,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();
 		
@@ -163,13 +164,13 @@ public class NearbyUtils {
 		builder.append("WHERE { \n");
 		builder.append("        ?poi a dul:Place . \n");
 		
-		if (!isNullOrEmpty(category)) {
+		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
 			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
 			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
 			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\")) } \n");
-			builder.append("FILTER ((STR(?category_en) = \"" + category + "\") || (STR(?category_it) = \"" + category + "\") || (STR(?category_empty) = \"" + category + "\"))");
-
+			
+			filterCategories(categories, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -268,86 +269,20 @@ public class NearbyUtils {
 		return results;
 	}
 	
-	
-//	/**
-//	 * Find information (title, description, category, latitude, longitude)
-//	 * @param results
-//	 * @throws IOException 
-//	 */
-//	private static void findOtherInformationForNearbyPoIs(
-//			List<NearbyElement> results) throws IOException {
-//		StringBuilder builder = new StringBuilder("SELECT DISTINCT ?poi ?element_title ?description ?category ?lat ?lon ?image_url \n");
-//		builder.append("WHERE { \n");
-//		builder.append("        ?poi a dul:Place . \n");
-//		builder.append("        OPTIONAL { ?poi schema:name ?title_en.  FILTER (langMatches(lang(?title_en), \"en\")) } \n");
-//		builder.append("        OPTIONAL { ?poi schema:name ?title_it.  FILTER (langMatches(lang(?title_it), \"it\")) } \n");
-//		builder.append("        OPTIONAL { ?poi schema:name ?title_empty.  FILTER (langMatches(lang(?title_empty), \"\")) } \n");
-//		builder.append("        BIND(COALESCE(?title_en, ?title_it, ?title_empty) AS ?element_title) \n");
-//		builder.append("        OPTIONAL { ?poi schema:description ?description_en.  FILTER (langMatches(lang(?description_en), \"en\"))} \n");
-//		builder.append("        OPTIONAL { ?poi schema:description ?description_it.  FILTER (langMatches(lang(?description_it), \"it\"))} \n");
-//		builder.append("        OPTIONAL { ?poi schema:description ?description_empty.  FILTER (langMatches(lang(?description_empty), \"\"))} \n");
-//		builder.append("        BIND(COALESCE(?description_en, ?description_it, ?description_empty) AS ?description) \n");
-//
-//		builder.append("OPTIONAL { ?poi locationOnt:businessType ?businessType . } \n");
-//		builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-//		builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-//		builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\"))} \n");
-//		builder.append("BIND(COALESCE(?category_en, ?category_it, ?category_empty) AS ?category) .\n");
-//		
-//		builder.append("        ?poi schema:geo ?geo . \n");
-//		builder.append("        ?geo schema:latitude ?lat . \n");
-//		builder.append("        ?geo schema:longitude ?lon . \n");
-//		builder.append("OPTIONAL { ?poi lode:poster ?image_url.} \n");
-//		builder.append("FILTER (");
-//		boolean firstTime = true;
-//		for (NearbyElement element: results) {
-//			if (firstTime) {
-//				firstTime = false;
-//				builder.append("(?poi = <").append(element.getId()).append(">)");
-//			} else {
-//				builder.append(" || (?poi = <").append(element.getId()).append(">)");
-//			}
-//		}
-//		builder.append(") \n");
-//		builder.append("}");
-//		
-//		
-//        StringBuilder resultBuilder = new StringBuilder();
-//		VirtuosoManager.getInstance().executeQueryViaSPARQL(builder.toString(), "application/sparql-results+json", resultBuilder);
-//		
-//		JSONObject json = new JSONObject(resultBuilder.toString());
-//		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
-//		int len = jsonArrs.length();
-//		for (int i = 0; i < len; i++) {
-//			JSONObject jsonElement = jsonArrs.getJSONObject(i);
-//			findOtherInformationForNearbyPoIs(jsonElement, results);
-//		}
-//	}
-//
-//
-//
-//	private static void findOtherInformationForNearbyPoIs(
-//			JSONObject jsonElement, List<NearbyElement> results) {
-//		String poiId = getAttributeValue(jsonElement, "poi");
-//		if (isNullOrEmpty(poiId)) return;
-//		for (NearbyElement nearbyElement: results) {
-//			if (poiId.equals(nearbyElement.getId())) {
-//				String title = getAttributeValue(jsonElement, "element_title");
-//				if (!isNullOrEmpty(title)) nearbyElement.setTitle(title);
-//				String desc = getAttributeValue(jsonElement, "description");
-//				if (!isNullOrEmpty(desc)) nearbyElement.setDescription(desc);
-//				String cat = getAttributeValue(jsonElement, "category");
-//				if (!isNullOrEmpty(cat)) nearbyElement.setCategory(cat);
-//				String latStr = getAttributeValue(jsonElement, "lat");
-//				if (!isNullOrEmpty(latStr)) nearbyElement.setLat(Double.valueOf(latStr));
-//				String lonStr = getAttributeValue(jsonElement, "lon");
-//				if (!isNullOrEmpty(lonStr)) nearbyElement.setLon(Double.valueOf(lonStr));
-//				String imageUrl = getAttributeValue(jsonElement, "image_url");
-//				if (!isNullOrEmpty(imageUrl)) nearbyElement.setImage_url(imageUrl);
-//			    break;
-//			}
-//		}
-//	}
+	private static void filterCategories(String[] categories, StringBuilder result) {
+		StringBuilder tmpBuilder = new StringBuilder();
+		for (String category: categories) {
+			if (category != null) category = category.trim();
+			if (category == null || category.equals("")) continue;
+			if (tmpBuilder.length() > 0) {
+				tmpBuilder.append(" || ");
+			}
+			tmpBuilder.append("(STR(?category_en) = \"" + category + "\") || (STR(?category_it) = \"" + category + "\") || (STR(?category_empty) = \"" + category + "\")");
+		}
+		if (tmpBuilder.length() > 0) {
+			result.append("FILTER (").append(tmpBuilder.toString()).append(") \n");
+		}
+	}
 
 
 	/**
