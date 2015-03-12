@@ -96,7 +96,8 @@ public class FaceBookAccountUtils {
 			if (len == 0) return;
 			for (int i = 0; i < len; i++) {
 				JSONObject tmpJson = arr.getJSONObject(i);
-				String know = Utils.gen3cixtyUID(tmpJson.getString("id"), Utils.UidSource.FACEBOOK);
+				String know = ProfileManagerImpl.getInstance().find3cixtyUID(tmpJson.getString("id"), null);
+				if (know == null) know = Utils.gen3cixtyUID(tmpJson.getString("id"), Utils.UidSource.FACEBOOK);
 				if (knowsResult.contains(know)) continue;
 				knowsResult.add(know);
 			}

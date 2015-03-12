@@ -287,8 +287,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     	qStr.append("OPTIONAL { \n");
     	qStr.append("           ?root foaf:img ?profileImage . \n");
     	qStr.append("         } \n");
-    	
-    	qStr.append("FILTER (str(?uid) = \"" + uid + "\" || str(?profileImage) = \"" + profileImage + "\") ");
+    	if (profileImage != null && !profileImage.equals("")) {
+    	    qStr.append("FILTER (str(?uid) = \"" + uid + "\" || str(?profileImage) = \"" + profileImage + "\") ");
+    	} else {
+    		qStr.append("FILTER (str(?uid) = \"" + uid + "\") ");
+    	}
 
 	    qStr.append("}");
 	    System.out.println(qStr.toString());
