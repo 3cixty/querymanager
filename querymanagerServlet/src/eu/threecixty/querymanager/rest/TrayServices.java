@@ -398,7 +398,7 @@ public class TrayServices {
 			if (rb == null) { // changed
 				List <ElementDetails> trayDetailsList = new ArrayList <ElementDetails>();
 				try {
-					findTrayDetails(trays, trayDetailsList);
+					findTrayDetails(trays, trayDetailsList, restTray);
 				} catch (IOException e) {
 					throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 				}
@@ -420,22 +420,24 @@ public class TrayServices {
 	}
 	
 	private void findTrayDetails(List<Tray> trays,
-			List<ElementDetails> trayDetailsList) throws IOException {
+			List<ElementDetails> trayDetailsList, RestTrayObject restTray) throws IOException {
 		List <String> eventIds = new LinkedList <String>();
 		List <String> poiIds = new LinkedList <String>();
 		for (Tray tray: trays) {
 			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
 			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
 		}
-
-		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
+		
+		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguages());
+		
+		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, tmpLanguages);
 		if (elementEventsDetails != null) {
 			for (ElementDetails eventDetails: elementEventsDetails) {
 				eventDetails.setType(EVENT_TYPE);
 			}
 			trayDetailsList.addAll(elementEventsDetails);
 		}
-		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, tmpLanguages);
 		if (elementPoIsDetails != null) {
 			for (ElementDetails poiDetails: elementPoIsDetails) {
 				poiDetails.setType(POI_TYPE);

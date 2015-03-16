@@ -27,14 +27,16 @@ public class NearbyServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
-			@HeaderParam("key") String key) {
+			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
 		String [] tmpCats;
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split(",");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCats, distance, offset, limit);
+			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCats,
+					tmpLanguages, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -49,14 +51,16 @@ public class NearbyServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
-			@HeaderParam("key") String key) {
+			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
 		String [] tmpCats;
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split(",");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, distance, offset, limit);
+			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats,
+					tmpLanguages, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -71,14 +75,16 @@ public class NearbyServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
-			@HeaderParam("key") String key) {
+			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
 		String [] tmpCats;
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split("");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(id, tmpCats, distance, offset, limit);
+			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(id, tmpCats,
+					tmpLanguages, distance, offset, limit);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -93,14 +99,16 @@ public class NearbyServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
-			@HeaderParam("key") String key) {
+			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
 		String [] tmpCats;
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split("");
 		try {
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats, distance, offset, limit, null);
+			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats,
+					tmpLanguages, distance, offset, limit, null);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();

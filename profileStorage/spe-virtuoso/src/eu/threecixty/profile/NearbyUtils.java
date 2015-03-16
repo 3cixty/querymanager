@@ -16,7 +16,7 @@ import org.json.JSONObject;
 //TODO: need to remove condition with new Virtuoso updated
 public class NearbyUtils {
 
-	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories,
+	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
 		
 		StringBuilder builder = null;
@@ -30,12 +30,9 @@ public class NearbyUtils {
 		builder.append("        ?event a lode:Event . \n");
 		
 		if (categories != null && categories.length > 0) {
-			
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?event lode:hasCategory ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\")) }\n");
 
-			filterCategories(categories, builder);
+			addCategoryOptional("?event", "lode:hasCategory", languages, builder);
+			filterCategories(categories, languages, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -64,10 +61,10 @@ public class NearbyUtils {
 		
 		System.out.println(builder.toString());
 		
-		return getNearbyEvents(builder.toString());
+		return getNearbyEvents(builder.toString(), languages);
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String id, String[] categories,
+	public static List <ElementDetails> getNearbyEvents(String id, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
 		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
@@ -102,10 +99,10 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(lat, lon, categories, distance, offset, limit, id);
+		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories,
+	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		// TODO: need to remove condition with new Virtuoso updated
 		StringBuilder builder = null;
@@ -120,11 +117,9 @@ public class NearbyUtils {
 		
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\")) } \n");
+			addCategoryOptional("?businessType", "skos:prefLabel", languages, builder);
 			
-			filterCategories(categories, builder);
+			filterCategories(categories, languages, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -137,7 +132,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString());
+		return getNearbyPoIs(builder.toString(), languages);
 	}
 	
 	/**
@@ -150,7 +145,7 @@ public class NearbyUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> getNearbyPoIElements(String locId, String[] categories,
+	public static List <ElementDetails> getNearbyPoIElements(String locId, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();
 		
@@ -166,11 +161,9 @@ public class NearbyUtils {
 		
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\")) } \n");
+			addCategoryOptional("?businessType", "skos:prefLabel ", languages, builder);
 			
-			filterCategories(categories, builder);
+			filterCategories(categories, languages, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -185,11 +178,11 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString());
+		return getNearbyPoIs(builder.toString(), languages);
 
 	}
 	
-	public static int countNearbyPoIs(String locId, String category, double distance) {
+	public static int countNearbyPoIs(String locId, String[] categories, String[] languages, double distance) {
 		if (isNullOrEmpty(locId)) return 0;
 		
 		StringBuilder builder = null;
@@ -202,12 +195,10 @@ public class NearbyUtils {
 		builder.append("WHERE { \n");
 		builder.append("        ?poi a dul:Place . \n");
 		
-		if (!isNullOrEmpty(category)) {
+		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_it.  FILTER (langMatches(lang(?category_it), \"it\"))} \n");
-			builder.append("OPTIONAL { ?businessType skos:prefLabel ?category_empty.  FILTER (langMatches(lang(?category_empty), \"\")) } \n");
-			builder.append("FILTER ((STR(?category_en) = \"" + category + "\") || (STR(?category_it) = \"" + category + "\") || (STR(?category_empty) = \"" + category + "\"))");
+			addCategoryOptional("?businessType", "skos:prefLabel", languages, builder);
+			filterCategories(categories, languages, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -223,7 +214,7 @@ public class NearbyUtils {
 		return 0;
 	}
 	
-	private static List <ElementDetails> getNearbyPoIs(String query) throws IOException {
+	private static List <ElementDetails> getNearbyPoIs(String query, String [] languages) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
@@ -237,7 +228,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet());
+		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet(), languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
@@ -246,7 +237,7 @@ public class NearbyUtils {
 		return results;
 	}
 	
-	private static List <ElementDetails> getNearbyEvents(String query) throws IOException {
+	private static List <ElementDetails> getNearbyEvents(String query, String [] languages) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
@@ -260,7 +251,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(maps.keySet());
+		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(maps.keySet(), languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
@@ -268,8 +259,17 @@ public class NearbyUtils {
 		Collections.sort(results, new ElementDistance());
 		return results;
 	}
+
+	private static void addCategoryOptional(String subject, String predicate, String[] languages, StringBuilder result) {
+		//builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
+		for (String language: languages) {
+			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ?category_").append(
+					language).append(".  FILTER (langMatches(lang(?category_").append(language).append("), \"").append(
+							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
+		}
+	}
 	
-	private static void filterCategories(String[] categories, StringBuilder result) {
+	private static void filterCategories(String[] categories, String[] languages, StringBuilder result) {
 		StringBuilder tmpBuilder = new StringBuilder();
 		for (String category: categories) {
 			if (category != null) category = category.trim();
@@ -277,7 +277,12 @@ public class NearbyUtils {
 			if (tmpBuilder.length() > 0) {
 				tmpBuilder.append(" || ");
 			}
-			tmpBuilder.append("(STR(?category_en) = \"" + category + "\") || (STR(?category_it) = \"" + category + "\") || (STR(?category_empty) = \"" + category + "\")");
+			for (int i = 0; i < languages.length; i++) {
+				if (i > 0) {
+					tmpBuilder.append(" || ");
+				}
+				tmpBuilder.append("(STR(?category_").append(languages[i]).append(") = \"").append(category).append("\") ");
+			}
 		}
 		if (tmpBuilder.length() > 0) {
 			result.append("FILTER (").append(tmpBuilder.toString()).append(") \n");

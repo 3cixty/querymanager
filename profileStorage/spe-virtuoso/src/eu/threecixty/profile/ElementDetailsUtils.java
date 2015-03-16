@@ -26,21 +26,19 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds) throws IOException {
+	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
-		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT * \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT * \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
-		queryBuff.append("OPTIONAL { ?item dc:title  ?title_en.  FILTER (langMatches(lang(?title_en), \"en\"))  } \n");
-		queryBuff.append("OPTIONAL { ?item dc:title  ?title_it.  FILTER (langMatches(lang(?title_it), \"it\"))  } \n");
-		queryBuff.append("OPTIONAL { ?item dc:title  ?title_empty.  FILTER (langMatches(lang(?title_empty), \"\"))  } \n");
+		
+		addInfoOptional("?item", "dc:title", "?title", languages, queryBuff);
+		
+		addInfoOptional("?item", "dc:description", "?description", languages, queryBuff);
 
-		queryBuff.append("OPTIONAL { ?item dc:description ?description_en. FILTER (langMatches(lang(?description_en), \"en\")) } \n");
-		queryBuff.append("OPTIONAL { ?item dc:description ?description_it. FILTER (langMatches(lang(?description_it), \"it\")) } \n");
-		queryBuff.append("OPTIONAL { ?item dc:description ?description_empty. FILTER (langMatches(lang(?description_empty), \"\")) } \n");
-
-		queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category.} \n");
+		addInfoOptional("?item", "lode:hasCategory", "?category", languages, queryBuff);
+		
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
 		queryBuff.append("              ?inSpace geo:long ?lon . }\n");
@@ -82,7 +80,7 @@ public class ElementDetailsUtils {
 		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		for (int i = 0; i  < len; i++) {
 			JSONObject tmpObj = jsonArrs.getJSONObject(i);
-			ElementEventDetails tmpEventDetails = createEventDetails(tmpObj);
+			ElementEventDetails tmpEventDetails = createEventDetails(tmpObj, languages);
 			if (tmpEventDetails == null) continue;
 			if (!elementsDetails.contains(tmpEventDetails)) elementsDetails.add(tmpEventDetails);
 		}
@@ -95,18 +93,17 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds) throws IOException {
+	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
-		StringBuffer queryBuff = new StringBuffer("SELECT DISTINCT *\n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT *\n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
-		queryBuff.append("OPTIONAL { ?poi schema:name ?name_en. FILTER (langMatches(lang(?name_en), \"en\")) } \n");
-		queryBuff.append("OPTIONAL { ?poi schema:name ?name_it. FILTER (langMatches(lang(?name_it), \"it\")) } \n");
-		queryBuff.append("OPTIONAL { ?poi schema:name ?name_empty. FILTER (langMatches(lang(?name_empty), \"\")) } \n");
 		
-		queryBuff.append("OPTIONAL{ ?poi locationOnt:businessType ?businessType. \n");
-		queryBuff.append("          ?businessType skos:prefLabel ?category . } \n");
+		addInfoOptional("?poi", "schema:name", "?name", languages, queryBuff);
+		
+		addInfoOptional("?poi locationOnt:businessType ?businessType. \n ?businessType", "skos:prefLabel", "?category", languages, queryBuff);
+		
 		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
 		queryBuff.append("          ?location schema:streetAddress ?address .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:geo ?geo . \n");
@@ -160,7 +157,7 @@ public class ElementDetailsUtils {
 			if (currentId == null) continue;
 			tmpPoIDetails = maps.get(currentId);
 			if (tmpPoIDetails == null) {
-				tmpPoIDetails = createPoIDetails(tmpObj);
+				tmpPoIDetails = createPoIDetails(tmpObj, languages);
 				maps.put(currentId, tmpPoIDetails);
 			} else {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
@@ -184,19 +181,20 @@ public class ElementDetailsUtils {
 		return elementsDetails;
 	}
 	
-	private static ElementPoIDetails createPoIDetails(JSONObject json) {
+	private static ElementPoIDetails createPoIDetails(JSONObject json, String [] languages) {
 		ElementPoIDetails poiDetails = new ElementPoIDetails();
 		String id = getAttributeValue(json, "poi");
 		if (isNullOrEmpty(id)) return null;
 		poiDetails.setId(id);
 		
-		String name = getAttributeValue(json, "name_en");
-		if (isNullOrEmpty(name)) name = getAttributeValue(json, "name_it");
-		if (isNullOrEmpty(name)) name = getAttributeValue(json, "name_empty");
-		if (!isNullOrEmpty(name)) poiDetails.setName(name);
+		for (String language: languages) {
+		    String name = getAttributeValue(json, "name_" + language);
+		    if (!isNullOrEmpty(name)) poiDetails.setName(name);
+		    
+			String category = getAttributeValue(json, "category_" + language);
+			if (!isNullOrEmpty(category)) poiDetails.setCategory(category);
+		}
 		
-		String category = getAttributeValue(json, "category");
-		if (!isNullOrEmpty(category)) poiDetails.setCategory(category);
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
 		String lon = getAttributeValue(json, "lon");
@@ -235,24 +233,23 @@ public class ElementDetailsUtils {
 		
 	}
 	
-	private static ElementEventDetails createEventDetails(JSONObject json) {
+	private static ElementEventDetails createEventDetails(JSONObject json, String [] languages) {
 		ElementEventDetails eventDetails = new ElementEventDetails();
 		String id = getAttributeValue(json, "item");
 		if (isNullOrEmpty(id)) return null;
 		eventDetails.setId(id);
 		
-		String title = getAttributeValue(json, "title_en");
-		if (isNullOrEmpty(title)) title = getAttributeValue(json, "title_it");
-		if (isNullOrEmpty(title)) title = getAttributeValue(json, "title_empty");
-		if (!isNullOrEmpty(title)) eventDetails.setName(title);
-		
-		String desc = getAttributeValue(json, "description_en");
-		if (isNullOrEmpty(desc)) desc = getAttributeValue(json, "description_it");
-		if (isNullOrEmpty(desc)) desc = getAttributeValue(json, "description_empty");
-		if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
-		
-		String category = getAttributeValue(json, "category");
-		if (!isNullOrEmpty(category)) eventDetails.setCategory(category);
+		for (String language: languages) {
+		    String title = getAttributeValue(json, "title_" + language);
+		    if (!isNullOrEmpty(title)) eventDetails.setName(title);
+		    
+		    String desc = getAttributeValue(json, "description_" + language);
+		    if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
+		    
+		    String category = getAttributeValue(json, "category_" + language);
+		    if (!isNullOrEmpty(category)) eventDetails.setCategory(category);
+		}
+
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) eventDetails.setLat(lat);
 		String lon = getAttributeValue(json, "lon");
@@ -270,6 +267,14 @@ public class ElementDetailsUtils {
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		return eventDetails;
+	}
+	
+	private static void addInfoOptional(String subject, String predicate, String object, String[] languages, StringBuilder result) {
+		for (String language: languages) {
+			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
+					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
+							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
+		}
 	}
 	
 	private static double getRatingValue(JSONObject json, String attributeName) {

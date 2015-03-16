@@ -24,6 +24,7 @@ public class RestTrayObject {
 	private String attend_datetime;
 	private int rating = -1;
 	private String image_url;
+	private String languages;
 	
 	public String getAction() {
 		return action;
@@ -139,5 +140,11 @@ public class RestTrayObject {
 	}
 	public void setImage_url(String image_url) {
 		this.image_url = image_url;
+	}
+	public String getLanguages() {
+		return languages;
+	}
+	public void setLanguages(String languages) {
+		this.languages = languages;
 	}
 }

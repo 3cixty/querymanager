@@ -218,17 +218,21 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/getElementsInDetails")
-	public Response getElementsInDetails(@HeaderParam("key") String key, 
+	public Response getElementsInDetails(@HeaderParam("key") String key,
+			@HeaderParam("Accept-Language") String languages, 
 			@QueryParam("events") String events, @QueryParam("pois") String pois) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			logInfo("App key is validated");
 
+			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+			
 			JSONObject result = new JSONObject();
 			if (events != null && !events.equals("")) {
 				List <String> eventIds = createList(events);
 				try {
-					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
+					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
+							eventIds, tmpLanguages);
 					if (eventsDetails != null) {
 						result.put("Events", eventsDetails);
 					}
@@ -239,7 +243,8 @@ public class QueryManagerServices {
 			if (pois != null && !pois.equals("")) {
 				List <String> poiIds = createList(pois);
 				try {
-					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds,
+							tmpLanguages);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
 					}
@@ -469,6 +474,7 @@ public class QueryManagerServices {
 	@GET
 	@Path("/getEventsInDetails")
 	public Response getItemsInDetails(@HeaderParam("access_token") String access_token,
+			@HeaderParam("Accept-Language") String languages,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
@@ -501,8 +507,9 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()));
 
 			try {
+				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				Map <String, Boolean> result = executeQuery(profiler, qm, query, null, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet());
+				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet(), tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(elementsInDetails).toString();
@@ -599,6 +606,7 @@ public class QueryManagerServices {
 	@GET
 	@Path("/getPoIsInDetails")
 	public Response getPoIsInDetails(@HeaderParam("access_token") String access_token,
+			@HeaderParam("Accept-Language") String languages,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("") @QueryParam("category") String category,
@@ -618,8 +626,9 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
+				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet());
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), tmpLanguages);
 				for (ElementDetails poi: poisInDetails) {
 					((ElementPoIDetails) poi).setAugmented(result.get(poi.getId()));
 				}
@@ -695,7 +704,9 @@ public class QueryManagerServices {
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2, @HeaderParam("key") String key) {
+			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@HeaderParam("key") String key,
+			@HeaderParam("Accept-Language") String languages) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -719,7 +730,8 @@ public class QueryManagerServices {
 
 				List <String> eventIds = QueryManager.getElementIDs(query);
 				try {
-					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds);
+					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, tmpLanguages);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					String content = JSONObject.wrap(eventsDetails).toString();
 					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
@@ -768,7 +780,8 @@ public class QueryManagerServices {
 			@DefaultValue("") @QueryParam("category") String category,
 			@DefaultValue("0") @QueryParam("minRating") int minRating,
 			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
-			@HeaderParam("key") String key) {
+			@HeaderParam("key") String key,
+			@HeaderParam("Accept-Language") String languages) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -777,7 +790,8 @@ public class QueryManagerServices {
 
 			List <String> poiIds = QueryManager.getElementIDs(query);
 			try {
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds);
+				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(poisInDetails).toString();
