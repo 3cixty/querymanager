@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ElementDetails;
+import eu.threecixty.profile.LanguageUtils;
 import eu.threecixty.profile.NearbyUtils;
 
 @Path("/" + Constants.PREFIX_NAME)

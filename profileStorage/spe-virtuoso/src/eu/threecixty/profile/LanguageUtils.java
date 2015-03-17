@@ -1,4 +1,4 @@
-package eu.threecixty.querymanager.rest;
+package eu.threecixty.profile;
 
 import java.util.LinkedList;
 import java.util.List;

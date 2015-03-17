@@ -35,8 +35,6 @@ public class NearbyUtils {
 			filterCategories(categories, languages, builder);
 		}
 		
-		addInfoOptional("?event", "dc:title", "?title", languages, true, builder);
-		
 		addInfoOptional("?event", "dc:description", "?description", languages, true, builder);
 		
 		builder.append("OPTIONAL { ?event ?p ?inSpace. \n");
