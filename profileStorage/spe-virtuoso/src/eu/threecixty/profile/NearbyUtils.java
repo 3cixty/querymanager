@@ -35,7 +35,9 @@ public class NearbyUtils {
 			filterCategories(categories, languages, builder);
 		}
 		
-		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+		addInfoOptional("?event", "dc:title", "?title", languages, true, builder);
+		
+		addInfoOptional("?event", "dc:description", "?description", languages, true, builder);
 		
 		builder.append("OPTIONAL { ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
@@ -121,8 +123,8 @@ public class NearbyUtils {
 			
 			filterCategories(categories, languages, builder);
 		}
-		
-		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+				
+		addInfoOptional("?poi", "schema:name", "?name", languages, true, builder);
 		
 		builder.append("        ?poi schema:geo ?geoPoi . \n");
 		builder.append("        ?geoPoi geo:geometry ?geo. \n");
@@ -166,7 +168,7 @@ public class NearbyUtils {
 			filterCategories(categories, languages, builder);
 		}
 		
-		// should get title, description in another query to avoid consuming a lot of time for filter first results		
+		addInfoOptional("?poi", "schema:name", "?name", languages, true, builder);
 		
 		builder.append("        ?poi schema:geo ?geoPoi . \n");
 		builder.append("        ?geoPoi geo:geometry ?geo. \n");
@@ -289,6 +291,26 @@ public class NearbyUtils {
 		}
 	}
 
+	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
+			boolean emptyFilter, StringBuilder result) {
+		for (String language: languages) {
+			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
+					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
+							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
+		}
+		if (emptyFilter) {
+			result.append("FILTER (");
+			int index = 0;
+			for (String language: languages) {
+				if (index > 0) {
+					result.append(" || ");
+				}
+				result.append("(").append(object).append("_").append(language).append(" != \"\")");
+				index++;
+			}
+			result.append(")\n");
+		}
+	}
 
 	/**
 	 * This method only creates PoI ID + distance.
