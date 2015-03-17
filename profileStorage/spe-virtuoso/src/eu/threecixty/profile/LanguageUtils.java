@@ -20,6 +20,10 @@ public class LanguageUtils {
 	private static final String [] ONLY_ITALIAN = {ITALIAN};
 	private static final String [] ONLY_FRENCH = {FRENCH};
 	
+	public static int getNumberOfLanguagesSupported() {
+		return ALL_LANGUAGES.length;
+	}
+	
 	public static String[] getLanguages(String language) {
 		if (language == null || language.equals("")) return ALL_LANGUAGES;
 		if (language.contains(",")) {

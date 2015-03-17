@@ -34,8 +34,11 @@ public class NearbyUtils {
 			addCategoryOptional("?event", "lode:hasCategory", languages, builder);
 			filterCategories(categories, languages, builder);
 		}
-		
-		addInfoOptional("?event", "dc:description", "?description", languages, true, builder);
+		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
+			addInfoUnion("?event", "dc:description", "?description", languages, builder);
+		} else {
+		    addInfoOptional("?event", "dc:description", "?description", languages, builder);
+		}
 		
 		builder.append("OPTIONAL { ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
@@ -122,7 +125,11 @@ public class NearbyUtils {
 			filterCategories(categories, languages, builder);
 		}
 				
-		addInfoOptional("?poi", "schema:name", "?name", languages, true, builder);
+		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
+			addInfoUnion("?poi", "schema:name", "?name", languages, builder);
+		} else {
+		    addInfoOptional("?poi", "schema:name", "?name", languages, builder);
+		}
 		
 		builder.append("        ?poi schema:geo ?geoPoi . \n");
 		builder.append("        ?geoPoi geo:geometry ?geo. \n");
@@ -166,7 +173,11 @@ public class NearbyUtils {
 			filterCategories(categories, languages, builder);
 		}
 		
-		addInfoOptional("?poi", "schema:name", "?name", languages, true, builder);
+		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
+			addInfoUnion("?poi", "schema:name", "?name", languages, builder);
+		} else {
+		    addInfoOptional("?poi", "schema:name", "?name", languages, builder);
+		}
 		
 		builder.append("        ?poi schema:geo ?geoPoi . \n");
 		builder.append("        ?geoPoi geo:geometry ?geo. \n");
@@ -290,23 +301,25 @@ public class NearbyUtils {
 	}
 
 	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
-			boolean emptyFilter, StringBuilder result) {
+			StringBuilder result) {
 		for (String language: languages) {
 			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
 					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
 							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
 		}
-		if (emptyFilter) {
-			result.append("FILTER (");
-			int index = 0;
-			for (String language: languages) {
-				if (index > 0) {
-					result.append(" || ");
-				}
-				result.append("(").append(object).append("_").append(language).append(" != \"\")");
-				index++;
+	}
+	
+	private static void addInfoUnion(String subject, String predicate, String object, String[] languages,
+			StringBuilder result) {
+		int index = 0;
+		for (String language: languages) {
+			if (index > 0) {
+				result.append(" UNION ");
 			}
-			result.append(")\n");
+			index++;
+			result.append(" { ").append(subject).append(" ").append(predicate).append(" ").append(object).append(
+					".  FILTER (langMatches(lang(").append(object).append("), \"").append(
+							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
 		}
 	}
 
