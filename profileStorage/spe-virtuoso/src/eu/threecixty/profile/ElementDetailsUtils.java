@@ -33,11 +33,11 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
 		
-		addInfoOptional("?item", "dc:title", "?title", languages, queryBuff);
+		addInfoOptional("?item", "dc:title", "?title", languages, true, queryBuff);
 		
-		addInfoOptional("?item", "dc:description", "?description", languages, queryBuff);
+		addInfoOptional("?item", "dc:description", "?description", languages, true, queryBuff);
 
-		addInfoOptional("?item", "lode:hasCategory", "?category", languages, queryBuff);
+		addInfoOptional("?item", "lode:hasCategory", "?category", languages, false, queryBuff);
 		
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
@@ -100,9 +100,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
-		addInfoOptional("?poi", "schema:name", "?name", languages, queryBuff);
+		addInfoOptional("?poi", "schema:name", "?name", languages, true, queryBuff);
 		
-		addInfoOptional("?poi locationOnt:businessType ?businessType. \n ?businessType", "skos:prefLabel", "?category", languages, queryBuff);
+		addInfoOptional("?poi locationOnt:businessType ?businessType. \n ?businessType", "skos:prefLabel", "?category", languages, false, queryBuff);
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
 		queryBuff.append("          ?location schema:streetAddress ?address .} \n");
@@ -269,11 +269,24 @@ public class ElementDetailsUtils {
 		return eventDetails;
 	}
 	
-	private static void addInfoOptional(String subject, String predicate, String object, String[] languages, StringBuilder result) {
+	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
+			boolean emptyFilter, StringBuilder result) {
 		for (String language: languages) {
 			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
 					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
 							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
+		}
+		if (emptyFilter) {
+			result.append("FILTER (");
+			int index = 0;
+			for (String language: languages) {
+				if (index > 0) {
+					result.append(" || ");
+				}
+				result.append("(").append(object).append("_").append(language).append(" != \"\")");
+				index++;
+			}
+			result.append(")\n");
 		}
 	}
 	
