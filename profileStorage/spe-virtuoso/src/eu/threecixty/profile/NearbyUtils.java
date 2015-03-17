@@ -226,6 +226,7 @@ public class NearbyUtils {
 	}
 	
 	private static List <ElementDetails> getNearbyPoIs(String query, String [] languages) throws IOException {
+		System.out.println(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
