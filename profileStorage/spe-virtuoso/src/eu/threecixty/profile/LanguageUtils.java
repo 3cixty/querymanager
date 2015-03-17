@@ -24,6 +24,10 @@ public class LanguageUtils {
 		return ALL_LANGUAGES.length;
 	}
 	
+	public static String[] getAllLanguages() {
+		return ALL_LANGUAGES;
+	}
+	
 	public static String[] getLanguages(String language) {
 		if (language == null || language.equals("")) return ALL_LANGUAGES;
 		if (language.contains(",")) {

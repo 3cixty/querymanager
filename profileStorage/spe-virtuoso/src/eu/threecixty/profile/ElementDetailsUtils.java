@@ -33,11 +33,11 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
 		
-		addInfoOptional("?item", "dc:title", "?title", languages, true, queryBuff);
+		addInfoOptional("?item", "dc:title", "?title", LanguageUtils.getAllLanguages(), true, queryBuff);
 		
 		addInfoOptional("?item", "dc:description", "?description", languages, true, queryBuff);
 
-		addInfoOptional("?item", "lode:hasCategory", "?category", languages, false, queryBuff);
+		addInfoOptional("?item", "lode:hasCategory", "?category", LanguageUtils.getAllLanguages(), false, queryBuff);
 		
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
@@ -100,7 +100,8 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
-		addInfoOptional("?poi", "schema:name", "?name", languages, true, queryBuff);
+		addInfoOptional("?poi", "schema:name", "?name", LanguageUtils.getAllLanguages(), true, queryBuff);
+		addInfoOptional("?poi", "schema:description", "?description", languages, true, queryBuff);
 		
 		addInfoOptional("?poi locationOnt:businessType ?businessType. \n ?businessType", "skos:prefLabel", "?category", languages, false, queryBuff);
 		
@@ -187,12 +188,17 @@ public class ElementDetailsUtils {
 		if (isNullOrEmpty(id)) return null;
 		poiDetails.setId(id);
 		
-		for (String language: languages) {
+		for (String language: LanguageUtils.getAllLanguages()) {
 		    String name = getAttributeValue(json, "name_" + language);
 		    if (!isNullOrEmpty(name)) poiDetails.setName(name);
 		    
 			String category = getAttributeValue(json, "category_" + language);
 			if (!isNullOrEmpty(category)) poiDetails.setCategory(category);
+		}
+		
+		for (String language: languages) {
+		    String desc = getAttributeValue(json, "description_" + language);
+		    if (!isNullOrEmpty(desc)) poiDetails.setDescription(desc);
 		}
 		
 		String lat = getAttributeValue(json, "lat");
@@ -239,15 +245,18 @@ public class ElementDetailsUtils {
 		if (isNullOrEmpty(id)) return null;
 		eventDetails.setId(id);
 		
-		for (String language: languages) {
+		for (String language: LanguageUtils.getAllLanguages()) {
 		    String title = getAttributeValue(json, "title_" + language);
 		    if (!isNullOrEmpty(title)) eventDetails.setName(title);
+
+		    String category = getAttributeValue(json, "category_" + language);
+		    if (!isNullOrEmpty(category)) eventDetails.setCategory(category);
+		}
+		
+		for (String language: languages) {
 		    
 		    String desc = getAttributeValue(json, "description_" + language);
 		    if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
-		    
-		    String category = getAttributeValue(json, "category_" + language);
-		    if (!isNullOrEmpty(category)) eventDetails.setCategory(category);
 		}
 
 		String lat = getAttributeValue(json, "lat");

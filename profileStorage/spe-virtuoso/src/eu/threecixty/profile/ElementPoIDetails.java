@@ -7,6 +7,7 @@ public class ElementPoIDetails extends ElementDetails {
 	private double aggregate_rating;
 	private int review_counts;
 	private List <String> reviews;
+	private String description;
 	
 	private Boolean augmented;
 	
@@ -39,5 +40,11 @@ public class ElementPoIDetails extends ElementDetails {
 	}
 	public void setAugmented(Boolean augmented) {
 		this.augmented = augmented;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }
