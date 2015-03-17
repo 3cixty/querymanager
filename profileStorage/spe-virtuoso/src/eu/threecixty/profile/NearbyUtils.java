@@ -124,13 +124,13 @@ public class NearbyUtils {
 			
 			filterCategories(categories, languages, builder);
 		}
-				
+				/*
 		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
-			addInfoUnion("?poi", "schema:name", "?name", languages, builder);
+			//addInfoUnion("?poi", "schema:name", "?name", languages, builder);
 		} else {
 		    addInfoOptional("?poi", "schema:name", "?name", languages, builder);
 		}
-		
+		*/
 		builder.append("        ?poi schema:geo ?geoPoi . \n");
 		builder.append("        ?geoPoi geo:geometry ?geo. \n");
 
@@ -172,12 +172,13 @@ public class NearbyUtils {
 			
 			filterCategories(categories, languages, builder);
 		}
-		
+		/*
 		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
-			addInfoUnion("?poi", "schema:name", "?name", languages, builder);
+			//addInfoUnion("?poi", "schema:name", "?name", languages, builder);
 		} else {
 		    addInfoOptional("?poi", "schema:name", "?name", languages, builder);
 		}
+		*/
 		
 		builder.append("        ?poi schema:geo ?geoPoi . \n");
 		builder.append("        ?geoPoi geo:geometry ?geo. \n");
