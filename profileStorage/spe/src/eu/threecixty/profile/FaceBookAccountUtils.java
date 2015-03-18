@@ -24,7 +24,7 @@ public class FaceBookAccountUtils {
 	private static final String FACEBOOK_FRIENDS_PREFIX = "https://graph.facebook.com/v2.2/me/friends?fields=id&format=json&method=get&pretty=0&suppress_http_code=1&access_token=";
 
 
-	public static String getUID(String accessToken, String appId) {
+	public static String getUID(String accessToken, String appId, int width, int height) {
 		if (accessToken == null) return "";
 		try {
 			String content = Utils.readUrl(FACE_BOOK_ACCESS_TOKEN_VALIDATION + accessToken);
@@ -35,7 +35,7 @@ public class FaceBookAccountUtils {
 			String firstName = json.getString("first_name");
 			String lastName = json.getString("last_name");
 			String gender = json.has("gender") ? json.getString("gender") : null;
-			String picture = getProfileImage(accessToken);
+			String picture = getProfileImage(accessToken, width, height);
 			
 			// TODO: 1. need to check ProfileIdentities to know whether or not there is a profile corresponding with this uid
 			//       2. need to check email to know whether or not there is a profile corresponding with this uid
@@ -108,9 +108,11 @@ public class FaceBookAccountUtils {
 		}
 	}
 	
-	private static String getProfileImage(String accessToken) {
+	private static String getProfileImage(String accessToken, int width, int height) {
 		try {
-			String content = Utils.readUrl(FACEBOOK_PROFILE_IMAGE_PREFIX + accessToken + "&format=json&method=get&pretty=0&redirect=false&suppress_http_code=1");
+			String content = Utils.readUrl(FACEBOOK_PROFILE_IMAGE_PREFIX + accessToken
+					+ "&format=json&method=get&pretty=0&redirect=false&suppress_http_code=1&width="
+					+ width + "&height=" + height);
 			JSONObject json = new JSONObject(content);
 			return json.getJSONObject("data").getString("url");
 		} catch (Exception e) {

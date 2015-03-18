@@ -105,14 +105,17 @@ public class OAuthServices {
 	
 	@GET
 	@Path("/getAccessTokenForFB")
-	public Response getAccessTokenForFB(@HeaderParam("fb_access_token") String fb_access_token, @HeaderParam("key") String appkey,
-			@DefaultValue("") @HeaderParam("scope") String scope) {
+	public Response getAccessTokenForFB(@HeaderParam("fb_access_token") String fb_access_token,
+			@HeaderParam("key") String appkey,
+			@DefaultValue("") @HeaderParam("scope") String scope,
+			@DefaultValue("50") @QueryParam("width") int width,
+			@DefaultValue("50") @QueryParam("height") int height) {
 		App app = OAuthWrappers.retrieveApp(appkey);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		String _3cixtyUid = FaceBookAccountUtils.getUID(fb_access_token, app.getAppNameSpace());
+		String _3cixtyUid = FaceBookAccountUtils.getUID(fb_access_token, app.getAppNameSpace(), width, height);
 		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Facebook access token is invalid or expired\"} ")
@@ -368,7 +371,9 @@ public class OAuthServices {
 	@GET
 	@Path("/redirect_uri")
 	public Response redirect_uri(@QueryParam("access_token_outside") String accessTokenFromOutside,
-			@DefaultValue("Google") @QueryParam("source") String source) {
+			@DefaultValue("Google") @QueryParam("source") String source,
+			@DefaultValue("50") @QueryParam("width") int width,
+			@DefaultValue("50") @QueryParam("height") int height) {
 		HttpSession session = httpRequest.getSession();
 		App app = (App) session.getAttribute(APP_KEY);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
@@ -377,7 +382,7 @@ public class OAuthServices {
 		        .build();
 		
 		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside, app.getAppNameSpace())
-				: FaceBookAccountUtils.getUID(accessTokenFromOutside, app.getAppNameSpace());
+				: FaceBookAccountUtils.getUID(accessTokenFromOutside, app.getAppNameSpace(), width, height);
 		
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)

@@ -95,6 +95,8 @@
     document.write("<form id='form'>");
     document.write("<input type='hidden' name='access_token_outside' value='" + access_token + "'>");
     document.write("<input type='hidden' name='source' value='Facebook'>");
+    document.write("<input type='hidden' name='width' value='50'>");
+    document.write("<input type='hidden' name='height' value='50'>");
     document.write("<input type='hidden' name='key' value='<%=key%>'>");
     document.write("</form>");
     document.getElementById('form').action = "<%=Configuration.get3CixtyRoot()%>/redirect_uri";
