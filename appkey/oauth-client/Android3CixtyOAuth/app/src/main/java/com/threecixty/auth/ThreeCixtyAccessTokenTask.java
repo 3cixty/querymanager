@@ -46,7 +46,7 @@ public class ThreeCixtyAccessTokenTask extends ThreeCixtyAbstractTask {
                 conn = getUrlConnection(OAUTH_ANDROID_SERVICE, activity);
                 conn.setRequestProperty("google_access_token", encode(token));
             } else if (FACEBOOK_SOURCE.equals(tokenSource)) {
-                conn = getUrlConnection(OAUTH_ANDROID_SERVICE_FB, activity);
+                conn = getUrlConnection(OAUTH_ANDROID_SERVICE_FB + "?width=100&height=100", activity);
                 conn.setRequestProperty("fb_access_token", encode(token));
             }
             if (conn != null) {
