@@ -14,19 +14,15 @@
 
     <Button android:layout_width="wrap_content" android:layout_height="wrap_content" 
         android:text="Sign in to Google" android:id="@+id/login" android:layout_gravity="center_horizontal" />
-<!--
+
     <com.facebook.widget.LoginButton
         xmlns:fb="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/authButton"
+        android:id="@+id/sign_in_to_fb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
         fb:login_text="Sign in to Facebook"
         />
-        -->
 
-
-    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Sign in to Facebook" android:id="@+id/sign_in_to_fb" android:layout_gravity="center_horizontal" />
 </LinearLayout>

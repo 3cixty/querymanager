@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.facebook.widget.LoginButton;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -63,9 +64,17 @@ public class MainActivity extends FragmentActivity {
 		}
 		
 		if (callerIntent.hasExtra(EXTRA_TOKEN_KEY)) accessToken = callerIntent.getStringExtra(EXTRA_TOKEN_KEY);
-		
+
+
+
 		final Button cmdLogin = (Button) findViewById(R.id.login);
-        final Button cmdSignInToFb= (Button) findViewById(R.id.sign_in_to_fb);
+        final LoginButton cmdSignInToFb= (LoginButton) findViewById(R.id.sign_in_to_fb);
+        cmdSignInToFb.setSessionStatusCallback(statusCallback);
+
+        Session session = Session.getActiveSession();
+        if (session != null && session.isOpened() && !session.isClosed()) {
+            session.closeAndClearTokenInformation();
+        }
 
 
 		if (appkey != null) { // get 3Cixty token
@@ -100,21 +109,6 @@ public class MainActivity extends FragmentActivity {
                                 @Override
                                 public void onClick(View v) {
                                     goWithAskingForPermission();
-                                }
-                            });
-                            cmdSignInToFb.setOnClickListener(new View.OnClickListener() {
-
-                                @Override
-                                public void onClick(View v) {
-
-                                    Session session = Session.getActiveSession();
-                                    if (session != null && !session.isOpened() && !session.isClosed()) {
-                                        session.openForRead(new Session.OpenRequest(MainActivity.this)
-                                                .setPermissions(Arrays.asList("public_profile"))
-                                                .setCallback(statusCallback));
-                                    } else {
-                                        Session.openActiveSession(MainActivity.this, true, statusCallback);
-                                    }
                                 }
                             });
                         } else {
