@@ -31,8 +31,9 @@ public class NearbyUtils {
 		
 		if (categories != null && categories.length > 0) {
 
-			addCategoryOptional("?event", "lode:hasCategory", languages, builder);
-			filterCategories(categories, languages, builder);
+			builder.append("?event lode:hasCategory ?category . \n");
+		
+			filterCategories(categories, builder);
 		}
 		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
 			addInfoUnion("?event", "dc:description", "?description", languages, builder);
@@ -120,9 +121,9 @@ public class NearbyUtils {
 		
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			addCategoryOptional("?businessType", "skos:prefLabel", languages, builder);
+			builder.append("?businessType skos:prefLabel ?category .\n");
 			
-			filterCategories(categories, languages, builder);
+			filterCategories(categories, builder);
 		}
 				/*
 		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
@@ -168,9 +169,9 @@ public class NearbyUtils {
 		
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			addCategoryOptional("?businessType", "skos:prefLabel ", languages, builder);
+			builder.append("?businessType skos:prefLabel ?category .\n");
 			
-			filterCategories(categories, languages, builder);
+			filterCategories(categories, builder);
 		}
 		/*
 		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
@@ -209,8 +210,8 @@ public class NearbyUtils {
 		
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			addCategoryOptional("?businessType", "skos:prefLabel", languages, builder);
-			filterCategories(categories, languages, builder);
+			builder.append("?businessType skos:prefLabel ?category .\n");
+			filterCategories(categories, builder);
 		}
 		
 		// should get title, description in another query to avoid consuming a lot of time for filter first results		
@@ -272,34 +273,21 @@ public class NearbyUtils {
 		Collections.sort(results, new ElementDistance());
 		return results;
 	}
-
-	private static void addCategoryOptional(String subject, String predicate, String[] languages, StringBuilder result) {
-		//builder.append("OPTIONAL { ?event lode:hasCategory ?category_en.  FILTER (langMatches(lang(?category_en), \"en\"))} \n");
-		for (String language: languages) {
-			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ?category_").append(
-					language).append(".  FILTER (langMatches(lang(?category_").append(language).append("), \"").append(
-							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
-		}
-	}
 	
-	private static void filterCategories(String[] categories, String[] languages, StringBuilder result) {
-		StringBuilder tmpBuilder = new StringBuilder();
+	private static void filterCategories(String[] categories, StringBuilder result) {
+		if (categories.length == 0) return;
+		result.append("FILTER (");
+		int index = 0;
 		for (String category: categories) {
 			if (category != null) category = category.trim();
 			if (category == null || category.equals("")) continue;
-			if (tmpBuilder.length() > 0) {
-				tmpBuilder.append(" || ");
+			if (index > 0) {
+				result.append(" || ");
 			}
-			for (int i = 0; i < languages.length; i++) {
-				if (i > 0) {
-					tmpBuilder.append(" || ");
-				}
-				tmpBuilder.append("(STR(?category_").append(languages[i]).append(") = \"").append(category).append("\") ");
-			}
+			result.append("STR(?category) = \"").append(category).append("\"");
+
 		}
-		if (tmpBuilder.length() > 0) {
-			result.append("FILTER (").append(tmpBuilder.toString()).append(") \n");
-		}
+		result.append(") \n");
 	}
 
 	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
