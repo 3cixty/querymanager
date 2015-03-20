@@ -284,6 +284,7 @@ public class NearbyUtils {
 			if (index > 0) {
 				result.append(" || ");
 			}
+			index++;
 			result.append("STR(?category) = \"").append(category).append("\"");
 
 		}
