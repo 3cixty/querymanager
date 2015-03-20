@@ -244,8 +244,9 @@
 
 
   <build>
+    <finalName>apis-authorization-server-war-1.3.5-Test</finalName>
     <plugins>
-
+      
       <!--
       Specific jetty-maven-plugin configuration for running Jetty during development.
       None of its goals are run in a normal build lifecycle.

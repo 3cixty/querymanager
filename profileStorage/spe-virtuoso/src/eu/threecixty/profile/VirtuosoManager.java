@@ -25,7 +25,7 @@ import virtuoso.jena.driver.VirtuosoUpdateRequest;
 
 public class VirtuosoManager {
 	
-	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixty.com/private/";
+	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixtyTest.com/private/";
 	
 	
 	 private static final Logger LOGGER = Logger.getLogger(

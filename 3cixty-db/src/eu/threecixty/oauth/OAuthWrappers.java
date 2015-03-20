@@ -32,7 +32,7 @@ public class OAuthWrappers {
 	
 	private static final String ROOT_SERVER = ROOT_LOCALHOST;
 	
-	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5";
+	private static final String OAUTH_SERVER_CONTEXT_NAME = "apis-authorization-server-war-1.3.5-Test";
 
 	//public static final String ENDPOINT_AUTHORIZATION = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/authorize";
 	public static final String ENDPOINT_AUTHORIZATION = 
