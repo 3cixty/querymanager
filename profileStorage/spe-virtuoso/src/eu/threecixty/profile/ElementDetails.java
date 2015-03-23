@@ -1,5 +1,7 @@
 package eu.threecixty.profile;
 
+import java.util.List;
+
 public class ElementDetails {
 
 	private String id;
@@ -14,6 +16,8 @@ public class ElementDetails {
 	private String type;
 	
 	private Double distance; // this attribute is used for nearby elements (Event/PoI)
+	
+	private List<String> categories; // This contains a list of categories
 
 	public String getId() {
 		return id;
@@ -83,6 +87,12 @@ public class ElementDetails {
 	}
 	public void setDistance(Double distance) {
 		this.distance = distance;
+	}
+	public List<String> getCategories() {
+		return categories;
+	}
+	public void setCategories(List<String> categories) {
+		this.categories = categories;
 	}
 	public int hashCode() {
 		if (id == null) return -1;

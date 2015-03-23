@@ -19,14 +19,17 @@ import org.json.JSONObject;
 public class ElementDetailsUtils {
 	
 	private static final String COMMENT_ATTRIBUTE = "reviewBody"; // to get comment
+	private static final String CATEGORY_ATTRIBUTE = "category";
 	
 	/**
 	 * Creates a list of events with info in details from a given list of IDs.
 	 * @param eventIds
+	 * @param categories
+	 * 			The categories, null for all categories.
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] languages) throws IOException {
+	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT * \n");
@@ -37,7 +40,23 @@ public class ElementDetailsUtils {
 		
 		addInfoOptional("?item", "dc:description", "?description", languages, true, queryBuff);
 
-		addInfoOptional("?item", "lode:hasCategory", "?category", LanguageUtils.getAllLanguages(), false, queryBuff);
+		if (categories == null) {
+			queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category . } \n");
+		} else {
+			queryBuff.append("?item lode:hasCategory ?category . \n");
+			if (categories.length > 0) {
+				queryBuff.append("FILTER (");
+				int index = 0;
+				for (String tmpCat: categories) {
+					if (index > 0) {
+						queryBuff.append(" || ");
+					}
+					index++;
+					queryBuff.append("STR(?category) = \"" + tmpCat + "\"");
+				}
+				queryBuff.append(") .\n");
+			}
+		}
 		
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
@@ -76,24 +95,38 @@ public class ElementDetailsUtils {
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
 		if (len < 1) return null;
+		
+		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
 
-		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		for (int i = 0; i  < len; i++) {
 			JSONObject tmpObj = jsonArrs.getJSONObject(i);
-			ElementEventDetails tmpEventDetails = createEventDetails(tmpObj, languages);
-			if (tmpEventDetails == null) continue;
-			if (!elementsDetails.contains(tmpEventDetails)) elementsDetails.add(tmpEventDetails);
+			String currentId = tmpObj.get("item").toString();
+			if (currentId == null) continue;
+			ElementDetails tmpEventDetails = maps.get(currentId); 
+			if (tmpEventDetails == null) {
+				tmpEventDetails = createEventDetails(tmpObj, languages);
+				maps.put(currentId, tmpEventDetails);
+			} else {
+				String category = getAttributeValue(tmpObj, CATEGORY_ATTRIBUTE);
+				if (!isNullOrEmpty(category)) {
+					if (!tmpEventDetails.getCategories().contains(category))
+						    tmpEventDetails.getCategories().add(category);
+				}
+			}
 		}
+		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
+		elementsDetails.addAll(maps.values());
+		processCategories(elementsDetails);
 		return elementsDetails;
 	}
-	
+
 	/**
 	 * Creates a list of PoIs with info in details from a given list of IDs.
 	 * @param poiIds
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] languages) throws IOException {
+	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT *\n");
@@ -103,7 +136,23 @@ public class ElementDetailsUtils {
 		addInfoOptional("?poi", "schema:name", "?name", LanguageUtils.getAllLanguages(), true, queryBuff);
 		addInfoOptional("?poi", "schema:description", "?description", languages, true, queryBuff);
 		
-		addInfoOptional("?poi locationOnt:businessType ?businessType. \n ?businessType", "skos:prefLabel", "?category", languages, false, queryBuff);
+		if (categories == null) {
+			queryBuff.append("OPTIONAL {?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . } \n");
+		} else {
+			queryBuff.append("?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . \n");
+			if (categories.length > 0) {
+				queryBuff.append("FILTER (");
+				int index = 0;
+				for (String tmpCat: categories) {
+					if (index > 0) {
+						queryBuff.append(" || ");
+					}
+					index++;
+					queryBuff.append("STR(?category) = \"" + tmpCat + "\"");
+				}
+				queryBuff.append(") .\n");
+			}
+		}
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
 		queryBuff.append("          ?location schema:streetAddress ?address .} \n");
@@ -166,6 +215,11 @@ public class ElementDetailsUtils {
 					List <String> comments = ((ElementPoIDetails) tmpPoIDetails).getReviews();
 					if (!comments.contains(comment)) comments.add(comment);
 				}
+				String category = getAttributeValue(tmpObj, CATEGORY_ATTRIBUTE);
+				if (!isNullOrEmpty(category)) {
+					if (!tmpPoIDetails.getCategories().contains(category))
+						tmpPoIDetails.getCategories().add(category);
+				}
 			}
 		}
 		
@@ -179,6 +233,7 @@ public class ElementDetailsUtils {
 		
 		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		elementsDetails.addAll(maps.values());
+		processCategories(elementsDetails);
 		return elementsDetails;
 	}
 	
@@ -191,15 +246,17 @@ public class ElementDetailsUtils {
 		for (String language: LanguageUtils.getAllLanguages()) {
 		    String name = getAttributeValue(json, "name_" + language);
 		    if (!isNullOrEmpty(name)) poiDetails.setName(name);
-		    
-			String category = getAttributeValue(json, "category_" + language);
-			if (!isNullOrEmpty(category)) poiDetails.setCategory(category);
 		}
 		
 		for (String language: languages) {
 		    String desc = getAttributeValue(json, "description_" + language);
 		    if (!isNullOrEmpty(desc)) poiDetails.setDescription(desc);
 		}
+		
+		List <String> categories = new LinkedList <String>();
+		poiDetails.setCategories(categories);
+		String category = getAttributeValue(json, CATEGORY_ATTRIBUTE);
+		if (!isNullOrEmpty(category)) categories.add(category);
 		
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
@@ -248,9 +305,6 @@ public class ElementDetailsUtils {
 		for (String language: LanguageUtils.getAllLanguages()) {
 		    String title = getAttributeValue(json, "title_" + language);
 		    if (!isNullOrEmpty(title)) eventDetails.setName(title);
-
-		    String category = getAttributeValue(json, "category_" + language);
-		    if (!isNullOrEmpty(category)) eventDetails.setCategory(category);
 		}
 		
 		for (String language: languages) {
@@ -258,6 +312,11 @@ public class ElementDetailsUtils {
 		    String desc = getAttributeValue(json, "description_" + language);
 		    if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
 		}
+		
+		List <String> categories = new LinkedList <String>();
+		eventDetails.setCategories(categories);
+		String category = getAttributeValue(json, CATEGORY_ATTRIBUTE);
+		if (!isNullOrEmpty(category)) categories.add(category);
 
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) eventDetails.setLat(lat);
@@ -296,6 +355,19 @@ public class ElementDetailsUtils {
 				index++;
 			}
 			result.append(")\n");
+		}
+	}
+	
+	private static void processCategories(List<ElementDetails> elementsDetails) {
+		StringBuilder catBuilder = new StringBuilder();
+		for (ElementDetails ed: elementsDetails) {
+			catBuilder.setLength(0);
+			for (String category: ed.getCategories()) {
+				if (catBuilder.length() > 0) catBuilder.append(", ");
+				catBuilder.append(category);
+			}
+			ed.setCategory(catBuilder.toString());
+			ed.setCategories(null);
 		}
 	}
 	
