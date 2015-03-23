@@ -65,7 +65,7 @@ public class NearbyUtils {
 		
 		System.out.println(builder.toString());
 		
-		return getNearbyEvents(builder.toString(), languages);
+		return getNearbyEvents(builder.toString(), categories, languages);
 	}
 	
 	public static List <ElementDetails> getNearbyEvents(String id, String[] categories, String[] languages,
@@ -140,7 +140,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), languages);
+		return getNearbyPoIs(builder.toString(), categories, languages);
 	}
 	
 	/**
@@ -191,7 +191,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), languages);
+		return getNearbyPoIs(builder.toString(), categories, languages);
 
 	}
 	
@@ -227,7 +227,7 @@ public class NearbyUtils {
 		return 0;
 	}
 	
-	private static List <ElementDetails> getNearbyPoIs(String query, String [] languages) throws IOException {
+	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories, String [] languages) throws IOException {
 		System.out.println(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
@@ -242,7 +242,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet(), languages);
+		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet(), categories, languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
@@ -251,7 +251,7 @@ public class NearbyUtils {
 		return results;
 	}
 	
-	private static List <ElementDetails> getNearbyEvents(String query, String [] languages) throws IOException {
+	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
@@ -265,7 +265,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(maps.keySet(), languages);
+		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(maps.keySet(), categories, languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
@@ -284,6 +284,7 @@ public class NearbyUtils {
 			if (index > 0) {
 				result.append(" || ");
 			}
+			index++;
 			result.append("STR(?category) = \"").append(category).append("\"");
 
 		}

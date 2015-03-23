@@ -431,14 +431,14 @@ public class TrayServices {
 		
 		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguages());
 		
-		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, tmpLanguages);
+		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
 		if (elementEventsDetails != null) {
 			for (ElementDetails eventDetails: elementEventsDetails) {
 				eventDetails.setType(EVENT_TYPE);
 			}
 			trayDetailsList.addAll(elementEventsDetails);
 		}
-		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, tmpLanguages);
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
 		if (elementPoIsDetails != null) {
 			for (ElementDetails poiDetails: elementPoIsDetails) {
 				poiDetails.setType(POI_TYPE);

@@ -233,7 +233,7 @@ public class QueryManagerServices {
 				List <String> eventIds = createList(events);
 				try {
 					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
-							eventIds, tmpLanguages);
+							eventIds, null, tmpLanguages);
 					if (eventsDetails != null) {
 						result.put("Events", eventsDetails);
 					}
@@ -244,7 +244,7 @@ public class QueryManagerServices {
 			if (pois != null && !pois.equals("")) {
 				List <String> poiIds = createList(pois);
 				try {
-					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds,
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null,
 							tmpLanguages);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
@@ -510,7 +510,7 @@ public class QueryManagerServices {
 			try {
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				Map <String, Boolean> result = executeQuery(profiler, qm, query, null, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet(), tmpLanguages);
+				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet(), null, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(elementsInDetails).toString();
@@ -629,7 +629,7 @@ public class QueryManagerServices {
 			try {
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), tmpLanguages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), null, tmpLanguages);
 				for (ElementDetails poi: poisInDetails) {
 					((ElementPoIDetails) poi).setAugmented(result.get(poi.getId()));
 				}
@@ -732,7 +732,7 @@ public class QueryManagerServices {
 				List <String> eventIds = QueryManager.getElementIDs(query);
 				try {
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, tmpLanguages);
+					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					String content = JSONObject.wrap(eventsDetails).toString();
 					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
@@ -792,7 +792,7 @@ public class QueryManagerServices {
 			List <String> poiIds = QueryManager.getElementIDs(query);
 			try {
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, tmpLanguages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(poisInDetails).toString();
