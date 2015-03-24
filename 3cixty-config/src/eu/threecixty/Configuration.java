@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public class Configuration {
 
-	private static String path;
+	public static String path;
 	private static Properties props;
 
 	private static String version;
