@@ -10,6 +10,7 @@ public class ReportRequest {
 	private String lastPage;
 	private String lastElement;
 	private String lastPosition;
+	private String key;
 
 	public String getClientTimeStamp() {
 		return clientTimeStamp;
@@ -28,6 +29,13 @@ public class ReportRequest {
 	}
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+	
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
 	}
 	public String getUserToken() {
 		return userToken;
