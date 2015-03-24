@@ -11,6 +11,10 @@ public class ReportRequest {
 	private String lastElement;
 	private String lastPosition;
 	private String key;
+	
+	private String uid;
+	private String firstName;
+	private String lastName;
 
 	public String getClientTimeStamp() {
 		return clientTimeStamp;
@@ -66,5 +70,23 @@ public class ReportRequest {
 	}
 	public void setLastPosition(String lastPosition) {
 		this.lastPosition = lastPosition;
+	}
+	public String getUid() {
+		return uid;
+	}
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 }
