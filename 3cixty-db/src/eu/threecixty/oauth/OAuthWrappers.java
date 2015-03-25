@@ -259,9 +259,9 @@ public class OAuthWrappers {
 		return OAuthModelsUtils.deleteUserAccessToken(accessToken);
 	}
 
-	public static String findGoogleUIDFrom(String accessToken) {
+	public static String findUIDFrom(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return null;
-		return OAuthModelsUtils.findGoogleUIDFromAccessToken(accessToken);
+		return OAuthModelsUtils.findUIDFromAccessToken(accessToken);
 	}
 
 	public static boolean updateAppKey(String uid, String appid, String appname, String description,

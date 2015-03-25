@@ -640,7 +640,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	protected static String findGoogleUIDFromAccessToken(String accessToken) {
+	protected static String findUIDFromAccessToken(String accessToken) {
 		if (isNullOrEmpty(accessToken)) return null;
 		Session session = null;
 		try {

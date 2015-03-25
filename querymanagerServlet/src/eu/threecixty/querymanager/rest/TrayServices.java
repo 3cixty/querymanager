@@ -243,7 +243,7 @@ public class TrayServices {
 		tray.setElement_title(element_title);
 		tray.setImage_url(image_url);
 		
-		String uid = OAuthWrappers.findGoogleUIDFrom(token);
+		String uid = OAuthWrappers.findUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			tray.setToken(token);
 		} else {
@@ -264,7 +264,7 @@ public class TrayServices {
 	private List<Tray> getTrayElements(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String access_token = restTray.getToken();
-		String uid = OAuthWrappers.findGoogleUIDFrom(access_token);
+		String uid = OAuthWrappers.findUIDFrom(access_token);
 
 		// XXX: check user permission
 		if (uid != null && !"".equals(uid)) {
@@ -292,7 +292,7 @@ public class TrayServices {
 		String junkToken = restTray.getJunk_token();
 		if (junkToken == null || junkToken.equals("")) return null;
 		String threeCixtyToken = restTray.getThree_cixty_token();
-		String uid = OAuthWrappers.findGoogleUIDFrom(threeCixtyToken);
+		String uid = OAuthWrappers.findUIDFrom(threeCixtyToken);
 		if (uid == null || uid.equals("")) return null;
 		if (!ProfileManagerImpl.getInstance().getTrayManager().replaceUID(junkToken, uid)) return null;
 		checkPermission(threeCixtyToken);
@@ -308,7 +308,7 @@ public class TrayServices {
 	        InvalidTrayElement, TooManyConnections {
 		String token = restTray.getToken();
 		if (token == null || token.equals("")) return false;
-		String uid = OAuthWrappers.findGoogleUIDFrom(token);
+		String uid = OAuthWrappers.findUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(token);
 		}
@@ -327,7 +327,7 @@ public class TrayServices {
 		if (itemId == null || itemId.equals("")) return false;
 		String token = restTray.getToken();
 
-		String uid = OAuthWrappers.findGoogleUIDFrom(token);
+		String uid = OAuthWrappers.findUIDFrom(token);
 		
 		// check user permission
 		if (uid != null && !uid.equals("")) {
