@@ -2,8 +2,10 @@ package eu.threecixty.profile;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,11 +41,11 @@ public class GoogleAccountUtils {
 		String user_id = null;
 		String _3cixtyUID = null;
 		try {
-			/*
+			
 			if (!accessToken.equals("")) { // TODO: remove after testing
 				String uid = String.valueOf(System.nanoTime()); // random uid
-				
-				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
+				Map <String, Boolean> attrs = Utils.getAttributesToLoadProfileFromGoogleFB();
+				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, attrs);
 				profile.setHasUID(uid);
 				String picture = "https://www.google.fr/images/srpr/logo11w.png";
 				profile.setProfileImage(picture);
@@ -63,14 +65,14 @@ public class GoogleAccountUtils {
 				}
 				
 				Set<String> knows = new HashSet<String>();
+				String animeshGoogleUID = Utils.gen3cixtyUID("103411760688868522737", Utils.UidSource.GOOGLE);
+				knows.add(animeshGoogleUID); // this would be useful to test augmentation query
 				
-				knows.add("103411760688868522737"); // this would be useful to test augmentation query
-				
-				ProfileManagerImpl.getInstance().saveProfile(profile);
+				ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 				
 				return uid;
 			}
-			*/
+			
 			// due to error asked by Christian
 //			String reqMsg = readUrl(
 //					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
