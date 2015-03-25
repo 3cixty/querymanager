@@ -1,0 +1,248 @@
+package eu.threecixty.querymanager.rest;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.Security;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import eu.threecixty.Configuration;
+import eu.threecixty.logs.CallLoggingConstants;
+import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.oauth.AccessToken;
+import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.ReportRequest;
+
+@Path("/" + Constants.PREFIX_NAME)
+public class ReportServices {
+	private static final String CLIENT_TIMESTAMP = "clientTimeStamp";
+	private static final String CLIENT_VERSION = "clientVersion";
+	private static final String REASON = "reason";
+	private static final String USER_TOKEN = "userToken";
+	private static final String APP_KEY = "key";
+	private static final String OTHER_REASON_TEXT = "otherReasonText";
+	private static final String LAST_PAGE = "lastPage";
+	private static final String LAST_ELEMENT = "lastElement";
+	private static final String LAST_POSITION = "lastPosition";
+	
+	private static final String REPORT_SERVICE = "Report service";
+	private static final String GMAIL_ACCOUNT_KEY = "GMAIL_ACCOUNT";
+	private static final String GMAIL_PWD_KEY = "GMAIL_PWD";
+	private static final String DESTINATIONS_KEY = "DESTINATION";
+	
+	private static String gmailAccount;
+	private static String googleUserName;
+	private static String gmailPwd;
+	private static List <String> destinations = new LinkedList <String>();
+
+	@POST
+	@Path("/reporting")
+    public Response report(InputStream input, @Context Request req) {
+		String content = getContent(input);
+		if (content == null || content.equals("")) return createInvalidResponse("Empty request");
+		long starttime = System.currentTimeMillis();
+		try {
+			JSONObject json = new JSONObject(content);
+			ReportRequest reportRequest = new ReportRequest();
+			if (json.has(USER_TOKEN)) {
+			    String userToken = getUserToken(json);
+			    reportRequest.setUserToken(userToken);
+			    AccessToken at = OAuthWrappers.findAccessTokenFromDB(userToken);
+			    CallLoggingManager.getInstance().save(at.getAppkey(), starttime, REPORT_SERVICE,
+			    		CallLoggingConstants.SUCCESSFUL);
+			    reportRequest.setUid(at.getUid());
+			    reportRequest.setUserToken(null); // clear user token
+			} else if (json.has(APP_KEY)) {
+				String key = getAppkey(json);
+			    CallLoggingManager.getInstance().save(key, starttime, REPORT_SERVICE,
+			    		CallLoggingConstants.SUCCESSFUL);
+			} else {
+				return createInvalidResponse("Your request must contain either userToken or key");
+			}
+			String timestamp = getTimestamp(json);
+			reportRequest.setClientTimeStamp(timestamp);
+			
+			if (!json.has(CLIENT_VERSION)) throw new WebApplicationException(
+					new Throwable("Client version is required"));
+			String clientVersion = json.getString(CLIENT_VERSION);
+			reportRequest.setClientVersion(clientVersion);
+			
+			if (!json.has(REASON)) throw new WebApplicationException(new Throwable("Reason is required"));
+			String reason = json.getString(REASON);
+			reportRequest.setReason(reason);
+			
+			if (json.has(OTHER_REASON_TEXT)) reportRequest.setOtherReasonText(json.getString(OTHER_REASON_TEXT));
+			
+			if (json.has(LAST_PAGE)) reportRequest.setLastPage(json.getString(LAST_PAGE));
+			
+			if (json.has(LAST_ELEMENT)) reportRequest.setLastElement(json.getString(LAST_ELEMENT));
+			
+			if (json.has(LAST_POSITION)) reportRequest.setLastPosition(json.getString(LAST_POSITION));
+			
+			sendEmail(reportRequest);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return createInvalidResponse("Your report request must be in JSON format");
+		} catch (WebApplicationException e) {
+			return createInvalidResponse(e.getMessage());
+		}
+		return null;
+	}
+	
+	private void sendEmail(ReportRequest reportRequest) {
+		if (gmailAccount == null) {
+			synchronized (reportRequest) {
+				if (gmailAccount == null) {
+					try {
+						loadProperties();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		if (gmailAccount != null && !gmailAccount.equals("")) {
+			try {
+				Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+				final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+
+				// Get a Properties object
+				Properties props = System.getProperties();
+				props.setProperty("mail.smtps.host", "smtp.gmail.com");
+				props.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY);
+				props.setProperty("mail.smtp.socketFactory.fallback", "false");
+				props.setProperty("mail.smtp.port", "465");
+				props.setProperty("mail.smtp.socketFactory.port", "465");
+				props.setProperty("mail.smtps.auth", "true");
+
+				/*
+	        If set to false, the QUIT command is sent and the connection is immediately closed. If set 
+	        to true (the default), causes the transport to wait for the response to the QUIT command.
+
+	        ref :   http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
+	                http://forum.java.sun.com/thread.jspa?threadID=5205249
+	                smtpsend.java - demo program from javamail
+				 */
+				props.put("mail.smtps.quitwait", "false");
+
+				Session session = Session.getInstance(props, null);
+
+				// -- Create a new message --
+				final MimeMessage msg = new MimeMessage(session);
+
+				// -- Set the FROM and TO fields --
+				msg.setFrom(new InternetAddress(gmailAccount));
+				for (String dest: destinations) {
+					msg.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
+				}
+
+				msg.setSubject("3cixty feedback");
+				msg.setText(JSONObject.wrap(reportRequest).toString(), "utf-8");
+				msg.setSentDate(new Date());
+
+				Transport t = session.getTransport("smtps");
+
+				t.connect("smtp.gmail.com", googleUserName, gmailPwd);
+				t.sendMessage(msg, msg.getAllRecipients());      
+				t.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private synchronized void loadProperties() throws IOException {
+		InputStream input = new FileInputStream(Configuration.path);
+		Properties props = new Properties();
+		props.load(input);
+		input.close();
+		gmailAccount = props.getProperty(GMAIL_ACCOUNT_KEY);
+		if (gmailAccount != null) {
+			int index = gmailAccount.indexOf("@");
+			if (index > 0) {
+				googleUserName = gmailAccount.substring(0, index);
+			}
+		}
+		gmailPwd = props.getProperty(GMAIL_PWD_KEY);
+		String tmpDests = props.getProperty(DESTINATIONS_KEY);
+		if (tmpDests != null && !tmpDests.equals("")) {
+			String [] dests = tmpDests.split(",");
+			for (String dest: dests) {
+				destinations.add(dest);
+			}
+		}
+	}
+
+	private String getTimestamp(JSONObject json) throws WebApplicationException {
+		if (!json.has(CLIENT_TIMESTAMP))
+			throw new WebApplicationException(new Throwable("Client timestamp is required"));
+		String timestamp = json.getString(CLIENT_TIMESTAMP);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+		try {
+			Date d = format.parse(timestamp);
+			if (d != null) return timestamp;
+		} catch (ParseException e) {
+			throw new WebApplicationException(new Throwable(
+					"Client timestamp is invalid. The pattern looks like: 2002-10-10T12:00:00-05:00"));
+		}
+		return null;
+	}
+	
+	private String getUserToken(JSONObject json) throws WebApplicationException {
+		String token = json.getString(USER_TOKEN);
+		if (!OAuthWrappers.validateUserAccessToken(token)) {
+			throw new WebApplicationException(new Throwable("userToken is invalid: " + token));
+		}
+		return token;
+	}
+	
+	private String getAppkey(JSONObject json) throws WebApplicationException {
+		String key = json.getString(APP_KEY);
+		if (!OAuthWrappers.validateAppKey(key)) {
+			throw new WebApplicationException(new Throwable("key is invalid: " + key));
+		}
+		return key;
+	}
+
+
+	private Response createInvalidResponse(String msg) {
+		return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
+	}
+	
+    private String getContent(InputStream input) {
+    	if (input == null) return null;
+    	StringBuffer buffer = new StringBuffer();
+    	byte[] b = new byte[1024];
+    	int readBytes = 0;
+    	try {
+			while ((readBytes = input.read(b)) >= 0) {
+				buffer.append(new String(b, 0, readBytes, "UTF-8"));
+			}
+			return buffer.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+}
