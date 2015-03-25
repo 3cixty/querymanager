@@ -50,7 +50,7 @@ public class GoFlowServices {
 	@POST
 	@Path("/registerGoFlowApp")
 	public Response registerApp(@HeaderParam("key") String appkey, @HeaderParam("google_access_token") String g_access_token) {
-		String uid = GoogleAccountUtils.getUID(g_access_token, null);
+		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": false, \"reason\": \"Google access token is invalid or expired\"} ")

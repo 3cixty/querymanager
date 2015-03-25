@@ -93,7 +93,7 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		String _3cixtyUid = GoogleAccountUtils.getUID(g_access_token, app.getAppNameSpace());
+		String _3cixtyUid = GoogleAccountUtils.getUID(g_access_token);
 		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -115,7 +115,7 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		String _3cixtyUid = FaceBookAccountUtils.getUID(fb_access_token, app.getAppNameSpace(), width, height);
+		String _3cixtyUid = FaceBookAccountUtils.getUID(fb_access_token, width, height);
 		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Facebook access token is invalid or expired\"} ")
@@ -140,7 +140,7 @@ public class OAuthServices {
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		String uid = GoogleAccountUtils.getUID(g_access_token, null);
+		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -185,7 +185,7 @@ public class OAuthServices {
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		String uid = GoogleAccountUtils.getUID(googleAccessToken, null);
+		String uid = GoogleAccountUtils.getUID(googleAccessToken);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -208,7 +208,7 @@ public class OAuthServices {
 	@Path("/getApps")
 	public Response getApps(@QueryParam("google_access_token") String g_access_token, @DefaultValue("json") @QueryParam("format") String format) {
 		try {
-			String uid = GoogleAccountUtils.getUID(g_access_token, null);
+			String uid = GoogleAccountUtils.getUID(g_access_token);
 			if (uid == null || uid.equals(""))
 				return Response.status(Response.Status.BAD_REQUEST)
 						.entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -247,7 +247,7 @@ public class OAuthServices {
 	@GET
 	@Path("/retrieveAppKey")
 	public Response retrieveAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid) {
-		String uid = GoogleAccountUtils.getUID(g_access_token, null);
+		String uid = GoogleAccountUtils.getUID(g_access_token);
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
@@ -381,8 +381,8 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		
-		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside, app.getAppNameSpace())
-				: FaceBookAccountUtils.getUID(accessTokenFromOutside, app.getAppNameSpace(), width, height);
+		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside)
+				: FaceBookAccountUtils.getUID(accessTokenFromOutside, width, height);
 		
 		if (uid == null || uid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)

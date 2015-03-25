@@ -34,7 +34,7 @@ public class GoogleAccountUtils {
 //	 */
 
 
-	public static String getUID(String accessToken, String appId) {
+	public static String getUID(String accessToken) {
 		if (accessToken == null) return "";
 		String user_id = null;
 		String _3cixtyUID = null;
