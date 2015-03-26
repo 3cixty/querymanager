@@ -66,10 +66,12 @@ public class ElementDetailsUtils {
 		queryBuff.append("              ?address vcard2006:street-address ?street .\n");
 		queryBuff.append("              ?address vcard2006:locality ?locality . }\n");
 		queryBuff.append(" OPTIONAL{ ?item lode:atTime ?time.");
-		queryBuff.append("              ?time time:hasBeginning ?beginning .\n");
+		queryBuff.append("              { ?time time:hasBeginning ?beginning .\n");
 		queryBuff.append("              ?beginning time:inXSDDateTime ?beginTime .\n");
 		queryBuff.append("              ?time time:hasEnd ?end .\n");
 		queryBuff.append("              ?end time:inXSDDateTime ?endTime .}\n");
+		queryBuff.append(" UNION { ?time time:inXSDDateTime ?beginTime .  } \n");
+		queryBuff.append("}");
 		queryBuff.append("OPTIONAL{ ?item lode:poster ?image_url .}\n");
 		queryBuff.append("OPTIONAL{ ?item dc:publisher ?source .}\n");
 		
@@ -330,6 +332,7 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(beginTime)) eventDetails.setTime_beginning(beginTime);
 		String endTime = getAttributeValue(json, "endTime");
 		if (!isNullOrEmpty(endTime)) eventDetails.setTime_end(endTime);
+		if (eventDetails.getTime_end() == null) eventDetails.setTime_end(eventDetails.getTime_beginning());
 		String image_url = getAttributeValue(json, "image_url");
 		if (!isNullOrEmpty(image_url)) eventDetails.setImage_url(image_url);
 		String source = getAttributeValue(json, "source");
