@@ -31,6 +31,7 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.oauth.model.App;
 import eu.threecixty.profile.ReportRequest;
 
 @Path("/" + Constants.PREFIX_NAME)
@@ -61,6 +62,7 @@ public class ReportServices {
 		String content = getContent(input);
 		if (content == null || content.equals("")) return createInvalidResponse("Empty request");
 		long starttime = System.currentTimeMillis();
+		String subject = null;
 		try {
 			JSONObject json = new JSONObject(content);
 			ReportRequest reportRequest = new ReportRequest();
@@ -71,11 +73,15 @@ public class ReportServices {
 			    CallLoggingManager.getInstance().save(at.getAppkey(), starttime, REPORT_SERVICE,
 			    		CallLoggingConstants.SUCCESSFUL);
 			    reportRequest.setUid(at.getUid());
+			    App app = OAuthWrappers.retrieveApp(at.getAppkey());
+			    subject = app.getAppName();
 			    reportRequest.setUserToken(null); // clear user token
 			} else if (json.has(APP_KEY)) {
 				String key = getAppkey(json);
 			    CallLoggingManager.getInstance().save(key, starttime, REPORT_SERVICE,
 			    		CallLoggingConstants.SUCCESSFUL);
+			    App app = OAuthWrappers.retrieveApp(key);
+			    subject = app.getAppName();
 			} else {
 				return createInvalidResponse("Your request must contain either userToken or key");
 			}
@@ -99,7 +105,7 @@ public class ReportServices {
 			
 			if (json.has(LAST_POSITION)) reportRequest.setLastPosition(json.getString(LAST_POSITION));
 			
-			sendEmail(reportRequest);
+			sendEmail(reportRequest, subject);
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return createInvalidResponse("Your report request must be in JSON format");
@@ -109,7 +115,7 @@ public class ReportServices {
 		return null;
 	}
 	
-	private void sendEmail(ReportRequest reportRequest) {
+	private void sendEmail(ReportRequest reportRequest, String subject) {
 		if (gmailAccount == null) {
 			synchronized (reportRequest) {
 				if (gmailAccount == null) {
@@ -156,7 +162,7 @@ public class ReportServices {
 					msg.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
 				}
 
-				msg.setSubject("3cixty feedback");
+				msg.setSubject("[3cixty feedback] " + subject);
 				msg.setText(JSONObject.wrap(reportRequest).toString(), "utf-8");
 				msg.setSentDate(new Date());
 
