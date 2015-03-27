@@ -102,6 +102,7 @@ public class Utils {
 		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
 		attrs.put(ProfileManager.ATTRIBUTE_KNOWS, true);
 		attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
+		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
 		return attrs;
 	}
 	
