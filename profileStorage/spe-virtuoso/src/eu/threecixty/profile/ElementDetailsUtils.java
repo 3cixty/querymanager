@@ -158,9 +158,14 @@ public class ElementDetailsUtils {
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
 		queryBuff.append("          ?location schema:streetAddress ?address .} \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:geo ?geo . \n");
+		queryBuff.append("OPTIONAL { { ?poi schema:geo ?geo . \n");
 		queryBuff.append("          ?geo schema:latitude ?lat . \n");
 		queryBuff.append("          ?geo schema:longitude ?lon .} \n");
+		queryBuff.append(" UNION { \n");
+		queryBuff.append("?poi geo:location ?geoLocation . \n");
+		queryBuff.append("?geoLocation geo:lat  ?lat . \n");
+		queryBuff.append("?geoLocation geo:long  ?lon . \n");
+		queryBuff.append("} } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
 		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");

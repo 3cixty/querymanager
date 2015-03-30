@@ -84,9 +84,14 @@ public class NearbyUtils {
 		
 		builder.append("} UNION { \n");
 		builder.append(" ?poi a dul:Place . \n");
-		builder.append("?poi schema:geo ?geoPoi . \n");
+		builder.append("{ ?poi schema:geo ?geoPoi . \n");
 		builder.append("?geoPoi schema:latitude ?lat. \n");
-		builder.append("?geoPoi schema:longitude ?lon. \n");
+		builder.append("?geoPoi schema:longitude ?lon. } \n");
+		builder.append("UNION {");
+		builder.append("?poi geo:location ?geoLocation . \n");
+		builder.append("?geoLocation geo:lat  ?lat . \n");
+		builder.append("?geoLocation geo:long  ?lon . \n");
+		builder.append("}");
 		builder.append("FILTER (?poi = <" + id + ">) \n");
 		
 		builder.append("}} \n");
@@ -133,8 +138,14 @@ public class NearbyUtils {
 		    addInfoOptional("?poi", "schema:name", "?name", languages, builder);
 		}
 		*/
-		builder.append("        ?poi schema:geo ?geoPoi . \n");
-		builder.append("        ?geoPoi geo:geometry ?geo. \n");
+		//builder.append("        ?poi schema:geo ?geoPoi . \n");
+		//builder.append("        ?geoPoi geo:geometry ?geo. \n");
+		
+		builder.append("{ ?poi schema:geo ?geoPoi . \n");
+		builder.append("?geoPoi geo:geometry ?geo. \n");
+		builder.append("} UNION {");
+		builder.append("?poi geo:location ?geo . \n");
+		builder.append("}");
 
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
@@ -174,18 +185,19 @@ public class NearbyUtils {
 			
 			filterCategories(categories, builder);
 		}
-		/*
-		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
-			//addInfoUnion("?poi", "schema:name", "?name", languages, builder);
-		} else {
-		    addInfoOptional("?poi", "schema:name", "?name", languages, builder);
-		}
-		*/
-		
-		builder.append("        ?poi schema:geo ?geoPoi . \n");
-		builder.append("        ?geoPoi geo:geometry ?geo. \n");
-		builder.append("        <").append(locId).append("> schema:geo ?geoPoiFixed . \n");
-		builder.append("        ?geoPoiFixed geo:geometry ?geoFixed . \n");
+
+		builder.append("{ ?poi schema:geo ?geoPoi . \n");
+		builder.append("?geoPoi geo:geometry ?geo. \n");
+		builder.append("} UNION {");
+		builder.append("?poi geo:location ?geo . \n");
+		builder.append("}");
+		// TODO
+		builder.append("{ <" + locId + "> schema:geo ?geoPoiFixed . \n");
+		builder.append("?geoPoiFixed geo:geometry ?geoFixed .  \n");
+		builder.append("} UNION {");
+		builder.append(" <" + locId + "> geo:location ?geoFixed . \n");
+		builder.append("}");
+
 		builder.append("        FILTER ( <").append(locId).append("> != ?poi ) . \n");
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
