@@ -84,7 +84,6 @@ public class TrayServices {
 			}
 		}
     	if (input == null || restTray == null) {
-    		CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
 			return createResponseException("Failed to understand your tray request");
     	} else {
     		if (!OAuthWrappers.validateAppKey(restTray.getKey())) {
