@@ -73,12 +73,15 @@ public class TrayServices {
     public Response invokeTrayServices(InputStream input, @Context Request req) {
     	long starttime = System.currentTimeMillis();
     	String restTrayStr = getRestTrayString(input);
+    	if (DEBUG_MOD) LOGGER.info(restTrayStr);
 		RestTrayObject restTray = null;
 		if (restTrayStr != null) {
 			try {
 				Gson gson = new Gson();
 				restTray = gson.fromJson(restTrayStr, RestTrayObject.class);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
     	if (input == null || restTray == null) {
     		CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_SERVICE, CallLoggingConstants.INVALID_PARAMS + restTrayStr);
