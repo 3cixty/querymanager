@@ -2,7 +2,6 @@ package eu.threecixty.profile;
 
 import java.util.List;
 
-import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoQueryExecution;
 
 import com.hp.hpl.jena.query.Query;
@@ -13,11 +12,9 @@ public class QueryReturnClass {
 	private List<String> resultSelectVar;
 	private Query query;
 	private ResultSet returnedResultSet;
-	private VirtGraph virtGraph;
 	private VirtuosoQueryExecution vqe;
 	
-	public QueryReturnClass(VirtGraph virtGraph, VirtuosoQueryExecution vqe) {
-		this.virtGraph = virtGraph;
+	public QueryReturnClass(VirtuosoQueryExecution vqe) {
 		this.vqe = vqe;
 	}
 	
@@ -44,10 +41,6 @@ public class QueryReturnClass {
 		if (vqe != null) {
 			vqe.close();
 			vqe = null;
-		}
-		if (virtGraph != null) {
-			VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
-			virtGraph = null;
 		}
 	}
 }

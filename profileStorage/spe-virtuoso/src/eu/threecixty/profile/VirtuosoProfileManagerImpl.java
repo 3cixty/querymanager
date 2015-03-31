@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import virtuoso.jena.driver.VirtGraph;
+
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -179,7 +181,8 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
         
         QueryReturnClass qRC;
 		try {
-			qRC = VirtuosoManager.getInstance().query(queryString);
+			VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+			qRC = VirtuosoManager.getInstance().query(queryString, virtGraph);
 			
 	        ResultSet results = qRC.getReturnedResultSet();
 	        
@@ -195,6 +198,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	            }
 	        }
 	        qRC.closeConnection();
+	        VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -219,7 +223,8 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
         
         QueryReturnClass qRC;
 		try {
-			qRC = VirtuosoManager.getInstance().query(queryString);
+			VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+			qRC = VirtuosoManager.getInstance().query(queryString, virtGraph);
 			
 	        ResultSet results = qRC.getReturnedResultSet();
 	        
@@ -238,6 +243,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	            }
 	        }
 	        qRC.closeConnection();
+	        VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -296,9 +302,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	    qStr.append("}");
 	    System.out.println(qStr.toString());
 	    QueryReturnClass qRC = null;
+	    VirtGraph virtGraph = null;
 	    String _3cixtyUID = null;
 		try {
-			qRC = VirtuosoManager.getInstance().query(qStr.toString());
+			virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+			qRC = VirtuosoManager.getInstance().query(qStr.toString(), virtGraph);
 			ResultSet results = qRC.getReturnedResultSet();
 			for ( ; results.hasNext(); ) {
 				QuerySolution qs = results.next();
@@ -312,6 +320,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			e.printStackTrace();
 		} finally {
 			if (qRC != null) qRC.closeConnection();
+			if (virtGraph != null) VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
 		}
 		return _3cixtyUID;
 	}

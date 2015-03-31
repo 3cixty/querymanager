@@ -78,13 +78,12 @@ public class VirtuosoManager {
 	 * @param query
 	 * @throws InterruptedException 
 	 */
-	public QueryReturnClass query(String query) throws InterruptedException {
+	public QueryReturnClass query(String query, VirtGraph virtGraph) throws InterruptedException {
 		try {
 			VirtuosoConnection.processConfigFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		VirtGraph virtGraph = getVirtGraph();
 
 		try {
 			Query sparql = QueryFactory
@@ -93,7 +92,7 @@ public class VirtuosoManager {
 			VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create(
 					sparql, virtGraph);
 
-			QueryReturnClass qRC = new QueryReturnClass(virtGraph, vqe);
+			QueryReturnClass qRC = new QueryReturnClass(vqe);
 			qRC.setResultSelectVar(sparql.getResultVars());
 			qRC.setReturnedResultSet(vqe.execSelect());
 			qRC.setQuery(sparql);
