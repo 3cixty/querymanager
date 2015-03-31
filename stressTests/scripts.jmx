@@ -589,8 +589,6 @@
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&quot;action&quot;: &quot;get_tray_elements&quot;&#xd;
 &quot;key&quot;: &quot;aa2605d7-859e-430d-a303-2054d9953f5b&quot;&#xd;
-&quot;limit&quot;: &quot;100&quot;&#xd;
-&quot;offset&quot;: &quot;0&quot;&#xd;
 &quot;order_type&quot;: &quot;desc&quot;&#xd;
 &quot;show_past_events&quot;: &quot;true&quot;&#xd;
 &quot;token&quot;: &quot;7NPPet0ASrSEWKkaxiVofHx74Wjr6xPO&quot;}</stringProp>
