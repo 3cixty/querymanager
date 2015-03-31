@@ -102,26 +102,30 @@ public class VirtuosoUserProfileStorage {
 		//try {
 			if (DEBUG_MOD) LOGGER.info("Start loading user profile");
 
+			VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+			
 			eu.threecixty.profile.UserProfile toUserProfile = new eu.threecixty.profile.UserProfile();
 			toUserProfile.setHasUID(uid);
 			
 			// load unique info for each profile: use a query instead of 5 ones to improve performance
 			// since the following method loads five kinds of information, so we always load these kinds
-			loadGenderNameImageAddressLastcrawl(uid, attributes, toUserProfile);
+			loadGenderNameImageAddressLastcrawl(virtGraph, uid, attributes, toUserProfile);
 
 			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES)) {
-			    loadProfileIdentitiesFromUserProfile(uid, toUserProfile);
+			    loadProfileIdentitiesFromUserProfile(virtGraph, uid, toUserProfile);
 			}
 
 			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_KNOWS)) {
-			    loadKnowsFromKBToUserProfile(uid, toUserProfile);
+			    loadKnowsFromKBToUserProfile(virtGraph, uid, toUserProfile);
 			}
 
 			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PREFERENCE)) {
-			    loadPreferencesFromKBToUserProfile(uid, toUserProfile);
+			    loadPreferencesFromKBToUserProfile(virtGraph, uid, toUserProfile);
 			}
 			
 			if (DEBUG_MOD) LOGGER.info("Finish loading user profile");
+			
+			VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
 			
 			return toUserProfile;
 //		} catch (Exception e) {
@@ -176,7 +180,7 @@ public class VirtuosoUserProfileStorage {
 			}
 
 			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_KNOWS)) {
-			    saveKnowsToKB(profile.getHasUID(), profile.getKnows(), queriesToRemoveData, queriesToInsertData);
+			    saveKnowsToKB(virtGraph, profile.getHasUID(), profile.getKnows(), queriesToRemoveData, queriesToInsertData);
 			}
 
 			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_PREFERENCE)) {
@@ -185,9 +189,9 @@ public class VirtuosoUserProfileStorage {
 			
 			if (ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_TRANSPORT)) {
 			    if (profile.getPreferences()==null)
-				    saveTransportToKB(profile.getHasUID(), null, queriesToRemoveData, queriesToInsertData);
+				    saveTransportToKB(virtGraph, profile.getHasUID(), null, queriesToRemoveData, queriesToInsertData);
 			    else
-				    saveTransportToKB(profile.getHasUID(), profile.getPreferences().getHasTransport(), queriesToRemoveData, queriesToInsertData);
+				    saveTransportToKB(virtGraph, profile.getHasUID(), profile.getPreferences().getHasTransport(), queriesToRemoveData, queriesToInsertData);
 			}
 
 			VirtuosoUpdateRequest vurToRemoveData = null;
@@ -206,7 +210,7 @@ public class VirtuosoUserProfileStorage {
 
 			if (vurToInsertData != null) vurToInsertData.exec();
 
-			virtGraph.close();
+			VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
 			
 			if (DEBUG_MOD) LOGGER.info("end saving user profile");
 			return true;
@@ -217,7 +221,7 @@ public class VirtuosoUserProfileStorage {
 		//return false;
 	}
 
-	private void saveUIDInfoTOKB(String uid, List <String> queries) throws InterruptedException {
+	private void saveUIDInfoTOKB( String uid, List <String> queries) throws InterruptedException {
 
 		if (!existUID()) {
 			// comment the following line as we only have one private graph
@@ -234,7 +238,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 * @throws InterruptedException 
 	 */
-	private void saveKnowsToKB(String uid, Set <String> knows, List <String> queriesToRemoveData,
+	private void saveKnowsToKB(VirtGraph virtGraph, String uid, Set <String> knows, List <String> queriesToRemoveData,
 			List <String> queriesToInsertData)  throws InterruptedException {
 
 		String str = GetSetQueryStrings.removeAllKnows(uid);
@@ -247,7 +251,7 @@ public class VirtuosoUserProfileStorage {
 		for ( ; iterators.hasNext(); ){
 			String know=iterators.next();
 
-			QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getUserURI(know)); // need to refactor here
+			QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getUserURI(know), virtGraph); // need to refactor here
 
 			ResultSet results = qRC.getReturnedResultSet();
 			if (!results.hasNext()){
@@ -416,10 +420,10 @@ public class VirtuosoUserProfileStorage {
 	 * @param mf
 	 * @throws InterruptedException 
 	 */
-	private void saveTransportToKB(String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports,
+	private void saveTransportToKB(VirtGraph virtGraph, String uid, Set<eu.threecixty.profile.oldmodels.Transport> transports,
 			List <String> queriesToRemoveData, List <String> queriesToInsertData) throws InterruptedException {
 
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getTransport(uid));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getTransport(uid), virtGraph);
 		
 		ResultSet results = qRC.getReturnedResultSet();
 
@@ -526,11 +530,11 @@ public class VirtuosoUserProfileStorage {
 	 * @param to
 	 * @throws InterruptedException 
 	 */
-	private void loadLikesFromKBToPreference(String uid, eu.threecixty.profile.oldmodels.Preference to) throws InterruptedException {
+	private void loadLikesFromKBToPreference(VirtGraph virtGraph, String uid, eu.threecixty.profile.oldmodels.Preference to) throws InterruptedException {
 
 		Set <eu.threecixty.profile.oldmodels.Likes> toLikes = new HashSet <eu.threecixty.profile.oldmodels.Likes>();
 
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getLikes(uid));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getLikes(uid), virtGraph);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		
@@ -566,7 +570,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param toUserProfile
 	 * @throws InterruptedException 
 	 */
-	private void loadGenderNameImageAddressLastcrawl(String uid, Map <String, Boolean> attributes,
+	private void loadGenderNameImageAddressLastcrawl(VirtGraph virtGraph, String uid, Map <String, Boolean> attributes,
 			UserProfile toUserProfile) throws InterruptedException {
 		if (!ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_GENDER)
 				&& !ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_NAME)
@@ -576,7 +580,7 @@ public class VirtuosoUserProfileStorage {
 			return;
 		}
 		QueryReturnClass qRC = VirtuosoManager.getInstance().query(
-				GetSetQueryStrings.createQueryToGetGenderNameImageAddressLastcrawl(uid));
+				GetSetQueryStrings.createQueryToGetGenderNameImageAddressLastcrawl(uid), virtGraph);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		Address toAddress = null;
@@ -641,10 +645,10 @@ public class VirtuosoUserProfileStorage {
 	 * @param toUserProfile
 	 * @throws InterruptedException 
 	 */
-	private void loadProfileIdentitiesFromUserProfile(String uid, eu.threecixty.profile.UserProfile toUserProfile) throws InterruptedException {
+	private void loadProfileIdentitiesFromUserProfile(VirtGraph virtGraph, String uid, eu.threecixty.profile.UserProfile toUserProfile) throws InterruptedException {
 		
 		Set <eu.threecixty.profile.oldmodels.ProfileIdentities> oldProfiles = new HashSet <eu.threecixty.profile.oldmodels.ProfileIdentities>();
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getProfileIdentities(uid));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getProfileIdentities(uid), virtGraph);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		
@@ -683,10 +687,10 @@ public class VirtuosoUserProfileStorage {
 	 * @param toUserProfile
 	 * @throws InterruptedException 
 	 */
-	private void loadKnowsFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile toUserProfile) throws InterruptedException {
+	private void loadKnowsFromKBToUserProfile(VirtGraph virtGraph, String uid, eu.threecixty.profile.UserProfile toUserProfile) throws InterruptedException {
 		
 		Set <String> knows = new HashSet <String>();
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getKnows(uid));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getKnows(uid), virtGraph);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		
@@ -713,13 +717,13 @@ public class VirtuosoUserProfileStorage {
 		return;
 	}
 
-	private void loadPreferencesFromKBToUserProfile(String uid, eu.threecixty.profile.UserProfile toUserProfile) throws InterruptedException {
+	private void loadPreferencesFromKBToUserProfile(VirtGraph virtGraph, String uid, eu.threecixty.profile.UserProfile toUserProfile) throws InterruptedException {
 		eu.threecixty.profile.oldmodels.Preference toPrefs = new eu.threecixty.profile.oldmodels.Preference();
 
-		loadLikesFromKBToPreference(uid,toPrefs);
-		loadTripPreferencesFromKBToPreferences(uid, toPrefs);
-		loadPlacePreferencesFromKBToPreferences(uid, toPrefs);
-		loadTransportFromKBToPreferences(uid,toPrefs);
+		loadLikesFromKBToPreference(virtGraph, uid,toPrefs);
+		loadTripPreferencesFromKBToPreferences(virtGraph, uid, toPrefs);
+		loadPlacePreferencesFromKBToPreferences(virtGraph, uid, toPrefs);
+		loadTransportFromKBToPreferences(virtGraph, uid,toPrefs);
 						
 		toUserProfile.setPreferences(toPrefs);
 						
@@ -730,10 +734,10 @@ public class VirtuosoUserProfileStorage {
 	 * @param toPrefs
 	 * @throws InterruptedException 
 	 */
-	private void loadTransportFromKBToPreferences(String uid, eu.threecixty.profile.oldmodels.Preference toPrefs) throws InterruptedException {
+	private void loadTransportFromKBToPreferences(VirtGraph virtGraph, String uid, eu.threecixty.profile.oldmodels.Preference toPrefs) throws InterruptedException {
 		
 		Set <eu.threecixty.profile.oldmodels.Transport> toTransports = new HashSet <eu.threecixty.profile.oldmodels.Transport>();
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getTransport(uid));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getTransport(uid), virtGraph);
 		ResultSet results = qRC.getReturnedResultSet();
 		
 		for ( ; results.hasNext(); ) {
@@ -747,7 +751,8 @@ public class VirtuosoUserProfileStorage {
 				
 				toTransport.setHasTransportURI(transport.asResource().getURI());
 				
-				QueryReturnClass qRCRegularTrips = VirtuosoManager.getInstance().query(GetSetQueryStrings.getRegularTripsForTransport(uid,transport.asResource().getURI()));
+				QueryReturnClass qRCRegularTrips = VirtuosoManager.getInstance().query(
+						GetSetQueryStrings.getRegularTripsForTransport(uid,transport.asResource().getURI()), virtGraph);
 				ResultSet resultsRegularTrips = qRCRegularTrips.getReturnedResultSet();
 				
 				Set <eu.threecixty.profile.oldmodels.RegularTrip> toRegularTrips = new HashSet <eu.threecixty.profile.oldmodels.RegularTrip>();
@@ -756,7 +761,7 @@ public class VirtuosoUserProfileStorage {
 					QuerySolution qsRegularTrips = resultsRegularTrips.next();
 					try {
 						eu.threecixty.profile.oldmodels.RegularTrip toRegularTrip = new eu.threecixty.profile.oldmodels.RegularTrip();
-						loadRegularTripFromKB(qsRegularTrips, toRegularTrip);
+						loadRegularTripFromKB(virtGraph, qsRegularTrips, toRegularTrip);
 				    	toRegularTrips.add(toRegularTrip);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -766,7 +771,8 @@ public class VirtuosoUserProfileStorage {
 				
 				qRCRegularTrips.closeConnection();
 				
-				QueryReturnClass qRCAccompanying = VirtuosoManager.getInstance().query(GetSetQueryStrings.getAccompanyingForTransport(uid,transport.asResource().getURI()));
+				QueryReturnClass qRCAccompanying = VirtuosoManager.getInstance().query(
+						GetSetQueryStrings.getAccompanyingForTransport(uid,transport.asResource().getURI()), virtGraph);
 				ResultSet resultsAccompanying = qRCAccompanying.getReturnedResultSet();
 				
 				Set <eu.threecixty.profile.oldmodels.Accompanying> toAccompanyings = new HashSet <eu.threecixty.profile.oldmodels.Accompanying>();
@@ -807,7 +813,7 @@ public class VirtuosoUserProfileStorage {
 	 * @param toRegularTrip
 	 * @throws InterruptedException 
 	 */
-	private void loadRegularTripFromKB(QuerySolution qs,
+	private void loadRegularTripFromKB(VirtGraph virtGraph, QuerySolution qs,
 			eu.threecixty.profile.oldmodels.RegularTrip toRegularTrip) throws InterruptedException {
 		
 		RDFNode regularTripURI = qs.get("regularTrip");
@@ -863,7 +869,7 @@ public class VirtuosoUserProfileStorage {
     	Set <eu.threecixty.profile.oldmodels.PersonalPlace> toPersonalPlaces = new HashSet <eu.threecixty.profile.oldmodels.PersonalPlace>();
 		
     	if (regularTripURI!=null)
-    		loadPersonalPlaceFromKBToRegularTrips(regularTripURI.asResource().getURI(),toPersonalPlaces);
+    		loadPersonalPlaceFromKBToRegularTrips(virtGraph, regularTripURI.asResource().getURI(),toPersonalPlaces);
     	
     	toRegularTrip.setHasPersonalPlacesNew(toPersonalPlaces);
 	}
@@ -875,10 +881,11 @@ public class VirtuosoUserProfileStorage {
 	 * @param toPersonalPlace
 	 * @throws InterruptedException 
 	 */
-	private void loadPersonalPlaceFromKBToRegularTrips(String regularTripURI,
+	private void loadPersonalPlaceFromKBToRegularTrips(VirtGraph virtGraph, String regularTripURI,
 			Set <eu.threecixty.profile.oldmodels.PersonalPlace> toPersonalPlaces) throws InterruptedException {
 
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getPersonalPlacesForRegularTrips(uid,regularTripURI));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(
+				GetSetQueryStrings.getPersonalPlacesForRegularTrips(uid,regularTripURI), virtGraph);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		
@@ -968,10 +975,10 @@ public class VirtuosoUserProfileStorage {
 	 * @param to
 	 * @throws InterruptedException 
 	 */
-	private void loadTripPreferencesFromKBToPreferences(String uid, eu.threecixty.profile.oldmodels.Preference to) throws InterruptedException {
+	private void loadTripPreferencesFromKBToPreferences(VirtGraph virtGraph, String uid, eu.threecixty.profile.oldmodels.Preference to) throws InterruptedException {
 		
 		Set <eu.threecixty.profile.oldmodels.TripPreference> tripPreferences = new HashSet <eu.threecixty.profile.oldmodels.TripPreference>();
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getTripPreferences(uid));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getTripPreferences(uid), virtGraph);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		
@@ -1029,10 +1036,10 @@ public class VirtuosoUserProfileStorage {
 	 * @param to
 	 * @throws InterruptedException 
 	 */
-	private void loadPlacePreferencesFromKBToPreferences(String uid, eu.threecixty.profile.oldmodels.Preference to) throws InterruptedException {
+	private void loadPlacePreferencesFromKBToPreferences(VirtGraph virtGraph, String uid, eu.threecixty.profile.oldmodels.Preference to) throws InterruptedException {
 		
 		Set <eu.threecixty.profile.oldmodels.PlacePreference> placePreferences = new HashSet <eu.threecixty.profile.oldmodels.PlacePreference>();
-		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getPlacePreferences(uid));
+		QueryReturnClass qRC = VirtuosoManager.getInstance().query(GetSetQueryStrings.getPlacePreferences(uid), virtGraph);
 
 		ResultSet results = qRC.getReturnedResultSet();
 		
@@ -1105,8 +1112,8 @@ public class VirtuosoUserProfileStorage {
 	    qStr.append("?root profile:userID ?uid .\n");
 	    qStr.append("FILTER (STR(?uid) = \"" + uid + "\") . \n\n");
 	    qStr.append("}");
-	    
-	    QueryReturnClass qRC = VirtuosoManager.getInstance().query(qStr.toString());
+	    VirtGraph virtGraph = VirtuosoManager.getInstance().getVirtGraph();
+	    QueryReturnClass qRC = VirtuosoManager.getInstance().query(qStr.toString(), virtGraph);
 		ResultSet results = qRC.getReturnedResultSet();
 		boolean found = false;
 		for ( ; results.hasNext(); ) {
@@ -1118,6 +1125,7 @@ public class VirtuosoUserProfileStorage {
 			}
 		}
 		qRC.closeConnection();
+		VirtuosoManager.getInstance().releaseVirtGraph(virtGraph);
 		if (DEBUG_MOD) {
 			if (found) LOGGER.info("Found UID = " + uid + " in Virtuoso");
 			else LOGGER.info("Not found UID = " + uid + " in Virtuoso. Here is the sparql query: " + qStr.toString());	
