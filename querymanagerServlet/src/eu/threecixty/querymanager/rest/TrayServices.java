@@ -80,7 +80,7 @@ public class TrayServices {
 				Gson gson = new Gson();
 				restTray = gson.fromJson(restTrayStr, RestTrayObject.class);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage());
 			}
 		}
     	if (input == null || restTray == null) {
