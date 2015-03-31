@@ -86,18 +86,22 @@ public class VirtuosoManager {
 		}
 		VirtGraph virtGraph = getVirtGraph();
 
-		Query sparql = QueryFactory
-				.create(query);
-		
-		VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create(
-				sparql, virtGraph);
-		
-		QueryReturnClass qRC = new QueryReturnClass(virtGraph, vqe);
-		qRC.setResultSelectVar(sparql.getResultVars());
-		qRC.setReturnedResultSet(vqe.execSelect());
-		qRC.setQuery(sparql);
-		
-		return qRC;
+		try {
+			Query sparql = QueryFactory
+					.create(query);
+
+			VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create(
+					sparql, virtGraph);
+
+			QueryReturnClass qRC = new QueryReturnClass(virtGraph, vqe);
+			qRC.setResultSelectVar(sparql.getResultVars());
+			qRC.setReturnedResultSet(vqe.execSelect());
+			qRC.setQuery(sparql);
+
+			return qRC;
+		} catch (JenaException je) {
+			throw new InterruptedException();
+		}
 	}
 	
 	
