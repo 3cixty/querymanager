@@ -581,16 +581,16 @@
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Wishlist" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET Wishlist" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&quot;action&quot;: &quot;get_tray_elements&quot;&#xd;
-&quot;key&quot;: &quot;aa2605d7-859e-430d-a303-2054d9953f5b&quot;&#xd;
-&quot;order_type&quot;: &quot;desc&quot;&#xd;
-&quot;show_past_events&quot;: &quot;true&quot;&#xd;
+                <stringProp name="Argument.value">{&quot;action&quot;: &quot;get_tray_elements&quot;,&#xd;
+&quot;key&quot;: &quot;aa2605d7-859e-430d-a303-2054d9953f5b&quot;,&#xd;
+&quot;order_type&quot;: &quot;desc&quot;,&#xd;
+&quot;show_past_events&quot;: &quot;true&quot;,&#xd;
 &quot;token&quot;: &quot;7NPPet0ASrSEWKkaxiVofHx74Wjr6xPO&quot;}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
