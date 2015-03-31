@@ -40,11 +40,13 @@ import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.LanguageUtils;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.VirtuosoManager;
 import eu.threecixty.querymanager.EventMediaFormat;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
 import eu.threecixty.querymanager.ThreeCixtyQuery;
+import eu.threecixty.querymanager.UnknownException;
 
 /**
  * The class is an end point for QA RestAPIs to expose to other components.
@@ -152,6 +154,11 @@ public class QueryManagerServices {
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
+				} catch (UnknownException e) {
+					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					        .entity(e.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
 				}
 			}
 		} else {
@@ -195,14 +202,21 @@ public class QueryManagerServices {
 				}
 				
 				String queryToBeExecuted = QueryManager.removePrefixes(jenaQuery.toString());
-				
-				String result = QueryManager.executeQuery(queryToBeExecuted, eventMediaFormat);
+				try {
+					String result = QueryManager.executeQuery(queryToBeExecuted, eventMediaFormat);
 
-				// log calls
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+					// log calls
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 
-				return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
-						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+				} catch (IOException e) {
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
 			}
 		} else {
 			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
@@ -228,35 +242,37 @@ public class QueryManagerServices {
 
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			
-			JSONObject result = new JSONObject();
-			if (events != null && !events.equals("")) {
-				List <String> eventIds = createList(events);
-				try {
+			try {
+				JSONObject result = new JSONObject();
+				if (events != null && !events.equals("")) {
+					List <String> eventIds = createList(events);
 					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
 							eventIds, null, tmpLanguages);
 					if (eventsDetails != null) {
 						result.put("Events", eventsDetails);
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
+
 				}
-			}
-			if (pois != null && !pois.equals("")) {
-				List <String> poiIds = createList(pois);
-				try {
+				if (pois != null && !pois.equals("")) {
+					List <String> poiIds = createList(pois);
+
 					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null,
 							tmpLanguages);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
+				
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				
+				return Response.ok(result.toString(), MediaType.APPLICATION_JSON_TYPE ).build();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
 			}
-			
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-			
-			return Response.ok(result.toString(), MediaType.APPLICATION_JSON_TYPE ).build();
 		} else {
 			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return createResponseForInvalidKey(key);
@@ -274,11 +290,18 @@ public class QueryManagerServices {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
-			
-			String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
-			
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+			try {
+				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
 		} else {
 			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return createResponseForInvalidKey(key);
@@ -296,11 +319,19 @@ public class QueryManagerServices {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place }";
-			
-			String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
-			
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+
+			try {
+				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
 		} else {
 			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return createResponseForInvalidKey(key);
@@ -346,9 +377,17 @@ public class QueryManagerServices {
 				String query = createGroupQuery(group, offset, limit,
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
-				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+				try {
+					String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+					return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+				} catch (IOException e) {
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
 			}
 			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_PARAMS + group);
 			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -382,9 +421,17 @@ public class QueryManagerServices {
 			int tmpOffset = offset < 0 ? 0 : offset;
 			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
 			+ tmpOffset +( limit < 0 ? "" : "\nLIMIT  " + limit);
-			String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+			try {
+				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
 		} else {
 			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return createResponseForInvalidKey(key);
@@ -450,6 +497,11 @@ public class QueryManagerServices {
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
 				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (UnknownException e) {
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -533,6 +585,11 @@ public class QueryManagerServices {
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
+			} catch (UnknownException e) {
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
 			}
 		} else {
 			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
@@ -584,6 +641,11 @@ public class QueryManagerServices {
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
 				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			} catch (UnknownException e) {
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -654,6 +716,11 @@ public class QueryManagerServices {
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
+			} catch (UnknownException e) {
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
 			}
 		} else {
 			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
@@ -690,9 +757,17 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getGroupBy()),
 						(pair2 == null ? null : pair2.getValue()));
 
-				String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+				try {
+					String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+					return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
 		} else {
 			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return createResponseForInvalidKey(key);
@@ -729,8 +804,9 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getGroupBy()),
 						(pair2 == null ? null : pair2.getValue()));
 
-				List <String> eventIds = QueryManager.getElementIDs(query);
 				try {
+					List <String> eventIds = QueryManager.getElementIDs(query);
+				
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -738,8 +814,9 @@ public class QueryManagerServices {
 					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (IOException e) {
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity(e.getMessage())
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+					        .entity(VirtuosoManager.BUSY_EXCEPTION)
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -764,9 +841,17 @@ public class QueryManagerServices {
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
-			String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
-			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-			return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+			try {
+				String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
 		} else {
 			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return createResponseForInvalidKey(key);
@@ -789,8 +874,8 @@ public class QueryManagerServices {
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
-			List <String> poiIds = QueryManager.getElementIDs(query);
 			try {
+				List <String> poiIds = QueryManager.getElementIDs(query);
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
 				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
 				
@@ -799,8 +884,9 @@ public class QueryManagerServices {
 				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				        .entity(VirtuosoManager.BUSY_EXCEPTION)
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -812,7 +898,8 @@ public class QueryManagerServices {
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
 			String query, String filter, EventMediaFormat eventMediaFormat,
-			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException, TooManyConnections {
+			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException,
+			TooManyConnections, UnknownException {
 
 		Query jenaQuery = createJenaQuery(query);
 		
@@ -848,7 +935,8 @@ public class QueryManagerServices {
 	
 	private Map <String, Boolean> executeQuery(IProfiler profiler, IQueryManager qm,
 			String query, String filter,
-			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException, TooManyConnections {
+			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException,
+			TooManyConnections, UnknownException {
 
 		Query jenaQuery = createJenaQuery(query);
 		

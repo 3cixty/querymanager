@@ -1,4 +1,5 @@
 package eu.threecixty.querymanager;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public interface IQueryManager {
 	 * 			The returned string format
 	 * @return: a RDF or JSON in string format. Return Null if any error occurs.
 	 */
-	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format);
+	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format) throws IOException, UnknownException;
 	
 	/**
 	 * Execute a given augmented query. The return is a map of pairs with key is element (Event/PoI) ID,
@@ -47,7 +48,7 @@ public interface IQueryManager {
 	 * @param augmentedQuery
 	 * @return
 	 */
-	Map <String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery);
+	Map <String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery) throws IOException;
 	
 	/**
 	 * Request preferences from Knowledge-Base of User Profiles.

@@ -99,7 +99,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	
 	@Override
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
-			EventMediaFormat format) {
+			EventMediaFormat format) throws IOException, UnknownException {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQuery.getQuery().getQuery().setDistinct(true);
@@ -136,17 +136,14 @@ import eu.threecixty.profile.oldmodels.Rating;
 
 		} catch (UnsupportedEncodingException e) {
 			LOGGER.error(e.getMessage());
-			return "ERROR:" + e.getMessage();
+			throw new UnknownException(e.getMessage());
 		} catch (MalformedURLException e) {
 			LOGGER.error(e.getMessage());
-			return "ERROR:" + e.getMessage();
-		} catch (IOException e) {
-			LOGGER.error(e.getMessage());
-			return "ERROR:" + e.getMessage();
+			throw new UnknownException(e.getMessage());
 		}
 	}
 	
-	public Map<String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery) {
+	public Map<String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery) throws IOException {
 		String formatType = "application/sparql-results+json";
 		augmentedQuery.getQuery().getQuery().setDistinct(true);
 		if (!augmentedQuery.getQuery().getQuery().hasLimit()) {
@@ -175,28 +172,25 @@ import eu.threecixty.profile.oldmodels.Rating;
 		
 		Map <String, Boolean> maps = new HashMap <String, Boolean>();
 		
-		try {
-			VirtuosoManager.getInstance().executeQueryViaSPARQL(augmentedQueryStr, formatType, sb);
-			JSONObject json = new JSONObject(sb.toString());
-			JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
-			
-			int len = jsonArrs.length();
-			for (int i = 0; i < len; i++) {
-				JSONObject jsonElement = jsonArrs.getJSONObject(i);
-				boolean hightLighted = isItemAugmented(jsonElement, numberOfOrders);
-				String elementId = null;
-				if (jsonElement.has("event")) {
-				    elementId = jsonElement.getJSONObject("event").get("value").toString();
-				} else if (jsonElement.has("venue")) {
-					elementId = jsonElement.getJSONObject("venue").get("value").toString();
-				}
-				if (elementId != null) {
-					maps.put(elementId, hightLighted);
-				}
+		VirtuosoManager.getInstance().executeQueryViaSPARQL(augmentedQueryStr, formatType, sb);
+		JSONObject json = new JSONObject(sb.toString());
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+
+		int len = jsonArrs.length();
+		for (int i = 0; i < len; i++) {
+			JSONObject jsonElement = jsonArrs.getJSONObject(i);
+			boolean hightLighted = isItemAugmented(jsonElement, numberOfOrders);
+			String elementId = null;
+			if (jsonElement.has("event")) {
+				elementId = jsonElement.getJSONObject("event").get("value").toString();
+			} else if (jsonElement.has("venue")) {
+				elementId = jsonElement.getJSONObject("venue").get("value").toString();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			if (elementId != null) {
+				maps.put(elementId, hightLighted);
+			}
 		}
+
 		return maps;
 	}
 
@@ -208,16 +202,12 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @param format
 	 * @return
 	 */
-	public static String executeQuery(String query, EventMediaFormat format) {
+	public static String executeQuery(String query, EventMediaFormat format) throws IOException {
 		if (query == null || format == null) return "";
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		StringBuilder builder = new StringBuilder();
-		try {
-			hasElementsForBindings(query, format, formatType, builder, null, 0);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		hasElementsForBindings(query, format, formatType, builder, null, 0);
 		return builder.toString();
 	}
 	
@@ -228,32 +218,28 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @param query
 	 * @return
 	 */
-	public static List <String> getElementIDs(String query) {
+	public static List <String> getElementIDs(String query) throws IOException {
 
 		String formatType = "application/sparql-results+json";
 
 		StringBuilder sb = new StringBuilder();
 		
 		List <String> elementIds = new LinkedList <String>();
-		
-		try {
-			VirtuosoManager.getInstance().executeQueryViaSPARQL(query, formatType, sb);
-			JSONObject json = new JSONObject(sb.toString());
-			JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
-			
-			int len = jsonArrs.length();
-			for (int i = 0; i < len; i++) {
-				JSONObject jsonElement = jsonArrs.getJSONObject(i);
-				String elementId = null;
-				if (jsonElement.has("event")) {
-				    elementId = jsonElement.getJSONObject("event").get("value").toString();
-				} else if (jsonElement.has("venue")) {
-					elementId = jsonElement.getJSONObject("venue").get("value").toString();
-				}
-				if (elementId != null) elementIds.add(elementId);
+
+		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, formatType, sb);
+		JSONObject json = new JSONObject(sb.toString());
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+
+		int len = jsonArrs.length();
+		for (int i = 0; i < len; i++) {
+			JSONObject jsonElement = jsonArrs.getJSONObject(i);
+			String elementId = null;
+			if (jsonElement.has("event")) {
+				elementId = jsonElement.getJSONObject("event").get("value").toString();
+			} else if (jsonElement.has("venue")) {
+				elementId = jsonElement.getJSONObject("venue").get("value").toString();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			if (elementId != null) elementIds.add(elementId);
 		}
 		return elementIds;
 	}
