@@ -25,7 +25,10 @@ import virtuoso.jena.driver.VirtuosoUpdateRequest;
 
 public class VirtuosoManager {
 	
+
 	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixtyTest.com/private/";
+
+	private static final String LOCN_PREFIX = "PREFIX locn: <http://www.w3.org/ns/locn#> ";
 	
 	
 	 private static final Logger LOGGER = Logger.getLogger(
@@ -99,6 +102,8 @@ public class VirtuosoManager {
 
 			return qRC;
 		} catch (JenaException je) {
+			je.printStackTrace();
+			releaseVirtGraph(virtGraph);
 			LOGGER.error(je.getMessage());
 			throw new InterruptedException();
 		}
@@ -117,6 +122,7 @@ public class VirtuosoManager {
 					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 			return graph;
 		} catch (JenaException e) {
+			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 			throw new InterruptedException();
 		}
@@ -132,7 +138,7 @@ public class VirtuosoManager {
 	}
 
 	public void executeQueryViaSPARQL(String query, String format, StringBuilder result) throws IOException {
-		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(query, "UTF-8");
+		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(LOCN_PREFIX + query, "UTF-8");
 		urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
 
 		URL url = new URL(urlStr);
