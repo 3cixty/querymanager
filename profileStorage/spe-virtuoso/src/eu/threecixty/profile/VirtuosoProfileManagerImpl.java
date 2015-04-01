@@ -33,6 +33,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		try {
 			return VirtuosoUserProfileStorage.getInstance(uid).loadProfile(attrs);
 		} catch (InterruptedException e) {
+			e.printStackTrace();
 			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 	}
@@ -42,6 +43,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		try {
 			return VirtuosoUserProfileStorage.getInstance(userProfile.getHasUID()).saveProfile(userProfile, attributes);
 		} catch (InterruptedException e) {
+			e.printStackTrace();
 			throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
 		}
 	}
