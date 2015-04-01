@@ -96,6 +96,7 @@ public class SPEServices {
 				if (DEBUG_MOD) LOGGER.info("Successful to getProfile API");
 				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
 			} catch (TooManyConnections e) {
+				e.printStackTrace();
 				return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(e.getMessage()).build();
 			}
 		} else {
