@@ -26,7 +26,8 @@ public class Configuration {
 			+ PROFILE_PREFIX
 			+"prefix frap:	<http://purl.org/frap#> "
 			+"prefix dc:	<http://purl.org/dc/elements/1.1/> "
-			+ "prefix fn: <http://www.w3.org/2005/xpath-functions#>";
+			+ "prefix fn: <http://www.w3.org/2005/xpath-functions#> "
+			+ "PREFIX locn: <http://www.w3.org/ns/locn#>";
 	
 	public static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 
