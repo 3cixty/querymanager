@@ -575,6 +575,7 @@ public class VirtuosoUserProfileStorage {
 				&& !ProfileManagerImpl.getInstance().checkAttributeToStore(attributes, ProfileManager.ATTRIBUTE_LAST_CRAWL_TIME)) {
 			return;
 		}
+		if (DEBUG_MOD) LOGGER.info(GetSetQueryStrings.createQueryToGetGenderNameImageAddressLastcrawl(uid));
 		QueryReturnClass qRC = VirtuosoManager.getInstance().query(
 				GetSetQueryStrings.createQueryToGetGenderNameImageAddressLastcrawl(uid));
 
