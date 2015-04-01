@@ -159,7 +159,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
 		queryBuff.append("          ?location schema:streetAddress ?address .} \n");
 		queryBuff.append("OPTIONAL {\n");
-		queryBuff.append("?poi geo:location/locn:geometry ?geoLocation . \n");
+		queryBuff.append("?poi geo:location ?geoLocation . \n");
 		queryBuff.append("?geoLocation geo:lat  ?lat . \n");
 		queryBuff.append("?geoLocation geo:long  ?lon . \n");
 		queryBuff.append("} \n");
