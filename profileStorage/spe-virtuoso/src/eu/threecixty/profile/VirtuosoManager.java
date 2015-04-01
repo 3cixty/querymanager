@@ -100,6 +100,7 @@ public class VirtuosoManager {
 
 			return qRC;
 		} catch (JenaException je) {
+			LOGGER.error(je.getMessage());
 			throw new InterruptedException();
 		}
 	}
@@ -117,6 +118,7 @@ public class VirtuosoManager {
 					VirtuosoConnection.USER, VirtuosoConnection.PASS);
 			return graph;
 		} catch (JenaException e) {
+			LOGGER.error(e.getMessage());
 			throw new InterruptedException();
 		}
 	}
