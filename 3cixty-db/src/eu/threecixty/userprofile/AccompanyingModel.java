@@ -21,33 +21,15 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "3cixty_accompanying")
-public class Accompanying implements java.io.Serializable {
+public class AccompanyingModel implements java.io.Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5486497561246201323L;
-	private UserModel user;
-	private UserModel friend;
 	private Integer id;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "3cixty_user_id", nullable = false)
-	public UserModel getUser() {
-		return user;
-	}
-	public void setUser(UserModel user) {
-		this.user = user;
-	}
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "3cixty_friend_id", nullable = false)
-	public UserModel getFriend() {
-		return friend;
-	}
-	public void setFriend(UserModel friend) {
-		this.friend = friend;
-	}
+	private TransportModel transportModel;
+
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -58,4 +40,15 @@ public class Accompanying implements java.io.Serializable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "3cixty_transport_id", nullable = false)
+	public TransportModel getTransportModel() {
+		return transportModel;
+	}
+	public void setTransportModel(TransportModel transportModel) {
+		this.transportModel = transportModel;
+	}
+	
+	
 }

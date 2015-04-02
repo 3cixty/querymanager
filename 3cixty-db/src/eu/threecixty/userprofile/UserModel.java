@@ -32,11 +32,12 @@ public class UserModel implements java.io.Serializable {
 	private String profileImage;
 	
 	private Set <Know> knows;
-	private Set <Accompanying> accompanyings;
+	
 	private long lastCrawlTimeToKB;
 	private Set <AccountModel> accounts;
 	
 	private AddressModel address;
+	private PreferenceModel preferenceModel;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -104,14 +105,6 @@ public class UserModel implements java.io.Serializable {
 		this.knows = knows;
 	}
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	public Set<Accompanying> getAccompanyings() {
-		return accompanyings;
-	}
-	public void setAccompanyings(Set<Accompanying> accompanyings) {
-		this.accompanyings = accompanyings;
-	}
-	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userModel")
 	public Set<AccountModel> getAccounts() {
 		return accounts;
@@ -127,4 +120,14 @@ public class UserModel implements java.io.Serializable {
 	public void setAddress(AddressModel address) {
 		this.address = address;
 	}
+	
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "userModel", cascade = CascadeType.ALL)
+	public PreferenceModel getPreferenceModel() {
+		return preferenceModel;
+	}
+	public void setPreferenceModel(PreferenceModel preferenceModel) {
+		this.preferenceModel = preferenceModel;
+	}
+	
+	
 }
