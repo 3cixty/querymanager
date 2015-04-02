@@ -28,7 +28,7 @@ public class UserModel implements java.io.Serializable {
 	private String firstName;
 	private String lastName;
 	private String uid;
-	private Boolean gender;
+	private String gender;
 	private String profileImage;
 	
 	private Set <Know> knows;
@@ -72,11 +72,11 @@ public class UserModel implements java.io.Serializable {
 		this.uid = uid;
 	}
 	
-	@Column(name = "gender", nullable = true)
-	public Boolean getGender() {
+	@Column(name = "gender", nullable = true, length = 100)
+	public String getGender() {
 		return gender;
 	}
-	public void setGender(Boolean gender) {
+	public void setGender(String gender) {
 		this.gender = gender;
 	}
 	
