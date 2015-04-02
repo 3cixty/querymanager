@@ -63,115 +63,119 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public int getMinimumNumberOfTimesVisited(String uid) {
-		if (profileManager != null) return profileManager.getMinimumNumberOfTimesVisited(uid);
+	public int getMinimumNumberOfTimesVisited(UserProfile userProfile) {
+		if (profileManager != null) return profileManager.getMinimumNumberOfTimesVisited(userProfile);
 		return 0;
 	}
 
 	@Override
-	public float getMinimumScoreRated(String uid) {
-		if (profileManager != null) return profileManager.getMinimumScoreRated(uid);
+	public float getMinimumScoreRated(UserProfile userProfile) {
+		if (profileManager != null) return profileManager.getMinimumScoreRated(userProfile);
 		return 0;
 	}
 
 	@Override
-	public int getMinimumNumberOfTimesVisitedForFriends(String uid) {
-		if (profileManager != null) return profileManager.getMinimumNumberOfTimesVisitedForFriends(uid);
+	public int getMinimumNumberOfTimesVisitedForFriends(UserProfile userProfile) {
+		if (profileManager != null)
+			return profileManager.getMinimumNumberOfTimesVisitedForFriends(userProfile);
 		return 0;
 	}
 
 	@Override
-	public float getMinimumScoreRatedForFriends(String uid) {
-		if (profileManager != null) return profileManager.getMinimumScoreRatedForFriends(uid);
+	public float getMinimumScoreRatedForFriends(UserProfile userProfile) {
+		if (profileManager != null) return profileManager.getMinimumScoreRatedForFriends(userProfile);
 		return 0;
 	}
 
 	@Override
-	public String getCountryName(String uid) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getCountryName(uid);
+	public String getCountryName(UserProfile userProfile) throws TooManyConnections {
+		if (profileManager != null)
+			return profileManager.getCountryName(userProfile);
 		return null;
 	}
 
 	@Override
-	public String getTownName(String uid) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getTownName(uid);
+	public String getTownName(UserProfile userProfile) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getTownName(userProfile);
 		return null;
 	}
 	
-	public GpsCoordinate getCoordinate(String uid) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getCoordinate(uid);
+	public GpsCoordinate getCoordinate(UserProfile userProfile) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getCoordinate(userProfile);
 		return null;
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(String uid, float rating) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getPlaceIdsFromRating(uid, rating);
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getPlaceIdsFromRating(userProfile, rating);
 		return new ArrayList<String>();
 	}
 
 	@Override
-	public List<String> getPlaceNamesFromNumberOfTimesVisited(String uid,
+	public List<String> getPlaceNamesFromNumberOfTimesVisited(UserProfile userProfile,
 			int number) {
-		if (profileManager != null) return profileManager.getPlaceNamesFromNumberOfTimesVisited(uid, number);
+		if (profileManager != null)
+			return profileManager.getPlaceNamesFromNumberOfTimesVisited(userProfile, number);
 		return new ArrayList <String>();
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
+	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
 			float rating) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(uid, rating);
+		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(userProfile, rating);
 		return new ArrayList <String>();
 	}
 
 	@Override
 	public List<String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(
-			String uid, int number) {
-		if (profileManager != null) return profileManager.getPlaceNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+			UserProfile userProfile, int number) {
+		if (profileManager != null)
+			return profileManager.getPlaceNamesFromNumberOfTimesVisitedOfFriends(userProfile, number);
 		return new ArrayList <String>();
 	}
 
 	@Override
-	public List<String> getEventNamesFromEventPreferences(String uid) {
-		if (profileManager != null) return profileManager.getEventNamesFromEventPreferences(uid);
+	public List<String> getEventNamesFromEventPreferences(UserProfile userProfile) {
+		if (profileManager != null) return profileManager.getEventNamesFromEventPreferences(userProfile);
 		return new ArrayList <String>();
 	}
 
 	@Override
-	public List<StartAndEndDate> getPreferredStartAndEndDates(String uid) {
-		if (profileManager != null) return profileManager.getPreferredStartAndEndDates(uid);
+	public List<StartAndEndDate> getPreferredStartAndEndDates(UserProfile userProfile) {
+		if (profileManager != null) return profileManager.getPreferredStartAndEndDates(userProfile);
 		return new ArrayList <StartAndEndDate>();
 	}
 
 	@Override
-	public List<String> getEventNamesFromRating(String uid, float rating) {
-		if (profileManager != null) return profileManager.getEventNamesFromRating(uid, rating);
+	public List<String> getEventNamesFromRating(UserProfile userProfile, float rating) {
+		if (profileManager != null) return profileManager.getEventNamesFromRating(userProfile, rating);
 		return new ArrayList <String>();
 	}
 
 	@Override
-	public List<String> getEventNamesFromNumberOfTimesVisited(String uid,
+	public List<String> getEventNamesFromNumberOfTimesVisited(UserProfile userProfile,
 			int number) {
-		if (profileManager != null) return profileManager.getEventNamesFromNumberOfTimesVisited(uid, number);
+		if (profileManager != null) return profileManager.getEventNamesFromNumberOfTimesVisited(userProfile, number);
 		return new ArrayList <String>();
 	}
 
 	@Override
-	public List<String> getEventNamesFromRatingOfFriends(String uid,
+	public List<String> getEventNamesFromRatingOfFriends(UserProfile userProfile,
 			float rating) {
-		if (profileManager != null) return profileManager.getEventNamesFromRatingOfFriends(uid, rating);
+		if (profileManager != null) return profileManager.getEventNamesFromRatingOfFriends(userProfile, rating);
 		return new ArrayList <String>();
 	}
 
 	@Override
 	public List<String> getEventNamesFromNumberOfTimesVisitedOfFriends(
-			String uid, int number) {
-		if (profileManager != null) return profileManager.getEventNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+			UserProfile userProfile, int number) {
+		if (profileManager != null) return profileManager.getEventNamesFromNumberOfTimesVisitedOfFriends(userProfile, number);
 		return new ArrayList <String>();
 	}
 
 	@Override
-	public List<String> getEventNamesWhichFriendsLikeToVisit(String uid) {
-		if (profileManager != null) return profileManager.getEventNamesWhichFriendsLikeToVisit(uid);
+	public List<String> getEventNamesWhichFriendsLikeToVisit(UserProfile userProfile) {
+		if (profileManager != null) return profileManager.getEventNamesWhichFriendsLikeToVisit(userProfile);
 		return new ArrayList <String>();
 	}
 

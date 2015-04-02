@@ -56,99 +56,99 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public int getMinimumNumberOfTimesVisited(String uid) {
-		return PreferencesUtilsVirtuoso.getMinimumNumberOfTimesVisited(uid);
+	public int getMinimumNumberOfTimesVisited(UserProfile userProfile) {
+		return PreferencesUtilsVirtuoso.getMinimumNumberOfTimesVisited(getUID(userProfile));
 	}
 
 	@Override
-	public float getMinimumScoreRated(String uid) {
-		return PreferencesUtilsVirtuoso.getMinimumScoreRated(uid);
+	public float getMinimumScoreRated(UserProfile userProfile) {
+		return PreferencesUtilsVirtuoso.getMinimumScoreRated(getUID(userProfile));
 	}
 
 	@Override
-	public int getMinimumNumberOfTimesVisitedForFriends(String uid) {
-		return PreferencesUtilsVirtuoso.getMinimumNumberOfTimesVisitedForFriends(uid);
+	public int getMinimumNumberOfTimesVisitedForFriends(UserProfile userProfile) {
+		return PreferencesUtilsVirtuoso.getMinimumNumberOfTimesVisitedForFriends(getUID(userProfile));
 	}
 
 	@Override
-	public float getMinimumScoreRatedForFriends(String uid) {
-		return PreferencesUtilsVirtuoso.getMinimumScoreRatedForFriends(uid);
+	public float getMinimumScoreRatedForFriends(UserProfile userProfile) {
+		return PreferencesUtilsVirtuoso.getMinimumScoreRatedForFriends(getUID(userProfile));
 	}
 
 	@Override
-	public String getCountryName(String uid) throws TooManyConnections {
-		return ProfilerPlaceUtilsVirtuoso.getCountryName(uid);
+	public String getCountryName(UserProfile userProfile) throws TooManyConnections {
+		return ProfilerPlaceUtilsVirtuoso.getCountryName(getUID(userProfile));
 	}
 
 	@Override
-	public String getTownName(String uid) throws TooManyConnections {
-		return ProfilerPlaceUtilsVirtuoso.getTownName(uid);
+	public String getTownName(UserProfile userProfile) throws TooManyConnections {
+		return ProfilerPlaceUtilsVirtuoso.getTownName(getUID(userProfile));
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(String uid, float rating) throws TooManyConnections {
-		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRating(uid, rating);
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating) throws TooManyConnections {
+		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRating(getUID(userProfile), rating);
 	}
 
 	@Override
-	public List<String> getPlaceNamesFromNumberOfTimesVisited(String uid,
+	public List<String> getPlaceNamesFromNumberOfTimesVisited(UserProfile userProfile,
 			int number) {
-		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromNumberOfTimesVisitedOfFriends(getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
+	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
 			float rating) throws TooManyConnections {
-		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRatingOfFriends(uid, rating);
+		return ProfilerPlaceUtilsVirtuoso.getPlaceIdsFromRatingOfFriends(getUID(userProfile), rating);
 	}
 
 	@Override
 	public List<String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(
-			String uid, int number) {
-		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+			UserProfile userProfile, int number) {
+		return ProfilerPlaceUtilsVirtuoso.getPlaceNamesFromNumberOfTimesVisitedOfFriends(getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getEventNamesFromEventPreferences(String uid) {
-		return ProfilerEventUtilsVirtuoso.getEventNamesFromEventPreference(uid);
+	public List<String> getEventNamesFromEventPreferences(UserProfile userProfile) {
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromEventPreference(getUID(userProfile));
 	}
 
 	@Override
-	public List<StartAndEndDate> getPreferredStartAndEndDates(String uid) {
-		return ProfilerEventUtilsVirtuoso.getPreferredStartAndEndDates(uid);
+	public List<StartAndEndDate> getPreferredStartAndEndDates(UserProfile userProfile) {
+		return ProfilerEventUtilsVirtuoso.getPreferredStartAndEndDates(getUID(userProfile));
 	}
 
 	@Override
-	public List<String> getEventNamesFromRating(String uid, float rating) {
-		return ProfilerEventUtilsVirtuoso.getEventNamesFromRating(uid, rating);
+	public List<String> getEventNamesFromRating(UserProfile userProfile, float rating) {
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromRating(getUID(userProfile), rating);
 	}
 
 	@Override
-	public List<String> getEventNamesFromNumberOfTimesVisited(String uid,
+	public List<String> getEventNamesFromNumberOfTimesVisited(UserProfile userProfile,
 			int number) {
-		return ProfilerEventUtilsVirtuoso.getEventNamesFromNumberOfTimesVisited(uid, number);
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromNumberOfTimesVisited(getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getEventNamesFromRatingOfFriends(String uid,
+	public List<String> getEventNamesFromRatingOfFriends(UserProfile userProfile,
 			float rating) {
-		return ProfilerEventUtilsVirtuoso.getEventNamesFromRatingOfFriends(uid, rating);
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromRatingOfFriends(getUID(userProfile), rating);
 	}
 
 	@Override
 	public List<String> getEventNamesFromNumberOfTimesVisitedOfFriends(
-			String uid, int number) {
-		return ProfilerEventUtilsVirtuoso.getEventNamesFromNumberOfTimesVisitedOfFriends(uid, number);
+			UserProfile userProfile, int number) {
+		return ProfilerEventUtilsVirtuoso.getEventNamesFromNumberOfTimesVisitedOfFriends(getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getEventNamesWhichFriendsLikeToVisit(String uid) {
-		return ProfilerEventUtilsVirtuoso.getEventNamesWhichFriendsLikeToVisit( uid);
+	public List<String> getEventNamesWhichFriendsLikeToVisit(UserProfile userProfile) {
+		return ProfilerEventUtilsVirtuoso.getEventNamesWhichFriendsLikeToVisit(getUID(userProfile));
 	}
 
 	@Override
-	public GpsCoordinate getCoordinate(String uid) throws TooManyConnections {
-		return ProfilerPlaceUtilsVirtuoso.getCoordinates( uid);
+	public GpsCoordinate getCoordinate(UserProfile userProfile) throws TooManyConnections {
+		return ProfilerPlaceUtilsVirtuoso.getCoordinates(getUID(userProfile));
 	}
 
 	@Override
@@ -230,7 +230,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	            RDFNode UID = qs.get("uid");
 	            RDFNode lastCrawlTime = qs.get("lastCrawlTime");
 	            if (UID!=null && lastCrawlTime!=null){
-	                //String UID = qs.getLiteral("uid").getString();
+	                //UserProfile userProfile = qs.getLiteral("uid").getString();
 	                //String lastCrawlTime = qs.getLiteral("lastCrawlTime").getString();
 	                
 	                IDCrawlTimeMapping mapper=new IDCrawlTimeMapping();
@@ -316,5 +316,10 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			if (qRC != null) qRC.closeConnection();
 		}
 		return _3cixtyUID;
+	}
+	
+	private String getUID(UserProfile userProfile) {
+		if (userProfile == null) return null;
+		return userProfile.getHasUID();
 	}
 }
