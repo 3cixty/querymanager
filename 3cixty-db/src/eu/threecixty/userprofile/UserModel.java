@@ -4,12 +4,14 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -28,15 +30,13 @@ public class UserModel implements java.io.Serializable {
 	private String uid;
 	private Boolean gender;
 	private String profileImage;
-	private Double latitude;
-	private Double longitude;
-	private String townName;
-	private String countryName;
-	private String streetAddress;
+	
 	private Set <Know> knows;
 	private Set <Accompanying> accompanyings;
 	private long lastCrawlTimeToKB;
 	private Set <AccountModel> accounts;
+	
+	private AddressModel address;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -88,46 +88,6 @@ public class UserModel implements java.io.Serializable {
 		this.profileImage = profileImage;
 	}
 	
-	@Column(name = "latitude", nullable = true)
-	public Double getLatitude() {
-		return latitude;
-	}
-	public void setLatitude(Double latitude) {
-		this.latitude = latitude;
-	}
-	
-	@Column(name = "longitude", nullable = true)
-	public Double getLongitude() {
-		return longitude;
-	}
-	public void setLongitude(Double longitude) {
-		this.longitude = longitude;
-	}
-	
-	@Column(name = "townName", nullable = true, length = 255)
-	public String getTownName() {
-		return townName;
-	}
-	public void setTownName(String townName) {
-		this.townName = townName;
-	}
-	
-	@Column(name = "countryName", nullable = true, length = 255)
-	public String getCountryName() {
-		return countryName;
-	}
-	public void setCountryName(String countryName) {
-		this.countryName = countryName;
-	}
-	
-	@Column(name = "streetAddress", nullable = true, length = 255)
-	public String getStreetAddress() {
-		return streetAddress;
-	}
-	public void setStreetAddress(String streetAddress) {
-		this.streetAddress = streetAddress;
-	}
-	
 	@Column(name = "lastCrawlTimeToKB")
 	public long getLastCrawlTimeToKB() {
 		return lastCrawlTimeToKB;
@@ -158,5 +118,13 @@ public class UserModel implements java.io.Serializable {
 	}
 	public void setAccounts(Set<AccountModel> accounts) {
 		this.accounts = accounts;
+	}
+	
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "userModel", cascade = CascadeType.ALL)
+	public AddressModel getAddress() {
+		return address;
+	}
+	public void setAddress(AddressModel address) {
+		this.address = address;
 	}
 }
