@@ -58,6 +58,8 @@ public class UserProfile{
   
     /**Attribute to store profile picture*/
     private String profileImage;
+    /**This attribute is used for better performance of accessing to persistent DB*/
+    private Integer modelIdInPersistentDB;
     
     public String getHasLastCrawlTime() {
 		return hasLastCrawlTime;
@@ -162,5 +164,11 @@ public class UserProfile{
 
 	public void setProfileImage(String profileImage) {
 		this.profileImage = profileImage;
-	}	
+	}
+	public Integer getModelIdInPersistentDB() {
+		return modelIdInPersistentDB;
+	}
+	public void setModelIdInPersistentDB(Integer modelIdInPersistentDB) {
+		this.modelIdInPersistentDB = modelIdInPersistentDB;
+	}
 }
