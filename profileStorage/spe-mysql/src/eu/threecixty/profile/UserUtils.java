@@ -267,6 +267,7 @@ public class UserUtils {
 
 	private static void convertKnowsForPersistence(UserProfile userProfile,
 			UserModel userModel) {
+		/*
 		Set <String> knowsStrs = userProfile.getKnows();
 		if (knowsStrs == null || knowsStrs.size() == 0) userModel.setKnows(null);
 		else {
@@ -278,6 +279,8 @@ public class UserUtils {
 			knowsModel.clear();
 			knowsModel.addAll(knowsStrs);
 		}
+		TODO
+		*/
 	}
 
 	private static void convertAddressForPersistence(UserProfile userProfile,
@@ -285,7 +288,7 @@ public class UserUtils {
 		Address address = userProfile.getHasAddress();
 		if (address == null) {
 			AddressModel addrModel = userModel.getAddress();
-			session.delete(addrModel);
+			if (addrModel != null) session.delete(addrModel);
 			userModel.setAddress(null);
 			return;
 		}
@@ -363,11 +366,14 @@ public class UserUtils {
 	}
 
 	private static void convertKnows(UserModel userModel, UserProfile userProfile) {
+		/*
 		Set <String> knows = userModel.getKnows();
 		if (knows == null || knows.size() == 0) return;
 		Set <String> toKnows = new HashSet <String>();
 		userProfile.setKnows(toKnows);
 		toKnows.addAll(knows);
+		*/
+		// TODO
 	}
 
 	private static void convertAddress(UserModel userModel,

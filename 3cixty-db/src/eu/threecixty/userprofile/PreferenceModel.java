@@ -4,12 +4,12 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -24,6 +24,9 @@ public class PreferenceModel implements java.io.Serializable {
 	private static final long serialVersionUID = -832632094168680764L;
 
 	private Integer id;
+	
+    @OneToOne
+    @JoinColumn(name = "3cixty_user_id")
 	private UserModel userModel;
 	private Set <TransportModel> transportModels;
 	
@@ -37,7 +40,6 @@ public class PreferenceModel implements java.io.Serializable {
 		this.id = id;
 	}
 	
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "preferenceModel", cascade = CascadeType.ALL)
 	public UserModel getUserModel() {
 		return userModel;
 	}
