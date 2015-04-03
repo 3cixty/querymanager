@@ -1,5 +1,8 @@
 package eu.threecixty.profile;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+
 import eu.threecixty.profile.oldmodels.Transport;
 import eu.threecixty.userprofile.TransportModel;
 
@@ -15,7 +18,7 @@ class TransportUtils {
 		// TODO
 	}
 	
-	protected static void convertTransport(Transport transport, TransportModel transportModel) {
+	protected static void convertTransport(Transport transport, TransportModel transportModel, Session session) throws HibernateException {
 		// TODO
 	}
 	

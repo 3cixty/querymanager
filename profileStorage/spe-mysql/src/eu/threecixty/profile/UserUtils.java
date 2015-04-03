@@ -17,7 +17,6 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.Transport;
 import eu.threecixty.userprofile.AccountModel;
 import eu.threecixty.userprofile.AddressModel;
-import eu.threecixty.userprofile.Know;
 import eu.threecixty.userprofile.PreferenceModel;
 import eu.threecixty.userprofile.TransportModel;
 import eu.threecixty.userprofile.UserModel;
@@ -29,7 +28,7 @@ public class UserUtils {
 			 UserUtils.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
-	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 //private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	 /**
 	  * Checks whether or not a given 3cixty UID exists in the DB.
@@ -92,6 +91,11 @@ public class UserUtils {
 		return _3cixtyUID;
 	}
 	
+	/**
+	 * Gets the corresponding user profile from a given 3cixty UID.
+	 * @param _3cixtyUID
+	 * @return
+	 */
 	public static UserProfile getUserProfile(String _3cixtyUID) {
 		Session session = null;
 		UserProfile userProfile = null;
@@ -114,6 +118,145 @@ public class UserUtils {
 		return userProfile;
 	}
 	
+	/**
+	 * Adds or updates a given user profile.
+	 * @param userProfile
+	 * @return
+	 */
+	public static boolean saveUserProfile(UserProfile userProfile) {
+		if (userProfile == null) return false;
+		Integer userModelId = userProfile.getModelIdInPersistentDB();
+		if (userModelId == null) return addUserProfile(userProfile);
+		return updateUserProfile(userProfile);
+	}
+	
+	private static boolean updateUserProfile(UserProfile userProfile) {
+		
+		Session session = null;
+		boolean added = false;
+		try {
+			
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			UserModel userModel = (UserModel) session.get(UserModel.class,
+					userProfile.getModelIdInPersistentDB());
+			
+			session.beginTransaction();
+		
+			convertToUserModel(userProfile, userModel, session);
+			
+			session.update(userModel);
+
+			session.getTransaction().commit();
+
+			added = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return added;
+	}
+
+	private static boolean addUserProfile(UserProfile userProfile) {
+		Session session = null;
+		boolean added = false;
+		try {
+			UserModel userModel = new UserModel();
+			userModel.setUid(userProfile.getHasUID());
+			
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			
+			convertToUserModel(userProfile, userModel, session);
+		
+			session.save(userModel);
+
+			session.getTransaction().commit();
+
+			added = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return added;
+	}
+
+	private static void convertToUserModel(UserProfile userProfile,
+			UserModel userModel, Session session) throws HibernateException {
+		convertNameForPersistence(userProfile, userModel);
+		convertAddressForPersistence(userProfile, userModel, session);
+		userModel.setGender(userProfile.getHasGender());
+		userModel.setProfileImage(userProfile.getProfileImage());
+		if (!isNullOrEmpty(userProfile.getHasLastCrawlTime())) {
+			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
+		}
+		convertKnowsForPersistence(userProfile, userModel);
+		convertPreferenceForPersistence(userProfile, userModel, session);
+		convertAccountsForPersistence(userProfile, userModel, session);
+	}
+
+	private static void convertAccountsForPersistence(UserProfile userProfile,
+			UserModel userModel, Session session) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void convertPreferenceForPersistence(
+			UserProfile userProfile, UserModel userModel, Session session) throws HibernateException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void convertKnowsForPersistence(UserProfile userProfile,
+			UserModel userModel) {
+		Set <String> knowsStrs = userProfile.getKnows();
+		if (knowsStrs == null || knowsStrs.size() == 0) userModel.setKnows(null);
+		else {
+			Set <String> knowsModel = userModel.getKnows();
+			if (knowsModel == null) {
+				knowsModel = new HashSet <String>();
+				userModel.setKnows(knowsModel);
+			}
+			knowsModel.clear();
+			knowsModel.addAll(knowsStrs);
+		}
+	}
+
+	private static void convertAddressForPersistence(UserProfile userProfile,
+			UserModel userModel, Session session) throws HibernateException {
+		Address address = userProfile.getHasAddress();
+		if (address == null) {
+			AddressModel addrModel = userModel.getAddress();
+			session.delete(addrModel);
+			userModel.setAddress(null);
+			return;
+		}
+		AddressModel addressModel = userModel.getAddress();
+		if (addressModel == null) {
+			addressModel = new AddressModel();
+			addressModel.setUserModel(userModel);
+			userModel.setAddress(addressModel);
+		}
+		addressModel.setCountryName(address.getCountryName());
+		addressModel.setTownName(address.getTownName());
+		addressModel.setStreetAddress(address.getStreetAddress());
+		addressModel.setPostalCode(address.getPostalCode());
+		addressModel.setLatitude(address.getLatitude());
+		addressModel.setLongitude(address.getLongitute());
+	}
+
+	private static void convertNameForPersistence(UserProfile userProfile,
+			UserModel userModel) {
+		Name name = userProfile.getHasName();
+		userModel.setFirstName(name == null ? null : name.getGivenName());
+		userModel.setLastName(name == null ? null : name.getFamilyName());
+	}
+
 	private static UserProfile convertToUserProfile(UserModel userModel) {
 		UserProfile userProfile = new UserProfile();
 		userProfile.setHasUID(userModel.getUid());
@@ -167,13 +310,11 @@ public class UserUtils {
 	}
 
 	private static void convertKnows(UserModel userModel, UserProfile userProfile) {
-		Set <Know> knows = userModel.getKnows();
+		Set <String> knows = userModel.getKnows();
 		if (knows == null || knows.size() == 0) return;
 		Set <String> toKnows = new HashSet <String>();
 		userProfile.setKnows(toKnows);
-		for (Know know: knows) {
-			toKnows.add(know.getUser().getUid());
-		}
+		toKnows.addAll(knows);
 	}
 
 	private static void convertAddress(UserModel userModel,
