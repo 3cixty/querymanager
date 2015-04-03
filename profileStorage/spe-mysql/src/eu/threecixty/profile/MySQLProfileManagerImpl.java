@@ -140,8 +140,7 @@ class MySQLProfileManagerImpl implements ProfileManager {
 
 	public UserProfile getProfile(String _3cixtyUID, Map<String, Boolean> arg1)
 			throws TooManyConnections {
-		// TODO Auto-generated method stub
-		return null;
+		return UserUtils.getUserProfile(_3cixtyUID);
 	}
 
 	public String getTownName(UserProfile userProfile) throws TooManyConnections {
@@ -156,8 +155,7 @@ class MySQLProfileManagerImpl implements ProfileManager {
 
 	public boolean saveProfile(UserProfile userProfile, Map<String, Boolean> arg1)
 			throws TooManyConnections {
-		// TODO Auto-generated method stub
-		return false;
+		return UserUtils.saveUserProfile(userProfile);
 	}
 
 }
