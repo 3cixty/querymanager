@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -202,14 +203,66 @@ public class UserUtils {
 
 	private static void convertAccountsForPersistence(UserProfile userProfile,
 			UserModel userModel, Session session) {
-		// TODO Auto-generated method stub
-		
+		Set <ProfileIdentities> pis = userProfile.getHasProfileIdenties();
+		Set <AccountModel> accountModels = userModel.getAccounts();
+		if (pis == null || pis.size() == 0) {
+			if (accountModels != null && accountModels.size() > 0) {
+				accountModels.clear();
+			}
+			return;
+		}
+		if (accountModels == null) {
+			accountModels = new HashSet<AccountModel>();
+			userModel.setAccounts(accountModels);
+		}
+		for (Iterator <AccountModel> it = accountModels.iterator(); it.hasNext(); ) {
+			AccountModel accountModel = it.next();
+			boolean found = findAccountModel(accountModel, pis);
+			if (!found) it.remove();
+		}
+		for (ProfileIdentities pi: pis) {
+			boolean found = findProfileIdentities(pi, accountModels);
+			if (!found) {
+				AccountModel accountModel = new AccountModel();
+				accountModel.setUserModel(userModel);
+				accountModel.setSource(pi.getHasSourceCarrier());
+				accountModel.setAccountId(pi.getHasUserAccountID());
+				accountModels.add(accountModel);
+			}
+		}
+	}
+
+	private static boolean findProfileIdentities(ProfileIdentities pi,
+			Set<AccountModel> accountModels) {
+		for (AccountModel accountModel: accountModels) {
+			if (accountModel.getAccountId().equals(pi.getHasUserAccountID()) &&
+					accountModel.getSource().equals(pi.getHasSourceCarrier())) return true;
+		}
+		return false;
+	}
+
+	private static boolean findAccountModel(AccountModel accountModel,
+			Set<ProfileIdentities> pis) {
+		for (ProfileIdentities pi: pis) {
+			if (accountModel.getAccountId().equals(pi.getHasUserAccountID()) &&
+					accountModel.getSource().equals(pi.getHasSourceCarrier())) return true;
+		}
+		return false;
 	}
 
 	private static void convertPreferenceForPersistence(
 			UserProfile userProfile, UserModel userModel, Session session) throws HibernateException {
 		// TODO Auto-generated method stub
-		
+		Preference preference = userProfile.getPreferences();
+		PreferenceModel preferenceModel = userModel.getPreferenceModel();
+		if (preference == null) {
+			if (preferenceModel != null) {
+			    userModel.setPreferenceModel(null);
+			    session.delete(preferenceModel);
+			}
+			return;
+		}
+		// TODO: save or update preferences
 	}
 
 	private static void convertKnowsForPersistence(UserProfile userProfile,

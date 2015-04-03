@@ -15,6 +15,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.CollectionOfElements;
+
 @Entity
 @Table(name = "3cixty_user_profile", uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"uid"})})
@@ -31,7 +33,7 @@ public class UserModel implements java.io.Serializable {
 	private String gender;
 	private String profileImage;
 	
-	private Set <Know> knows;
+	private Set <String> knows;
 	
 	private long lastCrawlTimeToKB;
 	private Set <AccountModel> accounts;
@@ -97,11 +99,11 @@ public class UserModel implements java.io.Serializable {
 		this.lastCrawlTimeToKB = lastCrawlTimeToKB;
 	}
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	public Set<Know> getKnows() {
+	@CollectionOfElements
+	public Set<String> getKnows() {
 		return knows;
 	}
-	public void setKnows(Set<Know> knows) {
+	public void setKnows(Set<String> knows) {
 		this.knows = knows;
 	}
 	
