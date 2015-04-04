@@ -4,6 +4,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,8 +26,6 @@ public class PreferenceModel implements java.io.Serializable {
 
 	private Integer id;
 	
-    @OneToOne
-    @JoinColumn(name = "3cixty_user_id")
 	private UserModel userModel;
 	private Set <TransportModel> transportModels;
 	
@@ -40,6 +39,8 @@ public class PreferenceModel implements java.io.Serializable {
 		this.id = id;
 	}
 	
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "3cixty_user_id")
 	public UserModel getUserModel() {
 		return userModel;
 	}

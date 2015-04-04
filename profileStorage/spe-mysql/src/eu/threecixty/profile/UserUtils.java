@@ -171,10 +171,12 @@ public class UserUtils {
 
 			session.beginTransaction();
 			
-			convertToUserModel(userProfile, userModel, session);
-		
 			session.save(userModel);
+			
+			convertToUserModel(userProfile, userModel, session);
 
+			session.update(userModel);
+			
 			session.getTransaction().commit();
 
 			added = true;
@@ -293,7 +295,6 @@ public class UserUtils {
 		if (addressModel == null) {
 			addressModel = new AddressModel();
 			addressModel.setUserModel(userModel);
-			userModel.setAddress(addressModel);
 		}
 		addressModel.setCountryName(address.getCountryName());
 		addressModel.setTownName(address.getTownName());
@@ -301,6 +302,10 @@ public class UserUtils {
 		addressModel.setPostalCode(address.getPostalCode());
 		addressModel.setLatitude(address.getLatitude());
 		addressModel.setLongitude(address.getLongitute());
+		
+		session.saveOrUpdate(addressModel);
+		
+		userModel.setAddress(addressModel);
 	}
 
 	private static void convertNameForPersistence(UserProfile userProfile,

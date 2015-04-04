@@ -4,6 +4,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,9 +37,8 @@ public class UserModel implements java.io.Serializable {
 	
 	private long lastCrawlTimeToKB;
 	private Set <AccountModel> accounts;
-	@OneToOne(mappedBy="userModel")
+
 	private AddressModel address;
-	@OneToOne(mappedBy="userModel")
 	private PreferenceModel preferenceModel;
 	
 	@Id
@@ -115,6 +115,7 @@ public class UserModel implements java.io.Serializable {
 		this.accounts = accounts;
 	}
 	
+	@OneToOne(mappedBy="userModel", cascade = CascadeType.ALL)
 	public AddressModel getAddress() {
 		return address;
 	}
@@ -122,6 +123,7 @@ public class UserModel implements java.io.Serializable {
 		this.address = address;
 	}
 	
+	@OneToOne(mappedBy="userModel", cascade = CascadeType.ALL)
 	public PreferenceModel getPreferenceModel() {
 		return preferenceModel;
 	}

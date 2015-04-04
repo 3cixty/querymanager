@@ -2,12 +2,17 @@ package eu.threecixty.userprofile;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "3cixty_address")
 public class AddressModel implements java.io.Serializable {
 
 	/**
@@ -22,8 +27,6 @@ public class AddressModel implements java.io.Serializable {
 	private String postalCode;
 	private Integer id;
 	
-    @OneToOne
-    @JoinColumn(name = "3cixty_user_id")
 	private UserModel userModel;
 	
 	@Column(name = "latitude", nullable = true)
@@ -74,6 +77,8 @@ public class AddressModel implements java.io.Serializable {
 		this.postalCode = postalCode;
 	}
 	
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "3cixty_user_id")
 	public UserModel getUserModel() {
 		return userModel;
 	}
