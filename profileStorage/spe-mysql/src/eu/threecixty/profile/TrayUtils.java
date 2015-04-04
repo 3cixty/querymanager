@@ -103,6 +103,35 @@ public class TrayUtils {
 		return tray;
 	}
 	
+	/**
+	 * Remove the corresponding with a given tray from DB.
+	 * @param tray
+	 * @return
+	 */
+	public static boolean deleteTray(Tray tray) {
+		if (tray == null) return false;
+		
+		Session session = null;
+		boolean successful = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			String hql = "DELETE TrayModel T WHERE T.uid = ? and T.elementId = ?";
+			Query query = session.createQuery(hql).setString(0, tray.getToken()).setString(1, tray.getElement_id());
+			
+			int ret = query.executeUpdate();
+			session.getTransaction().commit();
+			successful = ret == 1;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
+	}
+	
 	private static Tray convertTrayModel(TrayModel trayModel) {
 		Tray tray = new Tray();
 		tray.setToken(trayModel.getUid());

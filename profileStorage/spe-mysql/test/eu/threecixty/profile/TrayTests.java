@@ -40,9 +40,9 @@ public class TrayTests {
 	}
 	
 	@Test
-	public void testUpdateTray() {
+	public void testUpdateAndLoadTray() {
 		Tray tray = new Tray();
-		boolean attended = false;
+		boolean attended = true;
 		String title = "abc...xyz@&é";
 		String elementId = System.currentTimeMillis() + "";
 		String source = "TestSource";
@@ -65,6 +65,38 @@ public class TrayTests {
 		String newTitle = "new Title";
 		tray.setElement_title(newTitle);
 		ok = TrayUtils.updateTray(tray);
+		Assert.assertTrue(ok);
+		
+		Tray loadedTray = TrayUtils.getTray(token, elementId);
+		Assert.assertNotNull(loadedTray);
+		Assert.assertTrue(equal(tray, loadedTray));
+	}
+	
+	@Test
+	public void testDeleteTray() {
+		String newtoken = System.currentTimeMillis() + "";
+		Tray tray = new Tray();
+		boolean attended = true;
+		String title = "abc...xyz@&é";
+		String elementId = System.currentTimeMillis() + "";
+		String source = "TestSource";
+		String type = "Events";
+		String imageUrl = "fake URL";
+		String dateTimeAttended = "Fake DateTime";
+		int rating = 4;
+		tray.setToken(newtoken);
+		tray.setElement_id(elementId);
+		tray.setElement_title(title);
+		tray.setElement_type(type);
+		tray.setSource(source);
+		tray.setAttend(attended);
+		tray.setAttend_datetime(dateTimeAttended);
+		tray.setImage_url(imageUrl);
+		tray.setRating(rating);
+		boolean ok = TrayUtils.addTray(tray);
+		Assert.assertTrue(ok);
+		
+		ok = TrayUtils.deleteTray(tray);
 		Assert.assertTrue(ok);
 	}
 	
