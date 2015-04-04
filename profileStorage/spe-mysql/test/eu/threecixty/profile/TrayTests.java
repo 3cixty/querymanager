@@ -61,11 +61,29 @@ public class TrayTests {
 		Tray tray = createTray();
 		boolean ok = TrayUtils.addTray(tray);
 		Assert.assertTrue(ok);
+		Tray tray2 = createTray();
+		tray2.setToken(tray.getToken());
+		ok = TrayUtils.addTray(tray2);
+		Assert.assertTrue(ok);
 		
 		List <Tray> trays = TrayUtils.getTrays(tray.getToken());
-		Assert.assertTrue(trays.size() == 1);
+		Assert.assertTrue(trays.size() == 2);
 		Assert.assertTrue(equal(tray, trays.get(0)));
 	}
+	
+	@Test
+	public void testCleanTrays() {
+		Tray tray = createTray();
+		boolean ok = TrayUtils.addTray(tray);
+		Assert.assertTrue(ok);
+		
+		ok = TrayUtils.cleanTrays(tray.getToken());
+		Assert.assertTrue(ok);
+		
+		List <Tray> trays = TrayUtils.getTrays(tray.getToken());
+		Assert.assertTrue(trays.size() == 0);
+	}
+	
 	
 	private Tray createTray() {
 		String newtoken = System.currentTimeMillis() + "";

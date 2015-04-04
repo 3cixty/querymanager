@@ -162,8 +162,32 @@ public class TrayUtils {
 		return trays;
 	}
 	
+	/**
+	 * Cleans all the corresponding trays with a given UID.
+	 * @param uid
+	 * @return
+	 */
 	public static boolean cleanTrays(String uid) {
-		return false;
+		if (isNullOrEmpty(uid)) return false;
+		Session session = null;
+		boolean successful = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			String hql = "DELETE TrayModel T WHERE T.uid = ?";
+			Query query = session.createQuery(hql).setString(0, uid);
+			
+			int ret = query.executeUpdate();
+			session.getTransaction().commit();
+			successful = ret == 1;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
 	}
 	
 	private static Tray convertTrayModel(TrayModel trayModel) {
