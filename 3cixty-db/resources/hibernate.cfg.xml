@@ -27,5 +27,6 @@
         <mapping class="eu.threecixty.userprofile.PreferenceModel"></mapping>
         <mapping class="eu.threecixty.userprofile.TransportModel"></mapping>
         <mapping class="eu.threecixty.userprofile.UserModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.TrayModel"></mapping>
     </session-factory>
 </hibernate-configuration>
