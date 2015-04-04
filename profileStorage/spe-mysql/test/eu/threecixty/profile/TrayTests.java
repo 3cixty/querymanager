@@ -84,6 +84,24 @@ public class TrayTests {
 		Assert.assertTrue(trays.size() == 0);
 	}
 	
+	@Test
+	public void testReplaceUID() {
+		Tray tray = createTray();
+		boolean ok = TrayUtils.addTray(tray);
+		Assert.assertTrue(ok);
+		Tray tray2 = createTray();
+		tray2.setToken(tray.getToken());
+		ok = TrayUtils.addTray(tray2);
+		Assert.assertTrue(ok);
+		
+		String newToken = System.currentTimeMillis() + "";
+		
+		ok = TrayUtils.replaceUID(tray.getToken(), newToken);
+		Assert.assertTrue(ok);
+		
+		List <Tray> trays = TrayUtils.getTrays(newToken);
+		Assert.assertTrue(trays.size() == 2);
+	}
 	
 	private Tray createTray() {
 		String newtoken = System.currentTimeMillis() + "";

@@ -178,9 +178,32 @@ public class TrayUtils {
 			String hql = "DELETE TrayModel T WHERE T.uid = ?";
 			Query query = session.createQuery(hql).setString(0, uid);
 			
-			int ret = query.executeUpdate();
+			query.executeUpdate();
 			session.getTransaction().commit();
-			successful = ret == 1;
+			successful = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
+	}
+	
+	public static boolean replaceUID(String junkID, String uid) {
+		if (isNullOrEmpty(uid) || isNullOrEmpty(junkID)) return false;
+		Session session = null;
+		boolean successful = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			String hql = "UPDATE TrayModel T SET T.uid = ? WHERE T.uid = ?";
+			Query query = session.createQuery(hql).setString(0, uid).setString(1, junkID);
+			
+			query.executeUpdate();
+			session.getTransaction().commit();
+			successful = true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 			session.getTransaction().rollback();
