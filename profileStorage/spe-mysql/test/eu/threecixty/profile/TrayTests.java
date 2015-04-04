@@ -8,7 +8,7 @@ public class TrayTests {
 	String token = "123456789";
 
 	@Test
-	public void testAddTray() {
+	public void testAddAndLoadTray() {
 		Tray tray = new Tray();
 		boolean attended = false;
 		String title = "abc...xyz@&é";
@@ -33,6 +33,10 @@ public class TrayTests {
 		// try to add the second time, should fail
 		ok = TrayUtils.addTray(tray);
 		Assert.assertFalse(ok);
+		
+		Tray loadedTray = TrayUtils.getTray(token, elementId);
+		Assert.assertNotNull(loadedTray);
+		Assert.assertTrue(equal(tray, loadedTray));
 	}
 	
 	@Test
@@ -58,8 +62,28 @@ public class TrayTests {
 		boolean ok = TrayUtils.addTray(tray);
 		Assert.assertTrue(ok);
 		
-		// try to add the second time, should fail
-		ok = TrayUtils.addTray(tray);
-		Assert.assertFalse(ok);
+		String newTitle = "new Title";
+		tray.setElement_title(newTitle);
+		ok = TrayUtils.updateTray(tray);
+		Assert.assertTrue(ok);
+	}
+	
+	private boolean equal(Tray tray1, Tray tray2) {
+		if (!tray1.getToken().equals(tray2.getToken())) return false;
+		if (!equalStr(tray1.getElement_id(), tray2.getElement_id())) return false;
+		if (!equalStr(tray1.getElement_title(), tray2.getElement_title())) return false;
+		if (!equalStr(tray1.getElement_type(), tray2.getElement_type())) return false;
+		if (!equalStr(tray1.getImage_url(), tray2.getImage_url())) return false;
+		if (!equalStr(tray1.getSource(), tray2.getSource())) return false;
+		if (tray1.getRating() != tray2.getRating()) return false;
+		if (tray1.isAttend() != tray2.isAttend()) return false; 
+		return true;
+	}
+	
+	private boolean equalStr(String str1, String str2) {
+		if (str1 == null && str2 != null) return false;
+		if (str2 == null && str1 != null) return false;
+		if (str1 == null && str2 == null) return true;
+		return str1.equals(str2);
 	}
 }

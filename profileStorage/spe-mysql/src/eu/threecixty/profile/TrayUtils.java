@@ -45,7 +45,7 @@ public class TrayUtils {
 	}
 	
 	/**
-	 * Update a given tray.
+	 * Updates a given tray.
 	 * @param tray
 	 * @return
 	 */
@@ -74,12 +74,56 @@ public class TrayUtils {
 		return successful;
 	}
 	
+	/**
+	 * Loads the corresponding tray with a given UID and element ID.
+	 * @param uid
+	 * @param elementId
+	 * @return
+	 */
+	public static Tray getTray(String uid, String elementId) {
+		if (isNullOrEmpty(uid) || isNullOrEmpty(elementId)) return null;
+		Tray tray = null;
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM TrayModel T WHERE T.uid = ? and T.elementId = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, uid).setString(1, elementId).list();
+			
+			if (results.size() > 0) {
+				TrayModel trayModel = (TrayModel) results.get(0);
+				tray = convertTrayModel(trayModel);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return tray;
+	}
+	
+	private static Tray convertTrayModel(TrayModel trayModel) {
+		Tray tray = new Tray();
+		tray.setToken(trayModel.getUid());
+		tray.setAttend(trayModel.isAttended());
+		tray.setAttend_datetime(trayModel.getAttend_dateTime());
+		tray.setElement_id(trayModel.getElementId());
+		tray.setElement_title(trayModel.getTitle());
+		tray.setElement_type(trayModel.getType());
+		tray.setImage_url(trayModel.getImageUrl());
+		tray.setRating(trayModel.getRating());
+		tray.setSource(trayModel.getSource());
+		tray.setTimestamp(trayModel.getTimestamp());
+		return tray;
+	}
+
 	private static TrayModel convertTray(Tray tray) {
 		TrayModel trayModel = new TrayModel();
 		trayModel.setElementId(tray.getElement_id());
 		trayModel.setTitle(tray.getElement_title());
 		trayModel.setSource(tray.getSource());
-		trayModel.setType(tray.getSource());
+		trayModel.setType(tray.getElement_type());
 		trayModel.setAttended(tray.isAttend());
 		trayModel.setAttend_dateTime(tray.getAttend_datetime());
 		trayModel.setTimestamp(System.currentTimeMillis());
@@ -113,6 +157,10 @@ public class TrayUtils {
 			if (session != null) session.close();
 		}
 		return ret;
+	}
+	
+	private static boolean isNullOrEmpty(String str) {
+		return str == null || str.equals("");
 	}
 	
 	private TrayUtils() {
