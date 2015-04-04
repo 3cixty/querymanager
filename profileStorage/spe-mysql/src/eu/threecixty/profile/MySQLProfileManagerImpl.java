@@ -149,8 +149,7 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public TrayManager getTrayManager() {
-		// TODO Auto-generated method stub
-		return null;
+		return MySQLTrayManager.getInstance();
 	}
 
 	public boolean saveProfile(UserProfile userProfile, Map<String, Boolean> arg1)
