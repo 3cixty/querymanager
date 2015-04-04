@@ -8,98 +8,98 @@ import org.junit.Test;
 public class TrayTests {
 
 	@Test
-	public void testAddAndLoadTray() {
+	public void testAddAndLoadTray() throws Exception {
 		Tray tray = createTray();
-		boolean ok = TrayUtils.addTray(tray);
+		boolean ok = MySQLTrayManager.getInstance().addTray(tray);
 		Assert.assertTrue(ok);
 		String elementId = tray.getElement_id();
 		// try to add the second time, should fail
-		ok = TrayUtils.addTray(tray);
+		ok = MySQLTrayManager.getInstance().addTray(tray);
 		Assert.assertFalse(ok);
 		
 		String token = tray.getToken();
 		
-		Tray loadedTray = TrayUtils.getTray(token, elementId);
+		Tray loadedTray = MySQLTrayManager.getInstance().getTray(token, elementId);
 		Assert.assertNotNull(loadedTray);
 		Assert.assertTrue(equal(tray, loadedTray));
 	}
 	
 	@Test
-	public void testUpdateAndLoadTray() {
+	public void testUpdateAndLoadTray() throws Exception {
 		Tray tray = createTray();
-		boolean ok = TrayUtils.addTray(tray);
+		boolean ok = MySQLTrayManager.getInstance().addTray(tray);
 		Assert.assertTrue(ok);
 		String elementId = tray.getElement_id();
 		
 		String newTitle = "new Title";
 		tray.setElement_title(newTitle);
-		ok = TrayUtils.updateTray(tray);
+		ok = MySQLTrayManager.getInstance().updateTray(tray);
 		Assert.assertTrue(ok);
 		String token = tray.getToken();
-		Tray loadedTray = TrayUtils.getTray(token, elementId);
+		Tray loadedTray = MySQLTrayManager.getInstance().getTray(token, elementId);
 		Assert.assertNotNull(loadedTray);
 		Assert.assertTrue(equal(tray, loadedTray));
 	}
 	
 	@Test
-	public void testDeleteTray() {
+	public void testDeleteTray() throws Exception {
 		Tray tray = createTray();
 		String token = tray.getToken();
-		boolean ok = TrayUtils.addTray(tray);
+		boolean ok = MySQLTrayManager.getInstance().addTray(tray);
 		Assert.assertTrue(ok);
 		
-		ok = TrayUtils.deleteTray(tray);
+		ok = MySQLTrayManager.getInstance().deleteTray(tray);
 		Assert.assertTrue(ok);
 
-		List <Tray> trays = TrayUtils.getTrays(token);
+		List <Tray> trays = MySQLTrayManager.getInstance().getTrays(token);
 		Assert.assertTrue(trays.size() == 0);
 	}
 	
 	@Test
-	public void testGetTrays() {
+	public void testGetTrays() throws Exception {
 		
 		Tray tray = createTray();
-		boolean ok = TrayUtils.addTray(tray);
+		boolean ok = MySQLTrayManager.getInstance().addTray(tray);
 		Assert.assertTrue(ok);
 		Tray tray2 = createTray();
 		tray2.setToken(tray.getToken());
-		ok = TrayUtils.addTray(tray2);
+		ok = MySQLTrayManager.getInstance().addTray(tray2);
 		Assert.assertTrue(ok);
 		
-		List <Tray> trays = TrayUtils.getTrays(tray.getToken());
+		List <Tray> trays = MySQLTrayManager.getInstance().getTrays(tray.getToken());
 		Assert.assertTrue(trays.size() == 2);
 		Assert.assertTrue(equal(tray, trays.get(0)));
 	}
 	
 	@Test
-	public void testCleanTrays() {
+	public void testCleanTrays() throws Exception {
 		Tray tray = createTray();
-		boolean ok = TrayUtils.addTray(tray);
+		boolean ok = MySQLTrayManager.getInstance().addTray(tray);
 		Assert.assertTrue(ok);
 		
-		ok = TrayUtils.cleanTrays(tray.getToken());
+		ok = MySQLTrayManager.getInstance().cleanTrays(tray.getToken());
 		Assert.assertTrue(ok);
 		
-		List <Tray> trays = TrayUtils.getTrays(tray.getToken());
+		List <Tray> trays = MySQLTrayManager.getInstance().getTrays(tray.getToken());
 		Assert.assertTrue(trays.size() == 0);
 	}
 	
 	@Test
-	public void testReplaceUID() {
+	public void testReplaceUID() throws Exception {
 		Tray tray = createTray();
-		boolean ok = TrayUtils.addTray(tray);
+		boolean ok = MySQLTrayManager.getInstance().addTray(tray);
 		Assert.assertTrue(ok);
 		Tray tray2 = createTray();
 		tray2.setToken(tray.getToken());
-		ok = TrayUtils.addTray(tray2);
+		ok = MySQLTrayManager.getInstance().addTray(tray2);
 		Assert.assertTrue(ok);
 		
 		String newToken = System.currentTimeMillis() + "";
 		
-		ok = TrayUtils.replaceUID(tray.getToken(), newToken);
+		ok = MySQLTrayManager.getInstance().replaceUID(tray.getToken(), newToken);
 		Assert.assertTrue(ok);
 		
-		List <Tray> trays = TrayUtils.getTrays(newToken);
+		List <Tray> trays = MySQLTrayManager.getInstance().getTrays(newToken);
 		Assert.assertTrue(trays.size() == 2);
 	}
 	
