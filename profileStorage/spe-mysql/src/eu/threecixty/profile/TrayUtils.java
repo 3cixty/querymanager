@@ -133,6 +133,11 @@ public class TrayUtils {
 		return successful;
 	}
 	
+	/**
+	 * Gets the corresponding trays with a given UID.
+	 * @param uid
+	 * @return
+	 */
 	public static List <Tray> getTrays(String uid) {
 		List <Tray> trays = new LinkedList <Tray>();
 		if (isNullOrEmpty(uid)) return trays;
@@ -155,6 +160,10 @@ public class TrayUtils {
 			if (session != null) session.close();
 		}
 		return trays;
+	}
+	
+	public static boolean cleanTrays(String uid) {
+		return false;
 	}
 	
 	private static Tray convertTrayModel(TrayModel trayModel) {
