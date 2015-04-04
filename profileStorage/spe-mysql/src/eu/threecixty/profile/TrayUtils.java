@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -130,6 +131,30 @@ public class TrayUtils {
 			if (session != null) session.close();
 		}
 		return successful;
+	}
+	
+	public static List <Tray> getTrays(String uid) {
+		List <Tray> trays = new LinkedList <Tray>();
+		if (isNullOrEmpty(uid)) return trays;
+		
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM TrayModel T WHERE T.uid = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, uid).list();
+			for (Object obj: results) {
+				TrayModel trayModel = (TrayModel) obj;
+				Tray tray = convertTrayModel(trayModel);
+				trays.add(tray);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return trays;
 	}
 	
 	private static Tray convertTrayModel(TrayModel trayModel) {

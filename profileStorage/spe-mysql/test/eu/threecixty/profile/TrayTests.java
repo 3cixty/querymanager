@@ -1,5 +1,7 @@
 package eu.threecixty.profile;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -98,6 +100,35 @@ public class TrayTests {
 		
 		ok = TrayUtils.deleteTray(tray);
 		Assert.assertTrue(ok);
+	}
+	
+	@Test
+	public void testGetTrays() {
+		String newtoken = System.currentTimeMillis() + "";
+		Tray tray = new Tray();
+		boolean attended = true;
+		String title = "abc...xyz@&é";
+		String elementId = System.currentTimeMillis() + "";
+		String source = "TestSource";
+		String type = "Events";
+		String imageUrl = "fake URL";
+		String dateTimeAttended = "Fake DateTime";
+		int rating = 4;
+		tray.setToken(newtoken);
+		tray.setElement_id(elementId);
+		tray.setElement_title(title);
+		tray.setElement_type(type);
+		tray.setSource(source);
+		tray.setAttend(attended);
+		tray.setAttend_datetime(dateTimeAttended);
+		tray.setImage_url(imageUrl);
+		tray.setRating(rating);
+		boolean ok = TrayUtils.addTray(tray);
+		Assert.assertTrue(ok);
+		
+		List <Tray> trays = TrayUtils.getTrays(newtoken);
+		Assert.assertTrue(trays.size() == 1);
+		Assert.assertTrue(equal(tray, trays.get(0)));
 	}
 	
 	private boolean equal(Tray tray1, Tray tray2) {
