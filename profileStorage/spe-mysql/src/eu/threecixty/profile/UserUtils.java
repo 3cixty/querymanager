@@ -110,6 +110,7 @@ public class UserUtils {
 			if (results.size() > 0) {
 				UserModel userModel = (UserModel) results.get(0);
 				userProfile = convertToUserProfile(userModel);
+				userProfile.setModelIdInPersistentDB(userModel.getId());
 			}
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
