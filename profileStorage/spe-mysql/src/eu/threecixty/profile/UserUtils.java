@@ -205,7 +205,7 @@ public class UserUtils {
 	}
 
 	private static void convertAccountsForPersistence(UserProfile userProfile,
-			UserModel userModel, Session session) {
+			UserModel userModel, Session session) throws HibernateException {
 		Set <ProfileIdentities> pis = userProfile.getHasProfileIdenties();
 		Set <AccountModel> accountModels = userModel.getAccounts();
 		if (pis == null || pis.size() == 0) {
@@ -221,7 +221,10 @@ public class UserUtils {
 		for (Iterator <AccountModel> it = accountModels.iterator(); it.hasNext(); ) {
 			AccountModel accountModel = it.next();
 			boolean found = findAccountModel(accountModel, pis);
-			if (!found) it.remove();
+			if (!found) {
+				it.remove();
+				session.delete(accountModel);
+			}
 		}
 		for (ProfileIdentities pi: pis) {
 			boolean found = findProfileIdentities(pi, accountModels);
@@ -231,6 +234,7 @@ public class UserUtils {
 				accountModel.setSource(pi.getHasSourceCarrier());
 				accountModel.setAccountId(pi.getHasUserAccountID());
 				accountModels.add(accountModel);
+				session.save(accountModel);
 			}
 		}
 	}
