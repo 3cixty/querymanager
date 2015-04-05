@@ -41,7 +41,7 @@ public class NearbyServices {
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Server is too busy at the moment. Please try it later").build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
 		}
 	}
 	
@@ -65,7 +65,7 @@ public class NearbyServices {
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Server is too busy at the moment. Please try it later").build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class NearbyServices {
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Server is too busy at the moment. Please try it later").build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class NearbyServices {
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Server is too busy at the moment. Please try it later").build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
 		}
 	}
 }

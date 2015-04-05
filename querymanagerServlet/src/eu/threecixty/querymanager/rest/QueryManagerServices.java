@@ -43,7 +43,6 @@ import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UnknownException;
 import eu.threecixty.profile.UserProfile;
-import eu.threecixty.profile.VirtuosoManager;
 import eu.threecixty.querymanager.EventMediaFormat;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
@@ -153,12 +152,12 @@ public class QueryManagerServices {
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				} catch (TooManyConnections e) {
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				} catch (UnknownException e) {
-					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
@@ -215,8 +214,8 @@ public class QueryManagerServices {
 							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 				} catch (IOException e) {
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -271,8 +270,8 @@ public class QueryManagerServices {
 				return Response.ok(result.toString(), MediaType.APPLICATION_JSON_TYPE ).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -300,8 +299,8 @@ public class QueryManagerServices {
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -330,8 +329,8 @@ public class QueryManagerServices {
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -386,8 +385,8 @@ public class QueryManagerServices {
 					return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (IOException e) {
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -430,8 +429,8 @@ public class QueryManagerServices {
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -499,7 +498,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -578,7 +577,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -643,7 +642,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -709,7 +708,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -766,8 +765,8 @@ public class QueryManagerServices {
 					return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -818,8 +817,8 @@ public class QueryManagerServices {
 				} catch (IOException e) {
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -850,8 +849,8 @@ public class QueryManagerServices {
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -888,8 +887,8 @@ public class QueryManagerServices {
 			} catch (IOException e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}

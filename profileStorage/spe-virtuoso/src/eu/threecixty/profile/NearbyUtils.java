@@ -93,7 +93,7 @@ public class NearbyUtils {
 		builder.append("}} \n");
 		
         StringBuilder resultBuilder = new StringBuilder();
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(builder.toString(), "application/sparql-results+json", resultBuilder); 
+		SparqlEndPointUtils.executeQueryViaSPARQL(builder.toString(), "application/sparql-results+json", resultBuilder); 
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
@@ -228,7 +228,7 @@ public class NearbyUtils {
 		System.out.println(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -251,7 +251,7 @@ public class NearbyUtils {
 	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json", resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");

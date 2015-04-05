@@ -37,7 +37,6 @@ import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.Tray.OrderType;
-import eu.threecixty.profile.VirtuosoManager;
 
 /**
  * This class is an end point to expose Rest TrayAPIs to other components.
@@ -171,7 +170,12 @@ public class TrayServices {
     						.type(MediaType.TEXT_PLAIN_TYPE)
     						.build();
     			} catch (TooManyConnections e) {
-    				return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+    				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    						.entity(e.getMessage())
+    						.type(MediaType.TEXT_PLAIN_TYPE)
+    						.build();
+				} catch (IOException e) {
+    				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
     						.entity(e.getMessage())
     						.type(MediaType.TEXT_PLAIN_TYPE)
     						.build();
@@ -383,7 +387,7 @@ public class TrayServices {
 	}
 	
 	private Response get_tray_elements_details(RestTrayObject restTray, Request req, long starttime)
-			throws ThreeCixtyPermissionException, InvalidTrayElement, TooManyConnections {
+			throws ThreeCixtyPermissionException, InvalidTrayElement, TooManyConnections, IOException {
 		List <Tray> trays = getTrayElements(restTray);
 		if (trays == null) {
 			CallLoggingManager.getInstance().save(restTray.getKey(), starttime, CallLoggingConstants.TRAY_GET_SERVICE, CallLoggingConstants.FAILED);
@@ -400,11 +404,7 @@ public class TrayServices {
 	         cc.setMaxAge(86400);
 			if (rb == null) { // changed
 				List <ElementDetails> trayDetailsList = new ArrayList <ElementDetails>();
-				try {
-					findTrayDetails(trays, trayDetailsList, restTray);
-				} catch (IOException e) {
-					throw new TooManyConnections(VirtuosoManager.BUSY_EXCEPTION);
-				}
+				findTrayDetails(trays, trayDetailsList, restTray);
 				String content = JSONObject.wrap(trayDetailsList).toString();
 				
 				if (DEBUG_MOD) LOGGER.info(content);

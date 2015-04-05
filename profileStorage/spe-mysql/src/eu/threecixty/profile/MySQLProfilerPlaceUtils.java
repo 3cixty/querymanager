@@ -1,9 +1,6 @@
 package eu.threecixty.profile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,8 +29,6 @@ public class MySQLProfilerPlaceUtils {
 	private static final String FROM_PLACE_RATINGS_GRAPH = "FROM <http://3cixty.com/placesRating>\n";
 	private static final String FROM_USERPROFILE_MANUAL_GRAPH = "FROM <http://3cixty.com/userprofile>\n";
 	
-	private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
-	private static final String LOCN_PREFIX = "PREFIX locn: <http://www.w3.org/ns/locn#> ";
 	private static final String JSON_APP_FORMAT = "application/sparql-results+json";
 	
 	private static final Logger LOGGER = Logger.getLogger(
@@ -116,29 +111,13 @@ public class MySQLProfilerPlaceUtils {
 
 	    return getPlaceIdsFromQuery(buffer.toString());
 	}
-	
-	public static void executeQueryViaSPARQL(String query, String format,
-			StringBuilder result) throws IOException {
-		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(LOCN_PREFIX + query, "UTF-8");
-		urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
-
-		URL url = new URL(urlStr);
-
-		InputStream input = url.openStream();
-		byte [] b = new byte[1024];
-		int readBytes = 0;
-		while ((readBytes = input.read(b)) >= 0) {
-			result.append(new String(b, 0, readBytes, "UTF-8"));
-		}
-		input.close();
-	}
 
 	private static List<String> getPlaceIdsFromQuery(
 			String qStr) throws IOException, UnknownException {
 	    
 		List <String> placeNames = new ArrayList <String>();
 		StringBuilder result = new StringBuilder();
-		executeQueryViaSPARQL(qStr, JSON_APP_FORMAT, result);
+		SparqlEndPointUtils.executeQueryViaSPARQL(qStr, JSON_APP_FORMAT, result);
 		JSONObject jsonObj;
 
 		jsonObj = new JSONObject(result.toString());

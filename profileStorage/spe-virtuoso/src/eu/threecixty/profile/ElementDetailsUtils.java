@@ -90,10 +90,10 @@ public class ElementDetailsUtils {
 
 		StringBuilder result = new StringBuilder();
 		
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", result);
+		SparqlEndPointUtils.executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", result);
 
 		JSONObject json = new JSONObject(
-				VirtuosoManager.getInstance().cleanResultReceivedFromVirtuoso(result.toString()));
+				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
 		if (len < 1) return null;
@@ -194,10 +194,10 @@ public class ElementDetailsUtils {
 		
 		StringBuilder result = new StringBuilder();
 		
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", result);
+		SparqlEndPointUtils.executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", result);
 
 		JSONObject json = new JSONObject(
-				VirtuosoManager.getInstance().cleanResultReceivedFromVirtuoso(result.toString()));
+				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
 		if (len < 1) return null;

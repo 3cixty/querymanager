@@ -2,9 +2,6 @@ package eu.threecixty.profile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -26,7 +23,6 @@ import virtuoso.jena.driver.VirtuosoUpdateRequest;
 public class VirtuosoManager {
 	
 	private static final String PREFIX_EACH_USER_PROFILE_GRAPH = "http://3cixty.com/private/";
-	private static final String LOCN_PREFIX = "PREFIX locn: <http://www.w3.org/ns/locn#> ";
 	
 	
 	 private static final Logger LOGGER = Logger.getLogger(
@@ -34,8 +30,6 @@ public class VirtuosoManager {
 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
-	 
-	 private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 	 
 	 //private static final Semaphore SEMAPHORE = new Semaphore(100, true); // TODO: to be put in a property file
 	 
@@ -134,25 +128,6 @@ public class VirtuosoManager {
 	
 	public String getGraph(String uid) {
 		return PREFIX_EACH_USER_PROFILE_GRAPH;
-	}
-
-	public void executeQueryViaSPARQL(String query, String format, StringBuilder result) throws IOException {
-		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(LOCN_PREFIX + query, "UTF-8");
-		urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
-
-		URL url = new URL(urlStr);
-
-		InputStream input = url.openStream();
-		byte [] b = new byte[1024];
-		int readBytes = 0;
-		while ((readBytes = input.read(b)) >= 0) {
-			result.append(new String(b, 0, readBytes, "UTF-8"));
-		}
-		input.close();
-	}
-	
-	public String cleanResultReceivedFromVirtuoso(String result) {
-		return result.replace("\\U", "\\u");
 	}
 	
 	private JSONObject executeQuery(String queryStr, VirtGraph virtGraph) {
