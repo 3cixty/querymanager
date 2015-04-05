@@ -182,6 +182,7 @@ public class UserUtils {
 		List <String> googleUids = new LinkedList <String>();
 		Session session = null;
 		try {
+			// TODO: should take into account of accompanying model ? 
 			String hql = "From AccountModel A WHERE A.userModel.uid in (:uids) AND A.source = :source";
 			session = HibernateUtil.getSessionFactory().openSession();
 			List <?> results = session.createQuery(hql).setParameterList("uids",

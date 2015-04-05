@@ -55,18 +55,21 @@ class TransportUtils {
 	 * @param session
 	 * @throws HibernateException
 	 */
-	protected static void convertTransportForPersistence(Transport transport, TransportModel transportModel, Session session) throws HibernateException {
-		// TODO
+	protected static void convertTransportForPersistence(Transport transport,
+			TransportModel transportModel, Session session) throws HibernateException {
 		Set <Accompanying> accompanying = transport.getHasAccompanyings();
 		if (accompanying == null || accompanying.size()==0) {
-			Set <AccompanyingModel> accompanyingModel = transportModel.getAccompanyings();
-			session.delete(accompanyingModel);
-			transportModel.setAccompanyings(null);
+			Set <AccompanyingModel> accompanyingModels = transportModel.getAccompanyings();
+			if (accompanyingModels != null && accompanyingModels.size() > 0) {
+				accompanyingModels.clear();
+				transportModel.setAccompanyings(accompanyingModels);
+			}
 			return;
 		}
-		Set <AccompanyingModel> accompanyingModel = transportModel.getAccompanyings();
-		if (accompanyingModel == null) {
-			accompanyingModel = new HashSet <AccompanyingModel>();
+		Set <AccompanyingModel> accompanyingModels = transportModel.getAccompanyings();
+		if (accompanyingModels == null) {
+			accompanyingModels = new HashSet <AccompanyingModel>();
+			transportModel.setAccompanyings(accompanyingModels);
 		}
 		
 		Iterator <Accompanying> iterators = accompanying.iterator();
@@ -82,11 +85,11 @@ class TransportUtils {
 				singleAccompanyingModel.setAccompanyTime(singleAccompanying.getHasAccompanyTime());
 				singleAccompanyingModel.setHasAccompanyUserid1ST(singleAccompanying.getHasAccompanyUserid1ST());
 				singleAccompanyingModel.setHasAccompanyUserid2ST(singleAccompanying.getHasAccompanyUserid2ST());
-				
-				accompanyingModel.add(singleAccompanyingModel);	
+				singleAccompanyingModel.setTransportModel(transportModel);
+				session.save(singleAccompanyingModel);
+				accompanyingModels.add(singleAccompanyingModel);	
 			}
 		}
-		transportModel.setAccompanyings(accompanyingModel);
 	}
 	
 	private TransportUtils() {
