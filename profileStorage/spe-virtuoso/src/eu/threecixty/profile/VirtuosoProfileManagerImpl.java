@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -275,7 +276,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String find3cixtyUID(String uid, String profileImage) {
+	public String find3cixtyUID(String uid, String source, String profileImage) {
 		StringBuilder qStr = new StringBuilder(Configuration.PREFIXES);
 	    qStr.append("\nSELECT  DISTINCT *\n");
 	    qStr.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + "> \n");
@@ -325,8 +326,10 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public Set<String> find3cixtyUIDs(List<String> accountIds, String source) {
+	public Set<String> find3cixtyUIDs(List<String> accountIds, String source,
+			List <String> unfoundAccountIds) {
 		//XXX: This function only works for Google & Facebook account
+		// so, unfoundAccountIds list is always empty
 		Set <String> _3cixtyUIDs = new HashSet <String>();
 		for (String accountId: accountIds) {
 			String _3cixtyUid = Utils.gen3cixtyUID(accountId,
@@ -335,5 +338,18 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 			_3cixtyUIDs.add(_3cixtyUid);
 		}
 		return _3cixtyUIDs;
+	}
+
+	@Override
+	public boolean createProfiles(List<UserProfile> arg0) throws IOException,
+			UnknownException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public UserProfile findUserProfile(String arg0, String arg1, String arg2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

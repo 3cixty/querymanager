@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -243,18 +244,40 @@ public interface ProfileManager {
 	 * Finds 3cixty UID from a given UDI (Google or Facebook), and a given profile image.
 	 *
 	 * @param uid
+	 * @param source
 	 * @param profileImage
 	 * @return
 	 */
-	String find3cixtyUID(String uid, String profileImage);
+	String find3cixtyUID(String uid, String source, String profileImage);
 	
 	/**
 	 * Finds the corresponding 3cixty UIDs from a given list of account IDs and source.
 	 * @param accountIds
 	 * @param source
+	 * @param unfoundAccountIds
 	 * @return
 	 */
-	Set <String> find3cixtyUIDs(List <String> accountIds, String source);
+	Set <String> find3cixtyUIDs(List <String> accountIds, String source,
+			List <String> unfoundAccountIds);
+	
+	/**
+	 * Creates user profiles.
+	 * @param userProfiles
+	 * @return
+	 * @throws IOException
+	 * @throws UnknownException
+	 */
+	boolean createProfiles(List <UserProfile> userProfiles) throws IOException, UnknownException;
+	
+	/**
+	 * Finds the corresponding user profile with a given external
+	 * (Facebook, Google) uid, source, and profile image.
+	 * @param uid
+	 * @param source
+	 * @param profileImage
+	 * @return
+	 */
+	UserProfile findUserProfile(String uid, String source, String profileImage);
 	
 	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.

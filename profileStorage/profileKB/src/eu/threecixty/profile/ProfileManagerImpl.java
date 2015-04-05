@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -215,14 +216,30 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public String find3cixtyUID(String uid, String profileImage) {
-		if (profileManager != null) return profileManager.find3cixtyUID(uid, profileImage);
+	public String find3cixtyUID(String uid, String source, String profileImage) {
+		if (profileManager != null) return profileManager.find3cixtyUID(uid, source, profileImage);
 		return null;
 	}
 
 	@Override
-	public Set<String> find3cixtyUIDs(List<String> accountIds, String source) {
-		if (profileManager != null) return profileManager.find3cixtyUIDs(accountIds, source);
+	public Set<String> find3cixtyUIDs(List<String> accountIds, String source,
+			List <String> unfoundAccountIds) {
+		if (profileManager != null) return profileManager.find3cixtyUIDs(
+				accountIds, source, unfoundAccountIds);
+		return null;
+	}
+
+	@Override
+	public boolean createProfiles(List<UserProfile> userProfiles)
+			throws IOException, UnknownException {
+		if (profileManager != null) return profileManager.createProfiles(userProfiles);
+		return false;
+	}
+	
+	@Override
+	public UserProfile findUserProfile(String uid, String source,
+			String profileImage) {
+		if (profileManager != null) return profileManager.findUserProfile(uid, source, profileImage);
 		return null;
 	}
 	

@@ -16,17 +16,15 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	private static final float DEFAULT_MINIMUM_SCORE_RATED = 3;
 
 	public boolean checkAttributeToStore(Map<String, Boolean> arg0, String arg1) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	public boolean existUID(String _3cixtyUid) throws TooManyConnections {
 		return UserUtils.exists(_3cixtyUid);
 	}
 
-	public String find3cixtyUID(String uid, String profileImage) {
-		// TODO: need to refactor code with source
-		return UserUtils.find3cixtyUID(uid, null, profileImage);
+	public String find3cixtyUID(String uid, String source, String profileImage) {
+		return UserUtils.find3cixtyUID(uid, source, profileImage);
 	}
 
 	public List<UserProfile> getAllUserProfiles() {
@@ -158,8 +156,18 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return UserUtils.saveUserProfile(userProfile);
 	}
 
-	public Set<String> find3cixtyUIDs(List<String> accountIds, String source) {
-		return UserUtils.find3cixtyUIDs(accountIds, source);
+	public Set<String> find3cixtyUIDs(List<String> accountIds, String source,
+			List <String> unfoundAccountIds) {
+		return UserUtils.find3cixtyUIDs(accountIds, source, unfoundAccountIds);
+	}
+
+	public boolean createProfiles(List<UserProfile> profiles) throws IOException,
+			UnknownException {
+		return UserUtils.createProfiles(profiles);
+	}
+
+	public UserProfile findUserProfile(String uid, String source, String profileImage) {
+		return UserUtils.findUserProfile(uid, source, profileImage);
 	}
 
 }

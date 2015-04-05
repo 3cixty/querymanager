@@ -1,6 +1,8 @@
 package eu.threecixty.profile;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +25,7 @@ public class FaceBookAccountUtils {
 	private static final String FACEBOOK_PROFILE_IMAGE_PREFIX = "https://graph.facebook.com/v2.2/me/picture?access_token=";
 	private static final String FACEBOOK_FRIENDS_PREFIX = "https://graph.facebook.com/v2.2/me/friends?fields=id&format=json&method=get&pretty=0&suppress_http_code=1&access_token=";
 
+	public static final String FACEBOOK_SOURCE = "Facebook";
 
 	public static String getUID(String accessToken, int width, int height) {
 		if (accessToken == null) return "";
@@ -41,13 +44,17 @@ public class FaceBookAccountUtils {
 			//       2. need to check email to know whether or not there is a profile corresponding with this uid
 			// The following code is supposed that FaceBook info is independent with Google info.
 			
-			//String _3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
-			String _3cixtyUID = ProfileManagerImpl.getInstance().find3cixtyUID(uid, picture);
-			if (_3cixtyUID == null) _3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
+			String _3cixtyUID = null;
 			
-			Map <String, Boolean> attrsToLoad = Utils.getAttributesToLoadProfileFromGoogleFB();
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, attrsToLoad);
-			profile.setHasUID(_3cixtyUID);
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(uid, FACEBOOK_SOURCE, picture);
+			if (profile == null) {
+				_3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
+				profile = new UserProfile();
+				profile.setHasUID(_3cixtyUID);
+			} else {
+				_3cixtyUID = profile.getHasUID();
+			}
+			
 			if (picture != null) profile.setProfileImage(picture);
 			Name name = new Name();
 			profile.setHasName(name);
@@ -63,11 +70,13 @@ public class FaceBookAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			Utils.setProfileIdentities(_3cixtyUID, uid, "Facebook", profileIdentities);
+			Utils.setProfileIdentities(_3cixtyUID, uid, FACEBOOK_SOURCE, profileIdentities);
 			
-			Set <String> knows = new HashSet <String>(); // always refresh 'knows'
+			List <String> fUIDsFromFriends = new LinkedList<String>();
 			
-			findKnows(FACEBOOK_FRIENDS_PREFIX, accessToken, knows);
+			findFacebookUidsFromFriends(FACEBOOK_FRIENDS_PREFIX, accessToken, fUIDsFromFriends);
+			
+			Set <String> knows = Utils.getOrCreate3cixtyUIDsForKnows(fUIDsFromFriends, FACEBOOK_SOURCE);
 
 			profile.setKnows(knows);
 			
@@ -84,7 +93,8 @@ public class FaceBookAccountUtils {
 	
 
 
-	private static void findKnows(String url, String accessToken, Set <String> knowsResult) {
+	private static void findFacebookUidsFromFriends(String url, String accessToken,
+			List <String> facebookUidsFromFriends) {
 		// XXX: Note: we can only get friends' UID if your friends and you are using 3cixty.
 		// We can consider using 'taggable_friends' or 'invitable_friends' to get friends' UID,
 		// but to be considered later when we have time
@@ -96,13 +106,12 @@ public class FaceBookAccountUtils {
 			if (len == 0) return;
 			for (int i = 0; i < len; i++) {
 				JSONObject tmpJson = arr.getJSONObject(i);
-				String know = ProfileManagerImpl.getInstance().find3cixtyUID(tmpJson.getString("id"), null);
-				if (know == null) know = Utils.gen3cixtyUID(tmpJson.getString("id"), Utils.UidSource.FACEBOOK);
-				if (knowsResult.contains(know)) continue;
-				knowsResult.add(know);
+				String fUID = tmpJson.getString("id");
+				if (facebookUidsFromFriends.contains(fUID)) continue;
+				facebookUidsFromFriends.add(fUID);
 			}
 			String nextURL = json.getJSONObject("paging").getString("next");
-			findKnows(nextURL + "&access_token=", accessToken, knowsResult);
+			findFacebookUidsFromFriends(nextURL + "&access_token=", accessToken, facebookUidsFromFriends);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

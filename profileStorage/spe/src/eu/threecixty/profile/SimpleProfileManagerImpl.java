@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -218,7 +219,7 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String find3cixtyUID(String arg0, String arg2) {
+	public String find3cixtyUID(String arg0, String source, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -229,7 +230,20 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public Set<String> find3cixtyUIDs(List<String> arg0, String arg1) {
+	public Set<String> find3cixtyUIDs(List<String> arg0, String arg1, List <String> unfoundAccountIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean createProfiles(List<UserProfile> arg0) throws IOException,
+			UnknownException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public UserProfile findUserProfile(String arg0, String arg1, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}

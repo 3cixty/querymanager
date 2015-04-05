@@ -257,14 +257,14 @@ public class UserProfileTests {
 		List <String> googleUids = new LinkedList<String>();
 		googleUids.add(account1);
 		
-		Set <String> loaded3cixtyUids = new MySQLProfileManagerImpl().find3cixtyUIDs(googleUids, source1);
+		Set <String> loaded3cixtyUids = new MySQLProfileManagerImpl().find3cixtyUIDs(googleUids, source1, null);
 		// may contain 3cixty UIDs which were generated during precedent tests
 		Assert.assertTrue(loaded3cixtyUids.size() >= 1);
 		Assert.assertTrue(loaded3cixtyUids.contains(_3cixtyUID));
 		
 		List <String> mobidotUids = new LinkedList<String>();
 		mobidotUids.add(account2);
-		Set <String> loaded3cixtyUids2 = new MySQLProfileManagerImpl().find3cixtyUIDs(mobidotUids, source2);
+		Set <String> loaded3cixtyUids2 = new MySQLProfileManagerImpl().find3cixtyUIDs(mobidotUids, source2, null);
 		// may contain 3cixty UIDs which were generated during precedent tests
 		Assert.assertTrue(loaded3cixtyUids2.size() >= 1);
 		Assert.assertTrue(loaded3cixtyUids2.contains(_3cixtyUID));

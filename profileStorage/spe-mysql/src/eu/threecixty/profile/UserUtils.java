@@ -133,6 +133,45 @@ public class UserUtils {
 		return updateUserProfile(userProfile);
 	}
 	
+	
+	/**
+	 * Creates user profiles.
+	 * @param profiles
+	 * @return
+	 */
+	public static boolean createProfiles(List<UserProfile> profiles) {
+		Session session = null;
+		boolean added = false;
+		try {
+			
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			
+			for (UserProfile profile: profiles) {
+
+				UserModel userModel = new UserModel();
+				userModel.setUid(profile.getHasUID());
+
+				session.save(userModel);
+
+				convertToUserModel(profile, userModel, session);
+
+				session.update(userModel);
+			}
+			
+			session.getTransaction().commit();
+
+			added = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return added;
+	}
+	
 	/**
 	 * Gets all the corresponding Google UIDs from a given set of 3cixty UIDs.
 	 * @param _3cixtyUids
@@ -164,10 +203,11 @@ public class UserUtils {
 	 * Finds the corresponding 3cixty UIDs from a given list of accountIDs and source.
 	 * @param accountIds
 	 * @param source
+	 * @param unfoundAccountIds
 	 * @return
 	 */
 	public static Set<String> find3cixtyUIDs(List<String> accountIds,
-			String source) {
+			String source, List <String> unfoundAccountIds) {
 		if (accountIds == null || accountIds.size() == 0) return null;
 		Set <String> _3cixtyUids = new HashSet <String>();
 		Session session = null;
@@ -177,9 +217,17 @@ public class UserUtils {
 			List <?> results = session.createQuery(hql).setParameterList("accountIds",
 					accountIds).setParameter("source",
 							source).list();
+			List <String> accountIdsExisted = new LinkedList<String>();
 			for (Object obj: results) {
 				AccountModel accountModel = (AccountModel) obj;
 				_3cixtyUids.add(accountModel.getUserModel().getUid());
+				accountIdsExisted.add(accountModel.getAccountId());
+			}
+			if (unfoundAccountIds != null) {
+				for (String accountId: accountIds) {
+					if (!accountIdsExisted.contains(accountId))
+						unfoundAccountIds.add(accountId);
+				}
 			}
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
@@ -187,6 +235,44 @@ public class UserUtils {
 			if (session != null) session.close();
 		}
 		return _3cixtyUids;
+	}
+	
+	/**
+	 * Finds user profile.
+	 * @param uid
+	 * @param source
+	 * @param profileImage
+	 * @return
+	 */
+	public static UserProfile findUserProfile(String uid, String source,
+			String profileImage) {
+		Session session = null;
+		UserProfile userProfile = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String hql = "FROM AccountModel A WHERE A.accountId = ? AND A.source = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, uid).setString(1, source).list();
+			UserModel userModel = null;
+			if (results.size() > 0) {
+				userModel = ((AccountModel) results.get(0)).getUserModel();
+			} else if (!isNullOrEmpty(profileImage)) {
+				hql = "FROM UserModel U WHERE U.profileImage = ?";
+				query = session.createQuery(hql);
+				results = query.setString(0, profileImage).list();
+				if (results.size() > 0) {
+					userModel = ((UserModel) results.get(0));
+				}
+			}
+			if (userModel != null) userProfile = convertToUserProfile(userModel);
+
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return userProfile;
 	}
 	
 	private static boolean updateUserProfile(UserProfile userProfile) {
