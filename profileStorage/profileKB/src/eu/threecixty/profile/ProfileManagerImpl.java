@@ -30,6 +30,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	
 	public static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql?default-graph-uri=&query=";
 	
+	private static final String MYSQL_PM_IMPL = "eu.threecixty.profile.MySQLProfileManagerImpl";
+	
 	// TODO: make sure this full name is correct with the corresponding implementation with VIRTUOSO
 	private static final String VIRTUOSO_PM_IMPL = "eu.threecixty.profile.VirtuosoProfileManagerImpl";
 	
@@ -246,39 +248,32 @@ public class ProfileManagerImpl implements ProfileManager {
 	private ProfileManagerImpl() {
 		boolean found = false;
 		try {
-			profileManager = (ProfileManager) Class.forName(VIRTUOSO_PM_IMPL).newInstance();
+			profileManager = (ProfileManager) Class.forName(MYSQL_PM_IMPL).newInstance();
 			found = true;
-		} catch (ClassNotFoundException e) {
-			logInfo(e.getMessage());
-			//e.printStackTrace();
-		} catch (InstantiationException e) {
-			logInfo(e.getMessage());
-			//e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			logInfo(e.getMessage());
-			//e.printStackTrace();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		if (!found) {
+			try {
+				profileManager = (ProfileManager) Class.forName(VIRTUOSO_PM_IMPL).newInstance();
+				found = true;
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+			}
 		}
 		if (!found) {
 			try {
 				profileManager = (ProfileManager) Class.forName(THALES_PM_IMPL).newInstance();
 				found = true;
-			} catch (ClassNotFoundException e) {
-				//e.printStackTrace();
-			} catch (InstantiationException e) {
-				//e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				//e.printStackTrace();
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
 			}
 		}
 		if (!found) {
 			try {
 				profileManager = (ProfileManager) Class.forName(SIMPLE_PM_IMPL).newInstance();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
 			}
 		}
 		logInfo("profileManager = " + profileManager.getClass().getName());
