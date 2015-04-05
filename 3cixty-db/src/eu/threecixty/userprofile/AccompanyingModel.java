@@ -30,7 +30,12 @@ public class AccompanyingModel implements java.io.Serializable {
 	private Integer id;
 	private TransportModel transportModel;
 
-	
+	private Long accompanyTime; 
+	private Long accompanyValidity; 
+	private String hasAccompanyUserid1ST; 
+	private String hasAccompanyUserid2ST; 
+	private Double accompanyScore; 
+
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
@@ -50,5 +55,43 @@ public class AccompanyingModel implements java.io.Serializable {
 		this.transportModel = transportModel;
 	}
 	
+	@Column(name = "accompanyTime", nullable = true)
+	public Long getAccompanyTime() {
+		return accompanyTime;
+	}
+	public void setAccompanyTime(Long accompanyTime) {
+		this.accompanyTime = accompanyTime;
+	}
 	
+	@Column(name = "accompanyValidity", nullable = true)
+	public Long getAccompanyValidity() {
+		return accompanyValidity;
+	}
+	public void setAccompanyValidity(Long accompanyValidity) {
+		this.accompanyValidity = accompanyValidity;
+	}
+	
+	@Column(name = "hasAccompanyUserid1ST", nullable = false, length = 255)
+	public String getHasAccompanyUserid1ST() {
+		return hasAccompanyUserid1ST;
+	}
+	public void setHasAccompanyUserid1ST(String hasAccompanyUserid1ST) {
+		this.hasAccompanyUserid1ST = hasAccompanyUserid1ST;
+	}
+	
+	@Column(name = "hasAccompanyUserid2ST", nullable = false, length = 255)
+	public String getHasAccompanyUserid2ST() {
+		return hasAccompanyUserid2ST;
+	}
+	public void setHasAccompanyUserid2ST(String hasAccompanyUserid2ST) {
+		this.hasAccompanyUserid2ST = hasAccompanyUserid2ST;
+	}
+	
+	@Column(name = "accompanyScore", nullable = true)
+	public Double getAccompanyScore() {
+		return accompanyScore;
+	}
+	public void setAccompanyScore(Double accompanyScore) {
+		this.accompanyScore = accompanyScore;
+	}
 }
