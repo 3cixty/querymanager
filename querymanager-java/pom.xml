@@ -28,6 +28,12 @@
 	  <groupId>eu.3cixty</groupId>
 	  <artifactId>spe</artifactId>
 	  <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>eu.3cixty</groupId>
+          <artifactId>models</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 <!-- 
     <dependency>

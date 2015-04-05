@@ -38,6 +38,12 @@
     
     <dependency>
       <groupId>eu.3cixty</groupId>
+      <artifactId>spe-mysql</artifactId>
+	  <version>1.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>eu.3cixty</groupId>
       <artifactId>CrawlerCron</artifactId>
 	  <version>1.0</version>
     </dependency>
