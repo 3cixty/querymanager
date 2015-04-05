@@ -2,6 +2,7 @@ package eu.threecixty.profile;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -132,8 +133,34 @@ public class UserUtils {
 		return updateUserProfile(userProfile);
 	}
 	
+	/**
+	 * Gets all the corresponding Google UIDs from a given set of 3cixty UIDs.
+	 * @param _3cixtyUids
+	 * @return
+	 */
+	public static List<String> getGoogleUidsFrom3cixtyUIDs(Set<String> _3cixtyUids) {
+		if (_3cixtyUids == null || _3cixtyUids.size() == 0) return null;
+		List <String> googleUids = new LinkedList <String>();
+		Session session = null;
+		try {
+			String hql = "From AccountModel A WHERE A.userModel.uid in (:uids) AND A.source = :source";
+			session = HibernateUtil.getSessionFactory().openSession();
+			List <?> results = session.createQuery(hql).setParameterList("uids",
+					_3cixtyUids).setParameter("source",
+							GoogleAccountUtils.GOOGLE_SOURCE).list();
+			for (Object obj: results) {
+				AccountModel accountModel = (AccountModel) obj;
+				googleUids.add(accountModel.getAccountId());
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return googleUids;
+	}
+	
 	private static boolean updateUserProfile(UserProfile userProfile) {
-		
 		Session session = null;
 		boolean added = false;
 		try {

@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -159,7 +160,7 @@ public class UserProfileTests {
 		Set <ProfileIdentities> pis = new HashSet <ProfileIdentities>();
 		ProfileIdentities pi1 = new ProfileIdentities();
 		String source1 = "Google";
-		String account1 = "user1@gmail.com";
+		String account1 = "88888888888";
 		pi1.setHasSourceCarrier(source1);
 		pi1.setHasUserAccountID(account1);
 		pis.add(pi1);
@@ -194,6 +195,38 @@ public class UserProfileTests {
 		Set <ProfileIdentities> loadedPis2 = loadedProfile2.getHasProfileIdenties();
 		Assert.assertTrue(loadedPis2.size() == 1);
 		Assert.assertTrue(exists(account3, source3, loadedPis2));
+	}
+	
+	@Test
+	public void testListGoogleUids() throws Exception {
+		String _3cixtyUID = System.currentTimeMillis() + "";
+		UserProfile userProfile = new UserProfile();
+		userProfile.setHasUID(_3cixtyUID);
+
+		Set <ProfileIdentities> pis = new HashSet <ProfileIdentities>();
+		ProfileIdentities pi1 = new ProfileIdentities();
+		String source1 = "Google";
+		String account1 = "99999999";
+		pi1.setHasSourceCarrier(source1);
+		pi1.setHasUserAccountID(account1);
+		pis.add(pi1);
+		
+		ProfileIdentities pi2 = new ProfileIdentities();
+		String source2 = "Mobidot";
+		String account2 = "11111111";
+		pi2.setHasSourceCarrier(source2);
+		pi2.setHasUserAccountID(account2);
+		pis.add(pi2);
+		
+		userProfile.setHasProfileIdenties(pis);
+		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		
+		Set <String> _3cixtyUIDs = new HashSet <String>();
+		_3cixtyUIDs.add(_3cixtyUID);
+		
+		List <String> googleUids = UserUtils.getGoogleUidsFrom3cixtyUIDs(_3cixtyUIDs);
+		Assert.assertTrue(googleUids.size() == 1);
+		Assert.assertTrue(account1.equals(googleUids.get(0)));
 	}
 	
 	private boolean exists(String accountID, String source, Set <ProfileIdentities> pis) {

@@ -29,6 +29,7 @@ import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.IProfiler;
+import eu.threecixty.profile.UnknownException;
 import eu.threecixty.profile.VirtuosoManager;
 import eu.threecixty.profile.oldmodels.Event;
 import eu.threecixty.profile.oldmodels.Period;

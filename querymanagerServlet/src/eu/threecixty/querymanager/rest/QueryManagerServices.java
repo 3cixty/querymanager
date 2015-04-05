@@ -41,6 +41,7 @@ import eu.threecixty.profile.LanguageUtils;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.UnknownException;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.VirtuosoManager;
 import eu.threecixty.querymanager.EventMediaFormat;
@@ -48,7 +49,6 @@ import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
 import eu.threecixty.querymanager.ThreeCixtyQuery;
-import eu.threecixty.querymanager.UnknownException;
 
 /**
  * The class is an end point for QA RestAPIs to expose to other components.

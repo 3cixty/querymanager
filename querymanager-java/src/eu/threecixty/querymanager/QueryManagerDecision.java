@@ -13,6 +13,7 @@ import com.hp.hpl.jena.sparql.expr.Expr;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.UnknownException;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.oldmodels.Period;
 

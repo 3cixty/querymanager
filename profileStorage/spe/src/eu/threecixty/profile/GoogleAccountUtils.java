@@ -22,6 +22,8 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
  */
 public class GoogleAccountUtils {
 	
+	public static final String GOOGLE_SOURCE = "Google";
+	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 GoogleAccountUtils.class.getName());
 	
@@ -102,6 +104,7 @@ public class GoogleAccountUtils {
 				profile.setHasGender(json.getString("gender"));
 			}
 			
+			// TODO: find 3cixty UIDs from google UIDs
 			
 			// do this when login to 3cixty authorization say edit settings,
 			// select circles you want the app to get info form.
@@ -161,7 +164,7 @@ public class GoogleAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
+			Utils.setProfileIdentities(_3cixtyUID, user_id, GOOGLE_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			

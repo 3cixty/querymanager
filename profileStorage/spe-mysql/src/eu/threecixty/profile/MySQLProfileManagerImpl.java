@@ -1,14 +1,19 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.partners.Partner;
+import eu.threecixty.partners.PartnerImpl;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.oldmodels.Address;
 
 class MySQLProfileManagerImpl implements ProfileManager {
+	
+	private static final int DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED = 1;
+	private static final float DEFAULT_MINIMUM_SCORE_RATED = 3;
 
 	public boolean checkAttributeToStore(Map<String, Boolean> arg0, String arg1) {
 		// TODO Auto-generated method stub
@@ -25,15 +30,15 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public List<UserProfile> getAllUserProfiles() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public GpsCoordinate getCoordinate(UserProfile userProfile)
 			throws TooManyConnections {
-		// TODO Auto-generated method stub
-		
-		return null;
+		if (userProfile == null) return null;
+		Address addr = userProfile.getHasAddress();
+		if (addr == null) return null;
+		return new GpsCoordinate(addr.getLatitude(), addr.getLongitute());
 	}
 
 	public String getCountryName(UserProfile userProfile) throws TooManyConnections {
@@ -42,35 +47,29 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public List<String> getEventNamesFromEventPreferences(UserProfile userProfile) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<String> getEventNamesFromNumberOfTimesVisited(UserProfile userProfile,
 			int arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<String> getEventNamesFromNumberOfTimesVisitedOfFriends(
 			UserProfile userProfile, int arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<String> getEventNamesFromRating(UserProfile userProfile, float arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<String> getEventNamesFromRatingOfFriends(UserProfile userProfile,
 			float arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<String> getEventNamesWhichFriendsLikeToVisit(UserProfile userProfile) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -85,56 +84,58 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public int getMinimumNumberOfTimesVisited(UserProfile userProfile) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
 	}
 
 	public int getMinimumNumberOfTimesVisitedForFriends(UserProfile userProfile) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED;
 	}
 
 	public float getMinimumScoreRated(UserProfile userProfile) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DEFAULT_MINIMUM_SCORE_RATED;
 	}
 
 	public float getMinimumScoreRatedForFriends(UserProfile userProfile) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DEFAULT_MINIMUM_SCORE_RATED;
 	}
 
 	public Partner getPartner() {
-		// TODO Auto-generated method stub
-		return null;
+		return PartnerImpl.getInstance();
 	}
 
-	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float arg1)
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating)
 			throws TooManyConnections {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return MySQLProfilerPlaceUtils.getPlaceIdsFromRating(userProfile, rating);
+		} catch (IOException e) {
+			throw new TooManyConnections(e.getMessage());
+		} catch (UnknownException e) {
+			throw new TooManyConnections(e.getMessage());
+		}
 	}
 
 	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
-			float arg1) throws TooManyConnections {
-		// TODO Auto-generated method stub
-		return null;
+			float rating) throws TooManyConnections {
+		try {
+			return MySQLProfilerPlaceUtils.getPlaceIdsFromRatingOfFriends(userProfile, rating);
+		} catch (IOException e) {
+			throw new TooManyConnections(e.getMessage());
+		} catch (UnknownException e) {
+			throw new TooManyConnections(e.getMessage());
+		}
 	}
 
 	public List<String> getPlaceNamesFromNumberOfTimesVisited(UserProfile userProfile,
-			int arg1) {
-		// TODO Auto-generated method stub
+			int number) {
 		return null;
 	}
 
 	public List<String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(
 			UserProfile userProfile, int arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<StartAndEndDate> getPreferredStartAndEndDates(UserProfile userProfile) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
