@@ -160,6 +160,35 @@ public class UserUtils {
 		return googleUids;
 	}
 	
+	/**
+	 * Finds the corresponding 3cixty UIDs from a given list of accountIDs and source.
+	 * @param accountIds
+	 * @param source
+	 * @return
+	 */
+	public static Set<String> find3cixtyUIDs(List<String> accountIds,
+			String source) {
+		if (accountIds == null || accountIds.size() == 0) return null;
+		Set <String> _3cixtyUids = new HashSet <String>();
+		Session session = null;
+		try {
+			String hql = "From AccountModel A WHERE A.accountId in (:accountIds) AND A.source = :source";
+			session = HibernateUtil.getSessionFactory().openSession();
+			List <?> results = session.createQuery(hql).setParameterList("accountIds",
+					accountIds).setParameter("source",
+							source).list();
+			for (Object obj: results) {
+				AccountModel accountModel = (AccountModel) obj;
+				_3cixtyUids.add(accountModel.getUserModel().getUid());
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return _3cixtyUids;
+	}
+	
 	private static boolean updateUserProfile(UserProfile userProfile) {
 		Session session = null;
 		boolean added = false;

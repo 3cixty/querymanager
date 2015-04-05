@@ -18,6 +18,7 @@ import eu.threecixty.profile.IDCrawlTimeMapping;
 import eu.threecixty.profile.IDMapping;
 import eu.threecixty.profile.ProfileManager;
 import eu.threecixty.profile.UserProfile;
+import eu.threecixty.profile.Utils.UidSource;
 
 /**
  * This is an implementation version for ProfileManager using a RDF model file.
@@ -321,5 +322,18 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	private String getUID(UserProfile userProfile) {
 		if (userProfile == null) return null;
 		return userProfile.getHasUID();
+	}
+
+	@Override
+	public Set<String> find3cixtyUIDs(List<String> accountIds, String source) {
+		//XXX: This function only works for Google & Facebook account
+		Set <String> _3cixtyUIDs = new HashSet <String>();
+		for (String accountId: accountIds) {
+			String _3cixtyUid = Utils.gen3cixtyUID(accountId,
+					GoogleAccountUtils.GOOGLE_SOURCE.equals(source) ?
+							UidSource.GOOGLE : UidSource.FACEBOOK);
+			_3cixtyUIDs.add(_3cixtyUid);
+		}
+		return _3cixtyUIDs;
 	}
 }

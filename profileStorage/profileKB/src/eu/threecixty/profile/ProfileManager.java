@@ -249,6 +249,14 @@ public interface ProfileManager {
 	String find3cixtyUID(String uid, String profileImage);
 	
 	/**
+	 * Finds the corresponding 3cixty UIDs from a given list of account IDs and source.
+	 * @param accountIds
+	 * @param source
+	 * @return
+	 */
+	Set <String> find3cixtyUIDs(List <String> accountIds, String source);
+	
+	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.
 	 * @param attributes
 	 * @param attrChecked

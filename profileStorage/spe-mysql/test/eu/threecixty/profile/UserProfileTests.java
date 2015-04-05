@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -227,6 +228,46 @@ public class UserProfileTests {
 		List <String> googleUids = UserUtils.getGoogleUidsFrom3cixtyUIDs(_3cixtyUIDs);
 		Assert.assertTrue(googleUids.size() == 1);
 		Assert.assertTrue(account1.equals(googleUids.get(0)));
+	}
+	
+	@Test
+	public void testFind3cixtyUids() throws Exception {
+		String _3cixtyUID = System.currentTimeMillis() + "";
+		UserProfile userProfile = new UserProfile();
+		userProfile.setHasUID(_3cixtyUID);
+
+		Set <ProfileIdentities> pis = new HashSet <ProfileIdentities>();
+		ProfileIdentities pi1 = new ProfileIdentities();
+		String source1 = "Google";
+		String account1 = "77777";
+		pi1.setHasSourceCarrier(source1);
+		pi1.setHasUserAccountID(account1);
+		pis.add(pi1);
+		
+		ProfileIdentities pi2 = new ProfileIdentities();
+		String source2 = "Mobidot";
+		String account2 = "2222222";
+		pi2.setHasSourceCarrier(source2);
+		pi2.setHasUserAccountID(account2);
+		pis.add(pi2);
+		
+		userProfile.setHasProfileIdenties(pis);
+		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		
+		List <String> googleUids = new LinkedList<String>();
+		googleUids.add(account1);
+		
+		Set <String> loaded3cixtyUids = new MySQLProfileManagerImpl().find3cixtyUIDs(googleUids, source1);
+		// may contain 3cixty UIDs which were generated during precedent tests
+		Assert.assertTrue(loaded3cixtyUids.size() >= 1);
+		Assert.assertTrue(loaded3cixtyUids.contains(_3cixtyUID));
+		
+		List <String> mobidotUids = new LinkedList<String>();
+		mobidotUids.add(account2);
+		Set <String> loaded3cixtyUids2 = new MySQLProfileManagerImpl().find3cixtyUIDs(mobidotUids, source2);
+		// may contain 3cixty UIDs which were generated during precedent tests
+		Assert.assertTrue(loaded3cixtyUids2.size() >= 1);
+		Assert.assertTrue(loaded3cixtyUids2.contains(_3cixtyUID));
 	}
 	
 	private boolean exists(String accountID, String source, Set <ProfileIdentities> pis) {

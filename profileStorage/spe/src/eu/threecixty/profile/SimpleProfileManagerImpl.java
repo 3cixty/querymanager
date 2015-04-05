@@ -227,4 +227,10 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		if (userProfile == null) return null;
 		return userProfile.getHasUID();
 	}
+
+	@Override
+	public Set<String> find3cixtyUIDs(List<String> arg0, String arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

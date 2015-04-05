@@ -158,4 +158,8 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return UserUtils.saveUserProfile(userProfile);
 	}
 
+	public Set<String> find3cixtyUIDs(List<String> accountIds, String source) {
+		return UserUtils.find3cixtyUIDs(accountIds, source);
+	}
+
 }

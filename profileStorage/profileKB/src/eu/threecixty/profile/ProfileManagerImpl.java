@@ -220,6 +220,12 @@ public class ProfileManagerImpl implements ProfileManager {
 		return null;
 	}
 
+	@Override
+	public Set<String> find3cixtyUIDs(List<String> accountIds, String source) {
+		if (profileManager != null) return profileManager.find3cixtyUIDs(accountIds, source);
+		return null;
+	}
+	
 	private ProfileManagerImpl() {
 		boolean found = false;
 		try {
