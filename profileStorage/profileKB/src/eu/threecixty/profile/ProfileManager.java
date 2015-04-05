@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return Minimum number of times visited. This value should be updated by the miner component.
 	 */
-	int getMinimumNumberOfTimesVisited(String uid);
+	int getMinimumNumberOfTimesVisited(UserProfile userProfile);
 
 	/**
 	 * Gets minimum score rated by a given Google UID.
@@ -71,15 +72,15 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return Minimum score rated by a given Google UID.
 	 */
-	float getMinimumScoreRated(String uid);
+	float getMinimumScoreRated(UserProfile userProfile);
 
 	/**
 	 * 
 	 * @param uid
 	 * @return
 	 */
-	int getMinimumNumberOfTimesVisitedForFriends(String  uid);
-	float getMinimumScoreRatedForFriends(String uid);
+	int getMinimumNumberOfTimesVisitedForFriends(UserProfile userProfile);
+	float getMinimumScoreRatedForFriends(UserProfile userProfile);
 
 	/**
 	 * Gets country name.
@@ -87,7 +88,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return Country name if there exists in the KB, <code>null</code> otherwise. 
 	 */
-	String getCountryName(String uid) throws TooManyConnections;
+	String getCountryName(UserProfile userProfile) throws TooManyConnections;
 
 	/**
 	 * Gets town name.
@@ -95,7 +96,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return Town name if there exists in the KB, <code>null</code> otherwise.
 	 */
-	String getTownName(String uid) throws TooManyConnections;
+	String getTownName(UserProfile userProfile) throws TooManyConnections;
 
 	/**
 	 * Gets GPS coordinates.
@@ -103,7 +104,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return GPS coordinates information.
 	 */
-	GpsCoordinate getCoordinate(String uid) throws TooManyConnections;
+	GpsCoordinate getCoordinate(UserProfile userProfile) throws TooManyConnections;
 
 	/**
 	 * Gets a list of place IDs which were rated with a score more than a given <code>rating</code> value. 
@@ -113,7 +114,7 @@ public interface ProfileManager {
 	 * 				Rating score.
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRating(String uid, float rating) throws TooManyConnections;
+	List <String> getPlaceIdsFromRating(UserProfile userProfile, float rating) throws TooManyConnections;
 
 	/**
 	 * Gets a list of place names which were visited more than <code>number</code> times.
@@ -123,7 +124,7 @@ public interface ProfileManager {
 	 * 				Number of times visited.
 	 * @return A list of place names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceNamesFromNumberOfTimesVisited(String uid, int number);
+	List <String> getPlaceNamesFromNumberOfTimesVisited(UserProfile userProfile, int number);
 
 	/**
 	 * Gets a list of place IDs which were rated by friends with a score more than a given <code>rating</code>.
@@ -133,7 +134,7 @@ public interface ProfileManager {
 	 * 				Rating score
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRatingOfFriends(String uid, float rating) throws TooManyConnections;
+	List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile, float rating) throws TooManyConnections;
 	
 	/**
 	 * Gets a list of place names which were visited by friends more than <code>number</code> times.
@@ -143,7 +144,7 @@ public interface ProfileManager {
 	 * 				Number of times visited.
 	 * @return A list of place names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(String uid, int number);
+	List <String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(UserProfile userProfile, int number);
 
 	/**
 	 * Gets a list of event names which are preferred by user.
@@ -151,7 +152,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return A list of event names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getEventNamesFromEventPreferences(String uid);
+	List <String> getEventNamesFromEventPreferences(UserProfile userProfile);
 
 	/**
 	 * Gets a list of date ranges which are preferred by user.
@@ -159,7 +160,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return A list of date ranges if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <StartAndEndDate> getPreferredStartAndEndDates(String uid);
+	List <StartAndEndDate> getPreferredStartAndEndDates(UserProfile userProfile);
 	
 	/**
 	 * Gets a list of event names which were rated with a score more than <code>rating</code>.
@@ -169,7 +170,7 @@ public interface ProfileManager {
 	 * 				Rating score.
 	 * @return A list if event names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getEventNamesFromRating(String uid, float rating);
+	List <String> getEventNamesFromRating(UserProfile userProfile, float rating);
 	
 	/**
 	 * Gets a list of event names which were visited by user more than <code>number</code> times.
@@ -179,7 +180,7 @@ public interface ProfileManager {
 	 * 				Number of times visited.
 	 * @return A list of event names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getEventNamesFromNumberOfTimesVisited(String uid, int number);
+	List <String> getEventNamesFromNumberOfTimesVisited(UserProfile userProfile, int number);
 	
 	/**
 	 * Gets a list of event names which were rated by friends with a score more than <code>rating</code>.
@@ -189,7 +190,7 @@ public interface ProfileManager {
 	 * 				Rating score.
 	 * @return A list of event names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getEventNamesFromRatingOfFriends(String uid, float rating);
+	List <String> getEventNamesFromRatingOfFriends(UserProfile userProfile, float rating);
 
 	/**
 	 * Gets a list of event names which were visited by friends with number of times more than <code>number</code>.
@@ -199,7 +200,7 @@ public interface ProfileManager {
 	 * 				Number of times visited.
 	 * @return A list of event names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getEventNamesFromNumberOfTimesVisitedOfFriends(String uid, int number);
+	List <String> getEventNamesFromNumberOfTimesVisitedOfFriends(UserProfile userProfile, int number);
 
 	/**
 	 * Gets a list of event names that friends like to visit. 
@@ -207,7 +208,7 @@ public interface ProfileManager {
 	 * 				Google UID.
 	 * @return A list of event names if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getEventNamesWhichFriendsLikeToVisit(String uid);
+	List <String> getEventNamesWhichFriendsLikeToVisit(UserProfile userProfile);
 	
 	/**
 	 * Gets all the mapping between a Google UID and Mobidot information.
@@ -243,10 +244,40 @@ public interface ProfileManager {
 	 * Finds 3cixty UID from a given UDI (Google or Facebook), and a given profile image.
 	 *
 	 * @param uid
+	 * @param source
 	 * @param profileImage
 	 * @return
 	 */
-	String find3cixtyUID(String uid, String profileImage);
+	String find3cixtyUID(String uid, String source, String profileImage);
+	
+	/**
+	 * Finds the corresponding 3cixty UIDs from a given list of account IDs and source.
+	 * @param accountIds
+	 * @param source
+	 * @param unfoundAccountIds
+	 * @return
+	 */
+	Set <String> find3cixtyUIDs(List <String> accountIds, String source,
+			List <String> unfoundAccountIds);
+	
+	/**
+	 * Creates user profiles.
+	 * @param userProfiles
+	 * @return
+	 * @throws IOException
+	 * @throws UnknownException
+	 */
+	boolean createProfiles(List <UserProfile> userProfiles) throws IOException, UnknownException;
+	
+	/**
+	 * Finds the corresponding user profile with a given external
+	 * (Facebook, Google) uid, source, and profile image.
+	 * @param uid
+	 * @param source
+	 * @param profileImage
+	 * @return
+	 */
+	UserProfile findUserProfile(String uid, String source, String profileImage);
 	
 	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.

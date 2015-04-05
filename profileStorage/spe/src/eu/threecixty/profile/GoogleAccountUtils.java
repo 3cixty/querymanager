@@ -1,6 +1,8 @@
 package eu.threecixty.profile;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -23,6 +25,8 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
  *
  */
 public class GoogleAccountUtils {
+	
+	public static final String GOOGLE_SOURCE = "Google";
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 GoogleAccountUtils.class.getName());
@@ -83,17 +87,19 @@ public class GoogleAccountUtils {
 //			JSONObject nameObj = json.getJSONObject("name");
 			String givenName = json.getString("given_name");
 			String familyName = json.getString("family_name");
-			
-			// XXX: always save UserProfile to update with GoogleProfile
-			//if (ProfileManagerImpl.getInstance().existUID(user_id)) return user_id; // no need to update info as it exists
-			
+						
 			String picture = json.getString("picture");
 			
-			_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
-			
-			Map <String, Boolean> attrsToLoad = Utils.getAttributesToLoadProfileFromGoogleFB();
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, attrsToLoad);
-			profile.setHasUID(_3cixtyUID);
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(
+					user_id, GOOGLE_SOURCE, picture);
+			if (profile == null) {
+				_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
+				profile = new UserProfile();
+				profile.setHasUID(_3cixtyUID);
+			} else {
+				_3cixtyUID = profile.getHasUID();
+			}
+						
 			profile.setProfileImage(picture);
 			Name name = new Name();
 			profile.setHasName(name);
@@ -104,57 +110,25 @@ public class GoogleAccountUtils {
 				profile.setHasGender(json.getString("gender"));
 			}
 			
-			
-			// do this when login to 3cixty authorization say edit settings,
-			// select circles you want the app to get info form.
-			// then select only me.
-			// finaly say authourize.
-			// XXX: quick fix as TI could not get ProfileImage. Need to deal with Android OAuth Client to be able to get knows from Android Google access token
 			try {
-				reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
-						+ accessToken);
-				json = new JSONObject(reqMsg);
+				
+				List <String> googleUidsOfFriends = getGoogleUidsOfFriends(accessToken);
 
-				String nextPageToken = null;
-				Set<String> knows = new HashSet<String>();
-
-
-				if (json.has("nextPageToken")){		
-					while(json.has("nextPageToken")){
-						nextPageToken = json.getString("nextPageToken");
-						JSONArray jsonArray = json.getJSONArray("items");
-						int length=jsonArray.length();
-						for (int i = 0; i < length; i++) {
-							JSONObject jObject = jsonArray.getJSONObject(i);
-							String know3cixtyUID = Utils.gen3cixtyUID(jObject.getString("id"), Utils.UidSource.GOOGLE);
-							knows.add(know3cixtyUID);
-						}
-						reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
-								+ accessToken+"&pageToken="+nextPageToken);
-						json = new JSONObject(reqMsg);
-					}
-				}
-				else{
-					JSONArray jsonArray = json.getJSONArray("items");
-					int length=jsonArray.length();
-					for (int i = 0; i < length; i++) {
-						JSONObject jObject = jsonArray.getJSONObject(i);
-						String know3cixtyUID = Utils.gen3cixtyUID(jObject.getString("id"), Utils.UidSource.GOOGLE);
-						knows.add(know3cixtyUID);
-					}
-				}			
+				Set<String> knows = Utils.getOrCreate3cixtyUIDsForKnows(googleUidsOfFriends, GOOGLE_SOURCE);
 				
 				// hack for Tony
 				if (user_id.contains("117895882057702509461")) {
-					String animeshGoogleUID = Utils.gen3cixtyUID("103411760688868522737", Utils.UidSource.GOOGLE);
-					if (!knows.contains(animeshGoogleUID)) { // does not know Animesh
-						knows.add(animeshGoogleUID);
+					String animesh3cixtyUID = ProfileManagerImpl.getInstance().find3cixtyUID(
+							"103411760688868522737", GOOGLE_SOURCE, null);
+					if (!knows.contains(animesh3cixtyUID)) { // does not know Animesh
+						knows.add(animesh3cixtyUID);
 					}
 				}
 				
 				profile.setKnows(knows);
 			} catch (Exception ex) {
 				LOGGER.error(ex.getMessage());
+				return null;
 			}
 
 			Set <ProfileIdentities> profileIdentities = null;
@@ -163,7 +137,7 @@ public class GoogleAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			Utils.setProfileIdentities(_3cixtyUID, user_id, "Google", profileIdentities);
+			Utils.setProfileIdentities(_3cixtyUID, user_id, GOOGLE_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			
@@ -175,6 +149,40 @@ public class GoogleAccountUtils {
 		}
 		if (_3cixtyUID == null) return "";
 		return _3cixtyUID;
+	}
+	
+	private static List <String> getGoogleUidsOfFriends(String accessToken) throws Exception {
+		String nextPageToken = null;
+		List <String> googleUidsOfFriends = new LinkedList <String>();
+
+		String reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+				+ accessToken);
+		JSONObject json = new JSONObject(reqMsg);
+
+
+		if (json.has("nextPageToken")){		
+			while(json.has("nextPageToken")){
+				nextPageToken = json.getString("nextPageToken");
+				JSONArray jsonArray = json.getJSONArray("items");
+				int length=jsonArray.length();
+				for (int i = 0; i < length; i++) {
+					JSONObject jObject = jsonArray.getJSONObject(i);
+					googleUidsOfFriends.add(jObject.getString("id"));
+				}
+				reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
+						+ accessToken+"&pageToken="+nextPageToken);
+				json = new JSONObject(reqMsg);
+			}
+		}
+		else{
+			JSONArray jsonArray = json.getJSONArray("items");
+			int length=jsonArray.length();
+			for (int i = 0; i < length; i++) {
+				JSONObject jObject = jsonArray.getJSONObject(i);
+				googleUidsOfFriends.add(jObject.getString("id"));
+			}
+		}
+		return googleUidsOfFriends;
 	}
 	
 	public static int getValidationTime(String accessToken) {

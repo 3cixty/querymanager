@@ -20,8 +20,6 @@ public class Profiler implements IProfiler {
 
 	
 	private ProfilingTechniques profilingTechnique;
-	
-	private String uID;
 
 	private boolean currentCountryRequired = false;
 	private boolean currentTownRequired = false;
@@ -40,9 +38,10 @@ public class Profiler implements IProfiler {
 	private boolean friendsLikeVisitRequired = false;
 	
 	private Preference pref;
+	private UserProfile userProfile;
 	
-	public Profiler(String uid) {
-		this.uID = uid;
+	public Profiler(UserProfile userProfile) {
+		this.userProfile = userProfile;
 		
 		initDefaultParametersForAugmentation();
 	}
@@ -63,7 +62,7 @@ public class Profiler implements IProfiler {
 
 	@Override
 	public String getUID() {
-		return uID;
+		return userProfile == null ? null : userProfile.getHasUID();
 	}
 //	@Override
 //	public UserProfile getKBUserProfile() {
@@ -153,34 +152,38 @@ public class Profiler implements IProfiler {
 	public void requireFriendsLikeVisit(boolean friendsLikeVisitRequired) {
 		this.friendsLikeVisitRequired = friendsLikeVisitRequired;
 	}
+	
+	public UserProfile getProfile() {
+		return userProfile;
+	}
 
 	private void addEvents() {
 		Set <Event> events = new HashSet <Event>();
 		if (scoreRatedAtLeast != -1) {
-			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRating(uID, scoreRatedAtLeast);
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRating(userProfile, scoreRatedAtLeast);
 			addEvents(eventNames, events);
 			//addScoreRequired(scoreRatedAtLeast);
 		}
 		if (numberOfTimeVisitedAtLeast != -1) {
-			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisited(uID, numberOfTimeVisitedAtLeast);
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisited(userProfile, numberOfTimeVisitedAtLeast);
 			addEvents(eventNames, events);
 		}
 		if (scoreRatedForFriendsAtLeast != -1) {
-			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromRatingOfFriends(userProfile, scoreRatedForFriendsAtLeast);
 			addEvents(eventNames, events);
 			//addScoreRequired(scoreRatedForFriendsAtLeast);
 		}
 		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
-			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisitedOfFriends(uID, numberOfTimeVisitedForFriendsAtLeast);
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromNumberOfTimesVisitedOfFriends(userProfile, numberOfTimeVisitedForFriendsAtLeast);
 			addEvents(eventNames, events);
 		}
 		
 		if (eventNamesFromEventPreferenceRequired) {
-			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromEventPreferences(uID);
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesFromEventPreferences(userProfile);
 			addEvents(eventNames, events);
 		}
 		if (preferredEventDatesRequired) {
-			List <StartAndEndDate> startAndEndDates = ProfileManagerImpl.getInstance().getPreferredStartAndEndDates(uID);
+			List <StartAndEndDate> startAndEndDates = ProfileManagerImpl.getInstance().getPreferredStartAndEndDates(userProfile);
 			if (startAndEndDates != null) {
 				for (StartAndEndDate startAndEndDate: startAndEndDates) {
 
@@ -199,7 +202,7 @@ public class Profiler implements IProfiler {
 			}
 		}
 		if (friendsLikeVisitRequired) {
-			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesWhichFriendsLikeToVisit(uID);
+			List <String> eventNames = ProfileManagerImpl.getInstance().getEventNamesWhichFriendsLikeToVisit(userProfile);
 			addEvents(eventNames, events);
 		}
 		
@@ -233,35 +236,35 @@ public class Profiler implements IProfiler {
 	private void addPlaces() throws TooManyConnections {
 		Set <Place> places = new HashSet <Place>();
 		if (currentCountryRequired) {
-			Place place = createPlace(ProfileManagerImpl.getInstance().getCountryName(uID), NatureOfPlace.Country);
+			Place place = createPlace(ProfileManagerImpl.getInstance().getCountryName(userProfile), NatureOfPlace.Country);
 			if (place != null) places.add(place);
 		}
 		if (currentTownRequired) {
-			Place place = createPlace(ProfileManagerImpl.getInstance().getTownName(uID), NatureOfPlace.City);
+			Place place = createPlace(ProfileManagerImpl.getInstance().getTownName(userProfile), NatureOfPlace.City);
 			if (place != null) places.add(place);
 		}
 
 		if (scoreRatedAtLeast != -1) {
-			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRating(uID, scoreRatedAtLeast);
+			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRating(userProfile, scoreRatedAtLeast);
 			addPlaces(placeIds, places);
 			//addScoreRequired(scoreRatedAtLeast);
 		}
 		if (numberOfTimeVisitedAtLeast != -1) {
-			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisited(uID, numberOfTimeVisitedAtLeast);
+			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisited(userProfile, numberOfTimeVisitedAtLeast);
 			addPlaces(placeNames, places);
 		}
 		if (scoreRatedForFriendsAtLeast != -1) {
-			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRatingOfFriends(uID, scoreRatedForFriendsAtLeast);
+			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRatingOfFriends(userProfile, scoreRatedForFriendsAtLeast);
 			addPlaces(placeIds, places);
 			//addScoreRequired(scoreRatedForFriendsAtLeast);
 		}
 		if (numberOfTimeVisitedForFriendsAtLeast != -1) {
-			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisitedOfFriends(uID, numberOfTimeVisitedForFriendsAtLeast);
+			List <String> placeNames = ProfileManagerImpl.getInstance().getPlaceNamesFromNumberOfTimesVisitedOfFriends(userProfile, numberOfTimeVisitedForFriendsAtLeast);
 			addPlaces(placeNames, places);
 		}
 
 		if (distanceFromCurrentPosition != -1) {
-			GpsCoordinate coordinate = ProfileManagerImpl.getInstance().getCoordinate(uID);
+			GpsCoordinate coordinate = ProfileManagerImpl.getInstance().getCoordinate(userProfile);
 			if (coordinate != null) {
 			    addPlace(coordinate.getLatitude(), coordinate.getLongitude(), distanceFromCurrentPosition, places);
 			}

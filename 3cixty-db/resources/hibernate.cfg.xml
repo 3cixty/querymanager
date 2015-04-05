@@ -21,5 +21,12 @@
         <mapping class="eu.threecixty.logs.CallLogging"></mapping>
         <mapping class="eu.threecixty.partners.PartnerAccount"></mapping>
         <mapping class="eu.threecixty.partners.PartnerUser"></mapping>
+        <mapping class="eu.threecixty.userprofile.AccompanyingModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.AccountModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.AddressModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.PreferenceModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.TransportModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.UserModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.TrayModel"></mapping>
     </session-factory>
 </hibernate-configuration>

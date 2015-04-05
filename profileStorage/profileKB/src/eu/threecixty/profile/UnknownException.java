@@ -1,4 +1,4 @@
-package eu.threecixty.querymanager;
+package eu.threecixty.profile;
 
 public class UnknownException extends Exception {
 

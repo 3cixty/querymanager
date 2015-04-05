@@ -83,6 +83,8 @@ public interface IProfiler {
 	 * @return
 	 */
 	String getUID();
+	
+	UserProfile getProfile();
 
 //	/**
 //	 * Gets KB of UserProfile.

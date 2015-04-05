@@ -13,6 +13,8 @@ import com.hp.hpl.jena.sparql.expr.Expr;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.UnknownException;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.oldmodels.Period;
 
 /**
@@ -165,11 +167,12 @@ public class QueryManagerDecision {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireScoreRatedAtLeast(ProfileManagerImpl.getInstance().getMinimumScoreRated(profiler.getUID()));
+		UserProfile userProfile = profiler.getProfile();
+		profiler.requireScoreRatedAtLeast(ProfileManagerImpl.getInstance().getMinimumScoreRated(userProfile));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 		
 		profiler.initDefaultParametersForAugmentation();
-		profiler.requireNumberOfTimesVisitedAtLeast(ProfileManagerImpl.getInstance().getMinimumNumberOfTimesVisited(profiler.getUID()));
+		profiler.requireNumberOfTimesVisitedAtLeast(ProfileManagerImpl.getInstance().getMinimumNumberOfTimesVisited(userProfile));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 
 		QueryUtils.removeDoubleExpressions(exprs);
@@ -195,13 +198,14 @@ public class QueryManagerDecision {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
+		UserProfile userProfile = profiler.getProfile();
 		profiler.requireScoreRatedForFriendsAtLeast(
-				ProfileManagerImpl.getInstance().getMinimumScoreRatedForFriends(profiler.getUID()));
+				ProfileManagerImpl.getInstance().getMinimumScoreRatedForFriends(userProfile));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 
 		profiler.initDefaultParametersForAugmentation();
 		profiler.requireNumberOfTimesVisitedForFriendsAtLeast(
-				ProfileManagerImpl.getInstance().getMinimumNumberOfTimesVisitedForFriends(profiler.getUID()));
+				ProfileManagerImpl.getInstance().getMinimumNumberOfTimesVisitedForFriends(userProfile));
 		findTriplesAndExprs(profiler, qm, triples, exprs);
 
 		profiler.initDefaultParametersForAugmentation();

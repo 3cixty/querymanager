@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,99 +42,99 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public int getMinimumNumberOfTimesVisited(String uid) {
-		return PreferencesUtils.getMinimumNumberOfTimesVisited(uid);
+	public int getMinimumNumberOfTimesVisited(UserProfile userProfile) {
+		return PreferencesUtils.getMinimumNumberOfTimesVisited(getUID(userProfile));
 	}
 
 	@Override
-	public float getMinimumScoreRated(String uid) {
-		return PreferencesUtils.getMinimumScoreRated(uid);
+	public float getMinimumScoreRated(UserProfile userProfile) {
+		return PreferencesUtils.getMinimumScoreRated(getUID(userProfile));
 	}
 
 	@Override
-	public int getMinimumNumberOfTimesVisitedForFriends(String uid) {
-		return PreferencesUtils.getMinimumNumberOfTimesVisitedForFriends(uid);
+	public int getMinimumNumberOfTimesVisitedForFriends(UserProfile userProfile) {
+		return PreferencesUtils.getMinimumNumberOfTimesVisitedForFriends(getUID(userProfile));
 	}
 
 	@Override
-	public float getMinimumScoreRatedForFriends(String uid) {
-		return PreferencesUtils.getMinimumScoreRatedForFriends(uid);
+	public float getMinimumScoreRatedForFriends(UserProfile userProfile) {
+		return PreferencesUtils.getMinimumScoreRatedForFriends(getUID(userProfile));
 	}
 
 	@Override
-	public String getCountryName(String uid) {
-		return ProfilerPlaceUtils.getCountryName(getModel(), uid);
+	public String getCountryName(UserProfile userProfile) {
+		return ProfilerPlaceUtils.getCountryName(getModel(), getUID(userProfile));
 	}
 
 	@Override
-	public String getTownName(String uid) {
-		return ProfilerPlaceUtils.getTownName(getModel(), uid);
+	public String getTownName(UserProfile userProfile) {
+		return ProfilerPlaceUtils.getTownName(getModel(), getUID(userProfile));
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(String uid, float rating) {
-		return ProfilerPlaceUtils.getPlaceNamesFromRating(getModel(), uid, rating);
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating) {
+		return ProfilerPlaceUtils.getPlaceNamesFromRating(getModel(), getUID(userProfile), rating);
 	}
 
 	@Override
-	public List<String> getPlaceNamesFromNumberOfTimesVisited(String uid,
+	public List<String> getPlaceNamesFromNumberOfTimesVisited(UserProfile userProfile,
 			int number) {
-		return ProfilerPlaceUtils.getPlaceNamesFromNumberOfTimesVisitedOfFriends(getModel(), uid, number);
+		return ProfilerPlaceUtils.getPlaceNamesFromNumberOfTimesVisitedOfFriends(getModel(), getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRatingOfFriends(String uid,
+	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
 			float rating) {
-		return ProfilerPlaceUtils.getPlaceNamesFromRatingOfFriends(getModel(), uid, rating);
+		return ProfilerPlaceUtils.getPlaceNamesFromRatingOfFriends(getModel(), getUID(userProfile), rating);
 	}
 
 	@Override
 	public List<String> getPlaceNamesFromNumberOfTimesVisitedOfFriends(
-			String uid, int number) {
-		return ProfilerPlaceUtils.getPlaceNamesFromNumberOfTimesVisitedOfFriends(getModel(), uid, number);
+			UserProfile userProfile, int number) {
+		return ProfilerPlaceUtils.getPlaceNamesFromNumberOfTimesVisitedOfFriends(getModel(), getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getEventNamesFromEventPreferences(String uid) {
-		return ProfilerEventUtils.getEventNamesFromEventPreference(getModel(), uid);
+	public List<String> getEventNamesFromEventPreferences(UserProfile userProfile) {
+		return ProfilerEventUtils.getEventNamesFromEventPreference(getModel(), getUID(userProfile));
 	}
 
 	@Override
-	public List<StartAndEndDate> getPreferredStartAndEndDates(String uid) {
-		return ProfilerEventUtils.getPreferredStartAndEndDates(getModel(), uid);
+	public List<StartAndEndDate> getPreferredStartAndEndDates(UserProfile userProfile) {
+		return ProfilerEventUtils.getPreferredStartAndEndDates(getModel(), getUID(userProfile));
 	}
 
 	@Override
-	public List<String> getEventNamesFromRating(String uid, float rating) {
-		return ProfilerEventUtils.getEventNamesFromRating(getModel(), uid, rating);
+	public List<String> getEventNamesFromRating(UserProfile userProfile, float rating) {
+		return ProfilerEventUtils.getEventNamesFromRating(getModel(), getUID(userProfile), rating);
 	}
 
 	@Override
-	public List<String> getEventNamesFromNumberOfTimesVisited(String uid,
+	public List<String> getEventNamesFromNumberOfTimesVisited(UserProfile userProfile,
 			int number) {
-		return ProfilerEventUtils.getEventNamesFromNumberOfTimesVisited(getModel(), uid, number);
+		return ProfilerEventUtils.getEventNamesFromNumberOfTimesVisited(getModel(), getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getEventNamesFromRatingOfFriends(String uid,
+	public List<String> getEventNamesFromRatingOfFriends(UserProfile userProfile,
 			float rating) {
-		return ProfilerEventUtils.getEventNamesFromRatingOfFriends(getModel(), uid, rating);
+		return ProfilerEventUtils.getEventNamesFromRatingOfFriends(getModel(), getUID(userProfile), rating);
 	}
 
 	@Override
 	public List<String> getEventNamesFromNumberOfTimesVisitedOfFriends(
-			String uid, int number) {
-		return ProfilerEventUtils.getEventNamesFromNumberOfTimesVisitedOfFriends(getModel(), uid, number);
+			UserProfile userProfile, int number) {
+		return ProfilerEventUtils.getEventNamesFromNumberOfTimesVisitedOfFriends(getModel(), getUID(userProfile), number);
 	}
 
 	@Override
-	public List<String> getEventNamesWhichFriendsLikeToVisit(String uid) {
-		return ProfilerEventUtils.getEventNamesWhichFriendsLikeToVisit(getModel(), uid);
+	public List<String> getEventNamesWhichFriendsLikeToVisit(UserProfile userProfile) {
+		return ProfilerEventUtils.getEventNamesWhichFriendsLikeToVisit(getModel(), getUID(userProfile));
 	}
 
 	@Override
-	public GpsCoordinate getCoordinate(String uid) {
-		return ProfilerPlaceUtils.getCoordinates(getModel(), uid);
+	public GpsCoordinate getCoordinate(UserProfile userProfile) {
+		return ProfilerPlaceUtils.getCoordinates(getModel(), getUID(userProfile));
 	}
 	
 	private Model getModel() {
@@ -184,11 +185,11 @@ class SimpleProfileManagerImpl implements ProfileManager {
 			ResultSet rs = qe.execSelect();
 			for ( ; rs.hasNext(); ) {
 				QuerySolution qs = rs.next();
-				String UID = qs.getLiteral("uid").getString();
+				String uid = qs.getLiteral("uid").getString();
 				String mobidotUserName = qs.getLiteral("mobidotID").getString();
 				//Long mobidotID= getMobidotIDforUsername(mobidotUserName);
 				IDMapping mapper=new IDMapping();
-				mapper.setThreeCixtyID(UID);
+				mapper.setThreeCixtyID(uid);
 				mapper.setMobidotID(mobidotUserName);
 				//mapper.setMobidotID(mobidotID);
 				idMapping.add(mapper);
@@ -218,7 +219,31 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String find3cixtyUID(String arg0, String arg2) {
+	public String find3cixtyUID(String arg0, String source, String arg2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private String getUID(UserProfile userProfile) {
+		if (userProfile == null) return null;
+		return userProfile.getHasUID();
+	}
+
+	@Override
+	public Set<String> find3cixtyUIDs(List<String> arg0, String arg1, List <String> unfoundAccountIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean createProfiles(List<UserProfile> arg0) throws IOException,
+			UnknownException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public UserProfile findUserProfile(String arg0, String arg1, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}

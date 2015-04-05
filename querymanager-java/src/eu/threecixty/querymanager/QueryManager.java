@@ -29,7 +29,8 @@ import com.hp.hpl.jena.util.FileManager;
 
 import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.IProfiler;
-import eu.threecixty.profile.VirtuosoManager;
+import eu.threecixty.profile.SparqlEndPointUtils;
+import eu.threecixty.profile.UnknownException;
 import eu.threecixty.profile.oldmodels.Event;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Place;
@@ -172,7 +173,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		
 		Map <String, Boolean> maps = new HashMap <String, Boolean>();
 		
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(augmentedQueryStr, formatType, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQueryStr, formatType, sb);
 		JSONObject json = new JSONObject(sb.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 
@@ -226,7 +227,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		
 		List <String> elementIds = new LinkedList <String>();
 
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, formatType, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, sb);
 		JSONObject json = new JSONObject(sb.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 
@@ -260,13 +261,13 @@ import eu.threecixty.profile.oldmodels.Rating;
 		boolean ok = true;
 		// only make queries to public graphs
 //		if (uid == null) { // only public graphs
-		VirtuosoManager.getInstance().executeQueryViaSPARQL(query, formatType, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, sb);
 
 			if (EventMediaFormat.JSON == format) {
 				try {
 				    ok = hasElement(sb, numberOfOrders);
 				} catch (JSONException e) { // check if there are some backslashes
-					String newString = VirtuosoManager.getInstance().cleanResultReceivedFromVirtuoso(sb.toString());
+					String newString = SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(sb.toString());
 					//newString = newString.replace("\\","\\\\");
 					//newString = newString.replace("\\\\\"", "\\\\\\\"");
 					if (DEBUG_MOD) LOGGER.info(newString);

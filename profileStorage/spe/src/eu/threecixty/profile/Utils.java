@@ -1,8 +1,12 @@
 package eu.threecixty.profile;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,6 +50,29 @@ public class Utils {
 		}
 		if (found) return; // already existed
 		addProfileIdentities(_3cixtyUID, uid, source, profileIdentities);
+	}
+	
+	protected static Set <String> getOrCreate3cixtyUIDsForKnows(List <String> uids,
+			String source) throws IOException, UnknownException {
+		List <String> unfoundAccountIds = new LinkedList<String>();
+		Set<String> knows = ProfileManagerImpl.getInstance().find3cixtyUIDs(
+				uids, source, unfoundAccountIds);
+		
+		if (unfoundAccountIds.size() > 0) {
+			List <UserProfile> userProfilesToBeCreated = new LinkedList<UserProfile>();
+			for (String unfoundAccountId: unfoundAccountIds) {
+				String tmp3cixtyUid = Utils.gen3cixtyUID(unfoundAccountId, UidSource.GOOGLE);
+				UserProfile tmpUserProfile = new UserProfile();
+				tmpUserProfile.setHasUID(tmp3cixtyUid);
+				userProfilesToBeCreated.add(tmpUserProfile);
+				Set <ProfileIdentities> tmpPis = new HashSet <ProfileIdentities>();
+				Utils.setProfileIdentities(tmp3cixtyUid, unfoundAccountId, source, tmpPis);
+
+				knows.add(tmp3cixtyUid);
+			}
+			ProfileManagerImpl.getInstance().createProfiles(userProfilesToBeCreated);
+		}
+		return knows;
 	}
 	
 	protected static void addProfileIdentities(String _3cixtyUID, String partnerAccountId, String source,

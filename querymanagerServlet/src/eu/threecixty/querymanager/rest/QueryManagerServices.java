@@ -38,15 +38,16 @@ import eu.threecixty.profile.ElementDetailsUtils;
 import eu.threecixty.profile.ElementPoIDetails;
 import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.LanguageUtils;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.TooManyConnections;
-import eu.threecixty.profile.VirtuosoManager;
+import eu.threecixty.profile.UnknownException;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.querymanager.EventMediaFormat;
 import eu.threecixty.querymanager.IQueryManager;
 import eu.threecixty.querymanager.QueryManager;
 import eu.threecixty.querymanager.QueryManagerDecision;
 import eu.threecixty.querymanager.ThreeCixtyQuery;
-import eu.threecixty.querymanager.UnknownException;
 
 /**
  * The class is an end point for QA RestAPIs to expose to other components.
@@ -117,10 +118,11 @@ public class QueryManagerServices {
 						.build());
 			} else {
 				logInfo("Before reading user profile");
-				IProfiler profiler = new Profiler(user_id);
-				QueryManager qm = new QueryManager(user_id);
 
 				try {
+					UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+					IProfiler profiler = new Profiler(userProfile);
+					QueryManager qm = new QueryManager(user_id);
 					logInfo("Before augmenting and executing a query");
 					
 					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true, isLimitForProfile(userAccessToken));
@@ -150,12 +152,12 @@ public class QueryManagerServices {
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				} catch (TooManyConnections e) {
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				} catch (UnknownException e) {
-					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
@@ -212,8 +214,8 @@ public class QueryManagerServices {
 							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 				} catch (IOException e) {
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -268,8 +270,8 @@ public class QueryManagerServices {
 				return Response.ok(result.toString(), MediaType.APPLICATION_JSON_TYPE ).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -297,8 +299,8 @@ public class QueryManagerServices {
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -327,8 +329,8 @@ public class QueryManagerServices {
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -383,8 +385,8 @@ public class QueryManagerServices {
 					return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (IOException e) {
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -427,8 +429,8 @@ public class QueryManagerServices {
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -475,9 +477,6 @@ public class QueryManagerServices {
 				pair2 = gson.fromJson(filter2, KeyValuePair.class);
 			} catch (Exception e) {}
 
-			IProfiler profiler = new Profiler(user_id);
-			QueryManager qm = new QueryManager(user_id);
-
 			String query = createSelectSparqlQuery(offset, limit,
 					(pair1 == null ? null : pair1.getGroupBy()),
 					(pair1 == null ? null : pair1.getValue()),
@@ -485,6 +484,9 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()));
 
 			try {
+				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+				IProfiler profiler = new Profiler(userProfile);
+				QueryManager qm = new QueryManager(user_id);
 				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken));
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
@@ -496,7 +498,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -550,9 +552,6 @@ public class QueryManagerServices {
 				pair2 = gson.fromJson(filter2, KeyValuePair.class);
 			} catch (Exception e) {}
 
-			IProfiler profiler = new Profiler(user_id);
-			QueryManager qm = new QueryManager(user_id);
-
 			String query = createSelectSparqlQuery(offset, limit,
 					(pair1 == null ? null : pair1.getGroupBy()),
 					(pair1 == null ? null : pair1.getValue()),
@@ -560,6 +559,9 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()));
 
 			try {
+				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+				IProfiler profiler = new Profiler(userProfile);
+				QueryManager qm = new QueryManager(user_id);
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				Map <String, Boolean> result = executeQuery(profiler, qm, query, null, false, isLimitForProfile(userAccessToken));
 				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet(), null, tmpLanguages);
@@ -575,7 +577,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -623,12 +625,12 @@ public class QueryManagerServices {
 			String user_id =  userAccessToken.getUid();
 			String key = userAccessToken.getAppkey();
 
-			IProfiler profiler = new Profiler(user_id);
-			QueryManager qm = new QueryManager(user_id);
-
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
+				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+				IProfiler profiler = new Profiler(userProfile);
+				QueryManager qm = new QueryManager(user_id);
 				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken));
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
@@ -640,7 +642,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -683,12 +685,12 @@ public class QueryManagerServices {
 			String user_id =  userAccessToken.getUid();
 			String key = userAccessToken.getAppkey();
 
-			IProfiler profiler = new Profiler(user_id);
-			QueryManager qm = new QueryManager(user_id);
-
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
+				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+				IProfiler profiler = new Profiler(userProfile);
+				QueryManager qm = new QueryManager(user_id);
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference, false, isLimitForProfile(userAccessToken));
 				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), null, tmpLanguages);
@@ -706,7 +708,7 @@ public class QueryManagerServices {
 				        .build();
 			} catch (TooManyConnections e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -763,8 +765,8 @@ public class QueryManagerServices {
 					return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -815,8 +817,8 @@ public class QueryManagerServices {
 				} catch (IOException e) {
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
 					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-					        .entity(VirtuosoManager.BUSY_EXCEPTION)
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
 				}
@@ -847,8 +849,8 @@ public class QueryManagerServices {
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}
@@ -885,8 +887,8 @@ public class QueryManagerServices {
 			} catch (IOException e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
 				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_UNAVAILABLE)
-				        .entity(VirtuosoManager.BUSY_EXCEPTION)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
 			}

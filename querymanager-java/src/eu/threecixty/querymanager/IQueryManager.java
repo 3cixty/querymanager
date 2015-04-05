@@ -10,6 +10,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
 import eu.threecixty.profile.IProfiler;
+import eu.threecixty.profile.UnknownException;
 
 /**
  * 
