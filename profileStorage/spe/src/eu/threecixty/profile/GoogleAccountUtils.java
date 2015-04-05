@@ -49,7 +49,7 @@ public class GoogleAccountUtils {
 			if (!accessToken.equals("")) { // TODO: remove after testing
 				String uid = String.valueOf(System.nanoTime()); // random uid
 				Map <String, Boolean> attrs = Utils.getAttributesToLoadProfileFromGoogleFB();
-				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, attrs);
+				UserProfile profile = new UserProfile();
 				profile.setHasUID(uid);
 				String picture = "https://www.google.fr/images/srpr/logo11w.png";
 				profile.setProfileImage(picture);
