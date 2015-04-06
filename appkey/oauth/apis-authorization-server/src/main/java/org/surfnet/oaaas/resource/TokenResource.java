@@ -19,6 +19,7 @@
 package org.surfnet.oaaas.resource;
 
 import com.sun.jersey.api.client.ClientResponse.Status;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -39,11 +40,13 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.surfnet.oaaas.auth.OAuth2Validator.*;
@@ -62,7 +65,7 @@ public class TokenResource {
   public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
   
   /**This attribute is used to avoid synchronization issues among different instances of access token spring data repo*/
-  private static List <AccessToken> hackAccessTokens = new ArrayList<AccessToken>();
+  private static Map <String, AccessToken> hackAccessTokens = new HashMap<String, AccessToken>();
 
   @Inject
   private AuthorizationRequestRepository authorizationRequestRepository;
@@ -151,8 +154,10 @@ public class TokenResource {
     String refreshToken = (client.isUseRefreshTokens()) ? getTokenValue(true) : null;
     AuthenticatedPrincipal principal = request.getPrincipal();
     AccessToken token = new AccessToken(getTokenValue(false), principal, client, expires, request.getGrantedScopes(), refreshToken);
+    synchronized (hackAccessTokens) {
+        hackAccessTokens.put(token.getToken(), token);
+    }
     AccessToken ret = accessTokenRepository.save(token);
-    hackAccessTokens.add(ret);
     return ret;
   }
 
@@ -372,10 +377,7 @@ public class TokenResource {
    */
   public static synchronized AccessToken findByToken(String token) {
 	  if (token == null) return null;
-	  for (AccessToken tmpAt: hackAccessTokens) {
-		  if (token.equals(tmpAt.getToken())) return tmpAt;
-	  }
-	  return null;
+	  return hackAccessTokens.get(token);
   }
 
   /**
@@ -384,14 +386,7 @@ public class TokenResource {
    */
   public static synchronized void deleteByToken(String token) {
 	  if (token == null) return ;
-	  AccessToken at = null;
-	  for (AccessToken tmpAt: hackAccessTokens) {
-		  if (token.equals(tmpAt.getToken())) {
-			  at = tmpAt;
-			  break;
-		  }
-	  }
-	  if (at != null) hackAccessTokens.remove(at);
+	  hackAccessTokens.remove(token);
   }
 
   /**
@@ -401,15 +396,16 @@ public class TokenResource {
   public static synchronized void cleanAccessToken(AccessTokenRepository differentAccessTokenRepository) {
 	  if (differentAccessTokenRepository == null) return;
 	  // note that there might be different between a supposed instance in repo and hack list
-	  List <AccessToken> list = new ArrayList <AccessToken>();
-	  for (AccessToken tmpAT1: differentAccessTokenRepository.findAll()) {
-		  for (AccessToken tmpAT2: hackAccessTokens) {
-			  if (tmpAT1.getToken().equals(tmpAT2.getToken())) {
-				  list.add(tmpAT2);
-				  break;
-			  }
+	  Iterator <String> keys = hackAccessTokens.keySet().iterator();
+	  long currentTime = System.currentTimeMillis();
+	  for ( ; keys.hasNext(); ) {
+		  String key = keys.next();
+		  AccessToken token = hackAccessTokens.get(key);
+		  long subtract = currentTime - token.getExpires();
+		  if (subtract > 0) {
+			  keys.remove();
+			  hackAccessTokens.remove(key);
 		  }
 	  }
-	  hackAccessTokens.removeAll(list);
   }
 }
