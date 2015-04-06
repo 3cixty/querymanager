@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,8 +15,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 @Table(name = "3cixty_user_profile", uniqueConstraints = {
@@ -99,7 +98,7 @@ public class UserModel implements java.io.Serializable {
 		this.lastCrawlTimeToKB = lastCrawlTimeToKB;
 	}
 
-	@CollectionOfElements
+	@ElementCollection
 	public Set<String> getKnows() {
 		return knows;
 	}
