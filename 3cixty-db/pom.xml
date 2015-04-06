@@ -56,22 +56,28 @@
 
 	<!-- Hibernate core -->
 	<dependency>
-		<groupId>hibernate</groupId>
-		<artifactId>hibernate3</artifactId>
-		<version>3.2.3.GA</version>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-core</artifactId>
+		<version>4.3.8.Final</version>
 	</dependency>
  
 	<!-- Hibernate annotation -->
 	<dependency>
-		<groupId>hibernate-annotations</groupId>
+		<groupId>org.hibernate</groupId>
 		<artifactId>hibernate-annotations</artifactId>
-		<version>3.3.0.GA</version>
+		<version>3.5.6-Final</version>
+		<exclusions>
+		  <exclusion>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		  </exclusion>
+		</exclusions>
 	</dependency>
  
 	<dependency>
-		<groupId>hibernate-commons-annotations</groupId>
+		<groupId>org.hibernate.common</groupId>
 		<artifactId>hibernate-commons-annotations</artifactId>
-		<version>3.0.0.GA</version>
+		<version>4.0.5.Final</version>
 	</dependency>
 
 
@@ -112,9 +118,9 @@
 </dependency>
 
 <dependency>
-	<groupId>com.mchange</groupId>
-	<artifactId>c3p0</artifactId>
-	<version>0.9.5</version>
+	<groupId>org.hibernate</groupId>
+	<artifactId>hibernate-c3p0</artifactId>
+	<version>4.3.8.Final</version>
 </dependency>
 
 
