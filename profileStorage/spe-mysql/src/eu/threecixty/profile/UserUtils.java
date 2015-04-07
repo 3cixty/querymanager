@@ -466,6 +466,7 @@ public class UserUtils {
 	private static UserProfile convertToUserProfile(UserModel userModel) {
 		UserProfile userProfile = new UserProfile();
 		userProfile.setHasUID(userModel.getUid());
+		userProfile.setModelIdInPersistentDB(userModel.getId());
 		
 		convertName(userModel, userProfile);
 		convertAddress(userModel, userProfile);
