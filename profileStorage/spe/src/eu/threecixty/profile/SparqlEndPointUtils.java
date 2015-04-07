@@ -10,7 +10,7 @@ import java.net.URLEncoder;
 public class SparqlEndPointUtils {
 	
 	private static final String LOCN_PREFIX = "PREFIX locn: <http://www.w3.org/ns/locn#> ";
-	private static final String CE_MILANO_PREFIX = "PREFIX ce: <http://data.linkedevents.org/cell/milano/>";
+	private static final String CE_MILANO_PREFIX = "PREFIX ce: <http://data.linkedevents.org/cell/milano/> ";
 	private static final String SPARQL_ENDPOINT_URL = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 	
 	//private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
