@@ -16,8 +16,8 @@ public class SparqlEndPointUtils {
 	//private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
 
 	public static void executeQueryViaSPARQL(String query, String format, StringBuilder result) throws IOException {
-		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(LOCN_PREFIX + query, "UTF-8")
-				+ URLEncoder.encode(CE_MILANO_PREFIX + query, "UTF-8");
+		String urlStr = SPARQL_ENDPOINT_URL + URLEncoder.encode(
+				LOCN_PREFIX + CE_MILANO_PREFIX + query, "UTF-8");
 		urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
 
 		URL url = new URL(urlStr);
