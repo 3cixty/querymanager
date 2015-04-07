@@ -126,7 +126,7 @@ public class GoogleAccountUtils {
 				profile.setKnows(knows);
 			} catch (Exception ex) {
 				LOGGER.error(ex.getMessage());
-				return null;
+				//return null; // TI's code isn't able to get friends list
 			}
 
 			Set <ProfileIdentities> profileIdentities = null;
