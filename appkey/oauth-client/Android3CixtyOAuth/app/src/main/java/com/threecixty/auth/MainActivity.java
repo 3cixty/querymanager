@@ -189,7 +189,9 @@ public class MainActivity extends FragmentActivity {
             }
         }
 
-        Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+        if (Session.getActiveSession() != null) {
+            Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+        }
 
 	}
 
