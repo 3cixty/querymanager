@@ -107,7 +107,7 @@ public class QueryManagerServices {
 	 * @return Data received from Eurecom when executing a query augmented. 
 	 */
 	@GET
-	@Path("/augmentAndExecute")
+	@Path("/augmentAndExecute2")
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
@@ -206,7 +206,7 @@ public class QueryManagerServices {
 	 * @return
 	 */
 	@GET
-	@Path("/executeQuery")
+	@Path("/executeQuery2")
 	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
 			@QueryParam("format") String format, @QueryParam("query") String query) {
 		logInfo("Start executeQuery method ----------------------");
