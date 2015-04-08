@@ -13,8 +13,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -77,6 +79,17 @@ public class QueryManagerServices {
 
 	public static String realPath;
 	private static String allPrefixes;
+	
+
+	@POST
+	@Path("/augmentAndExecute")
+	public Response executeQueryPOST(@HeaderParam("access_token") String access_token,
+			@FormParam("format") String format, @FormParam("query") String query,
+			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug) {
+		
+		return executeQuery(access_token, format, query, filter, debug);
+	}
+
 	
 	/**
 	 * This method firstly augments a given query, then sends to Eurecom to execute and receives data back.
@@ -177,6 +190,21 @@ public class QueryManagerServices {
 	 * @param filter
 	 * @return
 	 */
+	@POST
+	@Path("/executeQuery")
+	public Response executeQueryNoAccessTokenPost(@HeaderParam("key") String key, 
+			@FormParam("format") String format, @FormParam("query") String query) {
+		return executeQueryNoAccessToken(key, format, query);
+	}
+	
+	/**
+	 * Make query without information about 3cixty access token
+	 * @param key
+	 * @param format
+	 * @param query
+	 * @param filter
+	 * @return
+	 */
 	@GET
 	@Path("/executeQuery")
 	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
@@ -194,18 +222,8 @@ public class QueryManagerServices {
 						.build();
 			} else {
 
-				Query jenaQuery = createJenaQuery(query);
-				if (jenaQuery == null) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNPARSED_QUERY);
-					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-							.entity(CallLoggingConstants.UNPARSED_QUERY)
-							.type(MediaType.TEXT_PLAIN)
-							.build();
-				}
-				
-				String queryToBeExecuted = QueryManager.removePrefixes(jenaQuery.toString());
 				try {
-					String result = QueryManager.executeQuery(queryToBeExecuted, eventMediaFormat);
+					String result = QueryManager.executeQuery(query, eventMediaFormat);
 
 					// log calls
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
