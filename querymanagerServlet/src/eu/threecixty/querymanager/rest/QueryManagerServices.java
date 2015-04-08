@@ -82,7 +82,7 @@ public class QueryManagerServices {
 	
 
 	@POST
-	@Path("/augmentAndExecute")
+	@Path("/augmentAndExecute2")
 	public Response executeQueryPOST(@HeaderParam("access_token") String access_token,
 			@FormParam("format") String format, @FormParam("query") String query,
 			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug) {
@@ -107,7 +107,7 @@ public class QueryManagerServices {
 	 * @return Data received from Eurecom when executing a query augmented. 
 	 */
 	@GET
-	@Path("/augmentAndExecute2")
+	@Path("/augmentAndExecute")
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
@@ -191,7 +191,7 @@ public class QueryManagerServices {
 	 * @return
 	 */
 	@POST
-	@Path("/executeQuery")
+	@Path("/executeQuery2")
 	public Response executeQueryNoAccessTokenPost(@HeaderParam("key") String key, 
 			@FormParam("format") String format, @FormParam("query") String query) {
 		return executeQueryNoAccessToken(key, format, query);
@@ -206,7 +206,7 @@ public class QueryManagerServices {
 	 * @return
 	 */
 	@GET
-	@Path("/executeQuery2")
+	@Path("/executeQuery")
 	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
 			@QueryParam("format") String format, @QueryParam("query") String query) {
 		logInfo("Start executeQuery method ----------------------");
