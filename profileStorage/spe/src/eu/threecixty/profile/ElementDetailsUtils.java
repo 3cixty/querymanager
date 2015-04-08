@@ -91,7 +91,7 @@ public class ElementDetailsUtils {
 		StringBuilder result = new StringBuilder();
 		
 		SparqlEndPointUtils.executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", 
-				SparqlEndPointUtils.HTTP_GET, result);
+				SparqlEndPointUtils.HTTP_POST, result);
 
 		JSONObject json = new JSONObject(
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
@@ -196,7 +196,7 @@ public class ElementDetailsUtils {
 		StringBuilder result = new StringBuilder();
 		
 		SparqlEndPointUtils.executeQueryViaSPARQL(queryBuff.toString(),
-				"application/sparql-results+json", SparqlEndPointUtils.HTTP_GET, result);
+				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, result);
 
 		JSONObject json = new JSONObject(
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));

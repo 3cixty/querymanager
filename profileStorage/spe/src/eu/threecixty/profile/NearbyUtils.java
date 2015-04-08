@@ -94,7 +94,7 @@ public class NearbyUtils {
 		
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(builder.toString(),
-				"application/sparql-results+json", SparqlEndPointUtils.HTTP_GET, resultBuilder); 
+				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, resultBuilder); 
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
@@ -230,7 +230,7 @@ public class NearbyUtils {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
-				SparqlEndPointUtils.HTTP_GET, resultBuilder);
+				SparqlEndPointUtils.HTTP_POST, resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -254,7 +254,7 @@ public class NearbyUtils {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
-				SparqlEndPointUtils.HTTP_GET, resultBuilder);
+				SparqlEndPointUtils.HTTP_POST, resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
