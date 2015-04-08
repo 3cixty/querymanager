@@ -100,7 +100,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	
 	@Override
 	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
-			EventMediaFormat format) throws IOException, UnknownException {
+			EventMediaFormat format, String httpMethod) throws IOException, UnknownException {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		augmentedQuery.getQuery().getQuery().setDistinct(true);
@@ -128,10 +128,10 @@ import eu.threecixty.profile.oldmodels.Rating;
 			
 			StringBuilder sb = new StringBuilder();
 			
-			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, sb, uid, numberOfOrders);
+			boolean ok = hasElementsForBindings(augmentedQueryStr, format, formatType, httpMethod, sb, uid, numberOfOrders);
 			if (ok) return sb.toString();
 			
-			hasElementsForBindings(originalQueryStr, format, formatType, sb, uid, numberOfOrders);
+			hasElementsForBindings(originalQueryStr, format, formatType, httpMethod, sb, uid, numberOfOrders);
 			
 			return sb.toString();
 
@@ -144,7 +144,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 		}
 	}
 	
-	public Map<String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery) throws IOException {
+	public Map<String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery,
+			String httpMethod) throws IOException {
 		String formatType = "application/sparql-results+json";
 		augmentedQuery.getQuery().getQuery().setDistinct(true);
 		if (!augmentedQuery.getQuery().getQuery().hasLimit()) {
@@ -173,7 +174,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		
 		Map <String, Boolean> maps = new HashMap <String, Boolean>();
 		
-		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQueryStr, formatType, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQueryStr, formatType, httpMethod, sb);
 		JSONObject json = new JSONObject(sb.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 
@@ -203,12 +204,12 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @param format
 	 * @return
 	 */
-	public static String executeQuery(String query, EventMediaFormat format) throws IOException {
+	public static String executeQuery(String query, EventMediaFormat format, String httpMethod) throws IOException {
 		if (query == null || format == null) return "";
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		StringBuilder builder = new StringBuilder();
-		hasElementsForBindings(query, format, formatType, builder, null, 0);
+		hasElementsForBindings(query, format, formatType, httpMethod, builder, null, 0);
 		return builder.toString();
 	}
 	
@@ -219,7 +220,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @param query
 	 * @return
 	 */
-	public static List <String> getElementIDs(String query) throws IOException {
+	public static List <String> getElementIDs(String query, String httpMethod) throws IOException {
 
 		String formatType = "application/sparql-results+json";
 
@@ -227,7 +228,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		
 		List <String> elementIds = new LinkedList <String>();
 
-		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
 		JSONObject json = new JSONObject(sb.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 
@@ -252,7 +253,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 	 * @return
 	 * @throws IOException 
 	 */
-	private static boolean hasElementsForBindings(String query, EventMediaFormat format, String formatType,
+	private static boolean hasElementsForBindings(String query, EventMediaFormat format,
+			String formatType, String httpMethod,
 			StringBuilder sb, String uid, int numberOfOrders) throws IOException {
 		sb.setLength(0);
 
@@ -261,7 +263,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		boolean ok = true;
 		// only make queries to public graphs
 //		if (uid == null) { // only public graphs
-		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
 
 			if (EventMediaFormat.JSON == format) {
 				try {

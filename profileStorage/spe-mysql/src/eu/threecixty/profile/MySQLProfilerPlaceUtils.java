@@ -117,7 +117,8 @@ public class MySQLProfilerPlaceUtils {
 	    
 		List <String> placeNames = new ArrayList <String>();
 		StringBuilder result = new StringBuilder();
-		SparqlEndPointUtils.executeQueryViaSPARQL(qStr, JSON_APP_FORMAT, result);
+		SparqlEndPointUtils.executeQueryViaSPARQL(qStr, JSON_APP_FORMAT,
+				SparqlEndPointUtils.HTTP_POST, result);
 		JSONObject jsonObj;
 
 		jsonObj = new JSONObject(result.toString());

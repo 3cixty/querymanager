@@ -41,7 +41,8 @@ public interface IQueryManager {
 	 * 			The returned string format
 	 * @return: a RDF or JSON in string format. Return Null if any error occurs.
 	 */
-	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery, EventMediaFormat format) throws IOException, UnknownException;
+	public String askForExecutingAugmentedQueryAtEventMedia(AugmentedQuery augmentedQuery,
+			EventMediaFormat format, String httpMethod) throws IOException, UnknownException;
 	
 	/**
 	 * Execute a given augmented query. The return is a map of pairs with key is element (Event/PoI) ID,
@@ -49,7 +50,7 @@ public interface IQueryManager {
 	 * @param augmentedQuery
 	 * @return
 	 */
-	Map <String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery) throws IOException;
+	Map <String, Boolean> askForExecutingAugmentedQuery(AugmentedQuery augmentedQuery, String httpMethod) throws IOException;
 	
 	/**
 	 * Request preferences from Knowledge-Base of User Profiles.

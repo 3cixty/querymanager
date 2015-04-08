@@ -21,7 +21,33 @@ public class SparqlEndPointUtils {
 	private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
 	private static final String UTF8 = "UTF-8";
 	
+	private static final String SPARQL_ENDPOINT_URL_GET = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
+	public static final String HTTP_POST = "POST";
+	public static final String HTTP_GET = "GET";
+	
+	
 	public static void executeQueryViaSPARQL(String query, String format,
+			String httpMethod, StringBuilder result) throws IOException {
+		if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, result);
+		else executeQueryViaSPARQL_POST(query, format, result);
+	}
+
+	private static void executeQueryViaSPARQL_GET(String query, String format, StringBuilder result) throws IOException {
+		String urlStr = SPARQL_ENDPOINT_URL_GET + URLEncoder.encode(
+					LOCN_PREFIX + CE_MILANO_PREFIX + query, "UTF-8");
+			urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
+			URL url = new URL(urlStr);
+	
+			InputStream input = url.openStream();
+		byte [] b = new byte[1024];
+		int readBytes = 0;
+			while ((readBytes = input.read(b)) >= 0) {
+			result.append(new String(b, 0, readBytes, "UTF-8"));
+			}
+		input.close();
+	}
+	
+	private static void executeQueryViaSPARQL_POST(String query, String format,
 			StringBuilder result) throws IOException {
 		HttpURLConnection.setFollowRedirects(true);
 		URL url = new URL(SPARQL_ENDPOINT_URL);
