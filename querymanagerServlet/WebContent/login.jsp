@@ -111,7 +111,23 @@
 
 
     <input type=hidden name="key" value="<%=key%>">
-    <label style="width: 60%">Sign in to 3cixty platform. Note that 3cixty uses Google or Facebook account to authenticate the user.</label>
+    <img src="<%=Configuration.get3CixtyRoot()%>/3cixty.png">
+    
+    
+    
+<p>
+Sign in to 3cixty platform. Note that 3cixty uses Google or Facebook account to authenticate the user.
+</p>
+Why sign in to the 3cixty platform? 
+<br>
+You can save your Wish List and access it from the mobile part of ExplorMI 360.
+<br>
+You can ask the application to take into account things like the ratings given by your friends.
+<br>
+If you have been in Milan and have asked the mobile part of the application to track your movements there, you can view pages summarizing your movements. 
+<br><br><br>
+To see how the privacy of your data will be protected, see the privacy statement [<a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">link</a>].
+
     
 
     <br>
