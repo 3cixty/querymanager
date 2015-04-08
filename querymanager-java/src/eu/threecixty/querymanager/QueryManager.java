@@ -124,7 +124,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				originalQueryStr = removePrefixes(originalQueryStr);
 			}
 			
-			logInfo("Augmented query: " + augmentedQueryStr);
+			if (DEBUG_MOD) LOGGER.info("Augmented query: " + augmentedQueryStr);
 			
 			StringBuilder sb = new StringBuilder();
 			
@@ -167,7 +167,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 			originalQueryStr = removePrefixes(originalQueryStr);
 		}
 		
-		logInfo("Augmented query: " + augmentedQueryStr);
+		if (DEBUG_MOD) LOGGER.info("Augmented query: " + augmentedQueryStr);
 		
 		StringBuilder sb = new StringBuilder();
 
@@ -258,7 +258,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 			StringBuilder sb, String uid, int numberOfOrders) throws IOException {
 		sb.setLength(0);
 
-		logInfo("Query to be executed: " + query);
+		if (DEBUG_MOD) LOGGER.info("Query to be executed: " + query);
 
 		boolean ok = true;
 		// only make queries to public graphs
@@ -267,12 +267,13 @@ import eu.threecixty.profile.oldmodels.Rating;
 
 			if (EventMediaFormat.JSON == format) {
 				try {
+					if (DEBUG_MOD) LOGGER.info("data received from Virtuoso: " + sb.toString());
 				    ok = hasElement(sb, numberOfOrders);
 				} catch (JSONException e) { // check if there are some backslashes
 					String newString = SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(sb.toString());
 					//newString = newString.replace("\\","\\\\");
 					//newString = newString.replace("\\\\\"", "\\\\\\\"");
-					if (DEBUG_MOD) LOGGER.info(newString);
+					if (DEBUG_MOD) LOGGER.info("data processed: " + newString);
 					sb.setLength(0);
 					sb.append(newString);
 					ok = hasElement(sb, numberOfOrders);
@@ -286,7 +287,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 //			sb.append(result.toString());
 //		}
 		
-		logInfo("Finished executing the query on Virtuoso: ok = " + ok);
+			if (DEBUG_MOD) LOGGER.info("Finished executing the query on Virtuoso: ok = " + ok);
 
 		return ok;
 	}
@@ -411,17 +412,17 @@ import eu.threecixty.profile.oldmodels.Rating;
 		if (preference == null || query == null) return;
 		if (triples.size() == 0 && exprs.size() == 0) return;
 		if (DEBUG_MOD) {
-			logInfo("Enter into the performORAugmentation method");
-			logInfo("Information about triples added: ----------------------");
+			if (DEBUG_MOD) LOGGER.info("Enter into the performORAugmentation method");
+			if (DEBUG_MOD) LOGGER.info("Information about triples added: ----------------------");
 			for (Triple triple: triples) {
-				logInfo(triple.toString());
+				if (DEBUG_MOD) LOGGER.info(triple.toString());
 			}
-			logInfo("-------------------------------------------------------");
-			logInfo("Information about expressions added: ----------------------");
+			if (DEBUG_MOD) LOGGER.info("-------------------------------------------------------");
+			if (DEBUG_MOD) LOGGER.info("Information about expressions added: ----------------------");
 			for (Expr expr: exprs) {
-				logInfo(expr.toString());
+				if (DEBUG_MOD) LOGGER.info(expr.toString());
 			}
-			logInfo("-------------------------------------------------------");
+			if (DEBUG_MOD) LOGGER.info("-------------------------------------------------------");
 		}
 		augmentedQuery = new AugmentedQuery(query.cloneQuery());
 		if (augmentedQuery.getQuery().getQuery().hasAggregators()) return;
@@ -436,47 +437,47 @@ import eu.threecixty.profile.oldmodels.Rating;
 			List<Triple> triples, List<Expr> exprs) {
 		if (query == null || preference == null) return;
 		
-		logInfo("Enter into the addTriplesAndExprsToLists method");
+		if (DEBUG_MOD) LOGGER.info("Enter into the addTriplesAndExprsToLists method");
 		
 		Set <Place> places = preference.getHasPlaces();
 		if (places != null && places.size() > 0) {
-			logInfo("List of places: --------------------");
+			if (DEBUG_MOD) LOGGER.info("List of places: --------------------");
 			for (Place place: places) {
-				logInfo("Place name: " + place.getHasPlaceDetail().getHasPlaceName()
+				if (DEBUG_MOD) LOGGER.info("Place name: " + place.getHasPlaceDetail().getHasPlaceName()
 						+ ", NatureOfPlace: " + place.getHasPlaceDetail().getHasNatureOfPlace());
 				query.addExpressionsAndTriples(place, exprs, triples, isForEvents);
 			}
-			logInfo("------------------------------------");
+			if (DEBUG_MOD) LOGGER.info("------------------------------------");
 		}
 
 		Set <Event> events = preference.getHasEvents();
 		if (events != null && events.size() > 0) {
-			logInfo("List of events: --------------------");
+			if (DEBUG_MOD) LOGGER.info("List of events: --------------------");
 			for (Event event: events) {
-				logInfo("Event name: " + event.getHasEventDetail().getHasEventName()
+				if (DEBUG_MOD) LOGGER.info("Event name: " + event.getHasEventDetail().getHasEventName()
 						+ ", NatureOfEvent: " + event.getHasEventDetail().getHasNatureOfEvent());
 				query.addExpressionsAndTriples(event, exprs, triples, isForEvents);
 			}
-			logInfo("------------------------------------");
+			if (DEBUG_MOD) LOGGER.info("------------------------------------");
 		}
 
 		Set <Period> periods = preference.getHasPeriods();
 		if (periods != null && periods.size() > 0) {
-			logInfo("List of periods: -------------------");
+			if (DEBUG_MOD) LOGGER.info("List of periods: -------------------");
 			addPeriodsToTriplesAndExprsList(periods, query, triples, exprs, isForEvents);
-			logInfo("------------------------------------");
+			if (DEBUG_MOD) LOGGER.info("------------------------------------");
 		}
 
 		Set <Double> scoresRequired = preference.getScoresRequired();
 		if (scoresRequired != null && scoresRequired.size() > 0) {
-			logInfo("List of scores: --------------------");
+			if (DEBUG_MOD) LOGGER.info("List of scores: --------------------");
 			for (Double score: scoresRequired) {
-				logInfo("Score: " + score);
+				if (DEBUG_MOD) LOGGER.info("Score: " + score);
 				Rating rating = new Rating();
 				rating.setHasUseDefinedRating(score);
 				query.addExpressionsAndTriples(rating, exprs, triples, isForEvents);
 			}
-			logInfo("------------------------------------");
+			if (DEBUG_MOD) LOGGER.info("------------------------------------");
 		}
 	}
 
@@ -548,7 +549,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 
 	private void addPeriodsToTriplesAndExprsList(Set<Period> periods, ThreeCixtyQuery query, List <Triple> triples, List <Expr> exprs, boolean isForEvents) {
 		for (Period period: periods) {
-			logInfo("start date: " + period.getStartDate() + ", end date: " + period.getEndDate());
+			if (DEBUG_MOD) LOGGER.info("start date: " + period.getStartDate() + ", end date: " + period.getEndDate());
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "startDate", "datetime",
 					exprs, triples, ThreeCixtyExpression.GreaterThanOrEqual, isForEvents);
 			query.addExprsAndTriplesFromAttributeNameAndPropertyName(period, "endDate", "datetime",
@@ -565,15 +566,6 @@ import eu.threecixty.profile.oldmodels.Rating;
 			return query.substring(index + 2);
 		}
 		return PREFIX_PROFILE_ADDED + query;
-	}
-	
-	/**
-	 * Logs message at Info level
-	 * @param msg
-	 */
-	private static void logInfo(String msg) {
-		if (!DEBUG_MOD) return;
-		LOGGER.info(msg);
 	}
 
 	@Override
