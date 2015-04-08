@@ -38,23 +38,23 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	public static String run(IProfiler profiler, IQueryManager qm, String filter,
-			EventMediaFormat format) throws TooManyConnections, UnknownException {
+			EventMediaFormat format, String httpMethod) throws TooManyConnections, UnknownException {
 		if (profiler != null && filter != null) {
 			if (!filter.equals(FRIENDS)) {
 				if (filter.equalsIgnoreCase(LOCATION)) {
-					return (String) filterBasedOnLocation(profiler, qm, format, true);
+					return (String) filterBasedOnLocation(profiler, qm, format, true, httpMethod);
 				} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
-					return (String) filterBasedOnEnteredRating(profiler, qm, format, true);
+					return (String) filterBasedOnEnteredRating(profiler, qm, format, true, httpMethod);
 				} else if (filter.equalsIgnoreCase(PREFERRED)) {
-					return (String) filterBasedOnPreferredEvent(profiler, qm, format, true);
+					return (String) filterBasedOnPreferredEvent(profiler, qm, format, true, httpMethod);
 				}
 			} else {
-				return (String) filterBasedOnFriends(profiler, qm, format, true);
+				return (String) filterBasedOnFriends(profiler, qm, format, true, httpMethod);
 			}
 		}
 		
 		try {
-			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
+			return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, httpMethod);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		}
@@ -69,24 +69,24 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static Map <String, Boolean> run(IProfiler profiler, IQueryManager qm, String filter)
+	public static Map <String, Boolean> run(IProfiler profiler, IQueryManager qm, String filter, String httpMethod)
 			throws TooManyConnections, UnknownException {
 		if (profiler != null && filter != null) {
 			if (!filter.equals(FRIENDS)) {
 				if (filter.equalsIgnoreCase(LOCATION)) {
-					return (Map<String, Boolean>) filterBasedOnLocation(profiler, qm, EventMediaFormat.JSON, false);
+					return (Map<String, Boolean>) filterBasedOnLocation(profiler, qm, EventMediaFormat.JSON, false, httpMethod);
 				} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
-					return (Map<String, Boolean>) filterBasedOnEnteredRating(profiler, qm, EventMediaFormat.JSON, false);
+					return (Map<String, Boolean>) filterBasedOnEnteredRating(profiler, qm, EventMediaFormat.JSON, false, httpMethod);
 				} else if (filter.equalsIgnoreCase(PREFERRED)) {
-					return (Map<String, Boolean>) filterBasedOnPreferredEvent(profiler, qm, EventMediaFormat.JSON, false);
+					return (Map<String, Boolean>) filterBasedOnPreferredEvent(profiler, qm, EventMediaFormat.JSON, false, httpMethod);
 				}
 			} else {
-				return (Map<String, Boolean>) filterBasedOnFriends(profiler, qm, EventMediaFormat.JSON, false);
+				return (Map<String, Boolean>) filterBasedOnFriends(profiler, qm, EventMediaFormat.JSON, false, httpMethod);
 			}
 		}
 		
 		try {
-			return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
+			return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery(), httpMethod);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		}
@@ -116,7 +116,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static Object filterBasedOnLocation(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format, boolean isResultInString) throws TooManyConnections, UnknownException {
+			EventMediaFormat format, boolean isResultInString, String httpMethod) throws TooManyConnections, UnknownException {
 		
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
@@ -147,8 +147,8 @@ public class QueryManagerDecision {
 			qm.performORAugmentation(triples, exprs);
 		}
 		try {
-			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
-			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
+			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format, httpMethod);
+			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery(), httpMethod);
 		} catch (IOException e) {
 			throw new TooManyConnections();
 		}
@@ -162,7 +162,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static Object filterBasedOnEnteredRating(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format, boolean isResultInString) throws TooManyConnections, UnknownException {
+			EventMediaFormat format, boolean isResultInString, String httpMethod) throws TooManyConnections, UnknownException {
 		// TODO: find minimum values from preferences
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
@@ -179,8 +179,9 @@ public class QueryManagerDecision {
 
 		qm.performORAugmentation(triples, exprs);
 		try {
-			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
-			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
+			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(),
+					format, httpMethod);
+			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery(), httpMethod);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		}
@@ -194,7 +195,8 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static Object filterBasedOnFriends(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format, boolean isResultInString) throws TooManyConnections, UnknownException {
+			EventMediaFormat format, boolean isResultInString,
+			String httpMethod) throws TooManyConnections, UnknownException {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
@@ -216,8 +218,9 @@ public class QueryManagerDecision {
 
 		qm.performORAugmentation(triples, exprs);
 		try {
-			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
-			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
+			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(
+					qm.getAugmentedQuery(), format, httpMethod);
+			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery(), httpMethod);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		}
@@ -231,7 +234,7 @@ public class QueryManagerDecision {
 	 * @return
 	 */
 	private static Object filterBasedOnPreferredEvent(IProfiler profiler, IQueryManager qm,
-			EventMediaFormat format, boolean isResultInString) throws TooManyConnections, UnknownException {
+			EventMediaFormat format, boolean isResultInString, String httpMethod) throws TooManyConnections, UnknownException {
 		List <Triple> triples = new ArrayList <Triple>();
 		List <Expr> exprs = new ArrayList<Expr>();
 		profiler.initDefaultParametersForAugmentation();
@@ -246,8 +249,9 @@ public class QueryManagerDecision {
 
 		qm.performORAugmentation(triples, exprs);
 		try {
-			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(qm.getAugmentedQuery(), format);
-			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery());
+			if (isResultInString) return qm.askForExecutingAugmentedQueryAtEventMedia(
+					qm.getAugmentedQuery(), format, httpMethod);
+			else return qm.askForExecutingAugmentedQuery(qm.getAugmentedQuery(), httpMethod);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		}

@@ -42,6 +42,7 @@ import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.LanguageUtils;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.Profiler;
+import eu.threecixty.profile.SparqlEndPointUtils;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UnknownException;
 import eu.threecixty.profile.UserProfile;
@@ -82,12 +83,12 @@ public class QueryManagerServices {
 	
 
 	@POST
-	@Path("/augmentAndExecute")
+	@Path("/augmentAndExecute2")
 	public Response executeQueryPOST(@HeaderParam("access_token") String access_token,
 			@FormParam("format") String format, @FormParam("query") String query,
 			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug) {
 		
-		return executeQuery(access_token, format, query, filter, debug);
+		return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
 	}
 
 	
@@ -111,6 +112,12 @@ public class QueryManagerServices {
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
 			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
+		return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
+	}
+	
+	private Response executeQueryWithHttpMethod(String access_token,
+			String format, String query,
+			String filter, String debug, String httpMethod) {
 		logInfo("Start augmentAndExecute method ----------------------");
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
@@ -138,7 +145,8 @@ public class QueryManagerServices {
 					QueryManager qm = new QueryManager(user_id);
 					logInfo("Before augmenting and executing a query");
 					
-					String result = executeQuery(profiler, qm, query, filter, eventMediaFormat, true, isLimitForProfile(userAccessToken));
+					String result = executeQuery(profiler, qm, query, filter,
+							eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
 
 					// log calls
 					
@@ -191,10 +199,10 @@ public class QueryManagerServices {
 	 * @return
 	 */
 	@POST
-	@Path("/executeQuery")
+	@Path("/executeQuery2")
 	public Response executeQueryNoAccessTokenPost(@HeaderParam("key") String key, 
 			@FormParam("format") String format, @FormParam("query") String query) {
-		return executeQueryNoAccessToken(key, format, query);
+		return executeQueryNoAccessTokenWithHttpMethod(key, format, query, SparqlEndPointUtils.HTTP_POST);
 	}
 	
 	/**
@@ -209,6 +217,11 @@ public class QueryManagerServices {
 	@Path("/executeQuery")
 	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
 			@QueryParam("format") String format, @QueryParam("query") String query) {
+		return executeQueryNoAccessTokenWithHttpMethod(key, format, query, SparqlEndPointUtils.HTTP_GET);
+	}
+	
+	private Response executeQueryNoAccessTokenWithHttpMethod(String key, 
+			String format, String query, String httpMethod) {
 		logInfo("Start executeQuery method ----------------------");
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
@@ -223,7 +236,7 @@ public class QueryManagerServices {
 			} else {
 
 				try {
-					String result = QueryManager.executeQuery(query, eventMediaFormat);
+					String result = QueryManager.executeQuery(query, eventMediaFormat, httpMethod);
 
 					// log calls
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -311,7 +324,7 @@ public class QueryManagerServices {
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			try {
-				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -341,7 +354,7 @@ public class QueryManagerServices {
 			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place }";
 
 			try {
-				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -398,7 +411,7 @@ public class QueryManagerServices {
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
 				try {
-					String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+					String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (IOException e) {
@@ -442,7 +455,7 @@ public class QueryManagerServices {
 			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
 			+ tmpOffset +( limit < 0 ? "" : "\nLIMIT  " + limit);
 			try {
-				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -505,7 +518,8 @@ public class QueryManagerServices {
 				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
 				IProfiler profiler = new Profiler(userProfile);
 				QueryManager qm = new QueryManager(user_id);
-				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken));
+				String result = executeQuery(profiler, qm, query, preference,
+						EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken), SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (ThreeCixtyPermissionException tcpe) {
@@ -649,7 +663,8 @@ public class QueryManagerServices {
 				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
 				IProfiler profiler = new Profiler(userProfile);
 				QueryManager qm = new QueryManager(user_id);
-				String result = executeQuery(profiler, qm, query, preference, EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken));
+				String result = executeQuery(profiler, qm, query, preference,
+						EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken), SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (ThreeCixtyPermissionException tcpe) {
@@ -778,7 +793,7 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getValue()));
 
 				try {
-					String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+					String result = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (Exception e) {
@@ -825,7 +840,7 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getValue()));
 
 				try {
-					List <String> eventIds = QueryManager.getElementIDs(query);
+					List <String> eventIds = QueryManager.getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
 				
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
@@ -862,7 +877,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
-				String result = QueryManager.executeQuery(query, EventMediaFormat.JSON);
+				String result = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -895,7 +910,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
-				List <String> poiIds = QueryManager.getElementIDs(query);
+				List <String> poiIds = QueryManager.getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
 				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
 				
@@ -918,7 +933,7 @@ public class QueryManagerServices {
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
 			String query, String filter, EventMediaFormat eventMediaFormat,
-			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException,
+			boolean needToCheckPredicate, boolean limitToProfile, String httpMethod) throws ThreeCixtyPermissionException,
 			TooManyConnections, UnknownException {
 
 		Query jenaQuery = createJenaQuery(query);
@@ -949,7 +964,7 @@ public class QueryManagerServices {
 
 		qm.setQuery(threecixtyQuery);
 		
-		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat);
+		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat, httpMethod);
 		return  result;
 	}
 	
@@ -972,7 +987,7 @@ public class QueryManagerServices {
 
 		qm.setQuery(threecixtyQuery);
 		
-		return QueryManagerDecision.run(profiler, qm, filter);
+		return QueryManagerDecision.run(profiler, qm, filter, SparqlEndPointUtils.HTTP_GET);
 	}
 
 	private String createGroupQuery(String group, int offset, int limit,
