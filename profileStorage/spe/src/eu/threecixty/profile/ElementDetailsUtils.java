@@ -36,7 +36,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
 		
-		addInfoOptional("?item", "dc:title", "?title", LanguageUtils.getAllLanguages(), true, queryBuff);
+		addInfoOptional("?item", "rdfs:label", "?title", LanguageUtils.getAllLanguages(), true, queryBuff);
 		
 		addInfoOptional("?item", "dc:description", "?description", languages, true, queryBuff);
 
