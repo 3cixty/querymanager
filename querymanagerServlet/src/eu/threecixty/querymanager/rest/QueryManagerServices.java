@@ -236,7 +236,7 @@ public class QueryManagerServices {
 			} else {
 
 				try {
-					String result = QueryManager.executeQuery(query, eventMediaFormat, httpMethod);
+					String result = executeQuery(query, eventMediaFormat, httpMethod);
 
 					// log calls
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -324,7 +324,7 @@ public class QueryManagerServices {
 		if (OAuthWrappers.validateAppKey(key)) {
 			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
 			try {
-				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -354,7 +354,7 @@ public class QueryManagerServices {
 			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place }";
 
 			try {
-				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -411,7 +411,7 @@ public class QueryManagerServices {
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
 				try {
-					String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
+					String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (IOException e) {
@@ -455,7 +455,7 @@ public class QueryManagerServices {
 			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
 			+ tmpOffset +( limit < 0 ? "" : "\nLIMIT  " + limit);
 			try {
-				String ret = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -793,7 +793,7 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getValue()));
 
 				try {
-					String result = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
+					String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (Exception e) {
@@ -877,7 +877,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
-				String result = QueryManager.executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
+				String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -945,20 +945,6 @@ public class QueryManagerServices {
 		/// XXX: hack for date ranges query
 		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
 		qm.setForDateRanges(isForDateRages);
-		
-		// now we only use one private graph and do not support private info in the query.
-//		if (needToCheckPredicate) {
-//			if (ScopeFilterUtils.containExplicitKnowsOrFollowsPredicate(jenaQuery)) {
-//				throw new ThreeCixtyPermissionException("You are not allowed to access KNOWS or FOLLOWS list");
-//			}
-//			ScopeFilterUtils.addFilterToRestrictKnows(jenaQuery);
-//
-//			if (limitToProfile) {
-//				if (ScopeFilterUtils.containExplicitProfilePredicate(jenaQuery))
-//					throw new ThreeCixtyPermissionException("You are not allowed to access USER PROFILE");
-//				ScopeFilterUtils.addFilterToRestrictProfile(jenaQuery);
-//			}
-//		}
 
 		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
 
@@ -1134,18 +1120,22 @@ public class QueryManagerServices {
 		LOGGER.info(msg);
 	}
 	
-//	@POST
-//	@Path("/dropGraphs")
-//	public Response dropGraphs(@HeaderParam("google_access_token") String access_token) {
-//		// XXX: this API should be removed whenever we fix all problems for private graphs
-//		String uid = GoogleAccountUtils.getUID(access_token);
-//		if (uid == null || uid.equals("")) return Response.serverError().build();
-//		if (!uid.equals("103918130978226832690")) return Response.serverError().build();
-//		for (int i = 0; i < 100; i++) {
-//			VirtuosoManager.getInstance().dropGraphs();
-//		}
-//		return Response.ok("drop graphs").build();
-//	}
+	/**
+	 * Executes query without creating a new instance of QueryManager.
+	 * <br>
+	 * Note that this method doesn't augment the given query.
+	 * @param query
+	 * @param format
+	 * @return
+	 */
+	private String executeQuery(String query, EventMediaFormat format, String httpMethod) throws IOException {
+		if (query == null || format == null) return "";
+		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
+				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
+		StringBuilder builder = new StringBuilder();
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
+		return builder.toString();
+	}
 
     public class KeyValuePair {
 
