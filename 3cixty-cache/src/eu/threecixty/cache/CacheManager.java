@@ -1,6 +1,10 @@
 package eu.threecixty.cache;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,6 +24,16 @@ public class CacheManager {
 	
 	public static CacheManager getInstance() {
 		return instance;
+	}
+	
+	public void loadQueries(String path) {
+		if (path == null) return;
+		File file = new File(path);
+		for (File tmpFile: file.listFiles()) {
+			String query = getQuery(tmpFile);
+			if (query == null) continue;
+			getContent(query);
+		}
 	}
 	
 	public String getContent(String query) {
@@ -51,6 +65,26 @@ public class CacheManager {
 		return cacheElements.containsKey(query);
 	}
 	
-	public CacheManager() {
+	private String getQuery(File file) {
+		if (file.isDirectory()) return null;
+		try {
+			InputStream input = new FileInputStream(file);
+			byte [] b = new byte [1024];
+			StringBuilder sb = new StringBuilder();
+			int readBytes = 0;
+			while ((readBytes = input.read(b)) >= 0) {
+				sb.append(new String(b, 0, readBytes, "UTF-8"));
+			}
+			input.close();
+			return sb.toString();
+		} catch (FileNotFoundException e) {
+			LOGGER.error(e.getMessage());
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	private CacheManager() {
 	}
 }
