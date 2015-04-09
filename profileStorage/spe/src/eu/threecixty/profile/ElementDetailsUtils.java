@@ -136,7 +136,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
-		addInfoOptional("?poi", "schema:name", "?name", LanguageUtils.getAllLanguages(), true, queryBuff);
+		addInfoOptional("?poi", "rdfs:label", "?name", LanguageUtils.getAllLanguages(), true, queryBuff);
 		addInfoOptional("?poi", "schema:description", "?description", languages, true, queryBuff);
 		
 		if (categories == null) {
