@@ -195,23 +195,6 @@ import eu.threecixty.profile.oldmodels.Rating;
 
 		return maps;
 	}
-
-	/**
-	 * Executes query without creating a new instance of QueryManager.
-	 * <br>
-	 * Note that this method doesn't augment the given query.
-	 * @param query
-	 * @param format
-	 * @return
-	 */
-	public static String executeQuery(String query, EventMediaFormat format, String httpMethod) throws IOException {
-		if (query == null || format == null) return "";
-		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
-				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
-		StringBuilder builder = new StringBuilder();
-		hasElementsForBindings(query, format, formatType, httpMethod, builder, null, 0);
-		return builder.toString();
-	}
 	
 	/**
 	 * Get a list of Element IDs (Events or PoIs) from Virtuoso for a given SPARQL query. This method supposes that the
@@ -261,33 +244,25 @@ import eu.threecixty.profile.oldmodels.Rating;
 		if (DEBUG_MOD) LOGGER.info("Query to be executed: " + query);
 
 		boolean ok = true;
-		// only make queries to public graphs
-//		if (uid == null) { // only public graphs
+
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
 
-			if (EventMediaFormat.JSON == format) {
-				try {
-					if (DEBUG_MOD) LOGGER.info("data received from Virtuoso: " + sb.toString());
-				    ok = hasElement(sb, numberOfOrders);
-				} catch (JSONException e) { // check if there are some backslashes
-					String newString = SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(sb.toString());
-					//newString = newString.replace("\\","\\\\");
-					//newString = newString.replace("\\\\\"", "\\\\\\\"");
-					if (DEBUG_MOD) LOGGER.info("data processed: " + newString);
-					sb.setLength(0);
-					sb.append(newString);
-					ok = hasElement(sb, numberOfOrders);
-				}
+		if (EventMediaFormat.JSON == format) {
+			try {
+				if (DEBUG_MOD) LOGGER.info("data received from Virtuoso: " + sb.toString());
+				ok = hasElement(sb, numberOfOrders);
+			} catch (JSONException e) { // check if there are some backslashes
+				String newString = SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(sb.toString());
+				//newString = newString.replace("\\","\\\\");
+				//newString = newString.replace("\\\\\"", "\\\\\\\"");
+				if (DEBUG_MOD) LOGGER.info("data processed: " + newString);
+				sb.setLength(0);
+				sb.append(newString);
+				ok = hasElement(sb, numberOfOrders);
 			}
-//		} else {
-//			JSONObject result = VirtuosoManager.getInstance().executeQuery(query, uid);
-//			if (result.getJSONObject("results").getJSONArray("bindings").length() < 1) {
-//				ok = false;
-//			}
-//			sb.append(result.toString());
-//		}
-		
-			if (DEBUG_MOD) LOGGER.info("Finished executing the query on Virtuoso: ok = " + ok);
+		}
+
+		if (DEBUG_MOD) LOGGER.info("Finished executing the query on Virtuoso: ok = " + ok);
 
 		return ok;
 	}
