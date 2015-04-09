@@ -4,10 +4,15 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
+
 import eu.threecixty.profile.SparqlEndPointUtils;
 
 public class CacheManager {
 
+	 private static final Logger LOGGER = Logger.getLogger(
+			 CacheManager.class.getName());
+	
 	private static final String JSON_APP_FORMAT = "application/sparql-results+json";
 	private static final CacheManager instance = new CacheManager();
 	
@@ -31,7 +36,7 @@ public class CacheManager {
 				cacheElements.put(query, cacheElement);
 				return cacheElement.content;
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage());
 			}
 		}
 		return null;
