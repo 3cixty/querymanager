@@ -1133,7 +1133,13 @@ public class QueryManagerServices {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		StringBuilder builder = new StringBuilder();
+		long startTime = System.currentTimeMillis();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
+		long endTime = System.currentTimeMillis();
+		if (DEBUG_MOD) {
+			LOGGER.info("Query: " + query);
+			LOGGER.info("Time to make the query: " + (endTime - startTime) + " ms");
+		}
 		return builder.toString();
 	}
 
