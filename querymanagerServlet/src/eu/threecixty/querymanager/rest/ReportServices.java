@@ -1,5 +1,6 @@
 package eu.threecixty.querymanager.rest;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -168,7 +169,8 @@ public class ReportServices {
 	}
 	
 	private synchronized void loadProperties() throws IOException {
-		InputStream input = new FileInputStream(Configuration.path);
+		InputStream input = new FileInputStream(Configuration.path + File.separatorChar + "WEB-INF"
+	            + File.separatorChar + "report.properties");
 		Properties props = new Properties();
 		props.load(input);
 		input.close();
