@@ -53,7 +53,7 @@ public class ReportServices {
 	private static final String GMAIL_PWD_KEY = "GMAIL_PWD";
 	private static final String DESTINATIONS_KEY = "DESTINATION";
 	
-	private static String gmailAccount;
+	private static String gmailAccount = null;
 	private static String gmailPwd;
 	private static List <String> destinations = new LinkedList <String>();
 
@@ -157,7 +157,7 @@ public class ReportServices {
 					msg.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
 				}
 
-				msg.setSubject("[3cixty feedback] " + subject);
+				msg.setSubject(subject);
 				msg.setText(JSONObject.wrap(reportRequest).toString(), "utf-8");
 				msg.setSentDate(new Date());
 
