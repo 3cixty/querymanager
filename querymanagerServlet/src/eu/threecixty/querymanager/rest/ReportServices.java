@@ -107,18 +107,18 @@ public class ReportServices {
 			if (json.has(LAST_POSITION)) reportRequest.setLastPosition(json.getString(LAST_POSITION));
 			
 			sendEmail(reportRequest, subject);
+			return Response.ok("Successful").build();
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return createInvalidResponse("Your report request must be in JSON format");
 		} catch (WebApplicationException e) {
 			return createInvalidResponse(e.getMessage());
 		}
-		return null;
 	}
 	
 	private void sendEmail(ReportRequest reportRequest, String subject) {
 		if (gmailAccount == null) {
-			synchronized (reportRequest) {
+			synchronized (this) {
 				if (gmailAccount == null) {
 					try {
 						loadProperties();
