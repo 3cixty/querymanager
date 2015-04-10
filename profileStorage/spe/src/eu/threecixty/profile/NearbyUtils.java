@@ -41,9 +41,9 @@ public class NearbyUtils {
 		    addInfoOptional("?event", "dc:description", "?description", languages, builder);
 		}
 		
-		builder.append("OPTIONAL { ?event ?p ?inSpace. \n");
+		builder.append(" ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
-		builder.append("              ?inSpace geo:long ?eventLon . }\n");
+		builder.append("              ?inSpace geo:long ?eventLon . \n");
 		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
 
 		builder.append(" OPTIONAL{ ?event lode:atTime ?time. \n");
