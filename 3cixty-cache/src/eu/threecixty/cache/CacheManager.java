@@ -29,6 +29,7 @@ public class CacheManager {
 	public void loadQueries(String path) {
 		if (path == null) return;
 		File file = new File(path);
+		if (!file.isDirectory()) return;
 		for (File tmpFile: file.listFiles()) {
 			String query = getQuery(tmpFile);
 			if (query == null) continue;
