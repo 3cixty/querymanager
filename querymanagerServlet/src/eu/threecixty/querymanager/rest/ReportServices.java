@@ -25,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +39,13 @@ import eu.threecixty.profile.ReportRequest;
 
 @Path("/" + Constants.PREFIX_NAME)
 public class ReportServices {
+
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ReportServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	private static final String CLIENT_TIMESTAMP = "clientTimeStamp";
 	private static final String CLIENT_VERSION = "clientVersion";
 	private static final String REASON = "reason";
@@ -53,13 +61,14 @@ public class ReportServices {
 	private static final String GMAIL_PWD_KEY = "GMAIL_PWD";
 	private static final String DESTINATIONS_KEY = "DESTINATION";
 	
-	private static String gmailAccount;
+	private static String gmailAccount = null;
 	private static String gmailPwd;
 	private static List <String> destinations = new LinkedList <String>();
 
 	@POST
 	@Path("/reporting")
     public Response report(InputStream input, @Context Request req) {
+		if (DEBUG_MOD) LOGGER.info("Enter into the feedback service");
 		String content = getContent(input);
 		if (content == null || content.equals("")) return createInvalidResponse("Empty request");
 		long starttime = System.currentTimeMillis();
@@ -86,15 +95,17 @@ public class ReportServices {
 			} else {
 				return createInvalidResponse("Your request must contain either userToken or key");
 			}
+			if (DEBUG_MOD) LOGGER.info("Before checking timestamp");
 			String timestamp = getTimestamp(json);
 			reportRequest.setClientTimeStamp(timestamp);
 			
-			if (!json.has(CLIENT_VERSION)) throw new WebApplicationException(
-					new Throwable("Client version is required"));
+			if (DEBUG_MOD) LOGGER.info("Before checking client version");
+			if (!json.has(CLIENT_VERSION)) return createInvalidResponse("Client version is required");
 			String clientVersion = json.getString(CLIENT_VERSION);
 			reportRequest.setClientVersion(clientVersion);
 			
-			if (!json.has(REASON)) throw new WebApplicationException(new Throwable("Reason is required"));
+			if (DEBUG_MOD) LOGGER.info("Before checking reason");
+			if (!json.has(REASON)) return createInvalidResponse("Reason is required");
 			String reason = json.getString(REASON);
 			reportRequest.setReason(reason);
 			
@@ -106,19 +117,25 @@ public class ReportServices {
 			
 			if (json.has(LAST_POSITION)) reportRequest.setLastPosition(json.getString(LAST_POSITION));
 			
+			if (DEBUG_MOD) LOGGER.info("Before sending feedback");
+			
 			sendEmail(reportRequest, subject);
+			return Response.ok("Successful").build();
 		} catch (JSONException e) {
-			e.printStackTrace();
+			LOGGER.equals(e.getMessage());
 			return createInvalidResponse("Your report request must be in JSON format");
 		} catch (WebApplicationException e) {
+			LOGGER.equals(e.getMessage());
+			return createInvalidResponse(e.getMessage());
+		} catch (Exception e) {
+			LOGGER.equals(e.getMessage());
 			return createInvalidResponse(e.getMessage());
 		}
-		return null;
 	}
 	
 	private void sendEmail(ReportRequest reportRequest, String subject) {
 		if (gmailAccount == null) {
-			synchronized (reportRequest) {
+			synchronized (this) {
 				if (gmailAccount == null) {
 					try {
 						loadProperties();
@@ -128,6 +145,7 @@ public class ReportServices {
 				}
 			}
 		}
+		if (DEBUG_MOD) LOGGER.info("Gmail used to send feedback: " + gmailAccount);
 		if (gmailAccount != null && !gmailAccount.equals("")) {
 			try {
 				Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
@@ -154,15 +172,17 @@ public class ReportServices {
 				// -- Set the FROM and TO fields --
 				msg.setFrom(new InternetAddress(gmailAccount));
 				for (String dest: destinations) {
+					if (DEBUG_MOD) LOGGER.info(dest);
 					msg.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
 				}
 
-				msg.setSubject("[3cixty feedback] " + subject);
+				msg.setSubject(subject);
 				msg.setText(JSONObject.wrap(reportRequest).toString(), "utf-8");
 				msg.setSentDate(new Date());
 
 				Transport.send(msg);      
 			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -189,11 +209,13 @@ public class ReportServices {
 		if (!json.has(CLIENT_TIMESTAMP))
 			throw new WebApplicationException(new Throwable("Client timestamp is required"));
 		String timestamp = json.getString(CLIENT_TIMESTAMP);
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+		if (DEBUG_MOD) LOGGER.info("Timestamp: " + timestamp);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 		try {
 			Date d = format.parse(timestamp);
 			if (d != null) return timestamp;
 		} catch (ParseException e) {
+			LOGGER.error(e.getMessage());
 			throw new WebApplicationException(new Throwable(
 					"Client timestamp is invalid. The pattern looks like: 2002-10-10T12:00:00-05:00"));
 		}

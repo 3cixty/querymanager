@@ -41,9 +41,9 @@ public class NearbyUtils {
 		    addInfoOptional("?event", "dc:description", "?description", languages, builder);
 		}
 		
-		builder.append("OPTIONAL { ?event ?p ?inSpace. \n");
+		builder.append(" ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
-		builder.append("              ?inSpace geo:long ?eventLon . }\n");
+		builder.append("              ?inSpace geo:long ?eventLon . \n");
 		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
 
 		builder.append(" OPTIONAL{ ?event lode:atTime ?time. \n");
@@ -128,17 +128,8 @@ public class NearbyUtils {
 			
 			filterCategories(categories, builder);
 		}
-				/*
-		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
-			//addInfoUnion("?poi", "schema:name", "?name", languages, builder);
-		} else {
-		    addInfoOptional("?poi", "schema:name", "?name", languages, builder);
-		}
-		*/
-		//builder.append("        ?poi schema:geo ?geoPoi . \n");
-		//builder.append("        ?geoPoi geo:geometry ?geo. \n");
 		
-		builder.append("?poi geo:location ?geometry . ?geometry locn:geometry ?geo . \n");
+		builder.append("?poi geo:location ?loc . ?loc geo:lat ?lat . ?loc geo:long ?lon . BIND(bif:st_point(xsd:decimal(?lon), xsd:decimal(?lat)) as ?geo) . \n");
 
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
