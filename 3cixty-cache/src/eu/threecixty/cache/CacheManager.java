@@ -36,7 +36,7 @@ public class CacheManager {
 			String query = getQuery(tmpFile);
 			if (query == null) continue;
 			if (DEBUG_MOD) LOGGER.info("query preloaded: " + query);
-			getContent(query);
+			executeQuery(query);
 		}
 	}
 	
@@ -44,20 +44,7 @@ public class CacheManager {
 		CacheElement cacheElement = cacheElements.get(query);
 		if (cacheElement == null) return null;
 		if (cacheElement.isValid()) return cacheElement.content;
-		synchronized (this) {
-			StringBuilder result = new StringBuilder();
-			try {
-				SparqlEndPointUtils.executeQueryViaSPARQL(query, JSON_APP_FORMAT,
-						SparqlEndPointUtils.HTTP_POST, result);
-				cacheElement = new CacheElement();
-				cacheElement.content = result.toString();
-				cacheElements.put(query, cacheElement);
-				return cacheElement.content;
-			} catch (IOException e) {
-				LOGGER.error(e.getMessage());
-			}
-		}
-		return null;
+		return executeQuery(query);
 	}
 	
 	/**
@@ -70,6 +57,21 @@ public class CacheManager {
 		boolean found = cacheElements.containsKey(query);
 		if (DEBUG_MOD) LOGGER.info("Query found in memory: " + found);
 		return found;
+	}
+	
+	private synchronized String executeQuery(String query) {
+		StringBuilder result = new StringBuilder();
+		try {
+			SparqlEndPointUtils.executeQueryViaSPARQL(query, JSON_APP_FORMAT,
+					SparqlEndPointUtils.HTTP_POST, result);
+			CacheElement cacheElement = new CacheElement();
+			cacheElement.content = result.toString();
+			cacheElements.put(query, cacheElement);
+			return cacheElement.content;
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
 	}
 	
 	private String getQuery(File file) {
