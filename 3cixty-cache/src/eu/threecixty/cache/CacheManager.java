@@ -16,6 +16,8 @@ public class CacheManager {
 
 	 private static final Logger LOGGER = Logger.getLogger(
 			 CacheManager.class.getName());
+	 
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private static final String JSON_APP_FORMAT = "application/sparql-results+json";
 	private static final CacheManager instance = new CacheManager();
@@ -33,6 +35,7 @@ public class CacheManager {
 		for (File tmpFile: file.listFiles()) {
 			String query = getQuery(tmpFile);
 			if (query == null) continue;
+			if (DEBUG_MOD) LOGGER.info("query preloaded: " + query);
 			getContent(query);
 		}
 	}
@@ -63,7 +66,10 @@ public class CacheManager {
 	 * @return
 	 */
 	public boolean isQueryShouldBeExecutedViaCache(String query) {
-		return cacheElements.containsKey(query);
+		if (DEBUG_MOD) LOGGER.info("Query to check in memory: " + query);
+		boolean found = cacheElements.containsKey(query);
+		if (DEBUG_MOD) LOGGER.info("Query found in memory: " + found);
+		return found;
 	}
 	
 	private String getQuery(File file) {
