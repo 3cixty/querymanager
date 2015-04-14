@@ -2,15 +2,22 @@
 <%@page import="eu.threecixty.oauth.model.App" %>
 <%@page import="eu.threecixty.oauth.OAuthWrappers" %>
 <%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"  pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Sign in to 3cixty</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta charset="UTF-8">
+ <link href="login/normalize.css" rel="stylesheet">
+    <link href="login/layout.css" rel="stylesheet">
+    <link href="login/basic.css" rel="stylesheet">
+    <link href="login/style2.css" rel="stylesheet">
+    <link href="login/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="login/fontello.css">
+    <script src="login/jquery-1.js"></script>
+<title>Sign in to 3cixty Platform</title>
 </head>
-<body>
+<body class="login-body">
 <%
     String key = request.getParameter("key");
     App app = OAuthWrappers.retrieveApp(key);
@@ -103,44 +110,52 @@
     document.getElementById('form').submit();
   }
 </script>
-
-
-<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
-
-<div>
-
-
-    <input type=hidden name="key" value="<%=key%>">
-    <img src="<%=Configuration.get3CixtyRoot()%>/3cixty.png">
+<div class="wrapper">
+	<div class="logo">
+    	<div class="logo-icon">
+    	</div>
+    </div>
     
-    
-    
-<p>
-Sign in to 3cixty platform. Note that 3cixty uses Google or Facebook account to authenticate the user.
-</p>
-Why sign in to the 3cixty platform? 
-<br>
-You can save your Wish List and access it from the mobile part of ExplorMI 360.
-<br>
-You can ask the application to take into account things like the ratings given by your friends.
-<br>
-If you have been in Milan and have asked the mobile part of the application to track your movements there, you can view pages summarizing your movements. 
-<br><br><br>
-To see how the privacy of your data will be protected, see the privacy statement [<a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">link</a>].
-
-    
-
-    <br>
-
-     <img src="./Red-signin_Long_base_20dp.png" onclick="document.getElementById('form').submit();"
-      style="border: none;padding: 0px; margin: 0px; cursor: pointer;" >
-
-<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">
-Sign in with Facebook
-</fb:login-button>
+	<div class="connect-area">
+		<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
+			<div>
+			    <input type=hidden name="key" value="<%=key%>">
+			    <div class="social-login-buttons">
+			        <!-- <div class="icon-facebook-1 social-btn fb-btn"></div>
+			        <div class="icon-gplus-1 social-btn google-btn"></div> -->
+			        <div class="social-btn">
+			        	<img src="./Red-signin_Long_base_44dp.png" height="38" width="182" onclick="document.getElementById('form').submit();" style="border: none;padding: 0px; margin: 0px; cursor: pointer;"/>
+			        </div>
+					<div>
+						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
+						Sign in with Facebook
+						</fb:login-button>
+					</div>
+			    </div>
+			   <!--  <div class="login-info"> 
+			    	Note that 3cixty Platform uses Google or Facebook account to authenticate you.
+			    </div> -->
+			</div>
+	    	<div class="login-benefits">
+        		<div class="login2-info">
+        			<strong> Benefits of Signing in </strong>
+        		</div>
+        		
+				<div class="login-info"> 
+					 You can save your WishList and access it from the mobile version of <strong>ExplorMI 360</strong>. 
+					 You can ask the application to take into account things like the ratings given by your friends.
+					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>ExplorMI 360</strong> to track your movements there, you can view summary of your movements. 
+					<br><br>
+					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
+				</div>
+			</div>
+			<div class="login-benefits">
+				<div class="login-info"> 
+					© 2015, 3cixty. All Rights Reserved.
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
- 
-</form>
-
 </body>
 </html>
