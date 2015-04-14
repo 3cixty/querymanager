@@ -404,9 +404,22 @@ public class OAuthServices {
 		
 		session.setAttribute(UID_KEY, uid);
 		
+		
 		AccessToken accessToken = OAuthWrappers.findAccessToken(uid, app);
 		if (accessToken != null) {
 			return redirect_uri_client2(accessToken, accessToken.getExpires_in(), app);
+		}
+		
+		// bypass authorization for 3cixty's apps
+		if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
+			AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, SCOPES);
+			if (at != null) {
+				if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), SCOPES, app)) {
+					return redirect_uri_client2(at, at.getExpires_in(), app);
+				}
+			}
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+					" {\"response\": \"failed\" } ").type(MediaType.APPLICATION_JSON_TYPE).build();
 		}
 		
 		try {
