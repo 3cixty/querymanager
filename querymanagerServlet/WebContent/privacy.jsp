@@ -45,7 +45,7 @@
        			<strong> What kinds of information do we collect? </strong>
        		</div>
        		<div class="login-info">
-   		    	We collect information about your First Name, Last Name, Gender, Friends List, and UserID.
+   		    	We collect information about your First Name, Last Name, Friends List, and UserID.
    		    </div>
 			<div class="login-info">
 		    <strong> How do we use this information?</strong>
