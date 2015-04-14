@@ -124,7 +124,7 @@
 			        <!-- <div class="icon-facebook-1 social-btn fb-btn"></div>
 			        <div class="icon-gplus-1 social-btn google-btn"></div> -->
 			        <div class="social-btn">
-			        	<img src="./Red-signin_Long_base_44dp.png" height="38" width="182" onclick="document.getElementById('form').submit();" style="border: none;padding: 0px; margin: 0px; cursor: pointer;"/>
+			        	<img src="./Red-signin_Long_base_44dp.png" height="30" width="180" onclick="document.getElementById('form').submit();" style="border: none;padding: 0px; margin: 0px; cursor: pointer;"/>
 			        </div>
 					<div>
 						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
