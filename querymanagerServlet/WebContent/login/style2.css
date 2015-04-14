@@ -499,6 +499,7 @@ table {
 {
 
 }
+
 .social-btn
 {
 	height: 3em;
@@ -508,6 +509,7 @@ table {
 	margin-top: 20px;
 	cursor: pointer;
 }
+
 .social-btn:hover:before
 {
 	background-color: transparent;
@@ -570,7 +572,7 @@ table {
     font-size: 12px;
     color: #999;
     margin-top: 14px;
-    text-align: justify;
+    text-align: left;
 }
 .login3-info
 {
