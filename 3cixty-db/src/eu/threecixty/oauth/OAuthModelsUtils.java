@@ -12,6 +12,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import eu.threecixty.cache.AppCache;
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.db.HibernateUtil;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Developer;
@@ -336,6 +338,7 @@ public class OAuthModelsUtils {
 
 			session.getTransaction().commit();
 			session.close();
+			TokenCacheManager.getInstance().update(app);
 			return true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
@@ -387,7 +390,7 @@ public class OAuthModelsUtils {
 
 			session.getTransaction().commit();
 			session.close();
-			
+			TokenCacheManager.getInstance().update(app);
 			return true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
@@ -481,6 +484,25 @@ public class OAuthModelsUtils {
 		}
 		return apps;
 	}
+	
+	public static List <App> getApps() {
+		List <App> apps = new ArrayList <App>();
+		Session session = null;
+		try {
+
+			session = HibernateUtil.getSessionFactory().openSession();
+			List<?> results = session.createCriteria(App.class).list();
+			session.close();
+			if (results.size() == 0) return apps;
+			for (Object obj: results) {
+				apps.add((App) obj);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
+		}
+		return apps;
+	}
 
 	protected static App retrieveApp(String uid, String appid) {
 		if (isNullOrEmpty(appid)) return null;
@@ -533,17 +555,18 @@ public class OAuthModelsUtils {
 	}
 
 	protected static boolean addUserAccessToken(String accessToken, String refreshToken,
-			String scope, User user, App app) {
+			String scope, User user, AppCache app) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
 		Session session = null;
 		try {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
 
+			App tmpApp = (App) session.get(App.class, app.getId());
 			UserAccessToken userAccessToken = new UserAccessToken();
 			userAccessToken.setAccessToken(accessToken);
 			userAccessToken.setUser(user);
-			userAccessToken.setApp(app);
+			userAccessToken.setApp(tmpApp);
 			userAccessToken.setRefreshToken(refreshToken);
 			
 			userAccessToken.setScope(scope);
@@ -554,6 +577,8 @@ public class OAuthModelsUtils {
 
 			session.getTransaction().commit();
 			session.close();
+			AccessToken at = createAccessToken(userAccessToken);
+			TokenCacheManager.getInstance().update(at);
 			return true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
@@ -663,27 +688,21 @@ public class OAuthModelsUtils {
 		}
 	}
 	
-	protected static AccessToken findTokenInfoFromDB(User user, App app) {
+	protected static AccessToken findTokenInfoFromDB(User user, AppCache app) {
 		if (user == null || app == null) return null;
 		Session session = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM UserAccessToken U WHERE U.user = ? AND U.app = ?";
+			String hql = "FROM UserAccessToken U WHERE U.user = ? AND U.app.id = ?";
 			Query query = session.createQuery(hql);
-			List <?> results = query.setEntity(0, user).setEntity(1, app).list();
+			List <?> results = query.setEntity(0, user).setEntity(1, app.getId()).list();
 			if (results.size() == 0) {
 				session.close();
 				return null;
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
-			AccessToken ac = new AccessToken();
-			
-			findScope(userAccessToken, ac);
-			
-			ac.setAppClientKey(userAccessToken.getApp().getClientId());
-			ac.setAccess_token(userAccessToken.getAccessToken());
-			ac.setRefresh_token(userAccessToken.getRefreshToken());
+			AccessToken ac = createAccessToken(userAccessToken);
 			session.close();
 			return ac;
 		} catch (HibernateException e) {
@@ -725,13 +744,7 @@ public class OAuthModelsUtils {
 				return null;
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
-			AccessToken ac = new AccessToken();
-
-			findScope(userAccessToken, ac);
-			
-			ac.setAppClientKey(userAccessToken.getApp().getClientId());
-			ac.setAppClientPwd(userAccessToken.getApp().getPassword());
-			ac.setRefresh_token(refreshToken);
+			AccessToken ac = createAccessToken(userAccessToken);
 			session.close();
 			return ac;
 		} catch (HibernateException e) {
@@ -755,16 +768,7 @@ public class OAuthModelsUtils {
 				return null;
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
-			AccessToken ac = new AccessToken();
-			
-			findScope(userAccessToken, ac);
-			
-			ac.setAppClientKey(userAccessToken.getApp().getClientId());
-			ac.setAppClientPwd(userAccessToken.getApp().getPassword());
-			ac.setAccess_token(accessToken);
-			ac.setRefresh_token(userAccessToken.getRefreshToken());
-			ac.setUid(userAccessToken.getUser().getUid());
-			ac.setAppkey(userAccessToken.getApp().getKey());
+			AccessToken ac = createAccessToken(userAccessToken);
 			session.close();
 			return ac;
 		} catch (HibernateException e) {
@@ -793,6 +797,21 @@ public class OAuthModelsUtils {
 			if (session != null) session.close();
 		}
 		return allRedirectUris;
+	}
+	
+	private static AccessToken createAccessToken(UserAccessToken userAccessToken) {
+		AccessToken ac = new AccessToken();
+		
+		findScope(userAccessToken, ac);
+		
+		ac.setAppClientKey(userAccessToken.getApp().getClientId());
+		ac.setAppClientPwd(userAccessToken.getApp().getPassword());
+		ac.setAccess_token(userAccessToken.getAccessToken());
+		ac.setRefresh_token(userAccessToken.getRefreshToken());
+		ac.setUid(userAccessToken.getUser().getUid());
+		ac.setAppkey(userAccessToken.getApp().getKey());
+		ac.setAppkeyId(userAccessToken.getApp().getId());
+		return ac;
 	}
 	
 	private static void findScope(UserAccessToken userAccessToken, AccessToken result) {

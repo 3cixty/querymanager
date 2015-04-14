@@ -27,6 +27,8 @@ import org.json.JSONObject;
 import com.google.gson.Gson;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.cache.AppCache;
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.oauth.model.App;
@@ -56,6 +58,7 @@ public class OAuthServices {
 	
 	public static final String REDIRECT_URI_CLIENT = V2_ROOT + "redirect_uri_client";
 	public static final String ONLY_GOOGLE_ACCESS_TOKEN = "only_google_access_token";
+	private static final String SCOPES = "Profile,WishList";
 
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -88,7 +91,7 @@ public class OAuthServices {
 	@Path("/getAccessToken")
 	public Response getAccessToken(@HeaderParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey,
 			@DefaultValue("") @HeaderParam("scope") String scope) {
-		App app = OAuthWrappers.retrieveApp(appkey);
+		AppCache app = TokenCacheManager.getInstance().getAppCache(appkey);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
@@ -110,7 +113,7 @@ public class OAuthServices {
 			@DefaultValue("") @HeaderParam("scope") String scope,
 			@DefaultValue("50") @QueryParam("width") int width,
 			@DefaultValue("50") @QueryParam("height") int height) {
-		App app = OAuthWrappers.retrieveApp(appkey);
+		AppCache app = TokenCacheManager.getInstance().getAppCache(appkey);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
@@ -270,7 +273,7 @@ public class OAuthServices {
 	@Path("/retrieveKeyInfo")
 	public Response retrieveKeyInfo(@HeaderParam("key") String key) {
 		try {
-			App app = OAuthWrappers.retrieveApp(key);
+			AppCache app = TokenCacheManager.getInstance().getAppCache(key);
 			if (app == null) {
 				return Response.status(Response.Status.OK)
 						.entity(" {\"response\": \"not found\"} ")
@@ -295,7 +298,7 @@ public class OAuthServices {
 			if (tokenInfo == null) {
 				return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
 			}
-			App app = OAuthWrappers.retrieveApp(tokenInfo.getAppkey());
+			AppCache app = TokenCacheManager.getInstance().getAppCache(tokenInfo.getAppkey());
 			if (app == null) {
 				return Response.ok(" {\"response\": \"not found\"} ", MediaType.APPLICATION_JSON_TYPE).build();
 			}
@@ -329,7 +332,7 @@ public class OAuthServices {
 	@Path("/auth")
 	public Response auth(@QueryParam("key") String appkey) {
 		HttpSession session = httpRequest.getSession();
-		App app = (App) session.getAttribute(APP_KEY);
+		AppCache app = (AppCache) session.getAttribute(APP_KEY);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
@@ -375,7 +378,7 @@ public class OAuthServices {
 			@DefaultValue("50") @QueryParam("width") int width,
 			@DefaultValue("50") @QueryParam("height") int height) {
 		HttpSession session = httpRequest.getSession();
-		App app = (App) session.getAttribute(APP_KEY);
+		AppCache app = (AppCache) session.getAttribute(APP_KEY);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Session is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
@@ -401,10 +404,10 @@ public class OAuthServices {
 			
 			return Response.temporaryRedirect(new URI(
 					OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
-			+ join(OAuthWrappers.getScopes(app)) + "&client_id="
-			+ app.getClientId() + "&redirect_uri="
+			+ SCOPES + "&client_id="
+			+ app.getAppClientKey() + "&redirect_uri="
 		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
-		    		OAuthWrappers.getBasicAuth(app.getClientId(), app.getPassword()))
+		    		OAuthWrappers.getBasicAuth(app.getAppClientKey(), app.getAppClientPwd()))
 		    		.header("Access-Control-Allow-Origin", "*")
                     .cacheControl(cacheControlNoStore())
                     .header("Pragma", "no-cache")
@@ -421,7 +424,7 @@ public class OAuthServices {
 			@QueryParam("refresh_token") String refreshToken,
 			@QueryParam("expires_in") int expires_in, @QueryParam("scope") String scope) {
 		HttpSession session = httpRequest.getSession();
-		App app = (App) session.getAttribute(APP_KEY);
+		AppCache app = (AppCache) session.getAttribute(APP_KEY);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Session is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
@@ -476,7 +479,7 @@ public class OAuthServices {
 				" {\"response\": \"successful\" }").type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
-	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, App app) {
+	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, AppCache app) {
 		HttpSession session = httpRequest.getSession();
 		session.removeAttribute(APP_KEY);
 		try {
@@ -493,7 +496,7 @@ public class OAuthServices {
 	}
 	
 	
-	private Response getAccessTokenFromUid(String _3cixtyUID, App app, String scope) {
+	private Response getAccessTokenFromUid(String _3cixtyUID, AppCache app, String scope) {
 		if (!checkValidScope(scope)) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Scope is invalid\"} ")
@@ -532,16 +535,16 @@ public class OAuthServices {
 		return builder.toString();
 	}
 
-	private String join(Set<Scope> scopes) {
-		StringBuilder builder = new StringBuilder();
-		for (Scope scope: scopes) {
-			if (builder.length() == 0) builder.append(scope.getScopeName());
-			else {
-				builder.append(',').append(scope.getScopeName());
-			}
-		}
-		return builder.toString();
-	}
+//	private String join(Set<Scope> scopes) {
+//		StringBuilder builder = new StringBuilder();
+//		for (Scope scope: scopes) {
+//			if (builder.length() == 0) builder.append(scope.getScopeName());
+//			else {
+//				builder.append(',').append(scope.getScopeName());
+//			}
+//		}
+//		return builder.toString();
+//	}
 
 	protected boolean validId(String id) {
 		if (id.matches(ID_PATTERN)) {

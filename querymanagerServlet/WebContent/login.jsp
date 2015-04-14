@@ -1,6 +1,6 @@
 <%@page import="eu.threecixty.Configuration" %>
-<%@page import="eu.threecixty.oauth.model.App" %>
-<%@page import="eu.threecixty.oauth.OAuthWrappers" %>
+<%@page import="eu.threecixty.cache.AppCache" %>
+<%@page import="eu.threecixty.cache.TokenCacheManager" %>
 <%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -13,7 +13,7 @@
 <body>
 <%
     String key = request.getParameter("key");
-    App app = OAuthWrappers.retrieveApp(key);
+    AppCache app = TokenCacheManager.getInstance().getAppCache(key);
     session.setAttribute(OAuthServices.APP_KEY, app);
 %>
 <script>

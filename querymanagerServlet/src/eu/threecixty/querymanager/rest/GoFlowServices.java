@@ -12,11 +12,12 @@ import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
 
+import eu.threecixty.cache.AppCache;
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.oauth.model.App;
 import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.profile.GoFlowServer;
 import eu.threecixty.profile.GoogleAccountUtils;
@@ -70,7 +71,7 @@ public class GoFlowServices {
 	}
 
 	public static boolean registerAppFromUID(String uid, String appkey) {
-		App app = OAuthWrappers.retrieveApp(appkey);
+		AppCache app = TokenCacheManager.getInstance().getAppCache(appkey);
 		if (app == null) return false;
 		
 		boolean ok = GoFlowServer.getInstance().registerNewApp(app.getAppNameSpace(), app.getAppName(), app.getDescription());
@@ -86,7 +87,7 @@ public class GoFlowServices {
 
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
 			CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime, CallLoggingConstants.GOFLOW_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			String appid = OAuthWrappers.retrieveApp(userAccessToken.getAppkey()).getAppNameSpace();
+			String appid = TokenCacheManager.getInstance().getAppCache(userAccessToken.getAppkey()).getAppNameSpace();
 			return getAccountFromUID(userAccessToken.getUid(), appid, role);
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.GOFLOW_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
