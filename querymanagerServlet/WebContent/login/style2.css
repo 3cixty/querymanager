@@ -570,6 +570,24 @@ table {
     font-size: 12px;
     color: #999;
     margin-top: 14px;
+    text-align: justify;
+}
+.login3-info
+{
+    font-size: 12px;
+    color: #999;
+    margin-top: 14px;
+    text-align: center;
+}
+
+login-benefitsCopyright .login3-info {
+    margin-top: 0px;
+    text-align: center;
+}
+.login-benefitsCopyright {
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+    padding-top: 15px;
 }
 
 login-benefits .login-info {
@@ -592,20 +610,23 @@ login-benefits .login-info {
 }
 .login2-info/* ,.login2-selection */
 {
-    font-size:14px;
+    font-size: 14px;
     color: #444;
     margin-bottom: 15px;
-    text-align:center;
+    text-align: center;
 }
 .login2-selection
-{text-align:left;margin-bottom: 30px;}
+{
+	text-align: left;
+	margin-bottom: 30px;
+}
 .login-body #form
 {
     margin: 30px 0px 0px;
 }
 
 #form .login2-info {
-    text-align: left;
+    text-align: center;
 }
 .permission
 {

@@ -77,6 +77,11 @@
    			</div>
    			<div class="login-info">This Privacy Policy may be updated from time to time for any reason; each version will apply to information collected while it was in place. We will notify you of any material changes to our Privacy Policy by posting the new Privacy Policy on our platform. You are advised to consult this Privacy Policy regularly for any changes.
    			</div>
+   			<div class="login-benefitsCopyright">
+				<div class="login3-info"> 
+					© 2015, 3cixty. All Rights Reserved.
+				</div>
+			</div>
 		</div>
 	<!-- </div> -->
 </body>

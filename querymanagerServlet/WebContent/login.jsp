@@ -149,8 +149,8 @@
 					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
 				</div>
 			</div>
-			<div class="login-benefits">
-				<div class="login-info"> 
+			<div class="login-benefitsCopyright">
+				<div class="login3-info"> 
 					© 2015, 3cixty. All Rights Reserved.
 				</div>
 			</div>
