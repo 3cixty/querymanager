@@ -467,7 +467,33 @@ table {
     -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
 }
-
+.wrapperPrivacy .logo-icon2 {
+    background-image: url("../ExploreMI360.png");
+    background-repeat: no-repeat;
+    height: 90px;
+    margin: 0 auto 5px;
+    width: 90px;
+    background-size: contain;
+    background-position: 50% 0%;
+}
+.wrapperPrivacy {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    width: 450px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    padding: 50px 40px 35px;
+    text-align: center;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
+    text-align:justify;
+}
 
 .social-login-buttons
 {
