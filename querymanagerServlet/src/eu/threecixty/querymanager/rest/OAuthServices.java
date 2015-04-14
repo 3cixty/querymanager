@@ -36,6 +36,7 @@ import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.utils.ScopeUtils;
 import eu.threecixty.profile.FaceBookAccountUtils;
 import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.querymanager.AuthorizationBypassManager;
 import eu.threecixty.querymanager.filter.DynamicCORSFilter;
 
 @Path("/" + Constants.VERSION_2)
@@ -91,6 +92,10 @@ public class OAuthServices {
 	@Path("/getAccessToken")
 	public Response getAccessToken(@HeaderParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey,
 			@DefaultValue("") @HeaderParam("scope") String scope) {
+		if (!AuthorizationBypassManager.getInstance().isFound(appkey))
+			return Response.status(Response.Status.UNAUTHORIZED).entity(
+					" {\"response\": \"failed\", \"reason\": \"App key is not allowed to get access token\"} ").type(
+							MediaType.APPLICATION_JSON_TYPE).build();
 		AppCache app = TokenCacheManager.getInstance().getAppCache(appkey);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
@@ -113,6 +118,10 @@ public class OAuthServices {
 			@DefaultValue("") @HeaderParam("scope") String scope,
 			@DefaultValue("50") @QueryParam("width") int width,
 			@DefaultValue("50") @QueryParam("height") int height) {
+		if (!AuthorizationBypassManager.getInstance().isFound(appkey))
+			return Response.status(Response.Status.UNAUTHORIZED).entity(
+					" {\"response\": \"failed\", \"reason\": \"App key is not allowed to get access token\"} ").type(
+							MediaType.APPLICATION_JSON_TYPE).build();
 		AppCache app = TokenCacheManager.getInstance().getAppCache(appkey);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")

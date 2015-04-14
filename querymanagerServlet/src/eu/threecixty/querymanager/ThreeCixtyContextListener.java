@@ -44,6 +44,8 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    GoFlowServer.setPath(realPath + File.separatorChar + "WEB-INF" + File.separatorChar + "goflow.properties");
 	    OAuthWrappers.addScopesByDefault();
 	    
+	    AuthorizationBypassManager.getInstance().load();
+	    
 	    // create timer for crawling Mobidot information
 	    CrawlerCron crawlerCron = new CrawlerCron();
 	    crawlerCron.run();
