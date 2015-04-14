@@ -1,0 +1,14 @@
+PREFIX schema: <http://schema.org/>
+PREFIX ma-ont: <http://www.w3.org/ns/ma-ont#>
+PREFIX ce: <http://data.linkedevents.org/cell/milano/>
+SELECT (?catRead as ?category) (?catRead as ?uri) (COUNT(DISTINCT ?venue) as ?count)
+WHERE
+{
+
+	?venue a dul:Place .
+	?venue <http://data.linkedevents.org/def/location#businessType> ?cat .
+	?cat skos:prefLabel ?catRead .
+}
+GROUP BY ?catRead
+ORDER BY DESC (?count)
+OFFSET 0 LIMIT 100 

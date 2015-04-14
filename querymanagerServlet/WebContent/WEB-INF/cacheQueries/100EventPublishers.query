@@ -1,0 +1,13 @@
+PREFIX schema: <http://schema.org/>
+PREFIX ma-ont: <http://www.w3.org/ns/ma-ont#>
+PREFIX ce: <http://data.linkedevents.org/cell/milano/>
+SELECT ?publisher (?publisher as ?uri) (COUNT(DISTINCT ?event) as ?count)
+WHERE
+{
+
+	?event a lode:Event .
+	?event dc:publisher ?publisher .
+}
+GROUP BY ?publisher
+ORDER BY DESC (?count)
+OFFSET 0 LIMIT 100 

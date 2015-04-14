@@ -1,0 +1,14 @@
+PREFIX schema: <http://schema.org/>
+PREFIX ma-ont: <http://www.w3.org/ns/ma-ont#>
+PREFIX ce: <http://data.linkedevents.org/cell/milano/>
+SELECT ?artist (?artist as ?uri) (COUNT(DISTINCT ?event) as ?count)
+WHERE
+{
+
+	?event a lode:Event .
+	?event lode:involvedAgent ?involvedAgent .
+	?involvedAgent rdfs:label ?artist .
+}
+GROUP BY ?artist
+ORDER BY DESC (?count)
+OFFSET 0 LIMIT 100 
