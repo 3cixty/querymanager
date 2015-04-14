@@ -35,7 +35,7 @@
         			
         		</div>
 -->			<div class="login-info"> 3cixty provides this Privacy Policy to inform users of our policies and procedures regarding the collection,
-				use and disclosure of personally identifiable information received from users of this platform, located at https://dev.3cixty.com.
+				use and disclosure of personally identifiable information received from users of this platform, located at https://www.3cixty.com.
 			</div>
 			<div class="login-info"> 
 				By using the 3cixty platform, you are consenting to our processing of your information. Processing means using cookies on a 
