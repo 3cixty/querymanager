@@ -25,7 +25,7 @@
     }
 </style> -->
 </head>
-<body class="login-body">
+<body class="login-bodyPrivacy">
 	<div class="wrapperPrivacy">
 		<!-- <div class="login-benefits"> -->
 			<div class="login2-info">

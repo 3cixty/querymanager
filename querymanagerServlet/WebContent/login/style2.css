@@ -438,14 +438,21 @@ table {
 {
     background-color: #f4f4f4 !important;
     background-image: none;
+    height: 600px;
+}
+
+.login2-body
+{
+    background-color: #f4f4f4 !important;
+    background-image: none;
 }
 
 .wrapper .logo-icon {
     background-image: url("../ExploreMI360.png");
     background-repeat: no-repeat;
-    height: 50px;
+    height: 100px;
     margin: 0 auto 5px;
-    width: 50px;
+    width: 100px;
     background-size: contain;
     background-position: 50% 0%;
 }
@@ -454,6 +461,7 @@ table {
     background-color: #ffffff;
     border: 1px solid #dddddd;
     width: 320px;
+    height: 570px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -467,6 +475,19 @@ table {
     -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
 }
+.login-bodyPrivacy,.login2-bodyPrivacy
+{
+    background-color: #f4f4f4 !important;
+    background-image: none;
+    height: 850px;
+}
+
+.login2-bodyPrivacy
+{
+    background-color: #f4f4f4 !important;
+    background-image: none;
+}
+
 .wrapperPrivacy .logo-icon2 {
     background-image: url("../ExploreMI360.png");
     background-repeat: no-repeat;
