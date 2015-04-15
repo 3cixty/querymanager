@@ -1,0 +1,347 @@
+@CHARSET "ISO-8859-1";
+
+* {
+	z-index: 10;
+	box-sizing: border-box; /* css3 rec */
+	-moz-box-sizing: border-box; /* ff2 */
+	-ms-box-sizing: border-box; /* ie8 */
+	-webkit-box-sizing: border-box; /* safari3 */
+	-khtml-box-sizing: border-box; /* konqueror */
+	-webkit-text-size-adjust: 100%;
+}
+
+.clearfix:after {
+	clear: both;
+	content: ".";
+	display: block;
+	font-size: 0;
+	height: 0;
+	line-height: 0;
+	visibility: hidden;
+}
+
+#header ul li #gps_toggle {
+	background-color: white;
+	border-radius: 0 0 0 3px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	color: #333;
+	display: none;
+	line-height: 1.3em;
+	padding: 1em;
+	position: absolute;
+	text-align: left;
+	text-shadow: 0 0 0;
+	top: 5em;
+	z-index: 100;
+}
+
+#bookmark_window input {
+	width: 100%;
+}
+
+#settings, #bookmark_window {
+	z-index: 100;
+	display: none;
+}
+
+#bookmark_window {
+	width: 500px;
+}
+
+#header ul {
+	position: fixed;
+	right: 0;
+	top: 0;
+}
+
+#header ul li {
+	cursor: pointer;
+	float: left;
+	padding: 0.5em 0;
+	
+}
+
+li#loggedIn.menu-profile {
+	min-height: 80px; /*prevent moving of tiles if name uses two rows and through hover it fits in one row*/
+}
+
+#loggedIn img {
+	height: 4em;
+	-webkit-border-radius: 2em;
+	-moz-border-radius: 2em;
+	border-radius: 2em;
+}
+
+#authorize-button {
+	width: 100%;
+}
+
+a {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+a.element {
+	vertical-align: bottom;
+}
+
+a.element span {
+	
+}
+
+ul {
+	list-style: none;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.ar {
+	text-align: right !important;
+}
+
+.node {
+    transition-delay: 0s;
+    transition-duration: 0.5s;
+    transition-property: all;
+    transition-timing-function: ease;
+    vertical-align: top;
+    display: inline-block;
+}
+
+.node.menu {
+	position: absolute;
+	transform: translate(80%, 5%);
+	z-index: 20;
+}
+
+.node>.main {
+	display: inline-block;
+	white-space: normal;
+}
+
+.node>.main>.body {
+	overflow: auto;
+	overflow-x: hidden;
+	-ms-overflow-x: hidden;
+}
+
+.node>.main>.header, #tray>ul>li {
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 50% 50%;
+}
+
+.options {
+	list-style: none;
+}
+
+.title {
+	clear: both;
+}
+
+.node>.main>.header>.count, .options>li,
+	.tray-element-remove {
+	cursor: pointer;
+}
+
+#tray li * {
+	vertical-align: top !important;
+}
+
+.children {
+	display: block;
+	text-align: center;
+	width: 100%;
+	white-space: nowrap;
+}
+
+#tray {
+	min-width: 280px;
+}
+
+#tray .title-wide {
+	color: white;
+	display: inline-block;
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#tray, #header {
+	position: fixed;
+	top: 0;
+}
+
+#tray ul {
+	list-style: none;
+}
+
+#login>* {
+	float: left;
+}
+
+#login>p {
+	padding-left: 1em;
+}
+
+.distance {
+	text-align: right;
+	color: #888;
+}
+
+.distance:before {
+	content: '(';
+}
+
+.distance:after {
+	content: ')';
+}
+
+.entity_tag {
+	background-color: #4cc1d3;
+	border-radius: 4px;
+	color: white;
+	font-weight: bold;
+	margin-right: 5px;
+	padding: 1px 5px 2px;
+	vertical-align: top;
+}
+
+.datepicker {
+	margin-right: 15px;
+	width: 120px;
+}
+
+
+#partner, #bookmarks_window {
+	display: none;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: 1000;
+	
+	background: rgba(20,20,20,0.5);
+}
+
+#partner > div, #bookmarks_window>div {
+	display: none;
+    background-color: white;
+    height: 75%;
+    left: 50%;
+    margin-left: -25%;
+    margin-top: -8%;
+    position: absolute;
+    top: 20%;
+    width: 45%;
+    z-index: 1000;
+    
+    
+}
+
+#partner > div > h1 {
+    height: 10%;
+    padding: 1em;
+}
+
+#partner > div > div:nth-of-type(1) {
+	float: none;
+	height: 40%;
+	width: 100%;
+	margin: auto;
+}
+
+#partner > div > div, #bookmarks_window > div > div {
+    height: 25%;
+    width: 33%;
+    float: left;
+}
+
+
+#bookmarks_window > div {
+	display: none;
+    height: auto;
+    padding-bottom: 50px;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 50px;
+    text-align: center;
+}
+    
+
+#partner > div > div img, #bookmarks_window > div > div img {
+    max-height: 100%;
+    max-width: 100%;
+    padding: 5%;
+    display: block;
+    margin: auto;
+}
+
+#header .partner-icon {
+    background-image: url("../img/e015.png");
+    background-position: 50% 0;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 42px;
+    margin: 0 auto;
+    width: 50px;
+    margin: 1.5em auto 0;
+}
+
+#social_media {
+	position: fixed;
+	z-index: 1000;
+	height: 32px;
+	width: 180px;
+	top: 100%;
+	left: 100%;
+	margin-top:-40px;
+	margin-left: -180px;
+} 
+ 
+.share-buttons{
+	list-style: none;
+}
+
+.share-buttons li{
+	display: inline;
+}
+
+@media (max-height: 694px) {
+        /*#header .toggle-base {
+        	display:none;
+        }
+        
+        #header .menu-icon {
+        	display:none;
+        }*/
+        
+        #header #loggedIn {
+        	min-height: 0px !important
+        }
+        
+        #header #dev_toggle, #header #mobility_profile {
+        display: none;
+        }
+        
+        #header .menu-profile img {
+        	display:none;
+        }
+        /*
+        #header .menu-item-text{
+        	display:none;
+        }
+        */
+}
+
+.slider {
+	width: 80%;
+	margin: 15px auto;
+	background: #cccccc;
+}
+
+.slider .ui-widget-header {
+    background: #0099CB;;
+}
