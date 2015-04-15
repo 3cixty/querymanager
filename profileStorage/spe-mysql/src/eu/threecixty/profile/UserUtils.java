@@ -12,6 +12,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import eu.threecixty.db.HibernateUtil;
+import eu.threecixty.profile.Utils.UidSource;
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.Name;
 import eu.threecixty.profile.oldmodels.Preference;
@@ -250,6 +251,8 @@ public class UserUtils {
 		Session session = null;
 		UserProfile userProfile = null;
 		try {
+			String tmpUid = Utils.gen3cixtyUID(uid, source.equals(GoogleAccountUtils.GOOGLE_SOURCE)
+					? UidSource.GOOGLE : UidSource.FACEBOOK);
 			session = HibernateUtil.getSessionFactory().openSession();
 
 			String hql = "FROM AccountModel A WHERE A.accountId = ? AND A.source = ?";
@@ -259,9 +262,9 @@ public class UserUtils {
 			if (results.size() > 0) {
 				userModel = ((AccountModel) results.get(0)).getUserModel();
 			} else if (!isNullOrEmpty(profileImage)) {
-				hql = "FROM UserModel U WHERE U.profileImage = ?";
+				hql = "FROM UserModel U WHERE U.profileImage = ? OR U.uid = ?";
 				query = session.createQuery(hql);
-				results = query.setString(0, profileImage).list();
+				results = query.setString(0, profileImage).setString(1, tmpUid).list();
 				if (results.size() > 0) {
 					userModel = ((UserModel) results.get(0));
 				}
