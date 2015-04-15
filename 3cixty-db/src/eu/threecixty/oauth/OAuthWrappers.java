@@ -12,12 +12,13 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
-
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.cache.AppCache;
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Developer;
 import eu.threecixty.oauth.model.Scope;
@@ -64,46 +65,6 @@ public class OAuthWrappers {
 	
 	private static final String HTTP_GET = "GET";
 	private static final String HTTP_POST = "POST";
-	
-//	/**
-//	 * Gets user access token.
-//	 * <br>
-//	 * When a given user does not have his access token, the method asks OAuth server to give him one ;
-//	 * otherwise, the method picks that information from 3cixty database.
-//	 * @param uid
-//	 * @param appkey
-//	 * @return
-//	 */
-//	public static String getAccessToken(String uid, String appkey) {
-//		User user = OAuthModelsUtils.getUser(uid);
-//		if (user == null) {
-//			// create user in database to map with access tokens created by oauth server
-//			if (!OAuthModelsUtils.addUser(uid)) return null;
-//			user = OAuthModelsUtils.getUser(uid);
-//			if (user == null) return null;
-//		}
-//		App app = OAuthModelsUtils.getApp(appkey);
-//		if (app == null) return null;
-//		UserAccessToken tmpUserAccessToken = null;
-//		for (UserAccessToken userAccessToken: user.getUserAccessTokens()) {
-//			if (userAccessToken.getApp().getId().intValue() == app.getId().intValue()) { // found in DB
-//				// check if this access token is still available on oauth server to delete
-//				if (!validateAccessToken(userAccessToken.getAccessToken())) {
-//					tmpUserAccessToken = userAccessToken;
-//				} else {
-//				    return userAccessToken.getAccessToken();
-//				}
-//			}
-//		}
-//		// delete UserAccessToken as this access token is not available on OAuth server
-//		if (tmpUserAccessToken != null) {
-//			OAuthModelsUtils.deleteUserAccessToken(tmpUserAccessToken);
-//		}
-//		// create a new access token
-//		String accessToken = createAccessTokenUsingOAuthServer();
-//		if (storeAccessTokenWithUID(uid, accessToken, app)) return accessToken;
-//		return null;
-//	}
 
 	/**
 	 * Return access token with info about expiration.
@@ -111,7 +72,9 @@ public class OAuthWrappers {
 	 * @param app
 	 * @return
 	 */
-	public static AccessToken findAccessToken(String uid, App app) {
+	public static AccessToken findAccessToken(String uid, AppCache app) {
+		AccessToken at = TokenCacheManager.getInstance().getAccessTokenFrom(uid, app.getAppkey());
+		if (at != null) return at;
 		User user = OAuthModelsUtils.getUser(uid);
 		if (user == null) {
 			// create user in database to map with access tokens created by oauth server
@@ -119,7 +82,7 @@ public class OAuthWrappers {
 			user = OAuthModelsUtils.getUser(uid);
 			if (user == null) return null;
 		}
-		if (app == null) return null;
+
 		AccessToken foundInDB = OAuthModelsUtils.findTokenInfoFromDB(user, app);
 		if (foundInDB != null) {
 			// check if this access token is still available on oauth server to delete
@@ -127,6 +90,7 @@ public class OAuthWrappers {
 			if (tokenInfo != null) {
 				// update expires_in
 				foundInDB.setExpires_in(tokenInfo.getExpires_in());
+				TokenCacheManager.getInstance().update(foundInDB);
 			    return foundInDB;
 			}
 		}
@@ -147,7 +111,7 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken,
-			String scope, App app) {
+			String scope, AppCache app) {
 		User user = OAuthModelsUtils.getUser(uid);
 		if (user == null) {
 			// create user in database to map with access tokens created by oauth server
@@ -247,21 +211,31 @@ public class OAuthWrappers {
 		if (newAccessToken == null) return null;
 		// update user access token as OAuth server already deleted old one
 		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(lastAccessToken, newAccessToken)) return null;
+		TokenCacheManager.getInstance().update(newAccessToken);
 		return newAccessToken;
 	}
 
 	public static AccessToken findAccessTokenFromDB(String accessToken) {
-		return OAuthModelsUtils.findTokenInfoFromAccessToken(accessToken);
+		AccessToken  at = TokenCacheManager.getInstance().getAccessToken(accessToken);
+		if (at != null) return at;
+		at = OAuthModelsUtils.findTokenInfoFromAccessToken(accessToken);
+		if (at != null) {
+		    TokenCacheManager.getInstance().update(at);
+		}
+		return at;
 	}
 	
 	public static boolean revokeAccessToken(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return false;
+		TokenCacheManager.getInstance().remove(accessToken);
 		return OAuthModelsUtils.deleteUserAccessToken(accessToken);
 	}
 
 	public static String findUIDFrom(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return null;
-		return OAuthModelsUtils.findUIDFromAccessToken(accessToken);
+		AccessToken  at = findAccessTokenFromDB(accessToken);
+		if (at == null) return null;
+		return at.getUid();
 	}
 
 	public static boolean updateAppKey(String uid, String appid, String appname, String description,
@@ -283,15 +257,6 @@ public class OAuthWrappers {
 		App app = OAuthModelsUtils.retrieveApp(uid, appid);
 		return app == null ? null : app.getKey();
 	}
-
-	/**
-	 * Retrieves app from a given UID and appID.
-	 * @param appkey
-	 * @return
-	 */
-	public static App retrieveApp(String appkey) {
-		return OAuthModelsUtils.getApp(appkey);
-	}
 	
 	public static Set <Scope> getScopes(App app) {
 		return OAuthModelsUtils.getScopes(app);
@@ -307,9 +272,7 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static boolean validateAppKey(String appKey) {
-		if (appKey == null || appKey.equals("")) return false;
-		if (!OAuthModelsUtils.existApp(appKey)) return false;
-		return tokenInfo(appKey) != null;
+		return (TokenCacheManager.getInstance().getAppCache(appKey) != null);
 	}
 
 	/**
@@ -319,8 +282,15 @@ public class OAuthWrappers {
 	 */
 	public static boolean validateUserAccessToken(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return false;
-		if (!OAuthModelsUtils.existUserAccessToken(accessToken)) return false;
-		return tokenInfo(accessToken) != null;
+		AccessToken at = TokenCacheManager.getInstance().getAccessToken(accessToken);
+		if (at != null) return true;
+		at = OAuthModelsUtils.findTokenInfoFromAccessToken(accessToken);
+		if (at == null) return false;
+		AccessToken atFromOAuth = tokenInfo(accessToken);
+		if (atFromOAuth == null) return false;
+		at.setExpires_in(atFromOAuth.getExpires_in());
+		TokenCacheManager.getInstance().update(at);
+		return true;
 	}
 
 	public static String getBasicAuth() {
@@ -410,13 +380,13 @@ public class OAuthWrappers {
 		return null;
 	}
 
-	public static AccessToken createAccessTokenForMobileApp(App app, String scope) {
+	public static AccessToken createAccessTokenForMobileApp(AppCache app, String scope) {
 	    
 	    String postParams = "grant_type=client_credentials&scope=" + scope;
 	    
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
-				app.getClientId().concat(":")
-				.concat(app.getPassword()).getBytes())));
+				app.getAppClientKey().concat(":")
+				.concat(app.getAppClientPwd()).getBytes())));
 		
 	    StringBuilder sb = new StringBuilder();
 	    makeHttpCall(ENDPOINT_TO_POST_ACCESS_TOKEN, auth, HTTP_POST, postParams, sb);

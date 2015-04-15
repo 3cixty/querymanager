@@ -18,6 +18,8 @@ public class AccessToken {
 	private String uid; // Google UID
 	private String appkey; // App Key
 	
+	private Integer appkeyId;
+	
 	public AccessToken() {
 	}
 	
@@ -88,5 +90,11 @@ public class AccessToken {
 		this.appClientPwd = appClientPwd;
 	}
 
+	public Integer getAppkeyId() {
+		return appkeyId;
+	}
 
+	public void setAppkeyId(Integer appkeyId) {
+		this.appkeyId = appkeyId;
+	}
 }

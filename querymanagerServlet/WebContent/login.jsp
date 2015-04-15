@@ -1,6 +1,6 @@
 <%@page import="eu.threecixty.Configuration" %>
-<%@page import="eu.threecixty.oauth.model.App" %>
-<%@page import="eu.threecixty.oauth.OAuthWrappers" %>
+<%@page import="eu.threecixty.cache.AppCache" %>
+<%@page import="eu.threecixty.cache.TokenCacheManager" %>
 <%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"  pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -20,7 +20,7 @@
 <body class="login-body">
 <%
     String key = request.getParameter("key");
-    App app = OAuthWrappers.retrieveApp(key);
+    AppCache app = TokenCacheManager.getInstance().getAppCache(key);
     session.setAttribute(OAuthServices.APP_KEY, app);
 %>
 <script>

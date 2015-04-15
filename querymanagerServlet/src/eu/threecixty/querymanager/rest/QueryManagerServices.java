@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 
+import eu.threecixty.cache.CacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -1130,17 +1131,23 @@ public class QueryManagerServices {
 	 */
 	private String executeQuery(String query, EventMediaFormat format, String httpMethod) throws IOException {
 		if (query == null || format == null) return "";
+		String ret = null;
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
-		StringBuilder builder = new StringBuilder();
 		long startTime = System.currentTimeMillis();
-		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
+		if (CacheManager.getInstance().isQueryShouldBeExecutedViaCache(query)) {
+			ret = CacheManager.getInstance().getContent(query);
+		} else {
+			StringBuilder builder = new StringBuilder();
+			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
+			ret = builder.toString();
+		}
 		long endTime = System.currentTimeMillis();
 		if (DEBUG_MOD) {
 			LOGGER.info("Query: " + query);
 			LOGGER.info("Time to make the query: " + (endTime - startTime) + " ms");
 		}
-		return builder.toString();
+		return ret;
 	}
 
     public class KeyValuePair {

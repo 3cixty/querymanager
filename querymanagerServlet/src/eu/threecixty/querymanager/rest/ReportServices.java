@@ -30,11 +30,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.cache.AppCache;
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.oauth.model.App;
 import eu.threecixty.profile.ReportRequest;
 
 @Path("/" + Constants.PREFIX_NAME)
@@ -80,17 +81,19 @@ public class ReportServices {
 			    String userToken = getUserToken(json);
 			    reportRequest.setUserToken(userToken);
 			    AccessToken at = OAuthWrappers.findAccessTokenFromDB(userToken);
+			    if (at == null) return createInvalidResponse("Your userToken is invalid");
 			    CallLoggingManager.getInstance().save(at.getAppkey(), starttime, REPORT_SERVICE,
 			    		CallLoggingConstants.SUCCESSFUL);
 			    reportRequest.setUid(at.getUid());
-			    App app = OAuthWrappers.retrieveApp(at.getAppkey());
+			    AppCache app = TokenCacheManager.getInstance().getAppCache(at.getAppkey());
 			    subject = app.getAppName();
 			    reportRequest.setUserToken(null); // clear user token
 			} else if (json.has(APP_KEY)) {
 				String key = getAppkey(json);
 			    CallLoggingManager.getInstance().save(key, starttime, REPORT_SERVICE,
 			    		CallLoggingConstants.SUCCESSFUL);
-			    App app = OAuthWrappers.retrieveApp(key);
+			    AppCache app = TokenCacheManager.getInstance().getAppCache(key);
+			    if (app == null) return createInvalidResponse("Your key is invalid");
 			    subject = app.getAppName();
 			} else {
 				return createInvalidResponse("Your request must contain either userToken or key");
