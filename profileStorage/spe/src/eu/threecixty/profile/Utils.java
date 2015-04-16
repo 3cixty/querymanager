@@ -137,7 +137,7 @@ public class Utils {
 	private Utils() {
 	}
 	
-	protected enum UidSource {
+	public enum UidSource {
 		GOOGLE, FACEBOOK
 	}
 }

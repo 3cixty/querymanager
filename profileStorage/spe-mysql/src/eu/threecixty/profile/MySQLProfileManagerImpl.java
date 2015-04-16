@@ -1,10 +1,13 @@
 package eu.threecixty.profile;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eu.threecixty.cache.ProfileCacheManager;
 import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerImpl;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
@@ -20,10 +23,14 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public boolean existUID(String _3cixtyUid) throws TooManyConnections {
+		UserProfile profile = ProfileCacheManager.getInstance().getProfile(_3cixtyUid);
+		if (profile != null) return true;
 		return UserUtils.exists(_3cixtyUid);
 	}
 
 	public String find3cixtyUID(String uid, String source, String profileImage) {
+		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source, profileImage);
+		if (userProfile != null) return userProfile.getHasUID();
 		return UserUtils.find3cixtyUID(uid, source, profileImage);
 	}
 
@@ -139,6 +146,8 @@ class MySQLProfileManagerImpl implements ProfileManager {
 
 	public UserProfile getProfile(String _3cixtyUID, Map<String, Boolean> arg1)
 			throws TooManyConnections {
+		UserProfile profile = ProfileCacheManager.getInstance().getProfile(_3cixtyUID);
+		if (profile != null) return profile;
 		return UserUtils.getUserProfile(_3cixtyUID);
 	}
 
@@ -153,11 +162,20 @@ class MySQLProfileManagerImpl implements ProfileManager {
 
 	public boolean saveProfile(UserProfile userProfile, Map<String, Boolean> arg1)
 			throws TooManyConnections {
-		return UserUtils.saveUserProfile(userProfile);
+		boolean successful = UserUtils.saveUserProfile(userProfile);
+		if (successful) ProfileCacheManager.getInstance().put(userProfile);
+		return successful;
 	}
 
 	public Set<String> find3cixtyUIDs(List<String> accountIds, String source,
 			List <String> unfoundAccountIds) {
+		if (accountIds == null || accountIds.size() == 0) return Collections.emptySet();
+		Set <String> _3cixtyUidsInCache = new HashSet <String>();
+		for (String accountId: accountIds) {
+			UserProfile tmpProfile = ProfileCacheManager.getInstance().findProfile(accountId, source, null);
+			if (tmpProfile != null) _3cixtyUidsInCache.add(tmpProfile.getHasUID());
+		}
+		if (_3cixtyUidsInCache.size() == accountIds.size()) return _3cixtyUidsInCache;
 		return UserUtils.find3cixtyUIDs(accountIds, source, unfoundAccountIds);
 	}
 
@@ -167,6 +185,8 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public UserProfile findUserProfile(String uid, String source, String profileImage) {
+		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source, profileImage);
+		if (userProfile != null) return userProfile;
 		return UserUtils.findUserProfile(uid, source, profileImage);
 	}
 

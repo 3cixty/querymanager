@@ -8,12 +8,12 @@ import eu.threecixty.profile.Tray;
 
 public class TrayCacheManager {
 
-	private static final TrayCacheManager instance = new TrayCacheManager();
+	private static final TrayCacheManager INSTANCE = new TrayCacheManager();
 	
 	private Map <String, List<Tray>> trayCaches;
 	
 	public static TrayCacheManager getInstance() {
-		return instance;
+		return INSTANCE;
 	}
 	
 	public List <Tray> getTrays(String token) {
