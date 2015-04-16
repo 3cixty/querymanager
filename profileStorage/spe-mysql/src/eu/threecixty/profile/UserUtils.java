@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,6 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 import eu.threecixty.cache.ProfileCacheManager;
@@ -26,7 +28,9 @@ import eu.threecixty.userprofile.UserModel;
 
 public class UserUtils {
 	
-	 private static final Logger LOGGER = Logger.getLogger(
+	public static final String MOBIDOT = "Mobidot";
+
+	private static final Logger LOGGER = Logger.getLogger(
 			 UserUtils.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
@@ -186,7 +190,6 @@ public class UserUtils {
 		List <String> googleUids = new LinkedList <String>();
 		Session session = null;
 		try {
-			// TODO: should take into account of accompanying model ? 
 			String hql = "From AccountModel A WHERE A.userModel.uid in (:uids) AND A.source = :source";
 			session = HibernateUtil.getSessionFactory().openSession();
 			List <?> results = session.createQuery(hql).setParameterList("uids",
@@ -576,5 +579,57 @@ public class UserUtils {
 	}
 	
 	private UserUtils() {
+	}
+
+	public static Set<IDMapping> getIDMappings() {
+		Session session = null;
+		Set <IDMapping> mappings = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT distinct uid, accountId FROM 3cixty_user_profile, 3cixty_account  WHERE source LIKE \"" + MOBIDOT + "\" AND 3cixty_user_profile.id = 3cixty_user_id";
+			SQLQuery query = session.createSQLQuery(sql);
+			@SuppressWarnings("unchecked")
+			List <Object[]> results = query.list();
+			if (results == null || results.size() == 0) return Collections.emptySet();
+			mappings = new HashSet <IDMapping>();
+			for (Object[] row: results) {
+				IDMapping idMapping = new IDMapping();
+				idMapping.setThreeCixtyID((String) row[0]);
+				idMapping.setMobidotID((String) row[1]);
+				mappings.add(idMapping);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return mappings;
+	}
+
+	public static Set<IDCrawlTimeMapping> getIDCrawlTimeMappings() {
+		Session session = null;
+		Set <IDCrawlTimeMapping> mappings = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT uid, lastCrawlTimeToKB FROM 3cixty_user_profile";
+			SQLQuery query = session.createSQLQuery(sql);
+			@SuppressWarnings("unchecked")
+			List <Object[]> results = query.list();
+			if (results == null || results.size() == 0) return Collections.emptySet();
+			mappings = new HashSet <IDCrawlTimeMapping>();
+			for (Object[] row: results) {
+				IDCrawlTimeMapping mapping = new IDCrawlTimeMapping();
+				mapping.setThreeCixtyID((String) row[0]);
+				mapping.setLastCrawlTime((String) row[1]);
+				mappings.add(mapping);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return mappings;
 	}
 }

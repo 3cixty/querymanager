@@ -79,13 +79,11 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public Set<IDCrawlTimeMapping> getIDCrawlTimeMappings() {
-		// TODO Auto-generated method stub
-		return null;
+		return UserUtils.getIDCrawlTimeMappings();
 	}
 
 	public Set<IDMapping> getIDMappings() {
-		// TODO Auto-generated method stub
-		return null;
+		return UserUtils.getIDMappings();
 	}
 
 	public int getMinimumNumberOfTimesVisited(UserProfile userProfile) {
@@ -189,5 +187,4 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		if (userProfile != null) return userProfile;
 		return UserUtils.findUserProfile(uid, source, profileImage);
 	}
-
 }
