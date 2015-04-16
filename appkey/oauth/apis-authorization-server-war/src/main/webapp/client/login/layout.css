@@ -1,0 +1,166 @@
+@CHARSET "ISO-8859-1";
+
+* {
+	padding: 0;
+	margin: 0;
+}
+
+#logout {
+	width: 110px;
+}
+
+table {
+	text-align: left;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+td {
+	padding: 0.1em 0.4em;
+}
+
+.node>.main {
+	margin: 0.2em;
+	margin-top: 0em;
+	width: 270px;
+}
+
+.node>.main>.header>* {
+	padding: 0 0.3em;
+}
+
+.node>.main>.header>.title {
+	padding-top: 0.3em;
+}
+
+.node>.main>.body>.search input {
+	width: 100%;
+	padding: 0.2em;
+}
+
+.content {
+	max-height: 220px;
+	overflow-y: scroll;
+}
+
+.node.element .content {
+	max-height: auto;
+}
+
+.node.menu>.main {
+	/*left: 130px;
+    position: relative;
+    top: -8px;*/
+	
+}
+
+.node.filter>.main {
+	/*width: 100%;
+	max-width: 100%;*/
+	
+}
+
+.node>.main>.header {
+	min-height: 36px;
+}
+
+.options>li {
+    border-radius: 3px;
+    float: right;
+    margin-top: 4px;
+    padding: 0 3px 3px;
+    margin-bottom: 4px;
+}
+
+.options {
+	text-align: right;
+}
+
+.options>li.remove {
+	float: left;
+}
+
+.thumbnail {
+	width: 70px;
+	height: 70px;
+	float: left;
+	margin-right: 5px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+}
+
+#header {
+	width: 100%;
+	height: 5em;
+	z-index: 100;
+}
+
+#header h1 {
+	line-height: 2.5em;
+	display: inline;
+	vertical-align: top;
+}
+
+#root {
+	margin-bottom: 20em;
+	margin-left: 7em;
+	margin-right: 7em;
+	margin-top: 3em;
+	clear: left;
+}
+
+#tray {
+	padding: 1em;
+	position: fixed;
+	right: 0;
+	top: 5em;
+}
+
+#settings ul li {
+	background-color: #FFFFFF;
+	border: 1px solid #4CC1D3;
+	float: left;
+	margin-left: 0.5em;
+	margin-top: 0.5em;
+	padding: 0.3em;
+}
+
+.tray-properties {
+    background-color: rgba(255, 255, 255, 0.6);
+    margin-bottom: -1em;
+    margin-top: 0.5em;
+    padding: 0.5em 0.5em 0;
+}
+
+.tray-properties:hover {
+	background-color: rgba(255, 255, 255, 0.9);
+	transition-property: all;
+	transition-duration: 0.5s;
+	transition-timing-function: cubic-bezier(0.1, 0.9, 0.2, 1);
+	transition-delay: 0s;
+}
+
+li:hover>.tray-properties {
+	display: block;
+}
+
+.display {
+	display: block !important;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+}
+
+.manual-selection {
+    padding-top: 2px !important;
+}
+
+.tray-properties > input {
+    margin-top: 6px;
+}
+
+.rate {
+    margin-top: 3px;
+}
