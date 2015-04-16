@@ -28,7 +28,7 @@ public class TokenCacheManager {
 	//private Map <String, String> refreshTokenCaches; // refresh token - access token
 	private Map <String, String> uidAppkeyAccessTokens;
 	private Map <Integer, AppCache> appIdCaches;
-	private Map <String, AppCache> appkeyCaches;
+	private Map <String, Integer> appkeyCaches;
 
 	public static TokenCacheManager getInstance() {
 		return instance;
@@ -69,7 +69,8 @@ public class TokenCacheManager {
 	}
 	
 	public AppCache getAppCache(String appkey) {
-		return appkeyCaches.get(appkey);
+		Integer appid = appkeyCaches.get(appkey);
+		return appIdCaches.get(appid);
 	}
 	
 	public void remove(String access_token) {
@@ -105,14 +106,14 @@ public class TokenCacheManager {
 		appCache.setThumbnail(app.getThumbnail());
 		appCache.setId(app.getId());
 		appIdCaches.put(app.getId(), appCache);
-		appkeyCaches.put(app.getKey(), appCache);
+		appkeyCaches.put(app.getKey(), app.getId());
 	}
 	
 	private TokenCacheManager() {
 		tokenCaches = new ConcurrentHashMap<String, TokenCache>();
 		//refreshTokenCaches = new ConcurrentHashMap<String, String>();
 		appIdCaches = new ConcurrentHashMap<Integer, AppCache>();
-		appkeyCaches = new ConcurrentHashMap<String, AppCache>();
+		appkeyCaches = new ConcurrentHashMap<String, Integer>();
 		uidAppkeyAccessTokens = new ConcurrentHashMap<String, String>();
 		loadAppCaches();
 	}

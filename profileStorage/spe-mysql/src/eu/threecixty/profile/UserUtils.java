@@ -11,6 +11,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import eu.threecixty.cache.ProfileCacheManager;
 import eu.threecixty.db.HibernateUtil;
 import eu.threecixty.profile.Utils.UidSource;
 import eu.threecixty.profile.oldmodels.Address;
@@ -157,12 +158,16 @@ public class UserUtils {
 				session.save(userModel);
 
 				convertToUserModel(profile, userModel, session);
+				profile.setModelIdInPersistentDB(userModel.getId());
 
 				session.update(userModel);
 			}
 			
 			session.getTransaction().commit();
 
+			for (UserProfile profile: profiles) {
+				ProfileCacheManager.getInstance().put(profile);
+			}
 			added = true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
