@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
+
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthModelsUtils;
 import eu.threecixty.oauth.model.App;
@@ -18,10 +20,15 @@ import eu.threecixty.oauth.model.App;
  */
 public class TokenCacheManager {
 
-	private static final TokenCacheManager instance = new TokenCacheManager();
+	private static final TokenCacheManager INSTANCE = new TokenCacheManager();
 	
 	private static final String WISHLISH = "WishList";
 	private static final String PROFILE = "Profile";
+	 private static final Logger LOGGER = Logger.getLogger(
+			 TokenCacheManager.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	
 	private Map <String, TokenCache> tokenCaches;
@@ -31,14 +38,22 @@ public class TokenCacheManager {
 	private Map <String, Integer> appkeyCaches;
 
 	public static TokenCacheManager getInstance() {
-		return instance;
+		return INSTANCE;
 	}
 
 	public AccessToken getAccessToken(String access_token) {
+		if (DEBUG_MOD) LOGGER.info("Checking token in memory");
 		TokenCache tokenCache = tokenCaches.get(access_token);
-		if (tokenCache == null) return null;
+		if (tokenCache == null) {
+			if (DEBUG_MOD) LOGGER.info("Given token is not found in memory");
+			return null;
+		}
 		long currentTime = System.currentTimeMillis();
-		if (currentTime > tokenCache.getCreation() + tokenCache.getExpiration() * 1000) return null;
+		if (currentTime > tokenCache.getCreation() + tokenCache.getExpiration() * 1000) {
+			if (DEBUG_MOD) LOGGER.info("Token is found inmemory, but invalid");
+			return null;
+		}
+		if (DEBUG_MOD) LOGGER.info("Token is found in memory and valid");
 		AccessToken accessToken = new AccessToken();
 		accessToken.setAccess_token(access_token);
 		accessToken.setUid(tokenCache.getUid());
