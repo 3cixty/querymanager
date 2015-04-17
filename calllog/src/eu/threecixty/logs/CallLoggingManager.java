@@ -1,11 +1,16 @@
 package eu.threecixty.logs;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CallLoggingManager {
 
 	private CallLoggingStorage storage;
+	
+	private Queue <CallLogging> callLoggings;
 	
 
 	public static CallLoggingManager getInstance() {
@@ -13,7 +18,29 @@ public class CallLoggingManager {
 	}
 
 	public boolean save(CallLogging stats) {
-		return storage.save(stats);
+		callLoggings.add(stats);
+		List <CallLogging> listToStore = null;
+		if (callLoggings.size() >= 50) {
+			synchronized (this) {
+				if (callLoggings.size() >= 50) {
+				    int count = 0;
+					while (count < 50) {
+						CallLogging callLogging = callLoggings.poll();
+						if (callLogging != null) {
+							if (count == 0) listToStore = new LinkedList<CallLogging>();
+							listToStore.add(callLogging);
+							count++;
+						} else {
+							break;
+						}
+					}
+				}
+			}
+		}
+		if (listToStore != null && listToStore.size() > 0) {
+			return storage.save(listToStore);
+		}
+		return true;
 	}
 
 	/**
@@ -89,6 +116,7 @@ public class CallLoggingManager {
 
 	private CallLoggingManager() {
 		storage = new CallLoggingStorageImpl();
+		callLoggings = new ConcurrentLinkedQueue<CallLogging>();
 	}
 	
 	/**Singleton holder for lazy initiation*/

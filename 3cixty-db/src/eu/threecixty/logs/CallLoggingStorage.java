@@ -15,6 +15,13 @@ public interface CallLoggingStorage {
 	 * @return <code>true</code> if the method successfully saves statistics, and <code>false</code> otherwise.
 	 */
 	boolean save(CallLogging logging);
+	
+	/**
+	 * Saves a list of CallLogging: Batch insert
+	 * @param loggings
+	 * @return
+	 */
+	boolean save(List <CallLogging> loggings);
 
 	/**
 	 * Gets a list of log calls.
