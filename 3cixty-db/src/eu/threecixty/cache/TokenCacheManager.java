@@ -85,6 +85,7 @@ public class TokenCacheManager {
 	
 	public AppCache getAppCache(String appkey) {
 		Integer appid = appkeyCaches.get(appkey);
+		if (appid == null) return null;
 		return appIdCaches.get(appid);
 	}
 	
