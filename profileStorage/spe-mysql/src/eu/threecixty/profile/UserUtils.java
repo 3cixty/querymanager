@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -215,7 +216,7 @@ public class UserUtils {
 	 */
 	public static Set<String> find3cixtyUIDs(List<String> accountIds,
 			String source, List <String> unfoundAccountIds) {
-		if (accountIds == null || accountIds.size() == 0) return null;
+		if (accountIds == null || accountIds.size() == 0) return Collections.emptySet();
 		Set <String> _3cixtyUids = new HashSet <String>();
 		Session session = null;
 		try {

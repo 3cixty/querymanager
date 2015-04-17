@@ -71,12 +71,14 @@ public class ProfileCacheManager {
 				return profile;
 			}
 		}
-		_3cixtyUID = profileImageCaches.get(profileImage);
-		if (_3cixtyUID == null) {
-			if (DEBUG_MOD) LOGGER.info("Not found profile in memory");
-			return null;
+		if (profileImage != null) {
+			_3cixtyUID = profileImageCaches.get(profileImage);
+			if (_3cixtyUID == null) {
+				if (DEBUG_MOD) LOGGER.info("Not found profile in memory");
+				return null;
+			}
+			profile = profileCaches.get(_3cixtyUID);
 		}
-		profile = profileCaches.get(_3cixtyUID);
 		if (DEBUG_MOD) {
 			if (profile == null) LOGGER.info("Not found profile in memory");
 			else LOGGER.info("Found profile in memory");
