@@ -7,7 +7,7 @@ public class AccessToken {
 
 	private String access_token;
 	private String refresh_token;
-	private int expires_in;
+	private int expires_in = -1;
 	private String token_type = "Bearer";
 	// This attribute is used to avoid making two queries to DB.
 	private String appClientKey;
