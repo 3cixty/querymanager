@@ -34,7 +34,7 @@ public class ProfileCacheManager {
 		if (DEBUG_MOD) LOGGER.info("Start putting profile in memory");
 		if (userProfile == null) return;
 		String _3cixtyUid = userProfile.getHasUID();
-		if (_3cixtyUid == null || !_3cixtyUid.equals("")) {
+		if (_3cixtyUid == null || _3cixtyUid.equals("")) {
 			if (DEBUG_MOD) LOGGER.info("3cixty UID is null or empty");
 			return;
 		}
