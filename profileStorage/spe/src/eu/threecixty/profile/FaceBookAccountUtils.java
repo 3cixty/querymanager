@@ -37,7 +37,7 @@ public class FaceBookAccountUtils {
 			String uid = json.getString("id");
 			String firstName = json.getString("first_name");
 			String lastName = json.getString("last_name");
-			String gender = json.has("gender") ? json.getString("gender") : null;
+
 			String picture = getProfileImage(accessToken, width, height);
 			
 			// TODO: 1. need to check ProfileIdentities to know whether or not there is a profile corresponding with this uid
@@ -61,9 +61,6 @@ public class FaceBookAccountUtils {
 			name.setGivenName(firstName);
 			name.setFamilyName(lastName);
 
-			if (gender != null) {
-				profile.setHasGender(json.getString("gender"));
-			}
 			Set <ProfileIdentities> profileIdentities = null;
 			if (profile.getHasProfileIdenties() == null) {
 				profileIdentities = new HashSet <ProfileIdentities>();
