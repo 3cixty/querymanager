@@ -231,6 +231,27 @@ public class UserUtils {
 				_3cixtyUids.add(accountModel.getUserModel().getUid());
 				accountIdsExisted.add(accountModel.getAccountId());
 			}
+			
+			// XXX: for cases where we cannot find the accountModel which corresponds with user profile
+			if (!"Mobidot".equalsIgnoreCase(source)) {
+				List <String> tmpUids = new LinkedList <String>();
+				for (String accountId: accountIds) {
+					if (!accountIdsExisted.contains(accountId)) {
+						String generatedID = Utils.gen3cixtyUID(accountId,
+								GoogleAccountUtils.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
+						tmpUids.add(generatedID);
+					}
+				}
+				String userModelHql = "FROM UserModel U WHERE U.uid in (:uids)";
+				List <?> userModelList = session.createQuery(userModelHql).setParameterList("uids",
+						tmpUids).list();
+				for (Object obj: userModelList) {
+					UserModel userModel = (UserModel) obj;
+					_3cixtyUids.add(userModel.getUid());
+					accountIdsExisted.add(userModel.getUid().substring(2));
+				}
+			}
+			
 			if (unfoundAccountIds != null) {
 				for (String accountId: accountIds) {
 					if (!accountIdsExisted.contains(accountId))
