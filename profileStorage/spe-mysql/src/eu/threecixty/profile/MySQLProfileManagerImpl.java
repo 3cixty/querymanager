@@ -148,7 +148,11 @@ class MySQLProfileManagerImpl implements ProfileManager {
 			throws TooManyConnections {
 		UserProfile profile = ProfileCacheManager.getInstance().getProfile(_3cixtyUID);
 		if (profile != null) return profile;
-		return UserUtils.getUserProfile(_3cixtyUID);
+		profile = UserUtils.getUserProfile(_3cixtyUID);
+		if (profile != null) {
+			ProfileCacheManager.getInstance().put(profile);
+		}
+		return profile;
 	}
 
 	public String getTownName(UserProfile userProfile) throws TooManyConnections {
@@ -187,7 +191,11 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	public UserProfile findUserProfile(String uid, String source, String profileImage) {
 		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source, profileImage);
 		if (userProfile != null) return userProfile;
-		return UserUtils.findUserProfile(uid, source, profileImage);
+		userProfile = UserUtils.findUserProfile(uid, source, profileImage);
+		if (userProfile != null) {
+			ProfileCacheManager.getInstance().put(userProfile);
+		}
+		return userProfile;
 	}
 
 }
