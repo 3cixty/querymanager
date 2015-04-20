@@ -35,8 +35,7 @@ public class ElementDetailsUtils {
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT * \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
-		
-		addInfoOptional("?item", "rdfs:label", "?title", LanguageUtils.getAllLanguages(), true, queryBuff);
+		queryBuff.append("?item rdfs:label ?title . \n");
 		
 		addInfoOptional("?item", "dc:description", "?description", languages, true, queryBuff);
 
@@ -136,7 +135,8 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
-		addInfoOptional("?poi", "rdfs:label", "?name", LanguageUtils.getAllLanguages(), true, queryBuff);
+		queryBuff.append(" ?poi rdfs:label ?name .  \n");
+		
 		addInfoOptional("?poi", "schema:description", "?description", languages, true, queryBuff);
 		
 		if (categories == null) {
