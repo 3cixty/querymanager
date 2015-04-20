@@ -36,8 +36,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
-		
-		addInfoOptional("?item", "dc:description", "?description", languages, true, queryBuff);
+		queryBuff.append("?item dc:description ?description . \n");
+		addDescriptionFilter(languages, queryBuff);
+		queryBuff.append(" BIND ((lang(?description) as ?language)) \n");
 
 		if (categories == null) {
 			queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category . } \n");
@@ -136,8 +137,7 @@ public class ElementDetailsUtils {
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
-		
-		addInfoOptional("?poi", "schema:description", "?description", languages, true, queryBuff);
+		queryBuff.append(" ?poi schema:description ?description .  \n");
 		
 		if (categories == null) {
 			queryBuff.append("OPTIONAL {?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . } \n");
@@ -249,15 +249,11 @@ public class ElementDetailsUtils {
 		if (isNullOrEmpty(id)) return null;
 		poiDetails.setId(id);
 		
-		for (String language: LanguageUtils.getAllLanguages()) {
-		    String name = getAttributeValue(json, "name_" + language);
-		    if (!isNullOrEmpty(name)) poiDetails.setName(name);
-		}
+		String name = getAttributeValue(json, "name");
+		if (!isNullOrEmpty(name)) poiDetails.setName(name);
 		
-		for (String language: languages) {
-		    String desc = getAttributeValue(json, "description_" + language);
-		    if (!isNullOrEmpty(desc)) poiDetails.setDescription(desc);
-		}
+		String desc = getAttributeValue(json, "description");
+		if (!isNullOrEmpty(desc)) poiDetails.setDescription(desc);
 		
 		List <String> categories = new LinkedList <String>();
 		poiDetails.setCategories(categories);
@@ -308,16 +304,11 @@ public class ElementDetailsUtils {
 		if (isNullOrEmpty(id)) return null;
 		eventDetails.setId(id);
 		
-		for (String language: LanguageUtils.getAllLanguages()) {
-		    String title = getAttributeValue(json, "title_" + language);
-		    if (!isNullOrEmpty(title)) eventDetails.setName(title);
-		}
-		
-		for (String language: languages) {
-		    
-		    String desc = getAttributeValue(json, "description_" + language);
-		    if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
-		}
+		String title = getAttributeValue(json, "title");
+		if (!isNullOrEmpty(title)) eventDetails.setName(title);
+		 
+		String desc = getAttributeValue(json, "description");
+		if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
 		
 		List <String> categories = new LinkedList <String>();
 		eventDetails.setCategories(categories);
@@ -341,28 +332,24 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(image_url)) eventDetails.setImage_url(image_url);
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
+		String language = getAttributeValue(json, "language");
+		if (!isNullOrEmpty(language)) {
+			if (language.contains("-tr")) eventDetails.setTranslation(true);
+		}
 		return eventDetails;
 	}
 	
-	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
-			boolean emptyFilter, StringBuilder result) {
+	private static void addDescriptionFilter(String[] languages, StringBuilder result) {
+		result.append("FILTER (");
+		int index = 0;
 		for (String language: languages) {
-			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
-					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
-							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
-		}
-		if (emptyFilter) {
-			result.append("FILTER (");
-			int index = 0;
-			for (String language: languages) {
-				if (index > 0) {
-					result.append(" || ");
-				}
-				result.append("(").append(object).append("_").append(language).append(" != \"\")");
-				index++;
+			if (index > 0) {
+				result.append(" || ");
 			}
-			result.append(")\n");
+			result.append("(lang(?description)").append(" = \"" + language + "\")");
+			index++;
 		}
+		result.append(")\n");
 	}
 	
 	private static void processCategories(List<ElementDetails> elementsDetails) {

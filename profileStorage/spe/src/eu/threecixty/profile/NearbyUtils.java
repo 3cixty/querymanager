@@ -35,11 +35,10 @@ public class NearbyUtils {
 		
 			filterCategories(categories, builder);
 		}
-		if (languages.length != LanguageUtils.getNumberOfLanguagesSupported()) {
-			addInfoUnion("?event", "dc:description", "?description", languages, builder);
-		} else {
-		    addInfoOptional("?event", "dc:description", "?description", languages, builder);
-		}
+		
+		builder.append("?event dc:description ?description .\n");
+		
+		addDescriptionFilter(languages, builder);
 		
 		builder.append(" ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
@@ -281,7 +280,7 @@ public class NearbyUtils {
 		}
 		result.append(") \n");
 	}
-
+/*
 	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
 			StringBuilder result) {
 		for (String language: languages) {
@@ -303,6 +302,20 @@ public class NearbyUtils {
 					".  FILTER (langMatches(lang(").append(object).append("), \"").append(
 							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
 		}
+	}
+	*/
+	
+	private static void addDescriptionFilter(String[] languages, StringBuilder result) {
+		result.append("FILTER (");
+		int index = 0;
+		for (String language: languages) {
+			if (index > 0) {
+				result.append(" || ");
+			}
+			result.append("(lang(?description)").append(" = \"" + language + "\")");
+			index++;
+		}
+		result.append(")\n");
 	}
 
 	/**

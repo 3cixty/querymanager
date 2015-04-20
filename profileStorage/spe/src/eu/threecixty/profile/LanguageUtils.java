@@ -1,8 +1,5 @@
 package eu.threecixty.profile;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * This is a utility class for dealing with languages in the header of an HTTP request.
  * @author Cong-Kinh Nguyen
@@ -13,13 +10,18 @@ public class LanguageUtils {
 	private static final String ENGLISH = "en";
 	private static final String FRENCH = "fr";
 	private static final String ITALIAN = "it";
-	private static final String EMPTY = "empty";
+	//private static final String EMPTY = "empty";
 	
-	private static final String [] ALL_LANGUAGES = {FRENCH, ENGLISH, ITALIAN, EMPTY};
-	private static final String [] ONLY_ENGLISH = {ENGLISH};
-	private static final String [] ONLY_ITALIAN = {ITALIAN};
-	private static final String [] ONLY_FRENCH = {FRENCH};
+	private static final String TRANSLATION_TAG = "-tr";
 	
+	//private static final String [] ALL_LANGUAGES = {FRENCH, ENGLISH, ITALIAN, EMPTY};
+	private static final String [] ONLY_ENGLISH = {ENGLISH, ENGLISH + TRANSLATION_TAG};
+	private static final String [] ONLY_ITALIAN = {ITALIAN, ITALIAN + TRANSLATION_TAG};
+	private static final String [] ONLY_FRENCH = {FRENCH, FRENCH + TRANSLATION_TAG};
+	
+	private static final String [] LANGUAGES_DEFAULT = ONLY_ENGLISH;
+	
+	/*
 	public static int getNumberOfLanguagesSupported() {
 		return ALL_LANGUAGES.length;
 	}
@@ -27,35 +29,30 @@ public class LanguageUtils {
 	public static String[] getAllLanguages() {
 		return ALL_LANGUAGES;
 	}
+	*/
 	
 	public static String[] getLanguages(String language) {
-		if (language == null || language.equals("")) return ALL_LANGUAGES;
+		if (language == null || language.equals("")) return LANGUAGES_DEFAULT;
 		if (language.contains(",")) {
 			String [] tmpLanguages = language.split(",");
-			boolean italianContained = false, englishContained = false, frenchContained = false;
-			List <String> list = new LinkedList <String>();
 			for (String tmpLanguage: tmpLanguages) {
 				String tmp = tmpLanguage.trim();
 				if (tmp.startsWith(ENGLISH)) {
-					englishContained = true;
-					list.add(ENGLISH);
+					return ONLY_ENGLISH;
 				}
 				if (tmp.startsWith(ITALIAN)) {
-					italianContained = true;
-					list.add(ITALIAN);
+					return ONLY_ITALIAN;
 				}
 				if (tmp.startsWith(FRENCH)) {
-					frenchContained = true;
-					list.add(FRENCH);
+					return ONLY_FRENCH;
 				}
 			}
-			if (italianContained && englishContained && frenchContained) return ALL_LANGUAGES;
-			else return list.toArray(new String[list.size()]);
+			return LANGUAGES_DEFAULT;
 		} else {
 			if (language.startsWith(ENGLISH)) return ONLY_ENGLISH;
 			else if (language.startsWith(ITALIAN)) return ONLY_ITALIAN;
 			else if (language.startsWith(FRENCH)) return ONLY_FRENCH;
-			return ONLY_ENGLISH;
+			return LANGUAGES_DEFAULT;
 		}
 	}
 
