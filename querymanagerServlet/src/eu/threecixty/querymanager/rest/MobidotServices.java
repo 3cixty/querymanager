@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import eu.threecixty.logs.CallLoggingConstants;
@@ -31,6 +32,9 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
 public class MobidotServices {
 	
 	private static final String MOBIDOT_SOURCE = "Mobidot";
+	
+	private static final Logger LOGGER = Logger.getLogger(
+			MobidotServices.class.getName());
 
 	@GET
 	@Path("/getMobidotAccount")
@@ -64,7 +68,11 @@ public class MobidotServices {
 					.type(MediaType.TEXT_PLAIN_TYPE)
 					.build();
 		} catch (Exception e) {
-			return Response.serverError().entity(e.getMessage()).build();
+			LOGGER.error(e.getMessage());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.getMessage())
+					.type(MediaType.TEXT_PLAIN_TYPE)
+					.build();
 		}
 	}
 
