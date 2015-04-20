@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -54,10 +53,10 @@ public class MobidotServices {
 				}
 			} else {
 				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.MOBIDOT_GET_USER_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 						.entity("The access token is invalid '" + access_token + "'")
 						.type(MediaType.TEXT_PLAIN)
-						.build());
+						.build();
 			}
 		} catch (TooManyConnections e) {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE)
@@ -65,7 +64,7 @@ public class MobidotServices {
 					.type(MediaType.TEXT_PLAIN_TYPE)
 					.build();
 		} catch (Exception e) {
-			return Response.serverError().build();
+			return Response.serverError().entity(e.getMessage()).build();
 		}
 	}
 
