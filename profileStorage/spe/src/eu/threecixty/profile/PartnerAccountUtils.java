@@ -2,6 +2,8 @@ package eu.threecixty.profile;
 
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+
 import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerUser;
@@ -9,6 +11,9 @@ import eu.threecixty.partners.PartnerUser;
 public class PartnerAccountUtils {
 	protected static final String MOBIDOT_APP_ID = "MobidotAppID";
 	
+	private static final Logger LOGGER = Logger.getLogger(
+			PartnerAccountUtils.class.getName());
+	private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	/**
 	 * Try to create a Mobidot user if it doesn't exist on Movesmarter server.
@@ -19,8 +24,15 @@ public class PartnerAccountUtils {
 	public static PartnerAccount retrieveOrAddMobidotUser(String _3cixtyUID, String displayName) {
 		Partner partner = ProfileManagerImpl.getInstance().getPartner();
     	PartnerUser mobidotUser = partner.getUser(_3cixtyUID);
+    	if (DEBUG_MOD) {
+    		if (mobidotUser == null) LOGGER.info("Not found the corresponding partner of " + _3cixtyUID);
+    		else LOGGER.info("Found the corresponding partner of " +  _3cixtyUID);
+    	}
 		PartnerAccount account = partner.findAccount(mobidotUser, MOBIDOT_APP_ID, null);
-		
+		if (DEBUG_MOD) {
+			if (account == null) LOGGER.info("Not found the corresponding Mobidot account");
+			else LOGGER.info("Found the corresponding Mobidot account");
+		}
 		if (account != null) { // already exist in 3cixty's DB
 			return account;
 		}
@@ -32,6 +44,7 @@ public class PartnerAccountUtils {
 		}
 		String password = "3cixtyI$InExpo)!_" + UUID.randomUUID().toString();
 		try {
+			if (DEBUG_MOD) LOGGER.info("Start creating a Mobidot account");
 		    String mobidotID = MobidotUserUtils.createMobidotUser(_3cixtyUID, displayName, password);
 		    if (mobidotID == null || mobidotID.equals("")) return null;
 		    account = new PartnerAccount();
@@ -41,9 +54,15 @@ public class PartnerAccountUtils {
 			account.setUser_id(mobidotID);
 			account.setRole("User");
 			account.setPartnerUser(mobidotUser);
-			partner.addAccount(account); // persist account in 3cixty's DB
-			return account;
+			boolean ok = partner.addAccount(account); // persist account in 3cixty's DB
+			if (ok) {
+				if (DEBUG_MOD) LOGGER.info("Successful to persist account in DB");
+			} else {
+				if (DEBUG_MOD) LOGGER.info("Failed to persist account in DB");
+			}
+			if (ok) return account;
 		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
 			e.printStackTrace();
 		}
 		return null;
