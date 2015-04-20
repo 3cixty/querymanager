@@ -39,7 +39,7 @@ public class UserModel implements java.io.Serializable {
 	private Set <AccountModel> accounts;
 
 	private AddressModel address;
-	private PreferenceModel preferenceModel;
+	private Set <AccompanyingModel> accompanyings;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -123,13 +123,11 @@ public class UserModel implements java.io.Serializable {
 		this.address = address;
 	}
 	
-	@OneToOne(mappedBy="userModel", cascade = CascadeType.ALL)
-	public PreferenceModel getPreferenceModel() {
-		return preferenceModel;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userModel")
+	public Set<AccompanyingModel> getAccompanyings() {
+		return accompanyings;
 	}
-	public void setPreferenceModel(PreferenceModel preferenceModel) {
-		this.preferenceModel = preferenceModel;
+	public void setAccompanyings(Set<AccompanyingModel> accompanyings) {
+		this.accompanyings = accompanyings;
 	}
-	
-	
 }

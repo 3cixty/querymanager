@@ -105,6 +105,43 @@ public class MobilityCrawlerCron {
 		tripPreference.setHasPreferredMinTimeOfAccompany(minTime);
 		if (DEBUG_MOD) LOGGER.info("Finish extracting Accompanying");
 	}
+	
+	private void extractAccompanying(IDMapping map, Set<IDMapping> idMapping,
+			String MobidotBaseurl, String APIKey, String mobidotID,
+			UserProfile profile) {
+		if (DEBUG_MOD) LOGGER.info("Start extracting Accompanying");
+		int length;
+		String urlStr;
+		urlStr = MobidotBaseurl + "measurement/Accompanies/" + mobidotID
+				+ "/modifiedSince/" + "0" + "?key=" + APIKey;
+		JSONArray resultAccompany = getTravelInfoforMobiditID(urlStr);
+
+		length = resultAccompany.length();
+
+		Set<Accompanying> accompanyings = profile.getAccompanyings();
+		if (accompanyings == null) {
+			accompanyings = new HashSet <Accompanying>();
+			profile.setAccompanyings(accompanyings);
+		} else accompanyings.clear();
+		Long minTime = 31556926L * 2;// 2 years
+		for (int i = 0; i < length; i++) {
+
+			JSONObject jsonobj = resultAccompany.getJSONObject(i);
+			
+			if (DEBUG_MOD) LOGGER.info("Accompanying received from Mobidot: " + jsonobj);
+			
+			Accompanying hasAccompany = storeAccompanyingDetailsInKB(
+					map.getThreeCixtyID(), jsonobj, idMapping);
+
+			if (hasAccompany != null) {
+				accompanyings.add(hasAccompany);
+				if (minTime > hasAccompany.getHasAccompanyValidity()) {
+					minTime = hasAccompany.getHasAccompanyValidity();
+				}
+			}
+		}
+		if (DEBUG_MOD) LOGGER.info("Finish extracting Accompanying");
+	}
 
 	/**
 	 * Calls Movesmarter APIs to get Personal Places. from the list of places
@@ -220,12 +257,12 @@ public class MobilityCrawlerCron {
 		String mobidotID=map.getMobidotID();
 		
 		if (mobidotID!=null) {
+			Long currentTime = getDateTime();
 			//map.setMobidotID(mobidotID);
+			/*
 			Preference pref = new Preference();
 			
 			Transport transport = new Transport();
-			
-			Long currentTime = getDateTime();
 			
 			// extract and set Regular trips
 			RegularTrip maxRegularTrip = extractRegularTrips(map, user,
@@ -263,7 +300,9 @@ public class MobilityCrawlerCron {
 			pref.setHasTransport(transports);
 			
 			user.setPreferences(pref);
+			*/
 			
+			extractAccompanying(map, idMapping, MobidotBaseurl, APIKey, mobidotID, user);
 			user.setHasLastCrawlTime(currentTime.toString());
 		}
 	}

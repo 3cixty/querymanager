@@ -12,6 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.cache.ProfileCacheManager;
+import eu.threecixty.profile.oldmodels.Accompanying;
 import eu.threecixty.profile.oldmodels.Period;
 import eu.threecixty.profile.oldmodels.Preference;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
@@ -159,7 +161,27 @@ public class MySQLProfilerPlaceUtils {
 	}
 	
 	private static List <String> getGoogleUIDsFromFriends(UserProfile userProfile) {
-		return UserUtils.getGoogleUidsFrom3cixtyUIDs(userProfile.getKnows());
+		// firstly, get 3cixty UIDs from user's friends list
+		Set <String> _3cixtyUIDs = userProfile.getKnows();
+		if (_3cixtyUIDs == null) {
+			_3cixtyUIDs = new HashSet<String>();
+		}
+		
+		// secondly, get 3cixty UIDs from accompanying list
+		Set <Accompanying> accompanyings = userProfile.getAccompanyings();
+		if (accompanyings != null) {
+			for (Accompanying accompanying: accompanyings) {
+				String tmp3cixtyUID = accompanying.getHasAccompanyUserid2ST();
+				if (!_3cixtyUIDs.contains(tmp3cixtyUID)) _3cixtyUIDs.add(tmp3cixtyUID);
+			}
+		}
+		List <String> results = ProfileCacheManager.getInstance().getGoogleUIDsOfFriends(userProfile.getHasUID());
+		if (results != null) return results;
+		results = UserUtils.getGoogleUidsFrom3cixtyUIDs(_3cixtyUIDs);
+		if (results != null) {
+			ProfileCacheManager.getInstance().putGoogleUIDsOfFriens(userProfile.getHasUID(), results);
+		}
+		return results;
 	}
 	
 	private static String getGoogleUID(UserProfile userProfile) {

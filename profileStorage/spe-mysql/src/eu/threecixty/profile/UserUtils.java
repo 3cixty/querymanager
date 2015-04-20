@@ -10,26 +10,27 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 import eu.threecixty.cache.ProfileCacheManager;
 import eu.threecixty.db.HibernateUtil;
 import eu.threecixty.profile.Utils.UidSource;
+import eu.threecixty.profile.oldmodels.Accompanying;
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.Name;
-import eu.threecixty.profile.oldmodels.Preference;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
-import eu.threecixty.profile.oldmodels.Transport;
+import eu.threecixty.userprofile.AccompanyingModel;
 import eu.threecixty.userprofile.AccountModel;
 import eu.threecixty.userprofile.AddressModel;
-import eu.threecixty.userprofile.PreferenceModel;
-import eu.threecixty.userprofile.TransportModel;
 import eu.threecixty.userprofile.UserModel;
 
 
 public class UserUtils {
 	
-	 private static final Logger LOGGER = Logger.getLogger(
+	public static final String MOBIDOT = "Mobidot";
+
+	private static final Logger LOGGER = Logger.getLogger(
 			 UserUtils.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
@@ -189,7 +190,6 @@ public class UserUtils {
 		List <String> googleUids = new LinkedList <String>();
 		Session session = null;
 		try {
-			// TODO: should take into account of accompanying model ? 
 			String hql = "From AccountModel A WHERE A.userModel.uid in (:uids) AND A.source = :source";
 			session = HibernateUtil.getSessionFactory().openSession();
 			List <?> results = session.createQuery(hql).setParameterList("uids",
@@ -373,8 +373,39 @@ public class UserUtils {
 			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
 		}
 		convertKnowsForPersistence(userProfile, userModel);
-		convertPreferenceForPersistence(userProfile, userModel, session);
 		convertAccountsForPersistence(userProfile, userModel, session);
+		convertAccompanyingsForPersistence(userProfile, userModel, session);
+	}
+
+	private static void convertAccompanyingsForPersistence(
+			UserProfile profile, UserModel userModel, Session session) {
+		Set <Accompanying> accompanyings = profile.getAccompanyings();
+		Set <AccompanyingModel> accompanyingModels = userModel.getAccompanyings();
+		if (accompanyings == null || accompanyings.size() == 0) {
+			if (accompanyingModels != null && accompanyingModels.size() > 0) {
+				accompanyingModels.clear();
+			}
+			return;
+		}
+		if (accompanyingModels == null) {
+			accompanyingModels = new HashSet<AccompanyingModel>();
+			userModel.setAccompanyings(accompanyingModels);
+		}
+		for (Iterator<AccompanyingModel> it = accompanyingModels.iterator(); it.hasNext();) {
+			AccompanyingModel am = it.next();
+			boolean found = AccompanyingUtils.findAccompanying(am, accompanyings);
+			if (!found) {
+				it.remove();
+				session.delete(am);
+			}
+		}
+		for (Accompanying accompanying: accompanyings) {
+			boolean found = AccompanyingUtils.findAccompanying(accompanying, accompanyingModels);
+			if (!found) {
+				AccompanyingModel am = AccompanyingUtils.save(accompanying, userModel, session);
+				if (am != null) accompanyingModels.add(am);
+			}
+		}
 	}
 
 	private static void convertAccountsForPersistence(UserProfile userProfile,
@@ -428,21 +459,6 @@ public class UserUtils {
 					accountModel.getSource().equals(pi.getHasSourceCarrier())) return true;
 		}
 		return false;
-	}
-
-	private static void convertPreferenceForPersistence(
-			UserProfile userProfile, UserModel userModel, Session session) throws HibernateException {
-		// TODO Auto-generated method stub
-		Preference preference = userProfile.getPreferences();
-		PreferenceModel preferenceModel = userModel.getPreferenceModel();
-		if (preference == null) {
-			if (preferenceModel != null) {
-			    userModel.setPreferenceModel(null);
-			    session.delete(preferenceModel);
-			}
-			return;
-		}
-		// TODO: save or update preferences
 	}
 
 	private static void convertKnowsForPersistence(UserProfile userProfile,
@@ -509,10 +525,21 @@ public class UserUtils {
 		userProfile.setHasLastCrawlTime(userModel.getLastCrawlTimeToKB() + "");
 		
 		convertKnows(userModel, userProfile);
-		convertPreference(userModel, userProfile);
 		convertAccounts(userModel, userProfile);
-		
+		convertAccompanyings(userModel, userProfile);
 		return userProfile;
+	}
+
+	private static void convertAccompanyings(UserModel userModel,
+			UserProfile userProfile) {
+		Set <AccompanyingModel> ams = userModel.getAccompanyings();
+		if (ams == null || ams.size() == 0) return;
+		Set <Accompanying> accompanyings = new HashSet<Accompanying>();
+		userProfile.setAccompanyings(accompanyings);
+		for (AccompanyingModel am: ams) {
+			Accompanying accompanying = AccompanyingUtils.createAccompanying(am);
+			accompanyings.add(accompanying);
+		}
 	}
 
 	private static void convertAccounts(UserModel userModel,
@@ -526,23 +553,6 @@ public class UserUtils {
 			pi.setHasSourceCarrier(accountModel.getSource());
 			pi.setHasUserAccountID(accountModel.getAccountId());
 			pis.add(pi);
-		}
-	}
-
-	private static void convertPreference(UserModel userModel,
-			UserProfile userProfile) {
-		PreferenceModel preferenceModel = userModel.getPreferenceModel();
-		if (preferenceModel == null) return;
-		Set <TransportModel> transportModels = preferenceModel.getTransportModels();
-		if (transportModels == null || transportModels.size() == 0) return;
-		Preference preference = new Preference();
-		userProfile.setPreferences(preference);
-		Set <Transport> transports = new HashSet <Transport>();
-		preference.setHasTransport(transports);
-		for (TransportModel transportModel: transportModels) {
-			Transport transport = new Transport();
-			TransportUtils.convertTransport(transportModel, transport);
-			transports.add(transport);
 		}
 	}
 
@@ -590,5 +600,57 @@ public class UserUtils {
 	}
 	
 	private UserUtils() {
+	}
+
+	public static Set<IDMapping> getIDMappings() {
+		Session session = null;
+		Set <IDMapping> mappings = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT distinct uid, accountId FROM 3cixty_user_profile, 3cixty_account  WHERE source LIKE \"" + MOBIDOT + "\" AND 3cixty_user_profile.id = 3cixty_user_id";
+			SQLQuery query = session.createSQLQuery(sql);
+			@SuppressWarnings("unchecked")
+			List <Object[]> results = query.list();
+			if (results == null || results.size() == 0) return Collections.emptySet();
+			mappings = new HashSet <IDMapping>();
+			for (Object[] row: results) {
+				IDMapping idMapping = new IDMapping();
+				idMapping.setThreeCixtyID((String) row[0]);
+				idMapping.setMobidotID((String) row[1]);
+				mappings.add(idMapping);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return mappings;
+	}
+
+	public static Set<IDCrawlTimeMapping> getIDCrawlTimeMappings() {
+		Session session = null;
+		Set <IDCrawlTimeMapping> mappings = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT uid, lastCrawlTimeToKB FROM 3cixty_user_profile";
+			SQLQuery query = session.createSQLQuery(sql);
+			@SuppressWarnings("unchecked")
+			List <Object[]> results = query.list();
+			if (results == null || results.size() == 0) return Collections.emptySet();
+			mappings = new HashSet <IDCrawlTimeMapping>();
+			for (Object[] row: results) {
+				IDCrawlTimeMapping mapping = new IDCrawlTimeMapping();
+				mapping.setThreeCixtyID((String) row[0]);
+				mapping.setLastCrawlTime((String) row[1]);
+				mappings.add(mapping);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return mappings;
 	}
 }
