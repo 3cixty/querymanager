@@ -68,6 +68,7 @@ public class MobidotServices {
 					.type(MediaType.TEXT_PLAIN_TYPE)
 					.build();
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(e.getMessage())
