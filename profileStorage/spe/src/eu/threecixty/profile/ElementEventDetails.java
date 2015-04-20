@@ -5,6 +5,7 @@ public class ElementEventDetails extends ElementDetails {
 	private String description;
 	private String time_beginning;
 	private String time_end;
+	private boolean translation;
 
 
 	public String getDescription() {
@@ -25,5 +26,11 @@ public class ElementEventDetails extends ElementDetails {
 	}
 	public void setTime_end(String time_end) {
 		this.time_end = time_end;
+	}
+	public boolean isTranslation() {
+		return translation;
+	}
+	public void setTranslation(boolean translation) {
+		this.translation = translation;
 	}
 }
