@@ -145,8 +145,9 @@ public class ElementDetailsUtils {
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
-		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . }  \n");
-		
+		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
+		addDescriptionFilter(languages, queryBuff);
+		queryBuff.append(" } \n");
 		if (categories == null) {
 			queryBuff.append("OPTIONAL {?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . } \n");
 		} else {
