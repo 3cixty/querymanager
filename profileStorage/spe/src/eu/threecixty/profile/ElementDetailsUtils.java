@@ -232,12 +232,14 @@ public class ElementDetailsUtils {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
 				if (!isNullOrEmpty(comment)) {
 					List <String> comments = ((ElementPoIDetails) tmpPoIDetails).getReviews();
-					if (!comments.contains(comment)) comments.add(comment);
-					
-					List <Boolean> reviewTranslations = ((ElementPoIDetails) tmpPoIDetails).getReviewTranslations();
-					String reviewLanguage = getAttributeValue(tmpObj, REVIEW_LANG);
-					if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
-					else reviewTranslations.add(false);
+					if (!comments.contains(comment)) {
+						comments.add(comment);
+
+						List <Boolean> reviewTranslations = ((ElementPoIDetails) tmpPoIDetails).getReviewTranslations();
+						String reviewLanguage = getAttributeValue(tmpObj, REVIEW_LANG);
+						if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
+						else reviewTranslations.add(false);
+					}
 				}
 				String category = getAttributeValue(tmpObj, CATEGORY_ATTRIBUTE);
 				if (!isNullOrEmpty(category)) {
