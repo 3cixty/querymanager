@@ -42,10 +42,11 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
+		queryBuff.append("OPTIONAL { ?item vcard2006:hasURL ?url . } \n");
 		queryBuff.append("?item dc:description ?description . \n");
 		addLanguageFilter("description", languages, queryBuff);
 
@@ -143,11 +144,12 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone  \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url  \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
+		queryBuff.append(" OPTIONAL { ?poi owl:sameAs ?url . } \n");
 		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
 		addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
@@ -318,6 +320,9 @@ public class ElementDetailsUtils {
 		}
 		poiDetails.setReviewTranslations(reviewTranslations);
 		
+		String url = getAttributeValue(json, "url");
+		if (isNullOrEmpty(url)) poiDetails.setUrl(url);
+		
 		return poiDetails;
 		
 	}
@@ -360,6 +365,8 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(language)) {
 			eventDetails.setTranslation(language.contains(TRANSLATION_TAG));
 		}
+		String url = getAttributeValue(json, "url");
+		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
 		return eventDetails;
 	}
 	
