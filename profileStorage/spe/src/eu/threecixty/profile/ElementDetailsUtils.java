@@ -39,13 +39,12 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT * \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon  ?locality ?image_url ?source (lang(?description)  as ?language) \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
 		queryBuff.append("?item dc:description ?description . \n");
 		addDescriptionFilter(languages, queryBuff);
-		queryBuff.append(" BIND ((lang(?description) as ?language)) \n");
 
 		if (categories == null) {
 			queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category . } \n");
