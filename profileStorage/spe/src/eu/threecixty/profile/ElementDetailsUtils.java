@@ -28,6 +28,8 @@ public class ElementDetailsUtils {
 	private static final String COMMENT_ATTRIBUTE = "reviewBody"; // to get comment
 	private static final String CATEGORY_ATTRIBUTE = "category";
 	
+	private static final String TRANSLATION_TAG = "-tr";
+	
 	/**
 	 * Creates a list of events with info in details from a given list of IDs.
 	 * @param eventIds
@@ -288,16 +290,11 @@ public class ElementDetailsUtils {
 		if (ratingValue == 0) ratingValue = getRatingValue(json, "ratingValue3");
 		if (ratingValue > 0) poiDetails.setAggregate_rating(ratingValue);
 		
-		// seems incorrect
-//		String reviewCountsStr = getAttributeValue(json, "reviewCounts");
-//		try {
-//			if (!isNullOrEmpty(reviewCountsStr)) {
-//				String [] reviews = reviewCountsStr.trim().split(" ");
-//				poiDetails.setReview_counts(Integer.parseInt(reviews[0]));
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		String descLang = getAttributeValue(json, "descLang");
+		if (!isNullOrEmpty(descLang)) {
+			poiDetails.setTranslation(descLang.contains(TRANSLATION_TAG));
+		}
+		
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
 		List <String> comments = new LinkedList <String>();
@@ -344,7 +341,7 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		String language = getAttributeValue(json, "language");
 		if (!isNullOrEmpty(language)) {
-			if (language.contains("-tr")) eventDetails.setTranslation(true);
+			eventDetails.setTranslation(language.contains(TRANSLATION_TAG));
 		}
 		return eventDetails;
 	}
