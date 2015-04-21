@@ -29,6 +29,7 @@ public class ElementDetailsUtils {
 	private static final String CATEGORY_ATTRIBUTE = "category";
 	
 	private static final String TRANSLATION_TAG = "-tr";
+	private static final String REVIEW_LANG = "reviewLang";
 	
 	/**
 	 * Creates a list of events with info in details from a given list of IDs.
@@ -232,6 +233,11 @@ public class ElementDetailsUtils {
 				if (!isNullOrEmpty(comment)) {
 					List <String> comments = ((ElementPoIDetails) tmpPoIDetails).getReviews();
 					if (!comments.contains(comment)) comments.add(comment);
+					
+					List <Boolean> reviewTranslations = ((ElementPoIDetails) tmpPoIDetails).getReviewTranslations();
+					String reviewLanguage = getAttributeValue(tmpObj, REVIEW_LANG);
+					if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
+					else reviewTranslations.add(false);
 				}
 				String category = getAttributeValue(tmpObj, CATEGORY_ATTRIBUTE);
 				if (!isNullOrEmpty(category)) {
@@ -301,6 +307,15 @@ public class ElementDetailsUtils {
 		String comment = getAttributeValue(json, COMMENT_ATTRIBUTE);
 		if (!isNullOrEmpty(comment) && !comments.contains(comment)) comments.add(comment);
 		poiDetails.setReviews(comments);
+		
+		List <Boolean> reviewTranslations = new LinkedList<Boolean>();
+		String reviewLanguage = getAttributeValue(json, REVIEW_LANG);
+		if (!isNullOrEmpty(comment)) {
+		    if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
+		    else reviewTranslations.add(false);
+		}
+		poiDetails.setReviewTranslations(reviewTranslations);
+		
 		return poiDetails;
 		
 	}

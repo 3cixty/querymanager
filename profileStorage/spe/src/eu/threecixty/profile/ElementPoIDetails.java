@@ -7,6 +7,7 @@ public class ElementPoIDetails extends ElementDetails {
 	private double aggregate_rating;
 	private int review_counts;
 	private List <String> reviews;
+	private List <Boolean> reviewTranslations;
 	private String description;
 	
 	private Boolean augmented;
@@ -46,5 +47,11 @@ public class ElementPoIDetails extends ElementDetails {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public List<Boolean> getReviewTranslations() {
+		return reviewTranslations;
+	}
+	public void setReviewTranslations(List<Boolean> reviewTranslations) {
+		this.reviewTranslations = reviewTranslations;
 	}
 }
