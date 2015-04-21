@@ -431,7 +431,7 @@ public class TrayServices {
 			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
 		}
 		
-		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguages());
+		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguage());
 		
 		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
 		if (elementEventsDetails != null) {
