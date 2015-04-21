@@ -44,7 +44,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("?item a lode:Event . \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
 		queryBuff.append("?item dc:description ?description . \n");
-		addDescriptionFilter(languages, queryBuff);
+		addLanguageFilter("description", languages, queryBuff);
 
 		if (categories == null) {
 			queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category . } \n");
@@ -140,13 +140,13 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT *\n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone  \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
 		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
-		addDescriptionFilter(languages, queryBuff);
+		addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
 		if (categories == null) {
 			queryBuff.append("OPTIONAL {?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . } \n");
@@ -173,8 +173,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("?geoLocation geo:lat  ?lat . \n");
 		queryBuff.append("?geoLocation geo:long  ?lon . \n");
 		queryBuff.append("} \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
-		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:reviewBody ?reviewBody .  \n");
+		addLanguageFilter("reviewBody", languages, queryBuff);
+		queryBuff.append(" } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating2 . \n");
 		queryBuff.append("          ?aggregateRating2 schema:ratingValue ?ratingValue2 . } \n");
@@ -348,14 +349,14 @@ public class ElementDetailsUtils {
 		return eventDetails;
 	}
 	
-	private static void addDescriptionFilter(String[] languages, StringBuilder result) {
+	private static void addLanguageFilter(String variable, String[] languages, StringBuilder result) {
 		result.append("FILTER (");
 		int index = 0;
 		for (String language: languages) {
 			if (index > 0) {
 				result.append(" || ");
 			}
-			result.append("(lang(?description)").append(" = \"" + language + "\")");
+			result.append("(lang(?" + variable +")").append(" = \"" + language + "\")");
 			index++;
 		}
 		result.append(")\n");
