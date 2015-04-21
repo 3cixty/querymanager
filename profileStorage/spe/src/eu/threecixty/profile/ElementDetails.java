@@ -19,6 +19,7 @@ public class ElementDetails {
 	private Double distance; // this attribute is used for nearby elements (Event/PoI)
 	
 	private List<String> categories; // This contains a list of categories
+	private String url;
 
 	public String getId() {
 		return id;
@@ -103,6 +104,13 @@ public class ElementDetails {
 		this.translation = translation;
 	}
 	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	public int hashCode() {
 		if (id == null) return -1;
 		return id.hashCode();
