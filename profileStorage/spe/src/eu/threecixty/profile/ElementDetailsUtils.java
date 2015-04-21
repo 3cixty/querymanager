@@ -95,7 +95,7 @@ public class ElementDetailsUtils {
 		queryBuff.append(") \n");
 		queryBuff.append("}");
 		
-		if (DEBUG_MOD) LOGGER.info(queryBuff.toString());
+		if (DEBUG_MOD) LOGGER.info("Get events in detail: " + queryBuff.toString());
 
 		StringBuilder result = new StringBuilder();
 		
@@ -200,7 +200,7 @@ public class ElementDetailsUtils {
 		queryBuff.append(") \n");
 		queryBuff.append("}");
 		
-		if (DEBUG_MOD) LOGGER.info(queryBuff.toString());
+		if (DEBUG_MOD) LOGGER.info("Get PoIs in detail: " + queryBuff.toString());
 		
 		StringBuilder result = new StringBuilder();
 		
