@@ -168,10 +168,9 @@ public class NearbyUtils {
 			
 			filterCategories(categories, builder);
 		}
-
-		builder.append("?poi geo:location/locn:geometry ?geo . \n");
-		// TODO
-		builder.append(" <" + locId + "> geo:location/locn:geometry ?geoFixed . \n");
+		
+		builder.append("?poi geo:location ?loc . ?loc geo:lat ?lat . ?loc geo:long ?lon . BIND(bif:st_point(xsd:decimal(?lon), xsd:decimal(?lat)) as ?geo) . \n");
+		builder.append(" <" + locId +"> geo:location ?locFixed . ?locFixed geo:lat ?latFixed . ?locFixed geo:long ?lonFixed . BIND(bif:st_point(xsd:decimal(?lonFixed), xsd:decimal(?latFixed)) as ?geoFixed) . \n");
 
 		builder.append("        FILTER ( <").append(locId).append("> != ?poi ) . \n");
 		builder.append("} \n");
@@ -181,38 +180,6 @@ public class NearbyUtils {
 		
 		return getNearbyPoIs(builder.toString(), categories, languages);
 
-	}
-	
-	public static int countNearbyPoIs(String locId, String[] categories, String[] languages, double distance) {
-		if (isNullOrEmpty(locId)) return 0;
-		
-		StringBuilder builder = null;
-		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance >= 0) as ?condition) \n");
-		} else {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
-		}
-
-		builder.append("WHERE { \n");
-		builder.append("        ?poi a dul:Place . \n");
-		
-		if (categories != null && categories.length > 0) {
-			builder.append("?poi locationOnt:businessType ?businessType. \n");
-			builder.append("?businessType skos:prefLabel ?category .\n");
-			filterCategories(categories, builder);
-		}
-		
-		// should get title, description in another query to avoid consuming a lot of time for filter first results		
-		
-		builder.append("        ?poi schema:geo ?geoPoi . \n");
-		builder.append("        ?geoPoi geo:geometry ?geo. \n");
-		builder.append("        <").append(locId).append("> schema:geo ?geoPoiFixed . \n");
-		builder.append("        ?geoPoiFixed geo:geometry ?geoFixed . \n");
-		builder.append("        FILTER ( <").append(locId).append("> != ?poi ) . \n");
-		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
-		
-		return 0;
 	}
 	
 	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories, String [] languages) throws IOException {
