@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +18,12 @@ import org.json.JSONObject;
  *
  */
 public class ElementDetailsUtils {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ElementDetailsUtils.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private static final String COMMENT_ATTRIBUTE = "reviewBody"; // to get comment
 	private static final String CATEGORY_ATTRIBUTE = "category";
@@ -87,6 +94,8 @@ public class ElementDetailsUtils {
 		}
 		queryBuff.append(") \n");
 		queryBuff.append("}");
+		
+		if (DEBUG_MOD) LOGGER.info(queryBuff.toString());
 
 		StringBuilder result = new StringBuilder();
 		
@@ -191,7 +200,7 @@ public class ElementDetailsUtils {
 		queryBuff.append(") \n");
 		queryBuff.append("}");
 		
-		System.out.println(queryBuff.toString());
+		if (DEBUG_MOD) LOGGER.info(queryBuff.toString());
 		
 		StringBuilder result = new StringBuilder();
 		
