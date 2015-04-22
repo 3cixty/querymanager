@@ -5,8 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 import org.apache.log4j.Logger;
 
@@ -22,7 +23,7 @@ public class CacheManager {
 	private static final String JSON_APP_FORMAT = "application/sparql-results+json";
 	private static final CacheManager instance = new CacheManager();
 	
-	private Map <String, CacheElement> cacheElements = new ConcurrentHashMap<String, CacheElement>();
+	private Map <String, CacheElement> cacheElements = new HashMap<String, CacheElement>();
 	
 	public static CacheManager getInstance() {
 		return instance;
@@ -44,7 +45,9 @@ public class CacheManager {
 		CacheElement cacheElement = cacheElements.get(query);
 		if (cacheElement == null) return null;
 		if (cacheElement.isValid()) return cacheElement.content;
-		return executeQuery(query);
+		synchronized (cacheElements) {
+			return executeQuery(query);
+		}
 	}
 	
 	/**
