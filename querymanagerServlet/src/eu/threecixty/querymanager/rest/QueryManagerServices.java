@@ -234,6 +234,12 @@ public class QueryManagerServices {
 	}
 	
 	@GET
+	@Path("/returnInput")
+	public Response returnInput(String input) {
+			return Response.ok(input).type(MediaType.TEXT_PLAIN_TYPE).build();
+	}
+	
+	@GET
 	@Path("/executeQuery")
 	public Response executeQueryNoAppKey(@HeaderParam("key") String key, 
 			@QueryParam("format") String format, @QueryParam("query") String query) {
