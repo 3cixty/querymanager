@@ -358,7 +358,19 @@ public class TrayServices {
 
 		
 		if (restTray.getDelete() != null && restTray.getDelete().booleanValue()) {
-			return ProfileManagerImpl.getInstance().getTrayManager().deleteTray(tray);
+
+			boolean ok = ProfileManagerImpl.getInstance().getTrayManager().deleteTray(tray);
+			// XXX: need to know last time an item deleted???
+			// XXX: the cheapest way would be to update the first tray
+			if (ok) {
+				List <Tray> restTrays = ProfileManagerImpl.getInstance().getTrayManager().getTrays(
+						(uid == null || uid.equals("")) ? token : uid);
+				if (restTrays.size() > 0) {
+					restTrays.get(0).setTimestamp(System.currentTimeMillis());
+					ProfileManagerImpl.getInstance().getTrayManager().updateTray(restTrays.get(0));
+				}
+			}
+			return ok;
 		}
 		
 		boolean attended = (restTray.getAttend() == Boolean.TRUE);
