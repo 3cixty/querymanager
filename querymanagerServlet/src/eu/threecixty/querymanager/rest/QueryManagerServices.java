@@ -1135,9 +1135,8 @@ public class QueryManagerServices {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		long startTime = System.currentTimeMillis();
-		if (CacheManager.getInstance().isQueryShouldBeExecutedViaCache(query)) {
-			ret = CacheManager.getInstance().getContent(query);
-		} else {
+		ret = CacheManager.getInstance().getContent(query);
+		if (ret == null) {
 			StringBuilder builder = new StringBuilder();
 			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
 			ret = builder.toString();
