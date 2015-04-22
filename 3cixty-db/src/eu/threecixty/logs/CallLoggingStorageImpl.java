@@ -28,7 +28,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	public boolean save(CallLogging logging) {
-		logInfo("Before logging call to DB");
+		if (DEBUG_MOD) LOGGER.info("Before logging call to DB");
 		if (logging == null) return false;
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
@@ -37,7 +37,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		
 		session.getTransaction().commit();
 		session.close();
-		logInfo("After logging call to DB");
+		if (DEBUG_MOD) LOGGER.info("After logging call to DB");
 		return true;
 	}
 
@@ -106,12 +106,20 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		return loggings;
 	}
 
-	/**
-	 * Logs message at Info level
-	 * @param msg
-	 */
-	private static void logInfo(String msg) {
-		if (!DEBUG_MOD) return;
-		LOGGER.info(msg);
+	@Override
+	public boolean save(List<CallLogging> loggings) {
+		if (DEBUG_MOD) LOGGER.info("Before logging call to DB");
+		if (loggings == null || loggings.size() == 0) return false;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		session.beginTransaction();
+		
+		for (CallLogging callLogging: loggings) {
+			session.save(callLogging);
+		}
+		
+		session.getTransaction().commit();
+		session.close();
+		if (DEBUG_MOD) LOGGER.info("After logging call to DB");
+		return true;
 	}	
 }

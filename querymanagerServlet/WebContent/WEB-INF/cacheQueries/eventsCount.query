@@ -1,0 +1,9 @@
+PREFIX schema: <http://schema.org/>
+PREFIX ma-ont: <http://www.w3.org/ns/ma-ont#>
+PREFIX ce: <http://data.linkedevents.org/cell/milano/>
+SELECT (COUNT(DISTINCT ?event) AS ?count)
+WHERE {
+	?event a lode:Event .
+	?event rdfs:label ?title.
+
+}

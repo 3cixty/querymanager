@@ -44,6 +44,12 @@
     
     <dependency>
       <groupId>eu.3cixty</groupId>
+      <artifactId>3cixty-cache</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>eu.3cixty</groupId>
       <artifactId>CrawlerCron</artifactId>
 	  <version>1.0</version>
     </dependency>
@@ -105,8 +111,8 @@
     
     <dependency>
 	  <groupId>javax.mail</groupId>
-	  <artifactId>javax.mail-api</artifactId>
-	  <version>1.5.2</version>
+	  <artifactId>mail</artifactId>
+	  <version>1.4.7</version>
     </dependency>
     
         <!-- javamelody-core -->

@@ -61,7 +61,8 @@ public class Utils {
 		if (unfoundAccountIds.size() > 0) {
 			List <UserProfile> userProfilesToBeCreated = new LinkedList<UserProfile>();
 			for (String unfoundAccountId: unfoundAccountIds) {
-				String tmp3cixtyUid = Utils.gen3cixtyUID(unfoundAccountId, UidSource.GOOGLE);
+				String tmp3cixtyUid = Utils.gen3cixtyUID(unfoundAccountId,
+						source.equalsIgnoreCase(GoogleAccountUtils.GOOGLE_SOURCE) ? UidSource.GOOGLE : UidSource.FACEBOOK);
 				UserProfile tmpUserProfile = new UserProfile();
 				tmpUserProfile.setHasUID(tmp3cixtyUid);
 				userProfilesToBeCreated.add(tmpUserProfile);
@@ -136,7 +137,7 @@ public class Utils {
 	private Utils() {
 	}
 	
-	protected enum UidSource {
+	public enum UidSource {
 		GOOGLE, FACEBOOK
 	}
 }

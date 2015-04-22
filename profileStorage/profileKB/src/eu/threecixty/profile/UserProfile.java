@@ -43,8 +43,8 @@ public class UserProfile{
 //    		+ "about the type of friendship")
     //private Set <UserProfile> knows;
     private Set <String> knows;
-    @Description(hasText = "History of user made query. Check this new architecture")
-    private Set<QueryHistory> hasQueryHistory; 
+    //@Description(hasText = "History of user made query. Check this new architecture")
+    //private Set<QueryHistory> hasQueryHistory; 
     
 //    @ComingSoonEntities
 //    @Description(hasText = "Collection of skills of the user.")
@@ -60,6 +60,8 @@ public class UserProfile{
     private String profileImage;
     /**This attribute is used for better performance of accessing to persistent DB*/
     private Integer modelIdInPersistentDB;
+    /**This attribute is used to contain information about accompanyings. This is used with SPE-mysql module*/
+    private Set <Accompanying> accompanyings;
     
     public String getHasLastCrawlTime() {
 		return hasLastCrawlTime;
@@ -151,12 +153,12 @@ public class UserProfile{
 	public void setHasUID(String hasUID) {
 		this.hasUID = hasUID;
 	}
-	public Set<QueryHistory> getHasQueryHistory() {
-		return hasQueryHistory;
-	}
-	public void setHasQueryHistory(Set<QueryHistory> hasQueryHistory) {
-		this.hasQueryHistory = hasQueryHistory;
-	}
+//	public Set<QueryHistory> getHasQueryHistory() {
+//		return hasQueryHistory;
+//	}
+//	public void setHasQueryHistory(Set<QueryHistory> hasQueryHistory) {
+//		this.hasQueryHistory = hasQueryHistory;
+//	}
 
 	public String getProfileImage() {
 		return profileImage;
@@ -170,5 +172,11 @@ public class UserProfile{
 	}
 	public void setModelIdInPersistentDB(Integer modelIdInPersistentDB) {
 		this.modelIdInPersistentDB = modelIdInPersistentDB;
+	}
+	public Set<Accompanying> getAccompanyings() {
+		return accompanyings;
+	}
+	public void setAccompanyings(Set<Accompanying> accompanyings) {
+		this.accompanyings = accompanyings;
 	}
 }

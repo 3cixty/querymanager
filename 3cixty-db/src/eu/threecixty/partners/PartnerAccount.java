@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "3cixty_partner_account")
@@ -89,7 +88,7 @@ public class PartnerAccount implements java.io.Serializable {
 		this.partnerUser = partnerUser;
 	}
 
-	@Transient
+	@Column(name = "mobidot_user_id", nullable = true, length = 255)
 	public String getUser_id() {
 		return user_id;
 	}

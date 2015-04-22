@@ -28,7 +28,7 @@ public class AccompanyingModel implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 5486497561246201323L;
 	private Integer id;
-	private TransportModel transportModel;
+	private UserModel userModel;
 
 	private Long accompanyTime; 
 	private Long accompanyValidity; 
@@ -47,12 +47,12 @@ public class AccompanyingModel implements java.io.Serializable {
 	}
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "3cixty_transport_id", nullable = false)
-	public TransportModel getTransportModel() {
-		return transportModel;
+	@JoinColumn(name = "3cixty_user_id", nullable = false)
+	public UserModel getUserModel() {
+		return userModel;
 	}
-	public void setTransportModel(TransportModel transportModel) {
-		this.transportModel = transportModel;
+	public void setUserModel(UserModel userModel) {
+		this.userModel = userModel;
 	}
 	
 	@Column(name = "accompanyTime", nullable = true)

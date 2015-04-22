@@ -14,10 +14,12 @@ public class ElementDetails {
 	private String image_url;
 	private String source;
 	private String type;
+	private boolean translation;
 	
 	private Double distance; // this attribute is used for nearby elements (Event/PoI)
 	
 	private List<String> categories; // This contains a list of categories
+	private String url;
 
 	public String getId() {
 		return id;
@@ -94,6 +96,21 @@ public class ElementDetails {
 	public void setCategories(List<String> categories) {
 		this.categories = categories;
 	}
+	
+	public boolean isTranslation() {
+		return translation;
+	}
+	public void setTranslation(boolean translation) {
+		this.translation = translation;
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	public int hashCode() {
 		if (id == null) return -1;
 		return id.hashCode();

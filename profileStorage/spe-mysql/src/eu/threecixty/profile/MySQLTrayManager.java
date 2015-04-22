@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import eu.threecixty.cache.TrayCacheManager;
 import eu.threecixty.profile.Tray.OrderType;
 
 public class MySQLTrayManager implements TrayManager {
@@ -17,17 +18,27 @@ public class MySQLTrayManager implements TrayManager {
 
 	public boolean addTray(Tray tray) throws InvalidTrayElement,
 			TooManyConnections {
-		return TrayUtils.addTray(tray);
+		boolean successful = TrayUtils.addTray(tray);
+		if (successful) {
+			TrayCacheManager.getInstance().putTray(tray);
+		}
+		return successful;
 	}
 
 	public boolean cleanTrays(String token) throws InvalidTrayElement,
 			TooManyConnections {
-		return TrayUtils.cleanTrays(token);
+		boolean successful = TrayUtils.cleanTrays(token);
+		if (successful) TrayCacheManager.getInstance().removeTrays(token);
+		return successful;
 	}
 
 	public boolean deleteTray(Tray tray) throws InvalidTrayElement,
 			TooManyConnections {
-		return TrayUtils.deleteTray(tray);
+		boolean successful = TrayUtils.deleteTray(tray);
+		if (successful) {
+			TrayCacheManager.getInstance().removeTray(tray);
+		}
+		return successful;
 	}
 
 	public List<Tray> getAllTrays() throws TooManyConnections {
@@ -37,19 +48,23 @@ public class MySQLTrayManager implements TrayManager {
 
 	public Tray getTray(String token, String elementId) throws InvalidTrayElement,
 			TooManyConnections {
+		Tray tray = TrayCacheManager.getInstance().getTray(token, elementId);
+		if (tray != null) return tray;
 		return TrayUtils.getTray(token, elementId);
 	}
 
 	public List<Tray> getTrays(String token) throws InvalidTrayElement,
 			TooManyConnections {
-		return TrayUtils.getTrays(token);
+		List <Tray> trays = TrayCacheManager.getInstance().getTrays(token);
+		if (trays != null) return trays;
+		trays = TrayUtils.getTrays(token);
+		TrayCacheManager.getInstance().addTrays(trays);
+		return trays;
 	}
 
 	public List<Tray> getTrays(String token, int offset, int limit, OrderType orderType,
 			boolean pastEventsShown) throws InvalidTrayElement, TooManyConnections {
-		// XXX: for sake of simplicity, I get all trays. The following code should be 
-		// replaced by SQL order clause.
-		List <Tray> trays = TrayUtils.getTrays(token);
+		List <Tray> trays = getTrays(token);
 		int firstIndex = (offset < 0) ? 0: offset;
 		if (firstIndex >= trays.size()) {
 			trays.clear();
@@ -68,12 +83,16 @@ public class MySQLTrayManager implements TrayManager {
 
 	public boolean replaceUID(String junkToken, String uid)
 			throws InvalidTrayElement, TooManyConnections {
-		return TrayUtils.replaceUID(junkToken, uid);
+		boolean successful = TrayUtils.replaceUID(junkToken, uid);
+		TrayCacheManager.getInstance().removeTrays(junkToken);
+		return successful;
 	}
 
 	public boolean updateTray(Tray tray) throws InvalidTrayElement,
 			TooManyConnections {
-		return TrayUtils.updateTray(tray);
+		boolean successful = TrayUtils.updateTray(tray);
+		if (successful) TrayCacheManager.getInstance().putTray(tray);
+		return successful;
 	}
 	
 	private List<Tray> getTraysWithOrderAndEventPast(List<Tray> trays,

@@ -358,7 +358,19 @@ public class TrayServices {
 
 		
 		if (restTray.getDelete() != null && restTray.getDelete().booleanValue()) {
-			return ProfileManagerImpl.getInstance().getTrayManager().deleteTray(tray);
+
+			boolean ok = ProfileManagerImpl.getInstance().getTrayManager().deleteTray(tray);
+			// XXX: need to know last time an item deleted???
+			// XXX: the cheapest way would be to update the first tray
+			if (ok) {
+				List <Tray> restTrays = ProfileManagerImpl.getInstance().getTrayManager().getTrays(
+						(uid == null || uid.equals("")) ? token : uid);
+				if (restTrays.size() > 0) {
+					restTrays.get(0).setTimestamp(System.currentTimeMillis());
+					ProfileManagerImpl.getInstance().getTrayManager().updateTray(restTrays.get(0));
+				}
+			}
+			return ok;
 		}
 		
 		boolean attended = (restTray.getAttend() == Boolean.TRUE);
@@ -431,7 +443,7 @@ public class TrayServices {
 			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
 		}
 		
-		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguages());
+		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguage());
 		
 		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
 		if (elementEventsDetails != null) {

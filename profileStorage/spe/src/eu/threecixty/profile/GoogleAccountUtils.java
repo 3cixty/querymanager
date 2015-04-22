@@ -105,10 +105,6 @@ public class GoogleAccountUtils {
 			profile.setHasName(name);
 			name.setGivenName(givenName);
 			name.setFamilyName(familyName);
-
-			if (json.has("gender")) {
-				profile.setHasGender(json.getString("gender"));
-			}
 			
 			try {
 				

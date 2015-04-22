@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,8 +19,17 @@ import org.json.JSONObject;
  */
 public class ElementDetailsUtils {
 	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ElementDetailsUtils.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	private static final String COMMENT_ATTRIBUTE = "reviewBody"; // to get comment
 	private static final String CATEGORY_ATTRIBUTE = "category";
+	
+	private static final String TRANSLATION_TAG = "-tr";
+	private static final String REVIEW_LANG = "reviewLang";
 	
 	/**
 	 * Creates a list of events with info in details from a given list of IDs.
@@ -32,13 +42,13 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT * \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
-		
-		addInfoOptional("?item", "rdfs:label", "?title", LanguageUtils.getAllLanguages(), true, queryBuff);
-		
-		addInfoOptional("?item", "dc:description", "?description", languages, true, queryBuff);
+		queryBuff.append("?item rdfs:label ?title . \n");
+		queryBuff.append("OPTIONAL { ?item vcard2006:hasURL ?url . } \n");
+		queryBuff.append("?item dc:description ?description . \n");
+		addLanguageFilter("description", languages, queryBuff);
 
 		if (categories == null) {
 			queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category . } \n");
@@ -87,6 +97,8 @@ public class ElementDetailsUtils {
 		}
 		queryBuff.append(") \n");
 		queryBuff.append("}");
+		
+		if (DEBUG_MOD) LOGGER.info("Get events in detail: " + queryBuff.toString());
 
 		StringBuilder result = new StringBuilder();
 		
@@ -132,13 +144,15 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT *\n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url  \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
 		
-		addInfoOptional("?poi", "rdfs:label", "?name", LanguageUtils.getAllLanguages(), true, queryBuff);
-		addInfoOptional("?poi", "schema:description", "?description", languages, true, queryBuff);
-		
+		queryBuff.append(" ?poi rdfs:label ?name .  \n");
+		queryBuff.append(" OPTIONAL { ?poi owl:sameAs ?url . } \n");
+		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
+		addLanguageFilter("description", languages, queryBuff);
+		queryBuff.append(" } \n");
 		if (categories == null) {
 			queryBuff.append("OPTIONAL {?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . } \n");
 		} else {
@@ -164,8 +178,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("?geoLocation geo:lat  ?lat . \n");
 		queryBuff.append("?geoLocation geo:long  ?lon . \n");
 		queryBuff.append("} \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:review ?review . \n");
-		queryBuff.append("          ?review schema:reviewBody ?reviewBody .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:reviewBody ?reviewBody .  \n");
+		addLanguageFilter("reviewBody", languages, queryBuff);
+		queryBuff.append(" } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating2 . \n");
 		queryBuff.append("          ?aggregateRating2 schema:ratingValue ?ratingValue2 . } \n");
@@ -191,7 +206,7 @@ public class ElementDetailsUtils {
 		queryBuff.append(") \n");
 		queryBuff.append("}");
 		
-		System.out.println(queryBuff.toString());
+		if (DEBUG_MOD) LOGGER.info("Get PoIs in detail: " + queryBuff.toString());
 		
 		StringBuilder result = new StringBuilder();
 		
@@ -219,7 +234,14 @@ public class ElementDetailsUtils {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
 				if (!isNullOrEmpty(comment)) {
 					List <String> comments = ((ElementPoIDetails) tmpPoIDetails).getReviews();
-					if (!comments.contains(comment)) comments.add(comment);
+					if (!comments.contains(comment)) {
+						comments.add(comment);
+
+						List <Boolean> reviewTranslations = ((ElementPoIDetails) tmpPoIDetails).getReviewTranslations();
+						String reviewLanguage = getAttributeValue(tmpObj, REVIEW_LANG);
+						if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
+						else reviewTranslations.add(false);
+					}
 				}
 				String category = getAttributeValue(tmpObj, CATEGORY_ATTRIBUTE);
 				if (!isNullOrEmpty(category)) {
@@ -249,15 +271,11 @@ public class ElementDetailsUtils {
 		if (isNullOrEmpty(id)) return null;
 		poiDetails.setId(id);
 		
-		for (String language: LanguageUtils.getAllLanguages()) {
-		    String name = getAttributeValue(json, "name_" + language);
-		    if (!isNullOrEmpty(name)) poiDetails.setName(name);
-		}
+		String name = getAttributeValue(json, "name");
+		if (!isNullOrEmpty(name)) poiDetails.setName(name);
 		
-		for (String language: languages) {
-		    String desc = getAttributeValue(json, "description_" + language);
-		    if (!isNullOrEmpty(desc)) poiDetails.setDescription(desc);
-		}
+		String desc = getAttributeValue(json, "description");
+		if (!isNullOrEmpty(desc)) poiDetails.setDescription(desc);
 		
 		List <String> categories = new LinkedList <String>();
 		poiDetails.setCategories(categories);
@@ -282,22 +300,29 @@ public class ElementDetailsUtils {
 		if (ratingValue == 0) ratingValue = getRatingValue(json, "ratingValue3");
 		if (ratingValue > 0) poiDetails.setAggregate_rating(ratingValue);
 		
-		// seems incorrect
-//		String reviewCountsStr = getAttributeValue(json, "reviewCounts");
-//		try {
-//			if (!isNullOrEmpty(reviewCountsStr)) {
-//				String [] reviews = reviewCountsStr.trim().split(" ");
-//				poiDetails.setReview_counts(Integer.parseInt(reviews[0]));
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		String descLang = getAttributeValue(json, "descLang");
+		if (!isNullOrEmpty(descLang)) {
+			poiDetails.setTranslation(descLang.contains(TRANSLATION_TAG));
+		}
+		
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
 		List <String> comments = new LinkedList <String>();
 		String comment = getAttributeValue(json, COMMENT_ATTRIBUTE);
 		if (!isNullOrEmpty(comment) && !comments.contains(comment)) comments.add(comment);
 		poiDetails.setReviews(comments);
+		
+		List <Boolean> reviewTranslations = new LinkedList<Boolean>();
+		String reviewLanguage = getAttributeValue(json, REVIEW_LANG);
+		if (!isNullOrEmpty(comment)) {
+		    if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
+		    else reviewTranslations.add(false);
+		}
+		poiDetails.setReviewTranslations(reviewTranslations);
+		
+		String url = getAttributeValue(json, "url");
+		if (isNullOrEmpty(url)) poiDetails.setUrl(url);
+		
 		return poiDetails;
 		
 	}
@@ -308,16 +333,11 @@ public class ElementDetailsUtils {
 		if (isNullOrEmpty(id)) return null;
 		eventDetails.setId(id);
 		
-		for (String language: LanguageUtils.getAllLanguages()) {
-		    String title = getAttributeValue(json, "title_" + language);
-		    if (!isNullOrEmpty(title)) eventDetails.setName(title);
-		}
-		
-		for (String language: languages) {
-		    
-		    String desc = getAttributeValue(json, "description_" + language);
-		    if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
-		}
+		String title = getAttributeValue(json, "title");
+		if (!isNullOrEmpty(title)) eventDetails.setName(title);
+		 
+		String desc = getAttributeValue(json, "description");
+		if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
 		
 		List <String> categories = new LinkedList <String>();
 		eventDetails.setCategories(categories);
@@ -341,28 +361,26 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(image_url)) eventDetails.setImage_url(image_url);
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
+		String language = getAttributeValue(json, "language");
+		if (!isNullOrEmpty(language)) {
+			eventDetails.setTranslation(language.contains(TRANSLATION_TAG));
+		}
+		String url = getAttributeValue(json, "url");
+		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
 		return eventDetails;
 	}
 	
-	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
-			boolean emptyFilter, StringBuilder result) {
+	private static void addLanguageFilter(String variable, String[] languages, StringBuilder result) {
+		result.append("FILTER (");
+		int index = 0;
 		for (String language: languages) {
-			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
-					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
-							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
-		}
-		if (emptyFilter) {
-			result.append("FILTER (");
-			int index = 0;
-			for (String language: languages) {
-				if (index > 0) {
-					result.append(" || ");
-				}
-				result.append("(").append(object).append("_").append(language).append(" != \"\")");
-				index++;
+			if (index > 0) {
+				result.append(" || ");
 			}
-			result.append(")\n");
+			result.append("(lang(?" + variable +")").append(" = \"" + language + "\")");
+			index++;
 		}
+		result.append(")\n");
 	}
 	
 	private static void processCategories(List<ElementDetails> elementsDetails) {

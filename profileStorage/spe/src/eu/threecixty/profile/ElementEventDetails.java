@@ -6,7 +6,6 @@ public class ElementEventDetails extends ElementDetails {
 	private String time_beginning;
 	private String time_end;
 
-
 	public String getDescription() {
 		return description;
 	}

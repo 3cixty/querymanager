@@ -1,5 +1,6 @@
 package eu.threecixty.querymanager.rest;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -23,19 +25,28 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.cache.AppCache;
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.oauth.model.App;
 import eu.threecixty.profile.ReportRequest;
 
 @Path("/" + Constants.PREFIX_NAME)
 public class ReportServices {
+
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ReportServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	private static final String CLIENT_TIMESTAMP = "clientTimeStamp";
 	private static final String CLIENT_VERSION = "clientVersion";
 	private static final String REASON = "reason";
@@ -51,14 +62,14 @@ public class ReportServices {
 	private static final String GMAIL_PWD_KEY = "GMAIL_PWD";
 	private static final String DESTINATIONS_KEY = "DESTINATION";
 	
-	private static String gmailAccount;
-	private static String googleUserName;
+	private static String gmailAccount = null;
 	private static String gmailPwd;
 	private static List <String> destinations = new LinkedList <String>();
 
 	@POST
 	@Path("/reporting")
     public Response report(InputStream input, @Context Request req) {
+		if (DEBUG_MOD) LOGGER.info("Enter into the feedback service");
 		String content = getContent(input);
 		if (content == null || content.equals("")) return createInvalidResponse("Empty request");
 		long starttime = System.currentTimeMillis();
@@ -70,30 +81,34 @@ public class ReportServices {
 			    String userToken = getUserToken(json);
 			    reportRequest.setUserToken(userToken);
 			    AccessToken at = OAuthWrappers.findAccessTokenFromDB(userToken);
+			    if (at == null) return createInvalidResponse("Your userToken is invalid");
 			    CallLoggingManager.getInstance().save(at.getAppkey(), starttime, REPORT_SERVICE,
 			    		CallLoggingConstants.SUCCESSFUL);
 			    reportRequest.setUid(at.getUid());
-			    App app = OAuthWrappers.retrieveApp(at.getAppkey());
+			    AppCache app = TokenCacheManager.getInstance().getAppCache(at.getAppkey());
 			    subject = app.getAppName();
 			    reportRequest.setUserToken(null); // clear user token
 			} else if (json.has(APP_KEY)) {
 				String key = getAppkey(json);
 			    CallLoggingManager.getInstance().save(key, starttime, REPORT_SERVICE,
 			    		CallLoggingConstants.SUCCESSFUL);
-			    App app = OAuthWrappers.retrieveApp(key);
+			    AppCache app = TokenCacheManager.getInstance().getAppCache(key);
+			    if (app == null) return createInvalidResponse("Your key is invalid");
 			    subject = app.getAppName();
 			} else {
 				return createInvalidResponse("Your request must contain either userToken or key");
 			}
+			if (DEBUG_MOD) LOGGER.info("Before checking timestamp");
 			String timestamp = getTimestamp(json);
 			reportRequest.setClientTimeStamp(timestamp);
 			
-			if (!json.has(CLIENT_VERSION)) throw new WebApplicationException(
-					new Throwable("Client version is required"));
+			if (DEBUG_MOD) LOGGER.info("Before checking client version");
+			if (!json.has(CLIENT_VERSION)) return createInvalidResponse("Client version is required");
 			String clientVersion = json.getString(CLIENT_VERSION);
 			reportRequest.setClientVersion(clientVersion);
 			
-			if (!json.has(REASON)) throw new WebApplicationException(new Throwable("Reason is required"));
+			if (DEBUG_MOD) LOGGER.info("Before checking reason");
+			if (!json.has(REASON)) return createInvalidResponse("Reason is required");
 			String reason = json.getString(REASON);
 			reportRequest.setReason(reason);
 			
@@ -105,19 +120,25 @@ public class ReportServices {
 			
 			if (json.has(LAST_POSITION)) reportRequest.setLastPosition(json.getString(LAST_POSITION));
 			
+			if (DEBUG_MOD) LOGGER.info("Before sending feedback");
+			
 			sendEmail(reportRequest, subject);
+			return Response.ok("Successful").build();
 		} catch (JSONException e) {
-			e.printStackTrace();
+			LOGGER.equals(e.getMessage());
 			return createInvalidResponse("Your report request must be in JSON format");
 		} catch (WebApplicationException e) {
+			LOGGER.equals(e.getMessage());
+			return createInvalidResponse(e.getMessage());
+		} catch (Exception e) {
+			LOGGER.equals(e.getMessage());
 			return createInvalidResponse(e.getMessage());
 		}
-		return null;
 	}
 	
 	private void sendEmail(ReportRequest reportRequest, String subject) {
 		if (gmailAccount == null) {
-			synchronized (reportRequest) {
+			synchronized (this) {
 				if (gmailAccount == null) {
 					try {
 						loadProperties();
@@ -127,31 +148,26 @@ public class ReportServices {
 				}
 			}
 		}
+		if (DEBUG_MOD) LOGGER.info("Gmail used to send feedback: " + gmailAccount);
 		if (gmailAccount != null && !gmailAccount.equals("")) {
 			try {
 				Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-				final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
 				// Get a Properties object
 				Properties props = System.getProperties();
-				props.setProperty("mail.smtps.host", "smtp.gmail.com");
-				props.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY);
-				props.setProperty("mail.smtp.socketFactory.fallback", "false");
-				props.setProperty("mail.smtp.port", "465");
-				props.setProperty("mail.smtp.socketFactory.port", "465");
-				props.setProperty("mail.smtps.auth", "true");
-
-				/*
-	        If set to false, the QUIT command is sent and the connection is immediately closed. If set 
-	        to true (the default), causes the transport to wait for the response to the QUIT command.
-
-	        ref :   http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
-	                http://forum.java.sun.com/thread.jspa?threadID=5205249
-	                smtpsend.java - demo program from javamail
-				 */
-				props.put("mail.smtps.quitwait", "false");
-
-				Session session = Session.getInstance(props, null);
+				props.put("mail.smtp.host", "smtp.gmail.com");
+				props.put("mail.smtp.socketFactory.port", "465");
+				props.put("mail.smtp.socketFactory.class",
+						"javax.net.ssl.SSLSocketFactory");
+				props.put("mail.smtp.auth", "true");
+				props.put("mail.smtp.port", "465");
+				
+				Session session = Session.getDefaultInstance(props,
+						new javax.mail.Authenticator() {
+							protected PasswordAuthentication getPasswordAuthentication() {
+								return new PasswordAuthentication(gmailAccount, gmailPwd);
+							}
+						});
 
 				// -- Create a new message --
 				final MimeMessage msg = new MimeMessage(session);
@@ -159,36 +175,29 @@ public class ReportServices {
 				// -- Set the FROM and TO fields --
 				msg.setFrom(new InternetAddress(gmailAccount));
 				for (String dest: destinations) {
+					if (DEBUG_MOD) LOGGER.info(dest);
 					msg.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
 				}
 
-				msg.setSubject("[3cixty feedback] " + subject);
+				msg.setSubject(subject);
 				msg.setText(JSONObject.wrap(reportRequest).toString(), "utf-8");
 				msg.setSentDate(new Date());
 
-				Transport t = session.getTransport("smtps");
-
-				t.connect("smtp.gmail.com", googleUserName, gmailPwd);
-				t.sendMessage(msg, msg.getAllRecipients());      
-				t.close();
+				Transport.send(msg);      
 			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
 	}
 	
 	private synchronized void loadProperties() throws IOException {
-		InputStream input = new FileInputStream(Configuration.path);
+		InputStream input = new FileInputStream(Configuration.path + File.separatorChar + "WEB-INF"
+	            + File.separatorChar + "report.properties");
 		Properties props = new Properties();
 		props.load(input);
 		input.close();
 		gmailAccount = props.getProperty(GMAIL_ACCOUNT_KEY);
-		if (gmailAccount != null) {
-			int index = gmailAccount.indexOf("@");
-			if (index > 0) {
-				googleUserName = gmailAccount.substring(0, index);
-			}
-		}
 		gmailPwd = props.getProperty(GMAIL_PWD_KEY);
 		String tmpDests = props.getProperty(DESTINATIONS_KEY);
 		if (tmpDests != null && !tmpDests.equals("")) {
@@ -203,11 +212,13 @@ public class ReportServices {
 		if (!json.has(CLIENT_TIMESTAMP))
 			throw new WebApplicationException(new Throwable("Client timestamp is required"));
 		String timestamp = json.getString(CLIENT_TIMESTAMP);
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+		if (DEBUG_MOD) LOGGER.info("Timestamp: " + timestamp);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 		try {
 			Date d = format.parse(timestamp);
 			if (d != null) return timestamp;
 		} catch (ParseException e) {
+			LOGGER.error(e.getMessage());
 			throw new WebApplicationException(new Throwable(
 					"Client timestamp is invalid. The pattern looks like: 2002-10-10T12:00:00-05:00"));
 		}

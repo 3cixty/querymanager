@@ -222,7 +222,7 @@ public class ThreeCixtyResource extends AbstractResource {
 		resourceServer.setKey(THREE_CIXTY_RES_SERVER_KEY);
 		resourceServer.setContactEmail("res@3cixty.com");
 		resourceServer.setContactName("3cixty RES");
-		resourceServer.setName("3Cixty Platform");
+		resourceServer.setName("3cixty Platform");
 		resourceServer.setSecret(ResourceServerUtils.getResourceServerSecret());
 		resourceServer.setThumbNailUrl(ResourceServerUtils.getResourceServerThumbNailUrl());
 

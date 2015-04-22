@@ -1,0 +1,24 @@
+PREFIX schema: <http://schema.org/>
+PREFIX ma-ont: <http://www.w3.org/ns/ma-ont#>
+PREFIX ce: <http://data.linkedevents.org/cell/milano/>
+SELECT DISTINCT ?event ?title ?description ?placeName ?img ?long ?lat ?cell
+WHERE {
+	?event a lode:Event.
+	OPTIONAL{
+		?event lode:inSpace ?geometry .
+		?geometry geo:long ?long .
+		?geometry geo:lat ?lat .
+	}
+	?event rdfs:label ?title .
+	?event locationOnt:cell ?cell .
+	OPTIONAL{?event dc:description ?description_en.  FILTER (langMatches(lang(?description_en), "en"))}
+	OPTIONAL{?event dc:description ?description_it.  FILTER (langMatches(lang(?description_it), "it"))}
+	OPTIONAL{?event dc:description ?description_empty.  FILTER (langMatches(lang(?description_empty), ""))}
+	BIND(COALESCE(?description_en, ?description_it, ?description_empty) AS ?description)
+	OPTIONAL{
+		?event lode:atPlace ?place.
+		?place rdfs:label ?placeName.
+	}
+	OPTIONAL{?event lode:poster ?img.}
+}
+OFFSET 0 LIMIT 100 
