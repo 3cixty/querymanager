@@ -215,8 +215,27 @@ public class QueryManagerServices {
 	 * @return
 	 */
 	@GET
+	@Path("/executeQueryNoKey")
+	public Response executeQueryNoAccessToken( 
+			@QueryParam("format") String format, @QueryParam("query") String query) {
+		EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+		String result;
+		try {
+			result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_GET);
+			return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+					MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+			return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+			        .entity(e.getMessage())
+			        .type(MediaType.TEXT_PLAIN)
+			        .build();
+		}
+	}
+	
+	@GET
 	@Path("/executeQuery")
-	public Response executeQueryNoAccessToken(@HeaderParam("key") String key, 
+	public Response executeQueryNoAppKey(@HeaderParam("key") String key, 
 			@QueryParam("format") String format, @QueryParam("query") String query) {
 		return executeQueryNoAccessTokenWithHttpMethod(key, format, query, SparqlEndPointUtils.HTTP_GET);
 	}
