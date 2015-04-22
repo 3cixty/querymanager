@@ -50,17 +50,17 @@ public class CacheManager {
 		}
 	}
 	
-	/**
-	 * Checks whether or not a given query should be executed through cache.
-	 * @param query
-	 * @return
-	 */
-	public boolean isQueryShouldBeExecutedViaCache(String query) {
-		if (DEBUG_MOD) LOGGER.info("Query to check in memory: " + query);
-		boolean found = cacheElements.containsKey(query);
-		if (DEBUG_MOD) LOGGER.info("Query found in memory: " + found);
-		return found;
-	}
+//	/**
+//	 * Checks whether or not a given query should be executed through cache.
+//	 * @param query
+//	 * @return
+//	 */
+//	public boolean isQueryShouldBeExecutedViaCache(String query) {
+//		if (DEBUG_MOD) LOGGER.info("Query to check in memory: " + query);
+//		boolean found = cacheElements.containsKey(query);
+//		if (DEBUG_MOD) LOGGER.info("Query found in memory: " + found);
+//		return found;
+//	}
 	
 	private synchronized String executeQuery(String query) {
 		StringBuilder result = new StringBuilder();
