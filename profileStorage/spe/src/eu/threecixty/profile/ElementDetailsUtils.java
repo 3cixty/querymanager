@@ -233,14 +233,14 @@ public class ElementDetailsUtils {
 			} else {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
 				if (!isNullOrEmpty(comment)) {
-					List <String> comments = ((ElementPoIDetails) tmpPoIDetails).getReviews();
-					if (!comments.contains(comment)) {
-						comments.add(comment);
-
-						List <Boolean> reviewTranslations = ((ElementPoIDetails) tmpPoIDetails).getReviewTranslations();
-						String reviewLanguage = getAttributeValue(tmpObj, REVIEW_LANG);
-						if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
-						else reviewTranslations.add(false);
+					List <Review> reviews = ((ElementPoIDetails) tmpPoIDetails).getReviews();
+					Review review = new Review();
+					review.setText(comment);
+					String reviewLanguage = getAttributeValue(tmpObj, REVIEW_LANG);
+					if (!isNullOrEmpty(reviewLanguage)) review.setTranslated(reviewLanguage.contains(TRANSLATION_TAG));
+					else review.setTranslated(false);
+					if (!reviews.contains(review)) {
+						reviews.add(review);
 					}
 				}
 				String category = getAttributeValue(tmpObj, CATEGORY_ATTRIBUTE);
@@ -307,18 +307,19 @@ public class ElementDetailsUtils {
 		
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
-		List <String> comments = new LinkedList <String>();
+		List <Review> reviews = new LinkedList <Review>();
 		String comment = getAttributeValue(json, COMMENT_ATTRIBUTE);
-		if (!isNullOrEmpty(comment) && !comments.contains(comment)) comments.add(comment);
-		poiDetails.setReviews(comments);
-		
-		List <Boolean> reviewTranslations = new LinkedList<Boolean>();
-		String reviewLanguage = getAttributeValue(json, REVIEW_LANG);
-		if (!isNullOrEmpty(comment)) {
-		    if (!isNullOrEmpty(reviewLanguage)) reviewTranslations.add(reviewLanguage.contains(TRANSLATION_TAG));
-		    else reviewTranslations.add(false);
+		if (!isNullOrEmpty(comment) && !reviews.contains(comment)) {
+			Review review = new Review();
+			review.setText(comment);
+			String reviewLanguage = getAttributeValue(json, REVIEW_LANG);
+			if (!isNullOrEmpty(comment)) {
+			    if (!isNullOrEmpty(reviewLanguage)) review.setTranslated(reviewLanguage.contains(TRANSLATION_TAG));
+			    else review.setTranslated(false);
+			}
+			reviews.add(review);
 		}
-		poiDetails.setReviewTranslations(reviewTranslations);
+		poiDetails.setReviews(reviews);
 		
 		String url = getAttributeValue(json, "url");
 		if (isNullOrEmpty(url)) poiDetails.setUrl(url);
