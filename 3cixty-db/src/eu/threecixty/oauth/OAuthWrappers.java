@@ -272,6 +272,7 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static boolean validateAppKey(String appKey) {
+		if (appKey == null || appKey.equals("")) return false;
 		return (TokenCacheManager.getInstance().getAppCache(appKey) != null);
 	}
 
