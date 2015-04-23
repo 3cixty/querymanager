@@ -1,5 +1,6 @@
 package eu.threecixty.cache;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -108,7 +109,7 @@ public class TokenCacheManager {
 		uidAppkeyAccessTokens.put(accessToken.getAppkey() + accessToken.getUid(), accessToken.getAccess_token());
 	}
 	
-	public void update(App app) {
+	public synchronized void update(App app) {
 		if (app == null) return;
 		AppCache appCache = new AppCache();
 		appCache.setAppClientKey(app.getClientId());
@@ -128,8 +129,8 @@ public class TokenCacheManager {
 	private TokenCacheManager() {
 		tokenCaches = new ConcurrentHashMap<String, TokenCache>();
 		//refreshTokenCaches = new ConcurrentHashMap<String, String>();
-		appIdCaches = new ConcurrentHashMap<Integer, AppCache>();
-		appkeyCaches = new ConcurrentHashMap<String, Integer>();
+		appIdCaches = new HashMap<Integer, AppCache>();
+		appkeyCaches = new HashMap<String, Integer>();
 		uidAppkeyAccessTokens = new ConcurrentHashMap<String, String>();
 		loadAppCaches();
 	}
