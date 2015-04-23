@@ -485,6 +485,21 @@ public class OAuthModelsUtils {
 		return apps;
 	}
 	
+	protected static App getApp(Integer id) {
+		Session session = null;
+		App app = null;
+		try {
+
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			app = (App) session.get(App.class, id);
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
+		}
+		return app;
+	}
+	
 	public static List <App> getApps() {
 		List <App> apps = new ArrayList <App>();
 		Session session = null;
@@ -562,11 +577,12 @@ public class OAuthModelsUtils {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			App tmpApp = (App) session.get(App.class, app.getId());
+			//App tmpApp = (App) session.get(App.class, app.getId());
 			UserAccessToken userAccessToken = new UserAccessToken();
 			userAccessToken.setAccessToken(accessToken);
 			userAccessToken.setUser(user);
-			userAccessToken.setApp(tmpApp);
+			//userAccessToken.setApp(tmpApp);
+			userAccessToken.set_3cixty_app_id(app.getId());
 			userAccessToken.setRefreshToken(refreshToken);
 			
 			userAccessToken.setScope(scope);
@@ -803,14 +819,15 @@ public class OAuthModelsUtils {
 		AccessToken ac = new AccessToken();
 		
 		findScope(userAccessToken, ac);
-		
-		ac.setAppClientKey(userAccessToken.getApp().getClientId());
-		ac.setAppClientPwd(userAccessToken.getApp().getPassword());
+		App app = getApp(userAccessToken.get_3cixty_app_id());
+		if (app == null) return null;
+		ac.setAppClientKey(app.getClientId());
+		ac.setAppClientPwd(app.getPassword());
 		ac.setAccess_token(userAccessToken.getAccessToken());
 		ac.setRefresh_token(userAccessToken.getRefreshToken());
 		ac.setUid(userAccessToken.getUser().getUid());
-		ac.setAppkey(userAccessToken.getApp().getKey());
-		ac.setAppkeyId(userAccessToken.getApp().getId());
+		ac.setAppkey(app.getKey());
+		ac.setAppkeyId(app.getId());
 		return ac;
 	}
 	

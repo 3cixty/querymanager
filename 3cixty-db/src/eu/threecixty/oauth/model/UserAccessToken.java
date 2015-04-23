@@ -29,18 +29,18 @@ public class UserAccessToken implements java.io.Serializable {
 	private String accessToken;
 	private String refreshToken;
 	private User user;
-	private App app;
+	//private App app;
+	private Integer _3cixty_app_id;
 	
 	private String scope;
 
 	public UserAccessToken() {
 	}
 
-	public UserAccessToken(Integer id, String accessToken, User user, App app) {
+	public UserAccessToken(Integer id, String accessToken, User user) {
 		this.id = id;
 		this.accessToken = accessToken;
 		this.user = user;
-		this.app = app;
 	}
 	
 	@Id
@@ -82,16 +82,6 @@ public class UserAccessToken implements java.io.Serializable {
 		this.user = user;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "3cixty_app_id", nullable = false)
-	public App getApp() {
-		return app;
-	}
-
-	public void setApp(App app) {
-		this.app = app;
-	}
-
 	@Column(name = "scope", unique = false, nullable = true, length = 64)
 	public String getScope() {
 		return scope;
@@ -100,4 +90,14 @@ public class UserAccessToken implements java.io.Serializable {
 	public void setScope(String scope) {
 		this.scope = scope;
 	}
+
+	@Column(name = "3cixty_app_id", nullable = false)
+	public Integer get_3cixty_app_id() {
+		return _3cixty_app_id;
+	}
+
+	public void set_3cixty_app_id(Integer _3cixty_app_id) {
+		this._3cixty_app_id = _3cixty_app_id;
+	}
+	
 }

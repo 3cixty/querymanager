@@ -15,7 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -32,7 +31,7 @@ public class App implements java.io.Serializable {
 	
 	private Integer id;
 	private String key;
-	private Set <UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
+	//private Set <UserAccessToken> userAccessTokens = new HashSet <UserAccessToken>();
 	private Developer developer;
 	private Set <Scope> scopes = new HashSet<Scope>();
 	//private Scope scope;
@@ -64,14 +63,14 @@ public class App implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "app")
-	public Set<UserAccessToken> getUserAccessTokens() {
-		return userAccessTokens;
-	}
-
-	public void setUserAccessTokens(Set<UserAccessToken> userAccessTokens) {
-		this.userAccessTokens = userAccessTokens;
-	}
+//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "app")
+//	public Set<UserAccessToken> getUserAccessTokens() {
+//		return userAccessTokens;
+//	}
+//
+//	public void setUserAccessTokens(Set<UserAccessToken> userAccessTokens) {
+//		this.userAccessTokens = userAccessTokens;
+//	}
 
 	@Column(name = "app_key", unique = true, nullable = false, length = 64)
 	public String getKey() {
