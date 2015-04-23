@@ -90,6 +90,11 @@ public class TokenCacheManager {
 		return appIdCaches.get(appid);
 	}
 	
+	public AppCache getAppCache(Integer appid) {
+		if (appid == null) return null;
+		return appIdCaches.get(appid);
+	}
+	
 	public void remove(String access_token) {
 		tokenCaches.remove(access_token);
 	}
