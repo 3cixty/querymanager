@@ -221,7 +221,7 @@ public class QueryManagerServices {
 		EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
 		String result;
 		try {
-			result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_GET);
+			result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_GET, true);
 			return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
 					MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
 		} catch (IOException e) {
