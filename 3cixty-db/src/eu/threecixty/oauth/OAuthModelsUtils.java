@@ -28,6 +28,8 @@ public class OAuthModelsUtils {
 	 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 
+	 protected static final int EXPIRATION_FIXED = 60 * 60 * 24; // one day
 	
 	protected static boolean addUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
@@ -586,6 +588,8 @@ public class OAuthModelsUtils {
 			userAccessToken.setRefreshToken(refreshToken);
 			
 			userAccessToken.setScope(scope);
+			userAccessToken.setCreation(System.currentTimeMillis());
+			userAccessToken.setExpiration(EXPIRATION_FIXED);
 
 			session.beginTransaction();
 
@@ -877,7 +881,8 @@ public class OAuthModelsUtils {
 			userAccessToken.setUser(user);
 			userAccessToken.set_3cixty_app_id(app.getId());
 			userAccessToken.setRefreshToken(refreshToken);
-			
+			userAccessToken.setCreation(System.currentTimeMillis());
+			userAccessToken.setExpiration(EXPIRATION_FIXED);
 			userAccessToken.setScope(scope);
 
 	 		session.save(userAccessToken);
