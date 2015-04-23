@@ -2,7 +2,7 @@ package eu.threecixty.cache;
 
 public class CacheElement {
 
-	private static final int VALIDATION = 100 * 60 * 60; // one hour
+	private static final int VALIDATION = 1000 * 60 * 60 * 24; // one day
 	private long creationTime;
 	private long lastValidTime;
 	public String content;
