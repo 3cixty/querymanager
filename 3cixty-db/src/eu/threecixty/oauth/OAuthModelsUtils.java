@@ -572,7 +572,7 @@ public class OAuthModelsUtils {
 	}
 
 	protected static boolean addUserAccessToken(String accessToken, String refreshToken,
-			String scope, User user, AppCache app) {
+			String scope, User user, AppCache app, int expiration) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
 		Session session = null;
 		try {
@@ -589,7 +589,7 @@ public class OAuthModelsUtils {
 			
 			userAccessToken.setScope(scope);
 			userAccessToken.setCreation(System.currentTimeMillis());
-			userAccessToken.setExpiration(EXPIRATION_FIXED);
+			userAccessToken.setExpiration(expiration);
 
 			session.beginTransaction();
 
@@ -854,7 +854,7 @@ public class OAuthModelsUtils {
 	}
 
 	public static boolean storeAccessTokenWithUID(String uid,
-			String accessToken, String refreshToken, String scope, AppCache app) {
+			String accessToken, String refreshToken, String scope, AppCache app, int expiration) {
 		Session session = null;
 		User user = null;
 		boolean successful = false;
@@ -882,7 +882,7 @@ public class OAuthModelsUtils {
 			userAccessToken.set_3cixty_app_id(app.getId());
 			userAccessToken.setRefreshToken(refreshToken);
 			userAccessToken.setCreation(System.currentTimeMillis());
-			userAccessToken.setExpiration(EXPIRATION_FIXED);
+			userAccessToken.setExpiration(expiration);
 			userAccessToken.setScope(scope);
 
 	 		session.save(userAccessToken);

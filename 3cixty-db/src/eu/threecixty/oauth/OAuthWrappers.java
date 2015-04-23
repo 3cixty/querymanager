@@ -66,7 +66,7 @@ public class OAuthWrappers {
 	
 	private static final String HTTP_GET = "GET";
 	private static final String HTTP_POST = "POST";
-	private static final int EXPIRATION_FIXED = 60 * 60 * 24; // one day
+	private static final int EXPIRATION_FIXED = OAuthModelsUtils.EXPIRATION_FIXED;
 
 	/**
 	 * Return access token with info about expiration.
@@ -113,8 +113,8 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken,
-			String scope, AppCache app) {
-		return OAuthModelsUtils.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app);
+			String scope, AppCache app, int expiration) {
+		return OAuthModelsUtils.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app, expiration);
 	}
 	
 	/**
@@ -198,15 +198,26 @@ public class OAuthWrappers {
 		return OAuthModelsUtils.getApps(uid);
 	}
 	
-	public static AccessToken refreshAccessToken(String lastRefreshToken) {
+	public static AccessToken refreshAccessToken(String lastRefreshToken, boolean oauthServerBypassed) {
 		AccessToken lastAccessToken = OAuthModelsUtils.findTokenInfoFromRefreshToken(lastRefreshToken);
 		if (lastAccessToken == null) return null;
-		AccessToken newAccessToken = refreshAccessTokenUsingOAuthServer(lastAccessToken);
+		AccessToken newAccessToken = oauthServerBypassed ?
+				refreshAccessTokenWithoutUsingOAuthServer(lastAccessToken) : refreshAccessTokenUsingOAuthServer(lastAccessToken);
 		if (newAccessToken == null) return null;
 		// update user access token as OAuth server already deleted old one
 		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(lastAccessToken, newAccessToken)) return null;
 		TokenCacheManager.getInstance().update(newAccessToken);
 		return newAccessToken;
+	}
+
+	private static AccessToken refreshAccessTokenWithoutUsingOAuthServer(
+			AccessToken lastAccessToken) {
+		AccessToken accessToken = new AccessToken();
+		accessToken.setAccess_token(UUID.randomUUID().toString());
+		accessToken.setExpires_in(EXPIRATION_FIXED);
+		accessToken.setRefresh_token(UUID.randomUUID().toString());
+		accessToken.getScopeNames().addAll(lastAccessToken.getScopeNames());
+		return accessToken;
 	}
 
 	public static AccessToken findAccessTokenFromDB(String accessToken) {
