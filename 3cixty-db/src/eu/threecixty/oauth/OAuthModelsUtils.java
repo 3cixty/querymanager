@@ -830,4 +830,52 @@ public class OAuthModelsUtils {
 	
 	private OAuthModelsUtils() {
 	}
+
+	public static boolean storeAccessTokenWithUID(String uid,
+			String accessToken, String refreshToken, String scope, AppCache app) {
+		Session session = null;
+		User user = null;
+		boolean successful = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			session.getTransaction().begin();
+
+			String hql = "FROM User U WHERE U.uid = ? AND U.class ='" + User.class.getSimpleName() + "'";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, uid).list();
+			session.close();
+			if (results.size() > 0) {
+				user = (User) results.get(0);
+			} else {
+				user = new User();
+
+				user.setUid(uid);
+
+				session.save(user);
+			}
+			
+			App tmpApp = (App) session.get(App.class, app.getId());
+			UserAccessToken userAccessToken = new UserAccessToken();
+			userAccessToken.setAccessToken(accessToken);
+			userAccessToken.setUser(user);
+			userAccessToken.setApp(tmpApp);
+			userAccessToken.setRefreshToken(refreshToken);
+			
+			userAccessToken.setScope(scope);
+
+	 		session.save(userAccessToken);
+	 		session.getTransaction().commit();
+
+			AccessToken at = createAccessToken(userAccessToken);
+			TokenCacheManager.getInstance().update(at);
+	
+			successful = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
+	}
 }
