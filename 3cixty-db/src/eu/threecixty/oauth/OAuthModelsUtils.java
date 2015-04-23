@@ -872,11 +872,10 @@ public class OAuthModelsUtils {
 				session.save(user);
 			}
 			
-			App tmpApp = (App) session.get(App.class, app.getId());
 			UserAccessToken userAccessToken = new UserAccessToken();
 			userAccessToken.setAccessToken(accessToken);
 			userAccessToken.setUser(user);
-			userAccessToken.setApp(tmpApp);
+			userAccessToken.set_3cixty_app_id(app.getId());
 			userAccessToken.setRefreshToken(refreshToken);
 			
 			userAccessToken.setScope(scope);
