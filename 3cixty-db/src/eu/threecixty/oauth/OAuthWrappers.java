@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
@@ -65,6 +66,7 @@ public class OAuthWrappers {
 	
 	private static final String HTTP_GET = "GET";
 	private static final String HTTP_POST = "POST";
+	private static final int EXPIRATION_FIXED = 60 * 60 * 24; // one day
 
 	/**
 	 * Return access token with info about expiration.
@@ -373,8 +375,12 @@ public class OAuthWrappers {
 		return null;
 	}
 
-	public static AccessToken createAccessTokenForMobileApp(AppCache app, String scope) {
+	public static AccessToken createAccessTokenForMobileApp(AppCache app, String scope, boolean oauthServerBypassed) {
 	    
+		if (oauthServerBypassed) {
+			return createAccessTokenForMobileAppWithoutUsingOAuthServer(app, scope);
+		}
+		
 	    String postParams = "grant_type=client_credentials&scope=" + scope;
 	    
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
@@ -397,6 +403,22 @@ public class OAuthWrappers {
 		return null;
 	}
 	
+	/**
+	 * Tokens created by this method don't exist on OAuth server, only exist on 3cixty DB.
+	 * @param app
+	 * @param scope
+	 * @return
+	 */
+	private static AccessToken createAccessTokenForMobileAppWithoutUsingOAuthServer(
+			AppCache app, String scope) {
+		AccessToken accessToken = new AccessToken();
+		accessToken.setAccess_token(UUID.randomUUID().toString());
+		accessToken.setExpires_in(EXPIRATION_FIXED);
+		accessToken.setRefresh_token(UUID.randomUUID().toString());
+		addScopeNames(scope, accessToken.getScopeNames());
+		return accessToken;
+	}
+
 	public static List <String> getAllRedirectUris() {
 		return OAuthModelsUtils.getAllRedirectUris();
 	}
