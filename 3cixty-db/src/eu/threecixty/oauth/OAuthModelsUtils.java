@@ -861,7 +861,7 @@ public class OAuthModelsUtils {
 			String hql = "FROM User U WHERE U.uid = ? AND U.class ='" + User.class.getSimpleName() + "'";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).list();
-			session.close();
+
 			if (results.size() > 0) {
 				user = (User) results.get(0);
 			} else {
