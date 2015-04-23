@@ -112,15 +112,7 @@ public class OAuthWrappers {
 	 */
 	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken,
 			String scope, AppCache app) {
-		User user = OAuthModelsUtils.getUser(uid);
-		if (user == null) {
-			// create user in database to map with access tokens created by oauth server
-			if (!OAuthModelsUtils.addUser(uid)) return false;
-			user = OAuthModelsUtils.getUser(uid);
-			if (user == null) return false;
-		}
-		if (accessToken == null || accessToken.equals("")) return false;
-		return OAuthModelsUtils.addUserAccessToken(accessToken, refreshToken, scope, user, app);
+		return OAuthModelsUtils.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app);
 	}
 	
 	/**
