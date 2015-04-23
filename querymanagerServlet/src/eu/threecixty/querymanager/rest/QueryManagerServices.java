@@ -1171,7 +1171,7 @@ public class QueryManagerServices {
 		}
 		long endTime = System.currentTimeMillis();
 		if (DEBUG_MOD) {
-			LOGGER.info("Query: " + query);
+			//LOGGER.info("Query: " + query);
 			LOGGER.info("Time to make the query: " + (endTime - startTime) + " ms");
 		}
 		return ret;
