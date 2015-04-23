@@ -1168,11 +1168,11 @@ public class QueryManagerServices {
 			StringBuilder builder = new StringBuilder();
 			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
 			ret = builder.toString();
-		}
-		long endTime = System.currentTimeMillis();
-		if (DEBUG_MOD) {
-			//LOGGER.info("Query: " + query);
-			LOGGER.info("Time to make the query: " + (endTime - startTime) + " ms");
+			long endTime = System.currentTimeMillis();
+			if (DEBUG_MOD) {
+				//LOGGER.info("Query: " + query);
+				LOGGER.info("Time to make the query: " + (endTime - startTime) + " ms");
+			}
 		}
 		return ret;
 	}
