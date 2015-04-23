@@ -1161,6 +1161,8 @@ public class QueryManagerServices {
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		long startTime = System.currentTimeMillis();
 		ret = CacheManager.getInstance().getContent(query);
+		long time = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Time to get data from map: " + (time - startTime));
 		if (ret == null) {
 			StringBuilder builder = new StringBuilder();
 			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
