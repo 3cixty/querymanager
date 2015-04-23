@@ -41,9 +41,16 @@ public class CacheManager {
 		}
 	}
 	
-	public String getContent(String query) {
+	public String getContent(String query, boolean stressTest) {
 		CacheElement cacheElement = cacheElements.get(query);
-		if (cacheElement == null) return null;
+		if (cacheElement == null) {
+			if (stressTest) {
+				synchronized (cacheElements) {
+					return executeQuery(query);
+				}
+			}
+			return null;
+		}
 		if (cacheElement.isValid()) return cacheElement.content;
 		synchronized (cacheElements) {
 			return executeQuery(query);
