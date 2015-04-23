@@ -819,14 +819,15 @@ public class OAuthModelsUtils {
 		AccessToken ac = new AccessToken();
 		
 		findScope(userAccessToken, ac);
-		App app = getApp(userAccessToken.get_3cixty_app_id());
+		
+		AppCache app = TokenCacheManager.getInstance().getAppCache(userAccessToken.get_3cixty_app_id());
 		if (app == null) return null;
-		ac.setAppClientKey(app.getClientId());
-		ac.setAppClientPwd(app.getPassword());
+		ac.setAppClientKey(app.getAppClientKey());
+		ac.setAppClientPwd(app.getAppClientPwd());
 		ac.setAccess_token(userAccessToken.getAccessToken());
 		ac.setRefresh_token(userAccessToken.getRefreshToken());
 		ac.setUid(userAccessToken.getUser().getUid());
-		ac.setAppkey(app.getKey());
+		ac.setAppkey(app.getAppkey());
 		ac.setAppkeyId(app.getId());
 		return ac;
 	}
