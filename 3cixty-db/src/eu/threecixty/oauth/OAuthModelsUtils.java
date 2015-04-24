@@ -833,6 +833,9 @@ public class OAuthModelsUtils {
 		ac.setUid(userAccessToken.getUser().getUid());
 		ac.setAppkey(app.getAppkey());
 		ac.setAppkeyId(app.getId());
+		if (userAccessToken.getCreation() != null && userAccessToken.getExpiration() != null) {
+			ac.setExpires_in(userAccessToken.getExpiration() - (int) ((System.currentTimeMillis() - userAccessToken.getCreation()) / 1000));
+		}
 		return ac;
 	}
 	

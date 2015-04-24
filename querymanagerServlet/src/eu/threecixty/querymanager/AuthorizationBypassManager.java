@@ -26,6 +26,10 @@ public class AuthorizationBypassManager {
 		return appkeys.containsKey(appkey);
 	}
 	
+	public Map <String, Boolean> getAppkeys() {
+		return appkeys;
+	}
+	
 	public void load() {
 		String path = Configuration.path;
 		File file = new File(path + File.separatorChar + "WEB-INF" + File.separatorChar + "authBypass.list");

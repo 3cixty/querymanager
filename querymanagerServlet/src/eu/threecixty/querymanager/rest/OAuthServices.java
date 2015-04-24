@@ -434,7 +434,7 @@ public class OAuthServices {
 		if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
 			AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, SCOPES);
 			if (at != null) {
-				if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), SCOPES, app)) {
+				if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), SCOPES, app, at.getExpires_in())) {
 					return redirect_uri_client2(at, at.getExpires_in(), app);
 				}
 			}
@@ -473,7 +473,7 @@ public class OAuthServices {
 		        .build();
 		String uid = (String) session.getAttribute(UID_KEY);
 		// scope can be a 'null' string as its result is found in 3cixtycallback
-		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app) || uid == null) {
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app, expires_in) || uid == null) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)
@@ -556,7 +556,7 @@ public class OAuthServices {
 	        .build();
 		}
 		// scope can be a 'null' string as its result is found in 3cixtycallback
-		if (!OAuthWrappers.storeAccessTokenWithUID(_3cixtyUID, accessToken.getAccess_token(), accessToken.getRefresh_token(), scope, app)) {
+		if (!OAuthWrappers.storeAccessTokenWithUID(_3cixtyUID, accessToken.getAccess_token(), accessToken.getRefresh_token(), scope, app, accessToken.getExpires_in())) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)
