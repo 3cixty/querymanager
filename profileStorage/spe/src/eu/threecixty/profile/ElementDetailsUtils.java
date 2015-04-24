@@ -46,9 +46,10 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("?item a lode:Event . \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
-		queryBuff.append("OPTIONAL { ?item vcard2006:hasURL ?url . } \n");
-		queryBuff.append("?item dc:description ?description . \n");
+		queryBuff.append(" OPTIONAL { ?item vcard2006:hasURL ?url . } \n");
+		queryBuff.append(" OPTIONAL { ?item dc:description ?description . \n");
 		addLanguageFilter("description", languages, queryBuff);
+		queryBuff.append(" } \n");
 
 		if (categories == null) {
 			queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category . } \n");
