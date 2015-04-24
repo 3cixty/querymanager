@@ -31,6 +31,8 @@ public class UserAccessToken implements java.io.Serializable {
 	private User user;
 	//private App app;
 	private Integer _3cixty_app_id;
+	private Long creation;
+	private Integer expiration;
 	
 	private String scope;
 
@@ -99,5 +101,22 @@ public class UserAccessToken implements java.io.Serializable {
 	public void set_3cixty_app_id(Integer _3cixty_app_id) {
 		this._3cixty_app_id = _3cixty_app_id;
 	}
-	
+
+	@Column(name = "creation", nullable = true)
+	public Long getCreation() {
+		return creation;
+	}
+
+	public void setCreation(Long creation) {
+		this.creation = creation;
+	}
+
+	public Integer getExpiration() {
+		return expiration;
+	}
+
+	@Column(name = "expiration", nullable = true)
+	public void setExpiration(Integer expiration) {
+		this.expiration = expiration;
+	}
 }

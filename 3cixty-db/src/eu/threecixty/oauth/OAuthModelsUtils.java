@@ -28,6 +28,8 @@ public class OAuthModelsUtils {
 	 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 
+	 protected static final int EXPIRATION_FIXED = 60 * 60 * 24; // one day
 	
 	protected static boolean addUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
@@ -570,7 +572,7 @@ public class OAuthModelsUtils {
 	}
 
 	protected static boolean addUserAccessToken(String accessToken, String refreshToken,
-			String scope, User user, AppCache app) {
+			String scope, User user, AppCache app, int expiration) {
 		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
 		Session session = null;
 		try {
@@ -586,6 +588,8 @@ public class OAuthModelsUtils {
 			userAccessToken.setRefreshToken(refreshToken);
 			
 			userAccessToken.setScope(scope);
+			userAccessToken.setCreation(System.currentTimeMillis());
+			userAccessToken.setExpiration(expiration);
 
 			session.beginTransaction();
 
@@ -829,6 +833,9 @@ public class OAuthModelsUtils {
 		ac.setUid(userAccessToken.getUser().getUid());
 		ac.setAppkey(app.getAppkey());
 		ac.setAppkeyId(app.getId());
+		if (userAccessToken.getCreation() != null && userAccessToken.getExpiration() != null) {
+			ac.setExpires_in(userAccessToken.getExpiration() - (int) ((System.currentTimeMillis() - userAccessToken.getCreation()) / 1000));
+		}
 		return ac;
 	}
 	
@@ -850,7 +857,7 @@ public class OAuthModelsUtils {
 	}
 
 	public static boolean storeAccessTokenWithUID(String uid,
-			String accessToken, String refreshToken, String scope, AppCache app) {
+			String accessToken, String refreshToken, String scope, AppCache app, int expiration) {
 		Session session = null;
 		User user = null;
 		boolean successful = false;
@@ -877,7 +884,8 @@ public class OAuthModelsUtils {
 			userAccessToken.setUser(user);
 			userAccessToken.set_3cixty_app_id(app.getId());
 			userAccessToken.setRefreshToken(refreshToken);
-			
+			userAccessToken.setCreation(System.currentTimeMillis());
+			userAccessToken.setExpiration(expiration);
 			userAccessToken.setScope(scope);
 
 	 		session.save(userAccessToken);

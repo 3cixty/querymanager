@@ -8,9 +8,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
@@ -40,7 +40,7 @@ public class OAuthWrappers {
 			Configuration.getHttpServer() + "/" + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/authorize";
 	
 	public static final String ENDPOINT_TO_POST_ACCESS_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/token";
-	private static final String ENDPOINT_TO_VALIDATE_ACCESS_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/v1/tokeninfo?access_token=";
+	//private static final String ENDPOINT_TO_VALIDATE_ACCESS_TOKEN = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/v1/tokeninfo?access_token=";
 	
 	private static final String ENDPOINT_TO_CREATE_CLIENT_FOR_APP = ROOT_SERVER + OAUTH_SERVER_CONTEXT_NAME + "/oauth2/3cixty/createClientIdForApp";
 	
@@ -65,6 +65,7 @@ public class OAuthWrappers {
 	
 	private static final String HTTP_GET = "GET";
 	private static final String HTTP_POST = "POST";
+	private static final int EXPIRATION_FIXED = OAuthModelsUtils.EXPIRATION_FIXED;
 
 	/**
 	 * Return access token with info about expiration.
@@ -85,14 +86,18 @@ public class OAuthWrappers {
 
 		AccessToken foundInDB = OAuthModelsUtils.findTokenInfoFromDB(user, app);
 		if (foundInDB != null) {
-			// check if this access token is still available on oauth server to delete
-			AccessToken tokenInfo = tokenInfo(foundInDB.getAccess_token());
-			if (tokenInfo != null) {
-				// update expires_in
-				foundInDB.setExpires_in(tokenInfo.getExpires_in());
+			if (foundInDB.getExpires_in() > 0) {
 				TokenCacheManager.getInstance().update(foundInDB);
-			    return foundInDB;
+				return foundInDB;
 			}
+//			// check if this access token is still available on oauth server to delete
+//			AccessToken tokenInfo = tokenInfo(foundInDB.getAccess_token());
+//			if (tokenInfo != null) {
+//				// update expires_in
+//				foundInDB.setExpires_in(tokenInfo.getExpires_in());
+//				TokenCacheManager.getInstance().update(foundInDB);
+//			    return foundInDB;
+//			}
 		}
 		// delete UserAccessToken as this access token is not available on OAuth server
 		if (foundInDB != null) {
@@ -111,8 +116,8 @@ public class OAuthWrappers {
 	 * @return
 	 */
 	public static boolean storeAccessTokenWithUID(String uid, String accessToken, String refreshToken,
-			String scope, AppCache app) {
-		return OAuthModelsUtils.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app);
+			String scope, AppCache app, int expiration) {
+		return OAuthModelsUtils.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app, expiration);
 	}
 	
 	/**
@@ -199,12 +204,25 @@ public class OAuthWrappers {
 	public static AccessToken refreshAccessToken(String lastRefreshToken) {
 		AccessToken lastAccessToken = OAuthModelsUtils.findTokenInfoFromRefreshToken(lastRefreshToken);
 		if (lastAccessToken == null) return null;
-		AccessToken newAccessToken = refreshAccessTokenUsingOAuthServer(lastAccessToken);
+		String appkey = lastAccessToken.getAppkey();
+		boolean oauthServerBypassed = OAuthBypassedManager.getInstance().isFound(appkey);
+		AccessToken newAccessToken = oauthServerBypassed ?
+				refreshAccessTokenWithoutUsingOAuthServer(lastAccessToken) : refreshAccessTokenUsingOAuthServer(lastAccessToken);
 		if (newAccessToken == null) return null;
 		// update user access token as OAuth server already deleted old one
 		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(lastAccessToken, newAccessToken)) return null;
 		TokenCacheManager.getInstance().update(newAccessToken);
 		return newAccessToken;
+	}
+
+	private static AccessToken refreshAccessTokenWithoutUsingOAuthServer(
+			AccessToken lastAccessToken) {
+		AccessToken accessToken = new AccessToken();
+		accessToken.setAccess_token(UUID.randomUUID().toString());
+		accessToken.setExpires_in(EXPIRATION_FIXED);
+		accessToken.setRefresh_token(UUID.randomUUID().toString());
+		accessToken.getScopeNames().addAll(lastAccessToken.getScopeNames());
+		return accessToken;
 	}
 
 	public static AccessToken findAccessTokenFromDB(String accessToken) {
@@ -279,9 +297,11 @@ public class OAuthWrappers {
 		if (at != null) return true;
 		at = OAuthModelsUtils.findTokenInfoFromAccessToken(accessToken);
 		if (at == null) return false;
-		AccessToken atFromOAuth = tokenInfo(accessToken);
-		if (atFromOAuth == null) return false;
-		at.setExpires_in(atFromOAuth.getExpires_in());
+
+		if (at.getExpires_in() <= 0) return false;
+//		AccessToken atFromOAuth = tokenInfo(accessToken);
+//		if (atFromOAuth == null) return false;
+//		at.setExpires_in(atFromOAuth.getExpires_in());
 		TokenCacheManager.getInstance().update(at);
 		return true;
 	}
@@ -319,39 +339,39 @@ public class OAuthWrappers {
 				.concat(pwd).getBytes())));
 	}
 
-	/**
-	 * Validates a given access token with OAuth server.
-	 * <br><br>
-	 * This method only returns access token and expires_in.
-	 * @param accessToken
-	 * @return
-	 */
-	private static AccessToken tokenInfo(String accessToken) {
-
-	    String auth = "Basic ".concat(new String(Base64.encodeBase64(resourceServerKey.concat(":")
-	            .concat(resourceServerSecret).getBytes())));
-	    StringBuilder sb = new StringBuilder();
-	    makeHttpCall(ENDPOINT_TO_VALIDATE_ACCESS_TOKEN + accessToken, auth, HTTP_GET, null, sb);
-	    try {
-	    	String jsonStr = sb.toString();
-	    	JSONObject jsonObj = new JSONObject(jsonStr);
-	    	if (!jsonObj.has("expires_in")) {
-	    		return null;
-	    	}
-	    	long currentTime = Calendar.getInstance().getTimeInMillis();
-	    	long expiredTime = jsonObj.getLong("expires_in");
-	    	if (expiredTime != 0) { // 0 means infinity
-	    		if (currentTime > expiredTime) return null;
-	    	}
-	    	AccessToken tokenInfo = new AccessToken();
-	    	tokenInfo.setExpires_in((int)((expiredTime - currentTime) / 1000));
-	    	tokenInfo.setAccess_token(accessToken);
-		    return tokenInfo;
-	    } catch (JSONException e) {
-	    	e.printStackTrace();
-	    }
-	    return null;
-	}
+//	/**
+//	 * Validates a given access token with OAuth server.
+//	 * <br><br>
+//	 * This method only returns access token and expires_in.
+//	 * @param accessToken
+//	 * @return
+//	 */
+//	private static AccessToken tokenInfo(String accessToken) {
+//
+//	    String auth = "Basic ".concat(new String(Base64.encodeBase64(resourceServerKey.concat(":")
+//	            .concat(resourceServerSecret).getBytes())));
+//	    StringBuilder sb = new StringBuilder();
+//	    makeHttpCall(ENDPOINT_TO_VALIDATE_ACCESS_TOKEN + accessToken, auth, HTTP_GET, null, sb);
+//	    try {
+//	    	String jsonStr = sb.toString();
+//	    	JSONObject jsonObj = new JSONObject(jsonStr);
+//	    	if (!jsonObj.has("expires_in")) {
+//	    		return null;
+//	    	}
+//	    	long currentTime = Calendar.getInstance().getTimeInMillis();
+//	    	long expiredTime = jsonObj.getLong("expires_in");
+//	    	if (expiredTime != 0) { // 0 means infinity
+//	    		if (currentTime > expiredTime) return null;
+//	    	}
+//	    	AccessToken tokenInfo = new AccessToken();
+//	    	tokenInfo.setExpires_in((int)((expiredTime - currentTime) / 1000));
+//	    	tokenInfo.setAccess_token(accessToken);
+//		    return tokenInfo;
+//	    } catch (JSONException e) {
+//	    	e.printStackTrace();
+//	    }
+//	    return null;
+//	}
 	
 	private static String createAccessTokenUsingOAuthServer() {
 
@@ -374,7 +394,11 @@ public class OAuthWrappers {
 	}
 
 	public static AccessToken createAccessTokenForMobileApp(AppCache app, String scope) {
-	    
+	    boolean oauthServerBypassed = OAuthBypassedManager.getInstance().isFound(app.getAppkey());
+		if (oauthServerBypassed) {
+			return createAccessTokenForMobileAppWithoutUsingOAuthServer(app, scope);
+		}
+		
 	    String postParams = "grant_type=client_credentials&scope=" + scope;
 	    
 		String auth = "Basic ".concat(new String(Base64.encodeBase64(
@@ -397,6 +421,22 @@ public class OAuthWrappers {
 		return null;
 	}
 	
+	/**
+	 * Tokens created by this method don't exist on OAuth server, only exist on 3cixty DB.
+	 * @param app
+	 * @param scope
+	 * @return
+	 */
+	private static AccessToken createAccessTokenForMobileAppWithoutUsingOAuthServer(
+			AppCache app, String scope) {
+		AccessToken accessToken = new AccessToken();
+		accessToken.setAccess_token(UUID.randomUUID().toString());
+		accessToken.setExpires_in(EXPIRATION_FIXED);
+		accessToken.setRefresh_token(UUID.randomUUID().toString());
+		addScopeNames(scope, accessToken.getScopeNames());
+		return accessToken;
+	}
+
 	public static List <String> getAllRedirectUris() {
 		return OAuthModelsUtils.getAllRedirectUris();
 	}
