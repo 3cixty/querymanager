@@ -194,7 +194,7 @@ public class OAuthServices {
 				}
 			    return Response.ok(" {\"key\": \"" + appKey + "\"} ", MediaType.APPLICATION_JSON_TYPE).build();
 			} else {
-				return Response.ok(" {\"response\": \"Cannot register App on GoFlow server\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+				return Response.ok(" {\"response\": \"failed\", \"reason\": \"Cannot register App on GoFlow server\"} ", MediaType.APPLICATION_JSON_TYPE).build();
 			}
 		}
 		return Response.status(Response.Status.BAD_REQUEST)
