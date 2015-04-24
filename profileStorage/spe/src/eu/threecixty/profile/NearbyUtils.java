@@ -36,9 +36,9 @@ public class NearbyUtils {
 			filterCategories(categories, builder);
 		}
 		
-		builder.append("?event dc:description ?description .\n");
+		//builder.append("?event dc:description ?description .\n");
 		
-		addDescriptionFilter(languages, builder);
+		//addDescriptionFilter(languages, builder);
 		
 		builder.append(" ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
@@ -272,18 +272,18 @@ public class NearbyUtils {
 	}
 	*/
 	
-	private static void addDescriptionFilter(String[] languages, StringBuilder result) {
-		result.append("FILTER (");
-		int index = 0;
-		for (String language: languages) {
-			if (index > 0) {
-				result.append(" || ");
-			}
-			result.append("(lang(?description)").append(" = \"" + language + "\")");
-			index++;
-		}
-		result.append(")\n");
-	}
+//	private static void addDescriptionFilter(String[] languages, StringBuilder result) {
+//		result.append("FILTER (");
+//		int index = 0;
+//		for (String language: languages) {
+//			if (index > 0) {
+//				result.append(" || ");
+//			}
+//			result.append("(lang(?description)").append(" = \"" + language + "\")");
+//			index++;
+//		}
+//		result.append(")\n");
+//	}
 
 	/**
 	 * This method only creates PoI ID + distance.
