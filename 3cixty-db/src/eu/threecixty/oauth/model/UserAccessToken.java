@@ -5,11 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -28,21 +25,21 @@ public class UserAccessToken implements java.io.Serializable {
 	
 	private String accessToken;
 	private String refreshToken;
-	private User user;
+	//private User user;
 	//private App app;
 	private Integer _3cixty_app_id;
 	private Long creation;
 	private Integer expiration;
+	private String uid;
 	
 	private String scope;
 
 	public UserAccessToken() {
 	}
 
-	public UserAccessToken(Integer id, String accessToken, User user) {
+	public UserAccessToken(Integer id, String accessToken) {
 		this.id = id;
 		this.accessToken = accessToken;
-		this.user = user;
 	}
 	
 	@Id
@@ -72,16 +69,6 @@ public class UserAccessToken implements java.io.Serializable {
 
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
-	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "3cixty_user_id", nullable = false)
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 	@Column(name = "scope", unique = false, nullable = true, length = 64)
@@ -118,5 +105,14 @@ public class UserAccessToken implements java.io.Serializable {
 	@Column(name = "expiration", nullable = true)
 	public void setExpiration(Integer expiration) {
 		this.expiration = expiration;
+	}
+
+	@Column(name = "uid", unique = false, nullable = true, length = 50)
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 }
