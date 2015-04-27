@@ -159,10 +159,8 @@ public class UserUtils {
 
 				session.save(userModel);
 
-				convertToUserModel(profile, userModel, session);
 				profile.setModelIdInPersistentDB(userModel.getId());
 
-				session.update(userModel);
 			}
 			
 			session.getTransaction().commit();
@@ -220,16 +218,16 @@ public class UserUtils {
 		Set <String> _3cixtyUids = new HashSet <String>();
 		Session session = null;
 		try {
-			String hql = "From AccountModel A WHERE A.accountId in (:accountIds) AND A.source = :source";
+			String sql = "SELECT accountId, uid FROM 3cixty_user_profile, 3cixty_account WHERE (3cixty_user_profile.id = 3cixty_account.3cixty_user_id) AND (accountId in (:accountIds)) AND source = :source";
 			session = HibernateUtil.getSessionFactory().openSession();
-			List <?> results = session.createQuery(hql).setParameterList("accountIds",
+			@SuppressWarnings("unchecked")
+			List <Object[]> results = session.createSQLQuery(sql).setParameterList("accountIds",
 					accountIds).setParameter("source",
 							source).list();
 			List <String> accountIdsExisted = new LinkedList<String>();
-			for (Object obj: results) {
-				AccountModel accountModel = (AccountModel) obj;
-				_3cixtyUids.add(accountModel.getUserModel().getUid());
-				accountIdsExisted.add(accountModel.getAccountId());
+			for (Object [] obj: results) {
+				_3cixtyUids.add(obj[1].toString());
+				accountIdsExisted.add(obj[0].toString());
 			}
 			
 			// XXX: for cases where we cannot find the accountModel which corresponds with user profile
@@ -242,13 +240,13 @@ public class UserUtils {
 						tmpUids.add(generatedID);
 					}
 				}
-				String userModelHql = "FROM UserModel U WHERE U.uid in (:uids)";
-				List <?> userModelList = session.createQuery(userModelHql).setParameterList("uids",
+				String userModelSql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
+				List <?> userModelList = session.createSQLQuery(userModelSql).setParameterList("uids",
 						tmpUids).list();
 				for (Object obj: userModelList) {
-					UserModel userModel = (UserModel) obj;
-					_3cixtyUids.add(userModel.getUid());
-					accountIdsExisted.add(userModel.getUid().substring(2));
+					String tmpUid = obj.toString();
+					_3cixtyUids.add(tmpUid);
+					accountIdsExisted.add(tmpUid.substring(2));
 				}
 			}
 			

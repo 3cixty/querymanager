@@ -183,7 +183,13 @@ class MySQLProfileManagerImpl implements ProfileManager {
 
 	public boolean createProfiles(List<UserProfile> profiles) throws IOException,
 			UnknownException {
-		return UserUtils.createProfiles(profiles);
+		boolean successful = UserUtils.createProfiles(profiles);
+		if (successful) {
+			for (UserProfile profile: profiles) {
+				ProfileCacheManager.getInstance().put(profile);
+			}
+		}
+		return successful;
 	}
 
 	public UserProfile findUserProfile(String uid, String source, String profileImage) {

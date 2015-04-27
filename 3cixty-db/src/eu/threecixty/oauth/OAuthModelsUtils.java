@@ -28,6 +28,8 @@ public class OAuthModelsUtils {
 	 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 
+	 protected static final int EXPIRATION_FIXED = 60 * 60 * 24; // one day
 	
 	protected static boolean addUser(String uid) {
 		if (isNullOrEmpty(uid)) return false;
@@ -485,6 +487,21 @@ public class OAuthModelsUtils {
 		return apps;
 	}
 	
+	protected static App getApp(Integer id) {
+		Session session = null;
+		App app = null;
+		try {
+
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			app = (App) session.get(App.class, id);
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.close();
+		}
+		return app;
+	}
+	
 	public static List <App> getApps() {
 		List <App> apps = new ArrayList <App>();
 		Session session = null;
@@ -553,39 +570,6 @@ public class OAuthModelsUtils {
 			return null;
 		}
 	}
-
-	protected static boolean addUserAccessToken(String accessToken, String refreshToken,
-			String scope, User user, AppCache app) {
-		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
-		Session session = null;
-		try {
-			
-			session = HibernateUtil.getSessionFactory().openSession();
-
-			App tmpApp = (App) session.get(App.class, app.getId());
-			UserAccessToken userAccessToken = new UserAccessToken();
-			userAccessToken.setAccessToken(accessToken);
-			userAccessToken.setUser(user);
-			userAccessToken.setApp(tmpApp);
-			userAccessToken.setRefreshToken(refreshToken);
-			
-			userAccessToken.setScope(scope);
-
-			session.beginTransaction();
-
-			session.save(userAccessToken);
-
-			session.getTransaction().commit();
-			session.close();
-			AccessToken at = createAccessToken(userAccessToken);
-			TokenCacheManager.getInstance().update(at);
-			return true;
-		} catch (HibernateException e) {
-			LOGGER.error(e.getMessage());
-			if (session != null) session.close();
-			return false;
-		}
-	}
 	
 	protected static boolean saveOrUpdateUserAccessToken(AccessToken lastAccessToken, AccessToken newAccessToken) {
 		if (lastAccessToken == null || newAccessToken == null) return false;
@@ -625,19 +609,9 @@ public class OAuthModelsUtils {
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM UserAccessToken U WHERE U.accessToken = ?";
-			Query query = session.createQuery(hql);
-			List <?> results = query.setString(0, accessToken).list();
-			if (results.size() == 0) {
-				session.close();
-				return false;
-			}
-			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
-			userAccessToken.getUser().getUserAccessTokens().remove(userAccessToken);
-			session.beginTransaction();
-			session.delete(userAccessToken);
-
-			session.getTransaction().commit();
+			Query q = session.createQuery(
+					"DELETE UserAccessToken U WHERE U.accessToken = ?").setString(0, accessToken);
+			q.executeUpdate();
 			session.close();
 			return true;
 		} catch (HibernateException e) {
@@ -677,7 +651,7 @@ public class OAuthModelsUtils {
 			String uid = null;
 			if (results.size() > 0) {
 				UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
-				uid = userAccessToken.getUser().getUid();
+				uid = userAccessToken.getUid();
 			}
 			session.close();
 			return uid;
@@ -688,15 +662,15 @@ public class OAuthModelsUtils {
 		}
 	}
 	
-	protected static AccessToken findTokenInfoFromDB(User user, AppCache app) {
-		if (user == null || app == null) return null;
+	protected static AccessToken findTokenInfoFromDB(String uid, AppCache app) {
+		if (uid == null || app == null) return null;
 		Session session = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM UserAccessToken U WHERE U.user = ? AND U.app.id = ?";
+			String hql = "FROM UserAccessToken U WHERE U.uid = ? AND U._3cixty_app_id = ?";
 			Query query = session.createQuery(hql);
-			List <?> results = query.setEntity(0, user).setEntity(1, app.getId()).list();
+			List <?> results = query.setString(0, uid).setInteger(1, app.getId()).list();
 			if (results.size() == 0) {
 				session.close();
 				return null;
@@ -804,13 +778,18 @@ public class OAuthModelsUtils {
 		
 		findScope(userAccessToken, ac);
 		
-		ac.setAppClientKey(userAccessToken.getApp().getClientId());
-		ac.setAppClientPwd(userAccessToken.getApp().getPassword());
+		AppCache app = TokenCacheManager.getInstance().getAppCache(userAccessToken.get_3cixty_app_id());
+		if (app == null) return null;
+		ac.setAppClientKey(app.getAppClientKey());
+		ac.setAppClientPwd(app.getAppClientPwd());
 		ac.setAccess_token(userAccessToken.getAccessToken());
 		ac.setRefresh_token(userAccessToken.getRefreshToken());
-		ac.setUid(userAccessToken.getUser().getUid());
-		ac.setAppkey(userAccessToken.getApp().getKey());
-		ac.setAppkeyId(userAccessToken.getApp().getId());
+		ac.setUid(userAccessToken.getUid());
+		ac.setAppkey(app.getAppkey());
+		ac.setAppkeyId(app.getId());
+		if (userAccessToken.getCreation() != null && userAccessToken.getExpiration() != null) {
+			ac.setExpires_in(userAccessToken.getExpiration() - (int) ((System.currentTimeMillis() - userAccessToken.getCreation()) / 1000));
+		}
 		return ac;
 	}
 	
@@ -829,5 +808,38 @@ public class OAuthModelsUtils {
 	}
 	
 	private OAuthModelsUtils() {
+	}
+
+	public static boolean storeAccessTokenWithUID(String uid,
+			String accessToken, String refreshToken, String scope, AppCache app, int expiration) {
+		Session session = null;
+		boolean successful = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			session.getTransaction().begin();
+			
+			UserAccessToken userAccessToken = new UserAccessToken();
+			userAccessToken.setAccessToken(accessToken);
+			userAccessToken.setUid(uid);
+			userAccessToken.set_3cixty_app_id(app.getId());
+			userAccessToken.setRefreshToken(refreshToken);
+			userAccessToken.setCreation(System.currentTimeMillis());
+			userAccessToken.setExpiration(expiration);
+			userAccessToken.setScope(scope);
+
+	 		session.save(userAccessToken);
+	 		session.getTransaction().commit();
+
+			AccessToken at = createAccessToken(userAccessToken);
+			TokenCacheManager.getInstance().update(at);
+	
+			successful = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
 	}
 }

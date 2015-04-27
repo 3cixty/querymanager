@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebListener;
 import eu.threecixty.Configuration;
 import eu.threecixty.CrawlerCron.CrawlerCron;
 import eu.threecixty.cache.CacheManager;
+import eu.threecixty.oauth.OAuthBypassedManager;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.GoFlowServer;
 import eu.threecixty.profile.RdfFileManager;
@@ -45,6 +46,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    OAuthWrappers.addScopesByDefault();
 	    
 	    AuthorizationBypassManager.getInstance().load();
+	    OAuthBypassedManager.getInstance().addAppKeys(AuthorizationBypassManager.getInstance().getAppkeys());
 	    
 	    // create timer for crawling Mobidot information
 	    CrawlerCron crawlerCron = new CrawlerCron();

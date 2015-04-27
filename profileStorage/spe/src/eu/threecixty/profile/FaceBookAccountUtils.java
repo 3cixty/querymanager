@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,9 +27,14 @@ public class FaceBookAccountUtils {
 	private static final String FACEBOOK_FRIENDS_PREFIX = "https://graph.facebook.com/v2.2/me/friends?fields=id&format=json&method=get&pretty=0&suppress_http_code=1&access_token=";
 
 	public static final String FACEBOOK_SOURCE = "Facebook";
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 FaceBookAccountUtils.class.getName());
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	public static String getUID(String accessToken, int width, int height) {
 		if (accessToken == null) return "";
+		long time1 = System.currentTimeMillis();
 		try {
 			String content = Utils.readUrl(FACE_BOOK_ACCESS_TOKEN_VALIDATION + accessToken);
 			if (content == null) return null;
@@ -54,33 +60,38 @@ public class FaceBookAccountUtils {
 			} else {
 				_3cixtyUID = profile.getHasUID();
 			}
-			
-			if (picture != null) profile.setProfileImage(picture);
-			Name name = new Name();
-			profile.setHasName(name);
-			name.setGivenName(firstName);
-			name.setFamilyName(lastName);
+			boolean generalInfoModified = Utils.checkNameAndProfileImageModified(profile, firstName, lastName, picture);
+			if (generalInfoModified) {
+				if (picture != null) profile.setProfileImage(picture);
+				Name name = new Name();
+				profile.setHasName(name);
+				name.setGivenName(firstName);
+				name.setFamilyName(lastName);
+			}
 
+			List <String> fUIDsFromFriends = new LinkedList<String>();
+			findFacebookUidsFromFriends(FACEBOOK_FRIENDS_PREFIX, accessToken, fUIDsFromFriends);
+			long time2 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to get info + friends list from Facebook server: " + (time2 - time1) + " ms");
+			
+			
+			Set <String> knows = Utils.getOrCreate3cixtyUIDsForKnows(fUIDsFromFriends, FACEBOOK_SOURCE);
+			boolean knowsModified = Utils.checkKnowsModified(profile, knows);
+			if (knowsModified) profile.setKnows(knows);
+			
 			Set <ProfileIdentities> profileIdentities = null;
 			if (profile.getHasProfileIdenties() == null) {
 				profileIdentities = new HashSet <ProfileIdentities>();
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
-			
-			Utils.setProfileIdentities(_3cixtyUID, uid, FACEBOOK_SOURCE, profileIdentities);
-			
-			List <String> fUIDsFromFriends = new LinkedList<String>();
-			
-			findFacebookUidsFromFriends(FACEBOOK_FRIENDS_PREFIX, accessToken, fUIDsFromFriends);
-			
-			Set <String> knows = Utils.getOrCreate3cixtyUIDsForKnows(fUIDsFromFriends, FACEBOOK_SOURCE);
-
-			profile.setKnows(knows);
+			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, uid, FACEBOOK_SOURCE);
+			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, uid, FACEBOOK_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			
-			ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
-			
+			if (generalInfoModified || knowsModified || profileIdentitiesModified) ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+			long time3 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time2) + " ms");
 			return _3cixtyUID;
 		} catch (Exception e) {
 			e.printStackTrace();

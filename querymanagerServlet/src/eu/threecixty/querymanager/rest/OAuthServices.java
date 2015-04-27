@@ -21,6 +21,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,6 +42,12 @@ import eu.threecixty.querymanager.filter.DynamicCORSFilter;
 
 @Path("/" + Constants.VERSION_2)
 public class OAuthServices {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 OAuthServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private static final String ID_PATTERN = "^[a-z_A-Z0-9:\\-]*$";
 	
@@ -77,7 +84,7 @@ public class OAuthServices {
 						.build();
 			}
 			return Response.status(Response.Status.BAD_REQUEST)
-					.entity(" {\"response\": \"failed\"} ")
+					.entity(" {\"response\": \"failed\", \"reason\": \"Access token is invalid\"} ")
 					.type(MediaType.APPLICATION_JSON_TYPE)
 					.build();
 		} else {
@@ -92,6 +99,7 @@ public class OAuthServices {
 	@Path("/getAccessToken")
 	public Response getAccessToken(@HeaderParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey,
 			@DefaultValue("") @HeaderParam("scope") String scope) {
+		long startTime = System.currentTimeMillis();
 		if (!AuthorizationBypassManager.getInstance().isFound(appkey))
 			return Response.status(Response.Status.UNAUTHORIZED).entity(
 					" {\"response\": \"failed\", \"reason\": \"App key is not allowed to get access token\"} ").type(
@@ -102,13 +110,18 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		String _3cixtyUid = GoogleAccountUtils.getUID(g_access_token);
+		long time1 = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Time to extract Google info: " + (time1 - startTime) + " ms");
 		if (_3cixtyUid == null || _3cixtyUid.equals(""))
 			return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Google access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 
-		return getAccessTokenFromUid(_3cixtyUid, app, scope);
+		Response response = getAccessTokenFromUid(_3cixtyUid, app, scope);
+		long endTime = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Total time generate 3cixty access token: " + (endTime - startTime) + " ms");
+		return response;
 	}
 	
 	@GET
@@ -118,6 +131,7 @@ public class OAuthServices {
 			@DefaultValue("") @HeaderParam("scope") String scope,
 			@DefaultValue("50") @QueryParam("width") int width,
 			@DefaultValue("50") @QueryParam("height") int height) {
+		long startTime = System.currentTimeMillis();
 		if (!AuthorizationBypassManager.getInstance().isFound(appkey))
 			return Response.status(Response.Status.UNAUTHORIZED).entity(
 					" {\"response\": \"failed\", \"reason\": \"App key is not allowed to get access token\"} ").type(
@@ -133,8 +147,14 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"Facebook access token is invalid or expired\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
+		long time1 = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Time to extract Facebook info: " + (time1 - startTime) + " ms");
 
-		return getAccessTokenFromUid(_3cixtyUid, app, scope);
+		Response response = getAccessTokenFromUid(_3cixtyUid, app, scope);
+		long endTime = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Total time generate 3cixty access token: " + (endTime - startTime) + " ms");
+		return response;
+
 	}
 
 	@GET
@@ -142,7 +162,7 @@ public class OAuthServices {
 	public Response getAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid,
 			@QueryParam("appname") String appname,
 			@DefaultValue("") @QueryParam("description") String desc, @QueryParam("category") String cat,
-			@QueryParam("scopeName") List<String> scopeNames,
+			@DefaultValue("") @QueryParam("scopeName") List<String> scopeNames,
 			@DefaultValue("")@QueryParam("redirect_uri") String redirect_uri,
 			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
 		//thumbNailUrl
@@ -174,7 +194,7 @@ public class OAuthServices {
 				}
 			    return Response.ok(" {\"key\": \"" + appKey + "\"} ", MediaType.APPLICATION_JSON_TYPE).build();
 			} else {
-				return Response.ok(" {\"response\": \"Cannot register App on GoFlow server\"} ", MediaType.APPLICATION_JSON_TYPE).build();
+				return Response.ok(" {\"response\": \"failed\", \"reason\": \"Cannot register App on GoFlow server\"} ", MediaType.APPLICATION_JSON_TYPE).build();
 			}
 		}
 		return Response.status(Response.Status.BAD_REQUEST)
@@ -414,7 +434,7 @@ public class OAuthServices {
 		if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
 			AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, SCOPES);
 			if (at != null) {
-				if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), SCOPES, app)) {
+				if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), SCOPES, app, at.getExpires_in())) {
 					return redirect_uri_client2(at, at.getExpires_in(), app);
 				}
 			}
@@ -453,7 +473,7 @@ public class OAuthServices {
 		        .build();
 		String uid = (String) session.getAttribute(UID_KEY);
 		// scope can be a 'null' string as its result is found in 3cixtycallback
-		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app) || uid == null) {
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken, refreshToken, scope, app, expires_in) || uid == null) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)
@@ -525,7 +545,10 @@ public class OAuthServices {
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
+		long startTime = System.currentTimeMillis();
 		AccessToken accessToken = OAuthWrappers.createAccessTokenForMobileApp(app, scope);
+		long endTime = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Time to create access token on OAuth server: " + (endTime - startTime) + " ms");
 		if (accessToken == null) {
 			return Response.status(Response.Status.BAD_REQUEST)
 	        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
@@ -533,7 +556,7 @@ public class OAuthServices {
 	        .build();
 		}
 		// scope can be a 'null' string as its result is found in 3cixtycallback
-		if (!OAuthWrappers.storeAccessTokenWithUID(_3cixtyUID, accessToken.getAccess_token(), accessToken.getRefresh_token(), scope, app)) {
+		if (!OAuthWrappers.storeAccessTokenWithUID(_3cixtyUID, accessToken.getAccess_token(), accessToken.getRefresh_token(), scope, app, accessToken.getExpires_in())) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Internal errors\"} ")
 			        .type(MediaType.APPLICATION_JSON_TYPE)

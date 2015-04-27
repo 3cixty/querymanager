@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.profile.oldmodels.Name;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
@@ -132,6 +133,52 @@ public class Utils {
 		attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
 		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
 		return attrs;
+	}
+	
+	protected static boolean checkProfileIdentitiesModified(
+			Set<ProfileIdentities> profileIdentities, String user_id,
+			String source) {
+		boolean found = false;
+		for (ProfileIdentities pi: profileIdentities) {
+			if (user_id.equals(pi.getHasUserAccountID())) {
+				found = true;
+				break;
+			}
+		}
+		return !found;
+	}
+
+	protected static boolean checkKnowsModified(UserProfile profile,
+			Set<String> knows) {
+		Set <String> originalKnows = profile.getKnows();
+		if (originalKnows == null || originalKnows.size() == 0) {
+			if (knows != null && knows.size() > 0) return true;
+			else return false;
+		}
+		if (knows == null || knows.size() == 0) return true;
+		if (knows.size() != originalKnows.size()) return true;
+		if (knows.containsAll(originalKnows)) return false;
+		return true;
+	}
+
+	protected static boolean checkNameAndProfileImageModified(UserProfile profile,
+			String firstName, String lastName, String profileImage) {
+		Name name = profile.getHasName();
+		if (name == null) return true;
+		boolean unmodified = isSameString(firstName, name.getGivenName()) && isSameString(lastName, name.getFamilyName())
+				&& isSameString(profileImage, profile.getProfileImage());
+		return !unmodified;
+	}
+	
+	private static boolean isSameString(String str1, String str2) {
+		if (str1 == null) {
+			if (str2 != null) return false;
+		} else if (str2 == null) {
+			if (str1 != null) return false;
+		} else {
+			return str1.equals(str2);
+		}
+		return true;
 	}
 	
 	private Utils() {
