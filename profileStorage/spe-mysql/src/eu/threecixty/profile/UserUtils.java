@@ -159,10 +159,8 @@ public class UserUtils {
 
 				session.save(userModel);
 
-				convertToUserModel(profile, userModel, session);
 				profile.setModelIdInPersistentDB(userModel.getId());
 
-				session.update(userModel);
 			}
 			
 			session.getTransaction().commit();
