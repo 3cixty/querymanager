@@ -283,9 +283,6 @@ public class OAuthWrappers {
 		if (at == null) return false;
 
 		if (at.getExpires_in() <= 0) return false;
-//		AccessToken atFromOAuth = tokenInfo(accessToken);
-//		if (atFromOAuth == null) return false;
-//		at.setExpires_in(atFromOAuth.getExpires_in());
 		TokenCacheManager.getInstance().update(at);
 		return true;
 	}
