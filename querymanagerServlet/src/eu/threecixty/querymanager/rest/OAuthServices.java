@@ -84,7 +84,7 @@ public class OAuthServices {
 						.build();
 			}
 			return Response.status(Response.Status.BAD_REQUEST)
-					.entity(" {\"response\": \"failed\"} ")
+					.entity(" {\"response\": \"failed\", \"reason\": \"Access token is invalid\"} ")
 					.type(MediaType.APPLICATION_JSON_TYPE)
 					.build();
 		} else {
@@ -162,7 +162,7 @@ public class OAuthServices {
 	public Response getAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid,
 			@QueryParam("appname") String appname,
 			@DefaultValue("") @QueryParam("description") String desc, @QueryParam("category") String cat,
-			@QueryParam("scopeName") List<String> scopeNames,
+			@DefaultValue("") @QueryParam("scopeName") List<String> scopeNames,
 			@DefaultValue("")@QueryParam("redirect_uri") String redirect_uri,
 			@DefaultValue("")@QueryParam("thumbNailUrl") String thumbNailUrl) {
 		//thumbNailUrl
