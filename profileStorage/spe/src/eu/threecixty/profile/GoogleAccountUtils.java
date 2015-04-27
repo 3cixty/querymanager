@@ -28,6 +28,7 @@ public class GoogleAccountUtils {
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 GoogleAccountUtils.class.getName());
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 //	/**
 //	 * Validates a given access token, 
@@ -78,6 +79,7 @@ public class GoogleAccountUtils {
 			// due to error asked by Christian
 //			String reqMsg = readUrl(
 //					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
+			long time1 = System.currentTimeMillis();
 			String reqMsg = Utils.readUrl(
 					"https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken);
 			JSONObject json = new JSONObject(reqMsg);
@@ -103,10 +105,12 @@ public class GoogleAccountUtils {
 			profile.setHasName(name);
 			name.setGivenName(givenName);
 			name.setFamilyName(familyName);
-			
+			long time2 = 0;
 			try {
 				
 				List <String> googleUidsOfFriends = getGoogleUidsOfFriends(accessToken);
+				time2 = System.currentTimeMillis();
+				if (DEBUG_MOD) LOGGER.info("Time to get info + friends list from Google server: " + (time2 - time1) + " ms");
 
 				Set<String> knows = Utils.getOrCreate3cixtyUIDsForKnows(googleUidsOfFriends, GOOGLE_SOURCE);
 				
@@ -136,7 +140,8 @@ public class GoogleAccountUtils {
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			
 			ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
-			
+			long time3 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time2) + " ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOGGER.error(e.getMessage());
