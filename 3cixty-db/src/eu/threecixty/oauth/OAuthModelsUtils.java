@@ -668,7 +668,7 @@ public class OAuthModelsUtils {
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM UserAccessToken U WHERE U.uid = ? AND U.app.id = ?";
+			String hql = "FROM UserAccessToken U WHERE U.uid = ? AND U._3cixty_app_id = ?";
 			Query query = session.createQuery(hql);
 			List <?> results = query.setString(0, uid).setInteger(1, app.getId()).list();
 			if (results.size() == 0) {
