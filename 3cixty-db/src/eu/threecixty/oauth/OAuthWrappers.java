@@ -22,7 +22,6 @@ import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.oauth.model.App;
 import eu.threecixty.oauth.model.Developer;
 import eu.threecixty.oauth.model.Scope;
-import eu.threecixty.oauth.model.User;
 import eu.threecixty.oauth.utils.ResourceServerUtils;
 import eu.threecixty.oauth.utils.ScopeUtils;
 
@@ -76,28 +75,13 @@ public class OAuthWrappers {
 	public static AccessToken findAccessToken(String uid, AppCache app) {
 		AccessToken at = TokenCacheManager.getInstance().getAccessTokenFrom(uid, app.getAppkey());
 		if (at != null) return at;
-		User user = OAuthModelsUtils.getUser(uid);
-		if (user == null) {
-			// create user in database to map with access tokens created by oauth server
-			if (!OAuthModelsUtils.addUser(uid)) return null;
-			user = OAuthModelsUtils.getUser(uid);
-			if (user == null) return null;
-		}
 
-		AccessToken foundInDB = OAuthModelsUtils.findTokenInfoFromDB(user, app);
+		AccessToken foundInDB = OAuthModelsUtils.findTokenInfoFromDB(uid, app);
 		if (foundInDB != null) {
 			if (foundInDB.getExpires_in() > 0) {
 				TokenCacheManager.getInstance().update(foundInDB);
 				return foundInDB;
 			}
-//			// check if this access token is still available on oauth server to delete
-//			AccessToken tokenInfo = tokenInfo(foundInDB.getAccess_token());
-//			if (tokenInfo != null) {
-//				// update expires_in
-//				foundInDB.setExpires_in(tokenInfo.getExpires_in());
-//				TokenCacheManager.getInstance().update(foundInDB);
-//			    return foundInDB;
-//			}
 		}
 		// delete UserAccessToken as this access token is not available on OAuth server
 		if (foundInDB != null) {

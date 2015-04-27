@@ -700,15 +700,15 @@ public class OAuthModelsUtils {
 		}
 	}
 	
-	protected static AccessToken findTokenInfoFromDB(User user, AppCache app) {
-		if (user == null || app == null) return null;
+	protected static AccessToken findTokenInfoFromDB(String uid, AppCache app) {
+		if (uid == null || app == null) return null;
 		Session session = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String hql = "FROM UserAccessToken U WHERE U.user = ? AND U.app.id = ?";
+			String hql = "FROM UserAccessToken U WHERE U.uid = ? AND U.app.id = ?";
 			Query query = session.createQuery(hql);
-			List <?> results = query.setEntity(0, user).setEntity(1, app.getId()).list();
+			List <?> results = query.setString(0, uid).setInteger(1, app.getId()).list();
 			if (results.size() == 0) {
 				session.close();
 				return null;
