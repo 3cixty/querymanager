@@ -240,7 +240,7 @@ public class UserUtils {
 						tmpUids.add(generatedID);
 					}
 				}
-				String userModelHql = "SELECT uid FROM UserModel U WHERE U.uid in (:uids)";
+				String userModelHql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
 				@SuppressWarnings("unchecked")
 				List <Object[]> userModelList = session.createSQLQuery(userModelHql).setParameterList("uids",
 						tmpUids).list();
