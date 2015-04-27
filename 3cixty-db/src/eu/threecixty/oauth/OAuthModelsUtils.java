@@ -570,44 +570,6 @@ public class OAuthModelsUtils {
 			return null;
 		}
 	}
-
-	/*
-	protected static boolean addUserAccessToken(String accessToken, String refreshToken,
-			String scope, User user, AppCache app, int expiration) {
-		if (isNullOrEmpty(accessToken) || user == null || app == null) return false;
-		Session session = null;
-		try {
-			
-			session = HibernateUtil.getSessionFactory().openSession();
-
-			//App tmpApp = (App) session.get(App.class, app.getId());
-			UserAccessToken userAccessToken = new UserAccessToken();
-			userAccessToken.setAccessToken(accessToken);
-			userAccessToken.setUser(user);
-			//userAccessToken.setApp(tmpApp);
-			userAccessToken.set_3cixty_app_id(app.getId());
-			userAccessToken.setRefreshToken(refreshToken);
-			
-			userAccessToken.setScope(scope);
-			userAccessToken.setCreation(System.currentTimeMillis());
-			userAccessToken.setExpiration(expiration);
-
-			session.beginTransaction();
-
-			session.save(userAccessToken);
-
-			session.getTransaction().commit();
-			session.close();
-			AccessToken at = createAccessToken(userAccessToken);
-			TokenCacheManager.getInstance().update(at);
-			return true;
-		} catch (HibernateException e) {
-			LOGGER.error(e.getMessage());
-			if (session != null) session.close();
-			return false;
-		}
-	}
-	*/
 	
 	protected static boolean saveOrUpdateUserAccessToken(AccessToken lastAccessToken, AccessToken newAccessToken) {
 		if (lastAccessToken == null || newAccessToken == null) return false;
