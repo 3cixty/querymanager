@@ -218,10 +218,10 @@ public class UserUtils {
 		Set <String> _3cixtyUids = new HashSet <String>();
 		Session session = null;
 		try {
-			String sql = "SELECT accountId, uid FROM 3cixty_user_profile, 3cixty_account WHERE (3cixty_user_profile.id = 3cixty_user_id) AND (accountId in (:accountIds)) AND source = :source";
+			String sql = "SELECT accountId, uid FROM 3cixty_user_profile, 3cixty_account WHERE (3cixty_user_profile.id = 3cixty_account.3cixty_user_id) AND (accountId in (:accountIds)) AND source = :source";
 			session = HibernateUtil.getSessionFactory().openSession();
 			@SuppressWarnings("unchecked")
-			List <Object[]> results = session.createQuery(sql).setParameterList("accountIds",
+			List <Object[]> results = session.createSQLQuery(sql).setParameterList("accountIds",
 					accountIds).setParameter("source",
 							source).list();
 			List <String> accountIdsExisted = new LinkedList<String>();
