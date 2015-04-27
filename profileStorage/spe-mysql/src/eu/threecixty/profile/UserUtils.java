@@ -241,11 +241,10 @@ public class UserUtils {
 					}
 				}
 				String userModelHql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
-				@SuppressWarnings("unchecked")
-				List <Object[]> userModelList = session.createSQLQuery(userModelHql).setParameterList("uids",
+				List <?> userModelList = session.createSQLQuery(userModelHql).setParameterList("uids",
 						tmpUids).list();
-				for (Object[] obj: userModelList) {
-					String tmpUid = obj[0].toString();
+				for (Object obj: userModelList) {
+					String tmpUid = obj.toString();
 					_3cixtyUids.add(tmpUid);
 					accountIdsExisted.add(tmpUid.substring(2));
 				}
