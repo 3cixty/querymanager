@@ -99,12 +99,15 @@ public class GoogleAccountUtils {
 			} else {
 				_3cixtyUID = profile.getHasUID();
 			}
-						
-			profile.setProfileImage(picture);
-			Name name = new Name();
-			profile.setHasName(name);
-			name.setGivenName(givenName);
-			name.setFamilyName(familyName);
+			boolean generalInfoModified = checkNameAndProfileImageModified(profile, givenName, familyName, picture);
+			if (generalInfoModified) {
+				profile.setProfileImage(picture);
+				Name name = new Name();
+				profile.setHasName(name);
+				name.setGivenName(givenName);
+				name.setFamilyName(familyName);
+			}
+			boolean knowsModified = false;
 			long time2 = 0;
 			try {
 				
@@ -122,8 +125,8 @@ public class GoogleAccountUtils {
 						knows.add(animesh3cixtyUID);
 					}
 				}
-				
-				profile.setKnows(knows);
+				knowsModified = checkKnowsModified(profile, knows);
+				if (knowsModified) profile.setKnows(knows);
 			} catch (Exception ex) {
 				LOGGER.error(ex.getMessage());
 				//return null; // TI's code isn't able to get friends list
@@ -135,11 +138,12 @@ public class GoogleAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			Utils.setProfileIdentities(_3cixtyUID, user_id, GOOGLE_SOURCE, profileIdentities);
+			boolean profileIdentitiesModified = checkProfileIdentitiesModified(profileIdentities, user_id, GOOGLE_SOURCE);
+			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, user_id, GOOGLE_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			
-			ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+			if (generalInfoModified || knowsModified || profileIdentitiesModified) ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 			long time3 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time2) + " ms");
 		} catch (Exception e) {
@@ -148,6 +152,41 @@ public class GoogleAccountUtils {
 		}
 		if (_3cixtyUID == null) return "";
 		return _3cixtyUID;
+	}
+	
+	private static boolean checkProfileIdentitiesModified(
+			Set<ProfileIdentities> profileIdentities, String user_id,
+			String source) {
+		boolean found = false;
+		for (ProfileIdentities pi: profileIdentities) {
+			if (user_id.equals(pi.getHasUserAccountID())) {
+				found = true;
+				break;
+			}
+		}
+		return !found;
+	}
+
+	private static boolean checkKnowsModified(UserProfile profile,
+			Set<String> knows) {
+		Set <String> originalKnows = profile.getKnows();
+		if (originalKnows == null || originalKnows.size() == 0) {
+			if (knows != null && knows.size() > 0) return true;
+			else return false;
+		}
+		if (knows == null || knows.size() == 0) return true;
+		if (knows.size() != originalKnows.size()) return true;
+		if (knows.containsAll(originalKnows)) return false;
+		return true;
+	}
+
+	private static boolean checkNameAndProfileImageModified(UserProfile profile,
+			String firstName, String lastName, String profileImage) {
+		Name name = profile.getHasName();
+		if (name == null) return true;
+		boolean unmodified = isSameString(firstName, name.getGivenName()) && isSameString(lastName, name.getFamilyName())
+				&& isSameString(profileImage, profile.getProfileImage());
+		return !unmodified;
 	}
 	
 	private static List <String> getGoogleUidsOfFriends(String accessToken) throws Exception {
@@ -198,6 +237,16 @@ public class GoogleAccountUtils {
 		return 0;
 	}
 
+	private static boolean isSameString(String str1, String str2) {
+		if (str1 == null) {
+			if (str2 != null) return false;
+		} else if (str2 == null) {
+			if (str1 != null) return false;
+		} else {
+			return str1.equals(str2);
+		}
+		return true;
+	}
 
 	
 	private GoogleAccountUtils() {
