@@ -240,13 +240,14 @@ public class UserUtils {
 						tmpUids.add(generatedID);
 					}
 				}
-				String userModelHql = "FROM UserModel U WHERE U.uid in (:uids)";
-				List <?> userModelList = session.createQuery(userModelHql).setParameterList("uids",
+				String userModelHql = "SELECT uid FROM UserModel U WHERE U.uid in (:uids)";
+				@SuppressWarnings("unchecked")
+				List <Object[]> userModelList = session.createSQLQuery(userModelHql).setParameterList("uids",
 						tmpUids).list();
-				for (Object obj: userModelList) {
-					UserModel userModel = (UserModel) obj;
-					_3cixtyUids.add(userModel.getUid());
-					accountIdsExisted.add(userModel.getUid().substring(2));
+				for (Object[] obj: userModelList) {
+					String tmpUid = obj[0].toString();
+					_3cixtyUids.add(tmpUid);
+					accountIdsExisted.add(tmpUid.substring(2));
 				}
 			}
 			
