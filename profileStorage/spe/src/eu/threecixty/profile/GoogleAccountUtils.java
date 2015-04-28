@@ -24,8 +24,6 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
  */
 public class GoogleAccountUtils {
 	
-	public static final String GOOGLE_SOURCE = "Google";
-	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 GoogleAccountUtils.class.getName());
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
@@ -91,7 +89,7 @@ public class GoogleAccountUtils {
 			String picture = json.getString("picture");
 			
 			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(
-					user_id, GOOGLE_SOURCE, picture);
+					user_id, SPEConstants.GOOGLE_SOURCE, picture);
 			if (profile == null) {
 				_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
 				profile = new UserProfile();
@@ -107,30 +105,7 @@ public class GoogleAccountUtils {
 				name.setGivenName(givenName);
 				name.setFamilyName(familyName);
 			}
-			boolean knowsModified = false;
-			long time2 = 0;
-			try {
-				
-				List <String> googleUidsOfFriends = getGoogleUidsOfFriends(accessToken);
-				time2 = System.currentTimeMillis();
-				if (DEBUG_MOD) LOGGER.info("Time to get info + friends list from Google server: " + (time2 - time1) + " ms");
 
-				Set<String> knows = Utils.getOrCreate3cixtyUIDsForKnows(googleUidsOfFriends, GOOGLE_SOURCE);
-				
-				// hack for Tony
-				if (user_id.contains("117895882057702509461")) {
-					String animesh3cixtyUID = ProfileManagerImpl.getInstance().find3cixtyUID(
-							"103411760688868522737", GOOGLE_SOURCE, null);
-					if (!knows.contains(animesh3cixtyUID)) { // does not know Animesh
-						knows.add(animesh3cixtyUID);
-					}
-				}
-				knowsModified = Utils.checkKnowsModified(profile, knows);
-				if (knowsModified) profile.setKnows(knows);
-			} catch (Exception ex) {
-				LOGGER.error(ex.getMessage());
-				//return null; // TI's code isn't able to get friends list
-			}
 
 			Set <ProfileIdentities> profileIdentities = null;
 			if (profile.getHasProfileIdenties() == null) {
@@ -138,14 +113,19 @@ public class GoogleAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, user_id, GOOGLE_SOURCE);
-			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, user_id, GOOGLE_SOURCE, profileIdentities);
+			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, user_id, SPEConstants.GOOGLE_SOURCE);
+			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, user_id, SPEConstants.GOOGLE_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			
-			if (generalInfoModified || knowsModified || profileIdentitiesModified) ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+			if (generalInfoModified || profileIdentitiesModified) {
+				boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+				if (successful) {
+					updateKnows(accessToken, user_id, profile);
+				}
+			} else updateKnows(accessToken, user_id, profile);
 			long time3 = System.currentTimeMillis();
-			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time2) + " ms");
+			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time1) + " ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOGGER.error(e.getMessage());
@@ -154,7 +134,13 @@ public class GoogleAccountUtils {
 		return _3cixtyUID;
 	}
 	
-	private static List <String> getGoogleUidsOfFriends(String accessToken) throws Exception {
+	private static void updateKnows(String accessToken, String user_id,
+			UserProfile profile) {
+		KnowsPersistence persistence = new KnowsPersistence(accessToken, SPEConstants.GOOGLE_SOURCE, user_id, profile);
+		PersistenceWorkerManager.getInstance().add(persistence);
+	}
+
+	protected static List <String> getGoogleUidsOfFriends(String accessToken) throws Exception {
 		String nextPageToken = null;
 		List <String> googleUidsOfFriends = new LinkedList <String>();
 
