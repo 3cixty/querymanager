@@ -192,7 +192,7 @@ public class UserUtils {
 			session = HibernateUtil.getSessionFactory().openSession();
 			List <?> results = session.createQuery(hql).setParameterList("uids",
 					_3cixtyUids).setParameter("source",
-							GoogleAccountUtils.GOOGLE_SOURCE).list();
+							SPEConstants.GOOGLE_SOURCE).list();
 			for (Object obj: results) {
 				AccountModel accountModel = (AccountModel) obj;
 				googleUids.add(accountModel.getAccountId());
@@ -236,7 +236,7 @@ public class UserUtils {
 				for (String accountId: accountIds) {
 					if (!accountIdsExisted.contains(accountId)) {
 						String generatedID = Utils.gen3cixtyUID(accountId,
-								GoogleAccountUtils.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
+								SPEConstants.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
 						tmpUids.add(generatedID);
 					}
 				}
@@ -276,7 +276,7 @@ public class UserUtils {
 		Session session = null;
 		UserProfile userProfile = null;
 		try {
-			String tmpUid = Utils.gen3cixtyUID(uid, source.equals(GoogleAccountUtils.GOOGLE_SOURCE)
+			String tmpUid = Utils.gen3cixtyUID(uid, source.equals(SPEConstants.GOOGLE_SOURCE)
 					? UidSource.GOOGLE : UidSource.FACEBOOK);
 			session = HibernateUtil.getSessionFactory().openSession();
 
@@ -370,7 +370,7 @@ public class UserUtils {
 		if (!isNullOrEmpty(userProfile.getHasLastCrawlTime())) {
 			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
 		}
-		convertKnowsForPersistence(userProfile, userModel);
+		//convertKnowsForPersistence(userProfile, userModel);
 		convertAccountsForPersistence(userProfile, userModel, session);
 		convertAccompanyingsForPersistence(userProfile, userModel, session);
 	}
@@ -459,9 +459,8 @@ public class UserUtils {
 		return false;
 	}
 
-	private static void convertKnowsForPersistence(UserProfile userProfile,
+	private static void convertKnowsForPersistence(Set <String> knowsStrs,
 			UserModel userModel) {
-		Set <String> knowsStrs = userProfile.getKnows();
 		if (knowsStrs == null || knowsStrs.size() == 0) userModel.setKnows(null);
 		else {
 			Set <String> knowsModel = userModel.getKnows();
@@ -650,5 +649,35 @@ public class UserUtils {
 			if (session != null) session.close();
 		}
 		return mappings;
+	}
+
+	public static boolean updateKnows(UserProfile profile, Set<String> knows) {
+		Session session = null;
+		boolean successful = false;
+		try {
+			
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			UserModel userModel = (UserModel) session.get(UserModel.class,
+					profile.getModelIdInPersistentDB());
+			
+			session.beginTransaction();
+		
+			profile.setKnows(knows);
+			convertKnowsForPersistence(knows, userModel);
+			
+			session.update(userModel);
+
+			session.getTransaction().commit();
+
+			profile.setKnows(knows);
+			successful = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			if (session != null) session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
 	}
 }

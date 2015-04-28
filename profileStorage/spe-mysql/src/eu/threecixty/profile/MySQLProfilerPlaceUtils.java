@@ -186,7 +186,7 @@ public class MySQLProfilerPlaceUtils {
 	
 	private static String getGoogleUID(UserProfile userProfile) {
 		for (ProfileIdentities pi: userProfile.getHasProfileIdenties()) {
-			if (pi.getHasSourceCarrier().equals(GoogleAccountUtils.GOOGLE_SOURCE))
+			if (pi.getHasSourceCarrier().equals(SPEConstants.GOOGLE_SOURCE))
 				return pi.getHasUserAccountID();
 		}
 		return null;
