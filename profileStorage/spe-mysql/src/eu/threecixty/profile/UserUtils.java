@@ -663,7 +663,6 @@ public class UserUtils {
 			
 			session.beginTransaction();
 		
-			profile.setKnows(knows);
 			convertKnowsForPersistence(knows, userModel);
 			
 			session.update(userModel);
