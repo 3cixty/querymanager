@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.profile.elements;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -11,6 +11,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import eu.threecixty.profile.Review;
+import eu.threecixty.profile.SparqlEndPointUtils;
 
 /**
  * This is a utility class to get a list of events or PoIs in details as requested by TI team.

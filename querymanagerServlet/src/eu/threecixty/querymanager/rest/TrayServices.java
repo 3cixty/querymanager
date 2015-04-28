@@ -28,15 +28,15 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.profile.ElementDetails;
-import eu.threecixty.profile.ElementDetailsUtils;
 import eu.threecixty.profile.InvalidTrayElement;
-import eu.threecixty.profile.LanguageUtils;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.RestTrayObject;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.Tray.OrderType;
+import eu.threecixty.profile.elements.ElementDetails;
+import eu.threecixty.profile.elements.ElementDetailsUtils;
+import eu.threecixty.profile.elements.LanguageUtils;
 
 /**
  * This class is an end point to expose Rest TrayAPIs to other components.

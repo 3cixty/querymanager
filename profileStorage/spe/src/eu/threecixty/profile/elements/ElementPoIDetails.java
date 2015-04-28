@@ -1,6 +1,8 @@
-package eu.threecixty.profile;
+package eu.threecixty.profile.elements;
 
 import java.util.List;
+
+import eu.threecixty.profile.Review;
 
 public class ElementPoIDetails extends ElementDetails {
 	private String telephone;

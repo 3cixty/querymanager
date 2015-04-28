@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.profile.elements;
 
 public class ElementEventDetails extends ElementDetails {
 
