@@ -11,6 +11,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import eu.threecixty.oauth.OAuthWrappers;
@@ -21,6 +22,12 @@ import eu.threecixty.profile.NearbyUtils;
 @Path("/" + Constants.PREFIX_NAME)
 public class NearbyServices {
 
+	 private static final Logger LOGGER = Logger.getLogger(
+			 NearbyServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	@GET
 	@Path("/getNearbyPoIs")
 	public Response getNearbyPoIs(@QueryParam("poi") String poiID,
@@ -35,9 +42,12 @@ public class NearbyServices {
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split(",");
 		try {
+			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCats,
 					tmpLanguages, distance, offset, limit);
+			long time2 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -59,9 +69,12 @@ public class NearbyServices {
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split(",");
 		try {
+			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats,
 					tmpLanguages, distance, offset, limit);
+			long time2 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -83,9 +96,12 @@ public class NearbyServices {
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split("");
 		try {
+			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(id, tmpCats,
 					tmpLanguages, distance, offset, limit);
+			long time2 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -107,9 +123,12 @@ public class NearbyServices {
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split("");
 		try {
+			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats,
 					tmpLanguages, distance, offset, limit, null);
+			long time2 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
