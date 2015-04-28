@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.profile.partners;
 
 import java.util.UUID;
 
@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerUser;
+import eu.threecixty.profile.ProfileManagerImpl;
 
 public class PartnerAccountUtils {
 	protected static final String MOBIDOT_APP_ID = "MobidotAppID";

@@ -11,9 +11,9 @@ import eu.threecixty.CrawlerCron.CrawlerCron;
 import eu.threecixty.cache.CacheManager;
 import eu.threecixty.oauth.OAuthBypassedManager;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.profile.GoFlowServer;
 import eu.threecixty.profile.RdfFileManager;
 import eu.threecixty.profile.TrayStorage;
+import eu.threecixty.profile.partners.GoFlowServer;
 import eu.threecixty.querymanager.rest.QueryManagerServices;
 import eu.threecixty.querymanager.rest.CallLogServices;
 

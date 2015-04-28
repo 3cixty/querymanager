@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.profile.partners;
 
 import java.io.IOException;
 
