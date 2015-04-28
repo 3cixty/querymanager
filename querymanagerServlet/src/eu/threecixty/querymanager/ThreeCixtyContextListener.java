@@ -11,6 +11,7 @@ import eu.threecixty.CrawlerCron.CrawlerCron;
 import eu.threecixty.cache.CacheManager;
 import eu.threecixty.oauth.OAuthBypassedManager;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.PersistenceWorkerManager;
 import eu.threecixty.profile.RdfFileManager;
 import eu.threecixty.profile.TrayStorage;
 import eu.threecixty.profile.partners.GoFlowServer;
@@ -22,6 +23,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	private static final String FOLDER_ROOT = "3cixtyData";
 
 	public void contextDestroyed(ServletContextEvent context) {
+		PersistenceWorkerManager.getInstance().stop();
 	}
 
 	public void contextInitialized(ServletContextEvent context) {

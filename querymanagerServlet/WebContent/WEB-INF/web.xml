@@ -10,7 +10,6 @@
 
 	<listener>
 		<listener-class>eu.threecixty.querymanager.ThreeCixtyContextListener</listener-class>
-		<listener-class>eu.threecixty.querymanager.ThreeCixtyPersistenceWorker</listener-class>
 		<listener-class>net.bull.javamelody.SessionListener</listener-class>
 	</listener>
 
