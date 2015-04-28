@@ -279,6 +279,8 @@ public interface ProfileManager {
 	 */
 	UserProfile findUserProfile(String uid, String source, String profileImage);
 	
+	boolean updateKnows(UserProfile profile, Set <String> knows);
+	
 	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.
 	 * @param attributes
