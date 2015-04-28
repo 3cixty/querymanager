@@ -247,4 +247,10 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean updateKnows(UserProfile arg0, Set<String> arg1) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

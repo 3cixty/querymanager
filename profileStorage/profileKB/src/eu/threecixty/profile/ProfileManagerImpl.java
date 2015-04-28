@@ -292,4 +292,10 @@ public class ProfileManagerImpl implements ProfileManager {
 	private static class SingletonHolder {
 		private static final ProfileManager INSTANCE = new ProfileManagerImpl();
 	}
+
+	@Override
+	public boolean updateKnows(UserProfile profile, Set<String> knows) {
+		if (profileManager != null) return profileManager.updateKnows(profile, knows);
+		return false;
+	}
 }

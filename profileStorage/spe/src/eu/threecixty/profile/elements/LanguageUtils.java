@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.profile.elements;
 
 /**
  * This is a utility class for dealing with languages in the header of an HTTP request.

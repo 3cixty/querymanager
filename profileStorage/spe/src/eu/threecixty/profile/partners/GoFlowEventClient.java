@@ -3,7 +3,7 @@
  *  
  *   Author : Pierre-Guillaume Raverdy, Copyright Ambientic 2014
  */
-package eu.threecixty.profile;
+package eu.threecixty.profile.partners;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

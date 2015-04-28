@@ -1,4 +1,4 @@
-package eu.threecixty.profile;
+package eu.threecixty.profile.elements;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -11,6 +11,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import eu.threecixty.profile.SparqlEndPointUtils;
 
 
 //TODO: need to remove condition with new Virtuoso updated

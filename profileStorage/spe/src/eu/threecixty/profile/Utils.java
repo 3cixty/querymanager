@@ -63,7 +63,7 @@ public class Utils {
 			List <UserProfile> userProfilesToBeCreated = new LinkedList<UserProfile>();
 			for (String unfoundAccountId: unfoundAccountIds) {
 				String tmp3cixtyUid = Utils.gen3cixtyUID(unfoundAccountId,
-						source.equalsIgnoreCase(GoogleAccountUtils.GOOGLE_SOURCE) ? UidSource.GOOGLE : UidSource.FACEBOOK);
+						SPEConstants.GOOGLE_SOURCE.equalsIgnoreCase(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
 				UserProfile tmpUserProfile = new UserProfile();
 				tmpUserProfile.setHasUID(tmp3cixtyUid);
 				userProfilesToBeCreated.add(tmpUserProfile);

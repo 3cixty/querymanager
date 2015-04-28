@@ -7,8 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
-import eu.threecixty.profile.FaceBookAccountUtils;
-import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.Utils;
 import eu.threecixty.profile.Utils.UidSource;
@@ -48,8 +47,8 @@ public class ProfileCacheManager {
 				String source = pi.getHasSourceCarrier();
 				String uid = pi.getHasUserAccountID();
 				UidSource uidSource = null;
-				if (GoogleAccountUtils.GOOGLE_SOURCE.equals(source)) uidSource = UidSource.GOOGLE;
-				else if (FaceBookAccountUtils.FACEBOOK_SOURCE.equals(source)) uidSource = UidSource.FACEBOOK;
+				if (SPEConstants.GOOGLE_SOURCE.equals(source)) uidSource = UidSource.GOOGLE;
+				else if (SPEConstants.FACEBOOK_SOURCE.equals(source)) uidSource = UidSource.FACEBOOK;
 				if (uidSource != null) {
 					String generatedID = Utils.gen3cixtyUID(uid, uidSource);
 					uidSourceCaches.put(generatedID, _3cixtyUid);
@@ -64,7 +63,7 @@ public class ProfileCacheManager {
 	public UserProfile findProfile(String uid, String source, String profileImage) {
 		if (DEBUG_MOD) LOGGER.info("Start finding profile in memory");
 		String generatedID = Utils.gen3cixtyUID(uid,
-				GoogleAccountUtils.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
+				SPEConstants.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
 		String _3cixtyUID = uidSourceCaches.get(generatedID);
 		UserProfile profile = null;
 		if (_3cixtyUID != null) {

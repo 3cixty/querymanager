@@ -20,13 +20,13 @@ import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.partners.PartnerAccount;
-import eu.threecixty.profile.PartnerAccountUtils;
 import eu.threecixty.profile.ProfileManager;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.Utils;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
+import eu.threecixty.profile.partners.PartnerAccountUtils;
 
 @Path("/" + Constants.VERSION_2)
 public class MobidotServices {

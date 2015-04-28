@@ -201,4 +201,12 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		}
 		return userProfile;
 	}
+
+	public boolean updateKnows(UserProfile profile, Set<String> knows) {
+		boolean successful = UserUtils.updateKnows(profile, knows);
+		if (successful) {
+			ProfileCacheManager.getInstance().put(profile);
+		}
+		return successful;
+	}
 }

@@ -342,7 +342,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		Set <String> _3cixtyUIDs = new HashSet <String>();
 		for (String accountId: accountIds) {
 			String _3cixtyUid = Utils.gen3cixtyUID(accountId,
-					GoogleAccountUtils.GOOGLE_SOURCE.equals(source) ?
+					SPEConstants.GOOGLE_SOURCE.equals(source) ?
 							UidSource.GOOGLE : UidSource.FACEBOOK);
 			_3cixtyUIDs.add(_3cixtyUid);
 		}
@@ -360,5 +360,11 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	public UserProfile findUserProfile(String arg0, String arg1, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean updateKnows(UserProfile arg0, Set<String> arg1) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
