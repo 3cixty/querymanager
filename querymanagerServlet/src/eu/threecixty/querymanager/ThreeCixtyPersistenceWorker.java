@@ -1,23 +1,14 @@
 package eu.threecixty.querymanager;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
-
-import eu.threecixty.db.PersistentObjectForWorker;
+import eu.threecixty.profile.PersistenceWorkerManager;
 
 public class ThreeCixtyPersistenceWorker implements ServletContextListener {
 
-	 private static final Logger LOGGER = Logger.getLogger(
-			 ThreeCixtyPersistenceWorker.class.getName());
-	
-	 private static final BlockingQueue<PersistentObjectForWorker> queue = new LinkedBlockingQueue<PersistentObjectForWorker>();
-
-	 private volatile Thread thread;
+	private volatile Thread thread;
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent context) {
@@ -34,13 +25,9 @@ public class ThreeCixtyPersistenceWorker implements ServletContextListener {
 				while (true) {
 					try {
 						Thread.sleep(2000);
-						PersistentObjectForWorker persistenceObj;
-						while ((persistenceObj = queue.poll()) != null) {
-							try {
-								persistenceObj.saveOrUpdate();
-							} catch (Exception e) {
-								LOGGER.error(e.getMessage());
-							}
+						while (true) {
+							boolean successful = PersistenceWorkerManager.getInstance().saveOrUpdate();
+							if (!successful) break; // empty queue or errors due to DB connection
 						}
 					} catch (InterruptedException e) {
 						return;
