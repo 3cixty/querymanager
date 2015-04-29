@@ -611,7 +611,9 @@ public class OAuthModelsUtils {
 
 			Query q = session.createSQLQuery(
 					"DELETE FROM 3cixty_user_accessToken WHERE access_token = ?").setString(0, accessToken);
+			session.beginTransaction();
 			q.executeUpdate();
+			session.getTransaction().commit();
 			session.close();
 			return true;
 		} catch (HibernateException e) {
