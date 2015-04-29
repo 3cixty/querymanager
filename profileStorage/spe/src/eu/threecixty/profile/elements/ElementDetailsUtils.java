@@ -326,7 +326,7 @@ public class ElementDetailsUtils {
 		poiDetails.setReviews(reviews);
 		
 		String url = getAttributeValue(json, "url");
-		if (isNullOrEmpty(url)) poiDetails.setUrl(url);
+		if (!isNullOrEmpty(url)) poiDetails.setUrl(url);
 		
 		return poiDetails;
 		
