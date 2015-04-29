@@ -7,13 +7,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import org.apache.log4j.Logger;
+
 import eu.threecixty.Configuration;
-
-
 
 
 public class SparqlEndPointUtils {
 	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 SparqlEndPointUtils.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private static final String LOCN_PREFIX = "PREFIX locn: <http://www.w3.org/ns/locn#> ";
 	private static final String CE_MILANO_PREFIX = "PREFIX ce: <http://data.linkedevents.org/cell/milano/> ";
@@ -28,8 +33,12 @@ public class SparqlEndPointUtils {
 	
 	public static void executeQueryViaSPARQL(String query, String format,
 			String httpMethod, StringBuilder result) throws IOException {
+		long startTime = System.currentTimeMillis();
 		if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, result);
 		else executeQueryViaSPARQL_POST(query, format, result);
+		long endTime = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Time to make query from server to KB without processing: "
+		        + (endTime - startTime) + " ms");
 	}
 
 	private static void executeQueryViaSPARQL_GET(String query, String format, StringBuilder result) throws IOException {
