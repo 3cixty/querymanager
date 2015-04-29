@@ -609,8 +609,8 @@ public class OAuthModelsUtils {
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			Query q = session.createQuery(
-					"DELETE UserAccessToken U WHERE U.accessToken = ?").setString(0, accessToken);
+			Query q = session.createSQLQuery(
+					"DELETE FROM 3cixty_user_accessToken WHERE access_token = ?").setString(0, accessToken);
 			q.executeUpdate();
 			session.close();
 			return true;
