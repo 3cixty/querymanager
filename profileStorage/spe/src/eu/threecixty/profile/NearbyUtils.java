@@ -27,7 +27,7 @@ public class NearbyUtils {
 		}
 
 		builder.append("WHERE { \n");
-		builder.append("        ?event a lode:Event . \n");
+		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
 		
 		if (categories != null && categories.length > 0) {
 
@@ -119,7 +119,7 @@ public class NearbyUtils {
 		}
 
 		builder.append("WHERE { \n");
-		builder.append("        ?poi a dul:Place . \n");
+		builder.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
 		
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
