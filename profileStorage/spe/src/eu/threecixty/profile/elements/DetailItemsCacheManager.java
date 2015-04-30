@@ -1,10 +1,8 @@
-package eu.threecixty.profile.element;
+package eu.threecixty.profile.elements;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import eu.threecixty.profile.elements.ElementDetails;
 
 
 

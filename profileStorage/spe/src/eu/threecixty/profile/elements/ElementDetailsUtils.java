@@ -12,11 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import eu.threecixty.profile.Review;
 import eu.threecixty.profile.SparqlEndPointUtils;
-
-import eu.threecixty.profile.element.DetailItemsCacheManager;
 
 
 /**
