@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eu.threecixty.profile.element.DetailItemsCacheManager;
+
 /**
  * This is a utility class to get a list of events or PoIs in details as requested by TI team.
  * @author Cong-Kinh Nguyen
@@ -41,6 +43,8 @@ public class ElementDetailsUtils {
 	 */
 	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return null;
+		
+		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url \n");
 		queryBuff.append("WHERE {\n");
@@ -55,18 +59,7 @@ public class ElementDetailsUtils {
 			queryBuff.append("OPTIONAL { ?item lode:hasCategory ?category . } \n");
 		} else {
 			queryBuff.append("?item lode:hasCategory ?category . \n");
-			if (categories.length > 0) {
-				queryBuff.append("FILTER (");
-				int index = 0;
-				for (String tmpCat: categories) {
-					if (index > 0) {
-						queryBuff.append(" || ");
-					}
-					index++;
-					queryBuff.append("STR(?category) = \"" + tmpCat + "\"");
-				}
-				queryBuff.append(") .\n");
-			}
+			appendCategoriesFilter(queryBuff, categories);
 		}
 		
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
@@ -89,6 +82,13 @@ public class ElementDetailsUtils {
 		queryBuff.append("FILTER (");
 		boolean first = true;
 		for (String eventId: eventIds) {
+			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(eventId);
+			if (tmp != null) {
+				for (String language: languages) {
+				    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+				}
+				continue;
+			}
 			if (first) {
 				first = false;
 				queryBuff.append("(?item = <").append(eventId).append(">)");
@@ -98,6 +98,8 @@ public class ElementDetailsUtils {
 		}
 		queryBuff.append(") \n");
 		queryBuff.append("}");
+		
+		if (finalList.size() == eventIds.size()) return finalList;
 		
 		if (DEBUG_MOD) LOGGER.info("Get events in detail: " + queryBuff.toString());
 
@@ -128,12 +130,26 @@ public class ElementDetailsUtils {
 					if (!tmpEventDetails.getCategories().contains(category))
 						    tmpEventDetails.getCategories().add(category);
 				}
+				String language = getAttributeValue(json, "language");
+				
+				String desc = getAttributeValue(json, "description");
+				if (!isNullOrEmpty(desc) && !isNullOrEmpty(language)) {
+					tmpEventDetails.putDescription(language, desc);
+				}
 			}
 		}
 		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		elementsDetails.addAll(maps.values());
 		processCategories(elementsDetails);
-		return elementsDetails;
+		
+		DetailItemsCacheManager.getInstance().put(elementsDetails);
+		for (ElementDetails tmp: elementsDetails) {
+			for (String language: languages) {
+			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+			}
+		}
+		
+		return finalList;
 	}
 
 	/**
@@ -159,16 +175,7 @@ public class ElementDetailsUtils {
 		} else {
 			queryBuff.append("?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . \n");
 			if (categories.length > 0) {
-				queryBuff.append("FILTER (");
-				int index = 0;
-				for (String tmpCat: categories) {
-					if (index > 0) {
-						queryBuff.append(" || ");
-					}
-					index++;
-					queryBuff.append("STR(?category) = \"" + tmpCat + "\"");
-				}
-				queryBuff.append(") .\n");
+				appendCategoriesFilter(queryBuff, categories);
 			}
 		}
 		
@@ -338,8 +345,13 @@ public class ElementDetailsUtils {
 		String title = getAttributeValue(json, "title");
 		if (!isNullOrEmpty(title)) eventDetails.setName(title);
 		 
+		String language = getAttributeValue(json, "language");
+		
 		String desc = getAttributeValue(json, "description");
-		if (!isNullOrEmpty(desc)) eventDetails.setDescription(desc);
+		if (!isNullOrEmpty(desc) && !isNullOrEmpty(language)) {
+			eventDetails.putDescription(language, desc);
+		}
+
 		
 		List <String> categories = new LinkedList <String>();
 		eventDetails.setCategories(categories);
@@ -363,10 +375,6 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(image_url)) eventDetails.setImage_url(image_url);
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
-		String language = getAttributeValue(json, "language");
-		if (!isNullOrEmpty(language)) {
-			eventDetails.setTranslation(language.contains(TRANSLATION_TAG));
-		}
 		String url = getAttributeValue(json, "url");
 		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
 		return eventDetails;
@@ -412,6 +420,21 @@ public class ElementDetailsUtils {
 			return jsonObject.getJSONObject(attr).get("value").toString();
 		}
 		return null;
+	}
+	
+	private static void appendCategoriesFilter(StringBuilder sb, String[] categories) {
+		if (categories.length > 0) {
+			sb.append("FILTER (");
+			int index = 0;
+			for (String tmpCat: categories) {
+				if (index > 0) {
+					sb.append(" || ");
+				}
+				index++;
+				sb.append("STR(?category) = \"" + tmpCat + "\"");
+			}
+			sb.append(") .\n");
+		}
 	}
 	
 	private static boolean isNullOrEmpty(String input) {
