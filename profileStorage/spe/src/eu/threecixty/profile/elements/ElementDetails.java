@@ -145,9 +145,13 @@ public class ElementDetails {
 			String tmpLang = language.substring(0, index);
 		    descriptions.put(tmpLang, description);
 		    translateds.put(tmpLang, true);
+			if (DEBUG_MOD) LOGGER.info("language: " + tmpLang);
+			if (DEBUG_MOD) LOGGER.info("description: " + description);
 		} else {
 			descriptions.put(language, description);
 			translateds.put(language, false);
+			if (DEBUG_MOD) LOGGER.info("language: " + language);
+			if (DEBUG_MOD) LOGGER.info("description: " + description);
 		}
 	}
 	
