@@ -1,8 +1,12 @@
 package eu.threecixty.profile.elements;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ElementDetails {
+	
+	protected static final String TRANSLATION_TAG = "-tr";
 
 	private String id;
 	private String name;
@@ -20,6 +24,17 @@ public class ElementDetails {
 	
 	private List<String> categories; // This contains a list of categories
 	private String url;
+	
+	private String description;
+	protected Map <String, String> descriptions;
+	protected Map <String, Boolean> translateds;
+
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 	public String getId() {
 		return id;
@@ -111,6 +126,45 @@ public class ElementDetails {
 		this.url = url;
 	}
 
+	public void putDescription(String language, String description) {
+		if (descriptions == null) {
+			descriptions = new HashMap<String, String>();
+		}
+		if (translateds == null) translateds = new HashMap<String, Boolean>();
+		if (language == null || description == null) return;
+		int index = language.indexOf(TRANSLATION_TAG);
+		if (index >= 0) {
+			String tmpLang = language.substring(0, index);
+		    descriptions.put(tmpLang, description);
+		    translateds.put(tmpLang, true);
+		} else {
+			descriptions.put(language, description);
+			translateds.put(language, false);
+		}
+	}
+	
+	public void cloneTo(ElementDetails element, String language) {
+		if (element == null) return;
+		element.setAddress(this.getAddress());
+		element.setCategory(this.getCategory());
+		if (language != null) {
+			if (descriptions != null) element.setDescription(descriptions.get(language));
+			if (translateds != null) {
+				Boolean tmpTranslated = translateds.get(language);
+				element.setTranslation(tmpTranslated == null ? false : tmpTranslated.booleanValue());
+			}
+		}
+		element.setDistance(this.getDistance());
+		element.setId(this.getId());
+		element.setImage_url(this.getImage_url());
+		element.setLat(this.getLat());
+		element.setLon(this.getLon());
+		element.setLocality(this.getLocality());
+		element.setName(this.getName());
+		element.setSource(this.getSource());
+		element.setUrl(this.getUrl());
+	}
+	
 	public int hashCode() {
 		if (id == null) return -1;
 		return id.hashCode();

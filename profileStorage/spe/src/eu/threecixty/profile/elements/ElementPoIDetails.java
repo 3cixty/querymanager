@@ -1,6 +1,8 @@
 package eu.threecixty.profile.elements;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eu.threecixty.profile.Review;
 
@@ -9,9 +11,9 @@ public class ElementPoIDetails extends ElementDetails {
 	private double aggregate_rating;
 	private int review_counts;
 	private List <Review> reviews;
-	private String description;
 	
 	private Boolean augmented;
+	private Map <String, List<Review>> reviewsLanguages; 
 	
 	public String getTelephone() {
 		return telephone;
@@ -38,16 +40,27 @@ public class ElementPoIDetails extends ElementDetails {
 	public void setAugmented(Boolean augmented) {
 		this.augmented = augmented;
 	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
 	public List<Review> getReviews() {
 		return reviews;
 	}
 	public void setReviews(List<Review> reviews) {
 		this.reviews = reviews;
+	}
+	
+	public void putReviews(String language, List <Review> reviews) {
+		if (language == null || reviews == null) return;
+		if (reviewsLanguages == null) reviewsLanguages = new HashMap<String, List<Review>>();
+		reviewsLanguages.put(language, reviews);
+	}
+	
+	public ElementPoIDetails export(String language) {
+		ElementPoIDetails epd = new ElementPoIDetails();
+		this.cloneTo(epd, language);
+		epd.telephone = this.telephone;
+		epd.augmented = this.augmented;
+		epd.review_counts = this.review_counts;
+		epd.aggregate_rating = this.aggregate_rating;
+		if (language != null && reviewsLanguages != null) epd.reviews = reviewsLanguages.get(language);
+		return epd;
 	}
 }

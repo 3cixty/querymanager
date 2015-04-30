@@ -2,16 +2,9 @@ package eu.threecixty.profile.elements;
 
 public class ElementEventDetails extends ElementDetails {
 
-	private String description;
+	
 	private String time_beginning;
 	private String time_end;
-
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
 
 	public String getTime_beginning() {
 		return time_beginning;
@@ -25,4 +18,15 @@ public class ElementEventDetails extends ElementDetails {
 	public void setTime_end(String time_end) {
 		this.time_end = time_end;
 	}
+	
+	public ElementEventDetails export(String language) {
+		ElementEventDetails eed = new ElementEventDetails();
+		this.cloneTo(eed, language);
+
+		eed.setTime_beginning(this.getTime_beginning());
+		eed.setTime_end(this.getTime_end());
+
+		return eed;
+	}
+	
 }
