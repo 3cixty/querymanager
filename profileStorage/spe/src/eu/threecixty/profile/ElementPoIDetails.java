@@ -56,7 +56,7 @@ public class ElementPoIDetails extends ElementDetails {
 			reviews = new LinkedList <Review>();
 			reviewsLanguages.put(tmpLanguage, reviews);
 		}
-		reviews.add(review);
+		if (!reviews.contains(review)) reviews.add(review);
 	}
 	
 	public ElementPoIDetails export(String language) {
