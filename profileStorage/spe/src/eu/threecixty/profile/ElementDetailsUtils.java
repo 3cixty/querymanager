@@ -280,7 +280,7 @@ public class ElementDetailsUtils {
 		DetailItemsCacheManager.getInstance().put(elementsDetails);
 		for (ElementDetails tmp: elementsDetails) {
 			for (String language: languages) {
-			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementPoIDetails) tmp).export(language));
 			}
 		}
 		
