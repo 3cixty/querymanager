@@ -4,15 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 
 public class ElementDetails {
-	
-	 private static final Logger LOGGER = Logger.getLogger(
-			 ElementDetails.class.getName());
-
-	 /**Attribute which is used to improve performance for logging out information*/
-	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	protected static final String TRANSLATION_TAG = "-tr";
 
@@ -145,13 +138,9 @@ public class ElementDetails {
 			String tmpLang = language.substring(0, index);
 		    descriptions.put(tmpLang, description);
 		    translateds.put(tmpLang, true);
-			if (DEBUG_MOD) LOGGER.info("language: " + tmpLang);
-			if (DEBUG_MOD) LOGGER.info("description: " + description);
 		} else {
 			descriptions.put(language, description);
 			translateds.put(language, false);
-			if (DEBUG_MOD) LOGGER.info("language: " + language);
-			if (DEBUG_MOD) LOGGER.info("description: " + description);
 		}
 	}
 	
