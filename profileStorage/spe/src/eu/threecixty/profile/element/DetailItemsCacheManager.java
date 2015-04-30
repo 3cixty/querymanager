@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import eu.threecixty.profile.ElementDetails;
+import eu.threecixty.profile.elements.ElementDetails;
+
+
 
 public class DetailItemsCacheManager {
 	
