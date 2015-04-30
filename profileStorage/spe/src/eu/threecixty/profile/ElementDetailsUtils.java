@@ -189,7 +189,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("?geoLocation geo:long  ?lon . \n");
 		queryBuff.append("} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:reviewBody ?reviewBody .  \n");
-		addLanguageFilter("reviewBody", languages, queryBuff);
+		//addLanguageFilter("reviewBody", languages, queryBuff);
 		queryBuff.append(" } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating2 . \n");
