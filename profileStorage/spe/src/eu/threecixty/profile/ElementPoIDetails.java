@@ -1,6 +1,7 @@
 package eu.threecixty.profile;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +46,17 @@ public class ElementPoIDetails extends ElementDetails {
 		this.reviews = reviews;
 	}
 	
-	public void putReviews(String language, List <Review> reviews) {
+	public void putReview(String language, Review review) {
 		if (language == null || reviews == null) return;
 		if (reviewsLanguages == null) reviewsLanguages = new HashMap<String, List<Review>>();
-		reviewsLanguages.put(language, reviews);
+		int index = language.indexOf(TRANSLATION_TAG);
+		String tmpLanguage = index >= 0 ? language.substring(0, index) : language;
+		List <Review> reviews = reviewsLanguages.get(tmpLanguage);
+		if (reviews == null) {
+			reviews = new LinkedList <Review>();
+			reviewsLanguages.put(tmpLanguage, reviews);
+		}
+		reviews.add(review);
 	}
 	
 	public ElementPoIDetails export(String language) {
