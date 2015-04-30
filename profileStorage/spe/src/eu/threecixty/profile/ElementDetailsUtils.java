@@ -252,15 +252,12 @@ public class ElementDetailsUtils {
 			} else {
 				String comment = getAttributeValue(tmpObj, COMMENT_ATTRIBUTE);
 				if (!isNullOrEmpty(comment)) {
-					List <Review> reviews = ((ElementPoIDetails) tmpPoIDetails).getReviews();
 					Review review = new Review();
 					review.setText(comment);
 					String reviewLanguage = getAttributeValue(tmpObj, REVIEW_LANG);
 					if (!isNullOrEmpty(reviewLanguage)) review.setTranslated(reviewLanguage.contains(TRANSLATION_TAG));
 					else review.setTranslated(false);
-					if (!reviews.contains(review)) {
-						reviews.add(review);
-					}
+					((ElementPoIDetails) tmpPoIDetails).putReview(reviewLanguage, review);
 				}
 				String category = getAttributeValue(tmpObj, CATEGORY_ATTRIBUTE);
 				if (!isNullOrEmpty(category)) {
@@ -276,18 +273,25 @@ public class ElementDetailsUtils {
 			}
 		}
 		
-		for (String key: maps.keySet()) {
-			ElementDetails tmp = maps.get(key);
+		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
+		elementsDetails.addAll(maps.values());
+		processCategories(elementsDetails);
+		
+		DetailItemsCacheManager.getInstance().put(elementsDetails);
+		for (ElementDetails tmp: elementsDetails) {
+			for (String language: languages) {
+			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+			}
+		}
+		
+		for (ElementDetails tmp: finalList) {
 			ElementPoIDetails poi = (ElementPoIDetails) tmp;
 			if (poi.getReview_counts() == 0) {
 				if (poi.getReviews() != null) poi.setReview_counts(poi.getReviews().size());
 			}
 		}
 		
-		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
-		elementsDetails.addAll(maps.values());
-		processCategories(elementsDetails);
-		return elementsDetails;
+		return finalList;
 	}
 	
 	private static ElementPoIDetails createPoIDetails(JSONObject json, String [] languages) {
@@ -331,9 +335,8 @@ public class ElementDetailsUtils {
 		
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
-		List <Review> reviews = new LinkedList <Review>();
 		String comment = getAttributeValue(json, COMMENT_ATTRIBUTE);
-		if (!isNullOrEmpty(comment) && !reviews.contains(comment)) {
+		if (!isNullOrEmpty(comment)) {
 			Review review = new Review();
 			review.setText(comment);
 			String reviewLanguage = getAttributeValue(json, REVIEW_LANG);
@@ -341,9 +344,8 @@ public class ElementDetailsUtils {
 			    if (!isNullOrEmpty(reviewLanguage)) review.setTranslated(reviewLanguage.contains(TRANSLATION_TAG));
 			    else review.setTranslated(false);
 			}
-			reviews.add(review);
+			poiDetails.putReview(reviewLanguage, review);
 		}
-		poiDetails.setReviews(reviews);
 		
 		String url = getAttributeValue(json, "url");
 		if (!isNullOrEmpty(url)) poiDetails.setUrl(url);
