@@ -160,8 +160,6 @@ public class ElementDetails {
 		element.setAddress(this.getAddress());
 		element.setCategory(this.getCategory());
 		if (language != null) {
-			if (DEBUG_MOD) LOGGER.info("language: " + language);
-			if (DEBUG_MOD) LOGGER.info("description: " + descriptions.values());
 			if (descriptions != null) element.setDescription(descriptions.get(language));
 			if (translateds != null) {
 				Boolean tmpTranslated = translateds.get(language);
