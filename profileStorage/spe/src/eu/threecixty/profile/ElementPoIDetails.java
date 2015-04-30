@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +79,7 @@ public class ElementPoIDetails extends ElementDetails {
 		epd.aggregate_rating = this.aggregate_rating;
 		if (language != null && reviewsLanguages != null) epd.reviews = reviewsLanguages.get(language);
 		if (epd.reviews == null) {
-			epd.reviews = new LinkedList <Review>();
+			epd.reviews = Collections.emptyList();
 		}
 		return epd;
 	}
