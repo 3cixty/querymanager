@@ -76,9 +76,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
 		queryBuff.append("              ?inSpace geo:long ?lon . }\n");
 		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place. \n");
-		queryBuff.append("              ?place vcard2006:hasAddress ?address .\n");
-		queryBuff.append("              ?address vcard2006:street-address ?street .\n");
-		queryBuff.append("              ?address vcard2006:locality ?locality . }\n");
+		queryBuff.append("              ?place schema:location ?address .\n");
+		queryBuff.append("              ?address schema:streetAddress ?street .\n");
+		queryBuff.append("              ?address schema:addressLocality ?locality . }\n");
 		queryBuff.append(" OPTIONAL{ ?item lode:atTime ?time.");
 		queryBuff.append("              { ?time time:hasBeginning ?beginning .\n");
 		queryBuff.append("              ?beginning time:inXSDDateTime ?beginTime .\n");
