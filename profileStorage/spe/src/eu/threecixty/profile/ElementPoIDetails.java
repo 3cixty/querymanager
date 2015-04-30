@@ -5,7 +5,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 public class ElementPoIDetails extends ElementDetails {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ElementPoIDetails.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	private String telephone;
 	private double aggregate_rating;
 	private int review_counts;
@@ -48,6 +57,7 @@ public class ElementPoIDetails extends ElementDetails {
 	
 	public void putReview(String language, Review review) {
 		if (language == null || reviews == null) return;
+		if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
 		if (reviewsLanguages == null) reviewsLanguages = new HashMap<String, List<Review>>();
 		int index = language.indexOf(TRANSLATION_TAG);
 		String tmpLanguage = index >= 0 ? language.substring(0, index) : language;
