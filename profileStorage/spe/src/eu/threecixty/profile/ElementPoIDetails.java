@@ -77,6 +77,9 @@ public class ElementPoIDetails extends ElementDetails {
 		epd.review_counts = this.review_counts;
 		epd.aggregate_rating = this.aggregate_rating;
 		if (language != null && reviewsLanguages != null) epd.reviews = reviewsLanguages.get(language);
+		if (epd.reviews == null) {
+			epd.reviews = new LinkedList <Review>();
+		}
 		return epd;
 	}
 }
