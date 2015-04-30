@@ -1,6 +1,8 @@
 package eu.threecixty.profile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ElementDetails {
 
@@ -20,6 +22,16 @@ public class ElementDetails {
 	
 	private List<String> categories; // This contains a list of categories
 	private String url;
+	
+	private String description;
+	protected Map <String, String> descriptions;
+
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 	public String getId() {
 		return id;
@@ -111,6 +123,33 @@ public class ElementDetails {
 		this.url = url;
 	}
 
+	public void putDescription(String language, String description) {
+		if (descriptions == null) {
+			descriptions = new HashMap<String, String>();
+		}
+		if (language == null || description == null) return;
+		descriptions.put(language, description);
+	}
+	
+	public void cloneTo(ElementDetails element, String language) {
+		if (element == null) return;
+		element.setAddress(this.getAddress());
+		element.setCategory(this.getCategory());
+		if (language != null) {
+			if (descriptions != null) element.setDescription(descriptions.get(language));
+		}
+		element.setDistance(this.getDistance());
+		element.setId(this.getId());
+		element.setImage_url(this.getImage_url());
+		element.setLat(this.getLat());
+		element.setLon(this.getLon());
+		element.setLocality(this.getLocality());
+		element.setName(this.getName());
+		element.setSource(this.getSource());
+		element.setTranslation(this.isTranslation());
+		element.setUrl(this.getUrl());
+	}
+	
 	public int hashCode() {
 		if (id == null) return -1;
 		return id.hashCode();
