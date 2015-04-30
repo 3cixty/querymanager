@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ElementDetails {
+	
+	protected static final String TRANSLATION_TAG = "-tr";
 
 	private String id;
 	private String name;
@@ -25,6 +27,7 @@ public class ElementDetails {
 	
 	private String description;
 	protected Map <String, String> descriptions;
+	protected Map <String, Boolean> translateds;
 
 	public String getDescription() {
 		return description;
@@ -127,8 +130,17 @@ public class ElementDetails {
 		if (descriptions == null) {
 			descriptions = new HashMap<String, String>();
 		}
+		if (translateds == null) translateds = new HashMap<String, Boolean>();
 		if (language == null || description == null) return;
-		descriptions.put(language, description);
+		int index = language.indexOf(TRANSLATION_TAG);
+		if (index >= 0) {
+			String tmpLang = language.substring(0, index);
+		    descriptions.put(tmpLang, description);
+		    translateds.put(tmpLang, true);
+		} else {
+			descriptions.put(language, description);
+			translateds.put(language, false);
+		}
 	}
 	
 	public void cloneTo(ElementDetails element, String language) {
@@ -137,6 +149,10 @@ public class ElementDetails {
 		element.setCategory(this.getCategory());
 		if (language != null) {
 			if (descriptions != null) element.setDescription(descriptions.get(language));
+			if (translateds != null) {
+				Boolean tmpTranslated = translateds.get(language);
+				element.setTranslation(tmpTranslated == null ? false : tmpTranslated.booleanValue());
+			}
 		}
 		element.setDistance(this.getDistance());
 		element.setId(this.getId());
@@ -146,7 +162,6 @@ public class ElementDetails {
 		element.setLocality(this.getLocality());
 		element.setName(this.getName());
 		element.setSource(this.getSource());
-		element.setTranslation(this.isTranslation());
 		element.setUrl(this.getUrl());
 	}
 	
