@@ -130,9 +130,9 @@ public class ElementDetailsUtils {
 					if (!tmpEventDetails.getCategories().contains(category))
 						    tmpEventDetails.getCategories().add(category);
 				}
-				String language = getAttributeValue(json, "language");
+				String language = getAttributeValue(tmpObj, "language");
 				
-				String desc = getAttributeValue(json, "description");
+				String desc = getAttributeValue(tmpObj, "description");
 				if (!isNullOrEmpty(desc) && !isNullOrEmpty(language)) {
 					tmpEventDetails.putDescription(language, desc);
 				}
