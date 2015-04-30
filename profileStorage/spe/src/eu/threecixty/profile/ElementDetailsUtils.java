@@ -161,6 +161,8 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return null;
 
+		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
+		
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url  \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" ?poi a dul:Place .  \n");
@@ -204,6 +206,13 @@ public class ElementDetailsUtils {
 		queryBuff.append("FILTER (");
 		boolean first = true;
 		for (String poiId: poiIds) {
+			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(poiId);
+			if (tmp != null) {
+				for (String language: languages) {
+				    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementPoIDetails) tmp).export(language));
+				}
+				continue;
+			}
 			if (first) {
 				first = false;
 				queryBuff.append("(?poi = <").append(poiId).append(">)");
@@ -213,6 +222,8 @@ public class ElementDetailsUtils {
 		}
 		queryBuff.append(") \n");
 		queryBuff.append("}");
+		
+		if (finalList.size() == poiIds.size()) return finalList;
 		
 		if (DEBUG_MOD) LOGGER.info("Get PoIs in detail: " + queryBuff.toString());
 		
@@ -256,6 +267,12 @@ public class ElementDetailsUtils {
 					if (!tmpPoIDetails.getCategories().contains(category))
 						tmpPoIDetails.getCategories().add(category);
 				}
+				String descLang = getAttributeValue(tmpObj, "descLang");
+				
+				String desc = getAttributeValue(tmpObj, "description");
+				if (!isNullOrEmpty(desc) && !isNullOrEmpty(descLang)) {
+					tmpPoIDetails.putDescription(descLang, desc);
+				}
 			}
 		}
 		
@@ -282,8 +299,12 @@ public class ElementDetailsUtils {
 		String name = getAttributeValue(json, "name");
 		if (!isNullOrEmpty(name)) poiDetails.setName(name);
 		
+		String descLang = getAttributeValue(json, "descLang");
+		
 		String desc = getAttributeValue(json, "description");
-		if (!isNullOrEmpty(desc)) poiDetails.setDescription(desc);
+		if (!isNullOrEmpty(desc) && !isNullOrEmpty(descLang)) {
+			poiDetails.putDescription(descLang, desc);
+		}
 		
 		List <String> categories = new LinkedList <String>();
 		poiDetails.setCategories(categories);
@@ -307,11 +328,6 @@ public class ElementDetailsUtils {
 		if (ratingValue == 0) ratingValue = getRatingValue(json, "ratingValue2");
 		if (ratingValue == 0) ratingValue = getRatingValue(json, "ratingValue3");
 		if (ratingValue > 0) poiDetails.setAggregate_rating(ratingValue);
-		
-		String descLang = getAttributeValue(json, "descLang");
-		if (!isNullOrEmpty(descLang)) {
-			poiDetails.setTranslation(descLang.contains(TRANSLATION_TAG));
-		}
 		
 		String telephone = getAttributeValue(json, "telephone");
 		if (!isNullOrEmpty(telephone)) poiDetails.setTelephone(telephone);
