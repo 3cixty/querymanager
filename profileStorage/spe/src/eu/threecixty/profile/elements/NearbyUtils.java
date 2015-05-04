@@ -47,7 +47,7 @@ public class NearbyUtils {
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
 		
 		if (distance >= 0) {
-			builder.append("FILTER (?distance >= " + distance + ") \n");
+			builder.append("FILTER (?distance <= " + distance + ") \n");
 		}
 		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
 		
@@ -124,7 +124,7 @@ public class NearbyUtils {
 
 		builder.append(" BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) \n");
 		if (distance >= 0) {
-			builder.append("FILTER (?distance >= " + distance + ") \n");
+			builder.append("FILTER (?distance <= " + distance + ") \n");
 		}
 		
 		builder.append("} \n");
@@ -168,7 +168,7 @@ public class NearbyUtils {
 
 		builder.append(" BIND(bif:st_distance(?geo, ?geoFixed) as ?distance) \n");
 		if (distance >= 0) {
-			builder.append("FILTER (?distance >= " + distance + ") \n");
+			builder.append("FILTER (?distance <= " + distance + ") \n");
 		}
 		
 		builder.append("} \n");
