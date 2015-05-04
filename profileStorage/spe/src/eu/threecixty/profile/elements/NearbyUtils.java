@@ -21,31 +21,23 @@ public class NearbyUtils {
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
 		
-		StringBuilder builder = null;
-		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance >= 0) as ?condition) ((?dtEndTime > ?thisMillisecond) as ?timeCondition) \n");
-		} else {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) ((?dtEndTime > ?thisMillisecond) as ?timeCondition) \n");
-		}
+		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance \n");
 
 		builder.append("WHERE { \n");
 		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
 		
 		if (categories != null && categories.length > 0) {
-
 			builder.append("?event lode:hasCategory ?category . \n");
 		
 			filterCategories(categories, builder);
 		}
 		
-		//builder.append("?event dc:description ?description .\n");
-		
-		//addDescriptionFilter(languages, builder);
-		
 		builder.append(" ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
 		builder.append("              ?inSpace geo:long ?eventLon . \n");
 		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
+
+		builder.append("BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) .\n");
 
 		builder.append(" OPTIONAL{ ?event lode:atTime ?time. \n");
 		builder.append("              { ?time time:hasEnd ?end .\n");
@@ -54,7 +46,11 @@ public class NearbyUtils {
 		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . } \n");
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
 		
+		if (distance >= 0) {
+			builder.append("FILTER (?distance >= " + distance + ") \n");
+		}
 		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
+		
 
 		if (!isNullOrEmpty(notId)) {
 			builder.append("FILTER (?event != <" + notId + ">) \n");
