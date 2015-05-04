@@ -245,43 +245,6 @@ public class NearbyUtils {
 		}
 		result.append(") \n");
 	}
-/*
-	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
-			StringBuilder result) {
-		for (String language: languages) {
-			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
-					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
-							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
-		}
-	}
-	
-	private static void addInfoUnion(String subject, String predicate, String object, String[] languages,
-			StringBuilder result) {
-		int index = 0;
-		for (String language: languages) {
-			if (index > 0) {
-				result.append(" UNION ");
-			}
-			index++;
-			result.append(" { ").append(subject).append(" ").append(predicate).append(" ").append(object).append(
-					".  FILTER (langMatches(lang(").append(object).append("), \"").append(
-							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
-		}
-	}
-	*/
-	
-//	private static void addDescriptionFilter(String[] languages, StringBuilder result) {
-//		result.append("FILTER (");
-//		int index = 0;
-//		for (String language: languages) {
-//			if (index > 0) {
-//				result.append(" || ");
-//			}
-//			result.append("(lang(?description)").append(" = \"" + language + "\")");
-//			index++;
-//		}
-//		result.append(")\n");
-//	}
 
 	/**
 	 * This method only creates PoI ID + distance.
