@@ -1,17 +1,29 @@
 package eu.threecixty.profile.elements;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import eu.threecixty.profile.Review;
+import org.apache.log4j.Logger;
 
 public class ElementPoIDetails extends ElementDetails {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ElementPoIDetails.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	private String telephone;
 	private double aggregate_rating;
 	private int review_counts;
 	private List <Review> reviews;
-	private String description;
 	
 	private Boolean augmented;
+	private Map <String, List<Review>> reviewsLanguages; 
 	
 	public String getTelephone() {
 		return telephone;
@@ -38,16 +50,38 @@ public class ElementPoIDetails extends ElementDetails {
 	public void setAugmented(Boolean augmented) {
 		this.augmented = augmented;
 	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
 	public List<Review> getReviews() {
 		return reviews;
 	}
 	public void setReviews(List<Review> reviews) {
 		this.reviews = reviews;
+	}
+	
+	public void putReview(String language, Review review) {
+		if (language == null || reviews == null) return;
+		if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
+		if (reviewsLanguages == null) reviewsLanguages = new HashMap<String, List<Review>>();
+		int index = language.indexOf(TRANSLATION_TAG);
+		String tmpLanguage = index >= 0 ? language.substring(0, index) : language;
+		List <Review> reviews = reviewsLanguages.get(tmpLanguage);
+		if (reviews == null) {
+			reviews = new LinkedList <Review>();
+			reviewsLanguages.put(tmpLanguage, reviews);
+		}
+		if (!reviews.contains(review)) reviews.add(review);
+	}
+	
+	public ElementPoIDetails export(String language) {
+		ElementPoIDetails epd = new ElementPoIDetails();
+		this.cloneTo(epd, language);
+		epd.telephone = this.telephone;
+		epd.augmented = this.augmented;
+		epd.review_counts = this.review_counts;
+		epd.aggregate_rating = this.aggregate_rating;
+		if (language != null && reviewsLanguages != null) epd.reviews = reviewsLanguages.get(language);
+		if (epd.reviews == null) {
+			epd.reviews = Collections.emptyList();
+		}
+		return epd;
 	}
 }

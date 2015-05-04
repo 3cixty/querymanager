@@ -21,31 +21,23 @@ public class NearbyUtils {
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
 		
-		StringBuilder builder = null;
-		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance >= 0) as ?condition) ((?dtEndTime > ?thisMillisecond) as ?timeCondition) \n");
-		} else {
-			builder = new StringBuilder("SELECT distinct ?event (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) ((?dtEndTime > ?thisMillisecond) as ?timeCondition) \n");
-		}
+		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance \n");
 
 		builder.append("WHERE { \n");
-		builder.append("        ?event a lode:Event . \n");
+		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
 		
 		if (categories != null && categories.length > 0) {
-
 			builder.append("?event lode:hasCategory ?category . \n");
 		
 			filterCategories(categories, builder);
 		}
 		
-		//builder.append("?event dc:description ?description .\n");
-		
-		//addDescriptionFilter(languages, builder);
-		
 		builder.append(" ?event ?p ?inSpace. \n");
 		builder.append("              ?inSpace geo:lat ?eventLat .\n");
 		builder.append("              ?inSpace geo:long ?eventLon . \n");
 		builder.append("BIND(bif:st_point(xsd:decimal(?eventLon), xsd:decimal(?eventLat)) as ?geo) .\n");
+
+		builder.append("BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) .\n");
 
 		builder.append(" OPTIONAL{ ?event lode:atTime ?time. \n");
 		builder.append("              { ?time time:hasEnd ?end .\n");
@@ -54,7 +46,11 @@ public class NearbyUtils {
 		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . } \n");
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
 		
+		if (distance >= 0) {
+			builder.append("FILTER (?distance <= " + distance + ") \n");
+		}
 		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
+		
 
 		if (!isNullOrEmpty(notId)) {
 			builder.append("FILTER (?event != <" + notId + ">) \n");
@@ -112,16 +108,10 @@ public class NearbyUtils {
 	
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
-		// TODO: need to remove condition with new Virtuoso updated
-		StringBuilder builder = null;
-		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance >= 0) as ?condition) \n");
-		} else {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
-		}
+		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance \n");
 
 		builder.append("WHERE { \n");
-		builder.append("        ?poi a dul:Place . \n");
+		builder.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
 		
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
@@ -132,6 +122,11 @@ public class NearbyUtils {
 		
 		builder.append("?poi geo:location ?loc . ?loc geo:lat ?lat . ?loc geo:long ?lon . BIND(bif:st_point(xsd:decimal(?lon), xsd:decimal(?lat)) as ?geo) . \n");
 
+		builder.append(" BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) \n");
+		if (distance >= 0) {
+			builder.append("FILTER (?distance <= " + distance + ") \n");
+		}
+		
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
@@ -154,12 +149,7 @@ public class NearbyUtils {
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();
 		
-		StringBuilder builder = null;
-		if (distance < 0) {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance >= 0) as ?condition) \n");
-		} else {
-			builder = new StringBuilder("SELECT distinct ?poi (bif:st_distance(?geo, ?geoFixed) as ?distance) ((?distance <= " + distance + ") as ?condition) \n");
-		}
+		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance \n");
 
 		builder.append("WHERE { \n");
 		builder.append("        ?poi a dul:Place . \n");
@@ -175,6 +165,12 @@ public class NearbyUtils {
 		builder.append(" <" + locId +"> geo:location ?locFixed . ?locFixed geo:lat ?latFixed . ?locFixed geo:long ?lonFixed . BIND(bif:st_point(xsd:decimal(?lonFixed), xsd:decimal(?latFixed)) as ?geoFixed) . \n");
 
 		builder.append("        FILTER ( <").append(locId).append("> != ?poi ) . \n");
+
+		builder.append(" BIND(bif:st_distance(?geo, ?geoFixed) as ?distance) \n");
+		if (distance >= 0) {
+			builder.append("FILTER (?distance <= " + distance + ") \n");
+		}
+		
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
@@ -249,43 +245,6 @@ public class NearbyUtils {
 		}
 		result.append(") \n");
 	}
-/*
-	private static void addInfoOptional(String subject, String predicate, String object, String[] languages,
-			StringBuilder result) {
-		for (String language: languages) {
-			result.append("OPTIONAL { ").append(subject).append(" ").append(predicate).append(" ").append(object).append("_").append(
-					language).append(".  FILTER (langMatches(lang(").append(object).append("_").append(language).append("), \"").append(
-							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
-		}
-	}
-	
-	private static void addInfoUnion(String subject, String predicate, String object, String[] languages,
-			StringBuilder result) {
-		int index = 0;
-		for (String language: languages) {
-			if (index > 0) {
-				result.append(" UNION ");
-			}
-			index++;
-			result.append(" { ").append(subject).append(" ").append(predicate).append(" ").append(object).append(
-					".  FILTER (langMatches(lang(").append(object).append("), \"").append(
-							language.equalsIgnoreCase("empty") ? "" : language).append("\"))} \n");
-		}
-	}
-	*/
-	
-//	private static void addDescriptionFilter(String[] languages, StringBuilder result) {
-//		result.append("FILTER (");
-//		int index = 0;
-//		for (String language: languages) {
-//			if (index > 0) {
-//				result.append(" || ");
-//			}
-//			result.append("(lang(?description)").append(" = \"" + language + "\")");
-//			index++;
-//		}
-//		result.append(")\n");
-//	}
 
 	/**
 	 * This method only creates PoI ID + distance.
@@ -293,16 +252,6 @@ public class NearbyUtils {
 	 * @return
 	 */
 	private static void findNearbyElement(JSONObject jsonElement, Map <String, Double> maps, String attributeID) {
-		String conditionStr = getAttributeValue(jsonElement, "condition");
-		int condition = Integer.parseInt(conditionStr);
-		if (condition == 0) return;
-		
-		if (jsonElement.has("timeCondition")) {
-		    String timeConditionStr = getAttributeValue(jsonElement, "timeCondition");
-		    int timecondition = Integer.parseInt(timeConditionStr);
-		    if (timecondition == 0) return;
-		}
-		
 		String elementId = getAttributeValue(jsonElement, attributeID);
 		
 		String distanceStr = getAttributeValue(jsonElement, "distance");
