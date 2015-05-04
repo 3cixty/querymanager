@@ -2,6 +2,7 @@ package eu.threecixty.profile.elements;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class ElementDetailsUtils {
 	 * @throws IOException
 	 */
 	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
-		if (eventIds == null || eventIds.size() == 0) return null;
+		if (eventIds == null || eventIds.size() == 0) return Collections.emptyList();
 		
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 
@@ -114,7 +115,7 @@ public class ElementDetailsUtils {
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
-		if (len < 1) return null;
+		if (len < 1) return Collections.emptyList();
 		
 		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
 
@@ -161,7 +162,7 @@ public class ElementDetailsUtils {
 	 * @throws IOException
 	 */
 	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
-		if (poiIds == null || poiIds.size() == 0) return null;
+		if (poiIds == null || poiIds.size() == 0) return Collections.emptyList();
 
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 		
@@ -238,7 +239,7 @@ public class ElementDetailsUtils {
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
-		if (len < 1) return null;
+		if (len < 1) return Collections.emptyList();
 
 		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
 		
