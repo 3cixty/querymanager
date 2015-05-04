@@ -43,6 +43,7 @@ public class TokenCacheManager {
 	}
 
 	public AccessToken getAccessToken(String access_token) {
+		if (access_token == null) return null;
 		if (DEBUG_MOD) LOGGER.info("Checking token in memory");
 		TokenCache tokenCache = tokenCaches.get(access_token);
 		if (tokenCache == null) {
@@ -79,12 +80,14 @@ public class TokenCacheManager {
 	}
 	
 	public AccessToken getAccessTokenFrom(String uid, String appkey) {
+		if (uid == null || appkey == null) return null;
 		String access_token = uidAppkeyAccessTokens.get(appkey + uid);
 		if (access_token == null) return null;
 		return getAccessToken(access_token);
 	}
 	
 	public AppCache getAppCache(String appkey) {
+		if (appkey == null) return null;
 		Integer appid = appkeyCaches.get(appkey);
 		if (appid == null) return null;
 		return appIdCaches.get(appid);
