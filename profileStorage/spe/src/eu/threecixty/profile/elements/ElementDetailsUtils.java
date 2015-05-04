@@ -90,7 +90,7 @@ public class ElementDetailsUtils {
 				}
 				continue;
 			}
-			queryBuff.append("<").append(eventId).append(">)");
+			queryBuff.append("<").append(eventId).append(">");
 
 		}
 		queryBuff.append("} \n");
