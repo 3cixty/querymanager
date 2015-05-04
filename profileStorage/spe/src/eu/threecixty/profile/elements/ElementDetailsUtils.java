@@ -115,7 +115,7 @@ public class ElementDetailsUtils {
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
-		if (len < 1) return Collections.emptyList();
+		if (len < 1) return finalList;
 		
 		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
 
@@ -239,7 +239,7 @@ public class ElementDetailsUtils {
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
-		if (len < 1) return Collections.emptyList();
+		if (len < 1) return finalList;
 
 		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
 		
