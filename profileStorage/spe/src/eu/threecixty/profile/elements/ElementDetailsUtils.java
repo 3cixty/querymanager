@@ -175,17 +175,12 @@ public class ElementDetailsUtils {
 		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
-		if (categories == null) {
-			queryBuff.append("OPTIONAL {?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . } \n");
-		} else {
-			queryBuff.append("?poi locationOnt:businessType ?businessType. \n ?businessType skos:prefLabel ?category . \n");
-			if (categories.length > 0) {
-				appendCategoriesFilter(queryBuff, categories);
-			}
+		queryBuff.append("?poi locationOnt:businessType/skos:prefLabel ?category . \n");
+		if (categories != null && categories.length > 0) {
+			appendCategoriesFilter(queryBuff, categories);
 		}
 		
-		queryBuff.append("OPTIONAL{ ?poi schema:location ?location . \n");
-		queryBuff.append("          ?location schema:streetAddress ?address .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:location/schema:streetAddress ?address . } \n");
 		queryBuff.append("OPTIONAL {\n");
 		queryBuff.append("?poi geo:location ?geoLocation . \n");
 		queryBuff.append("?geoLocation geo:lat  ?lat . \n");
@@ -195,19 +190,15 @@ public class ElementDetailsUtils {
 		//addLanguageFilter("reviewBody", languages, queryBuff);
 		queryBuff.append(" } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating2 . \n");
-		queryBuff.append("          ?aggregateRating2 schema:ratingValue ?ratingValue2 . } \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?aggregateRating3 . \n");
-		queryBuff.append("          ?aggregateRating3 schema:reviewRating ?reviewRating3 .  \n");
-		queryBuff.append("           ?reviewRating3 schema:ratingValue ?ratingValue3 .}  \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating/schema:ratingValue ?ratingValue2  .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating/schema:reviewRating/schema:ratingValue ?ratingValue3  .} \n");
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
 		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
 		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:telephone ?telephone .} \n");
 		
-		queryBuff.append("FILTER (");
-		boolean first = true;
+		queryBuff.append("VALUES ?poi {");
 		for (String poiId: poiIds) {
 			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(poiId);
 			if (tmp != null) {
@@ -216,14 +207,10 @@ public class ElementDetailsUtils {
 				}
 				continue;
 			}
-			if (first) {
-				first = false;
-				queryBuff.append("(?poi = <").append(poiId).append(">)");
-			} else {
-				queryBuff.append("|| (?poi = <").append(poiId).append(">)");
-			}
+
+			queryBuff.append("<").append(poiId).append(">");
 		}
-		queryBuff.append(") \n");
+		queryBuff.append("} \n");
 		queryBuff.append("}");
 		
 		if (finalList.size() == poiIds.size()) return finalList;
