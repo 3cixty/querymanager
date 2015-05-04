@@ -401,19 +401,6 @@ public class ElementDetailsUtils {
 		return eventDetails;
 	}
 	
-	private static void addLanguageFilter(String variable, String[] languages, StringBuilder result) {
-		result.append("FILTER (");
-		int index = 0;
-		for (String language: languages) {
-			if (index > 0) {
-				result.append(" || ");
-			}
-			result.append("(lang(?" + variable +")").append(" = \"" + language + "\")");
-			index++;
-		}
-		result.append(")\n");
-	}
-	
 	private static void processCategories(List<ElementDetails> elementsDetails) {
 		StringBuilder catBuilder = new StringBuilder();
 		for (ElementDetails ed: elementsDetails) {
