@@ -73,17 +73,15 @@ public class ElementDetailsUtils {
 		queryBuff.append("              ?address schema:streetAddress ?street .\n");
 		queryBuff.append("              ?address schema:addressLocality ?locality . }\n");
 		queryBuff.append(" OPTIONAL{ ?item lode:atTime ?time.");
-		queryBuff.append("              { ?time time:hasBeginning ?beginning .\n");
-		queryBuff.append("              ?beginning time:inXSDDateTime ?beginTime .\n");
-		queryBuff.append("              ?time time:hasEnd ?end .\n");
-		queryBuff.append("              ?end time:inXSDDateTime ?endTime .}\n");
+		queryBuff.append("              { ?time time:hasBeginning/time:inXSDDateTime ?beginTime .\n");
+		queryBuff.append("                ?time time:hasEnd/time:inXSDDateTime ?endTime .\n");
+		queryBuff.append("              }\n");
 		queryBuff.append(" UNION { ?time time:inXSDDateTime ?beginTime .  } \n");
 		queryBuff.append("}");
 		queryBuff.append("OPTIONAL{ ?item lode:poster ?image_url .}\n");
 		queryBuff.append("OPTIONAL{ ?item dc:publisher ?source .}\n");
 		
-		queryBuff.append("FILTER (");
-		boolean first = true;
+		queryBuff.append("VALUES ?item {");
 		for (String eventId: eventIds) {
 			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(eventId);
 			if (tmp != null) {
@@ -92,14 +90,10 @@ public class ElementDetailsUtils {
 				}
 				continue;
 			}
-			if (first) {
-				first = false;
-				queryBuff.append("(?item = <").append(eventId).append(">)");
-			} else {
-				queryBuff.append("|| (?item = <").append(eventId).append(">)");
-			}
+			queryBuff.append("<").append(eventId).append(">)");
+
 		}
-		queryBuff.append(") \n");
+		queryBuff.append("} \n");
 		queryBuff.append("}");
 		
 		if (finalList.size() == eventIds.size()) return finalList;
