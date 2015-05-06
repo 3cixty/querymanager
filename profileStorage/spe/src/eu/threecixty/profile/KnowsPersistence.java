@@ -75,7 +75,7 @@ public class KnowsPersistence implements PersistentObjectForWorker {
 			// hack for Tony
 			if (user_id.contains("117895882057702509461")) {
 				String animesh3cixtyUID = ProfileManagerImpl.getInstance().find3cixtyUID(
-						"103411760688868522737", SPEConstants.GOOGLE_SOURCE, null);
+						"103411760688868522737", SPEConstants.GOOGLE_SOURCE);
 				if (!knows.contains(animesh3cixtyUID)) { // does not know Animesh
 					knows.add(animesh3cixtyUID);
 				}

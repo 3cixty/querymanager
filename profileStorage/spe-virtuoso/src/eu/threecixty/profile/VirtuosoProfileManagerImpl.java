@@ -276,7 +276,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String find3cixtyUID(String uid, String source, String profileImage) {
+	public String find3cixtyUID(String uid, String source) {
 		StringBuilder qStr = new StringBuilder(Configuration.PREFIXES);
 	    qStr.append("\nSELECT  DISTINCT *\n");
 	    qStr.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + "> \n");
@@ -291,11 +291,9 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     	qStr.append("OPTIONAL { \n");
     	qStr.append("           ?root foaf:img ?profileImage . \n");
     	qStr.append("         } \n");
-    	if (profileImage != null && !profileImage.equals("")) {
-    	    qStr.append("FILTER (str(?uid) = \"" + uid + "\" || str(?profileImage) = \"" + profileImage + "\") ");
-    	} else {
-    		qStr.append("FILTER (str(?uid) = \"" + uid + "\") ");
-    	}
+
+    	qStr.append("FILTER (str(?uid) = \"" + uid + "\") ");
+
 
 	    qStr.append("}");
 	    System.out.println(qStr.toString());
@@ -348,7 +346,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public UserProfile findUserProfile(String arg0, String arg1, String arg2) {
+	public UserProfile findUserProfile(String arg0, String arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}

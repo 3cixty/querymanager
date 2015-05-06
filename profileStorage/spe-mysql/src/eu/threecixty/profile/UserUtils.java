@@ -65,10 +65,9 @@ public class UserUtils {
 	 * Finds the corresponding 3cixtyUID with a given 
 	 * @param uid
 	 * @param source
-	 * @param profileImage
 	 * @return
 	 */
-	public static String find3cixtyUID(String uid, String source, String profileImage) {
+	public static String find3cixtyUID(String uid, String source) {
 		if (isNullOrEmpty(uid)) return null;
 		String _3cixtyUID = null;
 		Session session = null;
@@ -80,13 +79,6 @@ public class UserUtils {
 			List <?> results = query.setString(0, uid).setString(1, source).list();
 			if (results.size() > 0) {
 				_3cixtyUID = ((AccountModel) results.get(0)).getUserModel().getUid();
-			} else if (!isNullOrEmpty(profileImage)) {
-				hql = "FROM UserModel U WHERE U.profileImage = ?";
-				query = session.createQuery(hql);
-				results = query.setString(0, profileImage).list();
-				if (results.size() > 0) {
-					_3cixtyUID = ((UserModel) results.get(0)).getUid();
-				}
 			}
 
 		} catch (HibernateException e) {
@@ -271,8 +263,7 @@ public class UserUtils {
 	 * @param profileImage
 	 * @return
 	 */
-	public static UserProfile findUserProfile(String uid, String source,
-			String profileImage) {
+	public static UserProfile findUserProfile(String uid, String source) {
 		Session session = null;
 		UserProfile userProfile = null;
 		try {
@@ -286,10 +277,10 @@ public class UserUtils {
 			UserModel userModel = null;
 			if (results.size() > 0) {
 				userModel = ((AccountModel) results.get(0)).getUserModel();
-			} else if (!isNullOrEmpty(profileImage)) {
-				hql = "FROM UserModel U WHERE U.profileImage = ? OR U.uid = ?";
+			} else {
+				hql = "FROM UserModel U WHERE U.uid = ?";
 				query = session.createQuery(hql);
-				results = query.setString(0, profileImage).setString(1, tmpUid).list();
+				results = query.setString(0, tmpUid).list();
 				if (results.size() > 0) {
 					userModel = ((UserModel) results.get(0));
 				}

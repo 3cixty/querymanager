@@ -219,7 +219,7 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String find3cixtyUID(String arg0, String source, String arg2) {
+	public String find3cixtyUID(String arg0, String sourc) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -243,7 +243,7 @@ class SimpleProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public UserProfile findUserProfile(String arg0, String arg1, String arg2) {
+	public UserProfile findUserProfile(String arg0, String arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}

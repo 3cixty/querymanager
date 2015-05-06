@@ -28,10 +28,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return UserUtils.exists(_3cixtyUid);
 	}
 
-	public String find3cixtyUID(String uid, String source, String profileImage) {
-		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source, profileImage);
+	public String find3cixtyUID(String uid, String source) {
+		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source);
 		if (userProfile != null) return userProfile.getHasUID();
-		return UserUtils.find3cixtyUID(uid, source, profileImage);
+		return UserUtils.find3cixtyUID(uid, source);
 	}
 
 	public List<UserProfile> getAllUserProfiles() {
@@ -174,7 +174,7 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		if (accountIds == null || accountIds.size() == 0) return Collections.emptySet();
 		Set <String> _3cixtyUidsInCache = new HashSet <String>();
 		for (String accountId: accountIds) {
-			UserProfile tmpProfile = ProfileCacheManager.getInstance().findProfile(accountId, source, null);
+			UserProfile tmpProfile = ProfileCacheManager.getInstance().findProfile(accountId, source);
 			if (tmpProfile != null) _3cixtyUidsInCache.add(tmpProfile.getHasUID());
 		}
 		if (_3cixtyUidsInCache.size() == accountIds.size()) return _3cixtyUidsInCache;
@@ -192,10 +192,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return successful;
 	}
 
-	public UserProfile findUserProfile(String uid, String source, String profileImage) {
-		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source, profileImage);
+	public UserProfile findUserProfile(String uid, String source) {
+		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source);
 		if (userProfile != null) return userProfile;
-		userProfile = UserUtils.findUserProfile(uid, source, profileImage);
+		userProfile = UserUtils.findUserProfile(uid, source);
 		if (userProfile != null) {
 			ProfileCacheManager.getInstance().put(userProfile);
 		}

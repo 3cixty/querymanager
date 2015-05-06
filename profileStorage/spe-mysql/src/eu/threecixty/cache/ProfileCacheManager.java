@@ -24,7 +24,6 @@ public class ProfileCacheManager {
 	
 	private Map <String, UserProfile> profileCaches; // key is 3cixty UID
 	private Map <String, String> uidSourceCaches; // key is generated ID by using Utils.generate3cixtyUID, values is a  3cixty UID
-	private Map <String, String> profileImageCaches; // key is profile image, values is a  3cixty UID
 	private Map <String, List <String>> googleUIDsOfFriends;
 	
 	public static ProfileCacheManager getInstance() {
@@ -55,12 +54,10 @@ public class ProfileCacheManager {
 				}
 			}
 		}
-		String profileImage = userProfile.getProfileImage();
-		if (profileImage != null && !profileImage.equals("")) profileImageCaches.put(profileImage, _3cixtyUid);
 		googleUIDsOfFriends.remove(_3cixtyUid);
 	}
 	
-	public UserProfile findProfile(String uid, String source, String profileImage) {
+	public UserProfile findProfile(String uid, String source) {
 		if (DEBUG_MOD) LOGGER.info("Start finding profile in memory");
 		String generatedID = Utils.gen3cixtyUID(uid,
 				SPEConstants.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
@@ -73,19 +70,10 @@ public class ProfileCacheManager {
 				return profile;
 			}
 		}
-		if (profileImage != null) {
-			_3cixtyUID = profileImageCaches.get(profileImage);
-			if (_3cixtyUID == null) {
-				if (DEBUG_MOD) LOGGER.info("Not found profile in memory");
-				return null;
-			}
-			profile = profileCaches.get(_3cixtyUID);
-		}
 		if (DEBUG_MOD) {
 			if (profile == null) LOGGER.info("Not found profile in memory");
-			else LOGGER.info("Found profile in memory");
 		}
-		return profile;
+		return null;
 	}
 	
 	public UserProfile getProfile(String _3cixtyUID) {
@@ -110,7 +98,6 @@ public class ProfileCacheManager {
 	private ProfileCacheManager() {
 		profileCaches = new ConcurrentHashMap<String, UserProfile>();
 		uidSourceCaches = new ConcurrentHashMap<String, String>();
-		profileImageCaches = new ConcurrentHashMap<String, String>();
 		googleUIDsOfFriends = new ConcurrentHashMap<String, List<String>>();
 	}
 }

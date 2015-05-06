@@ -89,7 +89,7 @@ public class GoogleAccountUtils {
 			String picture = json.getString("picture");
 			
 			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(
-					user_id, SPEConstants.GOOGLE_SOURCE, picture);
+					user_id, SPEConstants.GOOGLE_SOURCE);
 			if (profile == null) {
 				_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
 				profile = new UserProfile();

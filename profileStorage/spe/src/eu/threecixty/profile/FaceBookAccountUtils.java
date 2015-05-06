@@ -49,7 +49,7 @@ public class FaceBookAccountUtils {
 			
 			String _3cixtyUID = null;
 			
-			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(uid, SPEConstants.FACEBOOK_SOURCE, picture);
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(uid, SPEConstants.FACEBOOK_SOURCE);
 			if (profile == null) {
 				_3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
 				profile = new UserProfile();
