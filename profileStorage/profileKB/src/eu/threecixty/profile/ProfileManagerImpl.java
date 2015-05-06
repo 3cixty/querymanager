@@ -218,8 +218,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public String find3cixtyUID(String uid, String source, String profileImage) {
-		if (profileManager != null) return profileManager.find3cixtyUID(uid, source, profileImage);
+	public String find3cixtyUID(String uid, String source) {
+		if (profileManager != null) return profileManager.find3cixtyUID(uid, source);
 		return null;
 	}
 
@@ -239,9 +239,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public UserProfile findUserProfile(String uid, String source,
-			String profileImage) {
-		if (profileManager != null) return profileManager.findUserProfile(uid, source, profileImage);
+	public UserProfile findUserProfile(String uid, String source) {
+		if (profileManager != null) return profileManager.findUserProfile(uid, source);
 		return null;
 	}
 	

@@ -248,7 +248,7 @@ public interface ProfileManager {
 	 * @param profileImage
 	 * @return
 	 */
-	String find3cixtyUID(String uid, String source, String profileImage);
+	String find3cixtyUID(String uid, String source);
 	
 	/**
 	 * Finds the corresponding 3cixty UIDs from a given list of account IDs and source.
@@ -277,7 +277,7 @@ public interface ProfileManager {
 	 * @param profileImage
 	 * @return
 	 */
-	UserProfile findUserProfile(String uid, String source, String profileImage);
+	UserProfile findUserProfile(String uid, String source);
 	
 	boolean updateKnows(UserProfile profile, Set <String> knows);
 	
