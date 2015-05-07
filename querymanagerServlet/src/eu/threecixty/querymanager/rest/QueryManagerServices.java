@@ -934,9 +934,10 @@ public class QueryManagerServices {
 	}
 	
 	@GET
-	@Path("/getKbInfo")
+	@Path("/kb")
 	public Response getKBInfo() {
-		return Response.ok("Virtuoso SPARQL endpoint: " + Configuration.getVirtuosoServer()).build();
+		boolean eurecomKB = Configuration.getVirtuosoServer().contains("eurecom.fr");
+		return Response.ok(eurecomKB ? "Eurecom" : "HostEurope").build();
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,
