@@ -84,7 +84,16 @@ public class MySQLTrayManager implements TrayManager {
 	public boolean replaceUID(String junkToken, String uid)
 			throws InvalidTrayElement, TooManyConnections {
 		boolean successful = TrayUtils.replaceUID(junkToken, uid);
-		TrayCacheManager.getInstance().removeTrays(junkToken);
+		if (successful) {
+		    List <Tray> junkTrays = TrayCacheManager.getInstance().getTrays(junkToken);
+			TrayCacheManager.getInstance().removeTrays(junkToken);
+			if (junkTrays != null && junkTrays.size() > 0) {
+				for (Tray junkTray: junkTrays) {
+					junkTray.setToken(uid);
+				}
+				TrayCacheManager.getInstance().addTrays(junkTrays);
+			}
+		}
 		return successful;
 	}
 
