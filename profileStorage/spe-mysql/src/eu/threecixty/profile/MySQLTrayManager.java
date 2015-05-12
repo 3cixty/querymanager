@@ -87,7 +87,8 @@ public class MySQLTrayManager implements TrayManager {
 		if (successful) {
 		    List <Tray> junkTrays = TrayCacheManager.getInstance().getTrays(junkToken);
 			TrayCacheManager.getInstance().removeTrays(junkToken);
-			if (junkTrays != null && junkTrays.size() > 0) {
+			List <Tray> trays = TrayCacheManager.getInstance().getTrays(uid);
+			if (junkTrays != null && junkTrays.size() > 0 && trays != null) {
 				for (Tray junkTray: junkTrays) {
 					junkTray.setToken(uid);
 				}
