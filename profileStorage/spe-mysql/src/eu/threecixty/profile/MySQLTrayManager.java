@@ -3,6 +3,7 @@ package eu.threecixty.profile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import eu.threecixty.cache.TrayCacheManager;
@@ -83,17 +84,26 @@ public class MySQLTrayManager implements TrayManager {
 
 	public boolean replaceUID(String junkToken, String uid)
 			throws InvalidTrayElement, TooManyConnections {
-		boolean successful = TrayUtils.replaceUID(junkToken, uid);
+		if (junkToken == null || uid == null) return false;
+		List <Tray> junkTrays = getTrays(junkToken);
+		List <Tray> originalTrays = getTrays(uid);
+		boolean successful = TrayUtils.deleteTrays(junkToken);
 		if (successful) {
-		    List <Tray> junkTrays = TrayCacheManager.getInstance().getTrays(junkToken);
+			List <Tray> tmpTrays = new LinkedList <Tray>();
+			for (Tray junkTray: junkTrays) {
+				if (!isFound(junkTray, originalTrays)) {
+					tmpTrays.add(junkTray);
+				}
+			}
 			TrayCacheManager.getInstance().removeTrays(junkToken);
 			List <Tray> trays = TrayCacheManager.getInstance().getTrays(uid);
-			if (junkTrays != null && junkTrays.size() > 0 && trays != null) {
-				for (Tray junkTray: junkTrays) {
+			if (tmpTrays != null && tmpTrays.size() > 0) {
+				for (Tray junkTray: tmpTrays) {
 					junkTray.setToken(uid);
 				}
-				TrayCacheManager.getInstance().addTrays(junkTrays);
+				TrayUtils.addTrays(tmpTrays);
 			}
+			if (trays != null) TrayCacheManager.getInstance().addTrays(tmpTrays);
 		}
 		return successful;
 	}
@@ -133,4 +143,10 @@ public class MySQLTrayManager implements TrayManager {
 		return trays;
 	}
 
+	private boolean isFound(Tray tray, List <Tray> list) {
+		for (Tray tmp: list) {
+			if (tmp.getElement_id().equals(tray.getElement_id())) return true;
+		}
+		return false;
+	}
 }

@@ -213,6 +213,52 @@ public class TrayUtils {
 		return successful;
 	}
 	
+	public static boolean deleteTrays(String token) {
+		if (isNullOrEmpty(token)) return false;
+		Session session = null;
+		boolean successful = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			String hql = "DELETE TrayModel T  WHERE T.uid = ?";
+			Query query = session.createQuery(hql).setString(0, token);
+			
+			query.executeUpdate();
+			session.getTransaction().commit();
+			successful = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
+	}
+	
+	public static boolean addTrays(List <Tray> trays) {
+		if (trays == null || trays.size() == 0) return false;
+		Session session = null;
+		boolean successful = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			session.beginTransaction();
+			for (Tray tray: trays) {
+			TrayModel trayModel = convertTray(tray);
+			    session.save(trayModel);
+			}
+			session.getTransaction().commit();
+			successful = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return successful;
+	}
+	
 	private static Tray convertTrayModel(TrayModel trayModel) {
 		Tray tray = new Tray();
 		tray.setToken(trayModel.getUid());
