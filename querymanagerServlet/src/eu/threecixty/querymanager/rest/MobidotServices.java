@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -130,7 +131,7 @@ public class MobidotServices {
 
 	private String getContent(String username, String password) {
 		try {
-			URL url = new URL(MOBIDOT_ENDPOINT + "userName=" + username + "&password=" + password + "&key=" + MOBIDOT_KEY);
+			URL url = new URL(MOBIDOT_ENDPOINT + "userName=" + username + "&password=" + URLEncoder.encode(password, "UTF-8") + "&key=" + MOBIDOT_KEY);
 			InputStream input = url.openStream();
 			StringBuilder builder = new StringBuilder();
 			byte [] b = new byte[1024];
