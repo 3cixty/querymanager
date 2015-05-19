@@ -132,7 +132,12 @@ public class MobidotServices {
 		try {
 			URL url = new URL(MOBIDOT_ENDPOINT + "userName=" + username + "&password=" + password + "&key=" + MOBIDOT_KEY);
 			InputStream input = url.openStream();
-			
+			StringBuilder builder = new StringBuilder();
+			byte [] b = new byte[1024];
+			int readBytes = 0;
+			while ((readBytes = input.read(b)) >= 0) {
+				builder.append(new String(b, 0, readBytes, "UTF-8"));
+			}
 			input.close();
 		} catch (MalformedURLException e) {
 			LOGGER.error(e.getMessage());
