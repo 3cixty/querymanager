@@ -140,6 +140,7 @@ public class MobidotServices {
 				builder.append(new String(b, 0, readBytes, "UTF-8"));
 			}
 			input.close();
+			return builder.toString();
 		} catch (MalformedURLException e) {
 			LOGGER.error(e.getMessage());
 		} catch (IOException e) {
