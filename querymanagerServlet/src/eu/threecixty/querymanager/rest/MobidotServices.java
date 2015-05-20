@@ -103,7 +103,7 @@ public class MobidotServices {
 							.entity("Could not get token from Mobidot server")
 							.type(MediaType.TEXT_PLAIN_TYPE)
 							.build();
-					long currentTime = System.currentTimeMillis();
+					long currentTime = System.currentTimeMillis() / 1000;
 					JSONObject jsonObject = new JSONObject(content);
 					long expiry = jsonObject.getLong("expiry");
 					JSONObject returnObject = new JSONObject();
