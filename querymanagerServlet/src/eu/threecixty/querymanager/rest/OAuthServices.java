@@ -362,6 +362,9 @@ public class OAuthServices {
 	public Response auth(@QueryParam("key") String appkey) {
 		HttpSession session = httpRequest.getSession();
 		AppCache app = (AppCache) session.getAttribute(APP_KEY);
+		if (app == null) {
+			app = TokenCacheManager.getInstance().getAppCache(appkey);
+		}
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
 		        .entity(" {\"response\": \"failed\", \"reason\": \"key is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
