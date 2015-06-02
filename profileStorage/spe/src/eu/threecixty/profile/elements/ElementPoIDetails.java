@@ -58,7 +58,7 @@ public class ElementPoIDetails extends ElementDetails {
 	}
 	
 	public void putReview(String language, Review review) {
-		if (language == null || reviews == null) return;
+		if (language == null || review == null) return;
 		if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
 		if (reviewsLanguages == null) reviewsLanguages = new HashMap<String, List<Review>>();
 		int index = language.indexOf(TRANSLATION_TAG);
@@ -76,12 +76,13 @@ public class ElementPoIDetails extends ElementDetails {
 		this.cloneTo(epd, language);
 		epd.telephone = this.telephone;
 		epd.augmented = this.augmented;
-		epd.review_counts = this.review_counts;
 		epd.aggregate_rating = this.aggregate_rating;
 		if (language != null && reviewsLanguages != null) epd.reviews = reviewsLanguages.get(language);
 		if (epd.reviews == null) {
 			epd.reviews = Collections.emptyList();
 		}
+		epd.review_counts = epd.reviews.size();
+		if (DEBUG_MOD) LOGGER.info("language: " + language + ", all reviews = " + reviewsLanguages);
 		return epd;
 	}
 }
