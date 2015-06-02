@@ -76,12 +76,13 @@ public class ElementPoIDetails extends ElementDetails {
 		this.cloneTo(epd, language);
 		epd.telephone = this.telephone;
 		epd.augmented = this.augmented;
-		epd.review_counts = this.review_counts;
 		epd.aggregate_rating = this.aggregate_rating;
 		if (language != null && reviewsLanguages != null) epd.reviews = reviewsLanguages.get(language);
 		if (epd.reviews == null) {
 			epd.reviews = Collections.emptyList();
 		}
+		epd.review_counts = epd.reviews.size();
+		if (DEBUG_MOD) LOGGER.info("language: " + language + ", all reviews = " + reviewsLanguages);
 		return epd;
 	}
 }
