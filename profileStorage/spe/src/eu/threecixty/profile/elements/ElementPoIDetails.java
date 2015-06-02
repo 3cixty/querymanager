@@ -58,7 +58,7 @@ public class ElementPoIDetails extends ElementDetails {
 	}
 	
 	public void putReview(String language, Review review) {
-		if (language == null || reviews == null) return;
+		if (language == null || review == null) return;
 		if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
 		if (reviewsLanguages == null) reviewsLanguages = new HashMap<String, List<Review>>();
 		int index = language.indexOf(TRANSLATION_TAG);
