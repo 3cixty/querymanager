@@ -17,6 +17,11 @@ import eu.threecixty.profile.SparqlEndPointUtils;
 
 //TODO: need to remove condition with new Virtuoso updated
 public class NearbyUtils {
+	
+	private static final double MIN_LAT = 45.35668565341486;
+	private static final double MIN_LON = 9.011490619692509;
+	private static final double SIZE_LAT = 0.00211498;
+	private static final double SIZE_LON = 0.00300033;
 
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
@@ -46,6 +51,8 @@ public class NearbyUtils {
 		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . } \n");
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
 		
+		builder.append("?event locationOnt:cell ?cell .");
+		
 		if (distance >= 0) {
 			builder.append("FILTER (?distance <= " + distance + ") \n");
 		}
@@ -55,6 +62,16 @@ public class NearbyUtils {
 		if (!isNullOrEmpty(notId)) {
 			builder.append("FILTER (?event != <" + notId + ">) \n");
 		}
+		
+		builder.append("FILTER (");
+		List <Integer> cellIds = calcCellIds(lat, lon);
+		int index = 0;
+		for (int cellId: cellIds) {
+			if (index > 0) builder.append("||");
+			builder.append(" (?cell = <http://data.linkedevents.org/cell/milano/" + cellId + ">) ");
+			index++;
+		}
+		builder.append("). \n");
 		
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
@@ -120,12 +137,24 @@ public class NearbyUtils {
 			filterCategories(categories, builder);
 		}
 		
+		builder.append("?poi locationOnt:cell ?cell .");
+		
 		builder.append("?poi geo:location ?loc . ?loc geo:lat ?lat . ?loc geo:long ?lon . BIND(bif:st_point(xsd:decimal(?lon), xsd:decimal(?lat)) as ?geo) . \n");
 
 		builder.append(" BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) \n");
 		if (distance >= 0) {
-			builder.append("FILTER (?distance <= " + distance + ") \n");
+			builder.append("FILTER (?distance <= " + distance + ") .\n");
 		}
+		
+		builder.append("FILTER (");
+		List <Integer> cellIds = calcCellIds(lat, lon);
+		int index = 0;
+		for (int cellId: cellIds) {
+			if (index > 0) builder.append("||");
+			builder.append(" (?cell = <http://data.linkedevents.org/cell/milano/" + cellId + ">) ");
+			index++;
+		}
+		builder.append("). \n");
 		
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
@@ -265,6 +294,26 @@ public class NearbyUtils {
 			return jsonObject.getJSONObject(attr).get("value").toString();
 		}
 		return null;
+	}
+	
+	private static List <Integer> calcCellIds(double lat, double lon) {
+		List <Integer> rets = new LinkedList <Integer>();
+		for (int i = -2; i <= 2; i++) {
+			for (int j = -2; j <= 2; j++) {
+				double newLat = lat + i * SIZE_LAT;
+				double newLon = lon + j * SIZE_LON;
+				int cellId = calcCellId(newLat, newLon);
+				rets.add(cellId);
+			}
+		}
+		return rets;
+	}
+	
+	private static int calcCellId(double lat, double lon) {
+		int tmpLat = (int) Math.floor((lat - MIN_LAT)/(SIZE_LAT));
+		int tmpLon = (int) Math.floor(((lon - MIN_LON)/(SIZE_LON)));
+		int ret = tmpLat * 100 + tmpLon;
+		return ret;
 	}
 	
 	private static boolean isNullOrEmpty(String input) {
