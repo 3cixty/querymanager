@@ -22,6 +22,8 @@ public class NearbyUtils {
 	private static final double MIN_LON = 9.011490619692509;
 	private static final double SIZE_LAT = 0.00211498;
 	private static final double SIZE_LON = 0.00300033;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY = 2;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 10;
 
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
@@ -30,11 +32,12 @@ public class NearbyUtils {
 
 		builder.append("WHERE { \n");
 		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
-		
+		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY;
 		if (categories != null && categories.length > 0) {
 			builder.append("?event lode:hasCategory ?category . \n");
 		
 			filterCategories(categories, builder);
+			numberOfCells = NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY;
 		}
 		
 		builder.append(" ?event ?p ?inSpace. \n");
@@ -64,7 +67,7 @@ public class NearbyUtils {
 		}
 		
 		builder.append("FILTER (");
-		List <Integer> cellIds = calcCellIds(lat, lon);
+		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
 		int index = 0;
 		for (int cellId: cellIds) {
 			if (index > 0) builder.append("||");
@@ -126,6 +129,7 @@ public class NearbyUtils {
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance \n");
+		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY;
 
 		builder.append("WHERE { \n");
 		builder.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
@@ -135,6 +139,7 @@ public class NearbyUtils {
 			builder.append("?businessType skos:prefLabel ?category .\n");
 			
 			filterCategories(categories, builder);
+			numberOfCells = NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY;
 		}
 		
 		builder.append("?poi locationOnt:cell ?cell .");
@@ -147,7 +152,7 @@ public class NearbyUtils {
 		}
 		
 		builder.append("FILTER (");
-		List <Integer> cellIds = calcCellIds(lat, lon);
+		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
 		int index = 0;
 		for (int cellId: cellIds) {
 			if (index > 0) builder.append("||");
@@ -296,10 +301,10 @@ public class NearbyUtils {
 		return null;
 	}
 	
-	private static List <Integer> calcCellIds(double lat, double lon) {
+	private static List <Integer> calcCellIds(double lat, double lon, int numberOfCellsAsRadius) {
 		List <Integer> rets = new LinkedList <Integer>();
-		for (int i = -2; i <= 2; i++) {
-			for (int j = -2; j <= 2; j++) {
+		for (int i = - numberOfCellsAsRadius; i <= numberOfCellsAsRadius; i++) {
+			for (int j = - numberOfCellsAsRadius; j <= numberOfCellsAsRadius; j++) {
 				double newLat = lat + i * SIZE_LAT;
 				double newLon = lon + j * SIZE_LON;
 				int cellId = calcCellId(newLat, newLon);
