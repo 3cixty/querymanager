@@ -24,6 +24,7 @@ public class NearbyUtils {
 	private static final double SIZE_LON = 0.00300033;
 	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY = 2;
 	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 10;
+	private static final double CELL_SIZE = 0.5; // km
 
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
@@ -58,7 +59,7 @@ public class NearbyUtils {
 		
 		if (distance >= 0) {
 			builder.append("FILTER (?distance <= " + distance + ") \n");
-			int floor = (int) Math.floor(distance * 2); 
+			int floor = (int) Math.floor(distance / CELL_SIZE); 
 			if (distance > 0) numberOfCells = floor < numberOfCells ? floor : numberOfCells;
 		}
 		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
@@ -148,7 +149,7 @@ public class NearbyUtils {
 		builder.append(" BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) \n");
 		if (distance >= 0) {
 			builder.append("FILTER (?distance <= " + distance + ") .\n");
-			int floor = (int) Math.floor(distance * 2); 
+			int floor = (int) Math.floor(distance / CELL_SIZE); 
 			if (distance > 0) numberOfCells = floor < numberOfCells ? floor : numberOfCells;
 		}
 		
