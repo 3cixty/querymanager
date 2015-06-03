@@ -66,15 +66,12 @@ public class NearbyUtils {
 			builder.append("FILTER (?event != <" + notId + ">) \n");
 		}
 		
-		builder.append("FILTER (");
+		builder.append("VALUES ?cell {");
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
-		int index = 0;
 		for (int cellId: cellIds) {
-			if (index > 0) builder.append("||");
-			builder.append(" (?cell = <http://data.linkedevents.org/cell/milano/" + cellId + ">) ");
-			index++;
+			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}
-		builder.append("). \n");
+		builder.append("}. \n");
 		
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
@@ -151,15 +148,12 @@ public class NearbyUtils {
 			builder.append("FILTER (?distance <= " + distance + ") .\n");
 		}
 		
-		builder.append("FILTER (");
+		builder.append("VALUES ?cell {");
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
-		int index = 0;
 		for (int cellId: cellIds) {
-			if (index > 0) builder.append("||");
-			builder.append(" (?cell = <http://data.linkedevents.org/cell/milano/" + cellId + ">) ");
-			index++;
+			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}
-		builder.append("). \n");
+		builder.append("}. \n");
 		
 		builder.append("} \n");
 		builder.append("ORDER BY ?distance \n");
