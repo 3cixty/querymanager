@@ -14,6 +14,8 @@ public class Configuration {
 
 	private static String version;
 	
+	private static String target; // DEV or PROD
+	
 	public static final String PROFILE_GRAPH = "http://3cixty.com";
 	public static final String SCHEMA_URI = "http://schema.org/";
 	//public static final String PROFILE_GRAPH = "http://3cixty.com/fakeprofile";
@@ -68,12 +70,20 @@ public class Configuration {
 		return getProperty("FB_APP_ID");
 	}
 	
+	public static boolean isForProdTarget() {
+		if (target == null) {
+			if (props == null) load();
+			target = props.getProperty("PURPOSE");
+		}
+		return "prod".equalsIgnoreCase(target);
+	}
+	
 	private static String getProperty(String key) {
 		if (props == null) load();
-		String purpose = props.getProperty("PURPOSE");
-		if (purpose == null) return null;
-		else if (purpose.equals("localhost")) return props.getProperty(key + "_LOCAL");
-		else if (purpose.equals("prod")) return props.getProperty(key + "_PROD");
+		target = props.getProperty("PURPOSE");
+		if (target == null) return null;
+		else if (target.equals("localhost")) return props.getProperty(key + "_LOCAL");
+		else if (target.equals("prod")) return props.getProperty(key + "_PROD");
 		else return props.getProperty(key + "_DEV");
 	}
 
