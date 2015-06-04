@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerUser;
@@ -46,12 +47,13 @@ public class PartnerAccountUtils {
 		String password = "3cixtyI$InExpo)!_" + UUID.randomUUID().toString();
 		try {
 			if (DEBUG_MOD) LOGGER.info("Start creating a Mobidot account");
-		    String mobidotID = MobidotUserUtils.createMobidotUser(_3cixtyUID, displayName, password);
+			String mobidotUserName = Configuration.isForProdTarget() ? _3cixtyUID : _3cixtyUID + "DEV";
+		    String mobidotID = MobidotUserUtils.createMobidotUser(mobidotUserName, displayName, password);
 		    if (mobidotID == null || mobidotID.equals("")) return null;
 		    account = new PartnerAccount();
 			account.setAppId(MOBIDOT_APP_ID);
 			account.setPassword(password);
-			account.setUsername(_3cixtyUID);
+			account.setUsername(mobidotUserName);
 			account.setUser_id(mobidotID);
 			account.setRole("User");
 			account.setPartnerUser(mobidotUser);
