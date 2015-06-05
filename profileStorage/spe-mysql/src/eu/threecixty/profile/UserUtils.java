@@ -164,6 +164,9 @@ public class UserUtils {
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 			if (session != null) session.getTransaction().rollback();
+			for (UserProfile profile: profiles) {
+				ProfileCacheManager.getInstance().remove(profile);
+			}
 		} finally {
 			if (session != null) session.close();
 		}
