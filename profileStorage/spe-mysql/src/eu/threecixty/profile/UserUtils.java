@@ -1,10 +1,12 @@
 package eu.threecixty.profile;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -144,21 +146,26 @@ public class UserUtils {
 
 			session.beginTransaction();
 			
+			Map <String , UserModel> localUserModels = new HashMap<String, UserModel>();
+			
 			for (UserProfile profile: profiles) {
 
 				UserModel userModel = new UserModel();
 				userModel.setUid(profile.getHasUID());
 
 				session.save(userModel);
-
-				profile.setModelIdInPersistentDB(userModel.getId());
-
+				
+				localUserModels.put(userModel.getUid(), userModel);
 			}
 			
 			session.getTransaction().commit();
 
 			for (UserProfile profile: profiles) {
-				ProfileCacheManager.getInstance().put(profile);
+				UserModel tmpModel = localUserModels.get(profile.getHasUID());
+				if (tmpModel != null) {
+					profile.setModelIdInPersistentDB(tmpModel.getId());
+				    ProfileCacheManager.getInstance().put(profile);
+				}
 			}
 			added = true;
 		} catch (HibernateException e) {
