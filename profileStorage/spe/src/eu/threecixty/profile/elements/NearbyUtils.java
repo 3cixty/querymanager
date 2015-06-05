@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +26,12 @@ public class NearbyUtils {
 	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY = 2;
 	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 10;
 	private static final double CELL_SIZE = 0.5; // km
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 NearbyUtils.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
@@ -81,7 +88,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		System.out.println(builder.toString());
+		if (DEBUG_MOD) LOGGER.info(builder.toString());
 		
 		return getNearbyEvents(builder.toString(), categories, languages);
 	}
@@ -214,7 +221,7 @@ public class NearbyUtils {
 	}
 	
 	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories, String [] languages) throws IOException {
-		System.out.println(query);
+		if (DEBUG_MOD) LOGGER.info(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
