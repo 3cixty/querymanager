@@ -38,6 +38,26 @@ public class UserUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 //private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
+	public static boolean remove(UserProfile profile) {
+		if (profile == null) return false;
+		Session session = null;
+		boolean ok = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			
+			session.beginTransaction();
+			
+			session.getTransaction().commit();
+			
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return ok;
+	}
+	
 	 /**
 	  * Checks whether or not a given 3cixty UID exists in the DB.
 	  * @param _3cixtyUid

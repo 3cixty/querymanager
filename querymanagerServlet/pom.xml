@@ -29,17 +29,6 @@
       <version>6.0</version>
       <scope>provided</scope>
     </dependency>
-
-<dependency>
-	<groupId>net.minidev</groupId>
-	<artifactId>json-smart</artifactId>
-	<version>2.1.1</version>
-</dependency>
-<dependency>
-	<groupId>org.apache.logging.log4j</groupId>
-	<artifactId>log4j-web</artifactId>
-	<version>2.3</version>
-</dependency>
     
     <dependency>
       <groupId>eu.3cixty</groupId>
