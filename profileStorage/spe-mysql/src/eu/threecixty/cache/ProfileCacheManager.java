@@ -57,6 +57,19 @@ public class ProfileCacheManager {
 		googleUIDsOfFriends.remove(_3cixtyUid);
 	}
 	
+	public void remove(UserProfile userProfile) {
+		if (DEBUG_MOD) LOGGER.info("Start removing profile in memory");
+		if (userProfile == null) return;
+		String _3cixtyUid = userProfile.getHasUID();
+		if (_3cixtyUid == null || _3cixtyUid.equals("")) {
+			if (DEBUG_MOD) LOGGER.info("3cixty UID is null or empty");
+			return;
+		}
+		profileCaches.remove(_3cixtyUid);
+		if (DEBUG_MOD) LOGGER.info("Profile removed from memory with 3cixty UID = " + _3cixtyUid);
+		googleUIDsOfFriends.remove(_3cixtyUid);
+	}
+	
 	public UserProfile findProfile(String uid, String source) {
 		if (DEBUG_MOD) LOGGER.info("Start finding profile in memory");
 		String generatedID = Utils.gen3cixtyUID(uid,
