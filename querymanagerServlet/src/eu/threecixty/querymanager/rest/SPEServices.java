@@ -87,6 +87,7 @@ public class SPEServices {
 							.build());
 				}
 				String ret = JSONObject.wrap(profile).toString();
+				if (DEBUG_MOD) LOGGER.info(ret);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				if (DEBUG_MOD) LOGGER.info("Successful to getProfile API");
 				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
