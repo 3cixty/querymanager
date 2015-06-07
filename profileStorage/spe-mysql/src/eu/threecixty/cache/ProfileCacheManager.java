@@ -116,8 +116,8 @@ public class ProfileCacheManager {
 			UserProfile profile = profileCaches.get(key);
 			Name name = profile.getHasName();
 			sb.append("profile: " + " uid = " + profile.getHasUID()
-					+ ", given name = " + name == null ? "" : name.getGivenName()
-					+ ", family name = " + name == null ? "": name.getFamilyName()
+					+ ", given name = " + (name == null ? "" : name.getGivenName())
+					+ ", family name = " + (name == null ? "": name.getFamilyName())
 					+ "\n");
 		}
 		if (DEBUG_MOD) LOGGER.info(sb.toString());
