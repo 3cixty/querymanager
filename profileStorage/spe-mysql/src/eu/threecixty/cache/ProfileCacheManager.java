@@ -120,6 +120,7 @@ public class ProfileCacheManager {
 					+ ", family name = " + name == null ? "": name.getFamilyName()
 					+ "\n");
 		}
+		if (DEBUG_MOD) LOGGER.info(sb.toString());
 	}
 	
 	private ProfileCacheManager() {
