@@ -163,8 +163,10 @@ public class UserUtils {
 			for (UserProfile profile: profiles) {
 				UserModel tmpModel = localUserModels.get(profile.getHasUID());
 				if (tmpModel != null) {
-					profile.setModelIdInPersistentDB(tmpModel.getId());
-				    ProfileCacheManager.getInstance().put(profile);
+					if (tmpModel.getId() != null) {
+					    profile.setModelIdInPersistentDB(tmpModel.getId());
+				        ProfileCacheManager.getInstance().put(profile);
+					}
 				}
 			}
 			added = true;
