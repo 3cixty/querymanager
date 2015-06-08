@@ -112,13 +112,12 @@ public class ProfileCacheManager {
 	public void printProfilesInCache() {
 		StringBuilder sb = new StringBuilder();
 		for (String key: profileCaches.keySet()) {
-			sb.append("key = " + key).append("\n");
+			sb.append("key = " + key);
 			UserProfile profile = profileCaches.get(key);
 			Name name = profile.getHasName();
-			sb.append("profile: " + " uid = " + profile.getHasUID()
+			sb.append("\nprofile: " + " uid = " + profile.getHasUID()
 					+ ", given name = " + (name == null ? "" : name.getGivenName())
-					+ ", family name = " + (name == null ? "": name.getFamilyName())
-					+ "\n");
+					+ ", family name = " + (name == null ? "": name.getFamilyName()));
 		}
 		if (DEBUG_MOD) LOGGER.info(sb.toString());
 	}
