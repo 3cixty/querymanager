@@ -11,6 +11,7 @@ import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.Utils;
 import eu.threecixty.profile.Utils.UidSource;
+import eu.threecixty.profile.oldmodels.Name;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 public class ProfileCacheManager {
@@ -106,6 +107,19 @@ public class ProfileCacheManager {
 	
 	public List <String> getGoogleUIDsOfFriends(String _3cixtyUID) {
 		return googleUIDsOfFriends.get(_3cixtyUID);
+	}
+	
+	public void printProfilesInCache() {
+		StringBuilder sb = new StringBuilder();
+		for (String key: profileCaches.keySet()) {
+			sb.append("key = " + key);
+			UserProfile profile = profileCaches.get(key);
+			Name name = profile.getHasName();
+			sb.append("\nprofile: " + " uid = " + profile.getHasUID()
+					+ ", given name = " + (name == null ? "" : name.getGivenName())
+					+ ", family name = " + (name == null ? "": name.getFamilyName()));
+		}
+		if (DEBUG_MOD) LOGGER.info(sb.toString());
 	}
 	
 	private ProfileCacheManager() {

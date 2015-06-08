@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
+import eu.threecixty.cache.ProfileCacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -87,6 +88,7 @@ public class SPEServices {
 							.build());
 				}
 				String ret = JSONObject.wrap(profile).toString();
+				if (DEBUG_MOD) LOGGER.info(ret);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				if (DEBUG_MOD) LOGGER.info("Successful to getProfile API");
 				return Response.ok(ret, MediaType.APPLICATION_JSON).build();
@@ -98,6 +100,14 @@ public class SPEServices {
 			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PROFILE_GET_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 			return createResponseForAccessToken(access_token);
 		}
+	}
+	
+	@GET
+	@Path("/printProfilesInCache")
+	public Response printProfilesInCache() {
+		if (DEBUG_MOD) LOGGER.info("Enter into printProfilesInCache API");
+		ProfileCacheManager.getInstance().printProfilesInCache();
+		return Response.ok().build();
 	}
 	
 //	@POST
