@@ -106,6 +106,7 @@ public class GoogleAccountUtils {
 				name.setFamilyName(familyName);
 			}
 
+			if (DEBUG_MOD) LOGGER.info("user_id = " + user_id + ", 3cixty UID = " + _3cixtyUID + ", givenName = " + givenName + ", familyName = " + familyName);
 
 			Set <ProfileIdentities> profileIdentities = null;
 			if (profile.getHasProfileIdenties() == null) {
@@ -117,13 +118,16 @@ public class GoogleAccountUtils {
 			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, user_id, SPEConstants.GOOGLE_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
-			
-			if (generalInfoModified || profileIdentitiesModified) {
-				boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
-				if (successful) {
-					updateKnows(accessToken, user_id, profile);
-				}
-			} else updateKnows(accessToken, user_id, profile);
+			try {
+				if (generalInfoModified || profileIdentitiesModified) {
+					boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+					if (successful) {
+						updateKnows(accessToken, user_id, profile);
+					}
+				} else updateKnows(accessToken, user_id, profile);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+			}
 			long time3 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time1) + " ms");
 		} catch (Exception e) {
