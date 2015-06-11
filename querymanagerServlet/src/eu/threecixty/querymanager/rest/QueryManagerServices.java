@@ -31,7 +31,6 @@ import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 
-import eu.threecixty.Configuration;
 import eu.threecixty.cache.CacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
@@ -931,13 +930,6 @@ public class QueryManagerServices {
 			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
 			return createResponseForInvalidKey(key);
 		}
-	}
-	
-	@GET
-	@Path("/kb")
-	public Response getKBInfo() {
-		boolean eurecomKB = Configuration.getVirtuosoServer().contains("eurecom.fr");
-		return Response.ok(eurecomKB ? "Eurecom" : "HostEurope").build();
 	}
 
 	private String executeQuery(IProfiler profiler, IQueryManager qm,

@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
-
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -71,6 +74,45 @@ public class ConfigurationServices {
 		return Response.status(200).entity("Successful to change KB endpoint to default" ).build();
 	}
 	
+	@GET
+	@Path("/kb")
+	public Response getKBInfo() {
+		String virtuosoServer = Configuration.getVirtuosoServer().toLowerCase();
+		boolean eurecomKB = virtuosoServer.contains("3cixty.eurecom.fr");
+		boolean hostEuropeKB = virtuosoServer.contains("91.250.81.138");
+		if (eurecomKB) Response.ok("Eurecom").build();
+		if (hostEuropeKB) Response.ok("HostEurope").build();
+		boolean apiProxy = virtuosoServer.contains("api.3cixty.com");
+		if (apiProxy) return getKbInfoFromApiProxy();
+		return getKbInfoFromDevProxy();
+	}
+	
+	private Response getKbInfoFromDevProxy() {
+		try {
+			URL url = new URL("http://91.250.81.138:8890/sparql");
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			if (conn.getResponseCode() == 200) return Response.ok("HostEurope").build();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return Response.ok("Eurecom").build();
+	}
+
+	private Response getKbInfoFromApiProxy() {
+		try {
+			URL url = new URL("http://3cixty.eurecom.fr/sparql");
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			if (conn.getResponseCode() == 200) return Response.ok("Eurecom").build();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return Response.ok("HostEurope").build();
+	}
+
 	private synchronized void loadProperties() throws IOException {
 		InputStream input = new FileInputStream(Configuration.path + File.separatorChar + "WEB-INF"
 	            + File.separatorChar + "kbswitch.properties");
