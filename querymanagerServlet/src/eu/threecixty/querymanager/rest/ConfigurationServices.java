@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.DefaultValue;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
