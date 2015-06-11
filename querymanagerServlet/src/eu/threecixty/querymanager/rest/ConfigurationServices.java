@@ -50,7 +50,7 @@ public class ConfigurationServices {
 			return Response.status(400).entity("Virtuoso server is invalid").build();
 		}
 		Configuration.setVirtuosoServer(vituosoServer);
-		return Response.status(200).entity("Successful to set " + vituosoServer + " to the backend" ).build();
+		return Response.status(200).entity("Successful to set " + vituosoServer + " to the backend!" ).build();
 	}
 	
 	@POST
@@ -71,7 +71,7 @@ public class ConfigurationServices {
 			return Response.status(400).entity("Invalid username or password").build();
 		}
 		Configuration.resetVirtuosoServerByDefault();
-		return Response.status(200).entity("Successful to change KB endpoint to default" ).build();
+		return Response.status(200).entity("Successful to change KB endpoint to default!" ).build();
 	}
 	
 	@GET
