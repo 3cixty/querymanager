@@ -37,6 +37,7 @@ public class SparqlEndPointUtils {
 		if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, result);
 		else executeQueryViaSPARQL_POST(query, format, result);
 		long endTime = System.currentTimeMillis();
+		if (DEBUG_MOD) LOGGER.info("Query sent to KB: " + query);
 		if (DEBUG_MOD) LOGGER.info("Time to make query from server to KB without processing: "
 		        + (endTime - startTime) + " ms");
 	}
