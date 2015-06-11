@@ -15,6 +15,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
 import eu.threecixty.Configuration;
 
 
@@ -24,6 +26,12 @@ public class ConfigurationServices {
 
 	private static final String USER_KEY = "USERNAME";
 	private static final String PASS_KEY = "PWD";
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 ConfigurationServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private static String username = null;
 	private static String password = null;
@@ -78,6 +86,7 @@ public class ConfigurationServices {
 	@Path("/kb")
 	public Response getKBInfo() {
 		String virtuosoServer = Configuration.getVirtuosoServer().toLowerCase();
+		if (DEBUG_MOD) LOGGER.info("Virtuoso endpoint: " + virtuosoServer);
 		boolean eurecomKB = virtuosoServer.contains("3cixty.eurecom.fr");
 		boolean hostEuropeKB = virtuosoServer.contains("91.250.81.138");
 		if (eurecomKB) Response.ok("Eurecom").build();
