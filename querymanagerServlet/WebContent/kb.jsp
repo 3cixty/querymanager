@@ -32,7 +32,7 @@
 </div>
 
 <div>
-    <input type="hidden" name="virtuosoServer" value="http://3cixty.eurecom.fr">
+    <input type="hidden" name="virtuosoServer" id="virtuosoServer" value="http://3cixty.eurecom.fr">
 </div>
 
 <div>
