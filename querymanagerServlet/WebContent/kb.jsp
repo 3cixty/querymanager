@@ -36,7 +36,7 @@
 </div>
 
 <div>
-   <input type="checkbox" name="reset" value="reset" id="reset" onclick="prepareToSubmit()" > Reset KB to default configuration
+   <input type="checkbox" name="reset" value="reset" id="reset" onclick="prepareToSubmit()" >Reset KB to default configuration
 </div>
 
 <div>
