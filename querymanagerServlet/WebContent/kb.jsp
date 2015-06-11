@@ -27,8 +27,8 @@
 
 
 <div id="divKB">
-<input type="radio" name="kb" value="http://3cixty.eurecom.fr" id="kb" checked>EURECOM KB</br>
-<input type="radio" name="kb" value="http://91.250.81.138:8890" id="kb">HostEurope KB
+<input type="radio" name="kb" value="http://3cixty.eurecom.fr" id="eurecomKB" checked>EURECOM KB</br>
+<input type="radio" name="kb" value="http://91.250.81.138:8890" id="hostEuropeKB">HostEurope KB
 </div>
 
 <div>
@@ -45,7 +45,8 @@
 
 <script type="text/javascript">
     function prepareToSubmit() {
-    	document.getElementById("virtuosoServer").value = document.getElementById("kb").value;
+    	if (document.getElementById("eurecomKB").checked) document.getElementById("virtuosoServer").value = document.getElementById("eurecomKB").value;
+    	else document.getElementById("virtuosoServer").value = document.getElementById("hostEuropeKB").value;
     	var divKB = document.getElementById("divKB");
     	var form = document.getElementById("form");
     	if (document.getElementById("reset").checked) {
