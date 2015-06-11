@@ -72,7 +72,6 @@ public class ProfileCacheManager {
 	}
 	
 	public UserProfile findProfile(String uid, String source) {
-		/*
 		if (DEBUG_MOD) LOGGER.info("Start finding profile in memory");
 		String generatedID = Utils.gen3cixtyUID(uid,
 				SPEConstants.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
@@ -89,12 +88,9 @@ public class ProfileCacheManager {
 			if (profile == null) LOGGER.info("Not found profile in memory");
 		}
 		return null;
-		*/
-		return null;
 	}
 	
 	public UserProfile getProfile(String _3cixtyUID) {
-		/*
 		if (DEBUG_MOD) LOGGER.info("Checking in the memory for 3cixtyUID = " + _3cixtyUID);
 		UserProfile profile = profileCaches.get(_3cixtyUID);
 		if (DEBUG_MOD) {
@@ -102,8 +98,6 @@ public class ProfileCacheManager {
 			else LOGGER.info("Found the corresponding profile with " + _3cixtyUID + " in memory");
 		}
 		return profile;
-		*/
-		return null;
 	}
 	
 	public void putGoogleUIDsOfFriens(String _3cixtyUID, List <String> googleUIDs) {
