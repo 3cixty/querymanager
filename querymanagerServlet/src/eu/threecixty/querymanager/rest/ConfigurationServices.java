@@ -31,8 +31,8 @@ public class ConfigurationServices {
 		if (DEBUG_MOD) LOGGER.info("Virtuoso endpoint: " + virtuosoServer);
 		boolean eurecomKB = virtuosoServer.contains("3cixty.eurecom.fr");
 		boolean hostEuropeKB = virtuosoServer.contains("91.250.81.138");
-		if (eurecomKB) Response.ok("Eurecom").build();
-		if (hostEuropeKB) Response.ok("HostEurope").build();
+		if (eurecomKB) return Response.ok("Eurecom").build();
+		if (hostEuropeKB) return Response.ok("HostEurope").build();
 		boolean apiProxy = virtuosoServer.contains("api.3cixty.com");
 		if (apiProxy) return getKbInfoFromApiProxy();
 		return getKbInfoFromDevProxy();
