@@ -78,7 +78,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("              }\n");
 		queryBuff.append(" UNION { ?time time:inXSDDateTime ?beginTime .  } \n");
 		queryBuff.append("}");
-		queryBuff.append("OPTIONAL{ ?item lode:poster ?image_url .}\n");
+		queryBuff.append("OPTIONAL{ ?item lode:poster/ma-ont:locator ?image_url .}\n");
 		queryBuff.append("OPTIONAL{ ?item dc:publisher ?source .}\n");
 		
 		queryBuff.append("VALUES ?item {");
