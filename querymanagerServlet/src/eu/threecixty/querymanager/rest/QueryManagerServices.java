@@ -112,9 +112,10 @@ public class QueryManagerServices {
 	@Path("/augmentAndExecute")
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
-			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
-		// XXX: turn off QA
-		//return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
+			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug,
+			@DefaultValue("true") @QueryParam("turnOfQA") boolean turnOfQA) {
+		// check whether or not the flag for turning off QA is true
+		if (!turnOfQA) executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
