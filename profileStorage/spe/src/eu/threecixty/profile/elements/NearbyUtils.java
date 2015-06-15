@@ -23,7 +23,8 @@ public class NearbyUtils {
 	private static final double MIN_LON = 9.011490619692509;
 	private static final double SIZE_LAT = 0.00211498;
 	private static final double SIZE_LON = 0.00300033;
-	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY = 15;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_EVENT = 15;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI = 2;
 	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 15;
 	private static final double CELL_SIZE =CellUtils.DX / 1000; // km
 	
@@ -41,7 +42,7 @@ public class NearbyUtils {
 		builder.append("WHERE { \n");
 		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
 		builder.append("?event rdfs:label ?title . \n");
-		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY;
+		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_EVENT;
 		if (categories != null && categories.length > 0) {
 			builder.append("?event lode:hasCategory ?category . \n");
 		
@@ -138,7 +139,7 @@ public class NearbyUtils {
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance ?name \n");
-		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY;
+		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI;
 
 		builder.append("WHERE { \n");
 		builder.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
