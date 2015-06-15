@@ -23,9 +23,9 @@ public class NearbyUtils {
 	private static final double MIN_LON = 9.011490619692509;
 	private static final double SIZE_LAT = 0.00211498;
 	private static final double SIZE_LON = 0.00300033;
-	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY = 2;
-	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 10;
-	private static final double CELL_SIZE = 0.5; // km
+	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY = 15;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 15;
+	private static final double CELL_SIZE =CellUtils.DX / 1000; // km
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 NearbyUtils.class.getName());
@@ -66,7 +66,7 @@ public class NearbyUtils {
 		
 		if (distance >= 0) {
 			builder.append("FILTER (?distance <= " + distance + ") \n");
-			int floor = (int) Math.floor(distance / CELL_SIZE); 
+			int floor = (int) Math.floor(distance / CELL_SIZE) + 1; 
 			if (distance > 0) numberOfCells = floor < numberOfCells ? floor : numberOfCells;
 		}
 		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
@@ -78,6 +78,7 @@ public class NearbyUtils {
 		
 		builder.append("VALUES ?cell {");
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
+		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		for (int cellId: cellIds) {
 			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}
@@ -156,12 +157,13 @@ public class NearbyUtils {
 		builder.append(" BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) \n");
 		if (distance >= 0) {
 			builder.append("FILTER (?distance <= " + distance + ") .\n");
-			int floor = (int) Math.floor(distance / CELL_SIZE); 
+			int floor = (int) Math.floor(distance / CELL_SIZE) + 1; 
 			if (distance > 0) numberOfCells = floor < numberOfCells ? floor : numberOfCells;
 		}
 		
 		builder.append("VALUES ?cell {");
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
+		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		for (int cellId: cellIds) {
 			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}

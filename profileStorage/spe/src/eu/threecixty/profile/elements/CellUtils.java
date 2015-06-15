@@ -12,7 +12,7 @@ import org.json.JSONObject;
 public class CellUtils {
 	
 
-	private static final double DX = 234.431;
+	public static final double DX = 234.431;
 	private static final double DY = 234.431;
 	private static final double HAF_OF_DX = DX / 2;
 	private static final double HALF_OF_DY = DY / 2;
