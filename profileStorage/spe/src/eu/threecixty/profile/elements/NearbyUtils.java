@@ -37,7 +37,7 @@ public class NearbyUtils {
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
 		
-		StringBuilder builder = new StringBuilder("PREFIX ce: <http://data.linkedevents.org/cell/milano/> \n SELECT distinct ?event ?distance ?title \n");
+		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance ?title \n");
 
 		builder.append("WHERE { \n");
 		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
@@ -82,7 +82,7 @@ public class NearbyUtils {
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		for (int cellId: cellIds) {
-			builder.append("(ce:" + cellId + ")");
+			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}
 		builder.append("}. \n");
 		
@@ -138,7 +138,7 @@ public class NearbyUtils {
 	
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
-		StringBuilder builder = new StringBuilder("PREFIX ce: <http://data.linkedevents.org/cell/milano/> \n SELECT distinct ?poi ?distance ?name \n");
+		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance ?name \n");
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI;
 
 		builder.append("WHERE { \n");
@@ -167,7 +167,7 @@ public class NearbyUtils {
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		for (int cellId: cellIds) {
-			builder.append("(ce:" + cellId + ")");
+			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}
 		builder.append("}. \n");
 		
