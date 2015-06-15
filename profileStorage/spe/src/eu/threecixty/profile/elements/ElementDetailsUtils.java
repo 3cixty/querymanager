@@ -169,9 +169,12 @@ public class ElementDetailsUtils {
 		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
-		queryBuff.append("?poi locationOnt:businessType/skos:prefLabel ?category . \n");
+		
 		if (categories != null && categories.length > 0) {
+			queryBuff.append("?poi locationOnt:businessType/skos:prefLabel ?category . \n");
 			appendCategoriesFilter(queryBuff, categories);
+		} else {
+			queryBuff.append("OPTIONAL {?poi locationOnt:businessType/skos:prefLabel ?category . }\n");
 		}
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:location/schema:streetAddress ?address . } \n");
