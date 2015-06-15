@@ -36,10 +36,11 @@ public class NearbyUtils {
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId) throws IOException {
 		
-		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance \n");
+		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance ?title \n");
 
 		builder.append("WHERE { \n");
 		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
+		builder.append("?event rdfs:label ?title . \n");
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY;
 		if (categories != null && categories.length > 0) {
 			builder.append("?event lode:hasCategory ?category . \n");
@@ -136,12 +137,12 @@ public class NearbyUtils {
 	
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
-		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance \n");
+		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance ?name \n");
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY;
 
 		builder.append("WHERE { \n");
 		builder.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
-		
+		builder.append(" ?poi rdfs:label ?name .  \n");
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
 			builder.append("?businessType skos:prefLabel ?category .\n");
