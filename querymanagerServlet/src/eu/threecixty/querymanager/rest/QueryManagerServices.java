@@ -87,9 +87,45 @@ public class QueryManagerServices {
 	@Path("/augmentAndExecute2")
 	public Response executeQueryPOST(@HeaderParam("access_token") String access_token,
 			@FormParam("format") String format, @FormParam("query") String query,
-			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug) {
+			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug,
+			@DefaultValue("true") @QueryParam("turnOfQA") String turnOfQA) {
 		
-		return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		//return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		if (!"true".equalsIgnoreCase(turnOfQA)) executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String key = userAccessToken.getAppkey();
+			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+			if (eventMediaFormat == null || query == null) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("The format is not supported or query is null")
+						.type(MediaType.TEXT_PLAIN)
+						.build();
+			} else {
+
+				try {
+					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, false);
+
+					// log calls
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+
+					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+				} catch (IOException e) {
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
+			}
+		}
+		return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity("Invalid access token")
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
 	}
 
 	
@@ -112,8 +148,44 @@ public class QueryManagerServices {
 	@Path("/augmentAndExecute")
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
-			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
-		return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
+			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug,
+			@DefaultValue("true") @QueryParam("turnOfQA") String turnOfQA) {
+		// check whether or not the flag for turning off QA is true
+		if (!"true".equalsIgnoreCase(turnOfQA)) executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String key = userAccessToken.getAppkey();
+			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+			if (eventMediaFormat == null || query == null) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("The format is not supported or query is null")
+						.type(MediaType.TEXT_PLAIN)
+						.build();
+			} else {
+
+				try {
+					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, false);
+
+					// log calls
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+
+					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+				} catch (IOException e) {
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
+			}
+		}
+		return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity("Invalid access token")
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
 	}
 	
 	private Response executeQueryWithHttpMethod(String access_token,
