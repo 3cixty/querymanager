@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 public class CellUtils {
@@ -31,7 +32,12 @@ public class CellUtils {
 	private static final double p3 = 0.118;	// longitude calculation term 3
 
 
-	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 CellUtils.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+
 	
 	private static Map <Integer, Double> cellIdLats;
 	private static Map <Integer, Double> cellIdLons;
@@ -86,6 +92,7 @@ public class CellUtils {
 
 		}
 		double calcutedDistance = getDistanceFromLatLonInMeter(x_closest, y_closest, orgLat, orgLon);
+		if (DEBUG_MOD) LOGGER.info("calculated distance: " + calcutedDistance + ", distance = " + distance);
 		return calcutedDistance < distance; //(Math.pow(x_closest - lat, 2) + Math.pow(y_closest - lon, 2) < Math.pow(d,2));
 	}
 	
@@ -149,6 +156,7 @@ public class CellUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		if (DEBUG_MOD) LOGGER.info("Size of total number of cells: " + cellIdLats.size());
 	}
 	
 	private static String getContent(InputStream input) throws IOException {
