@@ -192,7 +192,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating/schema:reviewRating/schema:ratingValue ?ratingValue3  .} \n");
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
-		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
+		queryBuff.append("OPTIONAL{ ?poi lode:poster/ma-ont:locator ?image_url .} \n");
 		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:telephone ?telephone .} \n");
 		
