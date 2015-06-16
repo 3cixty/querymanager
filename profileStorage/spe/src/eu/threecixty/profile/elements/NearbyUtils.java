@@ -81,6 +81,7 @@ public class NearbyUtils {
 		builder.append("VALUES ?cell {");
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
+		if (cellIds.size() == 0) return Collections.emptyList();
 		for (int cellId: cellIds) {
 			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}
@@ -166,6 +167,7 @@ public class NearbyUtils {
 		builder.append("VALUES ?cell {");
 		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
+		if (cellIds.size() == 0) return Collections.emptyList();
 		for (int cellId: cellIds) {
 			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
 		}
