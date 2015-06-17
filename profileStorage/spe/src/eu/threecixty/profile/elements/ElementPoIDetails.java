@@ -23,7 +23,9 @@ public class ElementPoIDetails extends ElementDetails {
 	private List <Review> reviews;
 	
 	private Boolean augmented;
-	private Map <String, List<Review>> reviewsLanguages; 
+	private Map <String, List<Review>> reviewsLanguages;
+	
+	private String topCategory;
 	
 	public String getTelephone() {
 		return telephone;
@@ -57,6 +59,13 @@ public class ElementPoIDetails extends ElementDetails {
 		this.reviews = reviews;
 	}
 	
+	public String getTopCategory() {
+		return topCategory;
+	}
+	public void setTopCategory(String topCategory) {
+		this.topCategory = topCategory;
+	}
+	
 	public void putReview(String language, Review review) {
 		if (language == null || review == null) return;
 		if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
@@ -77,6 +86,7 @@ public class ElementPoIDetails extends ElementDetails {
 		epd.telephone = this.telephone;
 		epd.augmented = this.augmented;
 		epd.aggregate_rating = this.aggregate_rating;
+		epd.topCategory = this.topCategory;
 		if (language != null && reviewsLanguages != null) epd.reviews = reviewsLanguages.get(language);
 		if (epd.reviews == null) {
 			epd.reviews = Collections.emptyList();
