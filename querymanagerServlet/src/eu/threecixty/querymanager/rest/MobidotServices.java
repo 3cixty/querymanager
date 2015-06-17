@@ -39,6 +39,7 @@ public class MobidotServices {
 	private static final String MOBIDOT_SOURCE = "Mobidot";
 	private static final String MOBIDOT_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
 	private static final String MOBIDOT_ENDPOINT = "https://www.movesmarter.nl/external/identitymanager/user/onetimetoken?";
+	private static final int DAY_IN_SECOND = 60 * 60 * 24;
 	
 	private static final Logger LOGGER = Logger.getLogger(
 			MobidotServices.class.getName());
@@ -137,7 +138,8 @@ public class MobidotServices {
 
 	private String getContent(String username, String password) {
 		try {
-			URL url = new URL(MOBIDOT_ENDPOINT + "userName=" + username + "&password=" + URLEncoder.encode(password, "UTF-8") + "&key=" + MOBIDOT_KEY);
+			URL url = new URL(MOBIDOT_ENDPOINT + "userName=" + username + "&password=" + URLEncoder.encode(password, "UTF-8")
+					+ "&key=" + MOBIDOT_KEY + "&tokenLifetime=" + DAY_IN_SECOND);
 			InputStream input = url.openStream();
 			StringBuilder builder = new StringBuilder();
 			byte [] b = new byte[1024];
