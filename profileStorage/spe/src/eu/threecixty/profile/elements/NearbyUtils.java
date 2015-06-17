@@ -137,7 +137,8 @@ public class NearbyUtils {
 		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon,
+			String[] categories, String[] topCategories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance ?name \n");
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI;
@@ -150,6 +151,14 @@ public class NearbyUtils {
 			builder.append("?businessType skos:prefLabel ?category .\n");
 			
 			filterCategories(categories, builder);
+			numberOfCells = NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY;
+		}
+		
+		if (topCategories != null && topCategories.length > 0) {
+			builder.append("?poi locationOnt:businessTypeTop ?businessTypeTop. \n");
+			builder.append("?businessTypeTop skos:prefLabel ?topCategory .\n");
+			
+			filterTopCategories(topCategories, builder);
 			numberOfCells = NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY;
 		}
 		
@@ -178,7 +187,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, languages);
+		return getNearbyPoIs(builder.toString(), categories, topCategories, languages);
 	}
 	
 	/**
@@ -191,7 +200,8 @@ public class NearbyUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> getNearbyPoIElements(String locId, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyPoIElements(String locId, String[] categories, String[] topCategories,
+			String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();
 		
@@ -205,6 +215,13 @@ public class NearbyUtils {
 			builder.append("?businessType skos:prefLabel ?category .\n");
 			
 			filterCategories(categories, builder);
+		}
+		
+		if (topCategories != null && topCategories.length > 0) {
+			builder.append("?poi locationOnt:businessTypeTop ?businessTypeTop. \n");
+			builder.append("?businessTypeTop skos:prefLabel ?topCategory .\n");
+			
+			filterTopCategories(topCategories, builder);
 		}
 		
 		builder.append("?poi geo:location ?loc . ?loc geo:lat ?lat . ?loc geo:long ?lon . BIND(bif:st_point(xsd:decimal(?lon), xsd:decimal(?lat)) as ?geo) . \n");
@@ -222,11 +239,12 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, languages);
+		return getNearbyPoIs(builder.toString(), categories, topCategories, languages);
 
 	}
 	
-	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories, String [] languages) throws IOException {
+	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories,
+			String[] topCategories, String [] languages) throws IOException {
 		if (DEBUG_MOD) LOGGER.info(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
@@ -242,7 +260,8 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet(), categories, languages);
+		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet(),
+				categories, topCategories, languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
@@ -287,6 +306,23 @@ public class NearbyUtils {
 			}
 			index++;
 			result.append("STR(?category) = \"").append(category).append("\"");
+
+		}
+		result.append(") \n");
+	}
+	
+	private static void filterTopCategories(String[] topCategories, StringBuilder result) {
+		if (topCategories.length == 0) return;
+		result.append("FILTER (");
+		int index = 0;
+		for (String topCategory: topCategories) {
+			if (topCategory != null) topCategory = topCategory.trim();
+			if (topCategory == null || topCategory.equals("")) continue;
+			if (index > 0) {
+				result.append(" || ");
+			}
+			index++;
+			result.append("STR(?topCategory) = \"").append(topCategory).append("\"");
 
 		}
 		result.append(") \n");

@@ -155,12 +155,13 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
+	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds,
+			String[] categories, String[] topCategories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return Collections.emptyList();
 
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 		
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url  \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category ?topCategory  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url  \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
 		
@@ -175,6 +176,13 @@ public class ElementDetailsUtils {
 			appendCategoriesFilter(queryBuff, categories);
 		} else {
 			queryBuff.append("OPTIONAL {?poi locationOnt:businessType/skos:prefLabel ?category . }\n");
+		}
+		
+		if (topCategories != null && topCategories.length > 0) {
+			queryBuff.append("?poi locationOnt:businessTypeTop/skos:prefLabel ?topCategory . \n");
+			appendTopCategoriesFilter(queryBuff, topCategories);
+		} else {
+			queryBuff.append("OPTIONAL {?poi locationOnt:businessTypeTop/skos:prefLabel ?topCategory . }\n");
 		}
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:location/schema:streetAddress ?address . } \n");
@@ -303,6 +311,9 @@ public class ElementDetailsUtils {
 		String category = getAttributeValue(json, CATEGORY_ATTRIBUTE);
 		if (!isNullOrEmpty(category)) categories.add(category);
 		
+		String topCategory = getAttributeValue(json, "topCategory");
+		if (!isNullOrEmpty(topCategory)) poiDetails.setTopCategory(topCategory);
+		
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
 		String lon = getAttributeValue(json, "lon");
@@ -425,6 +436,21 @@ public class ElementDetailsUtils {
 				}
 				index++;
 				sb.append("STR(?category) = \"" + tmpCat + "\"");
+			}
+			sb.append(") .\n");
+		}
+	}
+	
+	private static void appendTopCategoriesFilter(StringBuilder sb, String[] topCategories) {
+		if (topCategories.length > 0) {
+			sb.append("FILTER (");
+			int index = 0;
+			for (String tmpCat: topCategories) {
+				if (index > 0) {
+					sb.append(" || ");
+				}
+				index++;
+				sb.append("STR(?topCategory) = \"" + tmpCat + "\"");
 			}
 			sb.append(") .\n");
 		}
