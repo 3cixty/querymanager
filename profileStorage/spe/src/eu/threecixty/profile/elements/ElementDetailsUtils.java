@@ -32,6 +32,7 @@ public class ElementDetailsUtils {
 	
 	private static final String COMMENT_ATTRIBUTE = "reviewBody"; // to get comment
 	private static final String CATEGORY_ATTRIBUTE = "category";
+	private static final String TOP_CATEGORY_ATTRIBUTE = "topCategory";
 	
 	private static final String TRANSLATION_TAG = "-tr";
 	private static final String REVIEW_LANG = "reviewLang";
@@ -236,12 +237,12 @@ public class ElementDetailsUtils {
 
 		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
 		
-		ElementDetails tmpPoIDetails = null;
+		ElementPoIDetails tmpPoIDetails = null;
 		for (int i = 0; i  < len; i++) {
 			JSONObject tmpObj = jsonArrs.getJSONObject(i);
 			String currentId = tmpObj.get("poi").toString();
 			if (currentId == null) continue;
-			tmpPoIDetails = maps.get(currentId);
+			tmpPoIDetails = (ElementPoIDetails) maps.get(currentId);
 			if (tmpPoIDetails == null) {
 				tmpPoIDetails = createPoIDetails(tmpObj, languages);
 				maps.put(currentId, tmpPoIDetails);
@@ -260,6 +261,11 @@ public class ElementDetailsUtils {
 					if (!tmpPoIDetails.getCategories().contains(category))
 						tmpPoIDetails.getCategories().add(category);
 				}
+				String topCategory = getAttributeValue(tmpObj, TOP_CATEGORY_ATTRIBUTE);
+				if (!isNullOrEmpty(topCategory)) {
+					if (!tmpPoIDetails.getTopCategories().contains(topCategory))
+						tmpPoIDetails.getTopCategories().add(topCategory);
+				}
 				String descLang = getAttributeValue(tmpObj, "descLang");
 				
 				String desc = getAttributeValue(tmpObj, "description");
@@ -272,6 +278,7 @@ public class ElementDetailsUtils {
 		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		elementsDetails.addAll(maps.values());
 		processCategories(elementsDetails);
+		processTopCategories(elementsDetails);
 		
 		DetailItemsCacheManager.getInstance().put(elementsDetails);
 		for (ElementDetails tmp: elementsDetails) {
@@ -311,8 +318,10 @@ public class ElementDetailsUtils {
 		String category = getAttributeValue(json, CATEGORY_ATTRIBUTE);
 		if (!isNullOrEmpty(category)) categories.add(category);
 		
-		String topCategory = getAttributeValue(json, "topCategory");
-		if (!isNullOrEmpty(topCategory)) poiDetails.setTopCategory(topCategory);
+		List <String> topCategories = new LinkedList <String>();
+		poiDetails.setTopCategories(topCategories);
+		String topCategory = getAttributeValue(json, TOP_CATEGORY_ATTRIBUTE);
+		if (!isNullOrEmpty(topCategory)) categories.add(topCategory);
 		
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
@@ -407,6 +416,19 @@ public class ElementDetailsUtils {
 			}
 			ed.setCategory(catBuilder.toString());
 			ed.setCategories(null);
+		}
+	}
+	
+	private static void processTopCategories(List<ElementDetails> elementsDetails) {
+		StringBuilder topCatBuilder = new StringBuilder();
+		for (ElementDetails ed: elementsDetails) {
+			topCatBuilder.setLength(0);
+			for (String topCategory: ((ElementPoIDetails) ed).getTopCategories()) {
+				if (topCatBuilder.length() > 0) topCatBuilder.append(", ");
+				topCatBuilder.append(topCategory);
+			}
+			((ElementPoIDetails) ed).setTopCategory(topCatBuilder.toString());
+			((ElementPoIDetails) ed).setTopCategories(null);
 		}
 	}
 	

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import eu.threecixty.profile.Review;
+
 import org.apache.log4j.Logger;
 
 public class ElementPoIDetails extends ElementDetails {
@@ -26,6 +27,8 @@ public class ElementPoIDetails extends ElementDetails {
 	private Map <String, List<Review>> reviewsLanguages;
 	
 	private String topCategory;
+	
+	private List<String> topCategories; // contain a list of top categories
 	
 	public String getTelephone() {
 		return telephone;
@@ -66,6 +69,12 @@ public class ElementPoIDetails extends ElementDetails {
 		this.topCategory = topCategory;
 	}
 	
+	public List<String> getTopCategories() {
+		return topCategories;
+	}
+	public void setTopCategories(List<String> topCategories) {
+		this.topCategories = topCategories;
+	}
 	public void putReview(String language, Review review) {
 		if (language == null || review == null) return;
 		if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
