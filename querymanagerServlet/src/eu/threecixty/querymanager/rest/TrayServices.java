@@ -452,7 +452,7 @@ public class TrayServices {
 			}
 			trayDetailsList.addAll(elementEventsDetails);
 		}
-		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, tmpLanguages);
 		if (elementPoIsDetails != null) {
 			for (ElementDetails poiDetails: elementPoIsDetails) {
 				poiDetails.setType(POI_TYPE);

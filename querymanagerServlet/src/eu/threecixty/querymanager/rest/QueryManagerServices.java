@@ -362,7 +362,7 @@ public class QueryManagerServices {
 				if (pois != null && !pois.equals("")) {
 					List <String> poiIds = createList(pois);
 
-					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null,
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null,
 							tmpLanguages);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
@@ -799,7 +799,7 @@ public class QueryManagerServices {
 				QueryManager qm = new QueryManager(user_id);
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), null, tmpLanguages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), null, null, tmpLanguages);
 				for (ElementDetails poi: poisInDetails) {
 					((ElementPoIDetails) poi).setAugmented(result.get(poi.getId()));
 				}
@@ -985,7 +985,7 @@ public class QueryManagerServices {
 			try {
 				List <String> poiIds = QueryManager.getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(poisInDetails).toString();

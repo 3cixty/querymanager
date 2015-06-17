@@ -35,17 +35,20 @@ public class NearbyServices {
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
+			@DefaultValue("") @QueryParam("topCategories") String topCategories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
 			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
-		String [] tmpCats;
+		String [] tmpCats, tmpTopCats;
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split(",");
+		if (topCategories == null || topCategories.equals("")) tmpTopCats = null;
+		else tmpTopCats = topCategories.split(",");
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCats,
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(poiID, tmpCats, tmpTopCats,
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -62,17 +65,20 @@ public class NearbyServices {
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
+			@DefaultValue("") @QueryParam("topCategories") String topCategories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
 			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
-		String [] tmpCats;
+		String [] tmpCats, tmpTopCats;
 		if (categories == null || categories.equals("")) tmpCats = null;
 		else tmpCats = categories.split(",");
+		if (topCategories == null || topCategories.equals("")) tmpTopCats = null;
+		else tmpTopCats = topCategories.split(",");
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats,
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, tmpTopCats,
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
