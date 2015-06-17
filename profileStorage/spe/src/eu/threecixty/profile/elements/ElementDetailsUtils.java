@@ -321,7 +321,7 @@ public class ElementDetailsUtils {
 		List <String> topCategories = new LinkedList <String>();
 		poiDetails.setTopCategories(topCategories);
 		String topCategory = getAttributeValue(json, TOP_CATEGORY_ATTRIBUTE);
-		if (!isNullOrEmpty(topCategory)) categories.add(topCategory);
+		if (!isNullOrEmpty(topCategory)) topCategories.add(topCategory);
 		
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
