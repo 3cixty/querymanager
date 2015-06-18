@@ -23,10 +23,6 @@ import eu.threecixty.oauth.model.App;
  *
  */
 public class TokenCacheManager {
-
-	
-	//private static final String WISHLISH = "WishList";
-	//private static final String PROFILE = "Profile";
 	
 	private static final String TOKEN_CACHE_KEY = "tokenCache";
 	private static final String UID_APPKEY_ACCESS_TOKEN_KEY = "uidAppkeyAccessToken";
@@ -42,12 +38,6 @@ public class TokenCacheManager {
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private MemcachedClient memcachedClient;
-	 
-	//private Map <String, TokenCache> tokenCaches;
-	//private Map <String, String> uidAppkeyAccessTokens;
-	//private Map <String, AppCache> appkeyCaches;
-	//private Map <String, AppCache> appIdCaches;
-	//private Map <String, Integer> appkeyCaches;
 
 	public static TokenCacheManager getInstance() {
 		return SingletonHolder.INSTANCE;
@@ -67,40 +57,6 @@ public class TokenCacheManager {
 	private AccessToken getAccessTokenWithoutCheckingExpiration(String access_token) {
 		if (access_token == null) return null;
 		if (DEBUG_MOD) LOGGER.info("Checking token in memory");
-		/*
-		TokenCache tokenCache = tokenCaches.get(access_token);
-		if (tokenCache == null) {
-			if (DEBUG_MOD) LOGGER.info("Given token is not found in memory");
-			return null;
-		}
-		long currentTime = System.currentTimeMillis();
-		if (currentTime > tokenCache.getCreation() + tokenCache.getExpiration() * 1000) {
-			if (DEBUG_MOD) LOGGER.info("Token is found inmemory, but invalid");
-			return null;
-		}
-		if (DEBUG_MOD) LOGGER.info("Token is found in memory and valid");
-		AccessToken accessToken = new AccessToken();
-		accessToken.setAccess_token(access_token);
-		accessToken.setUid(tokenCache.getUid());
-		accessToken.setRefresh_token(tokenCache.getRefresh_token());
-		accessToken.setExpires_in(tokenCache.getExpiration() - (int) ((currentTime - tokenCache.getCreation()) / 1000));
-		ScopeEnum scopeEnum = tokenCache.getScope();
-		if (scopeEnum == ScopeEnum.Profile) {
-		    accessToken.getScopeNames().add(PROFILE);
-		} else if (scopeEnum == ScopeEnum.WishList) {
-			accessToken.getScopeNames().add(WISHLISH);
-		} else {
-			accessToken.getScopeNames().add(PROFILE);
-			accessToken.getScopeNames().add(WISHLISH);
-		}
-		AppCache appCache = getAppCache(tokenCache.getAppid());
-		if (appCache != null) {
-			accessToken.setAppClientKey(appCache.getAppClientKey());
-			accessToken.setAppClientPwd(appCache.getAppClientPwd());
-			accessToken.setAppkey(appCache.getAppkey());
-		}
-		return accessToken;
-		*/
 		
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(TOKEN_CACHE_KEY + access_token);
@@ -108,14 +64,7 @@ public class TokenCacheManager {
 				Object myObj = f.get(TIME_OUT_TO_GET_CACHE, TimeUnit.MILLISECONDS);
 				if (myObj != null) {
 					
-					AccessToken at = (AccessToken)myObj;
-					/*
-					long currentTime = System.currentTimeMillis();
-					if (currentTime > at.getCreation() + at.getExpires_in() * 1000) {
-						if (DEBUG_MOD) LOGGER.info("Token is found in memory, but invalid");
-						return null;
-					}
-					*/
+					AccessToken at = (AccessToken) myObj;
 					return at;
 				}
 			} catch(TimeoutException e) {
@@ -135,10 +84,6 @@ public class TokenCacheManager {
 	public AccessToken getAccessTokenFrom(String uid, String appkey) {
 		if (uid == null || appkey == null) return null;
 		
-		/*
-		String access_token = uidAppkeyAccessTokens.get(appkey + uid);
-		if (access_token == null) return null;
-		return getAccessToken(access_token);*/
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(UID_APPKEY_ACCESS_TOKEN_KEY + appkey + uid);
 			try {
@@ -160,11 +105,7 @@ public class TokenCacheManager {
 	
 	public AppCache getAppCache(String appkey) {
 		if (appkey == null) return null;
-		/*
-		Integer appid = appkeyCaches.get(appkey);
-		if (appid == null) return null;
-		return appIdCaches.get(appid);
-		*/
+
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(APPKEY_CACHE_KEY + appkey);
 			try {
@@ -216,7 +157,6 @@ public class TokenCacheManager {
 	}
 	
 	public void remove(String access_token) {
-		//tokenCaches.remove(access_token);
 		AccessToken at = getAccessTokenWithoutCheckingExpiration(access_token);
 		if (at != null) {
 			// memcachedClient is not null because at is not null
@@ -230,8 +170,6 @@ public class TokenCacheManager {
 		accessToken.setCreation(System.currentTimeMillis());
 		putData(TOKEN_CACHE_KEY + accessToken.getAccess_token(), accessToken);
 		putData(UID_APPKEY_ACCESS_TOKEN_KEY + accessToken.getAppkey() + accessToken.getUid(), accessToken);
-		//tokenCaches.put(accessToken.getAccess_token(), tokenCache);
-		//uidAppkeyAccessTokens.put(accessToken.getAppkey() + accessToken.getUid(), accessToken.getAccess_token());
 	}
 	
 	public void update(App app) {
@@ -239,9 +177,6 @@ public class TokenCacheManager {
 		AppCache appCache = createAppCache(app);
 		putData(APP_ID_CACHE_KEY + app.getId(), appCache);
 		putData(APPKEY_CACHE_KEY + app.getKey(), appCache);
-		
-		//appIdCaches.put(app.getId(), appCache);
-		//appkeyCaches.put(app.getKey(), app.getId());
 	}
 	
 	public void stop() {
@@ -266,12 +201,7 @@ public class TokenCacheManager {
 	}
 	
 	private TokenCacheManager() {
-		//tokenCaches = new ConcurrentHashMap<String, TokenCache>();
-		//appIdCaches = new HashMap<Integer, AppCache>();
-		//appkeyCaches = new HashMap<String, Integer>();
-		//uidAppkeyAccessTokens = new ConcurrentHashMap<String, String>();
 		loadAppCaches();
-
 
 	    memcachedClient = MemcachedUtils.createClient();
 			
