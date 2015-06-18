@@ -52,8 +52,19 @@ public class TokenCacheManager {
 	public static TokenCacheManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-
+	
 	public AccessToken getAccessToken(String access_token) {
+		AccessToken at = getAccessTokenWithoutCheckingExpiration(access_token);
+		if (at == null) return null;
+		long currentTime = System.currentTimeMillis();
+		if (currentTime > at.getCreation() + at.getExpires_in() * 1000) {
+			if (DEBUG_MOD) LOGGER.info("Token is found in memory, but invalid");
+			return null;
+		}
+		return at;
+	}
+
+	private AccessToken getAccessTokenWithoutCheckingExpiration(String access_token) {
 		if (access_token == null) return null;
 		if (DEBUG_MOD) LOGGER.info("Checking token in memory");
 		/*
@@ -98,11 +109,13 @@ public class TokenCacheManager {
 				if (myObj != null) {
 					
 					AccessToken at = (AccessToken)myObj;
+					/*
 					long currentTime = System.currentTimeMillis();
 					if (currentTime > at.getCreation() + at.getExpires_in() * 1000) {
 						if (DEBUG_MOD) LOGGER.info("Token is found in memory, but invalid");
 						return null;
 					}
+					*/
 					return at;
 				}
 			} catch(TimeoutException e) {
@@ -204,7 +217,12 @@ public class TokenCacheManager {
 	
 	public void remove(String access_token) {
 		//tokenCaches.remove(access_token);
-		if (memcachedClient != null) memcachedClient.delete(TOKEN_CACHE_KEY + access_token);
+		AccessToken at = getAccessTokenWithoutCheckingExpiration(access_token);
+		if (at != null) {
+			// memcachedClient is not null because at is not null
+			memcachedClient.delete(TOKEN_CACHE_KEY + access_token);
+			memcachedClient.delete(UID_APPKEY_ACCESS_TOKEN_KEY + at.getAppkey() + at.getUid());
+		}
 	}
 	
 	public void update(AccessToken accessToken) {
