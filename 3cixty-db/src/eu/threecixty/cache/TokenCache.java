@@ -1,14 +1,20 @@
 package eu.threecixty.cache;
 
-public class TokenCache {
+import java.io.Serializable;
 
+public class TokenCache implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6364836815966298523L;
 	private String refresh_token;
 	private String uid;
 	private long creation;
 	private int expiration; // in second
 	private int appid;
 	private ScopeEnum scope;
-	
+	/*
 	public TokenCache() {
 		creation = System.currentTimeMillis();
 	}
@@ -54,4 +60,5 @@ public class TokenCache {
 	public void setRefresh_token(String refresh_token) {
 		this.refresh_token = refresh_token;
 	}
+	*/
 }
