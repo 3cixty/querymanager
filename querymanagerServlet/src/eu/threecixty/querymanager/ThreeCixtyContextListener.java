@@ -9,6 +9,8 @@ import javax.servlet.annotation.WebListener;
 import eu.threecixty.Configuration;
 import eu.threecixty.CrawlerCron.CrawlerCron;
 import eu.threecixty.cache.CacheManager;
+import eu.threecixty.cache.TokenCacheManager;
+import eu.threecixty.cache.TrayCacheManager;
 import eu.threecixty.oauth.OAuthBypassedManager;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.PersistenceWorkerManager;
@@ -23,6 +25,8 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	private static final String FOLDER_ROOT = "3cixtyData";
 
 	public void contextDestroyed(ServletContextEvent context) {
+		TokenCacheManager.getInstance().stop();
+		TrayCacheManager.getInstance().stop();
 		PersistenceWorkerManager.getInstance().stop();
 	}
 
