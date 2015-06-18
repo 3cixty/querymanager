@@ -127,7 +127,7 @@ public class TokenCacheManager {
 		if (access_token == null) return null;
 		return getAccessToken(access_token);*/
 		if (memcachedClient != null) {
-			Future<Object> f = memcachedClient.asyncGet(APPKEY_CACHE_KEY + appkey);
+			Future<Object> f = memcachedClient.asyncGet(UID_APPKEY_ACCESS_TOKEN_KEY + appkey + uid);
 			try {
 				Object myObj = f.get(TIME_OUT_TO_GET_CACHE, TimeUnit.MILLISECONDS);
 				if (myObj != null) return (AccessToken)myObj;
