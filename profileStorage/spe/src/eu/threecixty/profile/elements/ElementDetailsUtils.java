@@ -55,7 +55,6 @@ public class ElementDetailsUtils {
 		queryBuff.append("{ graph <http://3cixty.com/events> {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
 		queryBuff.append(" OPTIONAL { ?item rdfs:seeAlso ?url . } \n");
-		queryBuff.append(" OPTIONAL { ?item schema:url ?url1 . } \n");
 		queryBuff.append(" OPTIONAL { ?item owl:sameAs ?url2 . } \n");
 		queryBuff.append(" OPTIONAL { ?item dc:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
@@ -72,6 +71,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
 		queryBuff.append("              ?inSpace geo:long ?lon . }\n");
 		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place. \n");
+		queryBuff.append("              OPTIONAL { ?place schema:url ?url1 . } \n");
 		queryBuff.append("              ?place schema:location ?address .\n");
 		queryBuff.append("              ?address schema:streetAddress ?street .\n");
 		queryBuff.append("              ?address schema:addressLocality ?locality . }\n");
