@@ -85,7 +85,7 @@ public class OAuthWrappers {
 		}
 		// delete UserAccessToken as this access token is not available on OAuth server
 		if (foundInDB != null) {
-			OAuthModelsUtils.deleteUserAccessToken(foundInDB.getAccess_token());
+			//OAuthModelsUtils.deleteUserAccessToken(foundInDB.getAccess_token());
 		}
 		return null;
 	}
