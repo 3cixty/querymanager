@@ -50,7 +50,7 @@ public class ElementDetailsUtils {
 		
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?url1 \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("{ graph <http://3cixty.com/events> {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
@@ -163,7 +163,7 @@ public class ElementDetailsUtils {
 
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 		
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category ?topCategory  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url  \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category ?topCategory  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url ?url1  \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
 		
