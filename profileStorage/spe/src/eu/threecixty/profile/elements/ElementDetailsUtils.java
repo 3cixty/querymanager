@@ -50,12 +50,13 @@ public class ElementDetailsUtils {
 		
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?url1 \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?url1 ?url2 \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("{ graph <http://3cixty.com/events> {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
 		queryBuff.append(" OPTIONAL { ?item rdfs:seeAlso ?url . } \n");
 		queryBuff.append(" OPTIONAL { ?item schema:url ?url1 . } \n");
+		queryBuff.append(" OPTIONAL { ?item owl:sameAs ?url2 . } \n");
 		queryBuff.append(" OPTIONAL { ?item dc:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
@@ -163,13 +164,14 @@ public class ElementDetailsUtils {
 
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 		
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category ?topCategory  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url ?url1  \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category ?topCategory  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url ?url1 ?url2  \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
 		queryBuff.append(" OPTIONAL { ?poi owl:sameAs ?url . } \n");
 		queryBuff.append(" OPTIONAL { ?poi schema:url ?url1 . } \n");
+		queryBuff.append(" OPTIONAL { ?poi rdfs:seeAlso ?url2 . } \n");
 		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
@@ -359,6 +361,7 @@ public class ElementDetailsUtils {
 		
 		String url = getAttributeValue(json, "url");
 		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url2");
 		if (!isNullOrEmpty(url)) poiDetails.setUrl(url);
 		
 		return poiDetails;
@@ -406,6 +409,7 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		String url = getAttributeValue(json, "url");
 		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url2");
 		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
 		return eventDetails;
 	}
