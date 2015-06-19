@@ -55,6 +55,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("{ graph <http://3cixty.com/events> {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
 		queryBuff.append(" OPTIONAL { ?item rdfs:seeAlso ?url . } \n");
+		queryBuff.append(" OPTIONAL { ?item schema:url ?url1 . } \n");
 		queryBuff.append(" OPTIONAL { ?item dc:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
@@ -168,6 +169,7 @@ public class ElementDetailsUtils {
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
 		queryBuff.append(" OPTIONAL { ?poi owl:sameAs ?url . } \n");
+		queryBuff.append(" OPTIONAL { ?poi schema:url ?url1 . } \n");
 		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
@@ -356,6 +358,7 @@ public class ElementDetailsUtils {
 		}
 		
 		String url = getAttributeValue(json, "url");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
 		if (!isNullOrEmpty(url)) poiDetails.setUrl(url);
 		
 		return poiDetails;
@@ -402,6 +405,7 @@ public class ElementDetailsUtils {
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		String url = getAttributeValue(json, "url");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
 		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
 		return eventDetails;
 	}
