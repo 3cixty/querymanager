@@ -21,6 +21,7 @@ public class Tray {
 	private int rating = -1;
 	
 	private String image_url;
+	private Long creationTimestamp;
 	
 	public String getElement_id() {
 		return element_id;
@@ -100,6 +101,14 @@ public class Tray {
 
 	public void setImage_url(String image_url) {
 		this.image_url = image_url;
+	}
+
+	public Long getCreationTimestamp() {
+		return creationTimestamp;
+	}
+
+	public void setCreationTimestamp(Long creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
 	}
 
 	public enum OrderType {
