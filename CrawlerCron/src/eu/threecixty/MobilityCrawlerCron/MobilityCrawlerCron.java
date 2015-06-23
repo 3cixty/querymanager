@@ -112,11 +112,15 @@ public class MobilityCrawlerCron {
 		if (DEBUG_MOD) LOGGER.info("Start extracting Accompanying");
 		int length;
 		String urlStr;
-		urlStr = MobidotBaseurl + "measurement/Accompanies/" + mobidotID
+		urlStr = MobidotBaseurl + "measurement/Accompanies/" + mobidotID.trim()
 				+ "/modifiedSince/" + "0" + "?key=" + APIKey;
 		if (DEBUG_MOD) LOGGER.info("URL to get accompanying: " + urlStr);
 		JSONArray resultAccompany = getTravelInfoforMobiditID(urlStr);
 
+		if (resultAccompany == null) {
+			if (DEBUG_MOD) LOGGER.info("Error while accessing to Mobidot server");
+			return;
+		}
 		length = resultAccompany.length();
 
 		Set<Accompanying> accompanyings = profile.getAccompanyings();
@@ -361,7 +365,7 @@ public class MobilityCrawlerCron {
 				input.close();
 				return jsonob;
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (DEBUG_MOD) LOGGER.info(e.getMessage());
 				return null;
 			}
 		}
