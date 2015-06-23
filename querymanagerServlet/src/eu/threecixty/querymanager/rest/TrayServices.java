@@ -194,6 +194,10 @@ public class TrayServices {
     	try {
     		RestTrayObject restTrayObject = new RestTrayObject();
     		restTrayObject.setToken(accessToken);
+    		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
+    		if (at != null) {
+    			restTrayObject.setKey(at.getAppkey());
+    		}
     		restTrayObject.setAction(GET_ACTION_IN_DETAILS);
 			return get_tray_elements_details(restTrayObject, req, System.currentTimeMillis());
 		} catch (ThreeCixtyPermissionException e) {
