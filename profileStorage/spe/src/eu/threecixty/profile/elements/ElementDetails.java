@@ -28,7 +28,10 @@ public class ElementDetails {
 	
 	private String description;
 	
+	// asked by Christian to avoid calling API twice to get trays list in detail
 	private Long creationTimestamp;
+	private String attend_datetime;
+	private Integer rating;
 	
 	protected Map <String, String> descriptions;
 	protected Map <String, Boolean> translateds;
@@ -137,6 +140,18 @@ public class ElementDetails {
 		this.creationTimestamp = creationTimestamp;
 	}
 
+	public String getAttend_datetime() {
+		return attend_datetime;
+	}
+	public void setAttend_datetime(String attend_datetime) {
+		this.attend_datetime = attend_datetime;
+	}
+	public Integer getRating() {
+		return rating;
+	}
+	public void setRating(Integer rating) {
+		this.rating = rating;
+	}
 	public void putDescription(String language, String description) {
 		if (descriptions == null) {
 			descriptions = new HashMap<String, String>();

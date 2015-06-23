@@ -466,6 +466,8 @@ public class TrayServices {
 				eventDetails.setType(EVENT_TYPE);
 				for (Tray tray: trays) {
 					if (tray.getElement_id().equals(eventDetails.getId())) {
+						eventDetails.setAttend_datetime(tray.getAttend_datetime());
+						eventDetails.setRating(tray.getRating());
 						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
 						break;
 					}
@@ -479,6 +481,8 @@ public class TrayServices {
 				poiDetails.setType(POI_TYPE);
 				for (Tray tray: trays) {
 					if (tray.getElement_id().equals(poiDetails.getId())) {
+						poiDetails.setAttend_datetime(tray.getAttend_datetime());
+						poiDetails.setRating(tray.getRating());
 						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
 						break;
 					}
