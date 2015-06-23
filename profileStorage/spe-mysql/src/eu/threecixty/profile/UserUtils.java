@@ -401,14 +401,15 @@ public class UserUtils {
 	private static void convertAccompanyingsForPersistence(
 			UserProfile profile, UserModel userModel, Session session) {
 		Set <Accompanying> accompanyings = profile.getAccompanyings();
-		if (DEBUG_MOD) LOGGER.info("list of accompanyings before saving: " + accompanyings == null ? "empty" : " number of accompanyings: " + accompanyings.size());
 		Set <AccompanyingModel> accompanyingModels = userModel.getAccompanyings();
 		if (accompanyings == null || accompanyings.size() == 0) {
+			if (DEBUG_MOD) LOGGER.info("list of accompanyings before saving: empty");
 			if (accompanyingModels != null && accompanyingModels.size() > 0) {
 				accompanyingModels.clear();
 			}
 			return;
 		}
+		if (DEBUG_MOD) LOGGER.info("number of accompanyings before saving: " + accompanyings.size());
 		if (accompanyingModels == null) {
 			accompanyingModels = new HashSet<AccompanyingModel>();
 			userModel.setAccompanyings(accompanyingModels);
