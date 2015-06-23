@@ -9,13 +9,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -188,44 +186,44 @@ public class TrayServices {
 
     }
 	
-    @GET
-    @Path("/getTraysInDetail")
-    public Response getTraysInDetail(@Context HttpHeaders headers, @Context Request req) {
-    	try {
-    		if (DEBUG_MOD) LOGGER.info("Get trays in detail");
-    		RestTrayObject restTrayObject = new RestTrayObject();
-    		List <String> accessTokens = headers.getRequestHeader("access_token");
-    		if (accessTokens != null && accessTokens.size() > 0) {
-    		    restTrayObject.setToken(accessTokens.get(0));
-    		}
-    		AccessToken at = OAuthWrappers.findAccessTokenFromDB(restTrayObject.getToken());
-    		if (at != null) {
-    			restTrayObject.setKey(at.getAppkey());
-    		}
-    		restTrayObject.setAction(GET_ACTION_IN_DETAILS);
-			return get_tray_elements_details(restTrayObject, req, System.currentTimeMillis());
-		} catch (ThreeCixtyPermissionException e) {
-			return Response.status(Response.Status.FORBIDDEN)
-					.entity(e.getMessage())
-					.type(MediaType.TEXT_PLAIN)
-					.build();
-		} catch (InvalidTrayElement e) {
-			return Response.status(Response.Status.BAD_REQUEST)
-					.entity(e.getMessage())
-					.type(MediaType.TEXT_PLAIN_TYPE)
-					.build();
-		} catch (TooManyConnections e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.getMessage())
-					.type(MediaType.TEXT_PLAIN_TYPE)
-					.build();
-		} catch (IOException e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.getMessage())
-					.type(MediaType.TEXT_PLAIN_TYPE)
-					.build();
-		}
-    }
+//    @GET
+//    @Path("/getTraysInDetail")
+//    public Response getTraysInDetail(@Context HttpHeaders headers, @Context Request req) {
+//    	try {
+//    		if (DEBUG_MOD) LOGGER.info("Get trays in detail");
+//    		RestTrayObject restTrayObject = new RestTrayObject();
+//    		List <String> accessTokens = headers.getRequestHeader("access_token");
+//    		if (accessTokens != null && accessTokens.size() > 0) {
+//    		    restTrayObject.setToken(accessTokens.get(0));
+//    		}
+//    		AccessToken at = OAuthWrappers.findAccessTokenFromDB(restTrayObject.getToken());
+//    		if (at != null) {
+//    			restTrayObject.setKey(at.getAppkey());
+//    		}
+//    		restTrayObject.setAction(GET_ACTION_IN_DETAILS);
+//			return get_tray_elements_details(restTrayObject, req, System.currentTimeMillis());
+//		} catch (ThreeCixtyPermissionException e) {
+//			return Response.status(Response.Status.FORBIDDEN)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN)
+//					.build();
+//		} catch (InvalidTrayElement e) {
+//			return Response.status(Response.Status.BAD_REQUEST)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
+//		} catch (TooManyConnections e) {
+//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
+//		} catch (IOException e) {
+//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
+//		}
+//    }
     
     private String getRestTrayString(InputStream input) {
     	if (input == null) return null;
