@@ -195,7 +195,7 @@ public class TrayServices {
     		RestTrayObject restTrayObject = new RestTrayObject();
     		restTrayObject.setToken(accessToken);
     		restTrayObject.setAction(GET_ACTION_IN_DETAILS);
-			return get_tray_elements_details(null, req, System.currentTimeMillis());
+			return get_tray_elements_details(restTrayObject, req, System.currentTimeMillis());
 		} catch (ThreeCixtyPermissionException e) {
 			return Response.status(Response.Status.FORBIDDEN)
 					.entity(e.getMessage())
