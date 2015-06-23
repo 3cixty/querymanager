@@ -189,7 +189,7 @@ public class TrayServices {
     }
 	
     @GET
-    @Path("/getTraysInDetail")
+    @Path("/getTraysInDetail3")
     public Response getTraysIndetail(@HeaderParam("access_token") String accessToken, @Context Request req) {
     	try {
     		if (DEBUG_MOD) LOGGER.info("Get trays in detail");
