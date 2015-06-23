@@ -114,6 +114,7 @@ public class MobilityCrawlerCron {
 		String urlStr;
 		urlStr = MobidotBaseurl + "measurement/Accompanies/" + mobidotID
 				+ "/modifiedSince/" + "0" + "?key=" + APIKey;
+		if (DEBUG_MOD) LOGGER.info("URL to get accompanying: " + urlStr);
 		JSONArray resultAccompany = getTravelInfoforMobiditID(urlStr);
 
 		length = resultAccompany.length();
