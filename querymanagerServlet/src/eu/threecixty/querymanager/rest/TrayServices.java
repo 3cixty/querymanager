@@ -192,6 +192,7 @@ public class TrayServices {
     @Path("/getTraysInDetail")
     public Response getTraysIndetail(@HeaderParam("access_token") String accessToken, @Context Request req) {
     	try {
+    		if (DEBUG_MOD) LOGGER.info("Get trays in detail");
     		RestTrayObject restTrayObject = new RestTrayObject();
     		restTrayObject.setToken(accessToken);
     		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
