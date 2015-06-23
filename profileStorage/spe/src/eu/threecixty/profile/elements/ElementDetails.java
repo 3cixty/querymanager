@@ -27,6 +27,9 @@ public class ElementDetails {
 	private String url;
 	
 	private String description;
+	
+	private Long creationTimestamp;
+	
 	protected Map <String, String> descriptions;
 	protected Map <String, Boolean> translateds;
 
@@ -125,6 +128,13 @@ public class ElementDetails {
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public Long getCreationTimestamp() {
+		return creationTimestamp;
+	}
+	public void setCreationTimestamp(Long creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
 	}
 
 	public void putDescription(String language, String description) {

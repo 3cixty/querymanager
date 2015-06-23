@@ -449,6 +449,12 @@ public class TrayServices {
 		if (elementEventsDetails != null) {
 			for (ElementDetails eventDetails: elementEventsDetails) {
 				eventDetails.setType(EVENT_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(eventDetails.getId())) {
+						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
 			}
 			trayDetailsList.addAll(elementEventsDetails);
 		}
@@ -456,6 +462,12 @@ public class TrayServices {
 		if (elementPoIsDetails != null) {
 			for (ElementDetails poiDetails: elementPoIsDetails) {
 				poiDetails.setType(POI_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(poiDetails.getId())) {
+						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
 			}
 			trayDetailsList.addAll(elementPoIsDetails);
 		}
