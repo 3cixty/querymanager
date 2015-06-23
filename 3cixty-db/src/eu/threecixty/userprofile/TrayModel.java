@@ -29,6 +29,7 @@ public class TrayModel implements java.io.Serializable {
 	private boolean attended;
 	private String imageUrl;
 	private int rating = -1;
+	private Long timestampAdded;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -118,5 +119,13 @@ public class TrayModel implements java.io.Serializable {
 	}
 	public void setRating(int rating) {
 		this.rating = rating;
+	}
+	
+	@Column(name = "timestamp", nullable = true)
+	public Long getTimestampAdded() {
+		return timestampAdded;
+	}
+	public void setTimestampAdded(Long timestampAdded) {
+		this.timestampAdded = timestampAdded;
 	}
 }
