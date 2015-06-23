@@ -10,12 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -189,13 +189,16 @@ public class TrayServices {
     }
 	
     @GET
-    @Path("/getTraysInDetail3")
-    public Response getTraysIndetail(@HeaderParam("access_token") String accessToken, @Context Request req) {
+    @Path("/getTraysInDetail")
+    public Response getTraysInDetail(@Context HttpHeaders headers, @Context Request req) {
     	try {
     		if (DEBUG_MOD) LOGGER.info("Get trays in detail");
     		RestTrayObject restTrayObject = new RestTrayObject();
-    		restTrayObject.setToken(accessToken);
-    		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
+    		List <String> accessTokens = headers.getRequestHeader("access_token");
+    		if (accessTokens != null && accessTokens.size() > 0) {
+    		    restTrayObject.setToken(accessTokens.get(0));
+    		}
+    		AccessToken at = OAuthWrappers.findAccessTokenFromDB(restTrayObject.getToken());
     		if (at != null) {
     			restTrayObject.setKey(at.getAppkey());
     		}
