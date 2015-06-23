@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.CacheControl;
@@ -186,23 +188,36 @@ public class TrayServices {
 
     }
 	
-//	@POST
-//	@Path("/allTrays")
-//	public Response showAllTrays(@FormParam("username") String username, @FormParam("password") String password) {
-//		try {
-//			AdminValidator admin = new AdminValidator();
-//			if (admin.validate(username, password, CallLogServices.realPath)) {
-//				List <Tray> allProfiles = ProfileManagerImpl.getInstance().getTrayManager().getAllTrays();
-//				Gson gson = new Gson();
-//				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
-//			} else {
-//				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
-//			}
-//		} catch (URISyntaxException e) {
-//			e.printStackTrace();
-//		}
-//		return Response.serverError().build();
-//	}
+    @GET
+    @Path("/getTraysInDetail")
+    public Response getTraysIndetail(@HeaderParam("access_token") String accessToken, @Context Request req) {
+    	try {
+    		RestTrayObject restTrayObject = new RestTrayObject();
+    		restTrayObject.setToken(accessToken);
+    		restTrayObject.setAction(GET_ACTION_IN_DETAILS);
+			return get_tray_elements_details(null, req, System.currentTimeMillis());
+		} catch (ThreeCixtyPermissionException e) {
+			return Response.status(Response.Status.FORBIDDEN)
+					.entity(e.getMessage())
+					.type(MediaType.TEXT_PLAIN)
+					.build();
+		} catch (InvalidTrayElement e) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(e.getMessage())
+					.type(MediaType.TEXT_PLAIN_TYPE)
+					.build();
+		} catch (TooManyConnections e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.getMessage())
+					.type(MediaType.TEXT_PLAIN_TYPE)
+					.build();
+		} catch (IOException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.getMessage())
+					.type(MediaType.TEXT_PLAIN_TYPE)
+					.build();
+		}
+    }
     
     private String getRestTrayString(InputStream input) {
     	if (input == null) return null;
