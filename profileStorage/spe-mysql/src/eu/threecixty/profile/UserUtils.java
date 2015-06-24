@@ -640,8 +640,8 @@ public class UserUtils {
 			mappings = new HashSet <IDMapping>();
 			for (Object[] row: results) {
 				IDMapping idMapping = new IDMapping();
-				idMapping.setThreeCixtyID((String) row[0]);
-				idMapping.setMobidotID((String) row[1]);
+				idMapping.setThreeCixtyID(((String) row[0]).trim());
+				idMapping.setMobidotID(((String) row[1]).trim());
 				mappings.add(idMapping);
 			}
 		} catch (HibernateException e) {
