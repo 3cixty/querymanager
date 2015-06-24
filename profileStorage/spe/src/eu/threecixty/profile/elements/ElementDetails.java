@@ -152,6 +152,13 @@ public class ElementDetails {
 	public void setRating(Integer rating) {
 		this.rating = rating;
 	}
+	
+	public boolean containsDescIn(String language) {
+		if (language == null) return false;
+		if (descriptions == null) return false;
+		return descriptions.containsKey(language);
+	}
+	
 	public void putDescription(String language, String description) {
 		if (descriptions == null) {
 			descriptions = new HashMap<String, String>();
