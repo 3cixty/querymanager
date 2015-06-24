@@ -1,8 +1,7 @@
 package eu.threecixty.profile.partners;
 
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -64,18 +63,8 @@ public class MobidotUserUtils {
 			if (DEBUG_MOD) LOGGER.info("Finished creating mobidot user");
 			 
 		    int response = conn.getResponseCode();
-		    StringBuilder sb = new StringBuilder();
 			if (response == HttpURLConnection.HTTP_OK){
-				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
-				
-				String line = null;  
-
-			    while ((line = br.readLine()) != null) {  
-			    	sb.append(line + "\n");  
-			    }  
-
-			    br.close();
-			    return sb.toString();
+				return getContent(conn.getInputStream());
 			}
 			if (response == HttpURLConnection.HTTP_BAD_REQUEST)	return getMobidotID(uid);
 			else return null;
@@ -86,22 +75,35 @@ public class MobidotUserUtils {
 			
 			String urlStr = MOBIDOT_BASEURL + "/external/identitymanager/userIdForUser/"+DOMAIN+"/"+username
 					+ "?key=" + MOBIDOT_API_KEY;
-			StringBuilder sb = new StringBuilder();
 			try {
 				URL url = new URL(urlStr);
-				InputStream input = url.openStream();
-				byte[] b = new byte[1024];
-				int readBytes = 0;
-				while ((readBytes = input.read(b)) >= 0) {
-					sb.append(new String(b, 0, readBytes));
-				}
-				input.close();
-				if (sb.toString().isEmpty()) return null;
-				return sb.toString();
+				return getContent(url.openStream());
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
+	 }
+	 
+	 private static String getContent(InputStream input) {
+		 StringBuilder sb = new StringBuilder();
+		 byte [] b = new byte[1024];
+		 int readBytes = 0;
+		 try {
+			while ((readBytes = input.read(b)) >= 0) {
+				 sb.append(new String(b, 0, readBytes, "UTF-8"));
+			 }
+			input.close();
+			return sb.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+			if (input != null)
+				try {
+					input.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+		}
+		 return null;
 	 }
 	 
 	 private MobidotUserUtils() {
