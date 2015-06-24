@@ -139,6 +139,12 @@ public class MobilityCrawlerCron {
 					map.getThreeCixtyID(), jsonobj, idMapping);
 
 			if (hasAccompany != null) {
+				if (DEBUG_MOD) LOGGER.info("Accompany extracted: AccompanyId = " + hasAccompany.getHasAccompanyId()
+						+ ", AccompanyUserid2ST = " + hasAccompany.getHasAccompanyUserid2ST()
+						+ ", AccompanyUserid1ST = " + hasAccompany.getHasAccompanyUserid1ST()
+						+ ", AccompanyScore = " + hasAccompany.getHasAccompanyScore()
+						+ ", AccompanyTime = " + hasAccompany.getHasAccompanyTime()
+						+ ", AccompanyValidity = " + hasAccompany.getHasAccompanyValidity());
 				accompanyings.add(hasAccompany);
 				if (minTime > hasAccompany.getHasAccompanyValidity()) {
 					minTime = hasAccompany.getHasAccompanyValidity();
