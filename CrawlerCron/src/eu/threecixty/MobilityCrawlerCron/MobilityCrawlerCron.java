@@ -535,6 +535,7 @@ public class MobilityCrawlerCron {
         Iterator<IDMapping> iteratorMapping = idMapping.iterator();
         while (iteratorMapping.hasNext()) {
             IDMapping map = iteratorMapping.next();
+            if (DEBUG_MOD) LOGGER.info("map.ThreeCixty ID = " + map.getThreeCixtyID() +", map.MobidotID = " + map.getMobidotID());
             if (map.getMobidotID()!=null){
                 if (map.getMobidotID().equals(mobidotID.toString())) {
                     return map.getThreeCixtyID();
