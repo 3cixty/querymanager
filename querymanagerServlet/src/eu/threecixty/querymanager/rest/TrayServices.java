@@ -248,15 +248,15 @@ public class TrayServices {
 	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
-		if (itemId == null || itemId.equals("")) return false;
+		if (itemId == null || itemId.equals("")) throw new InvalidTrayElement("element_id is invalid");
 		String itemTypeStr = restTray.getElement_type();
-		if (itemTypeStr == null) return false;
+		if (itemTypeStr == null) throw new InvalidTrayElement("element type is invalid");
 
 		String token = restTray.getToken();
-		if (token == null || token.equals("")) return false;
+		if (token == null || token.equals("")) throw new InvalidTrayElement("token is invalid");
 		
 		String source = restTray.getSource();
-		if (source == null) return false;
+		if (source == null) throw new InvalidTrayElement("source is missed");
 		
 		String image_url = restTray.getImage_url();
 		
@@ -317,10 +317,10 @@ public class TrayServices {
 	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String junkToken = restTray.getJunk_token();
-		if (junkToken == null || junkToken.equals("")) return null;
+		if (junkToken == null || junkToken.equals("")) throw new InvalidTrayElement("junk token is invalid");
 		String threeCixtyToken = restTray.getThree_cixty_token();
 		String uid = OAuthWrappers.findUIDFrom(threeCixtyToken);
-		if (uid == null || uid.equals("")) return null;
+		if (uid == null || uid.equals("")) throw new InvalidTrayElement("3cixty token is invalid");
 		if (!ProfileManagerImpl.getInstance().getTrayManager().replaceUID(junkToken, uid)) return null;
 		checkPermission(threeCixtyToken);
 		return ProfileManagerImpl.getInstance().getTrayManager().getTrays(uid, 0, -1, OrderType.Desc, true);
@@ -334,7 +334,7 @@ public class TrayServices {
 	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String token = restTray.getToken();
-		if (token == null || token.equals("")) return false;
+		if (token == null || token.equals("")) throw new InvalidTrayElement("token is null or empty");
 		String uid = OAuthWrappers.findUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(token);
@@ -351,7 +351,7 @@ public class TrayServices {
 	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
-		if (itemId == null || itemId.equals("")) return false;
+		if (itemId == null || itemId.equals("")) throw new InvalidTrayElement("element_id is invalid");
 		String token = restTray.getToken();
 
 		String uid = OAuthWrappers.findUIDFrom(token);
@@ -362,7 +362,7 @@ public class TrayServices {
 		}
 		
 		Tray tray = ProfileManagerImpl.getInstance().getTrayManager().getTray((uid == null || uid.equals("")) ? token : uid, itemId);
-		if (tray == null) return false;
+		if (tray == null) throw new InvalidTrayElement("Don't find any items with " + itemId);
 		tray.setElement_id(itemId);
 		
 		String itemTypeStr = restTray.getElement_type();
@@ -406,7 +406,7 @@ public class TrayServices {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (!okDatetime) return false;
+			if (!okDatetime) throw new InvalidTrayElement("attend_datetime is in incorrect format. The format looks like dd-MM-yyyy HH:mm");
 			tray.setAttend_datetime(datetimeAttendedStr);
 		}
 		
