@@ -555,8 +555,11 @@ public class MobilityCrawlerCron {
 	 */
     public Accompanying storeAccompanyingDetailsInKB(String uID,
                                                      JSONObject jsonobj, Set<IDMapping> idMapping) {
-        String IDUser2 = reverseMap(jsonobj.getLong("userid2"), idMapping);
-        String IDUser1 = reverseMap(jsonobj.getLong("userid1"), idMapping);
+        Long jsonUserid2 = jsonobj.getLong("userid2");
+        Long jsonUserid1 = jsonobj.getLong("userid1");
+    	String IDUser2 = reverseMap(jsonUserid2, idMapping);
+        String IDUser1 = reverseMap(jsonUserid1, idMapping);
+        if (DEBUG_MOD) LOGGER.info("JSON userid1 = " + jsonUserid1 + ", userid2 = " + jsonUserid2);
         if (DEBUG_MOD) LOGGER.info("IDUser1 = " + IDUser1 + ", IDUser2 = " + IDUser2);
         if (IDUser1 != null && IDUser1.equals(uID)){
             Accompanying accompany = new Accompanying();
