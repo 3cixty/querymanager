@@ -373,6 +373,8 @@ public class UserUtils {
 			session.update(userModel);
 			
 			session.getTransaction().commit();
+			
+			userProfile.setModelIdInPersistentDB(userModel.getId());
 
 			added = true;
 		} catch (HibernateException e) {
