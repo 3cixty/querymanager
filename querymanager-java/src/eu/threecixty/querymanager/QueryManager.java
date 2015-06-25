@@ -78,6 +78,43 @@ import eu.threecixty.profile.oldmodels.Rating;
 	}
 	
 	@Override
+	public String createAugmentedQuery(String originalQuery) {
+		// TODO)
+		if (originalQuery == null) return originalQuery;
+		if (!originalQuery.contains("dul:Place")) return originalQuery;
+		int lastLimitIndex = originalQuery.lastIndexOf("LIMIT");
+		if (lastLimitIndex < 0) return originalQuery; // don't augment queries without limit
+		int lastOffsetIndex = originalQuery.lastIndexOf("OFFSET");
+		if (lastOffsetIndex < lastLimitIndex) { // LIMIT should be last term
+			// 5 LIMIT length, 1 space, 3 should be less than 1000 in the limit term
+			if (lastLimitIndex + 5 + 1 + 3 < originalQuery.length()) return originalQuery;
+			else return originalQuery.subSequence(0, lastLimitIndex) + getOrderbyAugmented()
+					+ "\n" + originalQuery.substring(lastLimitIndex);
+		} else if (lastLimitIndex + 5 + 1 + 3 < lastOffsetIndex) return originalQuery; // seems that LIMIT for sub-query
+		else return originalQuery.subSequence(0, lastLimitIndex) + getOrderbyAugmented()
+				+ "\n" + originalQuery.substring(lastLimitIndex);
+	}
+	
+	private String getOrderbyAugmented() {
+		// TODO Auto-generated method stub
+		if (DEBUG_MOD) LOGGER.info("Enter into the getOrderbyAugmented method");
+		if (preference == null) return "";
+		Set <Place> places = preference.getHasPlaces();
+		if (places != null && places.size() > 0) {
+			StringBuilder sb = new StringBuilder("ORDER BY");
+			if (DEBUG_MOD) LOGGER.info("List of places: --------------------");
+			for (Place place: places) {
+				if (DEBUG_MOD) LOGGER.info("PoI ID: " + place.getHasPlaceDetail().getHasPlaceName()
+						+ ", NatureOfPlace: " + place.getHasPlaceDetail().getHasNatureOfPlace());
+				sb.append(" DESC(venue = <" + place.getHasPlaceDetail().getHasPlaceName() + ">)");
+			}
+			if (DEBUG_MOD) LOGGER.info("------------------------------------");
+			return sb.toString();
+		}
+		return "";
+	}
+
+	@Override
 	public AugmentedQuery getAugmentedQuery() {
 		return augmentedQuery;
 	}

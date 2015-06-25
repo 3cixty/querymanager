@@ -45,6 +45,14 @@ public interface IQueryManager {
 			EventMediaFormat format, String httpMethod) throws IOException, UnknownException;
 	
 	/**
+	 * This method is used to create augmented query even it fails to use Jena to create SPARQL with a given query.
+	 * This should be called if the original query is failed to create using Jena library.
+	 * @param originalQuery
+	 * @return
+	 */
+	String createAugmentedQuery(String originalQuery);
+	
+	/**
 	 * Execute a given augmented query. The return is a map of pairs with key is element (Event/PoI) ID,
 	 * and value is true or false indicating that the corresponding key is highlighted or not.
 	 * @param augmentedQuery

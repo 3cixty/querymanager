@@ -218,8 +218,16 @@ public class QueryManagerServices {
 					QueryManager qm = new QueryManager(user_id);
 					logInfo("Before augmenting and executing a query");
 					
-					String result = executeQuery(profiler, qm, query, filter,
-							eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
+					String result;
+					try {
+						result = executeQuery(profiler, qm, query, filter,
+								eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
+					} catch (UnknownException e) {
+						String augmentedQuery = qm.createAugmentedQuery(query);
+						StringBuilder sb = new StringBuilder();
+						SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, format, httpMethod, sb);
+						result = sb.toString();
+					}
 
 					// log calls
 					
@@ -250,7 +258,7 @@ public class QueryManagerServices {
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
 					        .build();
-				} catch (UnknownException e) {
+				} catch (IOException e) {
 					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					        .entity(e.getMessage())
 					        .type(MediaType.TEXT_PLAIN)
