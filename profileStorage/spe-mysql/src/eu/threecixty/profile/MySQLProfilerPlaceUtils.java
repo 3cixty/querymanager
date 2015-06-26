@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import eu.threecixty.Configuration;
 import eu.threecixty.cache.ProfileCacheManager;
 import eu.threecixty.profile.oldmodels.Accompanying;
 import eu.threecixty.profile.oldmodels.Period;
@@ -25,11 +24,6 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
  *
  */
 public class MySQLProfilerPlaceUtils {
-	
-	private static final String PREFIXES = Configuration.PREFIXES;
-	private static final String FROM_GOOGLE_PLACE_GRAPH = "FROM <http://3cixty.com/googleplaces>\n";
-	private static final String FROM_PLACE_RATINGS_GRAPH = "FROM <http://3cixty.com/placesRating>\n";
-	private static final String FROM_USERPROFILE_MANUAL_GRAPH = "FROM <http://3cixty.com/userprofile>\n";
 	
 	private static final String JSON_APP_FORMAT = "application/sparql-results+json";
 	
@@ -49,12 +43,9 @@ public class MySQLProfilerPlaceUtils {
 		String googleUID = getGoogleUID(userProfile);
 		if (googleUID == null) return new ArrayList <String>();
 		
-		StringBuffer buffer = new StringBuffer(PREFIXES);
+		StringBuffer buffer = new StringBuffer();
 		
 		buffer.append("SELECT  ?x \n");
-		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
-		buffer.append(FROM_PLACE_RATINGS_GRAPH);
-		buffer.append(FROM_USERPROFILE_MANUAL_GRAPH);
 		buffer.append("where {\n");
 		buffer.append("?x schema:review ?review .\n");
 		buffer.append("?review schema:reviewRating	?reviewRating .\n");
@@ -80,12 +71,9 @@ public class MySQLProfilerPlaceUtils {
 		List <String> googleUIDsFromFriends = getGoogleUIDsFromFriends(userProfile);
 		if (googleUIDsFromFriends == null || googleUIDsFromFriends.size() == 0) return null;
 		
-		StringBuffer buffer = new StringBuffer(PREFIXES);
+		StringBuffer buffer = new StringBuffer();
 
 		buffer.append("SELECT  ?x \n");
-		buffer.append(FROM_GOOGLE_PLACE_GRAPH);
-		buffer.append(FROM_PLACE_RATINGS_GRAPH);
-		buffer.append(FROM_USERPROFILE_MANUAL_GRAPH);
 		buffer.append("where {\n");
 		
 		buffer.append("?x schema:review ?review .\n");
