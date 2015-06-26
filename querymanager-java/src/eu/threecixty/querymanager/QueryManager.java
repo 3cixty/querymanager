@@ -115,6 +115,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 				sb.append(" DESC(venue = <" + place.getHasPlaceDetail().getHasPlaceName() + ">)");
 			}
 			if (DEBUG_MOD) LOGGER.info("------------------------------------");
+			if (DEBUG_MOD) LOGGER.info("ORDER BY for QA: " + sb.toString());
 			return sb.toString();
 		}
 		return "";
