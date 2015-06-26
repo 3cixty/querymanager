@@ -24,11 +24,6 @@ import eu.threecixty.profile.oldmodels.Period;
  */
 public class QueryManagerDecision {
 
-	private static final String LOCATION = "location";
-	private static final String ENTERED_RATING = "enteredrating";
-	private static final String PREFERRED = "preferred";
-	private static final String FRIENDS = "friends";
-
 	/**
 	 * Augments and executes the query found in a given query manager.
 	 * @param profiler
@@ -40,12 +35,12 @@ public class QueryManagerDecision {
 	public static String run(IProfiler profiler, IQueryManager qm, String filter,
 			EventMediaFormat format, String httpMethod) throws TooManyConnections, UnknownException {
 		if (profiler != null && filter != null) {
-			if (!filter.equals(FRIENDS)) {
-				if (filter.equalsIgnoreCase(LOCATION)) {
+			if (!filter.equals(Constants.FRIENDS)) {
+				if (filter.equalsIgnoreCase(Constants.LOCATION)) {
 					return (String) filterBasedOnLocation(profiler, qm, format, true, httpMethod);
-				} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
+				} else if (filter.equalsIgnoreCase(Constants.ENTERED_RATING)) {
 					return (String) filterBasedOnEnteredRating(profiler, qm, format, true, httpMethod);
-				} else if (filter.equalsIgnoreCase(PREFERRED)) {
+				} else if (filter.equalsIgnoreCase(Constants.PREFERRED)) {
 					return (String) filterBasedOnPreferredEvent(profiler, qm, format, true, httpMethod);
 				}
 			} else {
@@ -72,12 +67,12 @@ public class QueryManagerDecision {
 	public static Map <String, Boolean> run(IProfiler profiler, IQueryManager qm, String filter, String httpMethod)
 			throws TooManyConnections, UnknownException {
 		if (profiler != null && filter != null) {
-			if (!filter.equals(FRIENDS)) {
-				if (filter.equalsIgnoreCase(LOCATION)) {
+			if (!filter.equals(Constants.FRIENDS)) {
+				if (filter.equalsIgnoreCase(Constants.LOCATION)) {
 					return (Map<String, Boolean>) filterBasedOnLocation(profiler, qm, EventMediaFormat.JSON, false, httpMethod);
-				} else if (filter.equalsIgnoreCase(ENTERED_RATING)) {
+				} else if (filter.equalsIgnoreCase(Constants.ENTERED_RATING)) {
 					return (Map<String, Boolean>) filterBasedOnEnteredRating(profiler, qm, EventMediaFormat.JSON, false, httpMethod);
-				} else if (filter.equalsIgnoreCase(PREFERRED)) {
+				} else if (filter.equalsIgnoreCase(Constants.PREFERRED)) {
 					return (Map<String, Boolean>) filterBasedOnPreferredEvent(profiler, qm, EventMediaFormat.JSON, false, httpMethod);
 				}
 			} else {
