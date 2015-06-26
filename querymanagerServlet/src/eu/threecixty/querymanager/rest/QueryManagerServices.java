@@ -230,6 +230,7 @@ public class QueryManagerServices {
 						} else if (eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)) {
 							profiler.requireScoreRatedForFriendsAtLeast(3);
 						}
+						profiler.PopulateProfile();
 						qm.requestPreferences(profiler);
 						String augmentedQuery = qm.createAugmentedQuery(query);
 						StringBuilder sb = new StringBuilder();
