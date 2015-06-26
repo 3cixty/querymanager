@@ -205,7 +205,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, topCategories, languages);
+		return getNearbyPoIs(builder.toString(), categories, topCategories, languages, listPoIsFromFriendsWishlist);
 	}
 	
 	/**
@@ -257,12 +257,13 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, topCategories, languages);
+		return getNearbyPoIs(builder.toString(), categories, topCategories, languages, null);
 
 	}
 	
 	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories,
-			String[] topCategories, String [] languages) throws IOException {
+			String[] topCategories, String [] languages,
+			List <String> listPoIsFromFriendsWishlist) throws IOException {
 		if (DEBUG_MOD) LOGGER.info(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
@@ -283,6 +284,19 @@ public class NearbyUtils {
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
+			
+			// set highlighted field
+			if (listPoIsFromFriendsWishlist != null && listPoIsFromFriendsWishlist.size() > 0) {
+				String elementId = elementDetails.getId();
+				boolean found = false;
+				for (String tmpId: listPoIsFromFriendsWishlist) {
+					if (elementId.equals(tmpId)) {
+						found = true;
+						break;
+					}
+				}
+				elementDetails.setHighlighted(found);
+			}
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
@@ -399,6 +413,14 @@ public class NearbyUtils {
 
 		@Override
 		public int compare(ElementDetails o1, ElementDetails o2) {
+			Boolean highlighted1 = o1.getHighlighted();
+			Boolean highlighted2 = o2.getHighlighted();
+			if (highlighted1 != null && highlighted1.booleanValue() == true) {
+				if (highlighted2 == null || highlighted2.booleanValue() == false) return -1;
+			}
+			if (highlighted2 != null && highlighted2.booleanValue() == true) {
+				if (highlighted1 == null || highlighted1.booleanValue() == false) return 1;
+			}
 			double d1 = o1.getDistance() == null ? 0 : o1.getDistance().doubleValue();
 			double d2 = o2.getDistance() == null ? 0 : o2.getDistance().doubleValue();
 			if (d1 == d2) return 0;
