@@ -233,6 +233,7 @@ public class QueryManagerServices {
 						profiler.PopulateProfile();
 						qm.requestPreferences(profiler);
 						String augmentedQuery = qm.createAugmentedQuery(query);
+						if (DEBUG_MOD) LOGGER.info("Query augmented: " + augmentedQuery);
 						StringBuilder sb = new StringBuilder();
 						SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, format, httpMethod, sb);
 						result = sb.toString();
