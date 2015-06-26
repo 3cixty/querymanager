@@ -83,16 +83,22 @@ import eu.threecixty.profile.oldmodels.Rating;
 		if (originalQuery == null) return originalQuery;
 		if (!originalQuery.contains("dul:Place")) return originalQuery;
 		int lastLimitIndex = originalQuery.lastIndexOf("LIMIT");
+		if (DEBUG_MOD) LOGGER.info("lastIndex Limit = " + lastLimitIndex);
 		if (lastLimitIndex < 0) return originalQuery; // don't augment queries without limit
 		int lastOffsetIndex = originalQuery.lastIndexOf("OFFSET");
+		if (DEBUG_MOD) LOGGER.info("lastIndex Offset = " + lastOffsetIndex);
 		if (lastOffsetIndex < lastLimitIndex) { // LIMIT should be last term
 			// 5 LIMIT length, 1 space, 3 should be 100 in the limit term
+			if (DEBUG_MOD) LOGGER.info("lastIndex Limit + 10 = " + (lastLimitIndex + 5 + 1 + 4) + ", length query = " + originalQuery.length());
 			if (lastLimitIndex + 5 + 1 + 4 < originalQuery.length()) return originalQuery;
 			else return originalQuery.subSequence(0, lastLimitIndex) + getOrderbyAugmented()
 					+ "\n" + originalQuery.substring(lastLimitIndex);
-		} else if (lastLimitIndex + 5 + 1 + 3 < lastOffsetIndex) return originalQuery; // seems that LIMIT for sub-query
-		else return originalQuery.subSequence(0, lastLimitIndex) + getOrderbyAugmented()
-				+ "\n" + originalQuery.substring(lastLimitIndex);
+		} else {
+			if (DEBUG_MOD) LOGGER.info("lastIndex Limit + 9 = " + (lastLimitIndex + 5 + 1 + 3) + ", lastOffset = " + lastOffsetIndex);
+			if (lastLimitIndex + 5 + 1 + 3 < lastOffsetIndex) return originalQuery; // seems that LIMIT for sub-query
+		    else return originalQuery.subSequence(0, lastLimitIndex) + getOrderbyAugmented()
+				    + "\n" + originalQuery.substring(lastLimitIndex);
+		}
 	}
 	
 	private String getOrderbyAugmented() {
