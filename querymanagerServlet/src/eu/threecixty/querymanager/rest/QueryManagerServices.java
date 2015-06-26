@@ -91,7 +91,7 @@ public class QueryManagerServices {
 			@DefaultValue("false") @QueryParam("turnOffQA") String turnOffQA) {
 		
 		//return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
-		if (!"true".equalsIgnoreCase(turnOffQA)) executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
@@ -151,7 +151,7 @@ public class QueryManagerServices {
 			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug,
 			@DefaultValue("false") @QueryParam("turnOffQA") String turnOffQA) {
 		// check whether or not the flag for turning off QA is true
-		if (!"true".equalsIgnoreCase(turnOffQA)) executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
+		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
