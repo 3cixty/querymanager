@@ -223,6 +223,12 @@ public class QueryManagerServices {
 						result = executeQuery(profiler, qm, query, filter,
 								eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
 					} catch (Exception e) {
+						profiler.initDefaultParametersForAugmentation();
+						if (eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)) {
+							profiler.requireScoreRatedAtLeast(3);
+						} else if (eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)) {
+							profiler.requireScoreRatedForFriendsAtLeast(3);
+						}
 						qm.requestPreferences(profiler);
 						String augmentedQuery = qm.createAugmentedQuery(query);
 						StringBuilder sb = new StringBuilder();
