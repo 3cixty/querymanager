@@ -223,6 +223,7 @@ public class QueryManagerServices {
 						result = executeQuery(profiler, qm, query, filter,
 								eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
 					} catch (Exception e) {
+						// try to add order by before limit term because most likely the given query doesn't conform to SPARQL 1.1 
 						profiler.initDefaultParametersForAugmentation();
 						if (eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)) {
 							profiler.requireScoreRatedAtLeast(3);
