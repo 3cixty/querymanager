@@ -96,7 +96,7 @@ public class NearbyUtils {
 			for (String eventFromWishList: listEventsFromFriendsWishlist) {
 				builder.append(" DESC(?event = <" + eventFromWishList + ">)");
 			}
-			builder.append(" ?distance");
+			builder.append(" ?distance \n");
 		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
@@ -200,7 +200,7 @@ public class NearbyUtils {
 			for (String poiFromWishList: listPoIsFromFriendsWishlist) {
 				builder.append(" DESC(?poi = <" + poiFromWishList + ">)");
 			}
-			builder.append(" ?distance");
+			builder.append(" ?distance \n");
 		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
