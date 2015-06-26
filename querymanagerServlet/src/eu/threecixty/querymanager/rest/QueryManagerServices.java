@@ -222,7 +222,7 @@ public class QueryManagerServices {
 					try {
 						result = executeQuery(profiler, qm, query, filter,
 								eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
-					} catch (UnknownException e) {
+					} catch (Exception e) {
 						String augmentedQuery = qm.createAugmentedQuery(query);
 						StringBuilder sb = new StringBuilder();
 						SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, format, httpMethod, sb);
@@ -247,12 +247,6 @@ public class QueryManagerServices {
 
 					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
 							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
-				} catch (ThreeCixtyPermissionException tcpe) {
-					CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY + query);
-					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity(tcpe.getMessage())
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
 				} catch (TooManyConnections e) {
 					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					        .entity(e.getMessage())
