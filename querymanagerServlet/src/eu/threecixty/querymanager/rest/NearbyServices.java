@@ -147,8 +147,8 @@ public class NearbyServices {
 	
 	
 	@GET
-	@Path("/getNearbyAugmentedPoIsBasedOnGPS")
-	public Response getNearbyAugmentedPoIsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
+	@Path("/getAugmentedNearbyPoIsBasedOnGPS")
+	public Response getAugmentedNearbyPoIsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
@@ -166,6 +166,7 @@ public class NearbyServices {
 				long time1 = System.currentTimeMillis();
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				List <String> listPoIsFromFriendsWishList = new LinkedList <String>();
+				// TODO
 				listPoIsFromFriendsWishList.add("http://data.linkedevents.org/location/243e8561-6f61-43ff-a70f-bc3cddca9a79"); // item 10
 				listPoIsFromFriendsWishList.add("http://data.linkedevents.org/location/53dc91f9-4121-4d2b-be97-9208b2d24429"); // item 11
 				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, tmpTopCats,
@@ -179,5 +180,39 @@ public class NearbyServices {
 			}
 		}
 		return Response.status(Response.Status.BAD_REQUEST).entity("Invalid access token").build();
+	}
+	
+	@GET
+	@Path("/getAugmentedNearbyEventsBasedOnGPS")
+	public Response getAugmentedNearbyEventsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("categories") String categories,
+			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@HeaderParam("access_token") String accessToken, @HeaderParam("Accept-Language") String languages) {
+		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
+		if (at != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+		String [] tmpCats;
+		if (categories == null || categories.equals("")) tmpCats = null;
+		else tmpCats = categories.split("");
+		try {
+			long time1 = System.currentTimeMillis();
+			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+			List <String> listEventsFromFriendsWishList = new LinkedList <String>();
+			// TODO
+			listEventsFromFriendsWishList.add("http://data.linkedevents.org/event/7f9a1d2f-7812-4e21-89d2-4bc93deac163");
+			listEventsFromFriendsWishList.add("http://data.linkedevents.org/location/53dc91f9-4121-4d2b-be97-9208b2d24429");
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats,
+					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
+			long time2 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+		}
+		} else {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Invalid access token").build();
+		}
 	}
 }

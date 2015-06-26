@@ -103,7 +103,7 @@ public class NearbyUtils {
 		
 		if (DEBUG_MOD) LOGGER.info(builder.toString());
 		
-		return getNearbyEvents(builder.toString(), categories, languages);
+		return getNearbyEvents(builder.toString(), categories, languages, listEventsFromFriendsWishlist);
 	}
 	
 	public static List <ElementDetails> getNearbyEvents(String id, String[] categories, String[] languages,
@@ -286,23 +286,14 @@ public class NearbyUtils {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
 			
 			// set highlighted field
-			if (listPoIsFromFriendsWishlist != null && listPoIsFromFriendsWishlist.size() > 0) {
-				String elementId = elementDetails.getId();
-				boolean found = false;
-				for (String tmpId: listPoIsFromFriendsWishlist) {
-					if (elementId.equals(tmpId)) {
-						found = true;
-						break;
-					}
-				}
-				elementDetails.setHighlighted(found);
-			}
+			setHighlightedField(elementDetails, listPoIsFromFriendsWishlist);
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
 	}
 	
-	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages) throws IOException {
+	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages,
+			List <String> listEventsFromFriendsWishlist) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
@@ -321,9 +312,26 @@ public class NearbyUtils {
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
+			// set highlighted field
+			setHighlightedField(elementDetails, listEventsFromFriendsWishlist);
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
+	}
+	
+	private static void setHighlightedField(ElementDetails elementDetails,
+			List <String> listItemsFromFriendsWishlist) {
+		if (listItemsFromFriendsWishlist != null && listItemsFromFriendsWishlist.size() > 0) {
+			String elementId = elementDetails.getId();
+			boolean found = false;
+			for (String tmpId: listItemsFromFriendsWishlist) {
+				if (elementId.equals(tmpId)) {
+					found = true;
+					break;
+				}
+			}
+			elementDetails.setHighlighted(found);
+		}
 	}
 	
 	private static void filterCategories(String[] categories, StringBuilder result) {
