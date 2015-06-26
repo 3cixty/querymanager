@@ -35,7 +35,8 @@ public class NearbyUtils {
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
-			double distance, int offset, int limit, String notId) throws IOException {
+			double distance, int offset, int limit, String notId,
+			List <String> listEventsFromFriendsWishlist) throws IOException {
 		
 		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance ?title \n");
 
@@ -88,7 +89,15 @@ public class NearbyUtils {
 		builder.append("}. \n");
 		
 		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
+		if (listEventsFromFriendsWishlist == null || listEventsFromFriendsWishlist.size() == 0) {
+		    builder.append("ORDER BY ?distance \n");
+		} else {
+			builder.append("ORDER BY");
+			for (String eventFromWishList: listEventsFromFriendsWishlist) {
+				builder.append(" DESC(?event = <" + eventFromWishList + ">)");
+			}
+			builder.append(" ?distance");
+		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
@@ -134,12 +143,13 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id);
+		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id, null);
 	}
 	
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon,
 			String[] categories, String[] topCategories, String[] languages,
-			double distance, int offset, int limit) throws IOException {
+			double distance, int offset, int limit,
+			List <String> listPoIsFromFriendsWishlist) throws IOException {
 		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance ?name \n");
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI;
 
@@ -183,7 +193,15 @@ public class NearbyUtils {
 		builder.append("}. \n");
 		
 		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
+		if (listPoIsFromFriendsWishlist == null || listPoIsFromFriendsWishlist.size() == 0) {
+		    builder.append("ORDER BY ?distance \n");
+		} else {
+			builder.append("ORDER BY");
+			for (String poiFromWishList: listPoIsFromFriendsWishlist) {
+				builder.append(" DESC(?poi = <" + poiFromWishList + ">)");
+			}
+			builder.append(" ?distance");
+		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
