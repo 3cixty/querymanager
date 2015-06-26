@@ -112,7 +112,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 			for (Place place: places) {
 				if (DEBUG_MOD) LOGGER.info("PoI ID: " + place.getHasPlaceDetail().getHasPlaceName()
 						+ ", NatureOfPlace: " + place.getHasPlaceDetail().getHasNatureOfPlace());
-				sb.append(" DESC(venue = <" + place.getHasPlaceDetail().getHasPlaceName() + ">)");
+				sb.append(" DESC(?venue = <" + place.getHasPlaceDetail().getHasPlaceName() + ">)");
 			}
 			if (DEBUG_MOD) LOGGER.info("------------------------------------");
 			if (DEBUG_MOD) LOGGER.info("ORDER BY for QA: " + sb.toString());
