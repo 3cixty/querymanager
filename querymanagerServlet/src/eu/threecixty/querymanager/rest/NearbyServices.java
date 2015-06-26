@@ -166,6 +166,8 @@ public class NearbyServices {
 				long time1 = System.currentTimeMillis();
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 				List <String> listPoIsFromFriendsWishList = new LinkedList <String>();
+				listPoIsFromFriendsWishList.add("http://data.linkedevents.org/location/243e8561-6f61-43ff-a70f-bc3cddca9a79"); // item 10
+				listPoIsFromFriendsWishList.add("http://data.linkedevents.org/location/53dc91f9-4121-4d2b-be97-9208b2d24429"); // item 11
 				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, tmpTopCats,
 						tmpLanguages, distance > 10 ? 2 : distance, offset, limit, listPoIsFromFriendsWishList);
 				long time2 = System.currentTimeMillis();
