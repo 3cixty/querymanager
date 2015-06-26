@@ -201,7 +201,7 @@ public class NearbyServices {
 			List <String> listEventsFromFriendsWishList = new LinkedList <String>();
 			// TODO
 			listEventsFromFriendsWishList.add("http://data.linkedevents.org/event/7f9a1d2f-7812-4e21-89d2-4bc93deac163");
-			listEventsFromFriendsWishList.add("http://data.linkedevents.org/location/53dc91f9-4121-4d2b-be97-9208b2d24429");
+			listEventsFromFriendsWishList.add("http://data.linkedevents.org/event/4f2b1a77-ef36-457e-b3a3-df804b29d105");
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
 			long time2 = System.currentTimeMillis();
