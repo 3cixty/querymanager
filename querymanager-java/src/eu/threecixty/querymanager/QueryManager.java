@@ -86,8 +86,8 @@ import eu.threecixty.profile.oldmodels.Rating;
 		if (lastLimitIndex < 0) return originalQuery; // don't augment queries without limit
 		int lastOffsetIndex = originalQuery.lastIndexOf("OFFSET");
 		if (lastOffsetIndex < lastLimitIndex) { // LIMIT should be last term
-			// 5 LIMIT length, 1 space, 3 should be less than 1000 in the limit term
-			if (lastLimitIndex + 5 + 1 + 3 < originalQuery.length()) return originalQuery;
+			// 5 LIMIT length, 1 space, 3 should be 100 in the limit term
+			if (lastLimitIndex + 5 + 1 + 4 < originalQuery.length()) return originalQuery;
 			else return originalQuery.subSequence(0, lastLimitIndex) + getOrderbyAugmented()
 					+ "\n" + originalQuery.substring(lastLimitIndex);
 		} else if (lastLimitIndex + 5 + 1 + 3 < lastOffsetIndex) return originalQuery; // seems that LIMIT for sub-query
