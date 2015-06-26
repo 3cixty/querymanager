@@ -223,6 +223,7 @@ public class QueryManagerServices {
 						result = executeQuery(profiler, qm, query, filter,
 								eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
 					} catch (Exception e) {
+						qm.requestPreferences(profiler);
 						String augmentedQuery = qm.createAugmentedQuery(query);
 						StringBuilder sb = new StringBuilder();
 						SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, format, httpMethod, sb);
