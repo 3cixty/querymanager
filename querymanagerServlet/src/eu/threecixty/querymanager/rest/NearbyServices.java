@@ -1,7 +1,6 @@
 package eu.threecixty.querymanager.rest;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -17,6 +16,8 @@ import org.json.JSONObject;
 
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.SocialWishListUtils;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.elements.ElementDetails;
 import eu.threecixty.profile.elements.LanguageUtils;
 import eu.threecixty.profile.elements.NearbyUtils;
@@ -165,10 +166,12 @@ public class NearbyServices {
 			try {
 				long time1 = System.currentTimeMillis();
 				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-				List <String> listPoIsFromFriendsWishList = new LinkedList <String>();
-				// TODO
-				listPoIsFromFriendsWishList.add("http://data.linkedevents.org/location/243e8561-6f61-43ff-a70f-bc3cddca9a79"); // item 10
-				listPoIsFromFriendsWishList.add("http://data.linkedevents.org/location/53dc91f9-4121-4d2b-be97-9208b2d24429"); // item 11
+				List<String> listPoIsFromFriendsWishList = null;
+				try {
+					listPoIsFromFriendsWishList = SocialWishListUtils.getPoIsFromFriendsWishList(at.getUid());
+				} catch (TooManyConnections e) {
+					e.printStackTrace();
+				}
 				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, tmpTopCats,
 						tmpLanguages, distance > 10 ? 2 : distance, offset, limit, listPoIsFromFriendsWishList);
 				long time2 = System.currentTimeMillis();
@@ -198,10 +201,12 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <String> listEventsFromFriendsWishList = new LinkedList <String>();
-			// TODO
-			listEventsFromFriendsWishList.add("http://data.linkedevents.org/event/7f9a1d2f-7812-4e21-89d2-4bc93deac163");
-			listEventsFromFriendsWishList.add("http://data.linkedevents.org/event/4f2b1a77-ef36-457e-b3a3-df804b29d105");
+			List<String> listEventsFromFriendsWishList = null;
+			try {
+				listEventsFromFriendsWishList = SocialWishListUtils.getEventsFromFriendsWishList(at.getUid());
+			} catch (TooManyConnections e) {
+				e.printStackTrace();
+			}
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
 			long time2 = System.currentTimeMillis();
