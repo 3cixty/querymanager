@@ -88,6 +88,7 @@ public class Configuration {
 	public static boolean isForProdTarget() {
 		if (target == null) {
 			if (props == null) load();
+			if (props == null) return false;
 			target = props.getProperty("PURPOSE");
 		}
 		return "prod".equalsIgnoreCase(target);
@@ -95,6 +96,7 @@ public class Configuration {
 	
 	private static String getProperty(String key) {
 		if (props == null) load();
+		if (props == null) return null;
 		target = props.getProperty("PURPOSE");
 		if (target == null) return null;
 		else if (target.equals("localhost")) return props.getProperty(key + "_LOCAL");

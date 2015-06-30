@@ -33,6 +33,9 @@ public class ElementDetails {
 	private String attend_datetime;
 	private Integer rating;
 	
+	// for highlighting results
+	private Boolean highlighted;
+	
 	protected Map <String, String> descriptions;
 	protected Map <String, Boolean> translateds;
 
@@ -153,6 +156,13 @@ public class ElementDetails {
 		this.rating = rating;
 	}
 	
+	public Boolean getHighlighted() {
+		return highlighted;
+	}
+	public void setHighlighted(Boolean highlighted) {
+		this.highlighted = highlighted;
+	}
+
 	public boolean containsDescIn(String language) {
 		if (language == null) return false;
 		if (descriptions == null) return false;

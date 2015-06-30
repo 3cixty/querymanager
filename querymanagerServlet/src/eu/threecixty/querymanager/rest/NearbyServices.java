@@ -14,7 +14,10 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.SocialWishListUtils;
+import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.elements.ElementDetails;
 import eu.threecixty.profile.elements.LanguageUtils;
 import eu.threecixty.profile.elements.NearbyUtils;
@@ -79,7 +82,7 @@ public class NearbyServices {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, tmpTopCats,
-					tmpLanguages, distance > 10 ? 2 : distance, offset, limit);
+					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
@@ -133,13 +136,88 @@ public class NearbyServices {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats,
-					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null);
+					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+		}
+	}
+	
+	
+	@GET
+	@Path("/getAugmentedNearbyPoIsBasedOnGPS")
+	public Response getAugmentedNearbyPoIsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("categories") String categories,
+			@DefaultValue("") @QueryParam("topCategories") String topCategories,
+			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@HeaderParam("access_token") String accessToken, @HeaderParam("Accept-Language") String languages) {
+		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
+		if (at != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			String [] tmpCats, tmpTopCats;
+			if (categories == null || categories.equals("")) tmpCats = null;
+			else tmpCats = categories.split(",");
+			if (topCategories == null || topCategories.equals("")) tmpTopCats = null;
+			else tmpTopCats = topCategories.split(",");
+			try {
+				long time1 = System.currentTimeMillis();
+				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+				List<String> listPoIsFromFriendsWishList = null;
+				try {
+					listPoIsFromFriendsWishList = SocialWishListUtils.getPoIsFromFriendsWishList(at.getUid());
+				} catch (TooManyConnections e) {
+					e.printStackTrace();
+				}
+				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(lat, lon, tmpCats, tmpTopCats,
+						tmpLanguages, distance > 10 ? 2 : distance, offset, limit, listPoIsFromFriendsWishList);
+				long time2 = System.currentTimeMillis();
+				if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+				return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+			}
+		}
+		return Response.status(Response.Status.BAD_REQUEST).entity("Invalid access token").build();
+	}
+	
+	@GET
+	@Path("/getAugmentedNearbyEventsBasedOnGPS")
+	public Response getAugmentedNearbyEventsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("categories") String categories,
+			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@HeaderParam("access_token") String accessToken, @HeaderParam("Accept-Language") String languages) {
+		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
+		if (at != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+		String [] tmpCats;
+		if (categories == null || categories.equals("")) tmpCats = null;
+		else tmpCats = categories.split("");
+		try {
+			long time1 = System.currentTimeMillis();
+			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+			List<String> listEventsFromFriendsWishList = null;
+			try {
+				listEventsFromFriendsWishList = SocialWishListUtils.getEventsFromFriendsWishList(at.getUid());
+			} catch (TooManyConnections e) {
+				e.printStackTrace();
+			}
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(lat, lon, tmpCats,
+					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
+			long time2 = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+		}
+		} else {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Invalid access token").build();
 		}
 	}
 }
