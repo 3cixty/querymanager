@@ -78,7 +78,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	 * @throws InvalidSparqlQuery
 	 * @return
 	 */
-	public String addOrderBysToQuery(String original, List<String> placeIds) throws InvalidSparqlQuery {
+	private String addOrderBysToQuery(String original, List<String> placeIds) throws InvalidSparqlQuery {
 		String queryWithPrefixes = allPrefixes == null ? Configuration.PREFIXES + " "+ original
 				: allPrefixes + " " + Configuration.PREFIXES + " " + original;
 		try {
