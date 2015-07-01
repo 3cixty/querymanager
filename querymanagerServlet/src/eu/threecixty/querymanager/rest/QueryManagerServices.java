@@ -1019,8 +1019,8 @@ public class QueryManagerServices {
 	
 	@GET
 	@Path("/validateQuery")
-	public Response validateSPARLQuery(String query) {
-		String fullQuery = getAllPrefixes() + " " + Configuration.PREFIXES + " " + query;
+	public Response validateSPARLQuery(@DefaultValue("") @QueryParam("query") String query) {
+		String fullQuery = getAllPrefixes() + " " + query;
 		try {
 		    Query q = QueryFactory.create(fullQuery);
 		    if (q != null) return Response.ok().build();
