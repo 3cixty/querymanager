@@ -11,6 +11,9 @@ public interface QueryAugmenter {
 
 	/**
 	 * Creates a query augmented in string format.
+	 * <br>
+	 * Note that if the given filter is improper, the augmented query will be the same with the original one.
+	 *
 	 * @param original
 	 * 			The original SPARQL query.
 	 * @param filter
