@@ -1020,10 +1020,10 @@ public class QueryManagerServices {
 	@GET
 	@Path("/validateQuery")
 	public Response validateSPARLQuery(@DefaultValue("") @QueryParam("query") String query) {
-		String fullQuery = getAllPrefixes() + " " + query;
+		String fullQuery = getAllPrefixes() + " " + Configuration.PREFIXES + " " + query;
 		try {
 		    Query q = QueryFactory.create(fullQuery);
-		    if (q != null) return Response.ok().build();
+		    if (q != null) return Response.ok().entity("The given query conforms to SPARQL 1.1!!!").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
