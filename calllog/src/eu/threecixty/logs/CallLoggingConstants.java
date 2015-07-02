@@ -56,6 +56,8 @@ public class CallLoggingConstants {
 	
 	public static final String GOFLOW_SERVICE = "GoFlow services";
 	
+	public static final String NEARBY_SERVICES = "Nearby services";
+	
 	
 	private CallLoggingConstants() {
 	}

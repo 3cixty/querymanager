@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import eu.threecixty.logs.CallLoggingConstants;
+import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.SocialWishListUtils;
@@ -55,6 +57,7 @@ public class NearbyServices {
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+			CallLoggingManager.getInstance().save(key, time1, CallLoggingConstants.NEARBY_SERVICES, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -85,6 +88,7 @@ public class NearbyServices {
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+			CallLoggingManager.getInstance().save(key, time1, CallLoggingConstants.NEARBY_SERVICES, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -112,6 +116,7 @@ public class NearbyServices {
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+			CallLoggingManager.getInstance().save(key, time1, CallLoggingConstants.NEARBY_SERVICES, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -139,6 +144,7 @@ public class NearbyServices {
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+			CallLoggingManager.getInstance().save(key, time1, CallLoggingConstants.NEARBY_SERVICES, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -176,6 +182,7 @@ public class NearbyServices {
 						tmpLanguages, distance > 10 ? 2 : distance, offset, limit, listPoIsFromFriendsWishList);
 				long time2 = System.currentTimeMillis();
 				if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+				CallLoggingManager.getInstance().save(at.getAppkey(), time1, CallLoggingConstants.NEARBY_SERVICES, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -211,6 +218,7 @@ public class NearbyServices {
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
+			CallLoggingManager.getInstance().save(at.getAppkey(), time1, CallLoggingConstants.NEARBY_SERVICES, CallLoggingConstants.SUCCESSFUL);
 			return Response.ok(JSONObject.wrap(nearbyElements).toString(), MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
 			e.printStackTrace();
