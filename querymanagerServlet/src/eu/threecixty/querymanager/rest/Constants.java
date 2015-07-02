@@ -16,6 +16,8 @@ public class Constants {
 	
 	public static final String WISH_LIST_SCOPE_NAME = "WishList";
 	public static final String PROFILE_SCOPE_NAME = "Profile";
+	public static final String JSON = "json";
+	public static final String RDF = "rdf";
 
 	private Constants() {
 	}

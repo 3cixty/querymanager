@@ -37,22 +37,14 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.profile.IProfiler;
-import eu.threecixty.profile.ProfileManagerImpl;
-import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.SparqlEndPointUtils;
-import eu.threecixty.profile.TooManyConnections;
-import eu.threecixty.profile.UnknownException;
-import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.elements.ElementDetails;
-import eu.threecixty.profile.elements.ElementPoIDetails;
 import eu.threecixty.profile.elements.ElementDetailsUtils;
 import eu.threecixty.profile.elements.LanguageUtils;
 import eu.threecixty.querymanager.EventMediaFormat;
-import eu.threecixty.querymanager.IQueryManager;
-import eu.threecixty.querymanager.QueryManager;
-import eu.threecixty.querymanager.QueryManagerDecision;
-import eu.threecixty.querymanager.ThreeCixtyQuery;
+import eu.threecixty.querymanager.InvalidSparqlQuery;
+import eu.threecixty.querymanager.QueryAugmenterFilter;
+import eu.threecixty.querymanager.QueryAugmenterImpl;
 
 /**
  * The class is an end point for QA RestAPIs to expose to other components.
@@ -81,7 +73,6 @@ public class QueryManagerServices {
 	}
 
 	public static String realPath;
-	private static String allPrefixes;
 	
 
 	@POST
@@ -192,83 +183,45 @@ public class QueryManagerServices {
 	private Response executeQueryWithHttpMethod(String access_token,
 			String format, String query,
 			String filter, String debug, String httpMethod) {
-		logInfo("Start augmentAndExecute method ----------------------");
+		if (DEBUG_MOD) LOGGER.info("Start augmentAndExecute method ----------------------");
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			logInfo("Found a valid access token");
+			if (DEBUG_MOD) LOGGER.info("Found a valid access token");
 			String user_id =  userAccessToken.getUid();
 			if ("on".equals(debug)) {
 				user_id = "107217557295681360318";
 			}
 			String key = userAccessToken.getAppkey();
 
-			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
-			if (eventMediaFormat == null || query == null) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-						.entity("The format is not supported or query is null")
-						.type(MediaType.TEXT_PLAIN)
-						.build());
-			} else {
-				logInfo("Before reading user profile");
+			try {
+				if (DEBUG_MOD) LOGGER.info("Before augmenting and executing a query");
 
-				try {
-					UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-					IProfiler profiler = new Profiler(userProfile);
-					QueryManager qm = new QueryManager(user_id);
-					logInfo("Before augmenting and executing a query");
-					
-					String result;
-					try {
-						result = executeQuery(profiler, qm, query, filter,
-								eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
-					} catch (Exception e) {
-						// try to add order by before limit term because most likely the given query doesn't conform to SPARQL 1.1 
-						profiler.initDefaultParametersForAugmentation();
-						if (eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)) {
-							profiler.requireScoreRatedAtLeast(3);
-						} else if (eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)) {
-							profiler.requireScoreRatedForFriendsAtLeast(3);
-						}
-						profiler.PopulateProfile();
-						qm.requestPreferences(profiler);
-						String augmentedQuery = qm.createAugmentedQuery(query);
-						if (DEBUG_MOD) LOGGER.info("Query augmented: " + augmentedQuery);
-						StringBuilder sb = new StringBuilder();
-						SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, format, httpMethod, sb);
-						result = sb.toString();
-					}
+				String result = executeQuery(user_id, query, filter, format, httpMethod);
 
-					// log calls
-					
-					if (filter == null) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("location")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("enteredrating")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("preferred")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("friends")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					}
+				// log calls
 
-					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
-							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
-				} catch (TooManyConnections e) {
-					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					        .entity(e.getMessage())
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
-				} catch (IOException e) {
-					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					        .entity(e.getMessage())
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
+				if (filter == null) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("location")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("enteredrating")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("preferred")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("friends")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				}
+
+				return Response.ok(result, Constants.JSON.equals(format) ?
+						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+			} catch (IOException e) {
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+						.entity(e.getMessage())
+						.type(MediaType.TEXT_PLAIN)
+						.build();
 			}
 		} else {
 			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
@@ -601,112 +554,12 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()));
 
 			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String result = executeQuery(profiler, qm, query, preference,
-						EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken), SparqlEndPointUtils.HTTP_GET);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			}
-		} else {
-			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			return createResponseForAccessToken(access_token);
-		}
-	}
-	
-	
-	/**
-	 * Gets Events in details.
-	 *
-	 * @param access_token
-	 * @param offset
-	 * @param limit
-	 * @param filter1
-	 * @param filter2
-	 * @param key
-	 * @return
-	 */
-	@GET
-	@Path("/getEventsInDetails")
-	public Response getItemsInDetails(@HeaderParam("access_token") String access_token,
-			@HeaderParam("Accept-Language") String languages,
-			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
-		
-		long starttime = System.currentTimeMillis();
-
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String user_id =  userAccessToken.getUid();
-			String key = userAccessToken.getAppkey();
-
-			Gson gson = new Gson();
-			KeyValuePair pair1 = null;
-			KeyValuePair pair2 = null;
-			try {
-				pair1 = gson.fromJson(filter1, KeyValuePair.class);
-			} catch (Exception e) {}
-			try {
-				pair2 = gson.fromJson(filter2, KeyValuePair.class);
-			} catch (Exception e) {}
-
-			String query = createSelectSparqlQuery(offset, limit,
-					(pair1 == null ? null : pair1.getGroupBy()),
-					(pair1 == null ? null : pair1.getValue()),
-					(pair2 == null ? null : pair2.getGroupBy()),
-					(pair2 == null ? null : pair2.getValue()));
-
-			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-				Map <String, Boolean> result = executeQuery(profiler, qm, query, null, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet(), null, tmpLanguages);
-				
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				String content = JSONObject.wrap(elementsInDetails).toString();
-				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
 			} catch (IOException e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -746,99 +599,11 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String result = executeQuery(profiler, qm, query, preference,
-						EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken), SparqlEndPointUtils.HTTP_GET);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY );
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			}
-		} else {
-			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			return createResponseForAccessToken(access_token);
-		}
-	}
-	
-	/**
-	 * Gets PoIs in details.
-	 *
-	 * @param access_token
-	 * @param offset
-	 * @param limit
-	 * @param preference
-	 * @param category
-	 * @return
-	 */
-	@GET
-	@Path("/getPoIsInDetails")
-	public Response getPoIsInDetails(@HeaderParam("access_token") String access_token,
-			@HeaderParam("Accept-Language") String languages,
-			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
-			@DefaultValue("") @QueryParam("category") String category,
-			@DefaultValue("0") @QueryParam("minRating") int minRating,
-			@DefaultValue("5") @QueryParam("maxRating") int maxRating) {
-		
-		long starttime = System.currentTimeMillis();
-
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String user_id =  userAccessToken.getUid();
-			String key = userAccessToken.getAppkey();
-
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
-
-			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), null, null, tmpLanguages);
-				for (ElementDetails poi: poisInDetails) {
-					((ElementPoIDetails) poi).setAugmented(result.get(poi.getId()));
-				}
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				String content = JSONObject.wrap(poisInDetails).toString();
-				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY );
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
 			} catch (IOException e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -894,58 +659,6 @@ public class QueryManagerServices {
 			return createResponseForInvalidKey(key);
 		}
 	}
-	
-	@GET
-	@Path("/getEventsInDetailsWithoutAccessToken")
-	public Response getEventsInDetailsWithoutUserInfo(
-			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2,
-			@HeaderParam("key") String key,
-			@HeaderParam("Accept-Language") String languages) {
-		
-		long starttime = System.currentTimeMillis();
-
-		if (OAuthWrappers.validateAppKey(key)) {
-
-				Gson gson = new Gson();
-				KeyValuePair pair1 = null;
-				KeyValuePair pair2 = null;
-				try {
-					pair1 = gson.fromJson(filter1, KeyValuePair.class);
-				} catch (Exception e) {}
-				try {
-					pair2 = gson.fromJson(filter2, KeyValuePair.class);
-				} catch (Exception e) {}
-
-				String query = createSelectSparqlQuery(offset, limit,
-						(pair1 == null ? null : pair1.getGroupBy()),
-						(pair1 == null ? null : pair1.getValue()),
-						(pair2 == null ? null : pair2.getGroupBy()),
-						(pair2 == null ? null : pair2.getValue()));
-
-				try {
-					List <String> eventIds = QueryManager.getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
-				
-					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-					String content = JSONObject.wrap(eventsDetails).toString();
-					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
-				} catch (IOException e) {
-					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-					LOGGER.error(e.getMessage());
-					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					        .entity(e.getMessage())
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
-				}
-		} else {
-			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			return createResponseForInvalidKey(key);
-		}
-	}
 
 	@GET
 	@Path("/getPoIsWithoutAccessToken")
@@ -980,44 +693,6 @@ public class QueryManagerServices {
 	}
 	
 	@GET
-	@Path("/getPoIsInDetailsWithoutAccessToken")
-	public Response getPoIsInDetailsWithoutUserInfo(
-			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("") @QueryParam("category") String category,
-			@DefaultValue("0") @QueryParam("minRating") int minRating,
-			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
-			@HeaderParam("key") String key,
-			@HeaderParam("Accept-Language") String languages) {
-		
-		long starttime = System.currentTimeMillis();
-
-		if (OAuthWrappers.validateAppKey(key)) {
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
-
-			try {
-				List <String> poiIds = QueryManager.getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
-				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, tmpLanguages);
-				
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				String content = JSONObject.wrap(poisInDetails).toString();
-				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (IOException e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
-				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			}
-		} else {
-			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			return createResponseForInvalidKey(key);
-		}
-	}
-	
-	@GET
 	@Path("/validateQuery")
 	public Response validateSPARLQuery(@DefaultValue("") @QueryParam("query") String query) {
 		String fullQuery = getAllPrefixes() + " " + Configuration.PREFIXES + " " + query;
@@ -1030,49 +705,32 @@ public class QueryManagerServices {
 		return Response.status(Response.Status.BAD_REQUEST).entity("incomprehensive query").build();
 	}
 
-	private String executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter, EventMediaFormat eventMediaFormat,
-			boolean needToCheckPredicate, boolean limitToProfile, String httpMethod) throws ThreeCixtyPermissionException,
-			TooManyConnections, UnknownException {
+	private String executeQuery(String uid, String query, String filter, String format,
+			String httpMethod) throws IOException {
 
-		Query jenaQuery = createJenaQuery(query);
+		if (QueryAugmenterImpl.allPrefixes == null) QueryAugmenterImpl.allPrefixes = getAllPrefixes();
 		
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);
-		qm.setForEvents(isForEvents);
-		
-		/// XXX: hack for date ranges query
-		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
-		qm.setForDateRanges(isForDateRages);
-
-		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
-
-		qm.setQuery(threecixtyQuery);
-		
-		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat, httpMethod);
-		return  result;
-	}
-	
-	private Map <String, Boolean> executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter,
-			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException,
-			TooManyConnections, UnknownException {
-
-		Query jenaQuery = createJenaQuery(query);
-		
-		// XXX: is for events
-		boolean isForEvents = (query.indexOf("lode:Event") > 0);
-		qm.setForEvents(isForEvents);
-		
-		/// XXX: hack for date ranges query
-		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
-		qm.setForDateRanges(isForDateRages);
-
-		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
-
-		qm.setQuery(threecixtyQuery);
-		
-		return QueryManagerDecision.run(profiler, qm, filter, SparqlEndPointUtils.HTTP_GET);
+		StringBuilder sb = new StringBuilder();
+		String formatType = Constants.JSON.equalsIgnoreCase(format) ? "application/sparql-results+json"
+				: (Constants.RDF.equals(format) ? "application/rdf+xml" : "application/sparql-results+json");
+		if (isForEvents) {
+			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+		} else {
+			QueryAugmenterFilter qaf = eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)
+					? QueryAugmenterFilter.FriendsRating : eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)
+							? QueryAugmenterFilter.MyRating : null;
+			try {
+				String augmentedQuery = new QueryAugmenterImpl().createQueryAugmented(query, qaf, uid);
+				SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, formatType, httpMethod, sb);
+			} catch (InvalidSparqlQuery e) {
+				if (DEBUG_MOD) LOGGER.info(e.getMessage());
+				// try with original query
+				SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+			}
+		}
+		return sb.toString();
 	}
 
 	private String createGroupQuery(String group, int offset, int limit,
@@ -1122,11 +780,11 @@ public class QueryManagerServices {
 			String category, int minRating, int maxRating) {
 		StringBuffer buffer = new StringBuffer();
 		if (category != null && !category.equals("")) {
-			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n    ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n    ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
 		            + category + "\" )\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 					+ minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < " + maxRating + " )\n  }\n");
 		} else {
-			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 		                + minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < "  + maxRating + " )\n  }");
 		}
 		return createSelectSparqlQuery(buffer.toString(), offset, limit);
@@ -1141,16 +799,6 @@ public class QueryManagerServices {
 			query.append("LIMIT ").append(limit).append("\n");
 		}
 		return query.toString();
-	}
-
-	private Query createJenaQuery(String queryStr) {
-		if (queryStr == null) return null;
-		if (allPrefixes == null) {
-			allPrefixes = getAllPrefixes() + " ";
-		}
-
-		Query jenaQuery = QueryFactory.create(allPrefixes + queryStr);
-		return jenaQuery;
 	}
 
 	/**
@@ -1178,13 +826,6 @@ public class QueryManagerServices {
 			e.printStackTrace();
 		}
     	return "";
-    }
-    
-    private boolean isLimitForProfile(AccessToken accessToken) {
-    	List <String> scopes = accessToken.getScopeNames();
-    	if (scopes == null || scopes.size() == 0) return true;
-    	if (scopes.contains(Constants.PROFILE_SCOPE_NAME)) return false;
-    	return true;
     }
     
     private List <String> createList(String idsStr) {
