@@ -7,6 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
  <meta charset="UTF-8">
  <link href="login/normalize.css" rel="stylesheet">
     <link href="login/layout.css" rel="stylesheet">
@@ -15,6 +16,8 @@
     <link href="login/style.css" rel="stylesheet">
     <link rel="stylesheet" href="login/fontello.css">
     <script src="login/jquery-1.js"></script>
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <title>Sign in to 3cixty Platform</title>
 </head>
 <body class="login-body">
@@ -151,11 +154,21 @@
 			</div>
 			<div class="login-benefitsCopyright">
 				<div class="login3-info"> 
-					© 2015, 3cixty. All Rights Reserved.
+					ï¿½ 2015, 3cixty. All Rights Reserved.
 				</div>
 			</div>
 		</form>
 	</div>
 </div>
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
 </body>
 </html>
