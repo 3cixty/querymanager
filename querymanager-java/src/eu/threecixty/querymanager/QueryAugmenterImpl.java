@@ -36,6 +36,16 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 		return original;
 	}
 
+	/**
+	 * Augments the given query based on my own ratings.
+	 * <br>
+	 * In principle, the method takes all IDs of places which have been rated by me to order results.
+	 * through Google places.
+	 * @param original
+	 * @param uid
+	 * @return
+	 * @throws InvalidSparqlQuery
+	 */
 	private String createAugmentedQueryBasedOnMyRating(String original,
 			String uid) throws InvalidSparqlQuery {
 		if (original == null) return null;
@@ -53,6 +63,15 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 		return original;
 	}
 
+	/**
+	 * Augments the given query based on my friends' ratings.
+	 * <br>
+	 * This method takes all IDs of places which have been rated by my friends to order results.
+	 * @param original
+	 * @param uid
+	 * @return
+	 * @throws InvalidSparqlQuery
+	 */
 	private String createAugmentedQueryBasedOnFriends(String original,
 			String uid) throws InvalidSparqlQuery {
 		if (original == null) return null;
