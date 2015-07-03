@@ -198,6 +198,7 @@ public class OAuthWrappers {
 		newAccessToken.setAppClientKey(lastAccessToken.getAppClientKey());
 		newAccessToken.setAppClientPwd(lastAccessToken.getAppClientPwd());
 		newAccessToken.setUid(lastAccessToken.getUid());
+		newAccessToken.setAppkeyId(lastAccessToken.getAppkeyId());
 		// update user access token as OAuth server already deleted old one
 		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(lastAccessToken, newAccessToken)) return null;
 		TokenCacheManager.getInstance().update(newAccessToken);
