@@ -193,6 +193,11 @@ public class OAuthWrappers {
 		AccessToken newAccessToken = oauthServerBypassed ?
 				refreshAccessTokenWithoutUsingOAuthServer(lastAccessToken) : refreshAccessTokenUsingOAuthServer(lastAccessToken);
 		if (newAccessToken == null) return null;
+		// update app info to new access token
+		newAccessToken.setAppkey(lastAccessToken.getAppkey());
+		newAccessToken.setAppClientKey(lastAccessToken.getAppClientKey());
+		newAccessToken.setAppClientPwd(lastAccessToken.getAppClientPwd());
+		newAccessToken.setUid(lastAccessToken.getUid());
 		// update user access token as OAuth server already deleted old one
 		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(lastAccessToken, newAccessToken)) return null;
 		TokenCacheManager.getInstance().update(newAccessToken);
