@@ -88,10 +88,12 @@ public class GoogleAccountUtils {
 						
 			String picture = json.getString("picture");
 			
+			String hashedUID = Encoder.getInstance().encode(user_id);
+			
 			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(
-					user_id, SPEConstants.GOOGLE_SOURCE);
+					hashedUID, SPEConstants.GOOGLE_SOURCE);
 			if (profile == null) {
-				_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
+				_3cixtyUID = Utils.gen3cixtyUID(hashedUID, UidSource.GOOGLE);
 				profile = new UserProfile();
 				profile.setHasUID(_3cixtyUID);
 			} else {
@@ -106,7 +108,7 @@ public class GoogleAccountUtils {
 				name.setFamilyName(familyName);
 			}
 
-			if (DEBUG_MOD) LOGGER.info("user_id = " + user_id + ", 3cixty UID = " + _3cixtyUID + ", givenName = " + givenName + ", familyName = " + familyName);
+			if (DEBUG_MOD) LOGGER.info("user_id = " + hashedUID + ", 3cixty UID = " + _3cixtyUID + ", givenName = " + givenName + ", familyName = " + familyName);
 
 			Set <ProfileIdentities> profileIdentities = null;
 			if (profile.getHasProfileIdenties() == null) {
@@ -114,17 +116,17 @@ public class GoogleAccountUtils {
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
 			
-			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, user_id, SPEConstants.GOOGLE_SOURCE);
-			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, user_id, SPEConstants.GOOGLE_SOURCE, profileIdentities);
+			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, hashedUID, SPEConstants.GOOGLE_SOURCE);
+			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, hashedUID, SPEConstants.GOOGLE_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			try {
 				if (generalInfoModified || profileIdentitiesModified) {
 					boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 					if (successful) {
-						updateKnows(accessToken, user_id, profile);
+						updateKnows(accessToken, hashedUID, profile);
 					}
-				} else updateKnows(accessToken, user_id, profile);
+				} else updateKnows(accessToken, hashedUID, profile);
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage());
 			}
@@ -160,7 +162,9 @@ public class GoogleAccountUtils {
 				int length=jsonArray.length();
 				for (int i = 0; i < length; i++) {
 					JSONObject jObject = jsonArray.getJSONObject(i);
-					googleUidsOfFriends.add(jObject.getString("id"));
+					String uid = jObject.getString("id");
+					String hashedUID = Encoder.getInstance().encode(uid);
+					googleUidsOfFriends.add(hashedUID);
 				}
 				reqMsg = Utils.readUrl("https://www.googleapis.com/plus/v1/people/me/people/visible?access_token="
 						+ accessToken+"&pageToken="+nextPageToken);
@@ -172,7 +176,9 @@ public class GoogleAccountUtils {
 			int length=jsonArray.length();
 			for (int i = 0; i < length; i++) {
 				JSONObject jObject = jsonArray.getJSONObject(i);
-				googleUidsOfFriends.add(jObject.getString("id"));
+				String uid = jObject.getString("id");
+				String hashedUID = Encoder.getInstance().encode(uid);
+				googleUidsOfFriends.add(hashedUID);
 			}
 		}
 		return googleUidsOfFriends;
