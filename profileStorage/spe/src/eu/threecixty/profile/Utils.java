@@ -25,8 +25,8 @@ public class Utils {
 	/**A prefix of two characters is really enough for future: 99 social networks*/
 	protected static final String GOOGLE_PREFIX = "10";
 	
-	private static final String FACEBOOK_PREFIX = "11";
-	private static final String NO_SOCIAL_NETWORK_PREFIX = "99";
+	protected static final String FACEBOOK_PREFIX = "11";
+	protected static final String NO_SOCIAL_NETWORK_PREFIX = "99";
 	
 	private static final String PROFILE_URI = Configuration.PROFILE_URI;
 	
