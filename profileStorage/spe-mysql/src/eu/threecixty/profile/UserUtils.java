@@ -488,8 +488,13 @@ public class UserUtils {
 
 	private static void convertKnowsForPersistence(Set <String> knowsStrs,
 			UserModel userModel) {
-		if (knowsStrs == null || knowsStrs.size() == 0) userModel.setKnows(null);
+		if (DEBUG_MOD) LOGGER.info("Entering in the method convertKnowsForPersistence");
+		if (knowsStrs == null || knowsStrs.size() == 0) {
+			if (DEBUG_MOD) LOGGER.info("Empty knows");
+			userModel.setKnows(null);
+		}
 		else {
+			if (DEBUG_MOD) LOGGER.info("Knows size: " + knowsStrs.size()+ ", " + knowsStrs);
 			Set <String> knowsModel = userModel.getKnows();
 			if (knowsModel == null) {
 				knowsModel = new HashSet <String>();
