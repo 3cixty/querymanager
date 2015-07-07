@@ -33,11 +33,11 @@ public class Utils {
 	public static String gen3cixtyUID(String originalUID, UidSource source) {
 		if (source == null || originalUID == null) return null;
 		if (source == UidSource.GOOGLE) {
-			return GOOGLE_PREFIX + originalUID;
+			return GOOGLE_PREFIX + Encoder.getInstance().encode(originalUID);
 		} else if (source == UidSource.FACEBOOK) {
-			return FACEBOOK_PREFIX + originalUID;
+			return FACEBOOK_PREFIX + Encoder.getInstance().encode(originalUID);
 		}
-		return NO_SOCIAL_NETWORK_PREFIX + originalUID;
+		return NO_SOCIAL_NETWORK_PREFIX + Encoder.getInstance().encode(originalUID);
 	}
 
 	public static void setProfileIdentities(String _3cixtyUID, String uid, String source,
