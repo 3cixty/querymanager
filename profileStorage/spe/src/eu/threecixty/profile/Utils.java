@@ -23,13 +23,23 @@ import eu.threecixty.profile.oldmodels.UserInteractionMode;
 public class Utils {
 	
 	/**A prefix of two characters is really enough for future: 99 social networks*/
-	protected static final String GOOGLE_PREFIX = "10";
+	private static final String GOOGLE_PREFIX = "10";
 	
-	protected static final String FACEBOOK_PREFIX = "11";
-	protected static final String NO_SOCIAL_NETWORK_PREFIX = "99";
+	private static final String FACEBOOK_PREFIX = "11";
+	private static final String NO_SOCIAL_NETWORK_PREFIX = "99";
 	
 	private static final String PROFILE_URI = Configuration.PROFILE_URI;
 	
+	/**
+	 * Generates 3cixty UID from a given UID and source.
+	 * <br>
+	 * Note that there is possibility that Google & Facebook UID are the same,
+	 * this method adds a prefix before hashed UID so that 3cixty UID is always
+	 * distinguished even original UIDs from Google & Facebook are the same.
+	 * @param originalUID
+	 * @param source
+	 * @return
+	 */
 	public static String gen3cixtyUID(String originalUID, UidSource source) {
 		if (source == null || originalUID == null) return null;
 		if (source == UidSource.GOOGLE) {
