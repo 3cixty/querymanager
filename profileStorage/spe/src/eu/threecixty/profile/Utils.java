@@ -153,11 +153,11 @@ public class Utils {
 	}
 	
 	protected static boolean checkProfileIdentitiesModified(
-			Set<ProfileIdentities> profileIdentities, String user_id,
+			Set<ProfileIdentities> profileIdentities, String hashedUID,
 			String source) {
 		boolean found = false;
 		for (ProfileIdentities pi: profileIdentities) {
-			if (user_id.equals(pi.getHasUserAccountID())) {
+			if (hashedUID.equals(pi.getHasUserAccountID())) {
 				found = true;
 				break;
 			}
