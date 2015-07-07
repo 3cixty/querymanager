@@ -48,10 +48,10 @@ public class FaceBookAccountUtils {
 			// The following code is supposed that FaceBook info is independent with Google info.
 			
 			String _3cixtyUID = null;
-			
-			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(uid, SPEConstants.FACEBOOK_SOURCE);
+			String hashedUID = Encoder.getInstance().encode(uid);
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(hashedUID, SPEConstants.FACEBOOK_SOURCE);
 			if (profile == null) {
-				_3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
+				_3cixtyUID = Utils.gen3cixtyUID(hashedUID, UidSource.FACEBOOK);
 				profile = new UserProfile();
 				profile.setHasUID(_3cixtyUID);
 			} else {
@@ -73,17 +73,17 @@ public class FaceBookAccountUtils {
 				profileIdentities = new HashSet <ProfileIdentities>();
 				profile.setHasProfileIdenties(profileIdentities);
 			} else profileIdentities = profile.getHasProfileIdenties();
-			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, uid, SPEConstants.FACEBOOK_SOURCE);
-			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, uid, SPEConstants.FACEBOOK_SOURCE, profileIdentities);
+			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, hashedUID, SPEConstants.FACEBOOK_SOURCE);
+			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, hashedUID, SPEConstants.FACEBOOK_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
 			
 			if (generalInfoModified || profileIdentitiesModified) {
 				boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 				if (successful) {
-					updateKnows(accessToken, uid, profile);
+					updateKnows(accessToken, hashedUID, profile);
 				}
-			} else updateKnows(accessToken, uid, profile);
+			} else updateKnows(accessToken, hashedUID, profile);
 			long time3 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time1) + " ms");
 			return _3cixtyUID;
@@ -117,8 +117,9 @@ public class FaceBookAccountUtils {
 			for (int i = 0; i < len; i++) {
 				JSONObject tmpJson = arr.getJSONObject(i);
 				String fUID = tmpJson.getString("id");
-				if (facebookUidsFromFriends.contains(fUID)) continue;
-				facebookUidsFromFriends.add(fUID);
+				String hashedUID = Encoder.getInstance().encode(fUID);
+				if (facebookUidsFromFriends.contains(hashedUID)) continue;
+				facebookUidsFromFriends.add(hashedUID);
 			}
 			String nextURL = json.getJSONObject("paging").getString("next");
 			findFacebookUidsFromFriends(nextURL + "&access_token=", accessToken, facebookUidsFromFriends);

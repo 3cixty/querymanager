@@ -31,23 +31,23 @@ public class Utils {
 	private static final String PROFILE_URI = Configuration.PROFILE_URI;
 	
 	/**
-	 * Generates 3cixty UID from a given UID and source.
+	 * Generates 3cixty UID from a given hashed UID and source.
 	 * <br>
 	 * Note that there is possibility that Google & Facebook UID are the same,
 	 * this method adds a prefix before hashed UID so that 3cixty UID is always
-	 * distinguished even original UIDs from Google & Facebook are the same.
-	 * @param originalUID
+	 * distinguished even hashed UIDs from Google & Facebook are the same.
+	 * @param hashedUID
 	 * @param source
 	 * @return
 	 */
-	public static String gen3cixtyUID(String originalUID, UidSource source) {
-		if (source == null || originalUID == null) return null;
+	public static String gen3cixtyUID(String hashedUID, UidSource source) {
+		if (source == null || hashedUID == null) return null;
 		if (source == UidSource.GOOGLE) {
-			return GOOGLE_PREFIX + Encoder.getInstance().encode(originalUID);
+			return GOOGLE_PREFIX + hashedUID;
 		} else if (source == UidSource.FACEBOOK) {
-			return FACEBOOK_PREFIX + Encoder.getInstance().encode(originalUID);
+			return FACEBOOK_PREFIX + hashedUID;
 		}
-		return NO_SOCIAL_NETWORK_PREFIX + Encoder.getInstance().encode(originalUID);
+		return NO_SOCIAL_NETWORK_PREFIX + hashedUID;
 	}
 
 	/**
