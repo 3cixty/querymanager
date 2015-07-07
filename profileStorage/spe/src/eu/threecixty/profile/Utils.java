@@ -50,17 +50,24 @@ public class Utils {
 		return NO_SOCIAL_NETWORK_PREFIX + Encoder.getInstance().encode(originalUID);
 	}
 
-	public static void setProfileIdentities(String _3cixtyUID, String uid, String source,
+	/**
+	 * 
+	 * @param _3cixtyUID
+	 * @param hashedUID
+	 * @param source
+	 * @param profileIdentities
+	 */
+	public static void setProfileIdentities(String _3cixtyUID, String hashedUID, String source,
 			Set<ProfileIdentities> profileIdentities) {
 		boolean found = false;
 		for (ProfileIdentities pi: profileIdentities) {
-			if (uid.equals(pi.getHasUserAccountID())) {
+			if (hashedUID.equals(pi.getHasUserAccountID())) {
 				found = true;
 				break;
 			}
 		}
 		if (found) return; // already existed
-		addProfileIdentities(_3cixtyUID, uid, source, profileIdentities);
+		addProfileIdentities(_3cixtyUID, hashedUID, source, profileIdentities);
 	}
 	
 	protected static Set <String> getOrCreate3cixtyUIDsForKnows(List <String> uids,
