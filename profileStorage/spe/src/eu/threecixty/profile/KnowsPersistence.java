@@ -49,14 +49,11 @@ public class KnowsPersistence implements PersistentObjectForWorker {
 			Set<String> knows = Utils.getOrCreate3cixtyUIDsForKnows(fUIDsFromFriends, SPEConstants.FACEBOOK_SOURCE);
 			boolean knowsModified = Utils.checkKnowsModified(profile, knows);
 			if (knowsModified) profile.setKnows(knows);
-			
+			ProfileManagerImpl.getInstance().saveProfile(profile, null);
 			return true;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
-
-		
-		// TODO: update knows
 		
 		return false;
 	}
@@ -83,7 +80,8 @@ public class KnowsPersistence implements PersistentObjectForWorker {
 			knowsModified = Utils.checkKnowsModified(profile, knows);
 			if (knowsModified) profile.setKnows(knows);
 			
-			// TODO: update knows
+			ProfileManagerImpl.getInstance().saveProfile(profile, null);
+
 			return true;
 		} catch (Exception ex) {
 			LOGGER.error(ex.getMessage());
