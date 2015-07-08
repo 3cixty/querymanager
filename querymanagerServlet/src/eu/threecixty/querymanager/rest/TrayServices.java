@@ -186,23 +186,44 @@ public class TrayServices {
 
     }
 	
-//	@POST
-//	@Path("/allTrays")
-//	public Response showAllTrays(@FormParam("username") String username, @FormParam("password") String password) {
-//		try {
-//			AdminValidator admin = new AdminValidator();
-//			if (admin.validate(username, password, CallLogServices.realPath)) {
-//				List <Tray> allProfiles = ProfileManagerImpl.getInstance().getTrayManager().getAllTrays();
-//				Gson gson = new Gson();
-//				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
-//			} else {
-//				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
-//			}
-//		} catch (URISyntaxException e) {
-//			e.printStackTrace();
+//    @GET
+//    @Path("/getTraysInDetail")
+//    public Response getTraysInDetail(@Context HttpHeaders headers, @Context Request req) {
+//    	try {
+//    		if (DEBUG_MOD) LOGGER.info("Get trays in detail");
+//    		RestTrayObject restTrayObject = new RestTrayObject();
+//    		List <String> accessTokens = headers.getRequestHeader("access_token");
+//    		if (accessTokens != null && accessTokens.size() > 0) {
+//    		    restTrayObject.setToken(accessTokens.get(0));
+//    		}
+//    		AccessToken at = OAuthWrappers.findAccessTokenFromDB(restTrayObject.getToken());
+//    		if (at != null) {
+//    			restTrayObject.setKey(at.getAppkey());
+//    		}
+//    		restTrayObject.setAction(GET_ACTION_IN_DETAILS);
+//			return get_tray_elements_details(restTrayObject, req, System.currentTimeMillis());
+//		} catch (ThreeCixtyPermissionException e) {
+//			return Response.status(Response.Status.FORBIDDEN)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN)
+//					.build();
+//		} catch (InvalidTrayElement e) {
+//			return Response.status(Response.Status.BAD_REQUEST)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
+//		} catch (TooManyConnections e) {
+//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
+//		} catch (IOException e) {
+//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
 //		}
-//		return Response.serverError().build();
-//	}
+//    }
     
     private String getRestTrayString(InputStream input) {
     	if (input == null) return null;
@@ -227,15 +248,15 @@ public class TrayServices {
 	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
-		if (itemId == null || itemId.equals("")) return false;
+		if (itemId == null || itemId.equals("")) throw new InvalidTrayElement("element_id is invalid");
 		String itemTypeStr = restTray.getElement_type();
-		if (itemTypeStr == null) return false;
+		if (itemTypeStr == null) throw new InvalidTrayElement("element type is invalid");
 
 		String token = restTray.getToken();
-		if (token == null || token.equals("")) return false;
+		if (token == null || token.equals("")) throw new InvalidTrayElement("token is invalid");
 		
 		String source = restTray.getSource();
-		if (source == null) return false;
+		if (source == null) throw new InvalidTrayElement("source is missed");
 		
 		String image_url = restTray.getImage_url();
 		
@@ -296,10 +317,10 @@ public class TrayServices {
 	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String junkToken = restTray.getJunk_token();
-		if (junkToken == null || junkToken.equals("")) return null;
+		if (junkToken == null || junkToken.equals("")) throw new InvalidTrayElement("junk token is invalid");
 		String threeCixtyToken = restTray.getThree_cixty_token();
 		String uid = OAuthWrappers.findUIDFrom(threeCixtyToken);
-		if (uid == null || uid.equals("")) return null;
+		if (uid == null || uid.equals("")) throw new InvalidTrayElement("3cixty token is invalid");
 		if (!ProfileManagerImpl.getInstance().getTrayManager().replaceUID(junkToken, uid)) return null;
 		checkPermission(threeCixtyToken);
 		return ProfileManagerImpl.getInstance().getTrayManager().getTrays(uid, 0, -1, OrderType.Desc, true);
@@ -313,7 +334,7 @@ public class TrayServices {
 	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String token = restTray.getToken();
-		if (token == null || token.equals("")) return false;
+		if (token == null || token.equals("")) throw new InvalidTrayElement("token is null or empty");
 		String uid = OAuthWrappers.findUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(token);
@@ -330,7 +351,7 @@ public class TrayServices {
 	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
-		if (itemId == null || itemId.equals("")) return false;
+		if (itemId == null || itemId.equals("")) throw new InvalidTrayElement("element_id is invalid");
 		String token = restTray.getToken();
 
 		String uid = OAuthWrappers.findUIDFrom(token);
@@ -341,7 +362,7 @@ public class TrayServices {
 		}
 		
 		Tray tray = ProfileManagerImpl.getInstance().getTrayManager().getTray((uid == null || uid.equals("")) ? token : uid, itemId);
-		if (tray == null) return false;
+		if (tray == null) throw new InvalidTrayElement("Don't find any items with " + itemId);
 		tray.setElement_id(itemId);
 		
 		String itemTypeStr = restTray.getElement_type();
@@ -385,7 +406,7 @@ public class TrayServices {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (!okDatetime) return false;
+			if (!okDatetime) throw new InvalidTrayElement("attend_datetime is in incorrect format. The format looks like dd-MM-yyyy HH:mm");
 			tray.setAttend_datetime(datetimeAttendedStr);
 		}
 		
@@ -449,6 +470,14 @@ public class TrayServices {
 		if (elementEventsDetails != null) {
 			for (ElementDetails eventDetails: elementEventsDetails) {
 				eventDetails.setType(EVENT_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(eventDetails.getId())) {
+						eventDetails.setAttend_datetime(tray.getAttend_datetime());
+						eventDetails.setRating(tray.getRating());
+						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
 			}
 			trayDetailsList.addAll(elementEventsDetails);
 		}
@@ -456,6 +485,14 @@ public class TrayServices {
 		if (elementPoIsDetails != null) {
 			for (ElementDetails poiDetails: elementPoIsDetails) {
 				poiDetails.setType(POI_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(poiDetails.getId())) {
+						poiDetails.setAttend_datetime(tray.getAttend_datetime());
+						poiDetails.setRating(tray.getRating());
+						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
 			}
 			trayDetailsList.addAll(elementPoIsDetails);
 		}

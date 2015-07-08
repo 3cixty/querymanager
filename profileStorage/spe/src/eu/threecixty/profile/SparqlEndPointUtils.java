@@ -20,9 +20,6 @@ public class SparqlEndPointUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
-	private static final String LOCN_PREFIX = "PREFIX locn: <http://www.w3.org/ns/locn#> ";
-	private static final String CE_MILANO_PREFIX = "PREFIX ce: <http://data.linkedevents.org/cell/milano/> ";
-	
 	private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
 	private static final String UTF8 = "UTF-8";
 	
@@ -43,8 +40,7 @@ public class SparqlEndPointUtils {
 	}
 
 	private static void executeQueryViaSPARQL_GET(String query, String format, StringBuilder result) throws IOException {
-		String urlStr = SPARQL_ENDPOINT_URL_GET + URLEncoder.encode(
-					LOCN_PREFIX + CE_MILANO_PREFIX + query, "UTF-8");
+		String urlStr = SPARQL_ENDPOINT_URL_GET + URLEncoder.encode(query, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
 			URL url = new URL(urlStr);
 	
@@ -70,7 +66,7 @@ public class SparqlEndPointUtils {
 		conn.setAllowUserInteraction(true);
 	
 		StringBuilder queryBuilder = new StringBuilder("query=").append(
-				URLEncoder.encode(CE_MILANO_PREFIX + LOCN_PREFIX + query, UTF8));
+				URLEncoder.encode(query, UTF8));
 		queryBuilder.append("&format=").append(URLEncoder.encode(format, UTF8));
 		
 		OutputStream output = conn.getOutputStream();

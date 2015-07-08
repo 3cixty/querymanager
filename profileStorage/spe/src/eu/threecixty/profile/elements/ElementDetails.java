@@ -27,6 +27,15 @@ public class ElementDetails {
 	private String url;
 	
 	private String description;
+	
+	// asked by Christian to avoid calling API twice to get trays list in detail
+	private Long creationTimestamp;
+	private String attend_datetime;
+	private Integer rating;
+	
+	// for highlighting results
+	private Boolean highlighted;
+	
 	protected Map <String, String> descriptions;
 	protected Map <String, Boolean> translateds;
 
@@ -127,6 +136,39 @@ public class ElementDetails {
 		this.url = url;
 	}
 
+	public Long getCreationTimestamp() {
+		return creationTimestamp;
+	}
+	public void setCreationTimestamp(Long creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
+	}
+
+	public String getAttend_datetime() {
+		return attend_datetime;
+	}
+	public void setAttend_datetime(String attend_datetime) {
+		this.attend_datetime = attend_datetime;
+	}
+	public Integer getRating() {
+		return rating;
+	}
+	public void setRating(Integer rating) {
+		this.rating = rating;
+	}
+	
+	public Boolean getHighlighted() {
+		return highlighted;
+	}
+	public void setHighlighted(Boolean highlighted) {
+		this.highlighted = highlighted;
+	}
+
+	public boolean containsDescIn(String language) {
+		if (language == null) return false;
+		if (descriptions == null) return false;
+		return descriptions.containsKey(language);
+	}
+	
 	public void putDescription(String language, String description) {
 		if (descriptions == null) {
 			descriptions = new HashMap<String, String>();

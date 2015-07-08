@@ -151,9 +151,14 @@ public class CrawlerCron {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-				ProfileManagerImpl.getInstance().saveProfile(user, attrs);
-				if (DEBUG_MOD) LOGGER.info("Finished saving Mobidot data of user: "+ map.getThreeCixtyID());
+				// XXX: the following try-catch to avoid being caused by incorrect inference
+				//      (two accompanyings can come from API& DEV database).
+				try {
+					ProfileManagerImpl.getInstance().saveProfile(user, attrs);
+					if (DEBUG_MOD) LOGGER.info("Finished saving Mobidot data of user: "+ map.getThreeCixtyID());
+				} catch (Exception e) {
+					if (DEBUG_MOD) LOGGER.info(e.getMessage());
+				}
 
 			} catch (TooManyConnections e) {
 				if (DEBUG_MOD) LOGGER.info(e.getMessage());

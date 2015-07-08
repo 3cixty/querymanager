@@ -112,10 +112,15 @@ public class MobilityCrawlerCron {
 		if (DEBUG_MOD) LOGGER.info("Start extracting Accompanying");
 		int length;
 		String urlStr;
-		urlStr = MobidotBaseurl + "measurement/Accompanies/" + mobidotID
+		urlStr = MobidotBaseurl + "measurement/Accompanies/" + mobidotID.trim()
 				+ "/modifiedSince/" + "0" + "?key=" + APIKey;
+		if (DEBUG_MOD) LOGGER.info("URL to get accompanying: " + urlStr);
 		JSONArray resultAccompany = getTravelInfoforMobiditID(urlStr);
 
+		if (resultAccompany == null) {
+			if (DEBUG_MOD) LOGGER.info("Error while accessing to Mobidot server");
+			return;
+		}
 		length = resultAccompany.length();
 
 		Set<Accompanying> accompanyings = profile.getAccompanyings();
@@ -134,6 +139,12 @@ public class MobilityCrawlerCron {
 					map.getThreeCixtyID(), jsonobj, idMapping);
 
 			if (hasAccompany != null) {
+				if (DEBUG_MOD) LOGGER.info("Accompany extracted: AccompanyId = " + hasAccompany.getHasAccompanyId()
+						+ ", AccompanyUserid2ST = " + hasAccompany.getHasAccompanyUserid2ST()
+						+ ", AccompanyUserid1ST = " + hasAccompany.getHasAccompanyUserid1ST()
+						+ ", AccompanyScore = " + hasAccompany.getHasAccompanyScore()
+						+ ", AccompanyTime = " + hasAccompany.getHasAccompanyTime()
+						+ ", AccompanyValidity = " + hasAccompany.getHasAccompanyValidity());
 				accompanyings.add(hasAccompany);
 				if (minTime > hasAccompany.getHasAccompanyValidity()) {
 					minTime = hasAccompany.getHasAccompanyValidity();
@@ -360,7 +371,7 @@ public class MobilityCrawlerCron {
 				input.close();
 				return jsonob;
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (DEBUG_MOD) LOGGER.info(e.getMessage());
 				return null;
 			}
 		}
@@ -524,6 +535,7 @@ public class MobilityCrawlerCron {
         Iterator<IDMapping> iteratorMapping = idMapping.iterator();
         while (iteratorMapping.hasNext()) {
             IDMapping map = iteratorMapping.next();
+            if (DEBUG_MOD) LOGGER.info("map.ThreeCixty ID = " + map.getThreeCixtyID() +", map.MobidotID = " + map.getMobidotID());
             if (map.getMobidotID()!=null){
                 if (map.getMobidotID().equals(mobidotID.toString())) {
                     return map.getThreeCixtyID();
@@ -543,9 +555,12 @@ public class MobilityCrawlerCron {
 	 */
     public Accompanying storeAccompanyingDetailsInKB(String uID,
                                                      JSONObject jsonobj, Set<IDMapping> idMapping) {
-        String IDUser2 = reverseMap(jsonobj.getLong("userid2"), idMapping);
-        String IDUser1 = reverseMap(jsonobj.getLong("userid1"), idMapping);
-        
+        Long jsonUserid2 = jsonobj.getLong("userid2");
+        Long jsonUserid1 = jsonobj.getLong("userid1");
+    	String IDUser2 = reverseMap(jsonUserid2, idMapping);
+        String IDUser1 = reverseMap(jsonUserid1, idMapping);
+        if (DEBUG_MOD) LOGGER.info("JSON userid1 = " + jsonUserid1 + ", userid2 = " + jsonUserid2);
+        if (DEBUG_MOD) LOGGER.info("IDUser1 = " + IDUser1 + ", IDUser2 = " + IDUser2);
         if (IDUser1 != null && IDUser1.equals(uID)){
             Accompanying accompany = new Accompanying();
             accompany.setHasAccompanyId(jsonobj.getLong("id"));

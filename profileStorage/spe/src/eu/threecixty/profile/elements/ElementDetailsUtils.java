@@ -90,7 +90,12 @@ public class ElementDetailsUtils {
 			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(eventId);
 			if (tmp != null) {
 				for (String language: languages) {
-				    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+				    if (!language.contains(TRANSLATION_TAG)) {
+				    	ElementEventDetails eed = (ElementEventDetails) tmp;
+				    	if (eed.containsDescIn(language)) finalList.add((eed).export(language));
+				    	else if (eed.containsDescIn("en")) finalList.add((eed).export("en"));
+				    	else finalList.add((eed).export(language));
+				    }
 				}
 				continue;
 			}
@@ -146,7 +151,12 @@ public class ElementDetailsUtils {
 		DetailItemsCacheManager.getInstance().put(elementsDetails);
 		for (ElementDetails tmp: elementsDetails) {
 			for (String language: languages) {
-			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+			    if (!language.contains(TRANSLATION_TAG)) {
+			    	ElementEventDetails eed = (ElementEventDetails) tmp;
+			    	if (eed.containsDescIn(language)) finalList.add((eed).export(language));
+			    	else if (eed.containsDescIn("en")) finalList.add((eed).export("en"));
+			    	else finalList.add((eed).export(language));
+			    }
 			}
 		}
 		
@@ -215,7 +225,12 @@ public class ElementDetailsUtils {
 			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(poiId);
 			if (tmp != null) {
 				for (String language: languages) {
-				    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementPoIDetails) tmp).export(language));
+				    if (!language.contains(TRANSLATION_TAG)) {
+				    	ElementPoIDetails epd = (ElementPoIDetails) tmp;
+				    	if (epd.containsDescIn(language)) finalList.add((epd).export(language));
+				    	else if (epd.containsDescIn("en")) finalList.add((epd).export("en"));
+				    	else finalList.add((epd).export(language));
+				    }
 				}
 				continue;
 			}
@@ -288,7 +303,12 @@ public class ElementDetailsUtils {
 		DetailItemsCacheManager.getInstance().put(elementsDetails);
 		for (ElementDetails tmp: elementsDetails) {
 			for (String language: languages) {
-			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementPoIDetails) tmp).export(language));
+			    if (!language.contains(TRANSLATION_TAG)) {
+			    	ElementPoIDetails epd = (ElementPoIDetails) tmp;
+			    	if (epd.containsDescIn(language)) finalList.add((epd).export(language));
+			    	else if (epd.containsDescIn("en")) finalList.add((epd).export("en"));
+			    	else finalList.add((epd).export(language));
+			    }
 			}
 		}
 		

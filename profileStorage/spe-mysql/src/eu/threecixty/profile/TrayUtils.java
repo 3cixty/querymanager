@@ -31,6 +31,7 @@ public class TrayUtils {
 			session = HibernateUtil.getSessionFactory().openSession();
 
 			TrayModel trayModel = convertTray(tray);
+			trayModel.setCreationTimestamp(System.currentTimeMillis());
 
 			session.beginTransaction();
 			session.save(trayModel);
@@ -271,6 +272,7 @@ public class TrayUtils {
 		tray.setRating(trayModel.getRating());
 		tray.setSource(trayModel.getSource());
 		tray.setTimestamp(trayModel.getTimestamp());
+		if (trayModel.getCreationTimestamp() != null) tray.setCreationTimestamp(trayModel.getCreationTimestamp());
 		return tray;
 	}
 

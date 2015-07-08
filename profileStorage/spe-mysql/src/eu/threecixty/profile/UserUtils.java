@@ -36,7 +36,7 @@ public class UserUtils {
 			 UserUtils.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
-	 //private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	public static boolean remove(UserProfile profile) {
 		if (profile == null) return false;
@@ -373,6 +373,8 @@ public class UserUtils {
 			session.update(userModel);
 			
 			session.getTransaction().commit();
+			
+			userProfile.setModelIdInPersistentDB(userModel.getId());
 
 			added = true;
 		} catch (HibernateException e) {
@@ -403,11 +405,13 @@ public class UserUtils {
 		Set <Accompanying> accompanyings = profile.getAccompanyings();
 		Set <AccompanyingModel> accompanyingModels = userModel.getAccompanyings();
 		if (accompanyings == null || accompanyings.size() == 0) {
+			if (DEBUG_MOD) LOGGER.info("list of accompanyings before saving: empty");
 			if (accompanyingModels != null && accompanyingModels.size() > 0) {
 				accompanyingModels.clear();
 			}
 			return;
 		}
+		if (DEBUG_MOD) LOGGER.info("number of accompanyings before saving: " + accompanyings.size());
 		if (accompanyingModels == null) {
 			accompanyingModels = new HashSet<AccompanyingModel>();
 			userModel.setAccompanyings(accompanyingModels);
@@ -484,8 +488,13 @@ public class UserUtils {
 
 	private static void convertKnowsForPersistence(Set <String> knowsStrs,
 			UserModel userModel) {
-		if (knowsStrs == null || knowsStrs.size() == 0) userModel.setKnows(null);
+		if (DEBUG_MOD) LOGGER.info("Entering in the method convertKnowsForPersistence");
+		if (knowsStrs == null || knowsStrs.size() == 0) {
+			if (DEBUG_MOD) LOGGER.info("Empty knows");
+			userModel.setKnows(null);
+		}
 		else {
+			if (DEBUG_MOD) LOGGER.info("Knows size: " + knowsStrs.size()+ ", " + knowsStrs);
 			Set <String> knowsModel = userModel.getKnows();
 			if (knowsModel == null) {
 				knowsModel = new HashSet <String>();
@@ -636,8 +645,8 @@ public class UserUtils {
 			mappings = new HashSet <IDMapping>();
 			for (Object[] row: results) {
 				IDMapping idMapping = new IDMapping();
-				idMapping.setThreeCixtyID((String) row[0]);
-				idMapping.setMobidotID((String) row[1]);
+				idMapping.setThreeCixtyID(((String) row[0]).trim());
+				idMapping.setMobidotID(((String) row[1]).trim());
 				mappings.add(idMapping);
 			}
 		} catch (HibernateException e) {

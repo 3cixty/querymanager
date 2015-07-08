@@ -38,7 +38,6 @@ import eu.threecixty.profile.oldmodels.Preference;
 import eu.threecixty.profile.oldmodels.Rating;
 
  public class QueryManager implements IQueryManager {
-	 private static final String PREFIX_PROFILE_ADDED = "PREFIX profile:<http://www.eu.3cixty.org/profile#> ";
 	 
 	 private static final Logger LOGGER = Logger.getLogger(
 			 QueryManager.class.getName());
@@ -114,15 +113,9 @@ import eu.threecixty.profile.oldmodels.Rating;
 		
 		String originalQueryStr = originalQuery.convert2String();
 		try {
-			if (originalQuery != null && originalQueryStr.contains("http://schema.org/")) {
-			    augmentedQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
-			            + removePrefixes(augmentedQueryStr);
-			    originalQueryStr = "PREFIX schema: <http://schema.org/>\n PREFIX locationOnt: <http://data.linkedevents.org/def/location#> \n "
-			    		+ removePrefixes(originalQueryStr);
-			} else {
-				augmentedQueryStr = removePrefixes(augmentedQueryStr);
-				originalQueryStr = removePrefixes(originalQueryStr);
-			}
+
+			augmentedQueryStr = removePrefixes(augmentedQueryStr);
+			originalQueryStr = removePrefixes(originalQueryStr);
 			
 			if (DEBUG_MOD) LOGGER.info("Augmented query: " + augmentedQueryStr);
 			
@@ -540,7 +533,7 @@ import eu.threecixty.profile.oldmodels.Rating;
 		if (index >= lastPrefixIndex) {
 			return query.substring(index + 2);
 		}
-		return PREFIX_PROFILE_ADDED + query;
+		return query;
 	}
 
 	@Override

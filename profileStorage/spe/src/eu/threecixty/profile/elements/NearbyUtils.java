@@ -35,7 +35,8 @@ public class NearbyUtils {
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
-			double distance, int offset, int limit, String notId) throws IOException {
+			double distance, int offset, int limit, String notId,
+			List <String> listEventsFromFriendsWishlist) throws IOException {
 		
 		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance ?title \n");
 
@@ -88,13 +89,21 @@ public class NearbyUtils {
 		builder.append("}. \n");
 		
 		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
+		if (listEventsFromFriendsWishlist == null || listEventsFromFriendsWishlist.size() == 0) {
+		    builder.append("ORDER BY ?distance \n");
+		} else {
+			builder.append("ORDER BY");
+			for (String eventFromWishList: listEventsFromFriendsWishlist) {
+				builder.append(" DESC(?event = <" + eventFromWishList + ">)");
+			}
+			builder.append(" ?distance \n");
+		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
 		if (DEBUG_MOD) LOGGER.info(builder.toString());
 		
-		return getNearbyEvents(builder.toString(), categories, languages);
+		return getNearbyEvents(builder.toString(), categories, languages, listEventsFromFriendsWishlist);
 	}
 	
 	public static List <ElementDetails> getNearbyEvents(String id, String[] categories, String[] languages,
@@ -134,12 +143,13 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id);
+		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id, null);
 	}
 	
 	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon,
 			String[] categories, String[] topCategories, String[] languages,
-			double distance, int offset, int limit) throws IOException {
+			double distance, int offset, int limit,
+			List <String> listPoIsFromFriendsWishlist) throws IOException {
 		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance ?name \n");
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI;
 
@@ -183,11 +193,19 @@ public class NearbyUtils {
 		builder.append("}. \n");
 		
 		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
+		if (listPoIsFromFriendsWishlist == null || listPoIsFromFriendsWishlist.size() == 0) {
+		    builder.append("ORDER BY ?distance \n");
+		} else {
+			builder.append("ORDER BY");
+			for (String poiFromWishList: listPoIsFromFriendsWishlist) {
+				builder.append(" DESC(?poi = <" + poiFromWishList + ">)");
+			}
+			builder.append(" ?distance \n");
+		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, topCategories, languages);
+		return getNearbyPoIs(builder.toString(), categories, topCategories, languages, listPoIsFromFriendsWishlist);
 	}
 	
 	/**
@@ -239,12 +257,13 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, topCategories, languages);
+		return getNearbyPoIs(builder.toString(), categories, topCategories, languages, null);
 
 	}
 	
 	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories,
-			String[] topCategories, String [] languages) throws IOException {
+			String[] topCategories, String [] languages,
+			List <String> listPoIsFromFriendsWishlist) throws IOException {
 		if (DEBUG_MOD) LOGGER.info(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
@@ -265,12 +284,16 @@ public class NearbyUtils {
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
+			
+			// set highlighted field
+			setHighlightedField(elementDetails, listPoIsFromFriendsWishlist);
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
 	}
 	
-	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages) throws IOException {
+	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages,
+			List <String> listEventsFromFriendsWishlist) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
@@ -289,9 +312,26 @@ public class NearbyUtils {
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
+			// set highlighted field
+			setHighlightedField(elementDetails, listEventsFromFriendsWishlist);
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
+	}
+	
+	private static void setHighlightedField(ElementDetails elementDetails,
+			List <String> listItemsFromFriendsWishlist) {
+		if (listItemsFromFriendsWishlist != null && listItemsFromFriendsWishlist.size() > 0) {
+			String elementId = elementDetails.getId();
+			boolean found = false;
+			for (String tmpId: listItemsFromFriendsWishlist) {
+				if (elementId.equals(tmpId)) {
+					found = true;
+					break;
+				}
+			}
+			elementDetails.setHighlighted(found);
+		}
 	}
 	
 	private static void filterCategories(String[] categories, StringBuilder result) {
@@ -381,6 +421,14 @@ public class NearbyUtils {
 
 		@Override
 		public int compare(ElementDetails o1, ElementDetails o2) {
+			Boolean highlighted1 = o1.getHighlighted();
+			Boolean highlighted2 = o2.getHighlighted();
+			if (highlighted1 != null && highlighted1.booleanValue() == true) {
+				if (highlighted2 == null || highlighted2.booleanValue() == false) return -1;
+			}
+			if (highlighted2 != null && highlighted2.booleanValue() == true) {
+				if (highlighted1 == null || highlighted1.booleanValue() == false) return 1;
+			}
 			double d1 = o1.getDistance() == null ? 0 : o1.getDistance().doubleValue();
 			double d2 = o2.getDistance() == null ? 0 : o2.getDistance().doubleValue();
 			if (d1 == d2) return 0;
