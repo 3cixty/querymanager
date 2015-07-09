@@ -1,5 +1,7 @@
 package eu.threecixty.profile.oldmodels;
 
+import java.io.Serializable;
+
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -7,7 +9,11 @@ import eu.threecixty.profile.annotations.Description;
  * @author Mobidot
  *
  */
-public class InfraRoute {
+public class InfraRoute implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8119590850836409028L;
 	@Description(hasText="ID in terms of OSM, O if unknown")
 	private int hasInfraRouteID;
 	@Description(hasText="route name")

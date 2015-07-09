@@ -1,5 +1,7 @@
 package eu.threecixty.profile.oldmodels;
 
+import java.io.Serializable;
+
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -7,7 +9,11 @@ import eu.threecixty.profile.annotations.Description;
  * @author Mobidot 
  * 
  */
-public class Weather {
+public class Weather implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2929467467455554364L;
 	@Description(hasText="ID")
 	private int hasWeatherID;
 	@Description(hasText="Average temperature, in Celsius, over the validity of the measurement.")

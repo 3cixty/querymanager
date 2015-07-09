@@ -34,7 +34,7 @@ public class UserProfile{
 //    @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Email")
 //    private String hasEmail; 
     @Description(hasText = "Collection of preferences of the user.")
-    private Preference preferences;
+    private transient Preference preferences;
 //    @Description(hasText = "Collection of Hobbies of the user.")
 //    private Set <String> hasHobbies;
 //    @Description(hasText = "Collection of languages the user speaks.")
