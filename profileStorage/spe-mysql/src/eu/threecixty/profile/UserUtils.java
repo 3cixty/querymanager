@@ -264,15 +264,13 @@ public class UserUtils {
 						tmpUids.add(generatedID);
 					}
 				}
-				if (tmpUids.size() > 0) {
-					String userModelSql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
-					List <?> userModelList = session.createSQLQuery(userModelSql).setParameterList("uids",
-							tmpUids).list();
-					for (Object obj: userModelList) {
-						String tmpUid = obj.toString();
-						_3cixtyUids.add(tmpUid);
-						accountIdsExisted.add(tmpUid.substring(2));
-					}
+				String userModelSql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
+				List <?> userModelList = session.createSQLQuery(userModelSql).setParameterList("uids",
+						tmpUids).list();
+				for (Object obj: userModelList) {
+					String tmpUid = obj.toString();
+					_3cixtyUids.add(tmpUid);
+					accountIdsExisted.add(tmpUid.substring(2));
 				}
 			}
 			
@@ -397,7 +395,7 @@ public class UserUtils {
 		if (!isNullOrEmpty(userProfile.getHasLastCrawlTime())) {
 			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
 		}
-		convertKnowsForPersistence(userProfile.getKnows(), userModel);
+		//convertKnowsForPersistence(userProfile, userModel);
 		convertAccountsForPersistence(userProfile, userModel, session);
 		convertAccompanyingsForPersistence(userProfile, userModel, session);
 	}
