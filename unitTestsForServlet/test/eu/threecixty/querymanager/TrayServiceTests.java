@@ -1,16 +1,19 @@
 package eu.threecixty.querymanager;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TrayServiceTests extends HTTPCall {
 
-	private static final String TRAY_SERVLET = "http://beta.3cixty.com:8080/querymanagerServlet-1.0/trayServlet";
+	private static final String TRAY_SERVLET = "https://dev.3cixty.com/v2/tray";
 //	private static final String APP_KEY="MTAzOTE4MTMwOTc4MjI2ODMyNjkwMTQwNDMxMTM5Nzg3MikoZXMJaWxfd3BxZAVs";
 //	private static final String TRAY_SERVLET = "http://localhost:8080/querymanagerServlet-1.0/services/tray";
-	private static final String APP_KEY="Y29uZy1raW5oLm5ndXllbkBpbnJpYS5mcjE0MDQ5ODQ2NTcwMTMAZW11XWEDKGdj";
+	private static final String APP_KEY="687eedc0-17a4-4835-bee6-43ac9394cd04";
 	
 	
 	@Test
@@ -47,9 +50,11 @@ public class TrayServiceTests extends HTTPCall {
 			JSONArray arr = new JSONArray(response.toString());
 			Assert.assertTrue(arr.length() == 3);
 			
-			Assert.assertTrue(arr.getJSONObject(0).getString("element_id").equals("001"));
-			Assert.assertTrue(arr.getJSONObject(1).getString("element_id").equals("002"));
-			Assert.assertTrue(arr.getJSONObject(2).getString("element_id").equals("003"));
+			List <String> listIds = createList("001", "002", "003");
+			
+			Assert.assertTrue(listIds.contains(arr.getJSONObject(0).getString("element_id")));
+			Assert.assertTrue(listIds.contains(arr.getJSONObject(1).getString("element_id")));
+			Assert.assertTrue(listIds.contains(arr.getJSONObject(2).getString("element_id")));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -83,10 +88,11 @@ public class TrayServiceTests extends HTTPCall {
 			JSONArray arr = new JSONArray(response.toString());
 			Assert.assertTrue(arr.length() == 3);
 			
-			Assert.assertTrue(arr.getJSONObject(0).getString("element_id").equals("005"));
-			Assert.assertTrue(arr.getJSONObject(1).getString("element_id").equals("006"));
-			Assert.assertTrue(arr.getJSONObject(2).getString("element_id").equals("004")); // changed because of updating time
-			
+			List <String> listIds = createList("004", "005", "006");
+			Assert.assertTrue(listIds.contains(arr.getJSONObject(0).getString("element_id")));
+			Assert.assertTrue(listIds.contains(arr.getJSONObject(1).getString("element_id")));
+			Assert.assertTrue(listIds.contains(arr.getJSONObject(2).getString("element_id")));
+
 			// delete a tray
 			params4 = createTray("update_tray_element", "004", "event", "ExlorationApp", uid, true, true);
 			sendPost(TRAY_SERVLET, params4);
@@ -98,8 +104,13 @@ public class TrayServiceTests extends HTTPCall {
 			arr = new JSONArray(response.toString());
 			Assert.assertTrue(arr.length() == 2);
 			
+			List <String> listIds2 = createList("005", "006"); // remove 004
+			Assert.assertTrue(listIds2.contains(arr.getJSONObject(0).getString("element_id")));
+			Assert.assertTrue(listIds2.contains(arr.getJSONObject(1).getString("element_id")));
+
 		} catch (Exception e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 	}
 	
@@ -184,5 +195,15 @@ public class TrayServiceTests extends HTTPCall {
 		buffer.append("\"key\":").append("\"" + APP_KEY + "\"");
 		buffer.append("}");
 		return buffer.toString();
+	}
+	
+	private List <String> createList(String...strings) {
+		List <String> list = new LinkedList <String>();
+		if (strings != null && strings.length > 0) {
+			for (String str: strings) {
+				list.add(str);
+			}
+		}
+		return list;
 	}
 }
