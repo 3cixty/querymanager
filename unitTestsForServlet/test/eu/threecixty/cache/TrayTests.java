@@ -31,7 +31,7 @@ public class TrayTests extends HTTPCall {
 		
 		response.setLength(0);
 		String params4 = createTray("get_tray_elements", null, null, null, token);
-		sendPost(SERVER2, params4, response);
+		sendPost(SERVER2, params4, response); // this should cache trays list on server 2
 		JSONArray arr1 = new JSONArray(response.toString());
 		Assert.assertTrue(arr1.length() == 1);
 		
@@ -45,7 +45,7 @@ public class TrayTests extends HTTPCall {
 		response.setLength(0);
 		sendPost(SERVER2, params4, response);
 		JSONArray arr2 = new JSONArray(response.toString());
-		Assert.assertTrue(arr2.length() == 4);
+		Assert.assertTrue(arr2.length() == 4); // make sure that trays list on server 2 is in sync
 	}
 	
 	private String createTray(String action, String trayItemId, String trayType, String source, String token) {
