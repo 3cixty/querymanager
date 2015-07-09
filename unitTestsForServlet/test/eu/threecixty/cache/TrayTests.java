@@ -8,8 +8,8 @@ import eu.threecixty.querymanager.HTTPCall;
 
 /**
  * 
- * This class is used to test Tray items is in consistent by adding them in one server,
- * then getting them from another server.
+ * This class is used to test Tray items are in sync by adding them in one memcached server,
+ * then getting them from another memcached server.
  *
  */
 public class TrayTests extends HTTPCall {
