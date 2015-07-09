@@ -1,6 +1,5 @@
 package eu.threecixty.profile;
 
-import java.io.Serializable;
 import java.util.Set;
 
 import eu.threecixty.profile.annotations.*;
@@ -12,12 +11,8 @@ import eu.threecixty.profile.oldmodels.*;
  *
  */
 @Extend(hasText = "http://www.w3.org/2006/vcard/ns#Individual //extends individual in current ontology")
-public class UserProfile implements Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6517187548873919594L;
-	//following are the required fields
+public class UserProfile{
+    //following are the required fields
     @RequiredNotNullEntities
     @Description(hasText="User ID on the 3cxity Plateform")
     private String hasUID="";
@@ -39,7 +34,7 @@ public class UserProfile implements Serializable {
 //    @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Email")
 //    private String hasEmail; 
     @Description(hasText = "Collection of preferences of the user.")
-    private transient Preference preferences;
+    private Preference preferences;
 //    @Description(hasText = "Collection of Hobbies of the user.")
 //    private Set <String> hasHobbies;
 //    @Description(hasText = "Collection of languages the user speaks.")

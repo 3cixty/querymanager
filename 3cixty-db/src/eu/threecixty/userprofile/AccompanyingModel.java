@@ -30,6 +30,7 @@ public class AccompanyingModel implements java.io.Serializable {
 	private Integer id;
 	private UserModel userModel;
 
+	private Long accompanyId;
 	private Long accompanyTime; 
 	private Long accompanyValidity; 
 	private String hasAccompanyUserid1ST; 
@@ -93,5 +94,13 @@ public class AccompanyingModel implements java.io.Serializable {
 	}
 	public void setAccompanyScore(Double accompanyScore) {
 		this.accompanyScore = accompanyScore;
+	}
+	
+	@Column(name = "accompanyId", nullable = true)
+	public Long getAccompanyId() {
+		return accompanyId;
+	}
+	public void setAccompanyId(Long accompanyId) {
+		this.accompanyId = accompanyId;
 	}
 }

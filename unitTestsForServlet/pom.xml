@@ -67,8 +67,7 @@
           <includes>
             <!-->include>**/PerformanceTests.java</include -->
             <!--include>**/StressTests.java</include-->
-            <include>**/cache/*Tests.java</include>
-            <include>**/TrayServiceTests.java</include>
+            <include>**/oauth/*Tests.java</include>
           </includes>
         </configuration>
       </plugin>
