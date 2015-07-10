@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebListener;
 import eu.threecixty.Configuration;
 import eu.threecixty.CrawlerCron.CrawlerCron;
 import eu.threecixty.cache.CacheManager;
+import eu.threecixty.cache.ProfileCacheManager;
 import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.cache.TrayCacheManager;
 import eu.threecixty.oauth.OAuthBypassedManager;
@@ -27,6 +28,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent context) {
 		TokenCacheManager.getInstance().stop();
 		TrayCacheManager.getInstance().stop();
+		ProfileCacheManager.getInstance().stop();
 		PersistenceWorkerManager.getInstance().stop();
 	}
 
