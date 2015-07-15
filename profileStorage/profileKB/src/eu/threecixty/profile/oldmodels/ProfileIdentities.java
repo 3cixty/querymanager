@@ -1,7 +1,5 @@
 package eu.threecixty.profile.oldmodels;
 
-import java.io.Serializable;
-
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -9,11 +7,7 @@ import eu.threecixty.profile.annotations.Description;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class ProfileIdentities implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5540919218099267428L;
+public class ProfileIdentities {
 	@Description(hasText="ProfileIdentities URI")
 	private String hasProfileIdentitiesURI="";
 	@Description(hasText="User Social profile carrier other than 3cixty")

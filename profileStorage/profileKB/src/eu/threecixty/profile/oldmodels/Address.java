@@ -1,7 +1,5 @@
 package eu.threecixty.profile.oldmodels;
 
-import java.io.Serializable;
-
 import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.annotations.Description;
 
@@ -10,11 +8,7 @@ import eu.threecixty.profile.annotations.Description;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class Address implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2326217996176079219L;
+public class Address {
 	@Description(hasText="UniqueID")
 	private String hasAddressURI="";
 	@Description(hasText="Post office box")

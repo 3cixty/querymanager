@@ -1,13 +1,7 @@
 package eu.threecixty.cache;
 
-import java.io.Serializable;
+public class AppCache {
 
-public class AppCache implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8640296419076568401L;
 	private String appkey;
 	private String appClientKey;
 	private String appClientPwd;

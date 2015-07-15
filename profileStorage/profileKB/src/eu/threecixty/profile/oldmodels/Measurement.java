@@ -1,7 +1,5 @@
 package eu.threecixty.profile.oldmodels;
 
-import java.io.Serializable;
-
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -10,11 +8,7 @@ import eu.threecixty.profile.annotations.Description;
  * @author Mobidot
  *
  */
-public class Measurement implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4046496791973592229L;
+public class Measurement {
 	@Description(hasText = "In seconds since epoch, in UTC")
     private Long hasMeasurementTime; 
     @Description(hasText = "In seconds")

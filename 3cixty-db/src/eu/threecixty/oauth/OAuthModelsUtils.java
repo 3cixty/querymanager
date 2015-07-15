@@ -444,7 +444,7 @@ public class OAuthModelsUtils {
 		}
 	}
 
-	public static App getApp(String key) {
+	protected static App getApp(String key) {
 		if (isNullOrEmpty(key)) return null;
 		Session session = null;
 		try {
@@ -487,7 +487,7 @@ public class OAuthModelsUtils {
 		return apps;
 	}
 	
-	public static App getApp(Integer id) {
+	protected static App getApp(Integer id) {
 		Session session = null;
 		App app = null;
 		try {
@@ -495,7 +495,6 @@ public class OAuthModelsUtils {
 			session = HibernateUtil.getSessionFactory().openSession();
 
 			app = (App) session.get(App.class, id);
-			session.close();
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 			if (session != null) session.close();

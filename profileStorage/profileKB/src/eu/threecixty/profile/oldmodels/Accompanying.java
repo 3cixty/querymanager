@@ -1,14 +1,8 @@
 package eu.threecixty.profile.oldmodels;
 
-import java.io.Serializable;
-
 import eu.threecixty.profile.annotations.Description;
 
-public class Accompanying implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1796721062878076803L;
+public class Accompanying {
 	@Description(hasText = "Unique accompany ID")
 	private String hasAccompanyURI; //Unique accompany ID
 	@Description(hasText = "Unique accompany ID")

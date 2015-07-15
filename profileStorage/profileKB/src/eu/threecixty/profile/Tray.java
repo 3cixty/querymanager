@@ -1,19 +1,13 @@
 package eu.threecixty.profile;
 
-import java.io.Serializable;
-
 /**
  * This class defines tray item information.
  * Question: should we need to check whether or not event information is correct.
  * @author Cong-Kinh NGUYEN
  *
  */
-public class Tray implements Serializable {
+public class Tray {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7343223023348165957L;
 	private String element_id;
 	private String element_type;
 	private String element_title;

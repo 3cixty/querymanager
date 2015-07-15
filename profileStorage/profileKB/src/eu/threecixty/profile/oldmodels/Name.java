@@ -1,7 +1,5 @@
 package eu.threecixty.profile.oldmodels;
 
-import java.io.Serializable;
-
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -9,11 +7,7 @@ import eu.threecixty.profile.annotations.Description;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class Name implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3881320839626422967L;
+public class Name {
 	@Description(hasText="Name URI")
 	private String hasNameURI="";
 	@Description(hasText="first name")

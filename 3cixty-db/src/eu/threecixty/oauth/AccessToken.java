@@ -1,15 +1,10 @@
 package eu.threecixty.oauth;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccessToken implements Serializable {
+public class AccessToken {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5897771990001680958L;
 	private String access_token;
 	private String refresh_token;
 	private int expires_in = -1;
@@ -24,8 +19,6 @@ public class AccessToken implements Serializable {
 	private String appkey; // App Key
 	
 	private Integer appkeyId;
-	
-	private Long creation; // might be null
 	
 	public AccessToken() {
 	}
@@ -103,13 +96,5 @@ public class AccessToken implements Serializable {
 
 	public void setAppkeyId(Integer appkeyId) {
 		this.appkeyId = appkeyId;
-	}
-
-	public Long getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Long creation) {
-		this.creation = creation;
 	}
 }
