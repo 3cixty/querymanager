@@ -9,6 +9,10 @@ import eu.threecixty.profile.annotations.Description;
  *
  */
 public class TripMeasurement extends Measurement {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6149468506460015541L;
 	@Description(hasText="Trip information")
 	private Trip hasTrip;
 	@Description(hasText="ID")

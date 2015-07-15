@@ -1,5 +1,7 @@
 package eu.threecixty.profile.oldmodels;
 
+import java.io.Serializable;
+
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -7,7 +9,11 @@ import eu.threecixty.profile.annotations.Description;
  * https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.Trip
  * @author Mobidot
  */
-public class Trip {
+public class Trip implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7779808220255530546L;
 	@Description(hasText = "Average speed of a trip, in meter per second")
     private Double hasTripAverageSpeed=0.0; 
     @Description(hasText = "Total distance of a trip, in meter")

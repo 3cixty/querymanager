@@ -29,6 +29,9 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 
 	public void contextDestroyed(ServletContextEvent context) {
 
+		TokenCacheManager.getInstance().stop();
+		TrayCacheManager.getInstance().stop();
+		ProfileCacheManager.getInstance().stop();
 		PersistenceWorkerManager.getInstance().stop();
 	}
 
