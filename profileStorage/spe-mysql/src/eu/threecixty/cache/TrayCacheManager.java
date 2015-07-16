@@ -23,25 +23,32 @@ public class TrayCacheManager {
 	public List <Tray> getTrays(String token) {
 		if (token == null) return null;
 		if (memcachedClient != null) {
-			Future<Object> f = memcachedClient.asyncGet(TRAY_KEY + token);
-			try {
-				Object myObj = f.get(TIME_OUT_TO_GET_CACHE, TimeUnit.MILLISECONDS);
-				if (myObj != null) {
-					
-					@SuppressWarnings("unchecked")
-					List <Tray> trays = (List <Tray>) myObj;
-					return trays;
-				}
-			} catch(TimeoutException e) {
-			    // Since we don't need this, go ahead and cancel the operation.  This
-			    // is not strictly necessary, but it'll save some work on the server.
-			    f.cancel(false);
-			    // Do other timeout related stuff
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
+//			Future<Object> f = memcachedClient.asyncGet(TRAY_KEY + token);
+//			try {
+//				Object myObj = f.get(TIME_OUT_TO_GET_CACHE, TimeUnit.MILLISECONDS);
+//				if (myObj != null) {
+//					
+//					@SuppressWarnings("unchecked")
+//					List <Tray> trays = (List <Tray>) myObj;
+//					return trays;
+//				}
+//			} catch(TimeoutException e) {
+//			    // Since we don't need this, go ahead and cancel the operation.  This
+//			    // is not strictly necessary, but it'll save some work on the server.
+//			    f.cancel(false);
+//			    // Do other timeout related stuff
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			} catch (ExecutionException e) {
+//				e.printStackTrace();
+//			}
+			
+			Object myObj = memcachedClient.get(TRAY_KEY + token);
+			if (myObj != null) {
+				@SuppressWarnings("unchecked")
+				List <Tray> trays = (List <Tray>) myObj;
+				return trays;
+		    }
 		}
 		
 		return null;
