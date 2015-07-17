@@ -12,9 +12,9 @@ import eu.threecixty.profile.Tray;
 public class TrayCacheManager {
 	
 	private static final String TRAY_KEY = "tray";
-	private static final int TIME_OUT_TO_GET_CACHE = 500; // in millisecond
+	private static final int TIME_OUT_TO_GET_CACHE = 200; // in millisecond
 	
-	private MemcachedClient memcachedClient;
+	private List<MemcachedClient> memcachedClients;
 	
 	public static TrayCacheManager getInstance() {
 		return SingletonHolder.INSTANCE;
@@ -22,6 +22,7 @@ public class TrayCacheManager {
 	
 	public List <Tray> getTrays(String token) {
 		if (token == null) return null;
+		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TRAY_KEY + token);
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(TRAY_KEY + token);
 			try {
@@ -97,6 +98,8 @@ public class TrayCacheManager {
 	
 	public void removeTrays(String token) {
 		if (token == null) return;
+		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TRAY_KEY + token);
+		if (memcachedClient == null) return;
 		if (memcachedClient != null) {
 			memcachedClient.delete(TRAY_KEY + token);
 		}
@@ -124,20 +127,24 @@ public class TrayCacheManager {
 	}
 	
 	public void stop() {
-		if (memcachedClient != null) {
-			memcachedClient.shutdown();
+		if (memcachedClients != null) {
+			for (MemcachedClient client: memcachedClients) {
+				client.shutdown();
+			}
 		}
 	}
 	
 	private <T> void putData(String key, T data) {
-		if (memcachedClient != null) {
+		if (memcachedClients != null) {
+			MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TRAY_KEY + key);
+			if (memcachedClient == null) return;
 			memcachedClient.set(TRAY_KEY + key, 0, data);
 			memcachedClient.flush();
 		}
 	}
 	
 	private TrayCacheManager() {		
-		memcachedClient = MemcachedUtils.createClient();
+		memcachedClients = MemcachedUtils.createClients();
 	}
 	
 	private static class SingletonHolder {

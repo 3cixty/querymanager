@@ -37,7 +37,7 @@ public class TokenCacheManager {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
-	private MemcachedClient memcachedClient;
+	private List<MemcachedClient> memcachedClients;
 
 	public static TokenCacheManager getInstance() {
 		return SingletonHolder.INSTANCE;
@@ -57,7 +57,7 @@ public class TokenCacheManager {
 	private AccessToken getAccessTokenWithoutCheckingExpiration(String access_token) {
 		if (access_token == null) return null;
 		if (DEBUG_MOD) LOGGER.info("Checking token in memory");
-		
+		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TOKEN_CACHE_KEY + access_token);
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(TOKEN_CACHE_KEY + access_token);
 			try {
@@ -83,7 +83,7 @@ public class TokenCacheManager {
 	
 	public AccessToken getAccessTokenFrom(String uid, String appkey) {
 		if (uid == null || appkey == null) return null;
-		
+		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, UID_APPKEY_ACCESS_TOKEN_KEY + appkey + uid);
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(UID_APPKEY_ACCESS_TOKEN_KEY + appkey + uid);
 			try {
@@ -105,7 +105,7 @@ public class TokenCacheManager {
 	
 	public AppCache getAppCache(String appkey) {
 		if (appkey == null) return null;
-
+		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, APPKEY_CACHE_KEY + appkey);
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(APPKEY_CACHE_KEY + appkey);
 			try {
@@ -131,7 +131,7 @@ public class TokenCacheManager {
 	
 	public AppCache getAppCache(Integer appid) {
 		if (appid == null) return null;
-		
+		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, APP_ID_CACHE_KEY + appid);
 		if (memcachedClient != null) {
 			Future<Object> f = memcachedClient.asyncGet(APP_ID_CACHE_KEY + appid);
 			try {
@@ -160,8 +160,11 @@ public class TokenCacheManager {
 		AccessToken at = getAccessTokenWithoutCheckingExpiration(access_token);
 		if (at != null) {
 			// memcachedClient is not null because at is not null
-			memcachedClient.delete(TOKEN_CACHE_KEY + access_token);
-			memcachedClient.delete(UID_APPKEY_ACCESS_TOKEN_KEY + at.getAppkey() + at.getUid());
+			MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TOKEN_CACHE_KEY + access_token);
+			if (memcachedClient != null) {
+			    memcachedClient.delete(TOKEN_CACHE_KEY + access_token);
+			    memcachedClient.delete(UID_APPKEY_ACCESS_TOKEN_KEY + at.getAppkey() + at.getUid());
+			}
 		}
 	}
 	
@@ -180,8 +183,10 @@ public class TokenCacheManager {
 	}
 	
 	public void stop() {
-		if (memcachedClient != null) {
-			memcachedClient.shutdown();
+		if (memcachedClients != null) {
+			for (MemcachedClient client: memcachedClients) {
+				client.shutdown();
+			}
 		}
 	}
 	
@@ -203,12 +208,17 @@ public class TokenCacheManager {
 	private TokenCacheManager() {
 		loadAppCaches();
 
-	    memcachedClient = MemcachedUtils.createClient();
+	    memcachedClients = MemcachedUtils.createClients();
 			
 	}
 	
 	private <T> void putData(String key, T data) {
-		if (memcachedClient != null) memcachedClient.set(key, 0, data);
+		if (memcachedClients != null) {
+			MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, key);
+			if (memcachedClient == null) return;
+			memcachedClient.set(key, 0, data);
+			memcachedClient.flush();
+		}
 	}
 
 	private void loadAppCaches() {
