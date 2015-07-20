@@ -438,30 +438,72 @@ table {
 {
     background-color: #f4f4f4 !important;
     background-image: none;
+    height: 600px;
 }
 
-.wrapper .logo-icon {
-    background-image: none;/* url("${client.thumbNailUrl}");*/
-    background-repeat: no-repeat;
-    height: 100px;
-    margin: 0 auto 5px;
-    width: 100px;
-    background-size: contain;
-    background-position: 50% 0%;
+.login2-body
+{
+    background-color: #f4f4f4 !important;
+    background-image: none;
 }
 
-.wrapper .logo-iconPlatform {
-    background-image: none;/*url("${client.resourceServer.thumbNailUrl}");*/
-    background-repeat: no-repeat;
-    height: 100px;
-    margin: 0 auto 5px;
-    width: 100px;
-    background-size: contain;
-    background-position: 50% 0%;
+.facebook {
+  width:500px;
+  heigth:300px;
 }
-
+.wrapper .left-logo {
+    float: left;
+    left: 20px;
+    background-position: 0;
+    background-image: url("../ExploreMI360.png");
+}
 
 .wrapper {
+	max-width: 960px;
+    padding: 40px 20px;
+    margin: 0 auto;
+    border-bottom: 1px solid #E0E0E0;
+    overflow: hidden;
+    /* background-color: #ffffff;
+    border: 1px solid #dddddd;
+    width: 320px;
+    height: 570px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    padding: 50px 40px 35px;
+    text-align: center;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.075); */
+}
+.login-bodyPrivacy,.login2-bodyPrivacy
+{
+    background-color: #f4f4f4 !important;
+    background-image: none;
+    height: 850px;
+}
+
+.login2-bodyPrivacy
+{
+    background-color: #f4f4f4 !important;
+    background-image: none;
+}
+
+.wrapperPrivacy .logo-icon2 {
+    background-image: url("../ExploreMI360.png");
+    background-repeat: no-repeat;
+    height: 90px;
+    margin: 0 auto 5px;
+    width: 90px;
+    background-size: contain;
+    background-position: 50% 0%;
+}
+.wrapperPrivacy {
     background-color: #ffffff;
     border: 1px solid #dddddd;
     width: 450px;
@@ -477,13 +519,14 @@ table {
     -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
     -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.075);
+    text-align:justify;
 }
-
 
 .social-login-buttons
 {
 
 }
+
 .social-btn
 {
 	height: 3em;
@@ -493,6 +536,7 @@ table {
 	margin-top: 20px;
 	cursor: pointer;
 }
+
 .social-btn:hover:before
 {
 	background-color: transparent;
@@ -552,27 +596,26 @@ table {
 }
 .login-info
 {
-    font-size: 12px;
+    /*font-size: 12px;
     color: #999;
     margin-top: 14px;
+    text-align: left; */
+    text-align:left;
+    color: #546e7a;
+    font-size: 13px;
+    font-weight: normal !important;
 }
-
-login-benefits .login-info {
-    margin-top: 0px;
-}
-
-.login-benefits {
-    border-top: 1px solid #ddd;
-    margin-top: 20px;
-    padding-top: 15px;
-}
-
 .login3-info
 {
-    font-size: 12px;
+    /*font-size: 12px;
     color: #999;
     margin-top: 14px;
     text-align: center;
+     */
+    text-align:left;
+    color: #546e7a;
+    font-size: 13px;
+    font-weight: normal !important;
 }
 
 login-benefitsCopyright .login3-info {
@@ -585,27 +628,60 @@ login-benefitsCopyright .login3-info {
     padding-top: 15px;
 }
 
+login-benefits .login-info {
+    margin-top: 0px;
+    text-align: justify;
+}
+
+.login-benefits {
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+    padding-top: 15px;
+}
+
+
 .login2-selection>div {
     margin: 10px 0;
 }
 .login2-selection input
 {
 }
-.login2-info,.login2-selection
+.login-title
 {
-    font-size:14px;
+    font-weight: lighter;
+}
+.privacy-desc
+{
+    text-align:left;
+    font-size: 13px;
+    font-weight: normal !important;
+}
+.login2-info/* ,.login2-selection */
+{
+    /*font-size: 14px;
     color: #444;
     margin-bottom: 15px;
+    text-align: center;
+    
+     */
+    text-align:left;
+    color: #546e7a;
+    font-size: 13px;
+    font-weight: normal !important;
+    
 }
 .login2-selection
-{text-align:left;margin-bottom: 30px;}
+{
+	text-align: left;
+	margin-bottom: 30px;
+}
 .login-body #form
 {
     margin: 30px 0px 0px;
 }
 
 #form .login2-info {
-    text-align: left;
+    text-align: center;
 }
 .permission
 {
@@ -1066,4 +1142,24 @@ padding-top:0;
 
 .node[data-children='0']>.main:after {
 	height: 0px;
+}
+
+.wrapper .logo-icon {
+    background-image: none;
+    background-repeat: no-repeat;
+    height: 100px;
+    margin: 0 auto 5px;
+    width: 100px;
+    background-size: contain;
+    background-position: 50% 0%;
+}
+
+.wrapper .logo-iconPlatform {
+    background-image: none;
+    background-repeat: no-repeat;
+    height: 100px;
+    margin: 0 auto 5px;
+    width: 100px;
+    background-size: contain;
+    background-position: 50% 0%;
 }
