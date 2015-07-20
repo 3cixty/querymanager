@@ -1100,7 +1100,7 @@ public class QueryManagerServices {
 		            + category + "\" )\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 					+ minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < " + maxRating + " )\n  }\n");
 		} else {
-			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph <http://3cixty.com/places> {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 		                + minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < "  + maxRating + " )\n  }");
 		}
 		return createSelectSparqlQuery(buffer.toString(), offset, limit);
