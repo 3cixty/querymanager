@@ -723,6 +723,7 @@ public class QueryManagerServices {
 							? QueryAugmenterFilter.MyRating : null;
 			try {
 				String augmentedQuery = new QueryAugmenterImpl().createQueryAugmented(query, qaf, uid);
+				System.out.println(augmentedQuery);
 				SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, formatType, httpMethod, sb);
 			} catch (InvalidSparqlQuery e) {
 				if (DEBUG_MOD) LOGGER.info(e.getMessage());
