@@ -5,21 +5,75 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"  pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
- <meta charset="UTF-8">
- <link href="login/normalize.css" rel="stylesheet">
-    <link href="login/layout.css" rel="stylesheet">
-    <link href="login/basic.css" rel="stylesheet">
-    <link href="login/style2.css" rel="stylesheet">
-    <link href="login/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="login/fontello.css">
-    <script src="login/jquery-1.js"></script>
-<script type="text/javascript" src="login/google_translate.js"></script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-<title>Sign in to 3cixty Platform</title>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+		<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+	 	
+	 	
+	 	<link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/layout.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
+	    
+	    <script src="login/jquery-1.js"></script>
+	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    	<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+		<script type="text/javascript" src="login/google_translate.js"></script>
+		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+		
+		<script>
+		    function start() {
+		      gapi.load('auth2', function() {
+		        auth2 = gapi.auth2.init({
+		          client_id: '<%=Configuration.getGoogleClientId()%>',
+		          // Scopes to request in addition to 'profile' and 'email'
+		          scope: 'https://www.googleapis.com/auth/plus.login'
+		        });
+		      });
+		    }
+		</script>
+     	<title>Sign in to 3cixty Platform</title>
+		
+		<style type="text/css">
+    		#customBtn {
+		        display: inline-block;
+		        background: #dd4b39;
+		        color: white;
+		        width: 164px;
+		        height: 39px;
+		        border-radius: 4px;
+		        border-color:#dd4b39;
+		        white-space: nowrap;
+		    }
+		    #customBtn:hover {
+		        cursor: pointer;
+		    }
+		    span.label {
+		        font-weight: bold;
+		    }
+		    span.ico {
+		        background: url('../v2/btn_red.png') no-repeat;
+		        display: inline-block;
+		        vertical-align: middle;
+		        width: 39px;
+		        height: 39px;
+		    }
+		    span.buttonText {
+		        display: inline-block;
+		        vertical-align: middle;
+		        padding-left: 30px;
+		        padding-right: 30px;
+		        font-size: 14px;
+		        font-weight: bold;
+		        /* Use the Roboto font that is loaded in the <head> */
+		        font-family: 'Roboto', sans-serif;
+	    }
+	</style>
 </head>
+
 <body class="login-body">
 <%
     String key = request.getParameter("key");
@@ -66,7 +120,7 @@
     cookie     : false,
     appId      : '<%=Configuration.getFacebookAppID()%>',
     xfbml      : true,
-    version    : 'v2.2'
+    version    : 'v2.3'
   });
 
   // Now that we've initialized the JavaScript SDK, we call 
@@ -114,49 +168,53 @@
   }
 </script>
 <div class="wrapper">
-	<div class="logo">
+	<div class="logo">  
     	<div class="logo-icon">
     	</div>
     </div>
-    
-	<div class="connect-area">
+	<div>
 		<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
 			<div>
+				<h3 class="privacy-title"> Sign In using </h3>
 			    <input type=hidden name="key" value="<%=key%>">
-			    <div class="social-login-buttons">
-			        <!-- <div class="icon-facebook-1 social-btn fb-btn"></div>
-			        <div class="icon-gplus-1 social-btn google-btn"></div> -->
-			        <div>
-			        	<img src="./Red-signin_Long_base_44dp.png" height="30" width="180" onclick="document.getElementById('form').submit();" style="border: none;padding: 0px; margin: 0px; cursor: pointer;"/>
-			        </div>
-					<div>
-						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
-						Sign in with Facebook
+                <div  align="center">
+				    <table><col width="165">
+				    <tr>
+				    <td>
+				    <div>
+				        <button id="customBtn" class="customGPlusSignIn">
+	                        <span class="ico"></span>
+	                        <span class="buttonText">Google</span>
+	                    </button>
+						<script>
+						  $('#customBtn').click(function(){
+					    	auth2.signIn({'scope': 'https://www.googleapis.com/auth/plus.login','redirect_uri': '<%=Configuration.get3CixtyRoot()%>/redirect_uri'}).then(signInCallback);
+						  });
+						</script>
+	                </div>
+				    </td>
+				    <td>
+				    <div>
+						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="xlarge">
+						Facebook
 						</fb:login-button>
 					</div>
-			    </div>
-			   <!--  <div class="login-info"> 
-			    	Note that 3cixty Platform uses Google or Facebook account to authenticate you.
-			    </div> -->
+				    </td>
+				    </tr>
+				    </table>
+			 	</div>
 			</div>
 	    	<div class="login-benefits">
-        		<div class="login2-info">
-        			<strong> Benefits of Signing in </strong>
-        		</div>
-        		
-				<div class="login-info"> 
+                <h3 class="privacy-title">Benefits of Signing in</h3>
+				<p class="privacy-desc"> 
 					 You can save your WishList and access it from the mobile version of <strong>ExplorMI 360</strong>. 
 					 You can ask the application to take into account things like the ratings given by your friends.
 					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>ExplorMI 360</strong> to track your movements there, you can view summary of your movements. 
 					<br><br>
 					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
-				</div>
+				</p>
 			</div>
-			<div class="login-benefitsCopyright">
-				<div class="login3-info"> 
-					� 2015, 3cixty. All Rights Reserved.
-				</div>
-			</div>
+			
 		</form>
 	</div>
 </div>
@@ -166,9 +224,17 @@
         new google.translate.TranslateElement({
             pageLanguage : 'en',
             layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
             multilanguagePage : true
             }, 'google_translate_element');
         }
 </script>
+<div id="footer">
+	<div class="wrapper">
+		<div class="left footer-menu">
+			<span>&copy 2015, 3cixty. All rights reserved</span>
+		</div>
+	</div>
+</div>
 </body>
 </html>

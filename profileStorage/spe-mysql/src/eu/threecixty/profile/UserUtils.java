@@ -264,13 +264,15 @@ public class UserUtils {
 						tmpUids.add(generatedID);
 					}
 				}
-				String userModelSql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
-				List <?> userModelList = session.createSQLQuery(userModelSql).setParameterList("uids",
-						tmpUids).list();
-				for (Object obj: userModelList) {
-					String tmpUid = obj.toString();
-					_3cixtyUids.add(tmpUid);
-					accountIdsExisted.add(tmpUid.substring(2));
+				if (tmpUids.size() > 0) {
+					String userModelSql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
+					List <?> userModelList = session.createSQLQuery(userModelSql).setParameterList("uids",
+							tmpUids).list();
+					for (Object obj: userModelList) {
+						String tmpUid = obj.toString();
+						_3cixtyUids.add(tmpUid);
+						accountIdsExisted.add(tmpUid.substring(2));
+					}
 				}
 			}
 			
@@ -395,7 +397,7 @@ public class UserUtils {
 		if (!isNullOrEmpty(userProfile.getHasLastCrawlTime())) {
 			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
 		}
-		//convertKnowsForPersistence(userProfile, userModel);
+		convertKnowsForPersistence(userProfile.getKnows(), userModel);
 		convertAccountsForPersistence(userProfile, userModel, session);
 		convertAccompanyingsForPersistence(userProfile, userModel, session);
 	}
@@ -488,8 +490,13 @@ public class UserUtils {
 
 	private static void convertKnowsForPersistence(Set <String> knowsStrs,
 			UserModel userModel) {
-		if (knowsStrs == null || knowsStrs.size() == 0) userModel.setKnows(null);
+		if (DEBUG_MOD) LOGGER.info("Entering in the method convertKnowsForPersistence");
+		if (knowsStrs == null || knowsStrs.size() == 0) {
+			if (DEBUG_MOD) LOGGER.info("Empty knows");
+			userModel.setKnows(null);
+		}
 		else {
+			if (DEBUG_MOD) LOGGER.info("Knows size: " + knowsStrs.size()+ ", " + knowsStrs);
 			Set <String> knowsModel = userModel.getKnows();
 			if (knowsModel == null) {
 				knowsModel = new HashSet <String>();

@@ -33,6 +33,7 @@ public class AccompanyingUtils {
 		am.setAccompanyTime(accompanying.getHasAccompanyTime());
 		am.setHasAccompanyUserid1ST(accompanying.getHasAccompanyUserid1ST());
 		am.setHasAccompanyUserid2ST(accompanying.getHasAccompanyUserid2ST());
+		am.setAccompanyId(accompanying.getHasAccompanyId());
 		am.setUserModel(userModel);
 		session.save(am);
 		return am;
@@ -45,6 +46,7 @@ public class AccompanyingUtils {
 		accompanying.setHasAccompanyTime(am.getAccompanyTime());
 		accompanying.setHasAccompanyUserid2ST(am.getHasAccompanyUserid2ST());
 		accompanying.setHasAccompanyUserid1ST(am.getHasAccompanyUserid1ST());
+		accompanying.setHasAccompanyId(am.getAccompanyId());
 		return accompanying;
 	}
 	
