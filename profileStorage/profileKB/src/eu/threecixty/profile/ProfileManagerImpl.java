@@ -297,4 +297,18 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (profileManager != null) return profileManager.updateKnows(profile, knows);
 		return false;
 	}
+
+	@Override
+	public void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List<String> toPlaceIds, List<Double> toSocialScores) {
+		if (profileManager != null) profileManager.findPlaceIdsAndSocialScore(
+				profile, rating, toPlaceIds, toSocialScores);
+	}
+
+	@Override
+	public void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
+			float rating, List<String> toPlaceIds, List<Double> toSocialScores) {
+		if (profileManager != null) profileManager.findPlaceIdsAndSocialScoreForFriends(
+				profile, rating, toPlaceIds, toSocialScores);
+	}
 }

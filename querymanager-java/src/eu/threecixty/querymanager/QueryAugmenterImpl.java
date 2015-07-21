@@ -1,14 +1,15 @@
 package eu.threecixty.querymanager;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.SortCondition;
+import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.syntax.Element;
+import com.hp.hpl.jena.sparql.syntax.ElementBind;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
 import com.hp.hpl.jena.sparql.util.ExprUtils;
@@ -24,15 +25,17 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	
 	private static final float MIN_SCORE = 3.0f;
 	private static final int DESC = - 1;
-	private static final String HIGHLIGHTED_VAR_NAME = "augmented";
+	private static final String SOCIAL_SCORE_VAR_NAME = "socialScore";
+	// TODO: to be changed
+	private double COEF = 1;
 
 	@Override
 	public String createQueryAugmented(String original,
 			QueryAugmenterFilter filter, String uid) throws InvalidSparqlQuery {
 		if (filter == QueryAugmenterFilter.FriendsRating)
-			return createAugmentedQueryBasedOnFriends(original, uid);
+			return createAugmentedQueryBasedOnFriends(original, uid, COEF);
 		else if (filter == QueryAugmenterFilter.MyRating)
-			return createAugmentedQueryBasedOnMyRating(original, uid);
+			return createAugmentedQueryBasedOnMyRating(original, uid, COEF);
 		return original;
 	}
 
@@ -47,16 +50,19 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	 * @throws InvalidSparqlQuery
 	 */
 	private String createAugmentedQueryBasedOnMyRating(String original,
-			String uid) throws InvalidSparqlQuery {
+			String uid, double coef) throws InvalidSparqlQuery {
 		if (original == null) return null;
 		if (uid == null) return original;
 		try {
 			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, null);
 			if (profile == null) return original;
-			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRating(
-					profile, MIN_SCORE);
+			
+			List <String> placeIds = new LinkedList <String>();
+			List <Double> socialScores = new LinkedList <Double>();
+			ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScore(
+					profile, MIN_SCORE, placeIds, socialScores);
 			if (placeIds == null || placeIds.size() == 0) return original;
-			return addOrderBysToQuery(original, placeIds);
+			return addOrderBysToQuery(original, placeIds, socialScores, coef);
 		} catch (TooManyConnections e) {
 			e.printStackTrace();
 		}
@@ -73,16 +79,18 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	 * @throws InvalidSparqlQuery
 	 */
 	private String createAugmentedQueryBasedOnFriends(String original,
-			String uid) throws InvalidSparqlQuery {
+			String uid, double coef) throws InvalidSparqlQuery {
 		if (original == null) return null;
 		if (uid == null) return original;
 		try {
 			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, null);
 			if (profile == null) return original;
-			List <String> placeIds = ProfileManagerImpl.getInstance().getPlaceIdsFromRatingOfFriends(
-					profile, MIN_SCORE);
+			List <String> placeIds = new LinkedList <String>();
+			List <Double> socialScores = new LinkedList <Double>();
+			ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScoreForFriends(
+					profile, MIN_SCORE, placeIds, socialScores);
 			if (placeIds == null || placeIds.size() == 0) return original;
-			return addOrderBysToQuery(original, placeIds);
+			return addOrderBysToQuery(original, placeIds, socialScores, coef);
 		} catch (TooManyConnections e) {
 			e.printStackTrace();
 		}
@@ -97,36 +105,35 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	 * @throws InvalidSparqlQuery
 	 * @return
 	 */
-	private String addOrderBysToQuery(String original, List<String> placeIds) throws InvalidSparqlQuery {
+	private String addOrderBysToQuery(String original, List<String> placeIds,
+			List <Double> socialScores, double coef) throws InvalidSparqlQuery {
 		String queryWithPrefixes = allPrefixes == null ? Configuration.PREFIXES + " "+ original
 				: allPrefixes + " " + Configuration.PREFIXES + " " + original;
 		try {
 			Query query = QueryFactory.create(queryWithPrefixes);
-			
 			Expr expr = createExpr(placeIds);
-			augmentQuery(query, expr);
+			ElementBind elementBind = createElementBind(placeIds, socialScores);
+			augmentQuery(query, expr, elementBind, coef);
 			query.setPrefixMapping(null); // remove all prefixes
 			return query.toString();
 		} catch (Exception e) {
 			throw new InvalidSparqlQuery(e.getMessage());
 		}
 	}
-	
-	private void augmentQuery(Query query, Expr expr) {
+
+	private void augmentQuery(Query query, Expr expr, ElementBind elementBind, double coef) {
 		// for queries having COUNT, GROUP BY, they should not be augmented
 		if (!query.hasAggregators() && !query.hasGroupBy()) {
-			List <SortCondition> scs = null;
-			if (query.getOrderBy() == null) {
-				scs = Collections.emptyList();
+			if (query.getOrderBy() == null || query.getOrderBy().size() == 0) {
+				query.addOrderBy(expr, DESC);
 			} else {
-				scs = new LinkedList <SortCondition>();
-				scs.addAll(query.getOrderBy());
-				query.getOrderBy().clear();
-			}
-			query.addResultVar(HIGHLIGHTED_VAR_NAME, expr);
-			query.addOrderBy(HIGHLIGHTED_VAR_NAME, DESC);
-			for (SortCondition sc: scs) {
-				query.addOrderBy(sc);
+				if (query.getOrderBy().size() == 1) {
+					SortCondition sc = query.getOrderBy().get(0);
+					Expr editorialExpr = sc.getExpression();
+					query.getOrderBy().clear();
+					Expr newExpr = ExprUtils.parse(editorialExpr.toString() + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
+					query.addOrderBy(newExpr, DESC);
+				}
 			}
 		}
 		
@@ -139,10 +146,31 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 			for (Element tmp: eg.getElements()) {
 				if (tmp instanceof ElementSubQuery) {
 					ElementSubQuery esq = (ElementSubQuery) tmp;
-					augmentQuery(esq.getQuery(), expr);
+					augmentQuery(esq.getQuery(), expr, elementBind, coef);
 				}
 			}
 		}
+		
+	}
+	
+	private ElementBind createElementBind(List<String> placeIds,
+			List<Double> socialScores) {
+		StringBuilder sb = new StringBuilder();
+		int lastIndex = placeIds.size() - 1;
+		for (int i = 0; i <= lastIndex; i++) {
+			String placeId = placeIds.get(i);
+			double socialScore = socialScores.get(i);
+			if (sb.length() > 0) sb.append(", ");
+			sb.append("if (?venue = <" + placeId + ">, " + socialScore);
+			if (i == lastIndex) {
+				sb.append(", 0");
+				for (int j = 0; j <= lastIndex; j++) {
+					sb.append(")");
+				}
+			}
+		}
+		ElementBind eb = new ElementBind(Var.alloc(SOCIAL_SCORE_VAR_NAME), ExprUtils.parse(sb.toString()));
+		return eb;
 	}
 	
 	private Expr createExpr(List<String> placeIds) {

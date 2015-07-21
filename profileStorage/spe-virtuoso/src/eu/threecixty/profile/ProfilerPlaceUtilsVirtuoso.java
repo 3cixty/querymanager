@@ -28,7 +28,7 @@ public class ProfilerPlaceUtilsVirtuoso {
 	private static final String FROM_PLACE_RATINGS_GRAPH = "FROM <http://3cixty.com/placesRating>\n";
 	private static final String FROM_USERPROFILE_MANUAL_GRAPH = "FROM <http://3cixty.com/userprofile>\n";
 	
-	private static final int GOOGLE_PREFIX_LENGTH = Utils.GOOGLE_PREFIX.length();
+	private static final int GOOGLE_PREFIX_LENGTH = 2;
 	
 	/**
 	 * Gets country name.

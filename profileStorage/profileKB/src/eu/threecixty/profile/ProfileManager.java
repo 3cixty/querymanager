@@ -137,6 +137,26 @@ public interface ProfileManager {
 	List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile, float rating) throws TooManyConnections;
 	
 	/**
+	 * Find place IDs and corresponding social scores for places rated by me.
+	 * @param profile
+	 * @param rating
+	 * @param toPlaceIds
+	 * @param toSocialScores
+	 */
+	void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List <String> toPlaceIds, List <Double> toSocialScores);
+	
+	/**
+	 * Find place IDs and corresponding social scores for places rated by my friends.
+	 * @param profile
+	 * @param rating
+	 * @param toPlaceIds
+	 * @param toSocialScores
+	 */
+	void findPlaceIdsAndSocialScoreForFriends(UserProfile profile, float rating,
+			List <String> toPlaceIds, List <Double> toSocialScores);
+	
+	/**
 	 * Gets a list of place names which were visited by friends more than <code>number</code> times.
 	 * @param uid
 	 * 				Google UID.

@@ -253,4 +253,18 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public void findPlaceIdsAndSocialScore(UserProfile arg0, float arg1,
+			List<String> arg2, List<Double> arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void findPlaceIdsAndSocialScoreForFriends(UserProfile arg0,
+			float arg1, List<String> arg2, List<Double> arg3) {
+		// TODO Auto-generated method stub
+		
+	}
 }

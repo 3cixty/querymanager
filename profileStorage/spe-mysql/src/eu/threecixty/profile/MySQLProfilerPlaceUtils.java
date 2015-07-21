@@ -30,6 +30,98 @@ public class MySQLProfilerPlaceUtils {
 	private static final Logger LOGGER = Logger.getLogger(
 			 UserUtils.class.getName());
 
+	/**
+	 * Find placeIDs and the corresponding social scores.
+	 * @param profile
+	 * @param rating
+	 * @param placeIds
+	 * @param socialScores
+	 * @throws IOException
+	 * @throws UnknownException
+	 */
+	public static void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List<String> placeIds, List<Double> socialScores) throws IOException, UnknownException {
+		String googleUID = getGoogleUID(profile);
+		if (googleUID == null) return;
+		
+		StringBuffer buffer = new StringBuffer();
+		
+		buffer.append("SELECT  ?x \n");
+		buffer.append("where {\n");
+		buffer.append("?x schema:review ?review .\n");
+		buffer.append("?review schema:reviewRating	?reviewRating .\n");
+		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
+		buffer.append("?review schema:creator ?creator . \n");
+		buffer.append("?creator schema:url " + getGoogleReviewCreator(googleUID) + ".\n");
+		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
+		buffer.append("}");
+		List <String> rets = getPlaceIdsFromQuery(buffer.toString());
+		if (rets == null) return;
+		placeIds.addAll(rets);
+		for (int i = 0; i < placeIds.size(); i++) {
+			socialScores.add(1.0);
+		}
+	}
+
+	public static void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
+			float rating, List<String> placeIds, List<Double> socialScores) throws IOException, UnknownException {
+		// TODO Auto-generated method stub
+		List <String> googleUIDsFromFriends = getGoogleUIDsFromFriends(profile);
+		if (googleUIDsFromFriends == null || googleUIDsFromFriends.size() == 0) return;
+		
+		StringBuffer buffer = new StringBuffer();
+
+		buffer.append("select ?x (SUM(?result)/(2*?count2) as ?socialScore) \n");
+		buffer.append("{ select ?creator ?x (count(?x) as ?count2) (?sum/(?maxRating*?count) as ?result) \n");
+		buffer.append("{ select ?creator ?x (MAX(?rating) as ?maxRating) (count(?creator)as ?count) (SUM(?rating) as ?sum) \n");
+		buffer.append("where {\n");
+		
+		buffer.append("?x schema:review ?review .\n");
+		buffer.append("?review schema:reviewRating	?reviewRating .\n");
+		buffer.append("?reviewRating schema:ratingValue ?ratingValue.\n");
+		buffer.append("?review schema:creator ?creator . \n");
+		buffer.append("?creator schema:url ?creatorURI .\n");
+		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
+		
+		StringBuilder tmpBuilder = new StringBuilder();
+		boolean first = true;
+		for (String googleUidFromFriend: googleUIDsFromFriends) {
+			if (first) {
+				tmpBuilder.append("(?creatorURI = <https://plus.google.com/" + googleUidFromFriend + ">)");
+				first = false;
+			} else tmpBuilder.append("|| (?creatorURI = <https://plus.google.com/" + googleUidFromFriend + ">)");
+		}
+		if (!first) {
+		    buffer.append("FILTER(").append(tmpBuilder.toString());
+		    buffer.append(")");
+		} else { // all friends are facebook UIDs
+			return;
+		}
+		buffer.append("} \n");
+		buffer.append("Group by ?creator ?x \n");
+		buffer.append("} } Group by ?x ?count2");
+		
+		StringBuilder result = new StringBuilder();
+		SparqlEndPointUtils.executeQueryViaSPARQL(buffer.toString(), JSON_APP_FORMAT,
+				SparqlEndPointUtils.HTTP_POST, result);
+		JSONObject jsonObj;
+
+		jsonObj = new JSONObject(result.toString());
+
+		try {
+			JSONArray jsonArr = jsonObj.getJSONObject("results").getJSONArray("bindings");
+			for (int index = 0; index < jsonArr.length(); index++) {
+				placeIds.add(jsonArr.getJSONObject(index).getJSONObject("x").getString("value"));
+				String score = jsonArr.getJSONObject(index).getJSONObject("socialScore").getString("value");
+				socialScores.add(Double.parseDouble(score));
+			}
+
+		} catch (JSONException e) {
+			LOGGER.error(e.getMessage());
+			throw new UnknownException(e);
+		}
+	}
+	
 
 	/**
 	 * Actually, this method is to get a list of place Ids.

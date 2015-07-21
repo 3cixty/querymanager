@@ -209,4 +209,30 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		}
 		return successful;
 	}
+
+	@Override
+	public void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List<String> placeIds, List<Double> socialScores) {
+		try {
+			MySQLProfilerPlaceUtils.findPlaceIdsAndSocialScore(profile,
+					rating, placeIds, socialScores);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UnknownException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
+			float rating, List<String> placeIds, List<Double> socialScores) {
+		try {
+			MySQLProfilerPlaceUtils.findPlaceIdsAndSocialScoreForFriends(
+					profile, rating, placeIds, socialScores);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UnknownException e) {
+			e.printStackTrace();
+		}
+	}
 }
