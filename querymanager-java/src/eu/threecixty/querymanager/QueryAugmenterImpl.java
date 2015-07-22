@@ -117,6 +117,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 			query.setPrefixMapping(null); // remove all prefixes
 			return query.toString();
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new InvalidSparqlQuery(e.getMessage());
 		}
 	}
