@@ -3,6 +3,8 @@ package eu.threecixty.querymanager;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.SortCondition;
@@ -22,6 +24,12 @@ import eu.threecixty.profile.UserProfile;
 public class QueryAugmenterImpl implements QueryAugmenter {
 	
 	public static String allPrefixes;
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 QueryAugmenterImpl.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private static final float MIN_SCORE = 3.0f;
 	private static final int DESC = - 1;
@@ -132,6 +140,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 					SortCondition sc = query.getOrderBy().get(0);
 					Expr editorialExpr = sc.getExpression();
 					query.getOrderBy().clear();
+					if (DEBUG_MOD) LOGGER.info("parsing the expression: " + editorialExpr.toString() + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
 					Expr newExpr = ExprUtils.parse(editorialExpr.toString() + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
 					query.addOrderBy(newExpr, DESC);
 				}
