@@ -79,11 +79,12 @@ public class QueryManagerServices {
 	@Path("/augmentAndExecute2")
 	public Response executeQueryPOST(@HeaderParam("access_token") String access_token,
 			@FormParam("format") String format, @FormParam("query") String query,
+			@DefaultValue("1") @FormParam("coef") double coef,
 			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug,
 			@DefaultValue("false") @QueryParam("turnOffQA") String turnOffQA) {
 		
 		//return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
-		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, coef, filter, debug, SparqlEndPointUtils.HTTP_POST);
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
@@ -140,10 +141,11 @@ public class QueryManagerServices {
 	@Path("/augmentAndExecute")
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
+			@DefaultValue("1") @QueryParam("coef") double coef,
 			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug,
 			@DefaultValue("false") @QueryParam("turnOffQA") String turnOffQA) {
 		// check whether or not the flag for turning off QA is true
-		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
+		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, coef, filter, debug, SparqlEndPointUtils.HTTP_GET);
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
@@ -181,7 +183,7 @@ public class QueryManagerServices {
 	}
 	
 	private Response executeQueryWithHttpMethod(String access_token,
-			String format, String query,
+			String format, String query, double coef,
 			String filter, String debug, String httpMethod) {
 		if (DEBUG_MOD) LOGGER.info("Start augmentAndExecute method ----------------------");
 		long starttime = System.currentTimeMillis();
@@ -197,7 +199,7 @@ public class QueryManagerServices {
 			try {
 				if (DEBUG_MOD) LOGGER.info("Before augmenting and executing a query");
 
-				String result = executeQuery(user_id, query, filter, format, httpMethod);
+				String result = executeQuery(user_id, query, filter, format, httpMethod, coef);
 
 				// log calls
 
@@ -554,7 +556,7 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()));
 
 			try {
-				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -599,7 +601,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
 
 			try {
-				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -706,7 +708,7 @@ public class QueryManagerServices {
 	}
 
 	private String executeQuery(String uid, String query, String filter, String format,
-			String httpMethod) throws IOException {
+			String httpMethod, double coef) throws IOException {
 
 		if (QueryAugmenterImpl.allPrefixes == null) QueryAugmenterImpl.allPrefixes = getAllPrefixes();
 		
@@ -722,7 +724,7 @@ public class QueryManagerServices {
 					? QueryAugmenterFilter.FriendsRating : eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)
 							? QueryAugmenterFilter.MyRating : null;
 			try {
-				String augmentedQuery = new QueryAugmenterImpl().createQueryAugmented(query, qaf, uid);
+				String augmentedQuery = new QueryAugmenterImpl().createQueryAugmented(query, qaf, uid, coef);
 				System.out.println(augmentedQuery);
 				SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, formatType, httpMethod, sb);
 			} catch (InvalidSparqlQuery e) {

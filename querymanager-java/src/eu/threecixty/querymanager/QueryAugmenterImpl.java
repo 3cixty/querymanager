@@ -34,16 +34,14 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	private static final float MIN_SCORE = 3.0f;
 	private static final int DESC = - 1;
 	private static final String SOCIAL_SCORE_VAR_NAME = "socialScore";
-	// TODO: to be changed
-	private double COEF = 1;
 
 	@Override
 	public String createQueryAugmented(String original,
-			QueryAugmenterFilter filter, String uid) throws InvalidSparqlQuery {
+			QueryAugmenterFilter filter, String uid, double coef) throws InvalidSparqlQuery {
 		if (filter == QueryAugmenterFilter.FriendsRating)
-			return createAugmentedQueryBasedOnFriends(original, uid, COEF);
+			return createAugmentedQueryBasedOnFriends(original, uid, coef);
 		else if (filter == QueryAugmenterFilter.MyRating)
-			return createAugmentedQueryBasedOnMyRating(original, uid, COEF);
+			return createAugmentedQueryBasedOnMyRating(original, uid, coef);
 		return original;
 	}
 

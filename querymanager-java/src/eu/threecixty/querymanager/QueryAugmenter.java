@@ -24,5 +24,5 @@ public interface QueryAugmenter {
 	 * @return
 	 */
 	String createQueryAugmented(String original, QueryAugmenterFilter filter,
-			String uid) throws InvalidSparqlQuery;
+			String uid, double coef) throws InvalidSparqlQuery;
 }
