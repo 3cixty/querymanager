@@ -141,7 +141,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 					Expr editorialExpr = sc.getExpression();
 					query.getOrderBy().clear();
 					if (DEBUG_MOD) LOGGER.info("parsing the expression: " + editorialExpr.toString() + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
-					Expr newExpr = ExprUtils.parse(editorialExpr.toString() + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
+					Expr newExpr = ExprUtils.parse(editorialExpr.toString() + " + " + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
 					query.addOrderBy(newExpr, DESC);
 				}
 			}
