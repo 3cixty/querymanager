@@ -379,8 +379,8 @@ public class UserUtils {
 				Friend friend = new Friend();
 				friend.setUid(obj[0].toString());
 				friend.setSource(obj[2].toString());
-				friend.setFirstName(obj[4].toString());
-				friend.setLastName(obj[5].toString());
+				friend.setFirstName(obj[3].toString());
+				friend.setLastName(obj[4].toString());
 				friends.add(friend);
 			}
 		} catch (HibernateException e) {
