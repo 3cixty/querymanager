@@ -356,4 +356,16 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Friend> findAllFriends(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
