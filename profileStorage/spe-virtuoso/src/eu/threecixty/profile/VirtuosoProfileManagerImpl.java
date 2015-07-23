@@ -358,6 +358,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
+
 	public void findPlaceIdsAndSocialScore(UserProfile arg0, float arg1,
 			List<String> arg2, List<Double> arg3) {
 		// TODO Auto-generated method stub
@@ -368,6 +369,16 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	public void findPlaceIdsAndSocialScoreForFriends(UserProfile arg0,
 			float arg1, List<String> arg2, List<Double> arg3) {
 		// TODO Auto-generated method stub
-		
+	}
+
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Friend> findAllFriends(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -302,6 +302,20 @@ public interface ProfileManager {
 	boolean updateKnows(UserProfile profile, Set <String> knows);
 	
 	/**
+	 * It's possible that I don't have any information at all about them within 3cixty context.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	List <Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID);
+	
+	/**
+	 * Find all my friends in my knows.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	List <Friend> findAllFriends(String my3cixtyUID);
+	
+	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.
 	 * @param attributes
 	 * @param attrChecked

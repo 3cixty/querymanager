@@ -299,6 +299,7 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
+
 	public void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
 			List<String> toPlaceIds, List<Double> toSocialScores) {
 		if (profileManager != null) profileManager.findPlaceIdsAndSocialScore(
@@ -310,5 +311,16 @@ public class ProfileManagerImpl implements ProfileManager {
 			float rating, List<String> toPlaceIds, List<Double> toSocialScores) {
 		if (profileManager != null) profileManager.findPlaceIdsAndSocialScoreForFriends(
 				profile, rating, toPlaceIds, toSocialScores);
+	}
+
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {
+		if (profileManager != null) return profileManager.findAll3cixtyFriendsHavingMyUIDInKnows(my3cixtyUID);
+		return null;
+	}
+
+	@Override
+	public List<Friend> findAllFriends(String my3cixtyUID) {
+		if (profileManager != null) return profileManager.findAllFriends(my3cixtyUID);
+		return null;
 	}
 }

@@ -1,14 +1,19 @@
 package eu.threecixty.querymanager.rest;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -24,9 +29,19 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.Friend;
+import eu.threecixty.profile.InvalidTrayElement;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.Tray;
+import eu.threecixty.profile.UserProfile;
+import eu.threecixty.profile.UserRelatedInformation;
+import eu.threecixty.profile.elements.ElementDetails;
+import eu.threecixty.profile.elements.LanguageUtils;
+import eu.threecixty.profile.oldmodels.Name;
+import eu.threecixty.querymanager.AdminValidator;
 
 /**
  * The class is an end point for Rest ProfileAPI to expose to other components.
@@ -109,6 +124,56 @@ public class SPEServices {
 		ProfileCacheManager.getInstance().printProfilesInCache();
 		return Response.ok().build();
 	}
+	
+	@GET
+	@Path("/getUserRelatedInformation")
+	public Response getProfiles(@HeaderParam("username") String username,
+			@HeaderParam("password") String password,
+			@QueryParam("uid") String _3cixtyUID, @DefaultValue("en") String language) {
+		try {
+			AdminValidator admin = new AdminValidator();
+			if (admin.validate(username, password, CallLogServices.realPath)) {
+				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
+				if (profile == null) {
+					return Response.ok().entity("No information about the given 3cixty UID").build();
+				}
+				UserRelatedInformation  uri = new UserRelatedInformation();
+				Name name = profile.getHasName();
+				if (name != null) {
+					uri.setFirstName(name.getGivenName());
+					uri.setLastName(name.getFamilyName());
+				}
+				try {
+					List <Tray> trays = ProfileManagerImpl.getInstance().getTrayManager().getTrays(_3cixtyUID);
+					List <ElementDetails> listOfElementDetails = new LinkedList <ElementDetails>();
+					TrayServices.findTrayDetails(trays, LanguageUtils.getLanguages(language), listOfElementDetails);
+					uri.setWishesList(listOfElementDetails);
+				} catch (InvalidTrayElement e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				List <Friend> peopleHaveMeInKnows = ProfileManagerImpl.getInstance().findAll3cixtyFriendsHavingMyUIDInKnows(_3cixtyUID);
+				uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
+				
+				List <Friend> friendsInMyKnows = ProfileManagerImpl.getInstance().findAllFriends(_3cixtyUID);
+				uri.setKnows(friendsInMyKnows);
+				
+				int number = friendsInMyKnows == null ? 0 : friendsInMyKnows.size();
+				if (number > 0) {
+					uri.setExtraInfo("There are " + number + " friends we cannot identify in the list of knows!!!");
+				}
+				return Response.ok().entity(JSONObject.wrap(uri).toString()).build();
+			} else {
+				return Response.status(400).entity("Username & password are not correct").build();
+			}
+		} catch (TooManyConnections e) {
+			e.printStackTrace();
+		}
+		return Response.serverError().build();
+	}
+	
 	
 //	@POST
 //	@Path("/getAllProfiles")

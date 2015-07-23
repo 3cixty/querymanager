@@ -235,4 +235,16 @@ class MySQLProfileManagerImpl implements ProfileManager {
 			e.printStackTrace();
 		}
 	}
+
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {
+		return UserUtils.findAll3cixtyFriendsHavingMyUIDInKnows(my3cixtyUID);
+	}
+
+	/**
+	 * Find all my friends in my list of knows.
+	 */
+	@Override
+	public List<Friend> findAllFriends(String my3cixtyUID) {
+		return UserUtils.findAllFriendsInMyListOfKnows(my3cixtyUID);
+	}
 }
