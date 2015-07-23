@@ -169,7 +169,6 @@ public class SPEServices {
 				return Response.status(400).entity("Username & password are not correct").build();
 			}
 		} catch (TooManyConnections e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return Response.serverError().build();
