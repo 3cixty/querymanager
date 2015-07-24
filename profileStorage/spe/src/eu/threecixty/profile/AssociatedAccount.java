@@ -5,6 +5,8 @@ public class AssociatedAccount {
 	private String accountId;
 	private String source;
 	private String password;
+	private String mobidotUserId;
+
 	public String getAccountId() {
 		return accountId;
 	}
@@ -22,5 +24,11 @@ public class AssociatedAccount {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public String getMobidotUserId() {
+		return mobidotUserId;
+	}
+	public void setMobidotUserId(String mobidotUserId) {
+		this.mobidotUserId = mobidotUserId;
 	}
 }

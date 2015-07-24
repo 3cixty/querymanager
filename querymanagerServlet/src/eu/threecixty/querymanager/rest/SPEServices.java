@@ -303,17 +303,21 @@ public class SPEServices {
 			UserProfile profile) {
 		List <AssociatedAccount> associatedAccounts = new LinkedList <AssociatedAccount>();
 		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
+		PartnerUser partnerUser = ProfileManagerImpl.getInstance().getPartner().getUser(profile.getHasUID());
+		List <PartnerAccount> partnerAccounts = partnerUser.getPartnerAccounts();
+		boolean found = false;
 		if (pis != null) {
 			for (ProfileIdentities pi: pis) {
 				AssociatedAccount associatedAccount = new AssociatedAccount();
 				associatedAccount.setAccountId(pi.getHasUserAccountID());
 				associatedAccount.setSource(pi.getHasSourceCarrier());
 				if (pi.getHasSourceCarrier().equals(SPEConstants.MOBIDOT_SOURCE)) {
-					PartnerUser partnerUser = ProfileManagerImpl.getInstance().getPartner().getUser(profile.getHasUID());
-					if (partnerUser.getPartnerAccounts() != null) {
-						for (PartnerAccount pa: partnerUser.getPartnerAccounts()) {
+					if (partnerAccounts != null) {
+						for (PartnerAccount pa: partnerAccounts) {
 							if (PartnerAccountUtils.MOBIDOT_APP_ID.equals(pa.getAppId())) {
 								associatedAccount.setPassword(pa.getPassword());
+								associatedAccount.setMobidotUserId(pa.getUser_id());
+								found = true;
 								break;
 							}
 						}
@@ -322,6 +326,19 @@ public class SPEServices {
 				associatedAccounts.add(associatedAccount);
 			}
 		}
+		if (!found) {
+			for (PartnerAccount pa: partnerAccounts) {
+				if (PartnerAccountUtils.MOBIDOT_APP_ID.equals(pa.getAppId())) {
+					AssociatedAccount associatedAccount = new AssociatedAccount();
+					associatedAccount.setAccountId(pa.getUsername());
+					associatedAccount.setSource(SPEConstants.MOBIDOT_SOURCE);
+					associatedAccount.setPassword(pa.getPassword());
+					associatedAccount.setMobidotUserId(pa.getUser_id());
+					break;
+				}
+			}
+		}
+		
 		if (associatedAccounts.size() > 0) uri.setAccounts(associatedAccounts);
 	}
 
