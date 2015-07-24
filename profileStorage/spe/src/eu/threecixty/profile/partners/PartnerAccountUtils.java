@@ -11,7 +11,7 @@ import eu.threecixty.partners.PartnerUser;
 import eu.threecixty.profile.ProfileManagerImpl;
 
 public class PartnerAccountUtils {
-	protected static final String MOBIDOT_APP_ID = "MobidotAppID";
+	public static final String MOBIDOT_APP_ID = "MobidotAppID";
 	
 	private static final Logger LOGGER = Logger.getLogger(
 			PartnerAccountUtils.class.getName());
