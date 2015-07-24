@@ -304,7 +304,7 @@ public class SPEServices {
 		List <AssociatedAccount> associatedAccounts = new LinkedList <AssociatedAccount>();
 		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
 		PartnerUser partnerUser = ProfileManagerImpl.getInstance().getPartner().getUser(profile.getHasUID());
-		List <PartnerAccount> partnerAccounts = partnerUser.getPartnerAccounts();
+		List <PartnerAccount> partnerAccounts = ProfileManagerImpl.getInstance().getPartner().getPartnerAccounts(partnerUser);
 		boolean found = false;
 		if (pis != null) {
 			for (ProfileIdentities pi: pis) {

@@ -162,4 +162,21 @@ public class PartnerImpl implements Partner {
 	
 	private PartnerImpl() {
 	}
+
+	@Override
+	public List<PartnerAccount> getPartnerAccounts(PartnerUser user) {
+		List <PartnerAccount> partnerAccounts;
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			PartnerUser freshUser = (PartnerUser) session.get(PartnerUser.class, user.getId());
+			partnerAccounts = freshUser.getPartnerAccounts();
+			session.close();
+			return partnerAccounts;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		}
+		if (session != null) session.close();
+		return null;
+	}
 }
