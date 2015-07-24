@@ -160,9 +160,9 @@ public class SPEServices {
 					e.printStackTrace();
 				}
 				
-				List <Friend> peopleHaveMeInKnows = ProfileManagerImpl.getInstance().findAll3cixtyFriendsHavingMyUIDInKnows(_3cixtyUID);
-				if (peopleHaveMeInKnows != null && peopleHaveMeInKnows.size() > 0)
-						uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
+				List <Friend> peopleHaveMeInKnows = ProfileManagerImpl.getInstance()
+						.findAll3cixtyFriendsHavingMyUIDInKnows(_3cixtyUID);
+				uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
 				
 				findFriendsInMyKnows(uri, profile, _3cixtyUID);
 				
@@ -295,7 +295,7 @@ public class SPEServices {
 			}
 		}
 		
-		if (friendsInMyKnows.size() > 0) uri.setKnows(friendsInMyKnows);
+		uri.setKnows(friendsInMyKnows);
 	}
 
 	private void findAccountsAssociated(UserRelatedInformation uri,
