@@ -341,7 +341,7 @@ public class UserUtils {
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String sql = "SELECT DISTINCT accountId, uid, source, element, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows where 3cixty_user_profile.id=3cixty_user_profile_knows.3cixty_user_profile_id AND (source like 'Google' OR source like 'Facebook') AND element = :myUID";
+			String sql = "SELECT DISTINCT accountId, uid, source, element, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id=3cixty_user_profile_knows.3cixty_user_profile_id AND (3cixty_user_profile.id = 3cixty_account.3cixty_user_id) AND (source like 'Google' OR source like 'Facebook') AND element = :myUID";
 			List <Object[]> results = session.createSQLQuery(sql).setParameter("myUID", my3cixtyUID).list();
 			
 			for (Object [] obj: results) {
