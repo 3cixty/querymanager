@@ -71,7 +71,7 @@ public class MySQLProfilerPlaceUtils {
 		
 		StringBuffer buffer = new StringBuffer();
 
-		buffer.append("select ?x (SUM(?result)/(2*?count2) as ?socialScore) \n");
+		buffer.append("select ?x (SUM(?result)/(?count2) as ?socialScore) \n");
 		buffer.append("{ select ?creator ?x (count(?x) as ?count2) (?sum/(?maxRating*?count) as ?result) \n");
 		buffer.append("{ select ?creator ?x (MAX(?ratingValue) as ?maxRating) (count(?creator)as ?count) (SUM(?ratingValue) as ?sum) \n");
 		buffer.append("where {\n");
