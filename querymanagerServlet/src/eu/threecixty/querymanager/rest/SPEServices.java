@@ -31,7 +31,6 @@ import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.partners.PartnerAccount;
-import eu.threecixty.partners.PartnerUser;
 import eu.threecixty.profile.AssociatedAccount;
 import eu.threecixty.profile.Friend;
 import eu.threecixty.profile.InvalidTrayElement;
@@ -303,8 +302,7 @@ public class SPEServices {
 			UserProfile profile) {
 		List <AssociatedAccount> associatedAccounts = new LinkedList <AssociatedAccount>();
 		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
-		PartnerUser partnerUser = ProfileManagerImpl.getInstance().getPartner().getUser(profile.getHasUID());
-		List <PartnerAccount> partnerAccounts = ProfileManagerImpl.getInstance().getPartner().getPartnerAccounts(partnerUser);
+		List <PartnerAccount> partnerAccounts = ProfileManagerImpl.getInstance().getPartner().getPartnerAccounts(profile.getHasUID());
 		boolean found = false;
 		if (pis != null) {
 			for (ProfileIdentities pi: pis) {

@@ -13,7 +13,7 @@ public interface Partner {
 	
 	PartnerAccount findAccount(PartnerUser user, String appid, String role);
 	
-	List <PartnerAccount> getPartnerAccounts(PartnerUser user);
+	List <PartnerAccount> getPartnerAccounts(String uid);
 	
 	boolean addAccount(PartnerAccount account);
 }
