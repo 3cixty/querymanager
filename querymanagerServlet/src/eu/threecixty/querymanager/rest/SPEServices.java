@@ -332,6 +332,7 @@ public class SPEServices {
 					associatedAccount.setSource(SPEConstants.MOBIDOT_SOURCE);
 					associatedAccount.setPassword(pa.getPassword());
 					associatedAccount.setMobidotUserId(pa.getUser_id());
+					associatedAccounts.add(associatedAccount);
 					break;
 				}
 			}
