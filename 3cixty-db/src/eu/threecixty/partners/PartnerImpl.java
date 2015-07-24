@@ -1,5 +1,6 @@
 package eu.threecixty.partners;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -164,13 +165,19 @@ public class PartnerImpl implements Partner {
 	}
 
 	@Override
-	public List<PartnerAccount> getPartnerAccounts(PartnerUser user) {
-		List <PartnerAccount> partnerAccounts;
+	public List<PartnerAccount> getPartnerAccounts(String uid) {
+		List <PartnerAccount> partnerAccounts = new LinkedList <PartnerAccount>();
 		Session session = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
-			PartnerUser freshUser = (PartnerUser) session.get(PartnerUser.class, user.getId());
-			partnerAccounts = freshUser.getPartnerAccounts();
+			String hql = "FROM PartnerAccount P WHERE P.partnerUser.uid = ?";
+			Query query = session.createQuery(hql);
+			List <?> results = query.setString(0, uid).list();
+			if (results != null) {
+				for (Object obj: results) {
+					partnerAccounts.add((PartnerAccount) obj);
+				}
+			}
 			session.close();
 			return partnerAccounts;
 		} catch (HibernateException e) {
