@@ -338,7 +338,7 @@ public class SPEServices {
 			}
 		}
 		
-		if (associatedAccounts.size() > 0) uri.setAccounts(associatedAccounts);
+		uri.setAccounts(associatedAccounts);
 	}
 
 	/**
