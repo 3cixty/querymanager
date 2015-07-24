@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -29,11 +30,15 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.partners.PartnerAccount;
+import eu.threecixty.partners.PartnerUser;
+import eu.threecixty.profile.AssociatedAccount;
 import eu.threecixty.profile.Friend;
 import eu.threecixty.profile.InvalidTrayElement;
 import eu.threecixty.profile.ProfileInformation;
 import eu.threecixty.profile.ProfileInformationStorage;
 import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.UserProfile;
@@ -41,6 +46,8 @@ import eu.threecixty.profile.UserRelatedInformation;
 import eu.threecixty.profile.elements.ElementDetails;
 import eu.threecixty.profile.elements.LanguageUtils;
 import eu.threecixty.profile.oldmodels.Name;
+import eu.threecixty.profile.oldmodels.ProfileIdentities;
+import eu.threecixty.profile.partners.PartnerAccountUtils;
 import eu.threecixty.querymanager.AdminValidator;
 
 /**
@@ -155,15 +162,14 @@ public class SPEServices {
 				}
 				
 				List <Friend> peopleHaveMeInKnows = ProfileManagerImpl.getInstance().findAll3cixtyFriendsHavingMyUIDInKnows(_3cixtyUID);
-				uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
+				if (peopleHaveMeInKnows != null && peopleHaveMeInKnows.size() > 0)
+						uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
 				
-				List <Friend> friendsInMyKnows = ProfileManagerImpl.getInstance().findAllFriends(_3cixtyUID);
-				uri.setKnows(friendsInMyKnows);
+				findFriendsInMyKnows(uri, profile, _3cixtyUID);
 				
-				int number = friendsInMyKnows == null ? 0 : friendsInMyKnows.size();
-				if (number > 0) {
-					uri.setExtraInfo("There are " + number + " friends we cannot identify in the list of knows!!!");
-				}
+				findAccountsAssociated(uri, profile);
+				
+				findAccompanyings(uri, profile);
 				return Response.ok().entity(JSONObject.wrap(uri).toString()).build();
 			} else {
 				return Response.status(400).entity("Username & password are not correct").build();
@@ -252,6 +258,73 @@ public class SPEServices {
 //		return Response.serverError().build();
 //	}
 	
+	private void findAccompanyings(UserRelatedInformation uri,
+			UserProfile profile) {
+		if (profile.getAccompanyings() != null
+				&& profile.getAccompanyings().size() > 0)
+			uri.setAccompanyings(profile.getAccompanyings());
+	}
+
+	private void findFriendsInMyKnows(UserRelatedInformation uri,
+			UserProfile profile, String _3cixtyUID) {
+		List <Friend> friendsInMyKnows = ProfileManagerImpl.getInstance().findAllFriends(_3cixtyUID);
+		if (friendsInMyKnows == null) friendsInMyKnows = new LinkedList <Friend>();
+		
+		Set <String> myKnows = profile.getKnows();
+		if (myKnows != null) {
+			for (String myKnow: myKnows) {
+				String tmpUid = myKnow.substring(2);
+				boolean found = false;
+				for (Friend friend: friendsInMyKnows) {
+					if (tmpUid.equals(friend.getUid()))  {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					Friend friend = new Friend();
+					friend.setFirstName("Unknown");
+					friend.setLastName("Unknown");
+					friend.setUid(tmpUid);
+					if (myKnow.startsWith(eu.threecixty.profile.Utils.GOOGLE_PREFIX)) {
+						friend.setSource(SPEConstants.GOOGLE_SOURCE);
+					} else if (myKnow.startsWith(eu.threecixty.profile.Utils.FACEBOOK_PREFIX)) {
+						friend.setSource(SPEConstants.FACEBOOK_SOURCE);
+					}
+					friendsInMyKnows.add(friend);
+				}
+			}
+		}
+		
+		if (friendsInMyKnows.size() > 0) uri.setKnows(friendsInMyKnows);
+	}
+
+	private void findAccountsAssociated(UserRelatedInformation uri,
+			UserProfile profile) {
+		List <AssociatedAccount> associatedAccounts = new LinkedList <AssociatedAccount>();
+		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
+		if (pis != null) {
+			for (ProfileIdentities pi: pis) {
+				AssociatedAccount associatedAccount = new AssociatedAccount();
+				associatedAccount.setAccountId(pi.getHasUserAccountID());
+				associatedAccount.setSource(pi.getHasSourceCarrier());
+				if (pi.getHasSourceCarrier().equals(SPEConstants.MOBIDOT_SOURCE)) {
+					PartnerUser partnerUser = ProfileManagerImpl.getInstance().getPartner().getUser(profile.getHasUID());
+					if (partnerUser.getPartnerAccounts() != null) {
+						for (PartnerAccount pa: partnerUser.getPartnerAccounts()) {
+							if (PartnerAccountUtils.MOBIDOT_APP_ID.equals(pa.getAppId())) {
+								associatedAccount.setPassword(pa.getPassword());
+								break;
+							}
+						}
+					}
+				}
+				associatedAccounts.add(associatedAccount);
+			}
+		}
+		if (associatedAccounts.size() > 0) uri.setAccounts(associatedAccounts);
+	}
+
 	/**
 	 * Saves profile information to the KB.
 	 * @param access_token

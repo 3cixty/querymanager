@@ -1,17 +1,20 @@
 package eu.threecixty.profile;
 
 import java.util.List;
+import java.util.Set;
 
 import eu.threecixty.profile.elements.ElementDetails;
+import eu.threecixty.profile.oldmodels.Accompanying;
 
 public class UserRelatedInformation {
 
 	private String firstName;
 	private String lastName;
+	private List <AssociatedAccount> accounts;
 	private List <ElementDetails> wishesList;
 	private List <Friend> knows;
 	private List <Friend> peopleHaveMeInKnows;
-	private String extraInfo;
+	private Set <Accompanying> accompanyings;
 	public String getFirstName() {
 		return firstName;
 	}
@@ -42,10 +45,16 @@ public class UserRelatedInformation {
 	public void setPeopleHaveMeInKnows(List<Friend> peopleHaveMeInKnows) {
 		this.peopleHaveMeInKnows = peopleHaveMeInKnows;
 	}
-	public String getExtraInfo() {
-		return extraInfo;
+	public List<AssociatedAccount> getAccounts() {
+		return accounts;
 	}
-	public void setExtraInfo(String extraInfo) {
-		this.extraInfo = extraInfo;
+	public void setAccounts(List<AssociatedAccount> accounts) {
+		this.accounts = accounts;
+	}
+	public Set<Accompanying> getAccompanyings() {
+		return accompanyings;
+	}
+	public void setAccompanyings(Set<Accompanying> accompanyings) {
+		this.accompanyings = accompanyings;
 	}
 }
