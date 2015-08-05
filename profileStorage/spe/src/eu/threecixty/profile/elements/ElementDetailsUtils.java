@@ -212,7 +212,7 @@ public class ElementDetailsUtils {
 		//addLanguageFilter("reviewBody", languages, queryBuff);
 		queryBuff.append(" } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating*/schema:ratingValue ?ratingValue2  .} \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating/schema:ratingValue ?ratingValue2  .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating/schema:reviewRating/schema:ratingValue ?ratingValue3  .} \n");
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
