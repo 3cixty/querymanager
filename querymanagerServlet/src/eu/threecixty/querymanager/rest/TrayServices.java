@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -109,9 +108,9 @@ public class TrayServices {
     				        //Verify if it matched with etag available in http request
     				        rb = req.evaluatePreconditions(etag);
 					        //Create cache control header
-					         CacheControl cc = new CacheControl();
+					         //CacheControl cc = new CacheControl();
 					         //Set max age to one day
-					         cc.setMaxAge(86400);
+					         //cc.setMaxAge(86400);
     						if (rb == null) { // changed
     							String content = JSONObject.wrap(trays).toString();
     							
@@ -121,11 +120,10 @@ public class TrayServices {
     							return Response.status(Response.Status.OK)
     									.entity(content)
     									.type(MediaType.APPLICATION_JSON_TYPE)
-    									.cacheControl(cc)
     									.tag(etag)
     									.build();
     						} else {
-    							return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
+    							return rb.tag(etag).status(Status.NOT_MODIFIED).build();
     						}
     					}
     				} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
@@ -432,9 +430,7 @@ public class TrayServices {
 	        //Verify if it matched with etag available in http request
 	        rb = req.evaluatePreconditions(etag);
 	        //Create cache control header
-	         CacheControl cc = new CacheControl();
 	         //Set max age to one day
-	         cc.setMaxAge(86400);
 			if (rb == null) { // changed
 				List <ElementDetails> trayDetailsList = new ArrayList <ElementDetails>();
 				findTrayDetails(trays, trayDetailsList, restTray);
@@ -446,11 +442,10 @@ public class TrayServices {
 				return Response.status(Response.Status.OK)
 						.entity(content)
 						.type(MediaType.APPLICATION_JSON_TYPE)
-						.cacheControl(cc)
 						.tag(etag)
 						.build();
 			} else {
-				return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
+				return rb.tag(etag).status(Status.NOT_MODIFIED).build();
 			}
 		}
 	}
