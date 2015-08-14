@@ -452,45 +452,7 @@ public class TrayServices {
 	
 	private void findTrayDetails(List<Tray> trays,
 			List<ElementDetails> trayDetailsList, RestTrayObject restTray) throws IOException {
-		List <String> eventIds = new LinkedList <String>();
-		List <String> poiIds = new LinkedList <String>();
-		for (Tray tray: trays) {
-			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
-			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
-		}
-		
-		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguage());
-		
-		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
-		if (elementEventsDetails != null) {
-			for (ElementDetails eventDetails: elementEventsDetails) {
-				eventDetails.setType(EVENT_TYPE);
-				for (Tray tray: trays) {
-					if (tray.getElement_id().equals(eventDetails.getId())) {
-						eventDetails.setAttend_datetime(tray.getAttend_datetime());
-						eventDetails.setRating(tray.getRating());
-						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
-						break;
-					}
-				}
-			}
-			trayDetailsList.addAll(elementEventsDetails);
-		}
-		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, tmpLanguages);
-		if (elementPoIsDetails != null) {
-			for (ElementDetails poiDetails: elementPoIsDetails) {
-				poiDetails.setType(POI_TYPE);
-				for (Tray tray: trays) {
-					if (tray.getElement_id().equals(poiDetails.getId())) {
-						poiDetails.setAttend_datetime(tray.getAttend_datetime());
-						poiDetails.setRating(tray.getRating());
-						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
-						break;
-					}
-				}
-			}
-			trayDetailsList.addAll(elementPoIsDetails);
-		}
+		findTrayDetails(trays, LanguageUtils.getLanguages(restTray.getLanguage()), trayDetailsList);
 	}
 
 	private long getNewestTimestamp(List <Tray> trays) {
@@ -516,5 +478,47 @@ public class TrayServices {
 		        .entity(msg)
 		        .type(MediaType.TEXT_PLAIN)
 		        .build();
+	}
+	
+	
+	public static void findTrayDetails(List<Tray> trays, String []languages,
+			List<ElementDetails> trayDetailsList) throws IOException {
+		List <String> eventIds = new LinkedList <String>();
+		List <String> poiIds = new LinkedList <String>();
+		for (Tray tray: trays) {
+			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
+			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
+		}
+		
+		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, languages);
+		if (elementEventsDetails != null) {
+			for (ElementDetails eventDetails: elementEventsDetails) {
+				eventDetails.setType(EVENT_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(eventDetails.getId())) {
+						eventDetails.setAttend_datetime(tray.getAttend_datetime());
+						eventDetails.setRating(tray.getRating());
+						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
+			}
+			trayDetailsList.addAll(elementEventsDetails);
+		}
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, languages);
+		if (elementPoIsDetails != null) {
+			for (ElementDetails poiDetails: elementPoIsDetails) {
+				poiDetails.setType(POI_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(poiDetails.getId())) {
+						poiDetails.setAttend_datetime(tray.getAttend_datetime());
+						poiDetails.setRating(tray.getRating());
+						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
+			}
+			trayDetailsList.addAll(elementPoIsDetails);
+		}
 	}
 }

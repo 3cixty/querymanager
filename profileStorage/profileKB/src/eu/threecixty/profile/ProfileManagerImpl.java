@@ -297,4 +297,16 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (profileManager != null) return profileManager.updateKnows(profile, knows);
 		return false;
 	}
+
+	@Override
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {
+		if (profileManager != null) return profileManager.findAll3cixtyFriendsHavingMyUIDInKnows(my3cixtyUID);
+		return null;
+	}
+
+	@Override
+	public List<Friend> findAllFriends(String my3cixtyUID) {
+		if (profileManager != null) return profileManager.findAllFriends(my3cixtyUID);
+		return null;
+	}
 }
