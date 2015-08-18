@@ -222,4 +222,9 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	public List<Friend> findAllFriends(String my3cixtyUID) {
 		return UserUtils.findAllFriendsInMyListOfKnows(my3cixtyUID);
 	}
+
+	@Override
+	public ForgottenUserManager getForgottenUserManager() {
+		return new ForgottenUserManagerImpl();
+	}
 }

@@ -265,4 +265,10 @@ class SimpleProfileManagerImpl implements ProfileManager {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public ForgottenUserManager getForgottenUserManager() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
