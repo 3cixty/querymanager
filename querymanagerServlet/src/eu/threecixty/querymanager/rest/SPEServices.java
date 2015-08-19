@@ -2,6 +2,7 @@ package eu.threecixty.querymanager.rest;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -179,6 +180,66 @@ public class SPEServices {
 		return Response.serverError().build();
 	}
 	
+	@POST
+	@Path("/forgetUser")
+	public Response forgetUser(@HeaderParam("username") String username,
+			@HeaderParam("password") String password, @FormParam("uid") String uid) {
+		if (DEBUG_MOD) LOGGER.info("Enter into forgetUser API");
+		AdminValidator admin = new AdminValidator();
+		if (admin.validate(username, password, CallLogServices.realPath)) {
+			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
+					.setPreventUserFromCrawling(uid);
+			if (ok) return Response.ok().entity("Succesful: UID " + uid + " won't be crawled next times").build();
+			return Response.serverError().entity(
+					"ERROR: Please contact with backend team for this error: " + uid).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).entity(
+				"Invalid username and password").build();
+	}
+	
+	@POST
+	@Path("/forgetKnowFromUser")
+	public Response forgetKnowFromUser(@HeaderParam("username") String username,
+			@HeaderParam("password") String password, @FormParam("uid") String uid,
+			@FormParam("know") String know) {
+		if (DEBUG_MOD) LOGGER.info("Enter into forgetKnowFromUser API");
+		AdminValidator admin = new AdminValidator();
+		if (admin.validate(username, password, CallLogServices.realPath)) {
+			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
+					.add(uid, know);
+			if (ok) return Response.ok().entity("Successful").build();
+			return Response.serverError().entity(
+					"ERROR: Please contact with backend team for this error: uid = "
+			        + uid + ", know = " + know).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).entity(
+				"Invalid username and password").build();
+	}
+	
+	@POST
+	@Path("/forgetKnowsFromUser")
+	public Response forgetKnowsFromUser(@HeaderParam("username") String username,
+			@HeaderParam("password") String password, @FormParam("uid") String uid,
+			@FormParam("knows") String knows) {
+		if (DEBUG_MOD) LOGGER.info("Enter into forgetKnowsFromUser API");
+		AdminValidator admin = new AdminValidator();
+		if ((knows != null) && admin.validate(username, password, CallLogServices.realPath)) {
+			Set <String> set = new HashSet <String>();
+			String [] arrs = knows.split(",");
+			for (int i = 0; i < arrs.length; i++) {
+				set.add(arrs[i].trim());
+			}
+			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
+					.add(uid, set);
+			if (ok) return Response.ok().entity("Successful").build();
+			return Response.serverError().entity(
+					"ERROR: Please contact with backend team for this error: uid = "
+			        + uid + ", knows = " + knows).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).entity(
+				"Invalid username and password OR knows is empty").build();
+	}
+	
 	
 //	@POST
 //	@Path("/getAllProfiles")
@@ -349,8 +410,8 @@ public class SPEServices {
 	 * @return If successful, the message <code>{"save": "true"}</code> will be returned. Otherwise,
 	 *         the message <code>{"save": "false"}</code> will be returned.
 	 */
-	@POST
-	@Path("/saveProfile")
+//	@POST
+//	@Path("/saveProfile")
 	public Response saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		try {
