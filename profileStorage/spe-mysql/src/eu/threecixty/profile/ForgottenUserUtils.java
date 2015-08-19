@@ -39,7 +39,7 @@ public class ForgottenUserUtils {
 			session.beginTransaction();
 			session.save(forgottenUser);
 			session.getTransaction().commit();
-			
+			ok = true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 			session.getTransaction().rollback();
@@ -141,7 +141,7 @@ public class ForgottenUserUtils {
 			
 			session.beginTransaction();
 			
-			String hql = "SELECT * FROM ForgottenUser WHERE uid = ?";
+			String hql = "FROM ForgottenUser WHERE uid = ?";
 			List <Object> list = session.createQuery(hql).setString(0, uid).list();
 			if (list != null && list.size() > 0) {
 				forgottenUser = (ForgottenUser) list.get(0);
