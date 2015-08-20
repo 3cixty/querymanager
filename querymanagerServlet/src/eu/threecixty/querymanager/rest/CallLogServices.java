@@ -100,8 +100,8 @@ public class CallLogServices  {
 	 * @return string
 	 **/ 
 	private String executeQuery() {
-
-		Collection <CallLoggingDisplay> collectionslog = CallLoggingManager.getInstance().getCallsWithCount();
+		long from = 1430438400000L;
+		Collection <CallLoggingDisplay> collectionslog = CallLoggingManager.getInstance().getCallsWithCount(from,System.currentTimeMillis());
     	Iterator <CallLoggingDisplay> callLoggingDisplays = collectionslog.iterator();
     	String jsonString="{"
     			+ "\"cols\": ["
