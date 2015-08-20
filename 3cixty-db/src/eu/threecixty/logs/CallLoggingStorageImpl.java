@@ -77,8 +77,8 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 				+ "DATE_FORMAT(DATE_SUB("+TABLE_NAME +".starttime, INTERVAL 1 Month),'%Y,%m,%d') AS starttime, "
 				+ "COUNT("+APPKEY_TABLE_NAME +".app_name) AS numberOfCalls "
 				+ "FROM " + TABLE_NAME +"," + APPKEY_TABLE_NAME
-				+ " WHERE "+ TABLE_NAME+".appkey LIKE "+ APPKEY_TABLE_NAME+".app_key"// AND "
-						/*+ TABLE_NAME +".starttime >=? AND "
+				+ " WHERE "+ TABLE_NAME+".appkey LIKE "+ APPKEY_TABLE_NAME+".app_key AND "
+						+ TABLE_NAME +".starttime >=? " /* AND "
 						+ TABLE_NAME +".starttime <= ? AND "
 						+ TABLE_NAME +".timeConsumed >= ? AND "
 						+ TABLE_NAME +".timeConsumed <= ? "*/
@@ -88,6 +88,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		
 		SQLQuery query = session.createSQLQuery(sql);
+		query.setTimestamp(0, new Timestamp(from);
 		
 		List <Object[]> list = query.list();
 		
