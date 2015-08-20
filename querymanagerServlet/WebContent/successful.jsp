@@ -11,7 +11,7 @@
     	response.sendRedirect("./adminLogin.jsp");
     }
 %>
-<div><%=session.getAttribute("successful!!!") %></div>
+<div><%=session.getAttribute("successful") %></div>
 <div>
 
 <a href="./<%=session.getAttribute("nextAction")%>">Continue</a>

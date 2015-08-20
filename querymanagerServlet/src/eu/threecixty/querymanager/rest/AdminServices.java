@@ -43,7 +43,14 @@ public class AdminServices {
 		if (session.getAttribute("admin") == Boolean.TRUE) {
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.setPreventUserFromCrawling(uid);
-			if (ok) return Response.ok().entity("Succesful: UID " + uid + " won't be crawled next times").build();
+			if (ok) {
+				session.setAttribute("successful", "successful!!!"); 
+				try {
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
 			return Response.serverError().entity(
 					"ERROR: Please contact with backend team for this error: " + uid).build();
 		}
@@ -64,7 +71,14 @@ public class AdminServices {
 		if (session.getAttribute("admin") == Boolean.TRUE) {
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(uid, know);
-			if (ok) return Response.ok().entity("Successful").build();
+			if (ok) {
+				session.setAttribute("successful", "successful!!!"); 
+				try {
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
 			return Response.serverError().entity(
 					"ERROR: Please contact with backend team for this error: uid = "
 			        + uid + ", know = " + know).build();
@@ -93,7 +107,14 @@ public class AdminServices {
 			}
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(uid, set);
-			if (ok) return Response.ok().entity("Successful").build();
+			if (ok) {
+				session.setAttribute("successful", "successful!!!"); 
+				try {
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
 			return Response.serverError().entity(
 					"ERROR: Please contact with backend team for this error: uid = "
 			        + uid + ", knows = " + knows).build();
