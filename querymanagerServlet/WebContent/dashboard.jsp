@@ -12,7 +12,7 @@
 <%
     if (session.getAttribute("admin") == null) {
     	session.setAttribute("nextAction", "dashboard.jsp");
-    	response.sendRedirect("./adminLogin.jsp");
+    	response.sendRedirect(eu.threecixty.Configuration.get3CixtyRoot() + "/adminLogin.jsp");
     }
 
     if (session.getAttribute("admin") == null) {

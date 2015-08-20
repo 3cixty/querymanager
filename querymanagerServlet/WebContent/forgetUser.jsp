@@ -1,3 +1,4 @@
+<%@page import="eu.threecixty.Configuration" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -7,10 +8,10 @@
 <%
     if (session.getAttribute("admin") == null) {
     	session.setAttribute("nextAction", "forgetUser.jsp");
-    	response.sendRedirect("./adminLogin.jsp");
+    	response.sendRedirect(Configuration.get3CixtyRoot() + "/adminLogin.jsp");
     }
 %>
-<form action="./forgetUserWithKnows" method="post">
+<form action="<%=Configuration.get3CixtyRoot()%>/forgetUserWithKnows" method="post">
 <div>
     <span>3cixty UID</span>
     <input type="text" name="uid">
@@ -28,7 +29,7 @@
 
 </form>
 
-<form action="./logoutAdmin">
+<form action="<%=Configuration.get3CixtyRoot()%>/logoutAdmin">
   <input type=submit value="Logout">
 </form>
 </body>
