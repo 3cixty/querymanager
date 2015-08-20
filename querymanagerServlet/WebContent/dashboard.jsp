@@ -36,13 +36,23 @@
                                dataType:"json",
                                async: false
                                }) .responseText;
+		var jsonDataUsers = $.ajax({
+             			type:"GET",
+             			url: "<%=Configuration.get3CixtyRoot()%>/getRelativeNumberofUsers",
+             			dataType:"json",
+             			async: false
+             			}) .responseText;
 
 		// Create our data table. sample
         //var jsonData='{"cols": [{"label":"date","type":"datetime"},{"label":"AppName","type":"string"},{"label":"Requests","type":"number"}],"rows": [{"c":[{"v":"Date(2014,9,30)"},{"v":"test"},{"v":1}]}, {"c":[{"v":"Date(2014,9,31)"},{"v":"test"},{"v":3}]}]}'
 
         var myObject = eval('(' + jsonData + ')');
 
+	var myObject2 = eval('(' + jsonDataUsers + ')');
+        
         var data = new google.visualization.DataTable(myObject);
+
+	var data2 = new google.visualization.DataTable(myObject2);
 
 		var grouped_data = google.visualization.data.group(data, [ 1 ], [ {
 			'column' : 2,
@@ -138,6 +148,18 @@
 				}
 			}
 		});
+
+		var completeTableUser = new google.visualization.ChartWrapper({
+            		'chartType' : 'Table',
+        		'containerId' : 'completeTableUser_div',
+            		'dataTable' : data2,
+            		'options' : {
+                		'page' : 'enable'
+        		}
+            	});
+
+
+        	completeTableUser.draw();
 
 		var completeTable = new google.visualization.ChartWrapper({
 			'chartType' : 'Table',
@@ -272,7 +294,7 @@
 				[ completeTable ]);
 		dashboard.bind([ chartRangeFilterControl, appSelectorFilter ],
 				areaChart);
-		dashboard.draw(data);
+		dashboard.draw(data,data2);
 	}
 </script>
 </head>
@@ -288,11 +310,14 @@
 		</p>
 		<table class="columns" width="100%">
 				<tr>
-					<td colspan="4">
+					<td colspan="5">
 						<div id="ColumnChartTotalRequests_div" style="width: 1215px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
+					<td>
+                        			<div id="completeTableUser_div" style="position: relative;"></div>
+                    			</td>
 					<td valign=center><font face="Sans-serif">Total Number
 							of Calls made by an App</font>
 						<div id="pieChart_div" style="position: relative;"></div></td>
@@ -307,19 +332,19 @@
 					</td>
 				</tr>
 				<tr>
-					<td colspan="4">
+					<td colspan="5">
 						<div id="areaChart_div"
 							style="width: 1215px; height: 300px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="4">
+					<td colspan="5">
 						<div id="chartRangeFilterControl_div"
 							style="width: 1215px; height: 50px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="4">
+					<td colspan="5">
 						<div id="appSelector_div" style="display: none"></div>
 					</td>
 				</tr>
