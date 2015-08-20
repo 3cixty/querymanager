@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<form action="<%=Configuration.get3CixtyRoot()%>forgetUserWithKnows" method="post">
+<form action="<%=Configuration.get3CixtyRoot()%>/loginAdmin" method="post">
 
 <div>
     Username
