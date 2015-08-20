@@ -88,7 +88,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		
 		SQLQuery query = session.createSQLQuery(sql);
-		query.setTimestamp(0, new Timestamp(from);
+		query.setTimestamp(0, new Timestamp(from));
 		
 		List <Object[]> list = query.list();
 		
@@ -107,6 +107,29 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		return loggings;
 	}
 
+	public List<RelativeNumberOfUsers> getRelativeNumberofUsers(){
+		List <RelativeNumberOfUsers> relativeNumberOfUsers = new ArrayList<RelativeNumberOfUsers>();
+		
+		String sql = "SELECT 3cixty_account.source, count(3cixty_account.source) AS count FROM 3cixty.3cixty_account group by 3cixty_account.source;";
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		
+		List <Object[]> list = query.list();
+		
+		session.close();
+		
+		for (Object[] row: list) {
+			RelativeNumberOfUsers relativeNumberOfUser = new RelativeNumberOfUsers();
+			relativeNumberOfUser.setPlatform((String) row[0]);
+			relativeNumberOfUser.setNumberOfUsers(((java.math.BigInteger) row[1]).intValue());
+			relativeNumberOfUsers.add(relativeNumberOfUser);
+		}
+		
+		return relativeNumberOfUsers;
+	}
+	
 	@Override
 	public boolean save(List<CallLogging> loggings) {
 		if (DEBUG_MOD) LOGGER.info("Before logging call to DB");
