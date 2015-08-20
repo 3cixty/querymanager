@@ -4,11 +4,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>App Key Login</title>
+<title>Admin login page</title>
 </head>
 <body>
 
-<form action="./loginAdmin" method="post">
+<form action="./" method="post">
 
 <div>
     Username
@@ -26,7 +26,7 @@
 <div>
     <input type="submit" name="submit" value="Login">
 </div>
-
+<input type="hidden" name="nextAction" value="<%=session.getAttribute("nextAction") == null ? "" : session.getAttribute("nextAction") %>">
 </form>
 </body>
 </html>

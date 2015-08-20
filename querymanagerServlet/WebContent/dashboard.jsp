@@ -9,8 +9,12 @@
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
 <%
+    if (session.getAttribute("admin") == null) {
+    	session.setAttribute("nextAction", "dashboard.jsp");
+    	response.sendRedirect("./adminLogin.jsp");
+    }
+
     if (session.getAttribute("admin") == null) {
     	response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
     } else {
