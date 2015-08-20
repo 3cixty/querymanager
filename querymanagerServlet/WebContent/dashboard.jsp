@@ -152,6 +152,9 @@
 			'containerId' : 'ColumnChartTotalRequests_div',
 			'dataTable' : grouped_data,
 			'options' : {
+				'chartArea' : {
+					'width' : 1000
+				},
 				'hAxis' : {
 					'title' : 'App Name'
 				},
@@ -200,13 +203,13 @@
 				},
 				'hAxis' : {
 					'slantedText' : false,
-					'direction' : -1
+					'direction' : 1
 				//'title':'Date'
 				},
 				'vAxis' : {
 					'viewWindow' : {
 						'min' : 0,
-						'max' : 20
+						'max' : 10000
 					},
 					'title' : 'Requests'
 				},
@@ -283,11 +286,10 @@
 	<div id="dashboard_div"
 		style="border: 1px solid rgb(204, 204, 204); margin-top: 1em; position: relative;"padding-left: 1em">
 		</p>
-		<table class="columns">
-			<tbody>
+		<table class="columns" width="100%">
 				<tr>
 					<td colspan="4">
-						<div id="ColumnChartTotalRequests_div" style="position: relative;"></div>
+						<div id="ColumnChartTotalRequests_div" style="width: 1215px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
@@ -307,13 +309,13 @@
 				<tr>
 					<td colspan="4">
 						<div id="areaChart_div"
-							style="width: 915px; height: 300px; position: relative;"></div>
+							style="width: 1215px; height: 300px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="4">
 						<div id="chartRangeFilterControl_div"
-							style="width: 915px; height: 50px; position: relative;"></div>
+							style="width: 1215px; height: 50px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
@@ -321,7 +323,6 @@
 						<div id="appSelector_div" style="display: none"></div>
 					</td>
 				</tr>
-			</tbody>
 		</table>
 	</div>
 	
