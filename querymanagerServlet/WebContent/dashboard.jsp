@@ -13,10 +13,6 @@
     if (session.getAttribute("admin") == null) {
     	session.setAttribute("nextAction", "dashboard.jsp");
     	response.sendRedirect(eu.threecixty.Configuration.get3CixtyRoot() + "/adminLogin.jsp");
-    }
-
-    if (session.getAttribute("admin") == null) {
-    	response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
     } else {
 %>
 

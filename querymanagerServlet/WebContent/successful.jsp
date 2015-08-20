@@ -10,7 +10,7 @@
 <%
     if (session.getAttribute("admin") == null) {
     	response.sendRedirect(Configuration.get3CixtyRoot() + "/adminLogin.jsp");
-    }
+    } else {
 %>
 <div><%=session.getAttribute("successful") %></div>
 <div>
@@ -25,3 +25,7 @@
 
 </div>
 </body>
+<% 
+    }
+%>
+</html>

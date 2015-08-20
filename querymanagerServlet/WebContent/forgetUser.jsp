@@ -9,7 +9,7 @@
     if (session.getAttribute("admin") == null) {
     	session.setAttribute("nextAction", "forgetUser.jsp");
     	response.sendRedirect(Configuration.get3CixtyRoot() + "/adminLogin.jsp");
-    }
+    } else {
 %>
 <form action="<%=Configuration.get3CixtyRoot()%>/forgetUserWithKnows" method="post">
 <div>
@@ -33,3 +33,6 @@
   <input type=submit value="Logout">
 </form>
 </body>
+<%
+    }
+%>
