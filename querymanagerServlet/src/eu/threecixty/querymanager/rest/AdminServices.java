@@ -24,6 +24,7 @@ import eu.threecixty.querymanager.AdminValidator;
 public class AdminServices {
 
 	 public static final String RESULT_ATTR = "result";
+	 public static final String UID_ERROR = "Error: UID must be set";
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 AdminServices.class.getName());
@@ -44,7 +45,7 @@ public class AdminServices {
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
-				session.setAttribute(RESULT_ATTR, "Error: uid should be set"); 
+				session.setAttribute(RESULT_ATTR, UID_ERROR); 
 				try {
 					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
@@ -80,7 +81,7 @@ public class AdminServices {
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
-				session.setAttribute(RESULT_ATTR, "Error: uid should be set"); 
+				session.setAttribute(RESULT_ATTR, UID_ERROR); 
 				try {
 					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
@@ -120,7 +121,7 @@ public class AdminServices {
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
-				session.setAttribute(RESULT_ATTR, "Error: uid should be set"); 
+				session.setAttribute(RESULT_ATTR, UID_ERROR); 
 				try {
 					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
