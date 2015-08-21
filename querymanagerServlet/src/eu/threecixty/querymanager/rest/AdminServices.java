@@ -41,6 +41,14 @@ public class AdminServices {
 		if (DEBUG_MOD) LOGGER.info("Enter into forgetUser API");
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") == Boolean.TRUE) {
+			if (uid == null || uid.equals("")) {
+				session.setAttribute("successful", "Error: uid should be set"); 
+				try {
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.setPreventUserFromCrawling(uid);
 			if (ok) {
@@ -69,6 +77,15 @@ public class AdminServices {
 		if (DEBUG_MOD) LOGGER.info("Enter into forgetKnowFromUser API");
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") == Boolean.TRUE) {
+			if (uid == null || uid.equals("")) {
+				session.setAttribute("successful", "Error: uid should be set"); 
+				try {
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(uid, know);
 			if (ok) {
@@ -100,6 +117,14 @@ public class AdminServices {
 		if (DEBUG_MOD) LOGGER.info("Enter into forgetUserWithKnows API");
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") == Boolean.TRUE) {
+			if (uid == null || uid.equals("")) {
+				session.setAttribute("successful", "Error: uid should be set"); 
+				try {
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
 			Set <String> set = new HashSet <String>();
 			String [] arrs = knows.split(",");
 			for (int i = 0; i < arrs.length; i++) {
