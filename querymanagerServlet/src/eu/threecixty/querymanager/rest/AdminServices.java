@@ -142,7 +142,7 @@ public class AdminServices {
 			if (admin.validate(username, password, realPath)) {
 				HttpSession session = httpRequest.getSession();
 				session.setAttribute("admin", true);
-				return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + nextAction)).build();
+				return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/" + nextAction)).build();
 			} else {
 				return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/errorLogin.jsp")).build();
 			}
