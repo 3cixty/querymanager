@@ -8,8 +8,7 @@
 .div-table{
   display:table;         
   width:auto;         
-  background-color:#eee;         
-  border:1px solid  #666666;         
+  background-color:#eee;      
   border-spacing:5px;/*cellspacing:poor IE support for  this*/
 }
 .div-table-row{
@@ -20,7 +19,7 @@
 .div-table-col{
   float:left;/*fix for  buggy browsers*/
   display:table-column;         
-  width:200px;         
+  width:auto;         
   background-color:#ccc;  
 }
 </style>
@@ -31,7 +30,7 @@
     	response.sendRedirect(Configuration.get3CixtyRoot() + "/adminLogin.jsp");
     } else {
 %>
-<form action="<%=Configuration.get3CixtyRoot()%>/forgetUserWithKnows" method="post">
+<form id="formToForget" action="<%=Configuration.get3CixtyRoot()%>/forgetUserWithKnows" method="post">
 <div class="div-table">
 <div class="div-table-row">
     <div class="div-table-col">3cixty UID</div>
@@ -50,13 +49,28 @@
     <span>Note that if there are more than one know, each know must be separated by a comma. If you want to forget a 3cixty user, please do not fill in the know</span>
 </div>
 
-<input type=submit value="Forget">
-
 </form>
 
-<form action="<%=Configuration.get3CixtyRoot()%>/logoutAdmin">
-  <input type=submit value="Logout">
-</form>
+<div class="div-table">
+  <div class="div-table-row">
+    <div class="div-table-col"><input type=button value="Forget" onlick="formToForgetSubmit();"></div>
+    <div class="div-table-col">
+    
+      <form action="<%=Configuration.get3CixtyRoot()%>/logoutAdmin">
+        <input type=submit value="Logout">
+      </form>
+    
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    function formToForgetSubmit() {
+    	var form = document.getElementById("formToForget");
+    	form.submit();
+    }
+</script>
+
 </body>
 <%
     }
