@@ -114,6 +114,10 @@ public class CallLoggingManager {
 		return storage.getCallsWithCount(from, to, minTimeConsumed, maxTimeConsumed);
 	}
 
+	public List<RelativeNumberOfUsers> getRelativeNumberofUsers(){
+		return storage.getRelativeNumberofUsers();
+	}
+	
 	private CallLoggingManager() {
 		storage = new CallLoggingStorageImpl();
 		callLoggings = new ConcurrentLinkedQueue<CallLogging>();

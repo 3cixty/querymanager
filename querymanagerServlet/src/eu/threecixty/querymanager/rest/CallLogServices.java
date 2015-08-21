@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 
 import eu.threecixty.logs.CallLoggingDisplay;
 import eu.threecixty.logs.CallLoggingManager;
+import eu.threecixty.logs.RelativeNumberOfUsers;
 
 /**
  * The class is an end point for Administer APIs calls.
@@ -48,6 +49,26 @@ public class CallLogServices  {
 			        .build());
 		}
 	}
+	
+	/**
+	 * Counts the number of calls.
+	 * @return
+	 */
+	@GET
+	@Path("/getRelativeNumberofUsers")
+	public Response getRelativeNumberofUsers() {
+        HttpSession session = httpRequest.getSession();
+		Boolean admin = (Boolean) session.getAttribute("admin");
+		if (admin) {
+			String ret = executeQueryUsersNumber();			
+			return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			        .entity("Do not have enough permissions.")
+			        .type(MediaType.TEXT_PLAIN)
+			        .build());
+		}
+	}
 
     
 	/**
@@ -55,8 +76,8 @@ public class CallLogServices  {
 	 * @return string
 	 **/ 
 	private String executeQuery() {
-
-		Collection <CallLoggingDisplay> collectionslog = CallLoggingManager.getInstance().getCallsWithCount();
+		long from = 1430438400000L;
+		Collection <CallLoggingDisplay> collectionslog = CallLoggingManager.getInstance().getCallsWithCount(from,System.currentTimeMillis());
     	Iterator <CallLoggingDisplay> callLoggingDisplays = collectionslog.iterator();
     	String jsonString="{"
     			+ "\"cols\": ["
@@ -74,6 +95,38 @@ public class CallLogServices  {
         	jsonString+="{\"c\":[{\"v\":\"Date("+callLoggingDisplay.getDateCall()+")\"},"
         					+ "{\"v\":\""+callLoggingDisplay.getCallLogging().getKey()+"\"},"
         					+ "{\"v\":"+callLoggingDisplay.getNumberOfCalls()+"}]"
+				      + "}";
+        	if (index<len){
+        		jsonString+=", ";
+        	}
+        }
+        jsonString+= "]"
+        		+ "}";
+        return jsonString;
+	}
+	/**
+	 * execute query
+	 * @return string
+	 **/ 
+	private String executeQueryUsersNumber() {
+		
+		Collection <RelativeNumberOfUsers> collectionslog = CallLoggingManager.getInstance().getRelativeNumberofUsers();
+    	Iterator <RelativeNumberOfUsers> relativeNumberOfUsers = collectionslog.iterator();
+    	String jsonString="{"
+    			+ "\"cols\": ["
+    					+ "{\"label\":\"Patform\",\"type\":\"string\"},"
+    					+ "{\"label\":\"Users\",\"type\":\"number\"}"
+    				+ "],"
+    			+ "\"rows\": [";
+    			
+        int len = collectionslog.size();
+        int index=0;
+        for ( ; relativeNumberOfUsers.hasNext(); ) {
+        	RelativeNumberOfUsers relativeNumberOfUser = relativeNumberOfUsers.next();
+        	index++;
+        	jsonString+="{\"c\":["
+        					+ "{\"v\":\""+relativeNumberOfUser.getPlatform()+"\"},"
+        					+ "{\"v\":"+relativeNumberOfUser.getNumberOfUsers()+"}]"
 				      + "}";
         	if (index<len){
         		jsonString+=", ";
