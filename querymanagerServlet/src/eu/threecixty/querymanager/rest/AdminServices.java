@@ -23,6 +23,8 @@ import eu.threecixty.querymanager.AdminValidator;
 @Path("/" + Constants.PREFIX_NAME)
 public class AdminServices {
 
+	 public static final String RESULT_ATTR = "result";
+	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 AdminServices.class.getName());
 
@@ -42,9 +44,9 @@ public class AdminServices {
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
-				session.setAttribute("successful", "Error: uid should be set"); 
+				session.setAttribute(RESULT_ATTR, "Error: uid should be set"); 
 				try {
-					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
@@ -52,9 +54,9 @@ public class AdminServices {
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.setPreventUserFromCrawling(uid);
 			if (ok) {
-				session.setAttribute("successful", "successful!!!"); 
+				session.setAttribute(RESULT_ATTR, "successful!!!"); 
 				try {
-					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
@@ -78,9 +80,9 @@ public class AdminServices {
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
-				session.setAttribute("successful", "Error: uid should be set"); 
+				session.setAttribute(RESULT_ATTR, "Error: uid should be set"); 
 				try {
-					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
@@ -89,9 +91,9 @@ public class AdminServices {
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(uid, know);
 			if (ok) {
-				session.setAttribute("successful", "successful!!!"); 
+				session.setAttribute(RESULT_ATTR, "successful!!!"); 
 				try {
-					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
@@ -118,9 +120,9 @@ public class AdminServices {
 		HttpSession session = httpRequest.getSession();
 		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
-				session.setAttribute("successful", "Error: uid should be set"); 
+				session.setAttribute(RESULT_ATTR, "Error: uid should be set"); 
 				try {
-					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
@@ -133,9 +135,9 @@ public class AdminServices {
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(uid, set);
 			if (ok) {
-				session.setAttribute("successful", "successful!!!"); 
+				session.setAttribute(RESULT_ATTR, "successful!!!"); 
 				try {
-					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/successful.jsp")).build();
+					return Response.temporaryRedirect(new URI(Configuration.get3CixtyRoot() + "/result.jsp")).build();
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}

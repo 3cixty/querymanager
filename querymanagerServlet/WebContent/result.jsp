@@ -1,4 +1,5 @@
 <%@page import="eu.threecixty.Configuration" %>
+<%@page import="eu.threecixty.querymanager.rest.AdminServices" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -12,7 +13,7 @@
     	response.sendRedirect(Configuration.get3CixtyRoot() + "/adminLogin.jsp");
     } else {
 %>
-<div><%=session.getAttribute("successful") %></div>
+<div><%=session.getAttribute(AdminServices.RESULT_ATTR) %></div>
 <div>
 
 <a href="./<%=session.getAttribute("nextAction")%>">Continue</a>
