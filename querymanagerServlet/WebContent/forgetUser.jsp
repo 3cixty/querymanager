@@ -53,7 +53,7 @@
 
 <div class="div-table">
   <div class="div-table-row">
-    <div class="div-table-col"><input type=button value="Forget" onlick="formToForgetSubmit();"></div>
+    <div class="div-table-col"><input type=button value="Forget" onClick="formToForgetSubmit();"></div>
     <div class="div-table-col">
     
       <form action="<%=Configuration.get3CixtyRoot()%>/logoutAdmin">
