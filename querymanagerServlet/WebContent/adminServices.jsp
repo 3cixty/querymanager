@@ -7,7 +7,7 @@
 </head>
 <body>
 <div>
-    <a href="<%=Configuration.get3CixtyRoot()%>/forgetUser.jsp">Admin corner</a>
+    <a href="<%=Configuration.get3CixtyRoot()%>/forgetUser.jsp">Forgotten User</a>
 </div>
 <div>
     <a href="<%=Configuration.get3CixtyRoot()%>/dashboard.jsp">Application calls report</a>
