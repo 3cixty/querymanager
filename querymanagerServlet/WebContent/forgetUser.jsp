@@ -19,7 +19,7 @@
 .div-table-col{
   float:left;/*fix for  buggy browsers*/
   display:table-column;         
-  width:auto;         
+  width:200px;         
   background-color:#ccc;  
 }
 </style>
