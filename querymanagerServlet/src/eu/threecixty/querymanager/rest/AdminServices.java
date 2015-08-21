@@ -40,7 +40,7 @@ public class AdminServices {
 	public Response forgetUser(@FormParam("uid") String uid) {
 		if (DEBUG_MOD) LOGGER.info("Enter into forgetUser API");
 		HttpSession session = httpRequest.getSession();
-		if (session.getAttribute("admin") == Boolean.TRUE) {
+		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
 				session.setAttribute("successful", "Error: uid should be set"); 
 				try {
@@ -76,7 +76,7 @@ public class AdminServices {
 			@FormParam("know") String know) {
 		if (DEBUG_MOD) LOGGER.info("Enter into forgetKnowFromUser API");
 		HttpSession session = httpRequest.getSession();
-		if (session.getAttribute("admin") == Boolean.TRUE) {
+		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
 				session.setAttribute("successful", "Error: uid should be set"); 
 				try {
@@ -116,7 +116,7 @@ public class AdminServices {
 		if (!knows.contains(",")) return forgetKnowFromUser(uid, knows); // one know
 		if (DEBUG_MOD) LOGGER.info("Enter into forgetUserWithKnows API");
 		HttpSession session = httpRequest.getSession();
-		if (session.getAttribute("admin") == Boolean.TRUE) {
+		if (session.getAttribute("admin") != null) {
 			if (uid == null || uid.equals("")) {
 				session.setAttribute("successful", "Error: uid should be set"); 
 				try {

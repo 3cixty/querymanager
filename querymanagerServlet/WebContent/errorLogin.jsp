@@ -12,7 +12,7 @@
 Either Username or password is wrong.
 </font>
 </p>
-<form action="./appkeyadmin_login.jsp" method="post">
+<form action="./adminLogin.jsp" method="post">
 <div>
 <input type="submit" name="goback" value="Go Back">
 </div>
