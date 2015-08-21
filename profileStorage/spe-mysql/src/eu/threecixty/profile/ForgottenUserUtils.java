@@ -187,7 +187,8 @@ public class ForgottenUserUtils {
 		}
 	}
 	
-	private static List<String> getSqlsToRemoveAllUSerProfile(String uid) {
+	private static List<String> getSqlsToRemoveAllUSerProfile(String uid) throws HibernateException {
+		if (!uid.matches("[0-9]+")) throw new HibernateException("UID must only contain digits");
 		List <String> list = new LinkedList <String>();
 		list.add("DELETE FROM 3cixty_user_profile_knows WHERE 3cixty_user_profile_id IN (SELECT id FROM 3cixty_user_profile WHERE uid LIKE '" + uid + "');");
 		list.add("DELETE FROM 3cixty_user_accessToken WHERE uid like '" + uid + "';");
