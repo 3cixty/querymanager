@@ -22,6 +22,13 @@
   width:200px;         
   background-color:#ccc;  
 }
+
+.div-table-col1{
+  float:left;/*fix for  buggy browsers*/
+  display:table-column;         
+  width:auto;         
+  background-color:#ccc;  
+}
 </style>
 </head>
 <%
@@ -34,13 +41,13 @@
 <div class="div-table">
 <div class="div-table-row">
     <div class="div-table-col">3cixty UID</div>
-    <div class="div-table-col">
+    <div class="div-table-col1">
     	<input type="text" name="uid">
     </div>
 </div>
 <div class="div-table-row">
     <div class="div-table-col">Know(s)</div>
-    <div class="div-table-col">
+    <div class="div-table-col1">
     	<input type="text" name="uid">
     </div>
 </div>
@@ -53,8 +60,8 @@
 
 <div class="div-table">
   <div class="div-table-row">
-    <div class="div-table-col"><input type=button value="Forget" onClick="formToForgetSubmit();"></div>
-    <div class="div-table-col">
+    <div class="div-table-col1"><input type=button value="Forget" onClick="formToForgetSubmit();"></div>
+    <div class="div-table-col1">
     
       <form action="<%=Configuration.get3CixtyRoot()%>/logoutAdmin">
         <input type=submit value="Logout">
