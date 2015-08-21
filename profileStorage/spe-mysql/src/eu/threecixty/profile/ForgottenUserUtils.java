@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -38,6 +39,7 @@ public class ForgottenUserUtils {
 			
 			session.beginTransaction();
 			session.save(forgottenUser);
+			if (forgottenUser.isNeedToAvoidBeingCrawled()) removeAllUserProfile(session, forgottenUser.getUid());
 			session.getTransaction().commit();
 			ok = true;
 		} catch (HibernateException e) {
@@ -63,6 +65,7 @@ public class ForgottenUserUtils {
 			
 			session.beginTransaction();
 			session.update(forgottenUser);
+			if (forgottenUser.isNeedToAvoidBeingCrawled()) removeAllUserProfile(session, forgottenUser.getUid());
 			session.getTransaction().commit();
 			ok = true;
 		} catch (HibernateException e) {
@@ -155,6 +158,50 @@ public class ForgottenUserUtils {
 		return forgottenUser;
 	}
 	
+//	public static boolean deleteProfile(String uid) {
+//		if (uid == null) return false;
+//		Session session = null;
+//		boolean ok = false;
+//		try {
+//			session = HibernateUtil.getSessionFactory().openSession();
+//			
+//			session.beginTransaction();
+//			
+//			removeAllUserProfile(session, uid);
+//			session.getTransaction().commit();
+//			ok = true;
+//		} catch (HibernateException e) {
+//			LOGGER.error(e.getMessage());
+//			session.getTransaction().rollback();
+//		} finally {
+//			if (session != null) session.close();
+//		}
+//		return ok;
+//	}
+	
+	private static void removeAllUserProfile(Session session, String uid)
+			throws HibernateException {
+		List <String> sqls = getSqlsToRemoveAllUSerProfile(uid);
+		for (String sql: sqls) {
+			session.createSQLQuery(sql).executeUpdate();
+		}
+	}
+	
+	private static List<String> getSqlsToRemoveAllUSerProfile(String uid) {
+		List <String> list = new LinkedList <String>();
+		list.add("DELETE FROM 3cixty_user_profile_knows WHERE 3cixty_user_profile_id IN (SELECT id FROM 3cixty_user_profile WHERE uid LIKE '" + uid + "');");
+		list.add("DELETE FROM 3cixty_user_accessToken WHERE uid like '" + uid + "';");
+		list.add("DELETE FROM 3cixty_tray WHERE uid like '" + uid + "';");
+		list.add("DELETE FROM 3cixty_partner_account WHERE partner_user_id in (SELECT id FROM 3cixty_partner_user WHERE uid LIKE '" + uid + "');");
+		list.add("DELETE FROM 3cixty_address WHERE 3cixty_user_id IN (SELECT id FROM 3cixty_user_profile WHERE uid LIKE '" + uid + "');");
+		list.add("DELETE FROM 3cixty_account WHERE 3cixty_user_id IN (SELECT id FROM 3cixty_user_profile WHERE uid LIKE '" + uid + "');");
+		list.add("DELETE FROM 3cixty_accompanying WHERE 3cixty_user_id IN (SELECT id FROM 3cixty_user_profile WHERE uid LIKE '" + uid + "');");
+		list.add("DELETE FROM 3cixty_partner_user WHERE uid LIKE '" + uid + "';");
+		list.add("DELETE FROM 3cixty_user WHERE uid LIKE '" + uid + "';");
+		list.add("DELETE FROM 3cixty_user_profile WHERE uid LIKE '" + uid + "';");
+		return list;
+	}
+
 	private ForgottenUserUtils() {
 	}
 }
