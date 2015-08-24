@@ -27,7 +27,7 @@
 <div>
     <input type="submit" name="submit" value="Login">
 </div>
-<input type="hidden" name="nextAction" value="<%=session.getAttribute("nextAction") == null ? "" : session.getAttribute("nextAction") %>">
+<input type="hidden" name="nextAction" value="<%=session.getAttribute("nextAction") == null ? "dashboard.jsp" : session.getAttribute("nextAction") %>">
 </form>
 </body>
 </html>
