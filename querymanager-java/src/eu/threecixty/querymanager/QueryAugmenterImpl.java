@@ -121,7 +121,6 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 			ElementBind elementBind = createElementBind(placeIds, socialScores);
 			augmentQuery(query, expr, elementBind, coef);
 			query.setPrefixMapping(null); // remove all prefixes
-			query.setQueryPattern(elementBind);
 			return query.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,8 +157,8 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 					augmentQuery(esq.getQuery(), expr, elementBind, coef);
 				}
 			}
+			eg.addElement(elementBind);
 		}
-		
 	}
 	
 	private ElementBind createElementBind(List<String> placeIds,
