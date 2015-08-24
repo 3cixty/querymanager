@@ -316,6 +316,12 @@ public interface ProfileManager {
 	List <Friend> findAllFriends(String my3cixtyUID);
 	
 	/**
+	 * Gets interface to manage forgotten users.
+	 * @return
+	 */
+	ForgottenUserManager getForgottenUserManager();
+	
+	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.
 	 * @param attributes
 	 * @param attrChecked

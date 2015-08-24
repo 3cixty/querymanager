@@ -57,6 +57,7 @@ public class FaceBookAccountUtils {
 			} else {
 				_3cixtyUID = profile.getHasUID();
 			}
+			ProfileManagerImpl.getInstance().getForgottenUserManager().remove(_3cixtyUID); // remove from forgotten user table
 			boolean generalInfoModified = Utils.checkNameAndProfileImageModified(profile, firstName, lastName, picture);
 			if (generalInfoModified) {
 				if (picture != null) profile.setProfileImage(picture);

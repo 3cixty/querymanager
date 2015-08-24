@@ -323,4 +323,10 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (profileManager != null) return profileManager.findAllFriends(my3cixtyUID);
 		return null;
 	}
+
+	@Override
+	public ForgottenUserManager getForgottenUserManager() {
+		if (profileManager != null) return profileManager.getForgottenUserManager();
+		return null;
+	}
 }

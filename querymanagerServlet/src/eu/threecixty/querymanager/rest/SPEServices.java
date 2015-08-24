@@ -12,7 +12,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -178,7 +177,6 @@ public class SPEServices {
 		}
 		return Response.serverError().build();
 	}
-	
 	
 //	@POST
 //	@Path("/getAllProfiles")
@@ -349,8 +347,8 @@ public class SPEServices {
 	 * @return If successful, the message <code>{"save": "true"}</code> will be returned. Otherwise,
 	 *         the message <code>{"save": "false"}</code> will be returned.
 	 */
-	@POST
-	@Path("/saveProfile")
+//	@POST
+//	@Path("/saveProfile")
 	public Response saveProfile(@HeaderParam("access_token") String access_token, @FormParam("profile") String profileStr) {
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		try {

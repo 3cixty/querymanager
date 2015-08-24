@@ -47,6 +47,19 @@ public class KnowsPersistence implements PersistentObjectForWorker {
 		
 		try {
 			Set<String> knows = Utils.getOrCreate3cixtyUIDsForKnows(fUIDsFromFriends, SPEConstants.FACEBOOK_SOURCE);
+			
+			String [] arrs = knows.toArray(new String[knows.size()]);
+			knows.clear();
+			ForgottenUserManager fum = ProfileManagerImpl.getInstance().getForgottenUserManager();
+			String _3cixtyUID = profile.getHasUID();
+			for (int i = 0; i < arrs.length; i++) {
+				String know = arrs[i];
+				if ((!fum.isCrawlable(_3cixtyUID, know)) || fum.isBlockedByUidOwner(know)) {
+					continue;
+				}
+				knows.add(know);
+			}
+			
 			boolean knowsModified = Utils.checkKnowsModified(profile, knows);
 			if (knowsModified) profile.setKnows(knows);
 			ProfileManagerImpl.getInstance().updateKnows(profile, knows);
@@ -68,6 +81,17 @@ public class KnowsPersistence implements PersistentObjectForWorker {
 			if (DEBUG_MOD) LOGGER.info("Time to get info + friends list from Google server: " + (time2 - time1) + " ms");
 
 			Set<String> knows = Utils.getOrCreate3cixtyUIDsForKnows(googleUidsOfFriends, SPEConstants.GOOGLE_SOURCE);
+			String [] arrs = knows.toArray(new String[knows.size()]);
+			knows.clear();
+			ForgottenUserManager fum = ProfileManagerImpl.getInstance().getForgottenUserManager();
+			String _3cixtyUID = profile.getHasUID();
+			for (int i = 0; i < arrs.length; i++) {
+				String know = arrs[i];
+				if ((!fum.isCrawlable(_3cixtyUID, know)) || fum.isBlockedByUidOwner(know)) {
+					continue;
+				}
+				knows.add(know);
+			}
 			
 			// hack for Tony
 			if (user_id.contains("117895882057702509461")) {

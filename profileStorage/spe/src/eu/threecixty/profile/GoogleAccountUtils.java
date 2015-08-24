@@ -97,6 +97,7 @@ public class GoogleAccountUtils {
 			} else {
 				_3cixtyUID = profile.getHasUID();
 			}
+			ProfileManagerImpl.getInstance().getForgottenUserManager().remove(_3cixtyUID); // remove from forgotten user table
 			boolean generalInfoModified = Utils.checkNameAndProfileImageModified(profile, givenName, familyName, picture);
 			if (generalInfoModified) {
 				profile.setProfileImage(picture);

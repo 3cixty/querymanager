@@ -93,7 +93,7 @@ public class MobidotUserUtils {
 				 sb.append(new String(b, 0, readBytes, "UTF-8"));
 			 }
 			input.close();
-			return sb.toString();
+			return sb.toString().trim();
 		} catch (IOException e) {
 			e.printStackTrace();
 			if (input != null)
