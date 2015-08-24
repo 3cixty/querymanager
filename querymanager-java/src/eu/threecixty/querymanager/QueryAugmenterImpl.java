@@ -117,6 +117,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 				: allPrefixes + " " + Configuration.PREFIXES + " " + original;
 		try {
 			Query query = QueryFactory.create(queryWithPrefixes);
+			if (query.hasAggregators()) return original;
 			Expr expr = createExpr(placeIds);
 			ElementBind elementBind = createElementBind(placeIds, socialScores);
 			augmentQuery(query, expr, elementBind, coef);
