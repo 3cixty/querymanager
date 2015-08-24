@@ -159,6 +159,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 				}
 			}
 			eg.addElement(elementBind);
+			query.addResultVar(SOCIAL_SCORE_VAR_NAME);
 		}
 	}
 	
