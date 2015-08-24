@@ -48,7 +48,7 @@
 <div class="div-table-row">
     <div class="div-table-col">Know(s)</div>
     <div class="div-table-col1">
-    	<input type="text" name="uid">
+    	<input type="text" name="knows">
     </div>
 </div>
 </div>
