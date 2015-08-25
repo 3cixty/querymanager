@@ -455,7 +455,6 @@ public class UserUtils {
 			UserModel userModel, Session session) throws HibernateException {
 		convertNameForPersistence(userProfile, userModel);
 		convertAddressForPersistence(userProfile, userModel, session);
-		userModel.setGender(userProfile.getHasGender());
 		userModel.setProfileImage(userProfile.getProfileImage());
 		if (!isNullOrEmpty(userProfile.getHasLastCrawlTime())) {
 			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
@@ -610,8 +609,6 @@ public class UserUtils {
 		
 		convertName(userModel, userProfile);
 		convertAddress(userModel, userProfile);
-		
-		if (!isNullOrEmpty(userModel.getGender())) userProfile.setHasGender(userModel.getGender());
 		
 		if (!isNullOrEmpty(userModel.getProfileImage()))
 			userProfile.setProfileImage(userModel.getProfileImage());
