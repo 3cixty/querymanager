@@ -57,7 +57,7 @@ public class QueryAugmentationUtils {
 					Query augmentedQuery = queries.get(0);
 					Query originalQuery = queries.get(1);
 					if (originalQuery.hasLimit()) {
-						return executeQueries(augmentedQuery, originalQuery, httpMethod);
+						return executeQueries(augmentedQuery, originalQuery, httpMethod, coef);
 					}
 				}
 			}
@@ -73,7 +73,7 @@ public class QueryAugmentationUtils {
 	
 	
 	private static String executeQueries(Query augmentedQuery,
-			Query originalQuery, String httpMethod) throws IOException {
+			Query originalQuery, String httpMethod, double coef) throws IOException {
 		int limit = (int) originalQuery.getLimit();
 		StringBuilder sbForAug = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery.toString(), FORMAT, httpMethod, sbForAug);
@@ -90,7 +90,7 @@ public class QueryAugmentationUtils {
 		// new JSON array contains final list of bindings which are in order of editorial + coef * socialScore
 		JSONArray newJsonArr = new JSONArray();
 		
-		findFirstNItems(limit, jsonArrsAug, jsonArrsOri, newJsonArr);
+		findFirstNItems(limit, jsonArrsAug, jsonArrsOri, coef, newJsonArr);
 		
 		rootJsonAug.getJSONObject("results").remove("bindings");
 		rootJsonAug.getJSONObject("results").put("bindings", newJsonArr);
@@ -99,7 +99,7 @@ public class QueryAugmentationUtils {
 
 
 	private static void findFirstNItems(int n, JSONArray jsonArrsAug,
-			JSONArray jsonArrsOri, JSONArray jsonArrResult) {
+			JSONArray jsonArrsOri, double coef, JSONArray jsonArrResult) {
 		int index1 = 0;
 		int index2 = 0;
 		int len1 = jsonArrsAug.length();
@@ -115,8 +115,8 @@ public class QueryAugmentationUtils {
 				jsonArrResult.put(i, json1);
 				index1++;
 			} else { // both are not null
-				double d1 = getTotalScore(json1);
-				double d2 = getTotalScore(json2);
+				double d1 = getTotalScore(json1, coef);
+				double d2 = getTotalScore(json2, coef);
 				if (d1 >= d2) {
 					jsonArrResult.put(i, json1);
 					index1++;
@@ -129,12 +129,12 @@ public class QueryAugmentationUtils {
 	}
 
 
-	private static double getTotalScore(JSONObject json) {
+	private static double getTotalScore(JSONObject json, double coef) {
 		JSONObject scoreObj = json.getJSONObject("score");
 		double val1 = scoreObj.getDouble("value");
 		JSONObject socialScoreObj = json.getJSONObject("socialScore");
 		double val2 = socialScoreObj.getDouble("value");
-		return val1 + val2;
+		return val1 + coef * val2;
 	}
 
 
