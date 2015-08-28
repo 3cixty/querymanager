@@ -16,6 +16,7 @@ import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementBind;
+import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
 import com.hp.hpl.jena.sparql.util.ExprUtils;
@@ -221,7 +222,9 @@ public class QueryAugmentationUtils {
 			query.addOrderBy(newExpr, DESC);
 		} else if (query.getOrderBy() == null || query.getOrderBy().size() == 0) {
 			if (expr != null) {
-			    query.addOrderBy(expr, 0);
+			    //query.addOrderBy(expr, 0);
+				ElementFilter ef = new ElementFilter(expr);
+				((ElementGroup) query.getQueryPattern()).addElementFilter(ef);
 			}
 		}
 		
