@@ -74,6 +74,8 @@ public class QueryAugmentationUtils {
 	
 	private static String executeQueries(Query augmentedQuery,
 			Query originalQuery, String httpMethod, double coef) throws IOException {
+		if (DEBUG_MOD) LOGGER.info("query 1: " + augmentedQuery.toString());
+		if (DEBUG_MOD) LOGGER.info("query 2: " + originalQuery.toString());
 		int limit = (int) originalQuery.getLimit();
 		StringBuilder sbForAug = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery.toString(), FORMAT, httpMethod, sbForAug);
