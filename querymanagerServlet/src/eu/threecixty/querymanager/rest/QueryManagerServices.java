@@ -42,7 +42,7 @@ import eu.threecixty.profile.elements.ElementDetails;
 import eu.threecixty.profile.elements.ElementDetailsUtils;
 import eu.threecixty.profile.elements.LanguageUtils;
 import eu.threecixty.querymanager.EventMediaFormat;
-import eu.threecixty.querymanager.InvalidSparqlQuery;
+import eu.threecixty.querymanager.QueryAugmentationUtils;
 import eu.threecixty.querymanager.QueryAugmenterFilter;
 import eu.threecixty.querymanager.QueryAugmenterImpl;
 
@@ -711,29 +711,44 @@ public class QueryManagerServices {
 			String httpMethod, double coef) throws IOException {
 
 		if (QueryAugmenterImpl.allPrefixes == null) QueryAugmenterImpl.allPrefixes = getAllPrefixes();
+		if (QueryAugmentationUtils.allPrefixes == null) QueryAugmentationUtils.allPrefixes = getAllPrefixes();
 		
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);
-		StringBuilder sb = new StringBuilder();
+//		StringBuilder sb = new StringBuilder();
+//		String formatType = Constants.JSON.equalsIgnoreCase(format) ? "application/sparql-results+json"
+//				: (Constants.RDF.equals(format) ? "application/rdf+xml" : "application/sparql-results+json");
+//		if (isForEvents) {
+//			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+//		} else {
+//			QueryAugmenterFilter qaf = eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)
+//					? QueryAugmenterFilter.FriendsRating : eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)
+//							? QueryAugmenterFilter.MyRating : null;
+//			try {
+//				String augmentedQuery = new QueryAugmenterImpl().createQueryAugmented(query, qaf, uid, coef);
+//				if (DEBUG_MOD) LOGGER.info(augmentedQuery);
+//				SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, formatType, httpMethod, sb);
+//			} catch (InvalidSparqlQuery e) {
+//				if (DEBUG_MOD) LOGGER.info(e.getMessage());
+//				// try with original query
+//				SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+//			}
+//		}
+//		return sb.toString();
+		
+		
 		String formatType = Constants.JSON.equalsIgnoreCase(format) ? "application/sparql-results+json"
 				: (Constants.RDF.equals(format) ? "application/rdf+xml" : "application/sparql-results+json");
 		if (isForEvents) {
+			StringBuilder sb = new StringBuilder();
 			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+			return sb.toString();
 		} else {
 			QueryAugmenterFilter qaf = eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)
 					? QueryAugmenterFilter.FriendsRating : eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)
 							? QueryAugmenterFilter.MyRating : null;
-			try {
-				String augmentedQuery = new QueryAugmenterImpl().createQueryAugmented(query, qaf, uid, coef);
-				System.out.println(augmentedQuery);
-				SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, formatType, httpMethod, sb);
-			} catch (InvalidSparqlQuery e) {
-				if (DEBUG_MOD) LOGGER.info(e.getMessage());
-				// try with original query
-				SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
-			}
+			return QueryAugmentationUtils.augmentAndExecuteQuery(query, qaf, uid, coef, httpMethod);
 		}
-		return sb.toString();
 	}
 
 	private String createGroupQuery(String group, int offset, int limit,
