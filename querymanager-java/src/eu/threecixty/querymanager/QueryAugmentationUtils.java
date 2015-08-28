@@ -60,6 +60,10 @@ public class QueryAugmentationUtils {
 					if (originalQuery.hasLimit()) {
 						return executeQueries(augmentedQuery, originalQuery, httpMethod, coef);
 					}
+				} else if (queries.size() == 1){
+					StringBuilder sb = new StringBuilder();
+					SparqlEndPointUtils.executeQueryViaSPARQL(queries.get(0).toString(), FORMAT, httpMethod, sb);
+					return sb.toString();
 				}
 			}
 		} catch (TooManyConnections e) {
