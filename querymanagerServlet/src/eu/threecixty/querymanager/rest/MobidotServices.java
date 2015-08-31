@@ -27,6 +27,7 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.profile.ProfileManager;
 import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.Utils;
@@ -36,7 +37,6 @@ import eu.threecixty.profile.partners.PartnerAccountUtils;
 @Path("/" + Constants.VERSION_2)
 public class MobidotServices {
 	
-	private static final String MOBIDOT_SOURCE = "Mobidot";
 	private static final String MOBIDOT_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
 	private static final String MOBIDOT_ENDPOINT = "https://www.movesmarter.nl/external/identitymanager/user/onetimetoken?";
 	private static final int TWO_HOURS_IN_SECOND = 60 * 60 * 2;
@@ -168,7 +168,7 @@ public class MobidotServices {
 			profileIdentities = new HashSet <ProfileIdentities>();
 			profile.setHasProfileIdenties(profileIdentities);
 		} else profileIdentities = profile.getHasProfileIdenties();
-		Utils.setProfileIdentities(uid, account.getUser_id(), MOBIDOT_SOURCE, profileIdentities);
+		Utils.setProfileIdentities(uid, account.getUser_id(), SPEConstants.MOBIDOT_SOURCE, profileIdentities);
 		
 		ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
 	}

@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -109,9 +108,9 @@ public class TrayServices {
     				        //Verify if it matched with etag available in http request
     				        rb = req.evaluatePreconditions(etag);
 					        //Create cache control header
-					         CacheControl cc = new CacheControl();
+					         //CacheControl cc = new CacheControl();
 					         //Set max age to one day
-					         cc.setMaxAge(86400);
+					         //cc.setMaxAge(86400);
     						if (rb == null) { // changed
     							String content = JSONObject.wrap(trays).toString();
     							
@@ -121,11 +120,10 @@ public class TrayServices {
     							return Response.status(Response.Status.OK)
     									.entity(content)
     									.type(MediaType.APPLICATION_JSON_TYPE)
-    									.cacheControl(cc)
     									.tag(etag)
     									.build();
     						} else {
-    							return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
+    							return rb.tag(etag).status(Status.NOT_MODIFIED).build();
     						}
     					}
     				} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
@@ -432,9 +430,7 @@ public class TrayServices {
 	        //Verify if it matched with etag available in http request
 	        rb = req.evaluatePreconditions(etag);
 	        //Create cache control header
-	         CacheControl cc = new CacheControl();
 	         //Set max age to one day
-	         cc.setMaxAge(86400);
 			if (rb == null) { // changed
 				List <ElementDetails> trayDetailsList = new ArrayList <ElementDetails>();
 				findTrayDetails(trays, trayDetailsList, restTray);
@@ -446,56 +442,17 @@ public class TrayServices {
 				return Response.status(Response.Status.OK)
 						.entity(content)
 						.type(MediaType.APPLICATION_JSON_TYPE)
-						.cacheControl(cc)
 						.tag(etag)
 						.build();
 			} else {
-				return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
+				return rb.tag(etag).status(Status.NOT_MODIFIED).build();
 			}
 		}
 	}
 	
 	private void findTrayDetails(List<Tray> trays,
 			List<ElementDetails> trayDetailsList, RestTrayObject restTray) throws IOException {
-		List <String> eventIds = new LinkedList <String>();
-		List <String> poiIds = new LinkedList <String>();
-		for (Tray tray: trays) {
-			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
-			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
-		}
-		
-		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguage());
-		
-		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
-		if (elementEventsDetails != null) {
-			for (ElementDetails eventDetails: elementEventsDetails) {
-				eventDetails.setType(EVENT_TYPE);
-				for (Tray tray: trays) {
-					if (tray.getElement_id().equals(eventDetails.getId())) {
-						eventDetails.setAttend_datetime(tray.getAttend_datetime());
-						eventDetails.setRating(tray.getRating());
-						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
-						break;
-					}
-				}
-			}
-			trayDetailsList.addAll(elementEventsDetails);
-		}
-		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, tmpLanguages);
-		if (elementPoIsDetails != null) {
-			for (ElementDetails poiDetails: elementPoIsDetails) {
-				poiDetails.setType(POI_TYPE);
-				for (Tray tray: trays) {
-					if (tray.getElement_id().equals(poiDetails.getId())) {
-						poiDetails.setAttend_datetime(tray.getAttend_datetime());
-						poiDetails.setRating(tray.getRating());
-						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
-						break;
-					}
-				}
-			}
-			trayDetailsList.addAll(elementPoIsDetails);
-		}
+		findTrayDetails(trays, LanguageUtils.getLanguages(restTray.getLanguage()), trayDetailsList);
 	}
 
 	private long getNewestTimestamp(List <Tray> trays) {
@@ -521,5 +478,47 @@ public class TrayServices {
 		        .entity(msg)
 		        .type(MediaType.TEXT_PLAIN)
 		        .build();
+	}
+	
+	
+	public static void findTrayDetails(List<Tray> trays, String []languages,
+			List<ElementDetails> trayDetailsList) throws IOException {
+		List <String> eventIds = new LinkedList <String>();
+		List <String> poiIds = new LinkedList <String>();
+		for (Tray tray: trays) {
+			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
+			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
+		}
+		
+		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, languages);
+		if (elementEventsDetails != null) {
+			for (ElementDetails eventDetails: elementEventsDetails) {
+				eventDetails.setType(EVENT_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(eventDetails.getId())) {
+						eventDetails.setAttend_datetime(tray.getAttend_datetime());
+						eventDetails.setRating(tray.getRating());
+						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
+			}
+			trayDetailsList.addAll(elementEventsDetails);
+		}
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, languages);
+		if (elementPoIsDetails != null) {
+			for (ElementDetails poiDetails: elementPoIsDetails) {
+				poiDetails.setType(POI_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(poiDetails.getId())) {
+						poiDetails.setAttend_datetime(tray.getAttend_datetime());
+						poiDetails.setRating(tray.getRating());
+						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
+			}
+			trayDetailsList.addAll(elementPoIsDetails);
+		}
 	}
 }

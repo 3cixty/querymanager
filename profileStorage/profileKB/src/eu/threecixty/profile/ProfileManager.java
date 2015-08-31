@@ -137,6 +137,26 @@ public interface ProfileManager {
 	List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile, float rating) throws TooManyConnections;
 	
 	/**
+	 * Find place IDs and corresponding social scores for places rated by me.
+	 * @param profile
+	 * @param rating
+	 * @param toPlaceIds
+	 * @param toSocialScores
+	 */
+	void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List <String> toPlaceIds, List <Double> toSocialScores);
+	
+	/**
+	 * Find place IDs and corresponding social scores for places rated by my friends.
+	 * @param profile
+	 * @param rating
+	 * @param toPlaceIds
+	 * @param toSocialScores
+	 */
+	void findPlaceIdsAndSocialScoreForFriends(UserProfile profile, float rating,
+			List <String> toPlaceIds, List <Double> toSocialScores);
+	
+	/**
 	 * Gets a list of place names which were visited by friends more than <code>number</code> times.
 	 * @param uid
 	 * 				Google UID.
@@ -280,6 +300,26 @@ public interface ProfileManager {
 	UserProfile findUserProfile(String uid, String source);
 	
 	boolean updateKnows(UserProfile profile, Set <String> knows);
+	
+	/**
+	 * It's possible that I don't have any information at all about them within 3cixty context.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	List <Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID);
+	
+	/**
+	 * Find all my friends in my knows.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	List <Friend> findAllFriends(String my3cixtyUID);
+	
+	/**
+	 * Gets interface to manage forgotten users.
+	 * @return
+	 */
+	ForgottenUserManager getForgottenUserManager();
 	
 	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.

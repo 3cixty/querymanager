@@ -329,6 +329,69 @@ public class UserUtils {
 		return userProfile;
 	}
 	
+	/**
+	 * Find all friends which have a list of knows containing the given 3cixty UID.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {
+		Session session = null;
+		List <Friend> friends = new LinkedList<Friend>();
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT DISTINCT accountId, uid, source, element, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id=3cixty_user_profile_knows.3cixty_user_profile_id AND (3cixty_user_profile.id = 3cixty_account.3cixty_user_id) AND (source like 'Google' OR source like 'Facebook') AND element = :myUID";
+			List <Object[]> results = session.createSQLQuery(sql).setParameter("myUID", my3cixtyUID).list();
+			
+			for (Object [] obj: results) {
+				Friend friend = new Friend();
+				friend.setUid(obj[0].toString());
+				friend.setSource(obj[2].toString());
+				friend.setFirstName(obj[4].toString());
+				friend.setLastName(obj[5].toString());
+				friends.add(friend);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return friends;
+	}
+	
+	/**
+	 * Find all friends in the list of knows of the given 3cixty UID.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Friend> findAllFriendsInMyListOfKnows(String my3cixtyUID) {
+		Session session = null;
+		List <Friend> friends = new LinkedList<Friend>();
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT accountId, uid, source, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_account where 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid in (SELECT element FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id= 3cixty_user_profile_id AND 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid = :myUID)";
+			List <Object[]> results = session.createSQLQuery(sql).setParameter("myUID", my3cixtyUID).list();
+			
+			for (Object [] obj: results) {
+				Friend friend = new Friend();
+				friend.setUid(obj[0].toString());
+				friend.setSource(obj[2].toString());
+				friend.setFirstName(obj[3].toString());
+				friend.setLastName(obj[4].toString());
+				friends.add(friend);
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return friends;
+	}
+	
+	
 	private static boolean updateUserProfile(UserProfile userProfile) {
 		Session session = null;
 		boolean added = false;
@@ -392,7 +455,6 @@ public class UserUtils {
 			UserModel userModel, Session session) throws HibernateException {
 		convertNameForPersistence(userProfile, userModel);
 		convertAddressForPersistence(userProfile, userModel, session);
-		userModel.setGender(userProfile.getHasGender());
 		userModel.setProfileImage(userProfile.getProfileImage());
 		if (!isNullOrEmpty(userProfile.getHasLastCrawlTime())) {
 			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
@@ -547,8 +609,6 @@ public class UserUtils {
 		
 		convertName(userModel, userProfile);
 		convertAddress(userModel, userProfile);
-		
-		if (!isNullOrEmpty(userModel.getGender())) userProfile.setHasGender(userModel.getGender());
 		
 		if (!isNullOrEmpty(userModel.getProfileImage()))
 			userProfile.setProfileImage(userModel.getProfileImage());

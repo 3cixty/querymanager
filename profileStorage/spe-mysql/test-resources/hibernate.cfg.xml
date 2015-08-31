@@ -27,5 +27,6 @@
         <mapping class="eu.threecixty.userprofile.AddressModel"></mapping>
         <mapping class="eu.threecixty.userprofile.UserModel"></mapping>
         <mapping class="eu.threecixty.userprofile.TrayModel"></mapping>
+        <mapping class="eu.threecixty.userprofile.ForgottenUser"></mapping>
     </session-factory>
 </hibernate-configuration>
