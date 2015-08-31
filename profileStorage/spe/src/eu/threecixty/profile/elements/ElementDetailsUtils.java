@@ -177,22 +177,19 @@ public class ElementDetailsUtils {
 	private static void reorder(List<ElementDetails> finalList,
 			Collection<String> itemIds) {
 		String [] ids = new String [itemIds.size()];
+		List <ElementDetails> newList = new LinkedList <ElementDetails>();
 		itemIds.toArray(ids);
-		int len = finalList.size();
-		for (int i = 0; i < len; i++) {
-			ElementDetails ed = finalList.get(i);
+		for (int i = 0; i < ids.length; i++) {
 			String itemId = ids[i];
-			if (itemId.equals(ed.getId())) continue;
-			for (int j = i + 1; j < len; j++) {
-				ElementDetails ed2 = finalList.get(j);
-				if (itemId.equals(ed2.getId())) {
-					finalList.set(i, ed2);
-					finalList.set(j, ed);
+			for (ElementDetails ed: finalList) {
+				if (itemId.equals(ed.getId())) {
+					newList.add(ed);
 					break;
 				}
 			}
 		}
-		
+		finalList.clear();
+		finalList.addAll(newList);
 	}
 
 	/**
