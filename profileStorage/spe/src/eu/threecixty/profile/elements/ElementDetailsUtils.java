@@ -106,7 +106,10 @@ public class ElementDetailsUtils {
 		queryBuff.append("} \n");
 		queryBuff.append("}");
 		
-		if (finalList.size() == eventIds.size()) return finalList;
+		if (finalList.size() == eventIds.size()) {
+			reorder(finalList, eventIds);
+			return finalList;
+		}
 		
 		if (DEBUG_MOD) LOGGER.info("Get events in detail: " + queryBuff.toString());
 
@@ -269,7 +272,10 @@ public class ElementDetailsUtils {
 		queryBuff.append("} \n");
 		queryBuff.append("}");
 		
-		if (finalList.size() == poiIds.size()) return finalList;
+		if (finalList.size() == poiIds.size()) {
+			reorder(finalList, poiIds);
+			return finalList;
+		}
 		
 		if (DEBUG_MOD) LOGGER.info("Get PoIs in detail: " + queryBuff.toString());
 		
