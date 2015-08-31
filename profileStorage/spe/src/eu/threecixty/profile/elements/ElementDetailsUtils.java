@@ -1,6 +1,7 @@
 package eu.threecixty.profile.elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class ElementDetailsUtils {
 	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return Collections.emptyList();
 		
-		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
+		List <ElementDetails> finalList = new ArrayList <ElementDetails>();
 
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?url1 ?url2 \n");
 		queryBuff.append("WHERE {\n");
@@ -160,7 +161,35 @@ public class ElementDetailsUtils {
 			}
 		}
 		
+		// reOrder final list
+		reorder(finalList, eventIds);
 		return finalList;
+	}
+
+	/**
+	 * Reorder the list to keep the same order compared to input.
+	 * @param finalList
+	 * @param itemIds
+	 */
+	private static void reorder(List<ElementDetails> finalList,
+			Collection<String> itemIds) {
+		String [] ids = new String [itemIds.size()];
+		itemIds.toArray(ids);
+		int len = finalList.size();
+		for (int i = 0; i < len; i++) {
+			ElementDetails ed = finalList.get(i);
+			String itemId = ids[i];
+			if (itemId.equals(ed.getId())) continue;
+			for (int j = i + 1; j < len; j++) {
+				ElementDetails ed2 = finalList.get(j);
+				if (itemId.equals(ed2.getId())) {
+					finalList.set(i, ed2);
+					finalList.set(j, ed);
+					break;
+				}
+			}
+		}
+		
 	}
 
 	/**
@@ -319,6 +348,8 @@ public class ElementDetailsUtils {
 			}
 		}
 		
+		// reOrder final list
+		reorder(finalList, poiIds);
 		return finalList;
 	}
 	
