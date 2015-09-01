@@ -116,6 +116,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		
 		SQLQuery query = session.createSQLQuery(sql);
 		
+		@SuppressWarnings("unchecked")
 		List <Object[]> list = query.list();
 		
 		session.close();
