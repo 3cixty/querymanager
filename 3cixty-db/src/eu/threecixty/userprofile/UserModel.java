@@ -45,6 +45,7 @@ public class UserModel implements java.io.Serializable {
 	private String password;
 	private String email;
 	private String username;
+	private Boolean emailConfirmed;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -150,5 +151,13 @@ public class UserModel implements java.io.Serializable {
 	}
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	
+	@Column(name = "emailConfirmed", nullable = true)
+	public Boolean getEmailConfirmed() {
+		return emailConfirmed;
+	}
+	public void setEmailConfirmed(Boolean emailConfirmed) {
+		this.emailConfirmed = emailConfirmed;
 	}
 }
