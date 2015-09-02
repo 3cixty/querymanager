@@ -23,6 +23,7 @@ public class UserActivation implements java.io.Serializable {
 	private String code;
 	private ActivationType type;
 	private boolean used;
+	private long creation;
 	
 	/**DO NOT reference the attribute with UserModel to avoid having to remove when deleting a user profile*/
 	private Integer userProfileId;
@@ -73,6 +74,16 @@ public class UserActivation implements java.io.Serializable {
 	public void setUserProfileId(Integer userProfileId) {
 		this.userProfileId = userProfileId;
 	}
+
+	@Column(name = "creation", nullable = false)
+	public long getCreation() {
+		return creation;
+	}
+
+	public void setCreation(long creation) {
+		this.creation = creation;
+	}
+
 
 	public enum ActivationType {
 		CREATION, FORGOTTEN_PASSWORD
