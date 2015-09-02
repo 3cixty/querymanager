@@ -24,6 +24,9 @@ public class UserActivation implements java.io.Serializable {
 	private ActivationType type;
 	private boolean used;
 	
+	/**DO NOT reference the attribute with UserModel to avoid having to remove when deleting a user profile*/
+	private Integer userProfileId;
+	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
@@ -60,6 +63,15 @@ public class UserActivation implements java.io.Serializable {
 
 	public void setUsed(boolean used) {
 		this.used = used;
+	}
+
+	@Column(name = "user_profile_id", nullable = false)
+	public Integer getUserProfileId() {
+		return userProfileId;
+	}
+
+	public void setUserProfileId(Integer userProfileId) {
+		this.userProfileId = userProfileId;
 	}
 
 	public enum ActivationType {
