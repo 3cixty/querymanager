@@ -561,7 +561,7 @@ public class MobilityCrawlerCron {
         String IDUser1 = reverseMap(jsonUserid1, idMapping);
         if (DEBUG_MOD) LOGGER.info("JSON userid1 = " + jsonUserid1 + ", userid2 = " + jsonUserid2);
         if (DEBUG_MOD) LOGGER.info("IDUser1 = " + IDUser1 + ", IDUser2 = " + IDUser2);
-        if (IDUser1 != null && IDUser1.equals(uID)){
+        if (IDUser1 != null && IDUser1.equals(uID) && (IDUser2 != null && !IDUser2.equals(""))){
             Accompanying accompany = new Accompanying();
             accompany.setHasAccompanyId(jsonobj.getLong("id"));
             accompany.setHasAccompanyUserid2ST(IDUser2);
@@ -573,7 +573,7 @@ public class MobilityCrawlerCron {
             accompany.setHasAccompanyValidity(jsonobj.getLong("validity"));
             return accompany;
         }
-        if (IDUser2 != null && IDUser2.equals(uID)){
+        if (IDUser2 != null && IDUser2.equals(uID) && (IDUser1 != null && !IDUser1.equals(""))){
             Accompanying accompany = new Accompanying();
             accompany.setHasAccompanyId(jsonobj.getLong("id"));
             accompany.setHasAccompanyUserid2ST(IDUser1);
