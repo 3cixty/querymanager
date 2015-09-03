@@ -188,7 +188,7 @@
 	                    </button>
 						<script>
 						  $('#customBtn').click(function(){
-					    	auth2.signIn({'scope': 'https://www.googleapis.com/auth/plus.login','redirect_uri': '<%=Configuration.get3CixtyRoot()%>/redirect_uri'}).then(signInCallback);
+					    		$('#form').submit();
 						  });
 						</script>
 	                </div>
