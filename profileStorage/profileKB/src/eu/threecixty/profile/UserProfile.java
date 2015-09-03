@@ -54,10 +54,6 @@ public class UserProfile{
     /**This attribute is used to contain information about accompanyings. This is used with SPE-mysql module*/
     private Set <Accompanying> accompanyings;
     
-    private String email;
-    private String username;
-    private boolean emailConfirmed;
-    
     public String getHasLastCrawlTime() {
 		return hasLastCrawlTime;
 	}
@@ -173,23 +169,5 @@ public class UserProfile{
 	}
 	public void setAccompanyings(Set<Accompanying> accompanyings) {
 		this.accompanyings = accompanyings;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public boolean isEmailConfirmed() {
-		return emailConfirmed;
-	}
-	public void setEmailConfirmed(boolean emailConfirmed) {
-		this.emailConfirmed = emailConfirmed;
 	}
 }

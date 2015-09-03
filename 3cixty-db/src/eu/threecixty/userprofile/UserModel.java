@@ -19,7 +19,7 @@ import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 @Table(name = "3cixty_user_profile", uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"uid", "username"})})
+		@UniqueConstraint(columnNames = {"uid"})})
 public class UserModel implements java.io.Serializable {
 
 	/**
@@ -40,12 +40,6 @@ public class UserModel implements java.io.Serializable {
 
 	private AddressModel address;
 	private Set <AccompanyingModel> accompanyings;
-	
-	/**The following attributes are used for creating 3cixty account*/
-	private String password;
-	private String email;
-	private String username;
-	private Boolean emailConfirmed;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -127,37 +121,5 @@ public class UserModel implements java.io.Serializable {
 	}
 	public void setAccompanyings(Set<AccompanyingModel> accompanyings) {
 		this.accompanyings = accompanyings;
-	}
-	
-	@Column(name = "password", unique = false, nullable = true, length = 100)
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	@Column(name = "email", unique = true, nullable = true, length = 100)
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	@Column(name = "username", unique = true, nullable = true, length = 100)
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	
-	@Column(name = "emailConfirmed", nullable = true)
-	public Boolean getEmailConfirmed() {
-		return emailConfirmed;
-	}
-	public void setEmailConfirmed(Boolean emailConfirmed) {
-		this.emailConfirmed = emailConfirmed;
 	}
 }
