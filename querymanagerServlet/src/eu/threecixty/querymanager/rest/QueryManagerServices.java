@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
@@ -695,6 +696,96 @@ public class QueryManagerServices {
 	}
 	
 	@GET
+	@Path("/getEventsInDetailsWithoutAccessToken")
+	public Response getEventsInDetailsWithoutUserInfo(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("{}") @QueryParam("filter1") String filter1,
+			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@HeaderParam("key") String key,
+			@HeaderParam("Accept-Language") String languages) {
+		
+		long starttime = System.currentTimeMillis();
+
+		if (OAuthWrappers.validateAppKey(key)) {
+
+				Gson gson = new Gson();
+				KeyValuePair pair1 = null;
+				KeyValuePair pair2 = null;
+				try {
+					pair1 = gson.fromJson(filter1, KeyValuePair.class);
+				} catch (Exception e) {}
+				try {
+					pair2 = gson.fromJson(filter2, KeyValuePair.class);
+				} catch (Exception e) {}
+
+				String query = createSelectSparqlQuery(offset, limit,
+						(pair1 == null ? null : pair1.getGroupBy()),
+						(pair1 == null ? null : pair1.getValue()),
+						(pair2 == null ? null : pair2.getGroupBy()),
+						(pair2 == null ? null : pair2.getValue()));
+
+				try {
+					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
+				
+					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
+					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+					String content = JSONObject.wrap(eventsDetails).toString();
+					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
+				} catch (IOException e) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
+		} else {
+			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
+		}
+	}
+	
+	@GET
+	@Path("/getPoIsInDetailsWithoutAccessToken")
+	public Response getPoIsInDetailsWithoutUserInfo(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("0") @QueryParam("minRating") int minRating,
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@HeaderParam("key") String key,
+			@HeaderParam("Accept-Language") String languages) {
+		
+		long starttime = System.currentTimeMillis();
+
+		if (OAuthWrappers.validateAppKey(key)) {
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
+
+			try {
+				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
+				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, tmpLanguages);
+				
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				String content = JSONObject.wrap(poisInDetails).toString();
+				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
+		} else {
+			if (key != null && !key.equals(""))  CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
+		}
+	}
+	
+	@GET
 	@Path("/validateQuery")
 	public Response validateSPARLQuery(@DefaultValue("") @QueryParam("query") String query) {
 		String fullQuery = getAllPrefixes() + " " + Configuration.PREFIXES + " " + query;
@@ -751,6 +842,32 @@ public class QueryManagerServices {
 		}
 	}
 
+	public static List <String> getElementIDs(String query, String httpMethod) throws IOException {
+
+		String formatType = "application/sparql-results+json";
+
+		StringBuilder sb = new StringBuilder();
+		
+		List <String> elementIds = new LinkedList <String>();
+
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+		JSONObject json = new JSONObject(sb.toString());
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+
+		int len = jsonArrs.length();
+		for (int i = 0; i < len; i++) {
+			JSONObject jsonElement = jsonArrs.getJSONObject(i);
+			String elementId = null;
+			if (jsonElement.has("event")) {
+				elementId = jsonElement.getJSONObject("event").get("value").toString();
+			} else if (jsonElement.has("venue")) {
+				elementId = jsonElement.getJSONObject("venue").get("value").toString();
+			}
+			if (elementId != null) elementIds.add(elementId);
+		}
+		return elementIds;
+	}
+	
 	private String createGroupQuery(String group, int offset, int limit,
 			String groupname1, String groupvalue1, String groupname2, String groupvalue2) {
 		StringBuffer buffer = new StringBuffer("select ?" + group + " (COUNT(*) as ?count) \n WHERE {\n ?event a lode:Event .\n" + getTriples(group));
