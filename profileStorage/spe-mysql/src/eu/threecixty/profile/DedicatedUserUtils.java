@@ -391,7 +391,7 @@ public class DedicatedUserUtils {
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			md.reset();
-			md.update(salt.getBytes(UTF8));
+			md.update((salt.toLowerCase() ).getBytes(UTF8));
 			
 			byte[] input = md.digest(password.getBytes(UTF8));
 			for (int i = 0; i < ITERATION_NUMBER; i++) {
