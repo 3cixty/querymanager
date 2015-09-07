@@ -241,6 +241,44 @@ public class DedicatedUserUtils {
 	}
 
 	/**
+	 * Set password.
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static boolean setPassword(String username, String password) {
+		if (isNullOrEmpty(username) || isNullOrEmpty(password)) return false;
+		Session session = null;
+		boolean ok = false;
+		try {
+			
+			session = HibernateUtil.getSessionFactory().openSession();
+			
+			String hql = "FROM DedicatedUser WHERE username = ?";
+			List <Object> list = session.createQuery(hql).setString(0,
+					username).list();
+			
+			if (list != null && list.size() > 0) {
+				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
+				String hashedPassword = hashPassword(password, username);
+				session.beginTransaction();
+
+				dedicatedUser.setPassword(hashedPassword);
+				session.save(dedicatedUser);
+				session.getTransaction().commit();
+				ok = true;
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return ok;
+	}
+	
+	/**
 	 * Checks a given username and password if they match in the database.
 	 * @param username
 	 * @param password
