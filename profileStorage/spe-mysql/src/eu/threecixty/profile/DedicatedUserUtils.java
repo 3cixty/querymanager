@@ -349,6 +349,36 @@ public class DedicatedUserUtils {
 		return ok;
 	}
 	
+	/**
+	 * Gets username from a given reset code.
+	 * @param code
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static String getUsername(String code) {
+		Session session = null;
+		String username = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			String hql = "FROM UserActivation WHERE code = ?";
+			List <Object> results = session.createQuery(hql).setString(0, code).list();
+			if (results != null && results.size() > 0) {
+				UserActivation userActivation = (UserActivation) results.get(0);
+				String hql1 = "FROM DedicatedUser WHERE id = ?";
+				List <Object> list = session.createQuery(hql1).setInteger(0,
+						userActivation.getDedicatedUserId()).list();
+				if (list != null && list.size() > 0) {
+					username = ((DedicatedUser) list.get(0)).getUsername();
+				}
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return username;
+	}
+	
 	private static UserModel createUserModel(String uid, String firstName,
 			String lastName) {
 		UserModel userModel = new UserModel();
