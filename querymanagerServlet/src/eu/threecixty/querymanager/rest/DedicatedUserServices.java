@@ -192,8 +192,8 @@ public class DedicatedUserServices {
 	
 	private boolean validatePassword(String password) throws Exception {
 		if (isNullOrEmpty(password)) throw new Exception("Password is empty");
-		if (password.length() < 4 || password.length() > 30) throw new Exception(
-				"Password must contain between 4 and 25 characters");
+		if (password.length() < 8 || password.length() > 30) throw new Exception(
+				"Password must contain between 8 and 30 characters");
 		if (!hasUppercase.matcher(password).find() || !hasLowercase.matcher(password).find()
 				|| !hasNumber.matcher(password).find() || !hasSpecialChar.matcher(password).find())
 			throw new Exception("Password must contain at least one lower case, one upper case, one digit and one special character");
