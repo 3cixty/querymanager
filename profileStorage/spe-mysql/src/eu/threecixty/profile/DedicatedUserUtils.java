@@ -114,8 +114,7 @@ public class DedicatedUserUtils {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static boolean activateForResettingPassword(String code,
-			String newPassword) throws ActivationException {
+	public static boolean activateForResettingPassword(String code) throws ActivationException {
 		Session session = null;
 		boolean ok = false;
 		try {
@@ -127,26 +126,14 @@ public class DedicatedUserUtils {
 				if (userActivation.isUsed()) throw new ActivationException("Code was aready used");
 				if (userActivation.getType() != ActivationType.FORGOTTEN_PASSWORD)
 					throw new ActivationException("The email needs to be confirmed first");
-				String hql1 = "FROM DedicatedUser WHERE id = ?";
-				List <Object> list = session.createQuery(hql1).setInteger(0,
-						userActivation.getDedicatedUserId()).list();
-				
-				if (list != null && list.size() > 0) {
-					DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
 					
-					session.beginTransaction();
-					
-					String hashedPassword = hashPassword(newPassword, dedicatedUser.getUsername());
-					dedicatedUser.setPassword(hashedPassword);
-					
-					session.save(dedicatedUser);
-					
-					userActivation.setUsed(true);
-					session.save(userActivation);
+				session.beginTransaction();
 
-					session.getTransaction().commit();
-					ok = true;
-				}
+				userActivation.setUsed(true);
+				session.save(userActivation);
+
+				session.getTransaction().commit();
+				ok = true;
 			}
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
