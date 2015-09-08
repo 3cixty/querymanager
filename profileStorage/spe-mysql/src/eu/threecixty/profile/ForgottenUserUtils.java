@@ -142,8 +142,6 @@ public class ForgottenUserUtils {
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 			
-			session.beginTransaction();
-			
 			String hql = "FROM ForgottenUser WHERE uid = ?";
 			List <Object> list = session.createQuery(hql).setString(0, uid).list();
 			if (list != null && list.size() > 0) {
@@ -151,7 +149,6 @@ public class ForgottenUserUtils {
 			}
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
-			session.getTransaction().rollback();
 		} finally {
 			if (session != null) session.close();
 		}

@@ -32,6 +32,7 @@ public class UserModel implements java.io.Serializable {
 	private String uid;
 	private String profileImage;
 	
+	
 	private Set <String> knows;
 	
 	private long lastCrawlTimeToKB;

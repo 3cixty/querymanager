@@ -1,23 +1,11 @@
 package eu.threecixty.querymanager.rest;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Security;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -29,13 +17,13 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import eu.threecixty.Configuration;
 import eu.threecixty.cache.AppCache;
 import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.EmailUtils;
 import eu.threecixty.profile.ReportRequest;
 
 @Path("/" + Constants.PREFIX_NAME)
@@ -58,13 +46,6 @@ public class ReportServices {
 	private static final String LAST_POSITION = "lastPosition";
 	
 	private static final String REPORT_SERVICE = "Report service";
-	private static final String GMAIL_ACCOUNT_KEY = "GMAIL_ACCOUNT";
-	private static final String GMAIL_PWD_KEY = "GMAIL_PWD";
-	private static final String DESTINATIONS_KEY = "DESTINATION";
-	
-	private static String gmailAccount = null;
-	private static String gmailPwd;
-	private static List <String> destinations = new LinkedList <String>();
 
 	@POST
 	@Path("/reporting")
@@ -137,75 +118,7 @@ public class ReportServices {
 	}
 	
 	private void sendEmail(ReportRequest reportRequest, String subject) {
-		if (gmailAccount == null) {
-			synchronized (this) {
-				if (gmailAccount == null) {
-					try {
-						loadProperties();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		if (DEBUG_MOD) LOGGER.info("Gmail used to send feedback: " + gmailAccount);
-		if (gmailAccount != null && !gmailAccount.equals("")) {
-			try {
-				Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-
-				// Get a Properties object
-				Properties props = System.getProperties();
-				props.put("mail.smtp.host", "smtp.gmail.com");
-				props.put("mail.smtp.socketFactory.port", "465");
-				props.put("mail.smtp.socketFactory.class",
-						"javax.net.ssl.SSLSocketFactory");
-				props.put("mail.smtp.auth", "true");
-				props.put("mail.smtp.port", "465");
-				
-				Session session = Session.getDefaultInstance(props,
-						new javax.mail.Authenticator() {
-							protected PasswordAuthentication getPasswordAuthentication() {
-								return new PasswordAuthentication(gmailAccount, gmailPwd);
-							}
-						});
-
-				// -- Create a new message --
-				final MimeMessage msg = new MimeMessage(session);
-
-				// -- Set the FROM and TO fields --
-				msg.setFrom(new InternetAddress(gmailAccount));
-				for (String dest: destinations) {
-					if (DEBUG_MOD) LOGGER.info(dest);
-					msg.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-				}
-
-				msg.setSubject(subject);
-				msg.setText(JSONObject.wrap(reportRequest).toString(), "utf-8");
-				msg.setSentDate(new Date());
-
-				Transport.send(msg);      
-			} catch (Exception e) {
-				LOGGER.error(e.getMessage());
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private synchronized void loadProperties() throws IOException {
-		InputStream input = new FileInputStream(Configuration.path + File.separatorChar + "WEB-INF"
-	            + File.separatorChar + "report.properties");
-		Properties props = new Properties();
-		props.load(input);
-		input.close();
-		gmailAccount = props.getProperty(GMAIL_ACCOUNT_KEY);
-		gmailPwd = props.getProperty(GMAIL_PWD_KEY);
-		String tmpDests = props.getProperty(DESTINATIONS_KEY);
-		if (tmpDests != null && !tmpDests.equals("")) {
-			String [] dests = tmpDests.split(",");
-			for (String dest: dests) {
-				destinations.add(dest);
-			}
-		}
+		EmailUtils.send(subject, JSONObject.wrap(reportRequest).toString());
 	}
 
 	private String getTimestamp(JSONObject json) throws WebApplicationException {

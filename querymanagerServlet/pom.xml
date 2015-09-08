@@ -115,6 +115,12 @@
 	  <version>1.4.7</version>
     </dependency>
     
+<dependency>
+	<groupId>commons-validator</groupId>
+	<artifactId>commons-validator</artifactId>
+	<version>1.4.1</version>
+</dependency>
+    
         <!-- javamelody-core -->
         <dependency>
                 <groupId>net.bull.javamelody</groupId>
