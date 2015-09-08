@@ -162,12 +162,14 @@ public class DedicatedUserUtils {
 	 * @param username
 	 * @param email
 	 * @return Code to reset password.
+	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
-	public static String resetPassword(String username, String email) {
+	public static String resetPassword(String username, String email) throws Exception {
 		if (isNullOrEmpty(username) || isNullOrEmpty(email)) return null;
 		Session session = null;
 		String code = null;
+		boolean ex = false;
 		try {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
@@ -190,9 +192,11 @@ public class DedicatedUserUtils {
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 			session.getTransaction().rollback();
+			ex = true;
 		} finally {
 			if (session != null) session.close();
 		}
+		if (ex) throw new Exception("Error to update database");
 		return code;
 	}
 	
