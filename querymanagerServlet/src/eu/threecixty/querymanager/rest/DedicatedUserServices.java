@@ -32,7 +32,7 @@ public class DedicatedUserServices {
 	private final Pattern hasUppercase = Pattern.compile("[A-Z]");
 	private final Pattern hasLowercase = Pattern.compile("[a-z]");
 	private final Pattern hasNumber = Pattern.compile("\\d");
-	private final Pattern hasSpecialChar = Pattern.compile("[^a-zA-Z0-9 ]");
+	//private final Pattern hasSpecialChar = Pattern.compile("[^a-zA-Z0-9 ]");
 	
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -195,8 +195,8 @@ public class DedicatedUserServices {
 		if (password.length() < 8 || password.length() > 30) throw new Exception(
 				"Password must contain between 8 and 30 characters");
 		if (!hasUppercase.matcher(password).find() || !hasLowercase.matcher(password).find()
-				|| !hasNumber.matcher(password).find() || !hasSpecialChar.matcher(password).find())
-			throw new Exception("Password must contain at least one lower case, one upper case, one digit and one special character");
+				|| !hasNumber.matcher(password).find())
+			throw new Exception("Password must contain at least one lower case, one upper case, one digit character");
 		return true;
 	}
 	
