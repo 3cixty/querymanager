@@ -26,18 +26,17 @@ public class DedicatedUserUtils {
 
 	/**
 	 * Creates a dedicated 3cixty user.
-	 * @param username
 	 * @param email
 	 * @param password
 	 * @param firstName
 	 * @param lastName
 	 * @return The activation code.
 	 */
-	public static String createDedicatedUser(String username, String email,
+	public static String createDedicatedUser(String email,
 			String password, String firstName, String lastName) {
-		if (isNullOrEmpty(username) || isNullOrEmpty(email) || isNullOrEmpty(password)
+		if (isNullOrEmpty(email) || isNullOrEmpty(password)
 				|| isNullOrEmpty(firstName) || isNullOrEmpty(lastName)) return null;
-		String hashedPassword = hashPassword(password, username); // username is salt
+		String hashedPassword = hashPassword(password, email); // email is salt
 		if (hashedPassword == null) throw new RuntimeException("The algorithm for hashing password (SHA256) doesn't exist");
 		String uid = UUID.randomUUID().toString();
 		Session session = null;
@@ -47,7 +46,6 @@ public class DedicatedUserUtils {
 			dedicatedUser.setEmail(email);
 			dedicatedUser.setEmailConfirmed(false);
 			dedicatedUser.setPassword(hashedPassword);
-			dedicatedUser.setUsername(username);
 			dedicatedUser.setUid(uid);
 			
 			UserModel userModel = createUserModel(uid, firstName, lastName);
@@ -146,14 +144,13 @@ public class DedicatedUserUtils {
 	
 	/**
 	 * Reset password
-	 * @param username
 	 * @param email
 	 * @return Code to reset password.
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
-	public static String resetPassword(String username, String email) throws Exception {
-		if (isNullOrEmpty(username) || isNullOrEmpty(email)) return null;
+	public static String resetPassword(String email) throws Exception {
+		if (isNullOrEmpty(email)) return null;
 		Session session = null;
 		String code = null;
 		boolean ex = false;
@@ -161,9 +158,8 @@ public class DedicatedUserUtils {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
 			
-			String hql1 = "FROM DedicatedUser WHERE username = ? AND email = ?";
-			List <Object> list = session.createQuery(hql1).setString(0,
-					username).setString(1, email).list();
+			String hql1 = "FROM DedicatedUser WHERE email = ?";
+			List <Object> list = session.createQuery(hql1).setString(0, email).list();
 			
 			if (list != null && list.size() > 0) {
 				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
@@ -189,15 +185,15 @@ public class DedicatedUserUtils {
 	
 	/**
 	 * Change password.
-	 * @param username
+	 * @param email
 	 * @param oldPassword
 	 * @param newPassword
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean changePassword(String username, String oldPassword,
+	public static boolean changePassword(String email, String oldPassword,
 			String newPassword) {
-		if (isNullOrEmpty(username) || isNullOrEmpty(oldPassword)
+		if (isNullOrEmpty(email) || isNullOrEmpty(oldPassword)
 				|| isNullOrEmpty(newPassword)) return false;
 		Session session = null;
 		boolean ok = false;
@@ -205,15 +201,15 @@ public class DedicatedUserUtils {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
 			
-			String hql = "FROM DedicatedUser WHERE username = ?";
+			String hql = "FROM DedicatedUser WHERE email = ?";
 			List <Object> list = session.createQuery(hql).setString(0,
-					username).list();
+					email).list();
 			
 			if (list != null && list.size() > 0) {
 				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
-				String oldHashedPassword = hashPassword(oldPassword, username);
+				String oldHashedPassword = hashPassword(oldPassword, email);
 				if (oldHashedPassword.equals(dedicatedUser.getPassword())) {
-					String newHashedPassword = hashPassword(newPassword, username);
+					String newHashedPassword = hashPassword(newPassword, email);
 					session.beginTransaction();
 
 					dedicatedUser.setPassword(newHashedPassword);
@@ -233,26 +229,26 @@ public class DedicatedUserUtils {
 
 	/**
 	 * Set password.
-	 * @param username
+	 * @param email
 	 * @param password
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean setPassword(String username, String password) {
-		if (isNullOrEmpty(username) || isNullOrEmpty(password)) return false;
+	public static boolean setPassword(String email, String password) {
+		if (isNullOrEmpty(email) || isNullOrEmpty(password)) return false;
 		Session session = null;
 		boolean ok = false;
 		try {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
 			
-			String hql = "FROM DedicatedUser WHERE username = ?";
+			String hql = "FROM DedicatedUser WHERE email = ?";
 			List <Object> list = session.createQuery(hql).setString(0,
-					username).list();
+					email).list();
 			
 			if (list != null && list.size() > 0) {
 				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
-				String hashedPassword = hashPassword(password, username);
+				String hashedPassword = hashPassword(password, email);
 				session.beginTransaction();
 
 				dedicatedUser.setPassword(hashedPassword);
@@ -270,27 +266,27 @@ public class DedicatedUserUtils {
 	}
 	
 	/**
-	 * Checks a given username and password if they match in the database.
-	 * @param username
+	 * Checks a given email and password if they match in the database.
+	 * @param email
 	 * @param password
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean checkPassword(String username, String password) {
-		if (isNullOrEmpty(username) || isNullOrEmpty(password)) return false;
+	public static boolean checkPassword(String email, String password) {
+		if (isNullOrEmpty(email) || isNullOrEmpty(password)) return false;
 		Session session = null;
 		boolean ok = false;
 		try {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
 			
-			String hql = "FROM DedicatedUser WHERE username = ?";
+			String hql = "FROM DedicatedUser WHERE email = ?";
 			List <Object> list = session.createQuery(hql).setString(0,
-					username).list();
+					email).list();
 			
 			if (list != null && list.size() > 0) {
 				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
-				String hashedPassword = hashPassword(password, username);
+				String hashedPassword = hashPassword(password, email);
 				if (hashedPassword.equals(dedicatedUser.getPassword())) {
 					ok = true;
 				}
@@ -305,23 +301,23 @@ public class DedicatedUserUtils {
 	
 	/**
 	 * Update first name and last name.
-	 * @param username
+	 * @param email
 	 * @param firstName
 	 * @param lastName
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean update(String username, String firstName, String lastName) {
-		if (isNullOrEmpty(username) || isNullOrEmpty(firstName) || isNullOrEmpty(lastName)) return false;
+	public static boolean update(String email, String firstName, String lastName) {
+		if (isNullOrEmpty(email) || isNullOrEmpty(firstName) || isNullOrEmpty(lastName)) return false;
 		Session session = null;
 		boolean ok = false;
 		try {
 			
 			session = HibernateUtil.getSessionFactory().openSession();
 			
-			String dedicatedUserHql = "FROM DedicatedUser WHERE username = ? ";
+			String dedicatedUserHql = "FROM DedicatedUser WHERE email = ? ";
 			List <Object> list = session.createQuery(dedicatedUserHql).setString(0,
-					username).list();
+					email).list();
 			
 			if (list != null && list.size() > 0) {
 				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
@@ -350,14 +346,14 @@ public class DedicatedUserUtils {
 	}
 	
 	/**
-	 * Gets username from a given reset code.
+	 * Gets email from a given reset code.
 	 * @param code
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static String getUsername(String code) {
+	public static String getEmail(String code) {
 		Session session = null;
-		String username = null;
+		String email = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 			String hql = "FROM UserActivation WHERE code = ?";
@@ -368,7 +364,7 @@ public class DedicatedUserUtils {
 				List <Object> list = session.createQuery(hql1).setInteger(0,
 						userActivation.getDedicatedUserId()).list();
 				if (list != null && list.size() > 0) {
-					username = ((DedicatedUser) list.get(0)).getUsername();
+					email = ((DedicatedUser) list.get(0)).getEmail();
 				}
 			}
 		} catch (HibernateException e) {
@@ -376,7 +372,36 @@ public class DedicatedUserUtils {
 		} finally {
 			if (session != null) session.close();
 		}
-		return username;
+		return email;
+	}
+	
+	/**
+	 * Checks if a given email already existed in the database.
+	 * @param email
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static boolean exists(String email) {
+		if (isNullOrEmpty(email)) return false;
+		Session session = null;
+		boolean ok = false;
+		try {
+			
+			session = HibernateUtil.getSessionFactory().openSession();
+			
+			String dedicatedUserHql = "FROM DedicatedUser WHERE email = ? ";
+			List list = session.createQuery(dedicatedUserHql).setString(0,
+					email).list();
+			
+			if (list != null && list.size() > 0) {
+				ok = true;
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return ok;
 	}
 	
 	private static UserModel createUserModel(String uid, String firstName,
