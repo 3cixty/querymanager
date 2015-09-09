@@ -44,7 +44,10 @@ public class DedicatedUserServices {
 	@Path("/signUp")
 	public Response signUp(
 			@FormParam("email") String email, @FormParam("password") String password,
-			@FormParam("firstName") String firstName, @FormParam("lastName") String lastName) {
+			@FormParam("firstName") String firstName, @FormParam("lastName") String lastName,
+			@FormParam("key") String key) {
+		if (isNullOrEmpty(key)) return Response.status(400).entity("App key is empty").build();
+		if (TokenCacheManager.getInstance().getAppCache(key) == null) return Response.status(400).entity("App key is invalid").build();
 		if (isNullOrEmpty(email)) return Response.status(400).entity("Email is empty").build();
 		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
 		if (DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email already existed").build();
@@ -55,7 +58,7 @@ public class DedicatedUserServices {
 		}
 		if (isNullOrEmpty(firstName) || isNullOrEmpty(lastName))
 			return Response.status(400).entity("First name and last name cannot be empty").build();
-		String code = DedicatedUserUtils.createDedicatedUser(email, password, firstName, lastName);
+		String code = DedicatedUserUtils.createDedicatedUser(email, password, firstName, lastName, key);
 		if (code == null) return Response.status(500).entity("Internal error! Please contact with 3cixty platform for help").build();
 		EmailUtils.send("Activation Code",
 				"Please click on the following link to activate your account <a href='"

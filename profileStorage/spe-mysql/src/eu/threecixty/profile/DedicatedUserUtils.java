@@ -30,10 +30,11 @@ public class DedicatedUserUtils {
 	 * @param password
 	 * @param firstName
 	 * @param lastName
+	 * @param key
 	 * @return The activation code.
 	 */
 	public static String createDedicatedUser(String email,
-			String password, String firstName, String lastName) {
+			String password, String firstName, String lastName, String key) {
 		if (isNullOrEmpty(email) || isNullOrEmpty(password)
 				|| isNullOrEmpty(firstName) || isNullOrEmpty(lastName)) return null;
 		String hashedPassword = hashPassword(password, email); // email is salt
@@ -47,6 +48,7 @@ public class DedicatedUserUtils {
 			dedicatedUser.setEmailConfirmed(false);
 			dedicatedUser.setPassword(hashedPassword);
 			dedicatedUser.setUid(uid);
+			dedicatedUser.setAppkey(key);
 			
 			UserModel userModel = createUserModel(uid, firstName, lastName);
 			

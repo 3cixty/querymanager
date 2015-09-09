@@ -24,6 +24,7 @@ public class DedicatedUser implements java.io.Serializable {
 	private String password;
 	private boolean emailConfirmed;
 	private String uid;
+	private String appkey; // app key instead of appId since we might have to disable keys in the future due to the app key being abuse
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -65,5 +66,13 @@ public class DedicatedUser implements java.io.Serializable {
 	}
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+	
+	@Column(name = "app_key", nullable = false, length = 100)
+	public String getAppkey() {
+		return appkey;
+	}
+	public void setAppkey(String appkey) {
+		this.appkey = appkey;
 	}
 }
