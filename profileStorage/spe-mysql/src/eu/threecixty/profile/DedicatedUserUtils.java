@@ -30,10 +30,11 @@ public class DedicatedUserUtils {
 	 * @param password
 	 * @param firstName
 	 * @param lastName
+	 * @param key
 	 * @return The activation code.
 	 */
 	public static String createDedicatedUser(String email,
-			String password, String firstName, String lastName) {
+			String password, String firstName, String lastName, String key) {
 		if (isNullOrEmpty(email) || isNullOrEmpty(password)
 				|| isNullOrEmpty(firstName) || isNullOrEmpty(lastName)) return null;
 		String hashedPassword = hashPassword(password, email); // email is salt
@@ -47,6 +48,7 @@ public class DedicatedUserUtils {
 			dedicatedUser.setEmailConfirmed(false);
 			dedicatedUser.setPassword(hashedPassword);
 			dedicatedUser.setUid(uid);
+			dedicatedUser.setAppkey(key);
 			
 			UserModel userModel = createUserModel(uid, firstName, lastName);
 			
@@ -373,6 +375,31 @@ public class DedicatedUserUtils {
 			if (session != null) session.close();
 		}
 		return email;
+	}
+	
+	/**
+	 * Gets 3cixty uid from a given email.
+	 * @param code
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static String getUid(String email) {
+		Session session = null;
+		String uid = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+				String hql1 = "FROM DedicatedUser WHERE email = ?";
+				List <Object> list = session.createQuery(hql1).setString(0, email).list();
+				if (list != null && list.size() > 0) {
+					uid = ((DedicatedUser) list.get(0)).getUid();
+				}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return uid;
 	}
 	
 	/**

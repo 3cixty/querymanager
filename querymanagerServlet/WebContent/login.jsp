@@ -23,17 +23,7 @@
 		<script type="text/javascript" src="login/google_translate.js"></script>
 		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 		
-		<script>
-		    function start() {
-		      gapi.load('auth2', function() {
-		        auth2 = gapi.auth2.init({
-		          client_id: '<%=Configuration.getGoogleClientId()%>',
-		          // Scopes to request in addition to 'profile' and 'email'
-		          scope: 'https://www.googleapis.com/auth/plus.login'
-		        });
-		      });
-		    }
-		</script>
+
      	<title>Sign in to 3cixty Platform</title>
 		
 		<style type="text/css">
@@ -172,8 +162,9 @@
     	</div>
     </div>
 	<div>
-		<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
+		
 			<div>
+			<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
 				<h3 class="privacy-title"> Sign In using </h3>
 			    <input type=hidden name="key" value="<%=key%>">
                 <div  align="center">
@@ -202,7 +193,31 @@
 				    </tr>
 				    </table>
 			 	</div>
+			 	</form>
 			</div>
+			
+			<div>
+			    <form action="./login" method="post">
+				  <h3 class="privacy-title"> Login </h3>
+			      <input type=hidden name="key" value="<%=key%>">
+                  <div  align="center">
+                    <div>
+    					<input type="text" name="email" id="email" placeholder="Email" required>
+  					</div>
+  					<div>
+    					<input type="password" name="password" id="password" placeholder="Password" required>
+  					</div>
+  					<input type="submit" value="Login">
+			 	  </div>
+			 	  <div  align="center">
+			 	  	<a>Forgot password?</a>
+			 	  </div>
+			 	  <div  align="center">
+			 	  	<a href="./signUp.jsp">Create an account</a>
+			 	  </div>
+			 	</form>
+			</div>
+			
 	    	<div class="login-benefits">
                 <h3 class="privacy-title">Benefits of Signing in</h3>
 				<p class="privacy-desc"> 
@@ -214,7 +229,7 @@
 				</p>
 			</div>
 			
-		</form>
+		
 	</div>
 </div>
 <div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>

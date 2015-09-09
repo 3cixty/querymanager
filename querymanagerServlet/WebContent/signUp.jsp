@@ -1,3 +1,5 @@
+<%@page import="eu.threecixty.cache.AppCache" %>
+<%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
 <html>
 <head>
 <title>Sign up for a new account</title>
@@ -96,7 +98,11 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="password.js"></script>
 </head>
-
+<%
+AppCache app = (AppCache) session.getAttribute(OAuthServices.APP_KEY);
+if (app != null) {
+	String key = app.getAppkey();
+%>
  <div class="main">
       <div class="one">
         <div class="register">
@@ -126,6 +132,7 @@
               <label></label>
               <input type="submit" value="Create Account" id="create-account" class="button"/>
             </div>
+            <input type="hidden" name="key" value='<%=key%>'>
           </form>
         </div>
       </div>
@@ -146,7 +153,7 @@
     		        alert("Email is invalid");
     		    else {
     		        $.ajax({url: "./existEmail?email=" + emailaddress, success: function(result){
-    		            if ("false" == result) {
+    		            if ("true" == result) {
     		            	alert("Email already existed!");
     		            }
     		        }});
@@ -157,3 +164,11 @@
     </script>
     
 </html>
+
+<%
+} else {
+	%>
+	Don't find application key!!! It would be timeout!
+	<%
+}
+%>

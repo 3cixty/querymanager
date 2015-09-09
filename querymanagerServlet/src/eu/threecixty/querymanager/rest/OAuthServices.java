@@ -66,7 +66,7 @@ public class OAuthServices {
 	
 	public static final String REDIRECT_URI_CLIENT = V2_ROOT + "redirect_uri_client";
 	public static final String ONLY_GOOGLE_ACCESS_TOKEN = "only_google_access_token";
-	private static final String SCOPES = "Profile,WishList";
+	public static final String SCOPES = "Profile,WishList";
 
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -541,7 +541,7 @@ public class OAuthServices {
 	}
 	
 	
-	private Response getAccessTokenFromUid(String _3cixtyUID, AppCache app, String scope) {
+	public static Response getAccessTokenFromUid(String _3cixtyUID, AppCache app, String scope) {
 		if (!checkValidScope(scope)) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Scope is invalid\"} ")
@@ -601,7 +601,7 @@ public class OAuthServices {
 		return false;
 	}
 	
-	private boolean checkValidScope(String scope) {
+	private static boolean checkValidScope(String scope) {
 		if (scope != null && !scope.equals("")) {
 			String[] primitiveScopes = scope.split(",");
 			for (String primitiveScope: primitiveScopes) {
