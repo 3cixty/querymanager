@@ -214,9 +214,8 @@ public class DedicatedUserServices {
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
-			return null;
 		}
-		return null;
+		return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Your email and password don't matche!!!\"} ").build();
 	}
 	
 	@GET
