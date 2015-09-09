@@ -66,7 +66,7 @@ public class OAuthServices {
 	
 	public static final String REDIRECT_URI_CLIENT = V2_ROOT + "redirect_uri_client";
 	public static final String ONLY_GOOGLE_ACCESS_TOKEN = "only_google_access_token";
-	private static final String SCOPES = "Profile,WishList";
+	public static final String SCOPES = "Profile,WishList";
 
 	@Context 
 	private HttpServletRequest httpRequest;
