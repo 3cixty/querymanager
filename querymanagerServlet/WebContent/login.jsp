@@ -213,7 +213,7 @@
 			 	  	<a>Forgot password?</a>
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./signUp.jsp">Create an account</a>
+			 	  	<a href="./signUp.jsp?key=<%=key%>">Create an account</a>
 			 	  </div>
 			 	</form>
 			</div>

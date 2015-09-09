@@ -99,9 +99,8 @@
 <script src="password.js"></script>
 </head>
 <%
-AppCache app = (AppCache) session.getAttribute(OAuthServices.APP_KEY);
-if (app != null) {
-	String key = app.getAppkey();
+String key = request.getParameter("key");
+if (key != null) {
 %>
  <div class="main">
       <div class="one">
@@ -168,7 +167,7 @@ if (app != null) {
 <%
 } else {
 	%>
-	Don't find application key!!! It would be timeout!
+	Don't find application key!!!
 	<%
 }
 %>
