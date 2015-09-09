@@ -375,6 +375,35 @@ public class DedicatedUserUtils {
 		return email;
 	}
 	
+	/**
+	 * Checks if a given email already existed in the database.
+	 * @param email
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static boolean exists(String email) {
+		if (isNullOrEmpty(email)) return false;
+		Session session = null;
+		boolean ok = false;
+		try {
+			
+			session = HibernateUtil.getSessionFactory().openSession();
+			
+			String dedicatedUserHql = "FROM DedicatedUser WHERE email = ? ";
+			List list = session.createQuery(dedicatedUserHql).setString(0,
+					email).list();
+			
+			if (list != null && list.size() > 0) {
+				ok = true;
+			}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return ok;
+	}
+	
 	private static UserModel createUserModel(String uid, String firstName,
 			String lastName) {
 		UserModel userModel = new UserModel();
