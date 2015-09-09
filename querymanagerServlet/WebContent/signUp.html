@@ -146,7 +146,7 @@
     		        alert("Email is invalid");
     		    else {
     		        $.ajax({url: "./existEmail?email=" + emailaddress, success: function(result){
-    		            if ("false" == result) {
+    		            if ("true" == result) {
     		            	alert("Email already existed!");
     		            }
     		        }});
