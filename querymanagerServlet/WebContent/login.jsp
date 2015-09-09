@@ -23,17 +23,7 @@
 		<script type="text/javascript" src="login/google_translate.js"></script>
 		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 		
-		<script>
-		    function start() {
-		      gapi.load('auth2', function() {
-		        auth2 = gapi.auth2.init({
-		          client_id: '<%=Configuration.getGoogleClientId()%>',
-		          // Scopes to request in addition to 'profile' and 'email'
-		          scope: 'https://www.googleapis.com/auth/plus.login'
-		        });
-		      });
-		    }
-		</script>
+
      	<title>Sign in to 3cixty Platform</title>
 		
 		<style type="text/css">
