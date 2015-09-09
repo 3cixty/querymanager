@@ -82,6 +82,7 @@ public class DedicatedUserServices {
 	public Response resetPassword(@FormParam("email") String email) {
 		if (isNullOrEmpty(email))
 			return Response.status(400).entity("Email is empty").build();
+		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
 		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email doesn't exist").build();
 		try {
 			String code = DedicatedUserUtils.resetPassword(email);
@@ -153,6 +154,7 @@ public class DedicatedUserServices {
 			@FormParam("newPassword") String newPassword) {
 		if (isNullOrEmpty(email))
 			return Response.status(400).entity("Email is empty").build();
+		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
 		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email doesn't exist").build();
 		try {
 			validatePassword(oldPassword);
@@ -173,6 +175,7 @@ public class DedicatedUserServices {
 			@FormParam("password") String password) {
 		if (isNullOrEmpty(email))
 			return Response.status(400).entity("Email is empty").build();
+		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
 
 		try {
 			validatePassword(password);
@@ -187,6 +190,17 @@ public class DedicatedUserServices {
 		return Response.status(400).entity(
 					"Failed to change password! Please check your old password").build();
 
+	}
+	
+	@GET
+	@Path("/existEmail")
+	public Response existEmail(@QueryParam("email") String email) {
+		if (isNullOrEmpty(email))
+			return Response.status(400).entity("Email is empty").build();
+		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
+
+		boolean ok = DedicatedUserUtils.exists(email);
+		return Response.ok().entity(ok).build();
 	}
 	
 	private boolean validatePassword(String password) throws Exception {
