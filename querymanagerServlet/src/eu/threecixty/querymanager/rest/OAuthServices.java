@@ -541,7 +541,7 @@ public class OAuthServices {
 	}
 	
 	
-	private Response getAccessTokenFromUid(String _3cixtyUID, AppCache app, String scope) {
+	public static Response getAccessTokenFromUid(String _3cixtyUID, AppCache app, String scope) {
 		if (!checkValidScope(scope)) {
 			return Response.status(Response.Status.BAD_REQUEST)
 			        .entity(" {\"response\": \"failed\", \"reason\": \"Scope is invalid\"} ")
@@ -601,7 +601,7 @@ public class OAuthServices {
 		return false;
 	}
 	
-	private boolean checkValidScope(String scope) {
+	private static boolean checkValidScope(String scope) {
 		if (scope != null && !scope.equals("")) {
 			String[] primitiveScopes = scope.split(",");
 			for (String primitiveScope: primitiveScopes) {
