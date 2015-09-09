@@ -11,7 +11,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "3cixty_dedicated_user", uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"email", "username", "uid"})})
+		@UniqueConstraint(columnNames = {"email", "uid"})})
 public class DedicatedUser implements java.io.Serializable {
 
 	/**
@@ -21,7 +21,6 @@ public class DedicatedUser implements java.io.Serializable {
 
 	private Integer id;
 	private String email;
-	private String username;
 	private String password;
 	private boolean emailConfirmed;
 	private String uid;
@@ -42,14 +41,6 @@ public class DedicatedUser implements java.io.Serializable {
 	}
 	public void setEmail(String email) {
 		this.email = email;
-	}
-	
-	@Column(name = "username", unique = true, nullable = false, length = 100)
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
 	}
 	
 	@Column(name = "password", unique = false, nullable = false, length = 100)
