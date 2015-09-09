@@ -13,11 +13,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
 import eu.threecixty.Configuration;
+import eu.threecixty.cache.AppCache;
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.profile.ActivationException;
 import eu.threecixty.profile.DedicatedUserUtils;
 import eu.threecixty.profile.EmailUtils;
@@ -172,23 +175,31 @@ public class DedicatedUserServices {
 	@POST
 	@Path("/login")
 	public Response login(@FormParam("email") String email,
-			@FormParam("password") String password) {
+			@FormParam("password") String password,
+			@FormParam("key") String key) {
+		if (isNullOrEmpty(key)) return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"App key is empty\"} ").build();
+		AppCache app = TokenCacheManager.getInstance().getAppCache(key);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
 		if (isNullOrEmpty(email))
-			return Response.status(400).entity("Email is empty").build();
-		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
+			return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Email is empty\"} ").build();
+		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Email is invalid\"} ").build();
 
 		try {
 			validatePassword(password);
 		} catch (Exception e) {
-			return Response.status(400).entity(e.getMessage()).build();
+			return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \""+ e.getMessage() + "\" }").build();
 		}
 		boolean ok = DedicatedUserUtils.checkPassword(email, password);
 		if (ok) {
-			// TODO: generate 3cixty token, then return it to client
-			return Response.ok().entity("Successful to change password!").build();
+			String uid = DedicatedUserUtils.getUid(email);
+			Response response = OAuthServices.getAccessTokenFromUid(uid, app, OAuthServices.SCOPES); // full access due to using email & password
+			return response;
 		}
 		return Response.status(400).entity(
-					"Failed to change password! Please check your old password").build();
+				" {\"response\": \"failed\", \"reason\": \"Your email and password don't match. Please check again!\"} ").build();
 
 	}
 	
