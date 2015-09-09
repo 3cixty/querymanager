@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -21,6 +22,8 @@ import org.apache.commons.validator.routines.EmailValidator;
 import eu.threecixty.Configuration;
 import eu.threecixty.cache.AppCache;
 import eu.threecixty.cache.TokenCacheManager;
+import eu.threecixty.oauth.AccessToken;
+import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ActivationException;
 import eu.threecixty.profile.DedicatedUserUtils;
 import eu.threecixty.profile.EmailUtils;
@@ -198,6 +201,47 @@ public class DedicatedUserServices {
 		boolean ok = DedicatedUserUtils.checkPassword(email, password);
 		if (ok) {
 			String uid = DedicatedUserUtils.getUid(email);
+			AccessToken accessToken = getAccessToken(app, uid);
+			if (accessToken == null) return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Could not create access token\"} ").build();
+
+			try {
+				return Response.temporaryRedirect(new URI(app.getRedirectUri()
+						+ "#access_token=" + accessToken.getAccess_token()
+						+ "&refresh_token=" + accessToken.getRefresh_token()
+						+ "&expires_in=" + accessToken.getExpires_in()
+						+ "&scope=" + OAuthServices.SCOPES))
+						.header("Access-Control-Allow-Origin", "*").build();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		return null;
+	}
+	
+	@GET
+	@Path("/loginOnMobile")
+	public Response loginOnMobile(@HeaderParam("email") String email,
+			@HeaderParam("password") String password,
+			@HeaderParam("key") String key) {
+		if (isNullOrEmpty(key)) return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"App key is empty\"} ").build();
+		AppCache app = TokenCacheManager.getInstance().getAppCache(key);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"App key is invalid\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		if (isNullOrEmpty(email))
+			return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Email is empty\"} ").build();
+		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Email is invalid\"} ").build();
+
+		try {
+			validatePassword(password);
+		} catch (Exception e) {
+			return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \""+ e.getMessage() + "\" }").build();
+		}
+		boolean ok = DedicatedUserUtils.checkPassword(email, password);
+		if (ok) {
+			String uid = DedicatedUserUtils.getUid(email);
 			Response response = OAuthServices.getAccessTokenFromUid(uid, app, OAuthServices.SCOPES); // full access due to using email & password
 			return response;
 		}
@@ -215,6 +259,17 @@ public class DedicatedUserServices {
 
 		boolean ok = DedicatedUserUtils.exists(email);
 		return Response.ok().entity(ok + "").build();
+	}
+	
+	private AccessToken getAccessToken(AppCache appCache, String uid) {
+		AccessToken accessToken = OAuthWrappers.createAccessTokenForMobileApp(appCache,
+				OAuthServices.SCOPES);
+		if (accessToken == null) return null;
+		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken.getAccess_token(), accessToken.getRefresh_token(),
+				OAuthServices.SCOPES, appCache, accessToken.getExpires_in())) {
+			return null;
+		}
+		return accessToken;
 	}
 	
 	private boolean validatePassword(String password) throws Exception {
