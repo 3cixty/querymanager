@@ -60,6 +60,9 @@
 		        /* Use the Roboto font that is loaded in the <head> */
 		        font-family: 'Roboto', sans-serif;
 	    }
+	    .loginInput {
+	        width: 330px;
+	    }
 	</style>
 </head>
 
@@ -202,10 +205,10 @@
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
                     <div>
-    					<input type="text" name="email" id="email" placeholder="Email" required>
+    					<input type="text" name="email" id="email" placeholder="Email" required class="loginInput">
   					</div>
   					<div>
-    					<input type="password" name="password" id="password" placeholder="Password" required>
+    					<input type="password" name="password" id="password" placeholder="Password" required class="loginInput">
   					</div>
   					<input type="submit" value="Login">
 			 	  </div>
