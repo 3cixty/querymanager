@@ -200,7 +200,7 @@ public class DedicatedUserServices {
 		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
 
 		boolean ok = DedicatedUserUtils.exists(email);
-		return Response.ok().entity(ok).build();
+		return Response.ok().entity(ok + "").build();
 	}
 	
 	private boolean validatePassword(String password) throws Exception {
