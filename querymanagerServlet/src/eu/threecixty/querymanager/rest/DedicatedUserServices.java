@@ -27,7 +27,7 @@ import eu.threecixty.profile.EmailUtils;
 public class DedicatedUserServices {
 	
 	private static final String RESETTING = "resetting";
-	private static final String USERNAME = "username";
+	private static final String EMAIL = "email";
 
 	private final Pattern hasUppercase = Pattern.compile("[A-Z]");
 	private final Pattern hasLowercase = Pattern.compile("[a-z]");
@@ -44,6 +44,7 @@ public class DedicatedUserServices {
 			@FormParam("firstName") String firstName, @FormParam("lastName") String lastName) {
 		if (isNullOrEmpty(email)) return Response.status(400).entity("Email is empty").build();
 		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
+		if (DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email already existed").build();
 		try {
 			validatePassword(password);
 		} catch (Exception e) {
@@ -53,7 +54,7 @@ public class DedicatedUserServices {
 			return Response.status(400).entity("First name and last name cannot be empty").build();
 		String code = DedicatedUserUtils.createDedicatedUser(email, password, firstName, lastName);
 		if (code == null) return Response.status(500).entity("Internal error! Please contact with 3cixty platform for help").build();
-		EmailUtils.send("Code activation",
+		EmailUtils.send("Activation Code",
 				"Please click on the following link to activate your account <a href='"
 						+ Configuration.get3CixtyRoot() + "/activate?code=" + code
 						+ "'>" + code + "</a>", email);
@@ -80,11 +81,12 @@ public class DedicatedUserServices {
 	@Path("/resetPassword")
 	public Response resetPassword(@FormParam("email") String email) {
 		if (isNullOrEmpty(email))
-			return Response.status(400).entity("Username or email is empty").build();
+			return Response.status(400).entity("Email is empty").build();
+		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email doesn't exist").build();
 		try {
 			String code = DedicatedUserUtils.resetPassword(email);
 			if (code == null) return Response.status(400).entity(
-					"Please check if the given username and email are correct!").build();
+					"Please check if the given email is correct!").build();
 			EmailUtils.send("Reset code", "Please click on the following link to activate the reset code <a href='"
 					+ Configuration.get3CixtyRoot() + "/activateForResettingPassword?code=" + code
 					+ "'>" + code + "</a>", email);
@@ -107,7 +109,7 @@ public class DedicatedUserServices {
 				HttpSession session = httpRequest.getSession();
 				session.setAttribute(RESETTING, Boolean.TRUE);
 				String email = DedicatedUserUtils.getEmail(code);
-				session.setAttribute(USERNAME, email);
+				session.setAttribute(EMAIL, email);
 				try {
 					return Response.seeOther(new URI(Configuration.get3CixtyRoot() + "/setPassword.html")).build();
 				} catch (URISyntaxException e) {
@@ -125,15 +127,15 @@ public class DedicatedUserServices {
 	@Path("/setPassword")
 	public Response setPassword(@FormParam("password") String password) {
 			HttpSession session = httpRequest.getSession();
-			if (session.getAttribute(RESETTING) == null || session.getAttribute(USERNAME) == null)
+			if (session.getAttribute(RESETTING) == null || session.getAttribute(EMAIL) == null)
 				return Response.status(400).entity("Session timeout or Invalid request").build();
 			
 			try {
 				if (validatePassword(password)) {
-					boolean ok = DedicatedUserUtils.setPassword(session.getAttribute(USERNAME).toString(), password);
+					boolean ok = DedicatedUserUtils.setPassword(session.getAttribute(EMAIL).toString(), password);
 					if (ok) {
 						session.removeAttribute(RESETTING);
-						session.removeAttribute(USERNAME);
+						session.removeAttribute(EMAIL);
 						return Response.ok().entity("Successful to set a new password!").build();
 					}
 				}
@@ -151,7 +153,7 @@ public class DedicatedUserServices {
 			@FormParam("newPassword") String newPassword) {
 		if (isNullOrEmpty(email))
 			return Response.status(400).entity("Email is empty").build();
-
+		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email doesn't exist").build();
 		try {
 			validatePassword(oldPassword);
 			validatePassword(newPassword);
