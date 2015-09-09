@@ -376,6 +376,31 @@ public class DedicatedUserUtils {
 	}
 	
 	/**
+	 * Gets 3cixty uid from a given email.
+	 * @param code
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static String getUid(String email) {
+		Session session = null;
+		String uid = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+				String hql1 = "FROM DedicatedUser WHERE email = ?";
+				List <Object> list = session.createQuery(hql1).setString(0, email).list();
+				if (list != null && list.size() > 0) {
+					uid = ((DedicatedUser) list.get(0)).getUid();
+				}
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return uid;
+	}
+	
+	/**
 	 * Checks if a given email already existed in the database.
 	 * @param email
 	 * @return
