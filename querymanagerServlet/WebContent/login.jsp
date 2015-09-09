@@ -201,7 +201,7 @@
 			
 			<div>
 			    <form action="<%=Configuration.get3CixtyRoot()%>/login" method="post">
-				  <h3 class="privacy-title"> Login </h3>
+				  <h3 class="privacy-title"> Sign In with 3cixty account </h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
                     <div>
@@ -210,7 +210,7 @@
   					<div>
     					<input type="password" name="password" id="password" placeholder="Password" required class="loginInput">
   					</div>
-  					<input type="submit" value="Login">
+  					<input type="submit" value="Sign in">
 			 	  </div>
 			 	  <div  align="center">
 			 	  	<a>Forgot password?</a>
