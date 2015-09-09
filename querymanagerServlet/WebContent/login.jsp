@@ -197,7 +197,7 @@
 			</div>
 			
 			<div>
-			    <form action="./login" method="post">
+			    <form action="<%=Configuration.get3CixtyRoot()%>/login" method="post">
 				  <h3 class="privacy-title"> Login </h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
