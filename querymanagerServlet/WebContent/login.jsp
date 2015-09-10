@@ -167,8 +167,10 @@
 </script>
 <div class="wrapper">
 	<div class="logo">  
-    	<div class="logo-icon">
+    	<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')"/>
     	</div>
+    	Powered by
+    	<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')"//>
     </div>
 	<div>
 		
