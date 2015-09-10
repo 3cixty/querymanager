@@ -119,7 +119,7 @@ public class GoFlowServer {
 		try {
 			GoFlowAdminClient adminClient = new GoFlowAdminClient(goflowUrl);
 			adminClient.loginUser(adminname, adminpwd, ADMIN_APPID);
-			adminClient.registerApp(appId, name, description);
+			adminClient.registerApp(appId, name, description, adminpwd);
 			adminClient.logoutUser();
 			return true;
 		} catch (IOException e) {
