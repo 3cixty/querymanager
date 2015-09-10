@@ -175,7 +175,7 @@ public class OAuthWrappers {
 		}
 		
 		boolean ok = OAuthModelsUtils.addApp(appkey, tmpAppId, appName, clientId, pwd, description, tmpCategory,
-				developer, scopeNames, redirect_uri);
+				developer, scopeNames, redirect_uri,thumbNailUrl);
 		if (!ok) return null;
 
 		return appkey;
