@@ -179,7 +179,7 @@ public class DedicatedUserServices {
 	}
 	
 	@POST
-	@Path("/login")
+	@Path("/signin")
 	public Response login(@FormParam("email") String email,
 			@FormParam("password") String password,
 			@FormParam("key") String key) {
@@ -219,7 +219,7 @@ public class DedicatedUserServices {
 	}
 	
 	@GET
-	@Path("/loginOnMobile")
+	@Path("/signinOnMobile")
 	public Response loginOnMobile(@HeaderParam("email") String email,
 			@HeaderParam("password") String password,
 			@HeaderParam("key") String key) {
