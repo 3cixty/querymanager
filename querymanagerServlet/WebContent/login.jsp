@@ -200,7 +200,7 @@
 			</div>
 			
 			<div>
-			    <form action="<%=Configuration.get3CixtyRoot()%>/login" method="post">
+			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
 				  <h3 class="privacy-title"> Sign In with 3cixty account </h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
