@@ -312,7 +312,7 @@ public class OAuthModelsUtils {
 	}
 
 	protected static boolean addApp(String key, String appId, String appName, String clientId, String pwd, String description,
-			String category, Developer developer, List<String> scopeNames, String redirect_uri) {
+			String category, Developer developer, List<String> scopeNames, String redirect_uri, String thumbNailUrl) {
 		if (isNullOrEmpty(key) || isNullOrEmpty(appId)
 				|| isNullOrEmpty(category) || developer == null) return false;
 		Session session = null;
@@ -335,7 +335,7 @@ public class OAuthModelsUtils {
 			app.setClientId(clientId);
 			app.setPassword(pwd);
 			app.setAppName(appName);
-			
+			app.setThumbnail(thumbNailUrl);
 			session.save(app);
 
 			session.getTransaction().commit();

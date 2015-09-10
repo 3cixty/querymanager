@@ -166,9 +166,23 @@
   }
 </script>
 <div class="wrapper">
-	<div class="logo">  
-    	<div class="logo-icon">
-    	</div>
+	<div class="logo">
+		<table>
+			<tr>
+		  		<td>
+    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')"/>
+    			</td>
+    			<td>
+    				<div  align="center">
+    					<h3 class="privacy-title"> Powered by </h3>
+   					</div>
+   				</td>
+    			<td>
+    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')"/>
+    			</td>
+    		</tr>
+    	</table>
+    				
     </div>
 	<div>
 		
