@@ -134,7 +134,7 @@ public class GoFlowAdminClient extends GoFlowEventClient {
 		return;
 	}
 
-	public void registerApp(String appid, String name, String description) throws IOException {
+	public void registerApp(String appid, String name, String description, String creatorPwd) throws IOException {
 		//
 		if (appid == null || appid.equals("") || !validId(appid)) {
 			throw new IOException("Invalid parameter");
@@ -142,8 +142,9 @@ public class GoFlowAdminClient extends GoFlowEventClient {
 
 		JsonObject jsonParam = new JsonObject();
 		jsonParam.addProperty("appId", appid);
-		jsonParam.addProperty("appName", name);
+        jsonParam.addProperty("appName", name);
 		jsonParam.addProperty("appDescription", description);
+        jsonParam.addProperty("pwd", creatorPwd);
 		String res = sendJsonPostRequest("event/registerApp", jsonParam.toString());
 
 		if (res == null) {
