@@ -216,7 +216,7 @@
   					<div>
     					<input type="password" name="password" id="password" placeholder="Password" required class="loginInput">
   					</div>
-  					<input class="signinButton" type="submit" value="Sign in">
+  					<input class="signinButton" type="submit" value=" Sign in ">
 			 	  </div>
 			 	  <div  align="center">
 			 	  	<a href="./forgotPassword.html"><font class="link">Forgot password?</font></a>
