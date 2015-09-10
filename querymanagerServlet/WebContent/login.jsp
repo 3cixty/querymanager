@@ -219,7 +219,7 @@
   					<input type="submit" value="Sign in">
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a><font class="link">Forgot password?</font></a>
+			 	  	<a href="./forgotPassword.html"><font class="link">Forgot password?</font></a>
 			 	  </div>
 			 	  <div  align="center">
 			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create an account</font></a>
