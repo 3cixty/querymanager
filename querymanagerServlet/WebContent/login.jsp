@@ -63,6 +63,12 @@
 	    .loginInput {
 	        width: 330px;
 	    }
+	    .signinButton {
+	        height: 39px;
+	    }
+	    .link {
+	        color: blue;
+	    }
 	</style>
 </head>
 
@@ -213,10 +219,10 @@
   					<input type="submit" value="Sign in">
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a>Forgot password?</a>
+			 	  	<a><font class="link">Forgot password?</font></a>
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./signUp.jsp?key=<%=key%>">Create an account</a>
+			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create an account</font></a>
 			 	  </div>
 			 	</form>
 			</div>
