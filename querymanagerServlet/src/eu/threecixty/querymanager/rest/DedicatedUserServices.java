@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -27,6 +28,7 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.ActivationException;
 import eu.threecixty.profile.DedicatedUserUtils;
 import eu.threecixty.profile.EmailUtils;
+import eu.threecixty.querymanager.AuthorizationBypassManager;
 
 
 @Path("/" + Constants.PREFIX_NAME)
@@ -201,19 +203,39 @@ public class DedicatedUserServices {
 		boolean ok = DedicatedUserUtils.checkPassword(email, password);
 		if (ok) {
 			String uid = DedicatedUserUtils.getUid(email);
-			AccessToken accessToken = getAccessToken(app, uid);
-			if (accessToken == null) return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Could not create access token\"} ").build();
-
+			AccessToken accessToken = OAuthWrappers.findAccessToken(uid, app);
+			if (accessToken != null) {
+				return redirect_uri_client2(accessToken, accessToken.getExpires_in(), app);
+			}
+			
+			// bypass authorization for 3cixty's apps
+			if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
+				AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, OAuthServices.SCOPES);
+				if (at != null) {
+					if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), OAuthServices.SCOPES, app, at.getExpires_in())) {
+						return redirect_uri_client2(at, at.getExpires_in(), app);
+					}
+				}
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+						" {\"response\": \"failed\" } ").type(MediaType.APPLICATION_JSON_TYPE).build();
+			}
+			
 			try {
-				return Response.temporaryRedirect(new URI(app.getRedirectUri()
-						+ "#access_token=" + accessToken.getAccess_token()
-						+ "&refresh_token=" + accessToken.getRefresh_token()
-						+ "&expires_in=" + accessToken.getExpires_in()
-						+ "&scope=" + OAuthServices.SCOPES))
-						.header("Access-Control-Allow-Origin", "*").build();
+				
+				return Response.temporaryRedirect(new URI(
+						OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
+				+ OAuthServices.SCOPES + "&client_id="
+				+ app.getAppClientKey() + "&redirect_uri="
+			    + OAuthServices.THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
+			    		OAuthWrappers.getBasicAuth(app.getAppClientKey(), app.getAppClientPwd()))
+			    		.header("Access-Control-Allow-Origin", "*")
+	                    .cacheControl(OAuthServices.cacheControlNoStore())
+	                    .header("Pragma", "no-cache")
+			    		.build();
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
+			return null;
 		}
 		return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Your email and password don't matche!!!\"} ").build();
 	}
@@ -222,7 +244,7 @@ public class DedicatedUserServices {
 	@Path("/signinOnMobile")
 	public Response loginOnMobile(@HeaderParam("email") String email,
 			@HeaderParam("password") String password,
-			@HeaderParam("key") String key) {
+			@HeaderParam("key") String key, @DefaultValue("") @HeaderParam("scopes") String scopes) {
 		if (isNullOrEmpty(key)) return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"App key is empty\"} ").build();
 		AppCache app = TokenCacheManager.getInstance().getAppCache(key);
 		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
@@ -241,7 +263,7 @@ public class DedicatedUserServices {
 		boolean ok = DedicatedUserUtils.checkPassword(email, password);
 		if (ok) {
 			String uid = DedicatedUserUtils.getUid(email);
-			Response response = OAuthServices.getAccessTokenFromUid(uid, app, OAuthServices.SCOPES); // full access due to using email & password
+			Response response = OAuthServices.getAccessTokenFromUid(uid, app, scopes);
 			return response;
 		}
 		return Response.status(400).entity(
@@ -260,16 +282,21 @@ public class DedicatedUserServices {
 		return Response.ok().entity(ok + "").build();
 	}
 	
-	private AccessToken getAccessToken(AppCache appCache, String uid) {
-		AccessToken accessToken = OAuthWrappers.createAccessTokenForMobileApp(appCache,
-				OAuthServices.SCOPES);
-		if (accessToken == null) return null;
-		if (!OAuthWrappers.storeAccessTokenWithUID(uid, accessToken.getAccess_token(), accessToken.getRefresh_token(),
-				OAuthServices.SCOPES, appCache, accessToken.getExpires_in())) {
-			return null;
+	
+	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, AppCache app) {
+		try {
+			return Response.temporaryRedirect(new URI(app.getRedirectUri()
+					+ "#access_token=" + accessToken.getAccess_token()
+					+ "&refresh_token=" + accessToken.getRefresh_token()
+					+ "&expires_in=" + expires_in
+					+ "&scope=" + OAuthServices.join(accessToken.getScopeNames(), ",") ))
+					.header("Access-Control-Allow-Origin", "*").build();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
-		return accessToken;
+		return null;
 	}
+	
 	
 	private boolean validatePassword(String password) throws Exception {
 		if (isNullOrEmpty(password)) throw new Exception("Password is empty");

@@ -571,7 +571,7 @@ public class OAuthServices {
 	}
 	
 
-	private String join(List<String> scopeNames, String strJoined) {
+	public static String join(List<String> scopeNames, String strJoined) {
 		if (scopeNames.size() == 0) return "null";
 		StringBuilder builder = new StringBuilder();
 		for (String scopeName: scopeNames) {
@@ -613,7 +613,7 @@ public class OAuthServices {
 		return true;
 	}
 	
-	private CacheControl cacheControlNoStore() {
+	public static CacheControl cacheControlNoStore() {
 		CacheControl cacheControl = new CacheControl();
 		cacheControl.setNoStore(true);
 		return cacheControl;
