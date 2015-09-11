@@ -46,14 +46,14 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
+	public static List <ElementDetails> createEventsDetails(String eventGraph, Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return Collections.emptyList();
 		
 		List <ElementDetails> finalList = new ArrayList <ElementDetails>();
 
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?url1 ?url2 \n");
 		queryBuff.append("WHERE {\n");
-		queryBuff.append("{ graph <http://3cixty.com/events> {?item a lode:Event.} } \n");
+		queryBuff.append("{ graph " + eventGraph + " {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
 		queryBuff.append(" OPTIONAL { ?item rdfs:seeAlso ?url . } \n");
 		queryBuff.append(" OPTIONAL { ?item owl:sameAs ?url2 . } \n");
@@ -198,7 +198,7 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds,
+	public static List <ElementDetails> createPoIsDetails(String poiGraph, Collection <String> poiIds,
 			String[] categories, String[] topCategories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return Collections.emptyList();
 
@@ -206,7 +206,7 @@ public class ElementDetailsUtils {
 		
 		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category ?topCategory  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url ?url1 ?url2  \n");
 		queryBuff.append("WHERE {\n");
-		queryBuff.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
+		queryBuff.append(" { graph " + poiGraph + " {?poi a dul:Place.} }  \n");
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
 		queryBuff.append(" OPTIONAL { ?poi owl:sameAs ?url . } \n");
