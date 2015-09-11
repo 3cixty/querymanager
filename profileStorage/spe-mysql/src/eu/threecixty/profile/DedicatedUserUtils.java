@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
+import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.db.HibernateUtil;
 import eu.threecixty.userprofile.DedicatedUser;
 import eu.threecixty.userprofile.UserActivation;
@@ -60,6 +61,7 @@ public class DedicatedUserUtils {
 			session.save(userModel);
 			
 			UserActivation userActivation = createUserActivation(dedicatedUser.getId(),
+					TokenCacheManager.getInstance().getAppCache(key).getId(),
 					ActivationType.CREATION);
 			session.save(userActivation);
 			session.getTransaction().commit();
@@ -73,10 +75,17 @@ public class DedicatedUserUtils {
 		return code;
 	}
 	
+	/**
+	 * This method is to activate a creation code. If successful, it will return appId and null otherwise.
+	 * @param code
+	 * @return
+	 * @throws ActivationException
+	 */
 	@SuppressWarnings("unchecked")
-	public static boolean activateForCreation(String code) throws ActivationException {
+	public static Integer activateForCreation(String code) throws ActivationException {
 		Session session = null;
 		boolean ok = false;
+		Integer appId = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 			String hql = "FROM UserActivation WHERE code = ?";
@@ -102,6 +111,7 @@ public class DedicatedUserUtils {
 
 					session.getTransaction().commit();
 					ok = true;
+					appId = userActivation.getAppId();
 				}
 			}
 		} catch (HibernateException e) {
@@ -110,13 +120,21 @@ public class DedicatedUserUtils {
 		} finally {
 			if (session != null) session.close();
 		}
-		return ok;
+		if (ok) return appId;
+		return null;
 	}
 	
+	/**
+	 * This method is to activate a reset code. If successful, it will return appId and null otherwise.
+	 * @param code
+	 * @return
+	 * @throws ActivationException
+	 */
 	@SuppressWarnings("unchecked")
-	public static boolean activateForResettingPassword(String code) throws ActivationException {
+	public static Integer activateForResettingPassword(String code) throws ActivationException {
 		Session session = null;
 		boolean ok = false;
+		Integer appId = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 			String hql = "FROM UserActivation WHERE code = ?";
@@ -134,6 +152,7 @@ public class DedicatedUserUtils {
 
 				session.getTransaction().commit();
 				ok = true;
+				appId = userActivation.getAppId();
 			}
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
@@ -141,7 +160,8 @@ public class DedicatedUserUtils {
 		} finally {
 			if (session != null) session.close();
 		}
-		return ok;
+		if (ok) return appId;
+		return null;
 	}
 	
 	/**
@@ -151,7 +171,7 @@ public class DedicatedUserUtils {
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
-	public static String resetPassword(String email) throws Exception {
+	public static String resetPassword(String email, String key) throws Exception {
 		if (isNullOrEmpty(email)) return null;
 		Session session = null;
 		String code = null;
@@ -165,10 +185,10 @@ public class DedicatedUserUtils {
 			
 			if (list != null && list.size() > 0) {
 				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
-				
+				Integer appId = TokenCacheManager.getInstance().getAppCache(key).getId();
 				session.beginTransaction();
 				
-				UserActivation userActivation = createUserActivation(dedicatedUser.getId(),
+				UserActivation userActivation = createUserActivation(dedicatedUser.getId(), appId,
 						ActivationType.FORGOTTEN_PASSWORD);
 				session.save(userActivation);
 				session.getTransaction().commit();
@@ -440,7 +460,7 @@ public class DedicatedUserUtils {
 		return userModel;
 	}
 
-	private static UserActivation createUserActivation(Integer dedicatedUserId,
+	private static UserActivation createUserActivation(Integer dedicatedUserId, Integer appId,
 			ActivationType type) {
 		if (dedicatedUserId == null) return null;
 		String code = UUID.randomUUID().toString();
@@ -451,6 +471,7 @@ public class DedicatedUserUtils {
 		userActivation.setDedicatedUserId(dedicatedUserId);
 		userActivation.setType(type);
 		userActivation.setCreation(System.currentTimeMillis());
+		userActivation.setAppId(appId);
 		return userActivation;
 	}
 	

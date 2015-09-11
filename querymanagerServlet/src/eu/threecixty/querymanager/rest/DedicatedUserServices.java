@@ -36,6 +36,7 @@ public class DedicatedUserServices {
 	
 	private static final String RESETTING = "resetting";
 	private static final String EMAIL = "email";
+	private static final String APP_ID = null;
 
 	private final Pattern hasUppercase = Pattern.compile("[A-Z]");
 	private final Pattern hasLowercase = Pattern.compile("[a-z]");
@@ -66,9 +67,9 @@ public class DedicatedUserServices {
 		String code = DedicatedUserUtils.createDedicatedUser(email, password, firstName, lastName, key);
 		if (code == null) return Response.status(500).entity("Internal error! Please contact with 3cixty platform for help").build();
 		EmailUtils.send("Activation Code",
-				"Please click on the following link to activate your account <a href='"
+				"Please click on the following link to activate your account <a href=\""
 						+ Configuration.get3CixtyRoot() + "/activate?code=" + code
-						+ "'>" + code + "</a>", email);
+						+ "\">" + code + "</a>", email);
 		return Response.ok().entity("Successful to sign up! Please check your email to activate your account!").build();
 	}
 	
@@ -78,9 +79,11 @@ public class DedicatedUserServices {
 		if (isNullOrEmpty(code))
 			return Response.status(400).entity("Activation code is empty").build();
 		try {
-			boolean ok = DedicatedUserUtils.activateForCreation(code);
-			if (ok) return Response.ok().entity(
-					"Successful! Your account has been successfully created on 3cixty platform.").build();
+			Integer appId = DedicatedUserUtils.activateForCreation(code);
+			String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
+			if (appId != null) return Response.ok().entity(
+					"Successful! Your account has been successfully created on 3cixty platform. Please <a href=\""
+			        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>.").build();
 			return Response.status(400).entity("Failed to activate! Please check if your activation code is valid (one time-use)").build();
 		} catch (ActivationException e) {
 			e.printStackTrace();
@@ -90,20 +93,23 @@ public class DedicatedUserServices {
 	
 	@POST
 	@Path("/resetPassword")
-	public Response resetPassword(@FormParam("email") String email) {
+	public Response resetPassword(@FormParam("email") String email, @FormParam("key") String key) {
 		if (isNullOrEmpty(email))
 			return Response.status(400).entity("Email is empty").build();
+		if (isNullOrEmpty(key)) return Response.status(400).entity("App key is empty").build();
 		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
-		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email doesn't exist").build();
+		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity(
+				"Sorry, this email " + email + " does not exist in our database. Are you sure it is correct?").build();
+		if (TokenCacheManager.getInstance().getAppCache(key) == null) return Response.status(400).entity("App key is invalid").build();
 		try {
-			String code = DedicatedUserUtils.resetPassword(email);
-			if (code == null) return Response.status(400).entity(
-					"Please check if the given email is correct!").build();
+			String code = DedicatedUserUtils.resetPassword(email, key);
+			if (code == null) return Response.status(500).entity(
+					"Internal error").build();
 			EmailUtils.send("Reset code", "Please click on the following link to activate the reset code <a href='"
 					+ Configuration.get3CixtyRoot() + "/activateForResettingPassword?code=" + code
 					+ "'>" + code + "</a>", email);
 			return Response.ok().entity(
-					"Successful to create a reset code! Please check your email to activate the reset code!").build();
+					"Your password reset code has been successfully sent to "+ email +". Please check your inbox for the next step.").build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.serverError().entity(e.getMessage()).build();
@@ -116,10 +122,11 @@ public class DedicatedUserServices {
 		if (isNullOrEmpty(code))
 			return Response.status(400).entity("Reset code is empty").build();
 		try {
-			boolean ok = DedicatedUserUtils.activateForResettingPassword(code);
-			if (ok) {
+			Integer appId = DedicatedUserUtils.activateForResettingPassword(code);
+			if (appId != null) {
 				HttpSession session = httpRequest.getSession();
 				session.setAttribute(RESETTING, Boolean.TRUE);
+				session.setAttribute(APP_ID, appId);
 				String email = DedicatedUserUtils.getEmail(code);
 				session.setAttribute(EMAIL, email);
 				try {
@@ -139,7 +146,8 @@ public class DedicatedUserServices {
 	@Path("/setPassword")
 	public Response setPassword(@FormParam("password") String password) {
 			HttpSession session = httpRequest.getSession();
-			if (session.getAttribute(RESETTING) == null || session.getAttribute(EMAIL) == null)
+			if (session.getAttribute(RESETTING) == null || session.getAttribute(EMAIL) == null
+					|| session.getAttribute(APP_ID) == null)
 				return Response.status(400).entity("Session timeout or Invalid request").build();
 			
 			try {
@@ -148,7 +156,12 @@ public class DedicatedUserServices {
 					if (ok) {
 						session.removeAttribute(RESETTING);
 						session.removeAttribute(EMAIL);
-						return Response.ok().entity("Successful to set a new password!").build();
+						Integer appId = (Integer) session.getAttribute(APP_ID);
+						String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
+						session.removeAttribute(APP_ID);
+						return Response.ok().entity(
+								"Password updates successfully! Please <a href=\""
+						        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>").build();
 					}
 				}
 			} catch (Exception e) {
@@ -166,7 +179,8 @@ public class DedicatedUserServices {
 		if (isNullOrEmpty(email))
 			return Response.status(400).entity("Email is empty").build();
 		if (!EmailValidator.getInstance().isValid(email)) return Response.status(400).entity("Email is invalid").build();
-		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity("Email doesn't exist").build();
+		if (!DedicatedUserUtils.exists(email)) return Response.status(400).entity(
+				"Sorry, this email " + email + " does not exist in our database. Are you sure it is correct?").build();
 		try {
 			validatePassword(oldPassword);
 			validatePassword(newPassword);
@@ -267,7 +281,7 @@ public class DedicatedUserServices {
 			return response;
 		}
 		return Response.status(400).entity(
-				" {\"response\": \"failed\", \"reason\": \"Your email and password don't match. Please check again!\"} ").build();
+				" {\"response\": \"failed\", \"reason\": \"Your email and password do not match.\"} ").build();
 
 	}
 	

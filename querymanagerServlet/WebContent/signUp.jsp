@@ -93,6 +93,11 @@
   line-height: 20px;
 }
 
+.pwdNote {
+  font-family: serif;
+  color: gray;
+  font-style: italic;
+}
 
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -133,6 +138,8 @@ if (key != null) {
             </div>
             <input type="hidden" name="key" value='<%=key%>'>
           </form>
+          
+          <span class="pwdNote">Password must contain at least one digit, one lower case, one upper case, and between 8 and 30 characters</span>
         </div>
       </div>
     </div>
@@ -142,6 +149,8 @@ if (key != null) {
 
        
        $(document).ready(function () {
+    	   
+    	   window.resizeTo((int) screen.width * 0.6, (int) screen.height * 0.6);
        
            $("#email").blur(function() 
     	      {
