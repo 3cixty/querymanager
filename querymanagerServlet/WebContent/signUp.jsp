@@ -150,7 +150,7 @@ if (key != null) {
        
        $(document).ready(function () {
     	   
-    	   window.resizeTo((int) screen.width * 0.6, (int) screen.height * 0.6);
+    	   window.resizeTo(screen.width * 0.6, screen.height * 0.6);
        
            $("#email").blur(function() 
     	      {
