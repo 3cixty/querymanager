@@ -125,6 +125,7 @@ public class SPEServices {
 	@Path("/getUserRelatedInformation")
 	public Response getProfiles(@HeaderParam("username") String username,
 			@HeaderParam("password") String password,
+			@HeaderParam("key") String key,
 			@QueryParam("uid") String _3cixtyUID, @DefaultValue("en") String language) {
 		try {
 			AdminValidator admin = new AdminValidator();
@@ -142,7 +143,7 @@ public class SPEServices {
 				try {
 					List <Tray> trays = ProfileManagerImpl.getInstance().getTrayManager().getTrays(_3cixtyUID);
 					List <ElementDetails> listOfElementDetails = new LinkedList <ElementDetails>();
-					TrayServices.findTrayDetails(trays, LanguageUtils.getLanguages(language), listOfElementDetails);
+					TrayServices.findTrayDetails(key, trays, LanguageUtils.getLanguages(language), listOfElementDetails);
 					uri.setWishesList(listOfElementDetails);
 				} catch (InvalidTrayElement e) {
 					e.printStackTrace();
