@@ -67,9 +67,8 @@ public class DedicatedUserServices {
 		String code = DedicatedUserUtils.createDedicatedUser(email, password, firstName, lastName, key);
 		if (code == null) return Response.status(500).entity("Internal error! Please contact with 3cixty platform for help").build();
 		EmailUtils.send("Activation Code",
-				"Please click on the following link to activate your account <a href=\""
-						+ Configuration.get3CixtyRoot() + "/activate?code=" + code
-						+ "\">" + code + "</a>", email);
+				"Please click on the following link to activate your account "
+						+ Configuration.get3CixtyRoot() + "/activate?code=" + code, email);
 		return Response.ok().entity("Successful to sign up! Please check your email to activate your account!").build();
 	}
 	
@@ -105,9 +104,8 @@ public class DedicatedUserServices {
 			String code = DedicatedUserUtils.resetPassword(email, key);
 			if (code == null) return Response.status(500).entity(
 					"Internal error").build();
-			EmailUtils.send("Reset code", "Please click on the following link to activate the reset code <a href='"
-					+ Configuration.get3CixtyRoot() + "/activateForResettingPassword?code=" + code
-					+ "'>" + code + "</a>", email);
+			EmailUtils.send("Reset code", "Please click on the following link to activate the reset code "
+					+ Configuration.get3CixtyRoot() + "/activateForResettingPassword?code=" + code, email);
 			return Response.ok().entity(
 					"Your password reset code has been successfully sent to "+ email +". Please check your inbox for the next step.").build();
 		} catch (Exception e) {
@@ -160,8 +158,8 @@ public class DedicatedUserServices {
 						String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
 						session.removeAttribute(APP_ID);
 						return Response.ok().entity(
-								"Password updates successfully! Please <a href=\""
-						        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>").build();
+								"Password updates successfully! Please proceed to the site by clicking on "
+						        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key).build();
 					}
 				}
 			} catch (Exception e) {
