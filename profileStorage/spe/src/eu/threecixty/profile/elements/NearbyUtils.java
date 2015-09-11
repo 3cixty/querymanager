@@ -34,14 +34,14 @@ public class NearbyUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
-	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyEvents(String eventGraph, double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId,
 			List <String> listEventsFromFriendsWishlist) throws IOException {
 		
 		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance ?title \n");
 
 		builder.append("WHERE { \n");
-		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
+		builder.append("        { graph " + eventGraph + " {?event a lode:Event.} } \n");
 		builder.append("?event rdfs:label ?title . \n");
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_EVENT;
 		if (categories != null && categories.length > 0) {
@@ -103,10 +103,10 @@ public class NearbyUtils {
 		
 		if (DEBUG_MOD) LOGGER.info(builder.toString());
 		
-		return getNearbyEvents(builder.toString(), categories, languages, listEventsFromFriendsWishlist);
+		return getNearbyEvents(eventGraph, builder.toString(), categories, languages, listEventsFromFriendsWishlist);
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String id, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyEvents(String eventGraph, String id, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
 		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
@@ -143,10 +143,10 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id, null);
+		return getNearbyEvents(eventGraph, lat, lon, categories, languages, distance, offset, limit, id, null);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon,
+	public static List <ElementDetails> getNearbyPoIElements(String poiGraph, double lat, double lon,
 			String[] categories, String[] topCategories, String[] languages,
 			double distance, int offset, int limit,
 			List <String> listPoIsFromFriendsWishlist) throws IOException {
@@ -154,7 +154,7 @@ public class NearbyUtils {
 		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI;
 
 		builder.append("WHERE { \n");
-		builder.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
+		builder.append(" { graph " + poiGraph + " {?poi a dul:Place.} }  \n");
 		builder.append(" ?poi rdfs:label ?name .  \n");
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
@@ -205,7 +205,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, topCategories, languages, listPoIsFromFriendsWishlist);
+		return getNearbyPoIs(poiGraph, builder.toString(), categories, topCategories, languages, listPoIsFromFriendsWishlist);
 	}
 	
 	/**
@@ -218,7 +218,7 @@ public class NearbyUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> getNearbyPoIElements(String locId, String[] categories, String[] topCategories,
+	public static List <ElementDetails> getNearbyPoIElements(String poiGraph, String locId, String[] categories, String[] topCategories,
 			String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();
@@ -257,11 +257,11 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, topCategories, languages, null);
+		return getNearbyPoIs(poiGraph, builder.toString(), categories, topCategories, languages, null);
 
 	}
 	
-	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories,
+	private static List <ElementDetails> getNearbyPoIs(String poiGraph, String query, String[] categories,
 			String[] topCategories, String [] languages,
 			List <String> listPoIsFromFriendsWishlist) throws IOException {
 		if (DEBUG_MOD) LOGGER.info(query);
@@ -279,7 +279,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet(),
+		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(poiGraph, maps.keySet(),
 				categories, topCategories, languages);
 		
 		for (ElementDetails elementDetails: results) {
@@ -292,7 +292,7 @@ public class NearbyUtils {
 		return results;
 	}
 	
-	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages,
+	private static List <ElementDetails> getNearbyEvents(String eventGraph, String query, String[] categories, String [] languages,
 			List <String> listEventsFromFriendsWishlist) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
@@ -308,7 +308,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(maps.keySet(), categories, languages);
+		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(eventGraph, maps.keySet(), categories, languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));

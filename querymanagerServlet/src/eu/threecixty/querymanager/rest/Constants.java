@@ -18,6 +18,11 @@ public class Constants {
 	public static final String PROFILE_SCOPE_NAME = "Profile";
 	public static final String JSON = "json";
 	public static final String RDF = "rdf";
+	
+	public static final String GRAPH_EVENT_EXPLORMI = "<http://3cixty.com/events>";
+	public static final String GRAPH_POI_EXPLORMI = "<http://3cixty.com/places>";
+	public static final String GRAPH_EVENT_OTHERS = "<http://3cixty.com/events>";
+	public static final String GRAPH_POI_OTHERS = "<http://3cixty.com/places>";
 
 	private Constants() {
 	}

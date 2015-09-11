@@ -322,7 +322,7 @@ public class QueryManagerServices {
 				if (events != null && !events.equals("")) {
 					List <String> eventIds = createList(events);
 					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
-							eventIds, null, tmpLanguages);
+							GraphChooser.getEventGraph(key), eventIds, null, tmpLanguages);
 					if (eventsDetails != null) {
 						result.put("Events", eventsDetails);
 					}
@@ -331,8 +331,8 @@ public class QueryManagerServices {
 				if (pois != null && !pois.equals("")) {
 					List <String> poiIds = createList(pois);
 
-					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null,
-							tmpLanguages);
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(GraphChooser.getPoIGraph(key),
+							poiIds, null, null, tmpLanguages);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
 					}
@@ -729,7 +729,8 @@ public class QueryManagerServices {
 					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
 				
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
+					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
+							GraphChooser.getEventGraph(key), eventIds, null, tmpLanguages);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					String content = JSONObject.wrap(eventsDetails).toString();
 					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
@@ -766,7 +767,8 @@ public class QueryManagerServices {
 			try {
 				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, tmpLanguages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(
+						GraphChooser.getPoIGraph(key), poiIds, null, null, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(poisInDetails).toString();

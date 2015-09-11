@@ -452,7 +452,7 @@ public class TrayServices {
 	
 	private void findTrayDetails(List<Tray> trays,
 			List<ElementDetails> trayDetailsList, RestTrayObject restTray) throws IOException {
-		findTrayDetails(trays, LanguageUtils.getLanguages(restTray.getLanguage()), trayDetailsList);
+		findTrayDetails(restTray.getKey(), trays, LanguageUtils.getLanguages(restTray.getLanguage()), trayDetailsList);
 	}
 
 	private long getNewestTimestamp(List <Tray> trays) {
@@ -481,7 +481,7 @@ public class TrayServices {
 	}
 	
 	
-	public static void findTrayDetails(List<Tray> trays, String []languages,
+	public static void findTrayDetails(String key, List<Tray> trays, String []languages,
 			List<ElementDetails> trayDetailsList) throws IOException {
 		List <String> eventIds = new LinkedList <String>();
 		List <String> poiIds = new LinkedList <String>();
@@ -490,7 +490,8 @@ public class TrayServices {
 			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
 		}
 		
-		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, languages);
+		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(
+				GraphChooser.getEventGraph(key), eventIds, null, languages);
 		if (elementEventsDetails != null) {
 			for (ElementDetails eventDetails: elementEventsDetails) {
 				eventDetails.setType(EVENT_TYPE);
@@ -505,7 +506,8 @@ public class TrayServices {
 			}
 			trayDetailsList.addAll(elementEventsDetails);
 		}
-		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, null, languages);
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(
+				GraphChooser.getPoIGraph(key), poiIds, null, null, languages);
 		if (elementPoIsDetails != null) {
 			for (ElementDetails poiDetails: elementPoIsDetails) {
 				poiDetails.setType(POI_TYPE);
