@@ -28,6 +28,7 @@ public class UserActivation implements java.io.Serializable {
 	
 	/**DO NOT reference the attribute with UserModel to avoid having to remove when deleting a user profile*/
 	private Integer dedicatedUserId;
+	private Integer appId;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -92,6 +93,15 @@ public class UserActivation implements java.io.Serializable {
 
 	public void setSent(boolean sent) {
 		this.sent = sent;
+	}
+
+	@Column(name = "app_id", nullable = false)
+	public Integer getAppId() {
+		return appId;
+	}
+
+	public void setAppId(Integer appId) {
+		this.appId = appId;
 	}
 
 

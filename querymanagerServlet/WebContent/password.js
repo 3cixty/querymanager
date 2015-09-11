@@ -17,7 +17,7 @@
          var pwd2 = document.getElementById("password-again").value;
          if (pwd1 != pwd2)
          {
-           alert("Check your password again");
+           alert("Passwords do not match");
            document.getElementById("password-again").focus();
            return false;
          } else {
