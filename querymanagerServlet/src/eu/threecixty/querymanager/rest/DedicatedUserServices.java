@@ -36,7 +36,7 @@ public class DedicatedUserServices {
 	
 	private static final String RESETTING = "resetting";
 	private static final String EMAIL = "email";
-	private static final String APP_ID = null;
+	private static final String APP_ID = "appId";
 
 	private final Pattern hasUppercase = Pattern.compile("[A-Z]");
 	private final Pattern hasLowercase = Pattern.compile("[a-z]");
