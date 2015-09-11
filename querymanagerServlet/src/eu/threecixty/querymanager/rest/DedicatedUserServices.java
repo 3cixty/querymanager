@@ -158,8 +158,8 @@ public class DedicatedUserServices {
 						String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
 						session.removeAttribute(APP_ID);
 						return Response.ok().entity(
-								"Password updates successfully! Please proceed to the site by clicking on "
-						        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key).build();
+								"Password updates successfully! Please <a href=\""
+						        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>").build();
 					}
 				}
 			} catch (Exception e) {
