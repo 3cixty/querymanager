@@ -1,23 +1,29 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 20
     buildToolsVersion "20.0.0"
-
-
+    defaultPublishConfig "release"
     defaultConfig {
-        applicationId "com.threecixty.auth"
+        // applicationId "com.threecixty.auth"
         minSdkVersion 9
         targetSdkVersion 20
         versionCode 8
         versionName "0.8"
     }
-
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+    }
+    signingConfigs {
+        release {
+            storeFile file("/keys/3cixty-release-key.keystore")
+        }
+    }
+    productFlavors {
     }
 }
 
