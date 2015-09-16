@@ -34,7 +34,7 @@ public class NearbyUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
-	public static List <ElementDetails> getNearbyEvents(String eventGraph, double lat, double lon, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId,
 			List <String> listEventsFromFriendsWishlist) throws IOException {
 		
@@ -103,10 +103,10 @@ public class NearbyUtils {
 		
 		if (DEBUG_MOD) LOGGER.info(builder.toString());
 		
-		return getNearbyEvents(eventGraph, builder.toString(), categories, languages, listEventsFromFriendsWishlist);
+		return getNearbyEvents(endPointUrl, eventGraph, builder.toString(), categories, languages, listEventsFromFriendsWishlist);
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String eventGraph, String id, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, String id, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
 		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
@@ -131,7 +131,7 @@ public class NearbyUtils {
 		
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(builder.toString(),
-				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, resultBuilder); 
+				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, endPointUrl, resultBuilder); 
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
@@ -143,10 +143,10 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(eventGraph, lat, lon, categories, languages, distance, offset, limit, id, null);
+		return getNearbyEvents(endPointUrl, eventGraph, lat, lon, categories, languages, distance, offset, limit, id, null);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(String poiGraph, double lat, double lon,
+	public static List <ElementDetails> getNearbyPoIElements(String endPointUrl, String poiGraph, double lat, double lon,
 			String[] categories, String[] topCategories, String[] languages,
 			double distance, int offset, int limit,
 			List <String> listPoIsFromFriendsWishlist) throws IOException {
@@ -205,7 +205,7 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(poiGraph, builder.toString(), categories, topCategories, languages, listPoIsFromFriendsWishlist);
+		return getNearbyPoIs(endPointUrl, poiGraph, builder.toString(), categories, topCategories, languages, listPoIsFromFriendsWishlist);
 	}
 	
 	/**
@@ -218,7 +218,7 @@ public class NearbyUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> getNearbyPoIElements(String poiGraph, String locId, String[] categories, String[] topCategories,
+	public static List <ElementDetails> getNearbyPoIElements(String endPointUrl, String poiGraph, String locId, String[] categories, String[] topCategories,
 			String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();
@@ -257,18 +257,18 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(poiGraph, builder.toString(), categories, topCategories, languages, null);
+		return getNearbyPoIs(endPointUrl, poiGraph, builder.toString(), categories, topCategories, languages, null);
 
 	}
 	
-	private static List <ElementDetails> getNearbyPoIs(String poiGraph, String query, String[] categories,
+	private static List <ElementDetails> getNearbyPoIs(String endPointUrl, String poiGraph, String query, String[] categories,
 			String[] topCategories, String [] languages,
 			List <String> listPoIsFromFriendsWishlist) throws IOException {
 		if (DEBUG_MOD) LOGGER.info(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
-				SparqlEndPointUtils.HTTP_POST, resultBuilder);
+				SparqlEndPointUtils.HTTP_POST, endPointUrl, resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -279,7 +279,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(poiGraph, maps.keySet(),
+		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(endPointUrl, poiGraph, maps.keySet(),
 				categories, topCategories, languages);
 		
 		for (ElementDetails elementDetails: results) {
@@ -292,12 +292,12 @@ public class NearbyUtils {
 		return results;
 	}
 	
-	private static List <ElementDetails> getNearbyEvents(String eventGraph, String query, String[] categories, String [] languages,
+	private static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, String query, String[] categories, String [] languages,
 			List <String> listEventsFromFriendsWishlist) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
-				SparqlEndPointUtils.HTTP_POST, resultBuilder);
+				SparqlEndPointUtils.HTTP_POST, endPointUrl, resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -308,7 +308,7 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(eventGraph, maps.keySet(), categories, languages);
+		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(endPointUrl, eventGraph, maps.keySet(), categories, languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));

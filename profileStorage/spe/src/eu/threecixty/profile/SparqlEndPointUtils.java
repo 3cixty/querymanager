@@ -9,8 +9,6 @@ import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 
-import eu.threecixty.Configuration;
-
 
 public class SparqlEndPointUtils {
 	
@@ -20,27 +18,27 @@ public class SparqlEndPointUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
-	private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
+	//private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
 	private static final String UTF8 = "UTF-8";
 	
-	private static final String SPARQL_ENDPOINT_URL_GET = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
+	//private static final String SPARQL_ENDPOINT_URL_GET = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 	public static final String HTTP_POST = "POST";
 	public static final String HTTP_GET = "GET";
 	
 	
 	public static void executeQueryViaSPARQL(String query, String format,
-			String httpMethod, StringBuilder result) throws IOException {
+			String httpMethod, String endPointUrl, StringBuilder result) throws IOException {
 		long startTime = System.currentTimeMillis();
-		if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, result);
-		else executeQueryViaSPARQL_POST(query, format, result);
+		if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, endPointUrl, result);
+		else executeQueryViaSPARQL_POST(query, format, endPointUrl, result);
 		long endTime = System.currentTimeMillis();
 		if (DEBUG_MOD) LOGGER.info("Query sent to KB: " + query);
 		if (DEBUG_MOD) LOGGER.info("Time to make query from server to KB without processing: "
 		        + (endTime - startTime) + " ms");
 	}
 
-	private static void executeQueryViaSPARQL_GET(String query, String format, StringBuilder result) throws IOException {
-		String urlStr = SPARQL_ENDPOINT_URL_GET + URLEncoder.encode(query, "UTF-8");
+	private static void executeQueryViaSPARQL_GET(String query, String format, String endPointUrl, StringBuilder result) throws IOException {
+		String urlStr = endPointUrl + "?default-graph-uri=&query=" + URLEncoder.encode(query, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
 			URL url = new URL(urlStr);
 	
@@ -53,10 +51,11 @@ public class SparqlEndPointUtils {
 		input.close();
 	}
 	
-	private static void executeQueryViaSPARQL_POST(String query, String format,
+	private static void executeQueryViaSPARQL_POST(String query, String format, String endPointUrl,
 			StringBuilder result) throws IOException {
 		HttpURLConnection.setFollowRedirects(true);
-		URL url = new URL(SPARQL_ENDPOINT_URL);
+		//URL url = new URL(SPARQL_ENDPOINT_URL);
+		URL url = new URL(endPointUrl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

@@ -44,25 +44,25 @@ public class QueryAugmentationUtils {
 	public static String allPrefixes;
 
 	public static String augmentAndExecuteQuery(String original, QueryAugmenterFilter filter,
-			String uid, double coef, String httpMethod) throws IOException {
+			String uid, double coef, String httpMethod, String endPointUrl) throws IOException {
 		try {
 			List <Query> queries = new LinkedList <Query>();
 			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, null);
 			if (profile != null) {
 				if (filter == QueryAugmenterFilter.FriendsRating) {
-					createAugmentedQueriesBasedOnFriends(original, profile, coef, queries);
+					createAugmentedQueriesBasedOnFriends(original, profile, coef, queries, endPointUrl);
 				} else if (filter == QueryAugmenterFilter.MyRating) {
-					createAugmentedQueryBasedOnMyRating(original, profile, coef, queries);
+					createAugmentedQueryBasedOnMyRating(original, profile, coef, queries, endPointUrl);
 				}
 				if (queries.size() == 2) { // one query augmented
 					Query augmentedQuery = queries.get(0);
 					Query originalQuery = queries.get(1);
 					if (originalQuery.hasLimit()) {
-						return executeQueries(augmentedQuery, originalQuery, httpMethod, coef);
+						return executeQueries(augmentedQuery, originalQuery, httpMethod, coef, endPointUrl);
 					}
 				} else if (queries.size() == 1){
 					StringBuilder sb = new StringBuilder();
-					SparqlEndPointUtils.executeQueryViaSPARQL(queries.get(0).toString(), FORMAT, httpMethod, sb);
+					SparqlEndPointUtils.executeQueryViaSPARQL(queries.get(0).toString(), FORMAT, httpMethod, endPointUrl, sb);
 					return sb.toString();
 				}
 			}
@@ -72,25 +72,25 @@ public class QueryAugmentationUtils {
 			e.printStackTrace();
 		}
 		StringBuilder sb = new StringBuilder();
-		SparqlEndPointUtils.executeQueryViaSPARQL(original, FORMAT, httpMethod, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(original, FORMAT, httpMethod, endPointUrl, sb);
 		return sb.toString();
 	}
 	
 	
 	private static String executeQueries(Query augmentedQuery,
-			Query originalQuery, String httpMethod, double coef) throws IOException {
+			Query originalQuery, String httpMethod, double coef, String endPointUrl) throws IOException {
 		if (DEBUG_MOD) LOGGER.info("query 1: " + augmentedQuery.toString());
 		if (DEBUG_MOD) LOGGER.info("query 2: " + originalQuery.toString());
 		int limit = (int) originalQuery.getLimit();
 		StringBuilder sbForAug = new StringBuilder();
-		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery.toString(), FORMAT, httpMethod, sbForAug);
+		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery.toString(), FORMAT, httpMethod,endPointUrl, sbForAug);
 		JSONObject rootJsonAug = new JSONObject(sbForAug.toString());
 		JSONArray jsonArrsAug = rootJsonAug.getJSONObject("results").getJSONArray("bindings");
 		if (jsonArrsAug.length() == limit) {
 			return sbForAug.toString();
 		}
 		StringBuilder sbForOri = new StringBuilder();
-		SparqlEndPointUtils.executeQueryViaSPARQL(originalQuery.toString(), FORMAT, httpMethod, sbForOri);
+		SparqlEndPointUtils.executeQueryViaSPARQL(originalQuery.toString(), FORMAT, httpMethod, endPointUrl, sbForOri);
 		JSONObject rootJsonOri = new JSONObject(sbForOri.toString());
 		JSONArray jsonArrsOri = rootJsonOri.getJSONObject("results").getJSONArray("bindings");
 		
@@ -156,12 +156,12 @@ public class QueryAugmentationUtils {
 	 * @throws InvalidSparqlQuery
 	 */
 	private static void createAugmentedQueryBasedOnMyRating(String original,
-			UserProfile profile, double coef, List <Query> queries) throws InvalidSparqlQuery {
+			UserProfile profile, double coef, List <Query> queries, String endPointUrl) throws InvalidSparqlQuery {
 		if (original == null) return;
 		List <String> placeIds = new LinkedList <String>();
 		List <Double> socialScores = new LinkedList <Double>();
 		ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScore(
-				profile, MIN_SCORE, placeIds, socialScores);
+				profile, MIN_SCORE, placeIds, socialScores, endPointUrl);
 
 		createAugmentedQueries(original, placeIds, socialScores, coef, queries);
 	}
@@ -176,12 +176,12 @@ public class QueryAugmentationUtils {
 	 * @throws InvalidSparqlQuery
 	 */
 	private static void createAugmentedQueriesBasedOnFriends(String original,
-			UserProfile profile, double coef, List <Query> queries) throws InvalidSparqlQuery {
+			UserProfile profile, double coef, List <Query> queries, String endPointUrl) throws InvalidSparqlQuery {
 		if (original == null) return;
 		List <String> placeIds = new LinkedList <String>();
 		List <Double> socialScores = new LinkedList <Double>();
 		ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScoreForFriends(
-				profile, MIN_SCORE, placeIds, socialScores);
+				profile, MIN_SCORE, placeIds, socialScores, endPointUrl);
 		createAugmentedQueries(original, placeIds, socialScores, coef, queries);
 	}
 	

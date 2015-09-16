@@ -53,7 +53,8 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(GraphChooser.getPoIGraph(key),
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(
+					SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key),
 					poiID, tmpCats, tmpTopCats,
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
@@ -85,8 +86,8 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(
-					GraphChooser.getPoIGraph(key), lat, lon, tmpCats, tmpTopCats,
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(SparqlChooser.getEndPointUrl(key),
+					SparqlChooser.getPoIGraph(key), lat, lon, tmpCats, tmpTopCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -114,8 +115,8 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(
-					GraphChooser.getEventGraph(key), id, tmpCats,
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(key),
+					SparqlChooser.getEventGraph(key), id, tmpCats,
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -143,8 +144,8 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(
-					GraphChooser.getEventGraph(key), lat, lon, tmpCats,
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(key),
+					SparqlChooser.getEventGraph(key), lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -182,8 +183,8 @@ public class NearbyServices {
 				} catch (TooManyConnections e) {
 					e.printStackTrace();
 				}
-				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(
-						GraphChooser.getPoIGraph(at.getAppkey()), lat, lon, tmpCats, tmpTopCats,
+				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(SparqlChooser.getEndPointUrl(at.getAppkey()),
+						SparqlChooser.getPoIGraph(at.getAppkey()), lat, lon, tmpCats, tmpTopCats,
 						tmpLanguages, distance > 10 ? 2 : distance, offset, limit, listPoIsFromFriendsWishList);
 				long time2 = System.currentTimeMillis();
 				if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -219,8 +220,8 @@ public class NearbyServices {
 			} catch (TooManyConnections e) {
 				e.printStackTrace();
 			}
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(
-					GraphChooser.getEventGraph(at.getAppkey()), lat, lon, tmpCats,
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(at.getAppkey()),
+					SparqlChooser.getEventGraph(at.getAppkey()), lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");

@@ -109,8 +109,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getPlaceIdsFromRating(userProfile, rating);
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating, String endPointUrl) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getPlaceIdsFromRating(userProfile, rating, endPointUrl);
 		return new ArrayList<String>();
 	}
 
@@ -124,8 +124,8 @@ public class ProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
-			float rating) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(userProfile, rating);
+			float rating, String endPointUrl) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(userProfile, rating, endPointUrl);
 		return new ArrayList <String>();
 	}
 
@@ -301,16 +301,16 @@ public class ProfileManagerImpl implements ProfileManager {
 	@Override
 
 	public void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
-			List<String> toPlaceIds, List<Double> toSocialScores) {
+			List<String> toPlaceIds, List<Double> toSocialScores, String endPointUrl) {
 		if (profileManager != null) profileManager.findPlaceIdsAndSocialScore(
-				profile, rating, toPlaceIds, toSocialScores);
+				profile, rating, toPlaceIds, toSocialScores, endPointUrl);
 	}
 
 	@Override
 	public void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
-			float rating, List<String> toPlaceIds, List<Double> toSocialScores) {
+			float rating, List<String> toPlaceIds, List<Double> toSocialScores, String endPointUrl) {
 		if (profileManager != null) profileManager.findPlaceIdsAndSocialScoreForFriends(
-				profile, rating, toPlaceIds, toSocialScores);
+				profile, rating, toPlaceIds, toSocialScores, endPointUrl);
 	}
 
 	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {

@@ -114,7 +114,7 @@ public interface ProfileManager {
 	 * 				Rating score.
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRating(UserProfile userProfile, float rating) throws TooManyConnections;
+	List <String> getPlaceIdsFromRating(UserProfile userProfile, float rating, String endPointUrl) throws TooManyConnections;
 
 	/**
 	 * Gets a list of place names which were visited more than <code>number</code> times.
@@ -134,7 +134,7 @@ public interface ProfileManager {
 	 * 				Rating score
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile, float rating) throws TooManyConnections;
+	List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile, float rating, String endPointUrl) throws TooManyConnections;
 	
 	/**
 	 * Find place IDs and corresponding social scores for places rated by me.
@@ -144,7 +144,7 @@ public interface ProfileManager {
 	 * @param toSocialScores
 	 */
 	void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
-			List <String> toPlaceIds, List <Double> toSocialScores);
+			List <String> toPlaceIds, List <Double> toSocialScores, String endPointUrl);
 	
 	/**
 	 * Find place IDs and corresponding social scores for places rated by my friends.
@@ -154,7 +154,7 @@ public interface ProfileManager {
 	 * @param toSocialScores
 	 */
 	void findPlaceIdsAndSocialScoreForFriends(UserProfile profile, float rating,
-			List <String> toPlaceIds, List <Double> toSocialScores);
+			List <String> toPlaceIds, List <Double> toSocialScores, String endPointUrl);
 	
 	/**
 	 * Gets a list of place names which were visited by friends more than <code>number</code> times.

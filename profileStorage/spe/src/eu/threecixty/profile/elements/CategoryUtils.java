@@ -12,7 +12,7 @@ import eu.threecixty.profile.SparqlEndPointUtils;
 
 public class CategoryUtils {
 	
-	public static List <String> getTopCategories() throws IOException {
+	public static List <String> getTopCategories(String endPointUrl) throws IOException {
 		StringBuilder builder = new StringBuilder();
 		builder.append("SELECT DISTINCT ?category \n");
 		builder.append("WHERE {\n");
@@ -24,7 +24,7 @@ public class CategoryUtils {
 		StringBuilder result = new StringBuilder();
 		
 		SparqlEndPointUtils.executeQueryViaSPARQL(builder.toString(), "application/sparql-results+json", 
-				SparqlEndPointUtils.HTTP_GET, result);
+				SparqlEndPointUtils.HTTP_GET, endPointUrl, result);
 		
 		JSONObject json = new JSONObject(
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));

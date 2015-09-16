@@ -37,11 +37,11 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 
 	@Override
 	public String createQueryAugmented(String original,
-			QueryAugmenterFilter filter, String uid, double coef) throws InvalidSparqlQuery {
+			QueryAugmenterFilter filter, String uid, double coef, String endPointUrl) throws InvalidSparqlQuery {
 		if (filter == QueryAugmenterFilter.FriendsRating)
-			return createAugmentedQueryBasedOnFriends(original, uid, coef);
+			return createAugmentedQueryBasedOnFriends(original, uid, coef, endPointUrl);
 		else if (filter == QueryAugmenterFilter.MyRating)
-			return createAugmentedQueryBasedOnMyRating(original, uid, coef);
+			return createAugmentedQueryBasedOnMyRating(original, uid, coef, endPointUrl);
 		return original;
 	}
 
@@ -56,7 +56,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	 * @throws InvalidSparqlQuery
 	 */
 	private String createAugmentedQueryBasedOnMyRating(String original,
-			String uid, double coef) throws InvalidSparqlQuery {
+			String uid, double coef, String endPointUrl) throws InvalidSparqlQuery {
 		if (original == null) return null;
 		if (uid == null) return original;
 		try {
@@ -66,7 +66,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 			List <String> placeIds = new LinkedList <String>();
 			List <Double> socialScores = new LinkedList <Double>();
 			ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScore(
-					profile, MIN_SCORE, placeIds, socialScores);
+					profile, MIN_SCORE, placeIds, socialScores, endPointUrl);
 			if (placeIds == null || placeIds.size() == 0) return original;
 			return addOrderBysToQuery(original, placeIds, socialScores, coef);
 		} catch (TooManyConnections e) {
@@ -85,7 +85,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 	 * @throws InvalidSparqlQuery
 	 */
 	private String createAugmentedQueryBasedOnFriends(String original,
-			String uid, double coef) throws InvalidSparqlQuery {
+			String uid, double coef, String endPointUrl) throws InvalidSparqlQuery {
 		if (original == null) return null;
 		if (uid == null) return original;
 		try {
@@ -94,7 +94,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 			List <String> placeIds = new LinkedList <String>();
 			List <Double> socialScores = new LinkedList <Double>();
 			ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScoreForFriends(
-					profile, MIN_SCORE, placeIds, socialScores);
+					profile, MIN_SCORE, placeIds, socialScores, endPointUrl);
 			if (placeIds == null || placeIds.size() == 0) return original;
 			return addOrderBysToQuery(original, placeIds, socialScores, coef);
 		} catch (TooManyConnections e) {

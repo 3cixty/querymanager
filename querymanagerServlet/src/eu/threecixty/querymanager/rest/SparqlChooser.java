@@ -1,8 +1,9 @@
 package eu.threecixty.querymanager.rest;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.querymanager.AuthorizationBypassManager;
 
-public class GraphChooser {
+public class SparqlChooser {
 
 	/**
 	 * Gets Event graph based on a given application key.
@@ -24,6 +25,15 @@ public class GraphChooser {
 		return Constants.GRAPH_POI_OTHERS;
 	}
 	
-	private GraphChooser() {
+	/**
+	 * Gets end point URL from a given app key.
+	 * @param key
+	 * @return
+	 */
+	public static String getEndPointUrl(String key) {
+		return Configuration.getVirtuosoServer();
+	}
+	
+	private SparqlChooser() {
 	}
 }

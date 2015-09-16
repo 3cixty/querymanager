@@ -25,7 +25,7 @@ public class CategoryServices {
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(
 				Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
 		try {
-			List <String> tops = CategoryUtils.getTopCategories();
+			List <String> tops = CategoryUtils.getTopCategories(SparqlChooser.getPoIGraph(key));
 			return Response.ok(JSONObject.wrap(tops).toString(),
 					MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (IOException e) {
