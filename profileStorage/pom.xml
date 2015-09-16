@@ -13,7 +13,7 @@
     <module>profileKB</module>
 	<module>models</module>
 	<module>spe</module>
-	<module>spe-virtuoso</module>
+	<!--module>spe-virtuoso</module-->
         <module>spe-mysql</module>
     <!--module>privacyManager</module-->
   </modules>

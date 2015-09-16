@@ -40,7 +40,7 @@ public class MySQLProfilerPlaceUtils {
 	 * @throws UnknownException
 	 */
 	public static void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
-			List<String> placeIds, List<Double> socialScores) throws IOException, UnknownException {
+			List<String> placeIds, List<Double> socialScores, String endPointUrl) throws IOException, UnknownException {
 		String googleUID = getGoogleUID(profile);
 		if (googleUID == null) return;
 		
@@ -55,7 +55,7 @@ public class MySQLProfilerPlaceUtils {
 		buffer.append("?creator schema:url " + getGoogleReviewCreator(googleUID) + ".\n");
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
 		buffer.append("}");
-		List <String> rets = getPlaceIdsFromQuery(buffer.toString());
+		List <String> rets = getPlaceIdsFromQuery(endPointUrl, buffer.toString());
 		if (rets == null) return;
 		placeIds.addAll(rets);
 		for (int i = 0; i < placeIds.size(); i++) {
@@ -64,7 +64,7 @@ public class MySQLProfilerPlaceUtils {
 	}
 
 	public static void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
-			float rating, List<String> placeIds, List<Double> socialScores) throws IOException, UnknownException {
+			float rating, List<String> placeIds, List<Double> socialScores, String endPointUrl) throws IOException, UnknownException {
 		// TODO Auto-generated method stub
 		List <String> googleUIDsFromFriends = getGoogleUIDsFromFriends(profile);
 		if (googleUIDsFromFriends == null || googleUIDsFromFriends.size() == 0) return;
@@ -103,7 +103,7 @@ public class MySQLProfilerPlaceUtils {
 		
 		StringBuilder result = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(buffer.toString(), JSON_APP_FORMAT,
-				SparqlEndPointUtils.HTTP_POST, result);
+				SparqlEndPointUtils.HTTP_POST, endPointUrl, result);
 		JSONObject jsonObj;
 
 		jsonObj = new JSONObject(result.toString());
@@ -131,7 +131,7 @@ public class MySQLProfilerPlaceUtils {
 	 * @return
 	 */
 	public static List <String> getPlaceIdsFromRating(UserProfile userProfile,
-			float rating) throws IOException, UnknownException {
+			float rating, String endPointUrl) throws IOException, UnknownException {
 		String googleUID = getGoogleUID(userProfile);
 		if (googleUID == null) return new ArrayList <String>();
 		
@@ -147,7 +147,7 @@ public class MySQLProfilerPlaceUtils {
 		buffer.append("FILTER (xsd:decimal(?ratingValue) >= " + rating + ") . \n\n");
 		buffer.append("}");
 		
-		return getPlaceIdsFromQuery(buffer.toString());
+		return getPlaceIdsFromQuery(endPointUrl, buffer.toString());
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class MySQLProfilerPlaceUtils {
 	 * @return
 	 */
 	public static List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
-			float rating) throws IOException, UnknownException {
+			float rating, String endPointUrl) throws IOException, UnknownException {
 
 		List <String> googleUIDsFromFriends = getGoogleUIDsFromFriends(userProfile);
 		if (googleUIDsFromFriends == null || googleUIDsFromFriends.size() == 0) return null;
@@ -191,16 +191,16 @@ public class MySQLProfilerPlaceUtils {
 		}
 		buffer.append("}");
 
-	    return getPlaceIdsFromQuery(buffer.toString());
+	    return getPlaceIdsFromQuery(endPointUrl, buffer.toString());
 	}
 
-	private static List<String> getPlaceIdsFromQuery(
+	private static List<String> getPlaceIdsFromQuery(String endPoitUrl,
 			String qStr) throws IOException, UnknownException {
 	    
 		List <String> placeNames = new ArrayList <String>();
 		StringBuilder result = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(qStr, JSON_APP_FORMAT,
-				SparqlEndPointUtils.HTTP_POST, result);
+				SparqlEndPointUtils.HTTP_POST, endPoitUrl, result);
 		JSONObject jsonObj;
 
 		jsonObj = new JSONObject(result.toString());
