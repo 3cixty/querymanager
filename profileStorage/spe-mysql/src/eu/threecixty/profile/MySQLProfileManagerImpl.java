@@ -106,10 +106,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return PartnerImpl.getInstance();
 	}
 
-	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating)
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating, String endPointUrl)
 			throws TooManyConnections {
 		try {
-			return MySQLProfilerPlaceUtils.getPlaceIdsFromRating(userProfile, rating);
+			return MySQLProfilerPlaceUtils.getPlaceIdsFromRating(userProfile, rating, endPointUrl);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		} catch (UnknownException e) {
@@ -118,9 +118,9 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
-			float rating) throws TooManyConnections {
+			float rating, String endPointUrl) throws TooManyConnections {
 		try {
-			return MySQLProfilerPlaceUtils.getPlaceIdsFromRatingOfFriends(userProfile, rating);
+			return MySQLProfilerPlaceUtils.getPlaceIdsFromRatingOfFriends(userProfile, rating, endPointUrl);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		} catch (UnknownException e) {
@@ -212,10 +212,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
-			List<String> placeIds, List<Double> socialScores) {
+			List<String> placeIds, List<Double> socialScores, String endPointUrl) {
 		try {
 			MySQLProfilerPlaceUtils.findPlaceIdsAndSocialScore(profile,
-					rating, placeIds, socialScores);
+					rating, placeIds, socialScores, endPointUrl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (UnknownException e) {
@@ -225,10 +225,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
-			float rating, List<String> placeIds, List<Double> socialScores) {
+			float rating, List<String> placeIds, List<Double> socialScores, String endPointUrl) {
 		try {
 			MySQLProfilerPlaceUtils.findPlaceIdsAndSocialScoreForFriends(
-					profile, rating, placeIds, socialScores);
+					profile, rating, placeIds, socialScores, endPointUrl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (UnknownException e) {

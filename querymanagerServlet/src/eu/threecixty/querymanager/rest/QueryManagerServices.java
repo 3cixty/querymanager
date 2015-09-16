@@ -100,7 +100,7 @@ public class QueryManagerServices {
 			} else {
 
 				try {
-					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, false);
+					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, key, false);
 
 					// log calls
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -161,7 +161,7 @@ public class QueryManagerServices {
 			} else {
 
 				try {
-					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, false);
+					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, key, false);
 
 					// log calls
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -200,7 +200,7 @@ public class QueryManagerServices {
 			try {
 				if (DEBUG_MOD) LOGGER.info("Before augmenting and executing a query");
 
-				String result = executeQuery(user_id, query, filter, format, httpMethod, coef);
+				String result = executeQuery(user_id, query, filter, format, httpMethod, coef, key);
 
 				// log calls
 
@@ -278,7 +278,7 @@ public class QueryManagerServices {
 			} else {
 
 				try {
-					String result = executeQuery(query, eventMediaFormat, httpMethod, false);
+					String result = executeQuery(query, eventMediaFormat, httpMethod, key, false);
 
 					// log calls
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -322,7 +322,8 @@ public class QueryManagerServices {
 				if (events != null && !events.equals("")) {
 					List <String> eventIds = createList(events);
 					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
-							GraphChooser.getEventGraph(key), eventIds, null, tmpLanguages);
+							SparqlChooser.getEndPointUrl(key),
+							SparqlChooser.getEventGraph(key), eventIds, null, tmpLanguages);
 					if (eventsDetails != null) {
 						result.put("Events", eventsDetails);
 					}
@@ -331,7 +332,8 @@ public class QueryManagerServices {
 				if (pois != null && !pois.equals("")) {
 					List <String> poiIds = createList(pois);
 
-					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(GraphChooser.getPoIGraph(key),
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(
+							SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key),
 							poiIds, null, null, tmpLanguages);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
@@ -364,9 +366,9 @@ public class QueryManagerServices {
 	public Response countItems(@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n { graph " + GraphChooser.getEventGraph(key) + " { ?event a lode:Event. } } \n } ";
+			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n { graph " + SparqlChooser.getEventGraph(key) + " { ?event a lode:Event. } } \n } ";
 			try {
-				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -393,10 +395,10 @@ public class QueryManagerServices {
 	public Response countPoIs(@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { { graph " + GraphChooser.getPoIGraph(key) + "  {?venue rdf:type dul:Place.} } }";
+			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key) + "  {?venue rdf:type dul:Place.} } }";
 
 			try {
-				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -453,7 +455,7 @@ public class QueryManagerServices {
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
 						existed2 ? pair2.getGroupBy() : null, pair2.getValue(), key);
 				try {
-					String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+					String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (IOException e) {
@@ -495,10 +497,10 @@ public class QueryManagerServices {
 		if (OAuthWrappers.validateAppKey(key)) {
 			int tmpOffset = offset < 0 ? 0 : offset;
 			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  {  { graph "
-			+ GraphChooser.getPoIGraph(key) + " { ?venue rdf:type dul:Place .} }\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
+			+ SparqlChooser.getPoIGraph(key) + " { ?venue rdf:type dul:Place .} }\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
 			+ tmpOffset +( limit < 0 ? "" : "\nLIMIT  " + limit);
 			try {
-				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -558,7 +560,7 @@ public class QueryManagerServices {
 					(pair2 == null ? null : pair2.getValue()), key);
 
 			try {
-				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1, key);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -603,7 +605,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key);
 
 			try {
-				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1, key);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -648,7 +650,7 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getValue()), key);
 
 				try {
-					String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+					String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (Exception e) {
@@ -680,7 +682,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key);
 
 			try {
-				String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+				String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -727,11 +729,11 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getValue()), key);
 
 				try {
-					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
+					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET, key);
 				
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
-							GraphChooser.getEventGraph(key), eventIds, null, tmpLanguages);
+					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(SparqlChooser.getEndPointUrl(key),
+							SparqlChooser.getEventGraph(key), eventIds, null, tmpLanguages);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					String content = JSONObject.wrap(eventsDetails).toString();
 					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
@@ -766,10 +768,10 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key);
 
 			try {
-				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
+				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET, key);
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(
-						GraphChooser.getPoIGraph(key), poiIds, null, null, tmpLanguages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(SparqlChooser.getEndPointUrl(key),
+						SparqlChooser.getPoIGraph(key), poiIds, null, null, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(poisInDetails).toString();
@@ -802,7 +804,7 @@ public class QueryManagerServices {
 	}
 
 	private String executeQuery(String uid, String query, String filter, String format,
-			String httpMethod, double coef) throws IOException {
+			String httpMethod, double coef, String key) throws IOException {
 
 		if (QueryAugmenterImpl.allPrefixes == null) QueryAugmenterImpl.allPrefixes = getAllPrefixes();
 		if (QueryAugmentationUtils.allPrefixes == null) QueryAugmentationUtils.allPrefixes = getAllPrefixes();
@@ -833,19 +835,20 @@ public class QueryManagerServices {
 		
 		String formatType = Constants.JSON.equalsIgnoreCase(format) ? "application/sparql-results+json"
 				: (Constants.RDF.equals(format) ? "application/rdf+xml" : "application/sparql-results+json");
+		String endPointUrl = SparqlChooser.getEndPointUrl(key);
 		if (isForEvents) {
 			StringBuilder sb = new StringBuilder();
-			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, endPointUrl, sb);
 			return sb.toString();
 		} else {
 			QueryAugmenterFilter qaf = eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)
 					? QueryAugmenterFilter.FriendsRating : eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)
 							? QueryAugmenterFilter.MyRating : null;
-			return QueryAugmentationUtils.augmentAndExecuteQuery(query, qaf, uid, coef, httpMethod);
+			return QueryAugmentationUtils.augmentAndExecuteQuery(query, qaf, uid, coef, httpMethod, endPointUrl);
 		}
 	}
 
-	public static List <String> getElementIDs(String query, String httpMethod) throws IOException {
+	public static List <String> getElementIDs(String query, String httpMethod, String endPointUrl) throws IOException {
 
 		String formatType = "application/sparql-results+json";
 
@@ -853,7 +856,7 @@ public class QueryManagerServices {
 		
 		List <String> elementIds = new LinkedList <String>();
 
-		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, endPointUrl, sb);
 		JSONObject json = new JSONObject(sb.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 
@@ -874,7 +877,7 @@ public class QueryManagerServices {
 	private String createGroupQuery(String group, int offset, int limit,
 			String groupname1, String groupvalue1, String groupname2, String groupvalue2, String key) {
 		StringBuffer buffer = new StringBuffer("select ?" + group + " (COUNT(*) as ?count) \n WHERE {\n { graph "
-			+ GraphChooser.getEventGraph(key) + " {?event a lode:Event . } }\n" + getTriples(group));
+			+ SparqlChooser.getEventGraph(key) + " {?event a lode:Event . } }\n" + getTriples(group));
 		if (groupname1 != null && groupname2 == null) {
 			if (!group.equals(groupvalue1)) {
 				buffer.append(getTriples(groupname1));
@@ -903,7 +906,7 @@ public class QueryManagerServices {
 	private String createSelectSparqlQuery(int offset, int limit, String groupname1, String groupvalue1,
 			String groupname2, String groupvalue2, String key) {
 		StringBuffer buffer = new StringBuffer("SELECT ?event ?title ?description \n	WHERE {\n { graph "
-			+ GraphChooser.getEventGraph(key) + "	{ ?event a lode:Event. } } \n	OPTIONAL{?event rdfs:label ?title.}\n	OPTIONAL{?event dc:description ?description.} \n");
+			+ SparqlChooser.getEventGraph(key) + "	{ ?event a lode:Event. } } \n	OPTIONAL{?event rdfs:label ?title.}\n	OPTIONAL{?event dc:description ?description.} \n");
 		if (groupTriples.containsKey(groupname1)) {
 			buffer.append(groupTriples.get(groupname1));
 			buffer.append("FILTER(STR(?" + groupname1 + ") = \"" + groupvalue1 + "\") .\n");
@@ -921,11 +924,11 @@ public class QueryManagerServices {
 			String category, int minRating, int maxRating, String key) {
 		StringBuffer buffer = new StringBuffer();
 		if (category != null && !category.equals("")) {
-			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + GraphChooser.getPoIGraph(key) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
 		            + category + "\" )\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 					+ minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < " + maxRating + " )\n  }\n");
 		} else {
-			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + GraphChooser.getPoIGraph(key) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 		                + minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < "  + maxRating + " )\n  }");
 		}
 		return createSelectSparqlQuery(buffer.toString(), offset, limit);
@@ -1009,7 +1012,7 @@ public class QueryManagerServices {
 	 * @param format
 	 * @return
 	 */
-	private String executeQuery(String query, EventMediaFormat format, String httpMethod, boolean stressTestOn) throws IOException {
+	private String executeQuery(String query, EventMediaFormat format, String httpMethod, String key, boolean stressTestOn) throws IOException {
 		if (query == null || format == null) return "";
 		String ret = null;
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
@@ -1021,7 +1024,7 @@ public class QueryManagerServices {
 		if (DEBUG_MOD) LOGGER.info("Time to get data from map: " + (time - startTime));
 		if (ret == null) {
 			StringBuilder builder = new StringBuilder();
-			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
+			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, SparqlChooser.getEndPointUrl(key), builder);
 			ret = builder.toString();
 		}
 		long endTime = System.currentTimeMillis();

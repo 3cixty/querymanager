@@ -8,6 +8,7 @@ import com.facebook.SessionState;
 import com.facebook.widget.LoginButton;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.common.SignInButton;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -30,7 +31,6 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 public class MainActivity extends FragmentActivity {
 
@@ -56,7 +56,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.oauth_lib_activity_main);
 		
 		Intent callerIntent = getIntent();
 		if (callerIntent.hasExtra(EXTRA_APP_KEY)) {
@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity {
 
 
 
-		final Button cmdLogin = (Button) findViewById(R.id.login);
+		final SignInButton cmdLogin = (SignInButton) findViewById(R.id.login_to_google);
         final LoginButton cmdSignInToFb= (LoginButton) findViewById(R.id.sign_in_to_fb);
         cmdSignInToFb.setSessionStatusCallback(statusCallback);
 
@@ -170,7 +170,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		if (appkey == null && appName == null && accessToken == null) {
-			Toast.makeText(this, "Please check app_key and app_name for getting 3Cixty token or access_token for revoking it", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Please check app_key and app_name for getting 3cixty token or access_token for revoking it", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -286,7 +286,7 @@ public class MainActivity extends FragmentActivity {
     }
 
 
-    private class SessionStatusCallback implements Session.StatusCallback {
+    public class SessionStatusCallback implements Session.StatusCallback {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (state.isOpened()) {

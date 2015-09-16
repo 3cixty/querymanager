@@ -491,7 +491,8 @@ public class TrayServices {
 		}
 		
 		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(
-				GraphChooser.getEventGraph(key), eventIds, null, languages);
+				SparqlChooser.getEndPointUrl(key),
+				SparqlChooser.getEventGraph(key), eventIds, null, languages);
 		if (elementEventsDetails != null) {
 			for (ElementDetails eventDetails: elementEventsDetails) {
 				eventDetails.setType(EVENT_TYPE);
@@ -507,7 +508,8 @@ public class TrayServices {
 			trayDetailsList.addAll(elementEventsDetails);
 		}
 		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(
-				GraphChooser.getPoIGraph(key), poiIds, null, null, languages);
+				SparqlChooser.getEndPointUrl(key),
+				SparqlChooser.getPoIGraph(key), poiIds, null, null, languages);
 		if (elementPoIsDetails != null) {
 			for (ElementDetails poiDetails: elementPoIsDetails) {
 				poiDetails.setType(POI_TYPE);
