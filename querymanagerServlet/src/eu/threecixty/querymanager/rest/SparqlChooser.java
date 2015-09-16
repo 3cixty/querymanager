@@ -31,7 +31,8 @@ public class SparqlChooser {
 	 * @return
 	 */
 	public static String getEndPointUrl(String key) {
-		return Configuration.getVirtuosoServer();
+		if (AuthorizationBypassManager.getInstance().isFound(key)) return Configuration.getVirtuosoServer();
+		return Configuration.getVirtuosoServerForOutside();
 	}
 	
 	private SparqlChooser() {

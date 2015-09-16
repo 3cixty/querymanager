@@ -34,6 +34,7 @@ public class Configuration {
 	public static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 
 	private static String http_virtuoso_server = null;
+	private static String http_virtuoso_server_for_outside = null;
 
 	public synchronized static void setPath(String path) {
 		Configuration.path = path;
@@ -67,6 +68,14 @@ public class Configuration {
 	
 	public static synchronized void resetVirtuosoServerByDefault() {
 		http_virtuoso_server = getProperty("VIRTUOSO_SERVER");
+	}
+	
+	public static String getVirtuosoServerForOutside() {
+		if (http_virtuoso_server_for_outside == null) {
+			http_virtuoso_server_for_outside = getProperty("VIRTUOSO_SERVER_FOR_OUTSIDES");
+		}
+		if (http_virtuoso_server_for_outside != null) return http_virtuoso_server_for_outside;
+		return getProperty("VIRTUOSO_SERVER_FOR_OUTSIDES");
 	}
 
 	public static String get3CixtyRoot() {
