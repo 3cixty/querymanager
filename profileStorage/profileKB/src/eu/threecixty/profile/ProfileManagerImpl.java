@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import eu.threecixty.Configuration;
 import eu.threecixty.partners.Partner;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
@@ -27,8 +26,6 @@ public class ProfileManagerImpl implements ProfileManager {
 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
-	
-	public static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql?default-graph-uri=&query=";
 	
 	private static final String MYSQL_PM_IMPL = "eu.threecixty.profile.MySQLProfileManagerImpl";
 	

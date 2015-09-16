@@ -18,10 +18,8 @@ public class SparqlEndPointUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
-	//private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
 	private static final String UTF8 = "UTF-8";
 	
-	//private static final String SPARQL_ENDPOINT_URL_GET = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 	public static final String HTTP_POST = "POST";
 	public static final String HTTP_GET = "GET";
 	
@@ -54,7 +52,6 @@ public class SparqlEndPointUtils {
 	private static void executeQueryViaSPARQL_POST(String query, String format, String endPointUrl,
 			StringBuilder result) throws IOException {
 		HttpURLConnection.setFollowRedirects(true);
-		//URL url = new URL(SPARQL_ENDPOINT_URL);
 		URL url = new URL(endPointUrl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
