@@ -4,6 +4,9 @@ import eu.threecixty.Configuration;
 import eu.threecixty.querymanager.AuthorizationBypassManager;
 
 public class SparqlChooser {
+	
+	private static String END_POINT_WITH_E015 = null;
+	private static String END_POINT_WITHOUT_E015 = null;
 
 	/**
 	 * Gets Event graph based on a given application key.
@@ -31,8 +34,14 @@ public class SparqlChooser {
 	 * @return
 	 */
 	public static String getEndPointUrl(String key) {
-		if (AuthorizationBypassManager.getInstance().isFound(key)) return Configuration.getVirtuosoServer();
-		return Configuration.getVirtuosoServerForOutside();
+		if (AuthorizationBypassManager.getInstance().isFound(key)) {
+			if (END_POINT_WITH_E015 == null) END_POINT_WITH_E015 = Configuration.getVirtuosoServer() + "/sparql";
+			return END_POINT_WITH_E015;
+		}
+		if (END_POINT_WITHOUT_E015 == null) {
+			END_POINT_WITHOUT_E015 = Configuration.getVirtuosoServerForOutside() + "/sparql";
+		}
+		return END_POINT_WITHOUT_E015;
 	}
 	
 	private SparqlChooser() {
