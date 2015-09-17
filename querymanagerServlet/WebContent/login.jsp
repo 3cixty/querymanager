@@ -238,6 +238,7 @@
   					<div>
     					<input type="password" name="password" id="password" placeholder="Password" required class="loginInput">
   					</div>
+  					<div style="height: 3px;"></div>
   					<input class="signinButton" type="submit" value=" Sign in ">
 			 	  </div>
 			 	  <div  align="center">
