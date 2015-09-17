@@ -221,7 +221,7 @@
 			
 			<div>
 			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
-				  <h3 class="privacy-title"> Sign in with 3cixty account </h3>
+				  <h3 class="privacy-title"> Or with 3cixty account </h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
                     <div>
@@ -236,7 +236,7 @@
 			 	  	<a href="./forgotPassword.jsp?key=<%=key%>"><font class="link">Forgot password?</font></a>
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create an account</font></a>
+			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Sign up</font></a>
 			 	  </div>
 			 	</form>
 			</div>
