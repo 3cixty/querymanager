@@ -8,7 +8,6 @@ import javax.servlet.annotation.WebListener;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.CrawlerCron.CrawlerCron;
-import eu.threecixty.cache.CacheManager;
 
 import eu.threecixty.cache.ProfileCacheManager;
 import eu.threecixty.cache.TokenCacheManager;
@@ -17,7 +16,6 @@ import eu.threecixty.cache.TrayCacheManager;
 import eu.threecixty.oauth.OAuthBypassedManager;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.PersistenceWorkerManager;
-import eu.threecixty.profile.RdfFileManager;
 import eu.threecixty.profile.partners.GoFlowServer;
 import eu.threecixty.querymanager.rest.AdminServices;
 import eu.threecixty.querymanager.rest.QueryManagerServices;
@@ -47,9 +45,6 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    	File originalFile = new File(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
 	    	originalFile.renameTo(rdfFile);
 	    }
-	    CacheManager.getInstance().loadQueries(realPath + File.separatorChar + "WEB-INF"
-	            + File.separatorChar + "cacheQueries");
-	    RdfFileManager.getInstance().setPathToRdfFile(rdfFile.getAbsolutePath());
 	    QueryManagerServices.realPath = realPath;
         CallLogServices.realPath = realPath;
         AdminServices.realPath = realPath;
