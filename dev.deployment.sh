@@ -1,4 +1,5 @@
 cp 3cixty-db/resources/dev.hibernate.cfg.xml 3cixty-db/resources/hibernate.cfg.xml
+cp 3cixty-db/resources/dev.memcached.conf 3cixty-db/resources/memcached.conf
 cp appkey/oauth/apis-authorization-server-war/src/main/resources/dev.apis.application.properties appkey/oauth/apis-authorization-server-war/src/main/resources/apis.application.properties
 cp querymanagerServlet/WebContent/WEB-INF/dev.3cixty.properties querymanagerServlet/WebContent/WEB-INF/3cixty.properties
 

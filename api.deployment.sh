@@ -1,5 +1,6 @@
 cp 3cixty-db/resources/api.hibernate.cfg.xml 3cixty-db/resources/hibernate.cfg.xml
 cp appkey/oauth/apis-authorization-server-war/src/main/resources/api.apis.application.properties appkey/oauth/apis-authorization-server-war/src/main/resources/apis.application.properties
+cp 3cixty-db/resources/api.memcached.conf 3cixty-db/resources/memcached.conf
 cp querymanagerServlet/WebContent/WEB-INF/api.3cixty.properties querymanagerServlet/WebContent/WEB-INF/3cixty.properties
 
 mvn clean install -Dmaven.test.skip=true
