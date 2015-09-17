@@ -96,29 +96,19 @@ public class UserProfileTests {
 	}
 	
 	@Test
-	public void testGenderAndProfileImageAndLastTime() throws TooManyConnections {
+	public void testProfileImageAndLastTime() throws TooManyConnections {
 		String _3cixtyUID = System.currentTimeMillis() + "";
-		String gender = "Male";
 		String profileImage = "fake url img";
 		UserProfile userProfile = new UserProfile();
 		userProfile.setHasUID(_3cixtyUID);
-		userProfile.setHasGender(gender);
 		userProfile.setProfileImage(profileImage);
 		String lastTime = System.currentTimeMillis() + "";
 		userProfile.setHasLastCrawlTime(lastTime);
 		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
 		
 		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
-		Assert.assertTrue(gender.equals(loadedProfile.getHasGender()));
 		Assert.assertTrue(profileImage.equals(loadedProfile.getProfileImage()));
 		Assert.assertTrue(lastTime.equals(loadedProfile.getHasLastCrawlTime()));
-		
-		gender = "Female";
-		loadedProfile.setHasGender(gender);
-		new MySQLProfileManagerImpl().saveProfile(loadedProfile, null);
-		
-		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
-		Assert.assertTrue(gender.equals(loadedProfile2.getHasGender()));
 	}
 	
 	@Test
