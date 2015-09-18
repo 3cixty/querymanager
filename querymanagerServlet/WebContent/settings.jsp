@@ -32,13 +32,15 @@
     <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
 <div>
+<a href="<%=Configuration.get3CixtyRoot()%>/getGoogleAccessToken">
 <img alt="Sign in with Google" src="./gplus.png">
+</a>
 </div>
 <div>
 <input type="text" name="googleAccessToken" id="googleAccessToken" value="">
 </div>
 <div>
-	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">
+	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Facebook
 	</fb:login-button>
 </div>
 <div>
