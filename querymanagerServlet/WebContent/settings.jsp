@@ -32,7 +32,7 @@
     <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
 <div>
-<a href="<%=Configuration.get3CixtyRoot()%>/getGoogleAccessToken">
+<a href="<%=Configuration.get3CixtyRoot()%>/getGoogleAccessToken" target="_blank">
 <img alt="Sign in with Google" src="./gplus.png">
 </a>
 </div>
