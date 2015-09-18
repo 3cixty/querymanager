@@ -13,6 +13,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import eu.threecixty.Configuration;
@@ -44,7 +45,7 @@ public class SettingsServices {
 
 	@GET
 	@Path("/viewSettings")
-	public void view(@HeaderParam("access_token") String access_token, @Context HttpServletResponse response,
+	public void view(@QueryParam("access_token") String access_token, @Context HttpServletResponse response,
             @Context HttpServletRequest request) {
 		try {
 
