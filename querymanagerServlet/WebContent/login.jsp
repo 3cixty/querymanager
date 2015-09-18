@@ -253,9 +253,9 @@
 	    	<div class="login-benefits">
                 <h3 class="privacy-title">Benefits of Signing in</h3>
 				<p class="privacy-desc"> 
-					 You can save your WishList and access it from the mobile version of <strong>ExplorMI 360</strong>. 
+					 You can save your WishList and access it from the mobile version of <strong>3cixty</strong> apps. 
 					 You can ask the application to take into account things like the ratings given by your friends.
-					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>ExplorMI 360</strong> to track your movements there, you can view summary of your movements. 
+					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>3cixty</strong> apps to track your movements there, you can view summary of your movements. 
 					<br><br>
 					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
 				</p>
