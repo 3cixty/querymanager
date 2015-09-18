@@ -12,7 +12,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
@@ -48,30 +47,28 @@ public class SettingsServices {
 	public void view(@HeaderParam("access_token") String access_token, @Context HttpServletResponse response,
             @Context HttpServletRequest request) {
 		try {
-			PrintWriter writer = response.getWriter();
 
 			long starttime = System.currentTimeMillis();
 			HttpSession session = httpRequest.getSession();
 			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-				try {
-					checkPermission(userAccessToken);
-				} catch (ThreeCixtyPermissionException e1) {
-					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
-							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
-					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					writer.write(e1.getMessage());
-					writer.close();
-					return;
-				}
+//				try {
+//					checkPermission(userAccessToken);
+//				} catch (ThreeCixtyPermissionException e1) {
+//					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
+//							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
+//					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//					writer.write(e1.getMessage());
+//					writer.close();
+//					return;
+//				}
 				String uid =  userAccessToken.getUid();
 				String key = userAccessToken.getAppkey();
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE,
 						CallLoggingConstants.SUCCESSFUL);
 
-				ThreeCixtySettings settings = SettingsStorage.load(uid);
-				session.setAttribute("settings", settings);
 				session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
+				session.setAttribute("uid", uid);
 
 				try {
 					request.getRequestDispatcher(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp").forward(request, response);
@@ -83,19 +80,18 @@ public class SettingsServices {
 				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE,
 						CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				PrintWriter writer = response.getWriter();
 				writer.write("Your access token '" + access_token + "' is invalid.");
 				writer.close();
 			}
 		} catch (IOException e2) {
 			e2.printStackTrace();
-		} catch (TooManyConnections e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 	}
+	
+	
+	
 
-	@POST
-	@Path("/saveSettings")
 	public void save(@DefaultValue("")@FormParam("firstName") String firstName,
 			@DefaultValue("")@FormParam("lastName") String lastName,
 			@DefaultValue("")@FormParam("townName") String townName,

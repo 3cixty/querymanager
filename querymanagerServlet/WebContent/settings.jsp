@@ -16,82 +16,113 @@
     String accessToken = (String) session.getAttribute("accessToken");
 
    if (accessToken == null) {
-	   response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
+	   response.sendError(400, "Invalid request");
+	   //response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
    } else  {
-        ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
+        String uid = (String) session.getAttribute("uid");
 %>
 
-<form action="<%=Configuration.get3CixtyRoot()%>/saveSettings" method="post">
+<form action="<%=Configuration.get3CixtyRoot()%>/linkAccounts" method="post">
 <div>
     <input type="hidden" name="access_token" value="<%=accessToken%>">
 </div>
 <div>
-<span >Google UID</span>
 </div>
 <div>
-    <input type="text" readonly="readonly" value="<%=settings.getUid()%>" name="uid">
+    <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
 <div>
- <span >First Name<!--<font color="red">*</font>--></span>
+<img alt="Sign in with Google" src="./gplus.png">
 </div>
 <div>
-    <input type="text" name="firstName" readonly="readonly"  value="<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>" required>
+<input type="text" name="googleAccessToken" id="googleAccessToken" value="">
 </div>
-<div><span >Last Name<!--<font color="red">*</font>--></span></div>
 <div>
-    <input type="text" name="lastName" readonly="readonly"  value="<%=settings.getLastName() == null ? "" : settings.getLastName()%>" required>
+	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">
+	</fb:login-button>
 </div>
-<div><span >Country</span></div>
 <div>
-    <input type="text" name="countryName" value="<%=settings.getCountryName() == null ? "" : settings.getCountryName()%>">
-</div>
-<div><span >City</span></div>
-<div>
-    <input type="text" name="townName" value="<%=settings.getTownName() == null ? "" : settings.getTownName()%>">
-</div>
-<div><span >Latitude</span></div>
-<div>
-    <input type="text" name="lat" value="<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>">
-</div>
-<div><span >Longitude</span></div>
-<div>
-    <input type="text" name="lon" value="<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>">
-</div>
-<div><span >Mobidot Account</span></div>
-<div>
-<input type="hidden" name="pi_sources" value="Mobidot">
-<input type="hidden" name="pi_ats" value="">
-    <input type="text" name="pi_ids" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
-</div>
-<div style="height: 10px;"></div>
-<div align="justify" style="font-size: 11px;"  >
-Disclaimer: <!--The information marked by red star are required. -->For Mobidot account, if the user specifies it, it will help us crawl the mobility profile and associate mobility related preferences while augmenting the query. If the Mobidot account is not specified, we will not augment the query based on mobility preferences and we will not crawl the mobility profile of the user.
-</div>
-<div style="height: 10px;"></div>
-<div align="center"  >
-    <input type="submit" value="Save">
-    <input type="button" value="Reset" onclick="reset();">
+<input type="hidden" name="fbAccessToken" id="fbAccessToken" value="">
 </div>
 </form>
 
-<script type="text/javascript">
-    function reset() {
-    	var firstName = document.getElementById("firstName");
-    	firstName.value = "<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>";
-    	var lastName = document.getElementById("lastName");
-    	lastName.value = "<%=settings.getLastName() == null ? "" : settings.getLastName()%>";
-    	var countryName = document.getElementById("countryName");
-    	countryName.value = "<%=settings.getCountryName() == null ? "" : settings.getCountryName()%>";
-    	var townName = document.getElementById("townName");
-    	townName.value = "<%=settings.getTownName() == null ? "" : settings.getTownName()%>";
-    	var lat = document.getElementById("lat");
-    	lat.value = "<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>";
-    	var lon = document.getElementById("lon");
-    	lon.value = "<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>";
-    	var pi_id = document.getElementById("pi_ids");
-    	pi_id.value = "<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>";
+<script>
+  var fbClicked = false;
+
+  // This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      if (!fbClicked) {
+    	  FB.logout(function(response) {
+    		  // user is now logged out
+    		});
+      }
+      else {
+    	  testAPI();
+      }
     }
-</script>
+  }
+
+  // This function is called when someone finishes with the Login
+  // Button.  See the onlogin handler attached to it in the sample
+  // code below.
+  function checkLoginState() {
+	  fbClicked = true;
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    //cookie     : true,  // enable cookies to allow the server to access
+    cookie     : false,
+    appId      : '<%=Configuration.getFacebookAppID()%>',
+    xfbml      : true,
+    version    : 'v2.3'
+  });
+
+  // Now that we've initialized the JavaScript SDK, we call 
+  // FB.getLoginStatus().  This function gets the state of the
+  // person visiting this page and can return one of three states to
+  // the callback you provide.  They can be:
+  //
+  // 1. Logged into your app ('connected')
+  // 2. Logged into Facebook, but not your app ('not_authorized')
+  // 3. Not logged into Facebook and can't tell if they are logged into
+  //    your app or not.
+  //
+  // These three cases are handled in the callback function.
+
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function testAPI() {
+    var access_token =   FB.getAuthResponse()['accessToken'];
+    var fbTokenInput = document.getElementById("fbAccessToken");
+    fbTokenInput.value = access_token;
+  }
 
 <%
 
