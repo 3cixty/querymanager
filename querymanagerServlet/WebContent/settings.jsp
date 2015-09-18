@@ -125,7 +125,8 @@
     var fbTokenInput = document.getElementById("fbAccessToken");
     fbTokenInput.value = access_token;
   }
-
+</script>
+  
 <%
 
    }
