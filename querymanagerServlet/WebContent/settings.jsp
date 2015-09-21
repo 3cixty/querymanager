@@ -148,7 +148,7 @@
 <script>
     function onSignIn(googleUser) {
     	var id_token = googleUser.getAuthResponse().id_token;
-    	$('#googleAccessToken').value = id_token;
+    	document.getElementById("googleAccessToken").value = id_token;
 	  	var profile = googleUser.getBasicProfile();
 	  	console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
 	  	console.log('Name: ' + profile.getName());
