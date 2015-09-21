@@ -7,9 +7,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="google-signin-client_id" content="<%=Configuration.getGoogleClientId()%>">
 <link href="<%=Configuration.get3CixtyRoot()%>/3cixty.css" rel="stylesheet" type="text/css">
 <title>Settings</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body>
 
@@ -47,6 +49,8 @@
 <div>
 <input type="text" name="fbAccessToken" id="fbAccessToken" value="">
 </div>
+
+<div class="g-signin2" data-onsuccess="onSignIn"></div>
 </form>
 
 <script>
@@ -138,6 +142,18 @@
 	    $('#anchorGoogleToken').on("click", function (e) {
 	        e.preventDefault();
 	    });
+	}
+</script>
+
+<script>
+    function onSignIn(googleUser) {
+    	var id_token = googleUser.getAuthResponse().id_token;
+    	$('#googleAccessToken').value = id_token;
+	  	var profile = googleUser.getBasicProfile();
+	  	console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+	  	console.log('Name: ' + profile.getName());
+	  	console.log('Image URL: ' + profile.getImageUrl());
+	  	console.log('Email: ' + profile.getEmail());
 	}
 </script>
   
