@@ -135,7 +135,7 @@
 	var tokenIndex = loc.indexOf(googleAccessTokenKey);
 	if (tokenIndex > 0) {
 		document.getElementById("googleAccessToken").value = loc.substring(tokenIndex + googleAccessTokenKey.length);
-	    $('anchorGoogleToken').on("click", function (e) {
+	    $('#anchorGoogleToken').on("click", function (e) {
 	        e.preventDefault();
 	    });
 	}
