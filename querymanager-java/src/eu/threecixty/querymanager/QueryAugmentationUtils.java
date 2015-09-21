@@ -202,13 +202,13 @@ public class QueryAugmentationUtils {
 			if (placeIds != null && placeIds.size() > 0) {
 				Expr expr = createExpr(placeIds);
 				ElementBind elementBind = createElementBind(placeIds, socialScores);
-				augmentQuery(query, expr, elementBind, coef);
+				augmentQuery(query, expr, elementBind, coef, false);
 				query.setPrefixMapping(null); // remove all prefixes
 				queries.add(query);
 			}
 			
 			ElementBind elementBind2 = createElementBindForConstant(0);
-			augmentQuery(originalQuery, null, elementBind2, coef);
+			augmentQuery(originalQuery, null, elementBind2, coef, false);
 			queries.add(originalQuery);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -216,14 +216,19 @@ public class QueryAugmentationUtils {
 		}
 	}
 	
-	private static void augmentQuery(Query query, Expr expr, ElementBind elementBind, double coef) {
+	private static void augmentQuery(Query query, Expr expr, ElementBind elementBind, double coef, boolean subQuery) {
 		if (query.getOrderBy() != null && query.getOrderBy().size() == 1) {
-			SortCondition sc = query.getOrderBy().get(0);
-			Expr editorialExpr = sc.getExpression();
-			query.getOrderBy().clear();
-			if (DEBUG_MOD) LOGGER.info("parsing the expression: " + editorialExpr.toString() + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
-			Expr newExpr = ExprUtils.parse(editorialExpr.toString() + " + " + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
-			query.addOrderBy(newExpr, DESC);
+			if (subQuery) {
+				SortCondition sc = new SortCondition(ExprUtils.parse("?" + SOCIAL_SCORE_VAR_NAME) , DESC);
+				query.getOrderBy().add(sc);
+			} else {
+				SortCondition sc = query.getOrderBy().get(0);
+				Expr editorialExpr = sc.getExpression();
+				query.getOrderBy().clear();
+				if (DEBUG_MOD) LOGGER.info("parsing the expression: " + editorialExpr.toString() + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
+				Expr newExpr = ExprUtils.parse(editorialExpr.toString() + " + " + coef + " * ?" + SOCIAL_SCORE_VAR_NAME);
+				query.addOrderBy(newExpr, DESC);
+			}
 		} else if (query.getOrderBy() == null || query.getOrderBy().size() == 0) {
 			if (expr != null) {
 			    //query.addOrderBy(expr, 0);
@@ -241,7 +246,7 @@ public class QueryAugmentationUtils {
 			for (Element tmp: eg.getElements()) {
 				if (tmp instanceof ElementSubQuery) {
 					ElementSubQuery esq = (ElementSubQuery) tmp;
-					augmentQuery(esq.getQuery(), expr, elementBind, coef);
+					augmentQuery(esq.getQuery(), expr, elementBind, coef, true);
 				}
 			}
 			eg.addElement(elementBind);
