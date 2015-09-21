@@ -131,9 +131,9 @@
 <script>
 	var googleAccessTokenKey = "#access_token=";
 	var loc = window.location.href.toString();
-	var tokenIndex = loc.indexOf(accessTokenKey);
+	var tokenIndex = loc.indexOf(googleAccessTokenKey);
 	if (tokenIndex > 0) {
-		document.getElementById("googleAccessToken").value = loc.substring(tokenIndex + accessTokenKey.length);
+		document.getElementById("googleAccessToken").value = loc.substring(tokenIndex + googleAccessTokenKey.length);
 	    $('anchorGoogleToken').click(function (e) {
 	        e.preventDefault();
 	    });
