@@ -45,7 +45,7 @@
 	</fb:login-button>
 </div>
 <div>
-<input type="hidden" name="fbAccessToken" id="fbAccessToken" value="">
+<input type="text" name="fbAccessToken" id="fbAccessToken" value="">
 </div>
 </form>
 
