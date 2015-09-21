@@ -32,7 +32,7 @@
     <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
 <div>
-<a href="<%=Configuration.get3CixtyRoot()%>/getGoogleAccessToken" target="_blank">
+<a href="<%=Configuration.get3CixtyRoot()%>/getGoogleAccessToken" target="_blank" id="anchorGoogleToken">
 <img alt="Sign in with Google" src="./gplus.png">
 </a>
 </div>
@@ -125,6 +125,19 @@
     var fbTokenInput = document.getElementById("fbAccessToken");
     fbTokenInput.value = access_token;
   }
+</script>
+  
+
+<script>
+	var googleAccessTokenKey = "#access_token=";
+	var loc = window.location.href.toString();
+	var tokenIndex = loc.indexOf(accessTokenKey);
+	if (tokenIndex > 0) {
+		document.getElementById("googleAccessToken").value = loc.substring(tokenIndex + accessTokenKey.length);
+	    $('anchorGoogleToken').click(function (e) {
+	        e.preventDefault();
+	    });
+	}
 </script>
   
 <%
