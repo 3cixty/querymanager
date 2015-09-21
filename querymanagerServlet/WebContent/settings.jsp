@@ -64,8 +64,6 @@
       >
     </div>
   </div>
-
-  <div id="email" class="hide"></div>
   
 </form>
 
@@ -168,6 +166,7 @@
    */
   function loginFinishedCallback(authResult) {
     if (authResult) {
+    	console.log(authResult); 
       if (authResult['error'] == undefined){
         gapi.auth.setToken(authResult); // Stocker le jeton renvoyé.
         toggleElement('signin-button'); // Masquer le bouton de connexion lorsque l'ouverture de session réussit.
@@ -207,17 +206,8 @@
     //console.log(obj);   // Retirer les commentaires pour inspecter l'objet complet.
 
     el.innerHTML = email;
-    toggleElement('email');
   }
 
-  function toggleElement(id) {
-    var el = document.getElementById(id);
-    if (el.getAttribute('class') == 'hide') {
-      el.setAttribute('class', 'show');
-    } else {
-      el.setAttribute('class', 'hide');
-    }
-  }
   </script>
 
   
