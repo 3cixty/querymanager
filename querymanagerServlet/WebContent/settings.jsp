@@ -9,6 +9,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link href="<%=Configuration.get3CixtyRoot()%>/3cixty.css" rel="stylesheet" type="text/css">
 <title>Settings</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 </head>
 <body>
 
