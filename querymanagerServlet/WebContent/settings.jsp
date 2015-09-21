@@ -11,7 +11,11 @@
 <link href="<%=Configuration.get3CixtyRoot()%>/3cixty.css" rel="stylesheet" type="text/css">
 <title>Settings</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="https://apis.google.com/js/platform.js" async defer></script>
+<style type="text/css">
+  .hide { display: none;}
+  .show { display: block;}
+</style>
+<script src="https://apis.google.com/js/plusone.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -50,7 +54,19 @@
 <input type="text" name="fbAccessToken" id="fbAccessToken" value="">
 </div>
 
-<div class="g-signin2" data-onsuccess="onSignIn"></div>
+  <div id="signin-button" class="show">
+     <div class="g-signin" data-callback="loginFinishedCallback"
+      data-approvalprompt="force"
+      data-clientid="<%=Configuration.getGoogleClientId()%>"
+      data-scope="https://www.googleapis.com/auth/plus.login"
+      data-height="short"
+      data-cookiepolicy="single_host_origin"
+      >
+    </div>
+  </div>
+
+  <div id="email" class="hide"></div>
+  
 </form>
 
 <script>
@@ -145,17 +161,65 @@
 	}
 </script>
 
-<script>
-    function onSignIn(googleUser) {
-    	var id_token = googleUser.getAuthResponse().id_token;
-    	document.getElementById("googleAccessToken").value = id_token;
-	  	var profile = googleUser.getBasicProfile();
-	  	console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-	  	console.log('Name: ' + profile.getName());
-	  	console.log('Image URL: ' + profile.getImageUrl());
-	  	console.log('Email: ' + profile.getEmail());
-	}
-</script>
+  <script type="text/javascript">
+  /*
+   * Déclenché lorsque l'utilisateur accepte la connexion, annule ou ferme la
+   * boîte de dialogue d'autorisation.
+   */
+  function loginFinishedCallback(authResult) {
+    if (authResult) {
+      if (authResult['error'] == undefined){
+        gapi.auth.setToken(authResult); // Stocker le jeton renvoyé.
+        toggleElement('signin-button'); // Masquer le bouton de connexion lorsque l'ouverture de session réussit.
+        getEmail();                     // Déclencher une requête pour obtenir l'adresse e-mail.
+      } else {
+        console.log('An error occurred');
+      }
+    } else {
+      console.log('Empty authResult');  // Un problème s'est produit
+    }
+  }
+
+  /*
+   * Initie la requête au point de terminaison userinfo pour obtenir l'adresse
+   * e-mail de l'utilisateur. Cette fonction dépend de gapi.auth.setToken, qui doit contenir un
+   * jeton d'accès OAuth valide.
+   *
+   * Une fois la requête achevée, le rappel getEmailCallback est déclenché et reçoit
+   * le résultat de la requête.
+   */
+  function getEmail(){
+    // Charger les bibliothèques OAuth2 pour activer les méthodes userinfo.
+    gapi.client.load('oauth2', 'v2', function() {
+          var request = gapi.client.oauth2.userinfo.get();
+          request.execute(getEmailCallback);
+        });
+  }
+
+  function getEmailCallback(obj){
+    var el = document.getElementById('email');
+    var email = '';
+
+    if (obj['email']) {
+      email = 'Email: ' + obj['email'];
+    }
+
+    //console.log(obj);   // Retirer les commentaires pour inspecter l'objet complet.
+
+    el.innerHTML = email;
+    toggleElement('email');
+  }
+
+  function toggleElement(id) {
+    var el = document.getElementById(id);
+    if (el.getAttribute('class') == 'hide') {
+      el.setAttribute('class', 'show');
+    } else {
+      el.setAttribute('class', 'hide');
+    }
+  }
+  </script>
+
   
 <%
 
