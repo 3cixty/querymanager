@@ -146,7 +146,7 @@
     if (authResult) {
       if (authResult['error'] == undefined){
     	  document.getElementById("googleAccessToken").value = authResult.access_token;
-  	      $('#anchorGoogleToken').on("click", function (e) {
+  	      $('#signin-button').on("click", function (e) {
 	          e.preventDefault();
 	      });
       } else {
