@@ -38,22 +38,6 @@
 <div>
     <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
-<div>
-<a href="<%=Configuration.get3CixtyRoot()%>/getGoogleAccessToken" target="_blank" id="anchorGoogleToken">
-<img alt="Sign in with Google" src="./gplus.png">
-</a>
-</div>
-<div>
-<input type="text" name="googleAccessToken" id="googleAccessToken" value="">
-</div>
-<div>
-	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Facebook
-	</fb:login-button>
-</div>
-<div>
-<input type="text" name="fbAccessToken" id="fbAccessToken" value="">
-</div>
-
   <div id="signin-button" class="show">
      <div class="g-signin" data-callback="loginFinishedCallback"
       data-approvalprompt="force"
@@ -64,6 +48,16 @@
       >
     </div>
   </div>
+<div>
+<input type="text" name="googleAccessToken" id="googleAccessToken" value="">
+</div>
+<div>
+	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Facebook
+	</fb:login-button>
+</div>
+<div>
+<input type="text" name="fbAccessToken" id="fbAccessToken" value="">
+</div>
   
 </form>
 
@@ -144,19 +138,6 @@
     var fbTokenInput = document.getElementById("fbAccessToken");
     fbTokenInput.value = access_token;
   }
-</script>
-  
-
-<script>
-	var googleAccessTokenKey = "#access_token=";
-	var loc = window.location.href.toString();
-	var tokenIndex = loc.indexOf(googleAccessTokenKey);
-	if (tokenIndex > 0) {
-		document.getElementById("googleAccessToken").value = loc.substring(tokenIndex + googleAccessTokenKey.length);
-	    $('#anchorGoogleToken').on("click", function (e) {
-	        e.preventDefault();
-	    });
-	}
 </script>
 
   <script type="text/javascript">
