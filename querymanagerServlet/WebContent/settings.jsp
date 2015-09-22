@@ -175,8 +175,6 @@
   function validation() {
 	  var gtk = document.getElementById("googleAccessToken").value;
 	  var fbtk = document.getElementById("fbAccessToken").value;
-	  alert(gtk);
-	  alert(fbtk);
 	  if ((gtk == '') && (fbtk == '')) {
 		  alert("You haven't yet signed in with neither Google nor Facebook account");
 		  return false;
