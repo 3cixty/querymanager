@@ -49,16 +49,19 @@
     </div>
   </div>
 <div>
-<input type="text" name="googleAccessToken" id="googleAccessToken" value="">
+<span>Google token</span><input type="text" name="googleAccessToken" id="googleAccessToken" value="">
 </div>
 <div>
 	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Facebook
 	</fb:login-button>
 </div>
 <div>
-<input type="text" name="fbAccessToken" id="fbAccessToken" value="">
+<span>Facebook token</span><input type="text" name="fbAccessToken" id="fbAccessToken" value="">
 </div>
-  
+<br>
+<div>
+<input type="submit" value="Update" />
+</div>
 </form>
 
 <script>
