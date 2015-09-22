@@ -14,6 +14,11 @@
 <style type="text/css">
   .hide { display: none;}
   .show { display: block;}
+  
+  .note {
+  	font-size: 11 px;
+  	font-style: italic;
+  }
 </style>
 <script src="https://apis.google.com/js/plusone.js" type="text/javascript"></script>
 </head>
@@ -34,6 +39,9 @@
     <input type="hidden" name="access_token" value="<%=accessToken%>">
 </div>
 <div>
+<div>
+  <span class="note">To link your 3cixty account with Google and Facebook account, you need to click on the corresponding <b>Sign in</b> button.</span>
+</div>
 </div>
 <div>
     <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
@@ -52,12 +60,15 @@
 <input type="text" name="googleAccessToken" id="googleAccessToken" value="" placeHolder="Google token">
 </div>
 <div>
-	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Facebook
+	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Sign in
 	</fb:login-button>
 </div>
 <div>
 <input type="text" name="fbAccessToken" id="fbAccessToken" value="" placeHolder="Facebook token">
 </div>
+<br>
+<span class="note">By clicking on <b>Update</b> button, you will link your 3cixty account with Google and Facebook account. You can link either of them or both of them.
+In the case you have used Google and Facebook account to sign in to 3cixty platform, all WishList items created by signing in with those accounts will be merged to your 3cixty account.</span>
 <br>
 <div>
 <input type="submit" value="Update" />
