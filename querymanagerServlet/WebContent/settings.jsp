@@ -173,7 +173,7 @@
   }
   
   function validation() {
-	  if (($("#googleAccessToken").value == "") && ($("#fbAccessToken").value="")) {
+	  if (($('#googleAccessToken').value == '') && ($('#fbAccessToken').value == '')) {
 		  alert("You haven't yet signed in with neither Google nor Facebook account");
 		  return false;
 	  }
