@@ -16,7 +16,7 @@
   .show { display: block;}
   
   .note {
-  	font-size: 11 px;
+  	font-size: 9 px;
   	font-style: italic;
   }
 </style>
@@ -42,6 +42,7 @@
 <div>
   <span class="note">To link your 3cixty account with Google and Facebook account, you need to click on the corresponding <b>Sign in</b> button.</span>
 </div>
+<br>
 </div>
 <div>
     <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
@@ -69,6 +70,7 @@
 <br>
 <span class="note">By clicking on <b>Update</b> button, you will link your 3cixty account with Google and Facebook account. You can link either of them or both of them.
 In the case you have used Google and Facebook account to sign in to 3cixty platform, all WishList items created by signing in with those accounts will be merged to your 3cixty account.</span>
+<br>
 <br>
 <div>
 <input type="submit" value="Update" />
