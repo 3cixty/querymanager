@@ -163,7 +163,6 @@
 
   function loginFinishedCallback(authResult) {
     if (authResult) {
-    	console.log(authResult); 
       if (authResult['error'] == undefined){
     	  document.getElementById("googleAccessToken").value = authResult.access_token;
   	      $('#anchorGoogleToken').on("click", function (e) {
