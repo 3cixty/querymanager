@@ -48,7 +48,7 @@
   </ol>
 </div>
 <div>
-    <input type="text" readonly="readonly" value="<%=uid%>" name="uid">
+    <input type="hidden" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
   <div id="signin-button" class="show">
      <div class="g-signin" data-callback="loginFinishedCallback"
