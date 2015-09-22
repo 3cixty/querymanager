@@ -39,8 +39,8 @@
     <input type="hidden" name="access_token" value="<%=accessToken%>">
 </div>
 <div>
-  <span class="note">To link your 3cixty account with Google or Facebook account, you need to do two following steps.</span>
-  <ol>
+  <h4>To link your 3cixty account with Google or Facebook account, you need to do two following steps:</h4>
+  <ol class="note">
     <li>Signing in with the corresponding <b>Sign in</b> button. You can click on both of them if you intend to link both Google and Facebook account to your 3cixty account.</li>
     <li>Confirming the link between your 3cixty account with Google account or Facebook, or both of them. In the case you have used either or both of them to sign in to 3cixty platform, 
     all WishList items created while signing in with those accounts will be merged to your 3cixty account if there isn't any conflict. 
