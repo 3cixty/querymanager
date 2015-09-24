@@ -12,6 +12,7 @@ import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerImpl;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.oldmodels.Address;
+import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 class MySQLProfileManagerImpl implements ProfileManager {
 	
@@ -251,5 +252,16 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	@Override
 	public ForgottenUserManager getForgottenUserManager() {
 		return new ForgottenUserManagerImpl();
+	}
+
+	@Override
+	public String findAccountId(UserProfile profile, String source) {
+		if (profile == null || source == null) return null;
+		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
+		if (pis == null) return null;
+		for (ProfileIdentities pi: pis) {
+			if (source.equals(pi.getHasSourceCarrier())) return pi.getHasUserAccountID();
+		}
+		return null;
 	}
 }
