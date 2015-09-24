@@ -155,26 +155,26 @@ public class ForgottenUserUtils {
 		return forgottenUser;
 	}
 	
-//	public static boolean deleteProfile(String uid) {
-//		if (uid == null) return false;
-//		Session session = null;
-//		boolean ok = false;
-//		try {
-//			session = HibernateUtil.getSessionFactory().openSession();
-//			
-//			session.beginTransaction();
-//			
-//			removeAllUserProfile(session, uid);
-//			session.getTransaction().commit();
-//			ok = true;
-//		} catch (HibernateException e) {
-//			LOGGER.error(e.getMessage());
-//			session.getTransaction().rollback();
-//		} finally {
-//			if (session != null) session.close();
-//		}
-//		return ok;
-//	}
+	public static boolean deleteProfile(String uid) {
+		if (uid == null) return false;
+		Session session = null;
+		boolean ok = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			
+			session.beginTransaction();
+			
+			removeAllUserProfile(session, uid);
+			session.getTransaction().commit();
+			ok = true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return ok;
+	}
 	
 	private static void removeAllUserProfile(Session session, String uid)
 			throws HibernateException {
