@@ -3,7 +3,9 @@ package eu.threecixty.querymanager.rest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,19 +13,27 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.FaceBookAccountUtils;
+import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.profile.InvalidTrayElement;
+import eu.threecixty.profile.ProfileManagerImpl;
+import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.Tray;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
@@ -53,16 +63,7 @@ public class SettingsServices {
 			HttpSession session = httpRequest.getSession();
 			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-//				try {
-//					checkPermission(userAccessToken);
-//				} catch (ThreeCixtyPermissionException e1) {
-//					CallLoggingManager.getInstance().save(userAccessToken.getAppkey(), starttime,
-//							CallLoggingConstants.SETTINGS_VIEW_SERVICE, CallLoggingConstants.FAILED);
-//					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//					writer.write(e1.getMessage());
-//					writer.close();
-//					return;
-//				}
+
 				String uid =  userAccessToken.getUid();
 				String key = userAccessToken.getAppkey();
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_VIEW_SERVICE,
@@ -90,7 +91,81 @@ public class SettingsServices {
 		}
 	}
 	
-	
+	@POST
+	@Path("/linkAccounts")
+	public Response linkAccounts(@FormParam("access_token") String accessToken,
+			@DefaultValue("") @FormParam("googleAccessToken") String googleAccessToken,
+			@DefaultValue("") @FormParam("fbAccessToken") String fbAccessToken) {
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			if (!isNotNullOrEmpty(googleAccessToken) || !isNotNullOrEmpty(fbAccessToken))
+				return Response.status(400).entity("Both Google and Facebook access tokens are empty").build();
+			String uidDerivedFromGoogle = GoogleAccountUtils.getUID(googleAccessToken);
+			if (!isNotNullOrEmpty(uidDerivedFromGoogle)) return Response.status(400).entity(
+					"Google access token " + googleAccessToken + " is invalid").build();
+			String uidDerivedFromFacebook = FaceBookAccountUtils.getUID(fbAccessToken, 50, 50);
+			if (!isNotNullOrEmpty(uidDerivedFromFacebook)) return Response.status(400).entity(
+					"Facebook access token " + fbAccessToken + " is invalid").build();
+			try {
+				List <Tray> traysDerivedFromGoogle = ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromGoogle);
+				List <Tray> traysDerivedFromFacebook = ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromFacebook);
+				List <Tray> traysDerivedFrom3cixtyAccount = ProfileManagerImpl.getInstance().getTrayManager().getTrays(userAccessToken.getUid());
+				if (conflict(traysDerivedFromGoogle, traysDerivedFromFacebook)) return Response.status(400).entity(
+						"There are at least two WishList items under your Google and Facebook account have the same identity").build();
+				if (conflict(traysDerivedFromGoogle, traysDerivedFrom3cixtyAccount)) return Response.status(400).entity(
+						"There are at least two WishList items under your Google and 3cixty dedicated account have the same identity").build();
+				if (conflict(traysDerivedFromFacebook, traysDerivedFrom3cixtyAccount)) return Response.status(400).entity(
+						"There are at least two WishList items under your Facebook and 3cixty dedicated account have the same identity").build();
+				ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromGoogle, userAccessToken.getUid());
+				ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromFacebook, userAccessToken.getUid());
+				
+				Set <String> googleKnows = ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getKnows();
+				Set <String> fbKnows = ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getKnows();
+				
+				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
+				Set <String> knows = profile.getKnows();
+				if (knows == null) {
+					knows = new HashSet<String>();
+					profile.setKnows(knows);
+				}
+				if (googleKnows != null && googleKnows.size() > 0) {
+					for (String uid: googleKnows) {
+						if (knows.contains(uid)) continue;
+						knows.add(uid);
+					}
+				}
+				if (fbKnows != null && fbKnows.size() > 0) {
+					for (String uid: fbKnows) {
+						if (knows.contains(uid)) continue;
+						knows.add(uid);
+					}
+				}
+				Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
+				if (pis == null) {
+					pis = new HashSet<ProfileIdentities>();
+					profile.setHasProfileIdenties(pis);
+				}
+				String g_user_id = ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null), SPEConstants.GOOGLE_SOURCE);
+				eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), g_user_id, SPEConstants.GOOGLE_SOURCE, pis);
+				
+				String fb_user_id = ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null), SPEConstants.FACEBOOK_SOURCE);
+				eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), fb_user_id, SPEConstants.FACEBOOK_SOURCE, pis);
+				
+				ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromGoogle);
+				ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromFacebook);
+				
+				ProfileManagerImpl.getInstance().saveProfile(profile, null);
+				
+			} catch (InvalidTrayElement e) {
+				e.printStackTrace();
+				return Response.status(400).entity(e.getMessage()).build();
+			} catch (TooManyConnections e) {
+				e.printStackTrace();
+				return Response.serverError().build();
+			}
+		}
+		return Response.status(400).entity("The token " + accessToken + " is invalid").build();
+	}
 	
 
 	public void save(@DefaultValue("")@FormParam("firstName") String firstName,
@@ -220,5 +295,25 @@ public class SettingsServices {
 
 	private void checkPermission(AccessToken accessToken) throws ThreeCixtyPermissionException {
 		SPEServices.checkPermission(accessToken);
+	}
+	
+	private boolean conflict(List <Tray> trays1, List <Tray> trays2) {
+		if (trays1 == null || trays1.size() == 0) return false;
+		if (trays2 == null || trays2.size() == 0) return false;
+		boolean found = false;
+		for (Tray tray1: trays1) {
+			if (exist(tray1.getElement_id(), trays2)) {
+				found = true;
+				break;
+			}
+		}
+		return found;
+	}
+	
+	private boolean exist(String itemId, List <Tray> inTrays) {
+		for (Tray tray: inTrays) {
+			if (itemId.equals(tray.getElement_id())) return true;
+		}
+		return false;
 	}
 }
