@@ -36,7 +36,7 @@ public class SparqlEndPointUtils {
 	}
 
 	private static void executeQueryViaSPARQL_GET(String query, String format, String endPointUrl, StringBuilder result) throws IOException {
-		String urlStr = endPointUrl + "?default-graph-uri=&query=" + URLEncoder.encode(query, "UTF-8");
+		String urlStr = endPointUrl + "?debug=on&default-graph-uri=&query=" + URLEncoder.encode(query, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
 			URL url = new URL(urlStr);
 	
