@@ -768,7 +768,7 @@ public class QueryManagerServices {
 			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key);
 
 			try {
-				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET, key);
+				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET, SparqlChooser.getEndPointUrl(key));
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
 				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(SparqlChooser.getEndPointUrl(key),
 						SparqlChooser.getPoIGraph(key), poiIds, null, null, tmpLanguages);
