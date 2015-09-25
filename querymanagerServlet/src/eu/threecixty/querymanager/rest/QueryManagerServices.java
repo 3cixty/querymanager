@@ -729,7 +729,8 @@ public class QueryManagerServices {
 						(pair2 == null ? null : pair2.getValue()), key);
 
 				try {
-					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET, key);
+					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET,
+							SparqlChooser.getEndPointUrl(key));
 				
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(SparqlChooser.getEndPointUrl(key),
