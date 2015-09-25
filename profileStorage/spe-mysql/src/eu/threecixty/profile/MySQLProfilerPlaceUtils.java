@@ -28,7 +28,8 @@ public class MySQLProfilerPlaceUtils {
 	private static final String JSON_APP_FORMAT = "application/sparql-results+json";
 	
 	private static final Logger LOGGER = Logger.getLogger(
-			 UserUtils.class.getName());
+			MySQLProfilerPlaceUtils.class.getName());
+	private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	/**
 	 * Find placeIDs and the corresponding social scores.
@@ -113,7 +114,12 @@ public class MySQLProfilerPlaceUtils {
 			for (int index = 0; index < jsonArr.length(); index++) {
 				placeIds.add(jsonArr.getJSONObject(index).getJSONObject("x").getString("value"));
 				String score = jsonArr.getJSONObject(index).getJSONObject("socialScore").getString("value");
-				socialScores.add(Double.parseDouble(score));
+				if (DEBUG_MOD) LOGGER.info("Social score: " + score);
+				try {
+				    socialScores.add(Double.parseDouble(score));
+				} catch (RuntimeException re) {
+					re.printStackTrace();
+				}
 			}
 
 		} catch (JSONException e) {
