@@ -104,7 +104,7 @@ public class MySQLProfilerPlaceUtils {
 		
 		StringBuilder result = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(buffer.toString(), JSON_APP_FORMAT,
-				SparqlEndPointUtils.HTTP_POST, endPointUrl, result);
+				SparqlEndPointUtils.HTTP_GET, endPointUrl, result);
 		JSONObject jsonObj;
 
 		jsonObj = new JSONObject(result.toString());
