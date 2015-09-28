@@ -1,9 +1,7 @@
 package eu.threecixty.cache;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +21,7 @@ public class ProfileCacheManager {
 
 	private static final String GOOGLE_UID_FRIENDS_KEY = "googleUIDFriends";
 	private static final String USER_PROFILE_KEY = "userProfile";
+	private static final String GENERATED_3CIXTYUID_WITH_ACTUAL_3CIXTY_UID = "generated3cixtyUIDWithActualUID";
 	private static final int TIME_OUT_TO_GET_CACHE = 200; // in millisecond
 	
 	private List<MemcachedClient> memcachedClients;
@@ -38,7 +37,7 @@ public class ProfileCacheManager {
 	//private Map <String, List <String>> googleUIDsOfFriends;
 	
 	// no need to use memcached since there is no update about value
-	private Map <String, String> uidSourceCaches; // key is generated ID by using Utils.generate3cixtyUID, values is a  3cixty UID
+	//private Map <String, String> uidSourceCaches; // key is generated ID by using Utils.generate3cixtyUID, values is a  3cixty UID
 	
 	public static ProfileCacheManager getInstance() {
 		return INSTANCE;
@@ -66,7 +65,9 @@ public class ProfileCacheManager {
 				else if (SPEConstants.FACEBOOK_SOURCE.equals(source)) uidSource = UidSource.FACEBOOK;
 				if (uidSource != null) {
 					String generatedID = Utils.gen3cixtyUID(uid, uidSource);
-					uidSourceCaches.put(generatedID, _3cixtyUid);
+					MemcachedClient memcachedClient2 = MemcachedUtils.getMemcachedClient(memcachedClients, GENERATED_3CIXTYUID_WITH_ACTUAL_3CIXTY_UID + generatedID);
+					if (memcachedClient2 != null) memcachedClient2.set(GENERATED_3CIXTYUID_WITH_ACTUAL_3CIXTY_UID + generatedID, 0, _3cixtyUid);
+					//uidSourceCaches.put(generatedID, _3cixtyUid);
 				}
 			}
 		}
@@ -97,12 +98,31 @@ public class ProfileCacheManager {
 		if (DEBUG_MOD) LOGGER.info("Start finding profile in memory");
 		String generatedID = Utils.gen3cixtyUID(uid,
 				SPEConstants.GOOGLE_SOURCE.equals(source) ? UidSource.GOOGLE : UidSource.FACEBOOK);
-		String _3cixtyUID = uidSourceCaches.get(generatedID);
+		MemcachedClient memcachedClient2 = MemcachedUtils.getMemcachedClient(memcachedClients, GENERATED_3CIXTYUID_WITH_ACTUAL_3CIXTY_UID + generatedID);
+		if (memcachedClient2 == null) return null;
+		String _3cixtyUID = null;
+		Future<Object> f = memcachedClient2.asyncGet(GENERATED_3CIXTYUID_WITH_ACTUAL_3CIXTY_UID + generatedID);
+		try {
+			Object myObj = f.get(TIME_OUT_TO_GET_CACHE, TimeUnit.MILLISECONDS);
+			if (myObj != null) {
+				_3cixtyUID = (String) myObj;
+			}
+		} catch(TimeoutException e) {
+		    // Since we don't need this, go ahead and cancel the operation.  This
+		    // is not strictly necessary, but it'll save some work on the server.
+		    f.cancel(false);
+		    // Do other timeout related stuff
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		//String _3cixtyUID = uidSourceCaches.get(generatedID);
 		UserProfile profile = null;
 		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, USER_PROFILE_KEY + _3cixtyUID);
 		if (memcachedClient == null) return null;
 		if (_3cixtyUID != null) {
-			Future<Object> f = memcachedClient.asyncGet(USER_PROFILE_KEY + _3cixtyUID);
+			f = memcachedClient.asyncGet(USER_PROFILE_KEY + _3cixtyUID);
 			try {
 				Object myObj = f.get(TIME_OUT_TO_GET_CACHE, TimeUnit.MILLISECONDS);
 				if (myObj != null) {
@@ -204,7 +224,7 @@ public class ProfileCacheManager {
 	
 	private ProfileCacheManager() {
 		//profileCaches = new ConcurrentHashMap<String, UserProfile>();
-		uidSourceCaches = new ConcurrentHashMap<String, String>();
+		//uidSourceCaches = new ConcurrentHashMap<String, String>();
 		//googleUIDsOfFriends = new ConcurrentHashMap<String, List<String>>();
 		memcachedClients = MemcachedUtils.createClients();
 	}
