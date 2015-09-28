@@ -25,6 +25,7 @@ import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.FaceBookAccountUtils;
+import eu.threecixty.profile.Friend;
 import eu.threecixty.profile.GoogleAccountUtils;
 import eu.threecixty.profile.InvalidTrayElement;
 import eu.threecixty.profile.ProfileManagerImpl;
@@ -98,17 +99,13 @@ public class SettingsServices {
 			@DefaultValue("") @FormParam("fbAccessToken") String fbAccessToken) {
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
-			if (!isNotNullOrEmpty(googleAccessToken) || !isNotNullOrEmpty(fbAccessToken))
+			if (!isNotNullOrEmpty(googleAccessToken) && !isNotNullOrEmpty(fbAccessToken))
 				return Response.status(400).entity("Both Google and Facebook access tokens are empty").build();
-			String uidDerivedFromGoogle = GoogleAccountUtils.getUID(googleAccessToken);
-			if (!isNotNullOrEmpty(uidDerivedFromGoogle)) return Response.status(400).entity(
-					"Google access token " + googleAccessToken + " is invalid").build();
-			String uidDerivedFromFacebook = FaceBookAccountUtils.getUID(fbAccessToken, 50, 50);
-			if (!isNotNullOrEmpty(uidDerivedFromFacebook)) return Response.status(400).entity(
-					"Facebook access token " + fbAccessToken + " is invalid").build();
+			String uidDerivedFromGoogle = isNotNullOrEmpty(googleAccessToken) ? GoogleAccountUtils.getUID(googleAccessToken) : null;
+			String uidDerivedFromFacebook = isNotNullOrEmpty(fbAccessToken) ? FaceBookAccountUtils.getUID(fbAccessToken, 50, 50) : null;
 			try {
-				List <Tray> traysDerivedFromGoogle = ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromGoogle);
-				List <Tray> traysDerivedFromFacebook = ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromFacebook);
+				List <Tray> traysDerivedFromGoogle = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromGoogle);
+				List <Tray> traysDerivedFromFacebook = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromFacebook);
 				List <Tray> traysDerivedFrom3cixtyAccount = ProfileManagerImpl.getInstance().getTrayManager().getTrays(userAccessToken.getUid());
 				if (conflict(traysDerivedFromGoogle, traysDerivedFromFacebook)) return Response.status(400).entity(
 						"There are at least two WishList items under your Google and Facebook account have the same identity").build();
@@ -116,11 +113,11 @@ public class SettingsServices {
 						"There are at least two WishList items under your Google and 3cixty dedicated account have the same identity").build();
 				if (conflict(traysDerivedFromFacebook, traysDerivedFrom3cixtyAccount)) return Response.status(400).entity(
 						"There are at least two WishList items under your Facebook and 3cixty dedicated account have the same identity").build();
-				ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromGoogle, userAccessToken.getUid());
-				ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromFacebook, userAccessToken.getUid());
+				if (uidDerivedFromGoogle != null) ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromGoogle, userAccessToken.getUid());
+				if (uidDerivedFromFacebook != null) ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromFacebook, userAccessToken.getUid());
 				
-				Set <String> googleKnows = ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getKnows();
-				Set <String> fbKnows = ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getKnows();
+				Set <String> googleKnows = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getKnows();
+				Set <String> fbKnows = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getKnows();
 				
 				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
 				Set <String> knows = profile.getKnows();
@@ -145,16 +142,22 @@ public class SettingsServices {
 					pis = new HashSet<ProfileIdentities>();
 					profile.setHasProfileIdenties(pis);
 				}
-				String g_user_id = ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null), SPEConstants.GOOGLE_SOURCE);
-				eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), g_user_id, SPEConstants.GOOGLE_SOURCE, pis);
+				String g_user_id = uidDerivedFromGoogle == null ? null: ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null), SPEConstants.GOOGLE_SOURCE);
+				if (g_user_id != null) eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), g_user_id, SPEConstants.GOOGLE_SOURCE, pis);
 				
-				String fb_user_id = ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null), SPEConstants.FACEBOOK_SOURCE);
-				eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), fb_user_id, SPEConstants.FACEBOOK_SOURCE, pis);
+				String fb_user_id = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null), SPEConstants.FACEBOOK_SOURCE);
+				if (fb_user_id != null) eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), fb_user_id, SPEConstants.FACEBOOK_SOURCE, pis);
 				
-				ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromGoogle);
-				ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromFacebook);
+				if (uidDerivedFromGoogle != null) ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromGoogle);
+				if (uidDerivedFromFacebook != null) ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromFacebook);
 				
 				ProfileManagerImpl.getInstance().saveProfile(profile, null);
+				
+				List <Friend> allFriendsHavingMyUIDDerivedFromGoogleInKnows = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().findAll3cixtyFriendsHavingMyUIDInKnows(uidDerivedFromGoogle);
+				List <Friend> allFriendsHavingMyUIDDerivedFromFacebookInKnows = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().findAll3cixtyFriendsHavingMyUIDInKnows(uidDerivedFromFacebook);
+				
+				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromGoogleInKnows, uidDerivedFromGoogle, profile.getHasUID());
+				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromFacebookInKnows, uidDerivedFromFacebook, profile.getHasUID());
 				
 			} catch (InvalidTrayElement e) {
 				e.printStackTrace();
@@ -167,6 +170,23 @@ public class SettingsServices {
 		return Response.status(400).entity("The token " + accessToken + " is invalid").build();
 	}
 	
+
+	private void updateFriendsHavingMyUIDInKnows(
+			List<Friend> allFriendsHavingMyUIDInKnows,
+			String uidDerivedFromOutSide, String newUID) throws TooManyConnections {
+		if (allFriendsHavingMyUIDInKnows != null) {
+			for (Friend friend: allFriendsHavingMyUIDInKnows) {
+				UserProfile tmpUP = ProfileManagerImpl.getInstance().getProfile(friend.getUid(), null);
+				Set <String> tmpKnows = tmpUP.getKnows();
+				if (tmpKnows != null) {
+					tmpKnows.remove(uidDerivedFromOutSide);
+					tmpKnows.add(newUID);
+					tmpUP.setKnows(tmpKnows);
+					ProfileManagerImpl.getInstance().saveProfile(tmpUP, null);
+				}
+			}
+		}
+	}
 
 	public void save(@DefaultValue("")@FormParam("firstName") String firstName,
 			@DefaultValue("")@FormParam("lastName") String lastName,
