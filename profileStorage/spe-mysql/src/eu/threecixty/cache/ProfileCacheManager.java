@@ -92,6 +92,23 @@ public class ProfileCacheManager {
 		//googleUIDsOfFriends.remove(_3cixtyUid);
 		memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, GOOGLE_UID_FRIENDS_KEY + _3cixtyUid);
 		if (memcachedClient != null) memcachedClient.delete(GOOGLE_UID_FRIENDS_KEY + _3cixtyUid);
+		
+		// remove map between generated 'blink' 3cixty and actual 3cixty
+		Set <ProfileIdentities> pis = userProfile.getHasProfileIdenties();
+		if (pis != null) {
+			for (ProfileIdentities pi: pis) {
+				String source = pi.getHasSourceCarrier();
+				String uid = pi.getHasUserAccountID();
+				UidSource uidSource = null;
+				if (SPEConstants.GOOGLE_SOURCE.equals(source)) uidSource = UidSource.GOOGLE;
+				else if (SPEConstants.FACEBOOK_SOURCE.equals(source)) uidSource = UidSource.FACEBOOK;
+				if (uidSource != null) {
+					String generatedID = Utils.gen3cixtyUID(uid, uidSource);
+					MemcachedClient memcachedClient2 = MemcachedUtils.getMemcachedClient(memcachedClients, GENERATED_3CIXTYUID_WITH_ACTUAL_3CIXTY_UID + generatedID);
+					if (memcachedClient2 != null) memcachedClient2.delete(GENERATED_3CIXTYUID_WITH_ACTUAL_3CIXTY_UID + generatedID);
+				}
+			}
+		}
 	}
 	
 	public UserProfile findProfile(String uid, String source) {
