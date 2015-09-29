@@ -46,6 +46,9 @@ import eu.threecixty.profile.oldmodels.UserInteractionMode;
 @Path("/" + Constants.PREFIX_NAME)
 public class SettingsServices {
 
+	public static final int GOOGLE_PROFILE_IDENTITIES = 2;
+	public static final int FACEBOOK_PROFILE_IDENTITIES = 3;
+	public static final String PROFILE_IDENTITIES_KEY = "profileIdentitiesKey";
 	
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
 
@@ -72,6 +75,11 @@ public class SettingsServices {
 
 				session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
 				session.setAttribute("uid", uid);
+				try {
+					session.setAttribute(PROFILE_IDENTITIES_KEY, madeOf(access_token));
+				} catch (TooManyConnections e1) {
+					e1.printStackTrace();
+				}
 
 				try {
 					request.getRequestDispatcher(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "settings.jsp").forward(request, response);
@@ -99,10 +107,20 @@ public class SettingsServices {
 			@DefaultValue("") @FormParam("fbAccessToken") String fbAccessToken) {
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			int piSum = 1;
+			try {
+				piSum = madeOf(accessToken);
+			} catch (TooManyConnections e1) {
+				e1.printStackTrace();
+			}
 			if (!isNotNullOrEmpty(googleAccessToken) && !isNotNullOrEmpty(fbAccessToken))
 				return Response.status(400).entity("Both Google and Facebook access tokens are empty").build();
 			String uidDerivedFromGoogle = isNotNullOrEmpty(googleAccessToken) ? GoogleAccountUtils.getUID(googleAccessToken) : null;
 			String uidDerivedFromFacebook = isNotNullOrEmpty(fbAccessToken) ? FaceBookAccountUtils.getUID(fbAccessToken, 50, 50) : null;
+			if ((piSum / GOOGLE_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromGoogle))
+				return Response.status(400).entity("A Google account was already linked to your current account").build();
+			if ((piSum / FACEBOOK_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromFacebook))
+				return Response.status(400).entity("A Facebook account was already linked to your current account").build();
 			try {
 				List <Tray> traysDerivedFromGoogle = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromGoogle);
 				List <Tray> traysDerivedFromFacebook = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromFacebook);
@@ -300,6 +318,23 @@ public class SettingsServices {
 		// TODO: update private data from accessToken ?
 		profileIdentities.add(tmpProfile);
 		settings.setIdentities(profileIdentities);
+	}
+	
+	public static int madeOf(String _3cixtyToken) throws TooManyConnections {
+		if (_3cixtyToken == null) return 1;
+		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyToken, null);
+		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
+		if (pis == null) return 1;
+		return madeOf(pis);
+	}
+	
+	private static int madeOf(Set <ProfileIdentities> pis) {
+		int ret = 1;
+		for (ProfileIdentities pi: pis) {
+			if (pi.getHasSourceCarrier().equals(SPEConstants.GOOGLE_SOURCE)) ret = ret * GOOGLE_PROFILE_IDENTITIES ;
+			else if (pi.getHasSourceCarrier().equals(SPEConstants.FACEBOOK_SOURCE)) ret = ret * FACEBOOK_PROFILE_IDENTITIES;
+		}
+		return ret;
 	}
 
 

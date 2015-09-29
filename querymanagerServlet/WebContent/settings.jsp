@@ -1,4 +1,5 @@
 <%@page import="eu.threecixty.querymanager.rest.Constants" %>
+<%@page import="eu.threecixty.querymanager.rest.SettingsServices" %>
 <%@page import="eu.threecixty.Configuration" %>
 <%@ page language="java" import="eu.threecixty.profile.ThreeCixtySettings" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -26,12 +27,12 @@
 
 <%
     String accessToken = (String) session.getAttribute("accessToken");
-
    if (accessToken == null) {
 	   response.sendError(400, "Invalid request");
 	   //response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
    } else  {
         String uid = (String) session.getAttribute("uid");
+        int piSum = (Integer) session.getAttribute(SettingsServices.PROFILE_IDENTITIES_KEY);
 %>
 
 <form action="<%=Configuration.get3CixtyRoot()%>/linkAccounts" method="post" onsubmit="return validation()">
@@ -43,13 +44,17 @@
   <ol class="note">
     <li>Signing in with the corresponding <b>Sign in</b> button. You can click on both of them if you intend to link both Google and Facebook account to your 3cixty account.</li>
     <li>Confirming the link between your current account with Google account or Facebook, or both of them. In the case you have used either or both of them to sign in to 3cixty platform, 
-    all WishList items created while signing in with those accounts will be merged to your 3cixty account if there isn't any conflict. 
-    The conflict means that you can find two items coming from your 3cixty account or those accounts have the same identity.</li>
+    all WishList items created while signing in with those accounts will be merged to your current account if there isn't any conflict. 
+    The conflict means that you can find two items coming from your current account or those accounts have the same identity.</li>
   </ol>
+  <i>If you already links your current account to a Google or Facebook, the corresponding Sign-In button for Google and Facebook will not appear.</i>
 </div>
 <div>
     <input type="hidden" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
+<%
+if (piSum / SettingsServices.GOOGLE_PROFILE_IDENTITIES != 0) {
+%>
   <div id="signin-button" class="show">
      <div class="g-signin" data-callback="loginFinishedCallback"
       data-approvalprompt="force"
@@ -63,6 +68,10 @@
 <div>
 <input type="text" name="googleAccessToken" id="googleAccessToken" value="" placeHolder="Google token" readonly="readonly">
 </div>
+<% }
+
+if (piSum / SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
+%>
 <div>
 	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Sign in
 	</fb:login-button>
@@ -70,6 +79,7 @@
 <div>
 <input type="text" name="fbAccessToken" id="fbAccessToken" value="" placeHolder="Facebook token" readonly="readonly">
 </div>
+<% } %>
 <br>
 <div>
 <input type="submit" value="Confirm" />
