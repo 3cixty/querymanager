@@ -13,9 +13,9 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -59,7 +59,7 @@ public class SettingsServices {
 
 	@GET
 	@Path("/viewSettings")
-	public void view(@QueryParam("access_token") String access_token, @Context HttpServletResponse response,
+	public void view(@HeaderParam("access_token") String access_token, @Context HttpServletResponse response,
             @Context HttpServletRequest request) {
 		try {
 
@@ -114,7 +114,7 @@ public class SettingsServices {
 				e1.printStackTrace();
 			}
 			if (!isNotNullOrEmpty(googleAccessToken) && !isNotNullOrEmpty(fbAccessToken))
-				return Response.status(400).entity("Both Google and Facebook access tokens are empty").build();
+				return Response.status(400).entity("You must provide one access token at least").build();
 			String uidDerivedFromGoogle = isNotNullOrEmpty(googleAccessToken) ? GoogleAccountUtils.getUID(googleAccessToken) : null;
 			String uidDerivedFromFacebook = isNotNullOrEmpty(fbAccessToken) ? FaceBookAccountUtils.getUID(fbAccessToken, 50, 50) : null;
 			if ((piSum % GOOGLE_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromGoogle))
