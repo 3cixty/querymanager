@@ -310,7 +310,8 @@ public class QueryManagerServices {
 	@Path("/getElementsInDetails")
 	public Response getElementsInDetails(@HeaderParam("key") String key,
 			@HeaderParam("Accept-Language") String languages, 
-			@QueryParam("events") String events, @QueryParam("pois") String pois) {
+			@QueryParam("events") String events, @QueryParam("pois") String pois,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			logInfo("App key is validated");
@@ -323,7 +324,7 @@ public class QueryManagerServices {
 					List <String> eventIds = createList(events);
 					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
 							SparqlChooser.getEndPointUrl(key),
-							SparqlChooser.getEventGraph(key), eventIds, null, tmpLanguages);
+							SparqlChooser.getEventGraph(key, city), eventIds, null, tmpLanguages);
 					if (eventsDetails != null) {
 						result.put("Events", eventsDetails);
 					}
@@ -333,7 +334,7 @@ public class QueryManagerServices {
 					List <String> poiIds = createList(pois);
 
 					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(
-							SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key),
+							SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key, city),
 							poiIds, null, null, tmpLanguages);
 					if (poisDetails != null) {
 						result.put("POIs", poisDetails);
@@ -363,10 +364,11 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/countItems")
-	public Response countItems(@HeaderParam("key") String key) {
+	public Response countItems(@HeaderParam("key") String key,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n { graph " + SparqlChooser.getEventGraph(key) + " { ?event a lode:Event. } } \n } ";
+			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n { graph " + SparqlChooser.getEventGraph(key, city) + " { ?event a lode:Event. } } \n } ";
 			try {
 				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 
@@ -392,10 +394,11 @@ public class QueryManagerServices {
 	 */
 	@GET
 	@Path("/countPoIs")
-	public Response countPoIs(@HeaderParam("key") String key) {
+	public Response countPoIs(@HeaderParam("key") String key,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key) + "  {?venue rdf:type dul:Place.} } }";
+			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key, city) + "  {?venue rdf:type dul:Place.} } }";
 
 			try {
 				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
@@ -432,6 +435,7 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
@@ -453,7 +457,7 @@ public class QueryManagerServices {
 						&& groupTriples.containsKey(pair2.getGroupBy());
 				String query = createGroupQuery(group, offset, limit,
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
-						existed2 ? pair2.getGroupBy() : null, pair2.getValue(), key);
+						existed2 ? pair2.getGroupBy() : null, pair2.getValue(), key, city);
 				try {
 					String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -492,12 +496,13 @@ public class QueryManagerServices {
 	public Response getAggregatedPoIs(
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			int tmpOffset = offset < 0 ? 0 : offset;
 			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  {  { graph "
-			+ SparqlChooser.getPoIGraph(key) + " { ?venue rdf:type dul:Place .} }\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
+			+ SparqlChooser.getPoIGraph(key, city) + " { ?venue rdf:type dul:Place .} }\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
 			+ tmpOffset +( limit < 0 ? "" : "\nLIMIT  " + limit);
 			try {
 				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
@@ -534,7 +539,8 @@ public class QueryManagerServices {
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
+			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -557,7 +563,7 @@ public class QueryManagerServices {
 					(pair1 == null ? null : pair1.getGroupBy()),
 					(pair1 == null ? null : pair1.getValue()),
 					(pair2 == null ? null : pair2.getGroupBy()),
-					(pair2 == null ? null : pair2.getValue()), key);
+					(pair2 == null ? null : pair2.getValue()), key, city);
 
 			try {
 				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1, key);
@@ -593,7 +599,8 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("") @QueryParam("category") String category,
 			@DefaultValue("0") @QueryParam("minRating") int minRating,
-			@DefaultValue("5") @QueryParam("maxRating") int maxRating) {
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -602,7 +609,7 @@ public class QueryManagerServices {
 			String user_id =  userAccessToken.getUid();
 			String key = userAccessToken.getAppkey();
 
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key);
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key, city);
 
 			try {
 				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1, key);
@@ -627,7 +634,9 @@ public class QueryManagerServices {
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2, @HeaderParam("key") String key) {
+			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
+			@HeaderParam("key") String key) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -647,7 +656,7 @@ public class QueryManagerServices {
 						(pair1 == null ? null : pair1.getGroupBy()),
 						(pair1 == null ? null : pair1.getValue()),
 						(pair2 == null ? null : pair2.getGroupBy()),
-						(pair2 == null ? null : pair2.getValue()), key);
+						(pair2 == null ? null : pair2.getValue()), key, city);
 
 				try {
 					String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
@@ -674,12 +683,13 @@ public class QueryManagerServices {
 			@DefaultValue("") @QueryParam("category") String category,
 			@DefaultValue("0") @QueryParam("minRating") int minRating,
 			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key) {
 		
 		long starttime = System.currentTimeMillis();
 
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key);
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key, city);
 
 			try {
 				String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
@@ -705,6 +715,7 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key,
 			@HeaderParam("Accept-Language") String languages) {
 		
@@ -726,7 +737,7 @@ public class QueryManagerServices {
 						(pair1 == null ? null : pair1.getGroupBy()),
 						(pair1 == null ? null : pair1.getValue()),
 						(pair2 == null ? null : pair2.getGroupBy()),
-						(pair2 == null ? null : pair2.getValue()), key);
+						(pair2 == null ? null : pair2.getValue()), key, city);
 
 				try {
 					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET,
@@ -734,7 +745,7 @@ public class QueryManagerServices {
 				
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(SparqlChooser.getEndPointUrl(key),
-							SparqlChooser.getEventGraph(key), eventIds, null, tmpLanguages);
+							SparqlChooser.getEventGraph(key, city), eventIds, null, tmpLanguages);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					String content = JSONObject.wrap(eventsDetails).toString();
 					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
@@ -760,19 +771,20 @@ public class QueryManagerServices {
 			@DefaultValue("") @QueryParam("category") String category,
 			@DefaultValue("0") @QueryParam("minRating") int minRating,
 			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key,
 			@HeaderParam("Accept-Language") String languages) {
 		
 		long starttime = System.currentTimeMillis();
 
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key);
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key, city);
 
 			try {
 				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET, SparqlChooser.getEndPointUrl(key));
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
 				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(SparqlChooser.getEndPointUrl(key),
-						SparqlChooser.getPoIGraph(key), poiIds, null, null, tmpLanguages);
+						SparqlChooser.getPoIGraph(key, city), poiIds, null, null, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(poisInDetails).toString();
@@ -876,9 +888,9 @@ public class QueryManagerServices {
 	}
 	
 	private String createGroupQuery(String group, int offset, int limit,
-			String groupname1, String groupvalue1, String groupname2, String groupvalue2, String key) {
+			String groupname1, String groupvalue1, String groupname2, String groupvalue2, String key, String city) {
 		StringBuffer buffer = new StringBuffer("select ?" + group + " (COUNT(*) as ?count) \n WHERE {\n { graph "
-			+ SparqlChooser.getEventGraph(key) + " {?event a lode:Event . } }\n" + getTriples(group));
+			+ SparqlChooser.getEventGraph(key, city) + " {?event a lode:Event . } }\n" + getTriples(group));
 		if (groupname1 != null && groupname2 == null) {
 			if (!group.equals(groupvalue1)) {
 				buffer.append(getTriples(groupname1));
@@ -905,9 +917,9 @@ public class QueryManagerServices {
 	}
 	
 	private String createSelectSparqlQuery(int offset, int limit, String groupname1, String groupvalue1,
-			String groupname2, String groupvalue2, String key) {
+			String groupname2, String groupvalue2, String key, String city) {
 		StringBuffer buffer = new StringBuffer("SELECT ?event ?title ?description \n	WHERE {\n { graph "
-			+ SparqlChooser.getEventGraph(key) + "	{ ?event a lode:Event. } } \n	OPTIONAL{?event rdfs:label ?title.}\n	OPTIONAL{?event dc:description ?description.} \n");
+			+ SparqlChooser.getEventGraph(key, city) + "	{ ?event a lode:Event. } } \n	OPTIONAL{?event rdfs:label ?title.}\n	OPTIONAL{?event dc:description ?description.} \n");
 		if (groupTriples.containsKey(groupname1)) {
 			buffer.append(groupTriples.get(groupname1));
 			buffer.append("FILTER(STR(?" + groupname1 + ") = \"" + groupvalue1 + "\") .\n");
@@ -922,14 +934,14 @@ public class QueryManagerServices {
 	}
 
 	private String createSelectSparqlQueryForPoI(int offset, int limit,
-			String category, int minRating, int maxRating, String key) {
+			String category, int minRating, int maxRating, String key, String city) {
 		StringBuffer buffer = new StringBuffer();
 		if (category != null && !category.equals("")) {
-			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key, city) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
 		            + category + "\" )\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 					+ minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < " + maxRating + " )\n  }\n");
 		} else {
-			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key, city) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 		                + minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < "  + maxRating + " )\n  }");
 		}
 		return createSelectSparqlQuery(buffer.toString(), offset, limit);
