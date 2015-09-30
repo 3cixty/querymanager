@@ -11,21 +11,25 @@ public class SparqlChooser {
 	/**
 	 * Gets Event graph based on a given application key.
 	 * @param key
+	 * @param city
+	 * 			The city parameter null means all cities in the KB.
 	 * @return
 	 */
-	public static String getEventGraph(String key) {
-		if (AuthorizationBypassManager.getInstance().isFound(key)) return Constants.GRAPH_EVENT_EXPLORMI;
-		return Constants.GRAPH_EVENT_OTHERS;
+	public static String getEventGraph(String key, String city) {
+		if (city == null) return Constants.GRAPH_EVENTS;
+		else return "<http://3cixty.com/" + city + "/events>";
 	}
 	
 	/**
 	 * Gets PoI graph based on a given application key.
 	 * @param key
+	 * @param city
+	 * 			The city parameter null means all cities in the KB.
 	 * @return
 	 */
-	public static String getPoIGraph(String key) {
-		if (AuthorizationBypassManager.getInstance().isFound(key)) return Constants.GRAPH_POI_EXPLORMI;
-		return Constants.GRAPH_POI_OTHERS;
+	public static String getPoIGraph(String key, String city) {
+		if (city == null) return Constants.GRAPH_POIS;
+		else return "<http://3cixty.com/" + city + "/places>";
 	}
 	
 	/**
