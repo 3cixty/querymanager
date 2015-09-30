@@ -188,6 +188,8 @@ public class SettingsServices {
 				
 				// TODO: add code for merging Mobidot accounts
 				
+				String accountsAffected = (uidDerivedFromGoogle != null && uidDerivedFromFacebook != null) ? "Google and Facebook" : (uidDerivedFromGoogle != null ? "Google" : (uidDerivedFromFacebook != null ? "Facebook" : null)); 
+				return Response.ok().entity("You are successful to link your account with " + accountsAffected).build();
 			} catch (InvalidTrayElement e) {
 				e.printStackTrace();
 				return Response.status(400).entity(e.getMessage()).build();
