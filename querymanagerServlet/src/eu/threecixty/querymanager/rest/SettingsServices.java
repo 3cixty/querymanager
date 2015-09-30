@@ -177,6 +177,8 @@ public class SettingsServices {
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromGoogleInKnows, uidDerivedFromGoogle, profile.getHasUID());
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromFacebookInKnows, uidDerivedFromFacebook, profile.getHasUID());
 				
+				// TODO: add code for merging Mobidot accounts
+				
 			} catch (InvalidTrayElement e) {
 				e.printStackTrace();
 				return Response.status(400).entity(e.getMessage()).build();
