@@ -206,6 +206,7 @@ public class SettingsServices {
 		if (allFriendsHavingMyUIDInKnows != null) {
 			for (Friend friend: allFriendsHavingMyUIDInKnows) {
 				UserProfile tmpUP = ProfileManagerImpl.getInstance().getProfile(friend.getUid(), null);
+				if (tmpUP == null) continue;
 				Set <String> tmpKnows = tmpUP.getKnows();
 				if (tmpKnows != null) {
 					tmpKnows.remove(uidDerivedFromOutSide);
