@@ -136,7 +136,7 @@ public class SettingsServices {
 				
 				Set <String> googleKnows = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getKnows();
 				Set <String> fbKnows = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getKnows();
-				
+								
 				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
 				Set <String> knows = profile.getKnows();
 				if (knows == null) {
@@ -155,6 +155,15 @@ public class SettingsServices {
 						knows.add(uid);
 					}
 				}
+				// always use Google profile image if existed
+				String googleProfileImage = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getProfileImage();
+				String fbProfileImage = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getProfileImage();
+				if (googleProfileImage == null) {
+					if (fbProfileImage != null) profile.setProfileImage(fbProfileImage);
+				} else {
+					profile.setProfileImage(googleProfileImage);
+				}
+
 				Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
 				if (pis == null) {
 					pis = new HashSet<ProfileIdentities>();
