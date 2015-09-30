@@ -117,9 +117,9 @@ public class SettingsServices {
 				return Response.status(400).entity("Both Google and Facebook access tokens are empty").build();
 			String uidDerivedFromGoogle = isNotNullOrEmpty(googleAccessToken) ? GoogleAccountUtils.getUID(googleAccessToken) : null;
 			String uidDerivedFromFacebook = isNotNullOrEmpty(fbAccessToken) ? FaceBookAccountUtils.getUID(fbAccessToken, 50, 50) : null;
-			if ((piSum / GOOGLE_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromGoogle))
+			if ((piSum % GOOGLE_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromGoogle))
 				return Response.status(400).entity("A Google account was already linked to your current account").build();
-			if ((piSum / FACEBOOK_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromFacebook))
+			if ((piSum % FACEBOOK_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromFacebook))
 				return Response.status(400).entity("A Facebook account was already linked to your current account").build();
 			try {
 				List <Tray> traysDerivedFromGoogle = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromGoogle);

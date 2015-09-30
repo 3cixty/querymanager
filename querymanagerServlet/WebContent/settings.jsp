@@ -53,7 +53,7 @@
     <input type="hidden" readonly="readonly" value="<%=uid%>" name="uid">
 </div>
 <%
-if (piSum / SettingsServices.GOOGLE_PROFILE_IDENTITIES != 0) {
+if (piSum % SettingsServices.GOOGLE_PROFILE_IDENTITIES != 0) {
 %>
   <div id="signin-button" class="show">
      <div class="g-signin" data-callback="loginFinishedCallback"
@@ -70,7 +70,7 @@ if (piSum / SettingsServices.GOOGLE_PROFILE_IDENTITIES != 0) {
 </div>
 <% }
 
-if (piSum / SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
+if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 %>
 <div>
 	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Sign in
