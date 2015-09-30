@@ -76,7 +76,7 @@ public class SettingsServices {
 				session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
 				session.setAttribute("uid", uid);
 				try {
-					session.setAttribute(PROFILE_IDENTITIES_KEY, madeOf(access_token));
+					session.setAttribute(PROFILE_IDENTITIES_KEY, madeOf(userAccessToken.getUid()));
 				} catch (TooManyConnections e1) {
 					e1.printStackTrace();
 				}
@@ -109,7 +109,7 @@ public class SettingsServices {
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
 			int piSum = 1;
 			try {
-				piSum = madeOf(accessToken);
+				piSum = madeOf(userAccessToken.getUid());
 			} catch (TooManyConnections e1) {
 				e1.printStackTrace();
 			}
@@ -331,9 +331,10 @@ public class SettingsServices {
 		settings.setIdentities(profileIdentities);
 	}
 	
-	public static int madeOf(String _3cixtyToken) throws TooManyConnections {
-		if (_3cixtyToken == null) return 1;
-		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyToken, null);
+	public static int madeOf(String _3cixtyUID) throws TooManyConnections {
+		if (_3cixtyUID == null) return 1;
+		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
+		if (profile == null) return 1;
 		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
 		if (pis == null) return 1;
 		return madeOf(pis);
