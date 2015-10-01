@@ -16,12 +16,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.TooManyConnections;
@@ -222,6 +224,33 @@ public class SettingsServices {
 		}
 	}
 
+	@POST
+	@Path("/removeFriend")
+	public Response removeFriendByUser(@FormParam("access_token") String access_token,
+			@FormParam("friendUid") String friendUid,
+			@Context HttpServletResponse response) {
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+
+			if (!isNotNullOrEmpty(friendUid)) return Response.status(400).entity("Empty friend UID").build();
+			
+			String key = userAccessToken.getAppkey();
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
+					CallLoggingConstants.SUCCESSFUL);
+			
+			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
+					.add(userAccessToken.getUid(), friendUid);
+			
+			if (ok) return Response.ok().build();
+			return Response.status(400).entity("Failed to remove the friend " + friendUid + " from your profile").build();
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
+					CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return Response.status(400).entity("Your access token '" + access_token + "' is invalid.").build();
+		}
+	}
+	
 	/**
 	 * Adds profile identities composed by a given source, a given accountId, and a given access token
 	 * to a given settings instance.
