@@ -34,7 +34,7 @@ public class NearbyUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
-	public static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, double lat, double lon, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyEvents(String city, String endPointUrl, String eventGraph, double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId,
 			List <String> listEventsFromFriendsWishlist) throws IOException {
 		
@@ -84,7 +84,7 @@ public class NearbyUtils {
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		if (cellIds.size() == 0) return Collections.emptyList();
 		for (int cellId: cellIds) {
-			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
+			builder.append("<http://data.linkedevents.org/cell/" + city + "/" + cellId + ">");
 		}
 		builder.append("}. \n");
 		
@@ -106,7 +106,7 @@ public class NearbyUtils {
 		return getNearbyEvents(endPointUrl, eventGraph, builder.toString(), categories, languages, listEventsFromFriendsWishlist);
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, String id, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyEvents(String city, String endPointUrl, String eventGraph, String id, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
 		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
@@ -143,10 +143,10 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(endPointUrl, eventGraph, lat, lon, categories, languages, distance, offset, limit, id, null);
+		return getNearbyEvents(city, endPointUrl, eventGraph, lat, lon, categories, languages, distance, offset, limit, id, null);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(String endPointUrl, String poiGraph, double lat, double lon,
+	public static List <ElementDetails> getNearbyPoIElements(String city, String endPointUrl, String poiGraph, double lat, double lon,
 			String[] categories, String[] topCategories, String[] languages,
 			double distance, int offset, int limit,
 			List <String> listPoIsFromFriendsWishlist) throws IOException {
@@ -188,7 +188,7 @@ public class NearbyUtils {
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		if (cellIds.size() == 0) return Collections.emptyList();
 		for (int cellId: cellIds) {
-			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
+			builder.append("<http://data.linkedevents.org/cell/" + city + "/" + cellId + ">");
 		}
 		builder.append("}. \n");
 		

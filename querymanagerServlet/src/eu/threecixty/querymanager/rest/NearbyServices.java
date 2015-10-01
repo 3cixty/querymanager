@@ -88,7 +88,7 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(SparqlChooser.getEndPointUrl(key),
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(city, SparqlChooser.getEndPointUrl(key),
 					SparqlChooser.getPoIGraph(key, city), lat, lon, tmpCats, tmpTopCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null);
 			long time2 = System.currentTimeMillis();
@@ -118,7 +118,7 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(key),
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(city, SparqlChooser.getEndPointUrl(key),
 					SparqlChooser.getEventGraph(key, city), id, tmpCats,
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
@@ -148,7 +148,7 @@ public class NearbyServices {
 		try {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(key),
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(city, SparqlChooser.getEndPointUrl(key),
 					SparqlChooser.getEventGraph(key, city), lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, null);
 			long time2 = System.currentTimeMillis();
@@ -188,7 +188,7 @@ public class NearbyServices {
 				} catch (TooManyConnections e) {
 					e.printStackTrace();
 				}
-				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(SparqlChooser.getEndPointUrl(at.getAppkey()),
+				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(city, SparqlChooser.getEndPointUrl(at.getAppkey()),
 						SparqlChooser.getPoIGraph(at.getAppkey(), city), lat, lon, tmpCats, tmpTopCats,
 						tmpLanguages, distance > 10 ? 2 : distance, offset, limit, listPoIsFromFriendsWishList);
 				long time2 = System.currentTimeMillis();
@@ -226,7 +226,7 @@ public class NearbyServices {
 			} catch (TooManyConnections e) {
 				e.printStackTrace();
 			}
-			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(at.getAppkey()),
+			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(city, SparqlChooser.getEndPointUrl(at.getAppkey()),
 					SparqlChooser.getEventGraph(at.getAppkey(), city), lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
 			long time2 = System.currentTimeMillis();
