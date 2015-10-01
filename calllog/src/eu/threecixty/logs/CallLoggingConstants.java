@@ -7,6 +7,8 @@ public class CallLoggingConstants {
 	
 	public static final String PRIVACY_SETTINGS_VIEW_SERVICE = "privacy settings view service";
 	//public static final String PRIVACY_SETTINGS_VIEW_M = "privacy settings view service";
+	public static final String SETTINGS_REMOVE_FRIEND_BY_USER = "settings: remove friend by user service";
+	public static final String SETTINGS_GET_ALL_INFORMATION_BY_USER = "settings: get all information by user service";
 	
 	public static final String TRAY_ADD_SERVICE = "tray add service";
 	public static final String TRAY_GET_SERVICE = "tray get service";
