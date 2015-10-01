@@ -5,6 +5,9 @@ public class CallLoggingConstants {
 	public static final String SETTINGS_VIEW_SERVICE = "settings view service";
 	public static final String SETTINGS_SAVE_SERVICE = "settings save service";
 	
+	public static final String PRIVACY_SETTINGS_VIEW_SERVICE = "privacy settings view service";
+	//public static final String PRIVACY_SETTINGS_VIEW_M = "privacy settings view service";
+	
 	public static final String TRAY_ADD_SERVICE = "tray add service";
 	public static final String TRAY_GET_SERVICE = "tray get service";
 	public static final String TRAY_LOGIN_SERVICE = "tray login service";

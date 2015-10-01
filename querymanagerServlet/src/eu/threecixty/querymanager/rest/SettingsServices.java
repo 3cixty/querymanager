@@ -16,6 +16,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -310,6 +311,40 @@ public class SettingsServices {
 	}
 
 
+	@GET
+	@Path("/viewPrivacySettings")
+	public void viewPrivacySettings(@QueryParam("access_token") String access_token, @Context HttpServletResponse response,
+            @Context HttpServletRequest request) {
+		try {
+			long starttime = System.currentTimeMillis();
+			HttpSession session = httpRequest.getSession();
+			AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+			if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+
+				String key = userAccessToken.getAppkey();
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.PRIVACY_SETTINGS_VIEW_SERVICE,
+						CallLoggingConstants.SUCCESSFUL);
+
+				session.setAttribute(ACCESS_TOKEN_PARAM, access_token);
+
+				try {
+					request.getRequestDispatcher(Constants.OFFSET_LINK_TO_SETTINGS_PAGE + "privacySettings.jsp").forward(request, response);
+					return;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.PRIVACY_SETTINGS_VIEW_SERVICE,
+						CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+				PrintWriter writer = response.getWriter();
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				writer.write("Your access token '" + access_token + "' is invalid.");
+				writer.close();
+			}
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+	}
 
 	/**
 	 * Adds profile identities composed by a given source, a given accountId, and a given access token
