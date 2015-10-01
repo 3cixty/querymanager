@@ -6,7 +6,8 @@
            	border-radius: 7px;
    			padding: 9px;
    			color: rgba(0,0,0,1);
-   			text-shadow: 0px 1px 1px rgba(227,227,227,1)
+   			text-shadow: 0px 1px 1px rgba(227,227,227,1);
+   			cursor:pointer;
 	    }
 
 	    .button:HOVER {
@@ -24,6 +25,11 @@
     background-color: rgba(0,0,0,0.7);
     text-align: center;
     width: 130px;
+}
+
+.spaceCell {
+    display: inline-block;
+    width: 20px;
 }
 
 .right {
