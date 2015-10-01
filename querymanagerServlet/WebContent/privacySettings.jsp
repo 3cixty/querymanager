@@ -23,6 +23,7 @@ Invalid request
       <div class="button">Show</div>
       <div class="button">Manage</div>
     </div>
+    <div class="spaceCell"></div>
     <div class="right" id="mainContent">
     
     </div>

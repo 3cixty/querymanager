@@ -27,6 +27,11 @@
     width: 130px;
 }
 
+.spaceCell {
+    display: inline-block;
+    width: 20px;
+}
+
 .right {
     display: inline-block;
 }
