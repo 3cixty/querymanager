@@ -480,9 +480,9 @@ public class ElementDetailsUtils {
 			eventDetails.setAdditionalUrls(additionalUrls);
 		}
 		String additionalUrl1 = getAttributeValue(json, "additionalUrl1");
-		if (additionalUrl1 != null) additionalUrls.add(additionalUrl1);
+		if (!isNullOrEmpty(additionalUrl1)) additionalUrls.add(additionalUrl1);
 		String additionalUrl2 = getAttributeValue(json, "additionalUrl2");
-		if (additionalUrl2 != null) additionalUrls.add(additionalUrl2);
+		if (!isNullOrEmpty(additionalUrl2)) additionalUrls.add(additionalUrl2);
 		
 		return eventDetails;
 	}
