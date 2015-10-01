@@ -209,6 +209,7 @@ public class ElementDetails {
 		element.setName(this.getName());
 		element.setSource(this.getSource());
 		element.setUrl(this.getUrl());
+		element.setAdditionalUrls(additionalUrls);
 	}
 	
 	public List<String> getAdditionalUrls() {
