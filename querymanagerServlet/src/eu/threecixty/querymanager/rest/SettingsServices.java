@@ -18,6 +18,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONObject;
+
 import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
@@ -27,6 +29,7 @@ import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.UserRelatedInformation;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
@@ -244,6 +247,31 @@ public class SettingsServices {
 			
 			if (ok) return Response.ok().build();
 			return Response.status(400).entity("Failed to remove the friend " + friendUid + " from your profile").build();
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
+					CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return Response.status(400).entity("Your access token '" + access_token + "' is invalid.").build();
+		}
+	}
+	
+	@POST
+	@Path("/getAllUserRelatedInfoByUser")
+	public Response getAllUserRelatedInfoByUser(@FormParam("access_token") String access_token,
+			@DefaultValue("en") @FormParam("language") String language,
+			@Context HttpServletResponse response) {
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+
+			try {
+				UserRelatedInformation uri = SPEServices.getUserRelatedInfo(
+						userAccessToken.getUid(), language, userAccessToken.getAppkey());
+				return Response.ok().entity(JSONObject.wrap(uri).toString()).build();
+			} catch (TooManyConnections e) {
+				e.printStackTrace();
+				return Response.serverError().build();
+			}
+			
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
 					CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);

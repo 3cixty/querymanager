@@ -130,36 +130,9 @@ public class SPEServices {
 		try {
 			AdminValidator admin = new AdminValidator();
 			if (admin.validate(username, password, CallLogServices.realPath)) {
-				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
-				if (profile == null) {
-					return Response.ok().entity("No information about the given 3cixty UID").build();
-				}
-				UserRelatedInformation  uri = new UserRelatedInformation();
-				Name name = profile.getHasName();
-				if (name != null) {
-					uri.setFirstName(name.getGivenName());
-					uri.setLastName(name.getFamilyName());
-				}
-				try {
-					List <Tray> trays = ProfileManagerImpl.getInstance().getTrayManager().getTrays(_3cixtyUID);
-					List <ElementDetails> listOfElementDetails = new LinkedList <ElementDetails>();
-					TrayServices.findTrayDetails(key, trays, LanguageUtils.getLanguages(language), listOfElementDetails);
-					uri.setWishesList(listOfElementDetails);
-				} catch (InvalidTrayElement e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				
-				List <Friend> peopleHaveMeInKnows = ProfileManagerImpl.getInstance()
-						.findAll3cixtyFriendsHavingMyUIDInKnows(_3cixtyUID);
-				uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
-				
-				findFriendsInMyKnows(uri, profile, _3cixtyUID);
-				
-				findAccountsAssociated(uri, profile);
-				
-				findAccompanyings(uri, profile);
+				UserRelatedInformation  uri = getUserRelatedInfo(_3cixtyUID, language, key);
+				if (uri == null) return Response.ok().entity("No information about the given 3cixty UID").build();
+
 				return Response.ok().entity(JSONObject.wrap(uri).toString()).build();
 			} else {
 				return Response.status(400).entity("Username & password are not correct").build();
@@ -168,6 +141,40 @@ public class SPEServices {
 			e.printStackTrace();
 		}
 		return Response.serverError().build();
+	}
+	
+	public static UserRelatedInformation getUserRelatedInfo(String _3cixtyUID, String language, String key) throws TooManyConnections {
+		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
+		if (profile == null) {
+			return null;
+		}
+		UserRelatedInformation  uri = new UserRelatedInformation();
+		Name name = profile.getHasName();
+		if (name != null) {
+			uri.setFirstName(name.getGivenName());
+			uri.setLastName(name.getFamilyName());
+		}
+		try {
+			List <Tray> trays = ProfileManagerImpl.getInstance().getTrayManager().getTrays(_3cixtyUID);
+			List <ElementDetails> listOfElementDetails = new LinkedList <ElementDetails>();
+			TrayServices.findTrayDetails(key, trays, LanguageUtils.getLanguages(language), listOfElementDetails);
+			uri.setWishesList(listOfElementDetails);
+		} catch (InvalidTrayElement e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		List <Friend> peopleHaveMeInKnows = ProfileManagerImpl.getInstance()
+				.findAll3cixtyFriendsHavingMyUIDInKnows(_3cixtyUID);
+		uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
+		
+		findFriendsInMyKnows(uri, profile, _3cixtyUID);
+		
+		findAccountsAssociated(uri, profile);
+		
+		findAccompanyings(uri, profile);
+		return uri;
 	}
 	
 //	@POST
@@ -247,14 +254,14 @@ public class SPEServices {
 //		return Response.serverError().build();
 //	}
 	
-	private void findAccompanyings(UserRelatedInformation uri,
+	private static void findAccompanyings(UserRelatedInformation uri,
 			UserProfile profile) {
 		if (profile.getAccompanyings() != null
 				&& profile.getAccompanyings().size() > 0)
 			uri.setAccompanyings(profile.getAccompanyings());
 	}
 
-	private void findFriendsInMyKnows(UserRelatedInformation uri,
+	private static void findFriendsInMyKnows(UserRelatedInformation uri,
 			UserProfile profile, String _3cixtyUID) {
 		List <Friend> friendsInMyKnows = ProfileManagerImpl.getInstance().findAllFriends(_3cixtyUID);
 		if (friendsInMyKnows == null) friendsInMyKnows = new LinkedList <Friend>();
@@ -288,7 +295,7 @@ public class SPEServices {
 		uri.setKnows(friendsInMyKnows);
 	}
 
-	private void findAccountsAssociated(UserRelatedInformation uri,
+	private static void findAccountsAssociated(UserRelatedInformation uri,
 			UserProfile profile) {
 		List <AssociatedAccount> associatedAccounts = new LinkedList <AssociatedAccount>();
 		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
