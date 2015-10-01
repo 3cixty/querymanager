@@ -51,7 +51,7 @@ public class ElementDetailsUtils {
 		
 		List <ElementDetails> finalList = new ArrayList <ElementDetails>();
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?url1 ?url2 \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?additionalUrl1 ?additionalUrl2 \n");
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("{ graph " + eventGraph + " {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
@@ -73,7 +73,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
 		queryBuff.append("              ?inSpace geo:long ?lon . }\n");
 		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place1. \n");
-		queryBuff.append("          ?place1 schema:url ?url1 . } \n");
+		//queryBuff.append("          ?place1 schema:url ?url1 . } \n");
 		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place. \n");
 		queryBuff.append("              ?place schema:location ?address .\n");
 		queryBuff.append("              ?address schema:streetAddress ?street .\n");
@@ -464,7 +464,6 @@ public class ElementDetailsUtils {
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		String url = getAttributeValue(json, "url");
-		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
 		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
 		
 		List <String> additionalUrls = eventDetails.getAdditionalUrls();
