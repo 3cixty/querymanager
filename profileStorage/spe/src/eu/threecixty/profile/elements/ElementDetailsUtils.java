@@ -55,8 +55,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("WHERE {\n");
 		queryBuff.append("{ graph " + eventGraph + " {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
-		queryBuff.append(" OPTIONAL { ?item rdfs:seeAlso ?url . } \n");
-		queryBuff.append(" OPTIONAL { ?item owl:sameAs ?url2 . } \n");
+		queryBuff.append(" OPTIONAL { ?item schema:url ?url . } \n");
+		queryBuff.append(" OPTIONAL { ?item rdfs:seeAlso ?additionalUrl1 . } \n");
+		queryBuff.append(" OPTIONAL { ?item owl:sameAs ?additionalUrl2 . } \n");
 		queryBuff.append(" OPTIONAL { ?item dc:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
@@ -464,8 +465,18 @@ public class ElementDetailsUtils {
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		String url = getAttributeValue(json, "url");
 		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
-		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url2");
 		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
+		
+		List <String> additionalUrls = eventDetails.getAdditionalUrls();
+		if (additionalUrls == null) {
+			additionalUrls = new LinkedList <String>();
+			eventDetails.setAdditionalUrls(additionalUrls);
+		}
+		String additionalUrl1 = getAttributeValue(json, "additionalUrl1");
+		if (additionalUrl1 != null) additionalUrls.add(additionalUrl1);
+		String additionalUrl2 = getAttributeValue(json, "additionalUrl2");
+		if (additionalUrl2 != null) additionalUrls.add(additionalUrl2);
+		
 		return eventDetails;
 	}
 	
