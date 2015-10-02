@@ -39,11 +39,14 @@ Invalid request
        $(document).ready(function () {
        // TODO: need to be updated
            $("#show").click(function() {
-    	       $.ajax({url: "<%=Configuration.get3CixtyRoot()%>/?email=" + emailaddress, success: function(result){
-    		       if ("true" == result) {
-    		            alert("Email already existed!");
-    		       }
-    		   }});
+    	       $.ajax({url: "<%=Configuration.get3CixtyRoot()%>/getAllUserRelatedInfoByUser",
+    	    	       beforeSend: function(xhr) {
+    	    	    	   xhr.setRequestHeader('access_token', '<%=session.getAttribute("accessToken")%>');
+    	    	       },
+    	    		   success: function(result){
+    	    			   $("#mainContent").html(result);
+    		   			}
+    	    	});
     		});
        });
        
