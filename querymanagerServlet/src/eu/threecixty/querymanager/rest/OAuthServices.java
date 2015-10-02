@@ -427,12 +427,6 @@ public class OAuthServices {
 		
 		session.setAttribute(UID_KEY, uid);
 		
-		
-		AccessToken accessToken = OAuthWrappers.findAccessToken(uid, app);
-		if (accessToken != null) {
-			return redirect_uri_client2(accessToken, accessToken.getExpires_in(), app);
-		}
-		
 		// bypass authorization for 3cixty's apps
 		if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
 			AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, SCOPES);

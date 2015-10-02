@@ -24,6 +24,7 @@ public class AccessToken implements Serializable {
 	private String appkey; // App Key
 	
 	private Integer appkeyId;
+	private Boolean used;
 	
 	private Long creation; // might be null
 	
@@ -111,5 +112,13 @@ public class AccessToken implements Serializable {
 
 	public void setCreation(Long creation) {
 		this.creation = creation;
+	}
+
+	public Boolean getUsed() {
+		return used;
+	}
+
+	public void setUsed(Boolean used) {
+		this.used = used;
 	}
 }

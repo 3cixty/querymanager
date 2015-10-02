@@ -33,6 +33,7 @@ public class UserAccessToken implements java.io.Serializable {
 	private String uid;
 	
 	private String scope;
+	private Boolean used;
 
 	public UserAccessToken() {
 	}
@@ -114,5 +115,14 @@ public class UserAccessToken implements java.io.Serializable {
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	@Column(name = "used", nullable = true)
+	public Boolean getUsed() {
+		return used;
+	}
+
+	public void setUsed(Boolean used) {
+		this.used = used;
 	}
 }
