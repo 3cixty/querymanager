@@ -1,0 +1,18 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+</head>
+<script>
+	var params = location.href.split('?')[1].split('&');
+	var data = {};
+	for (x in params) {
+		data[params[x].split('=')[0]] = params[x].split('=')[1];
+ 	}
+	var accessToken = data["access_token"];
+	alert(accessToken);
+</script>
+<body>
+<div>
+</div>
+</body>
+</html>
