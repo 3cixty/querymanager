@@ -254,10 +254,10 @@ public class SettingsServices {
 		}
 	}
 	
-	@POST
+	@GET
 	@Path("/getAllUserRelatedInfoByUser")
-	public Response getAllUserRelatedInfoByUser(@FormParam("access_token") String access_token,
-			@DefaultValue("en") @FormParam("language") String language,
+	public Response getAllUserRelatedInfoByUser(@HeaderParam("access_token") String access_token,
+			@DefaultValue("en") @QueryParam("language") String language,
 			@Context HttpServletResponse response) {
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
