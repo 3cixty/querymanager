@@ -20,11 +20,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONObject;
+
 import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+
 import eu.threecixty.profile.FaceBookAccountUtils;
 import eu.threecixty.profile.Friend;
 import eu.threecixty.profile.GoogleAccountUtils;
@@ -36,6 +39,8 @@ import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.UserProfile;
+
+import eu.threecixty.profile.UserRelatedInformation;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
 
@@ -346,6 +351,58 @@ public class SettingsServices {
 		}
 	}
 
+	@POST
+	@Path("/removeFriend")
+	public Response removeFriendByUser(@FormParam("access_token") String access_token,
+			@FormParam("friendUid") String friendUid,
+			@Context HttpServletResponse response) {
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+
+			if (!isNotNullOrEmpty(friendUid)) return Response.status(400).entity("Empty friend UID").build();
+			
+			String key = userAccessToken.getAppkey();
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
+					CallLoggingConstants.SUCCESSFUL);
+			
+			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
+					.add(userAccessToken.getUid(), friendUid);
+			
+			if (ok) return Response.ok().build();
+			return Response.status(400).entity("Failed to remove the friend " + friendUid + " from your profile").build();
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
+					CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return Response.status(400).entity("Your access token '" + access_token + "' is invalid.").build();
+		}
+	}
+	
+	@GET
+	@Path("/getAllUserRelatedInfoByUser")
+	public Response getAllUserRelatedInfoByUser(@HeaderParam("access_token") String access_token,
+			@DefaultValue("en") @QueryParam("language") String language,
+			@Context HttpServletResponse response) {
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+
+			try {
+				UserRelatedInformation uri = SPEServices.getUserRelatedInfo(
+						userAccessToken.getUid(), language, userAccessToken.getAppkey());
+				return Response.ok().entity(((JSONObject) JSONObject.wrap(uri)).toString(4)).build();
+			} catch (TooManyConnections e) {
+				e.printStackTrace();
+				return Response.serverError().build();
+			}
+			
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
+					CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return Response.status(400).entity("Your access token '" + access_token + "' is invalid.").build();
+		}
+	}
+	
 	/**
 	 * Adds profile identities composed by a given source, a given accountId, and a given access token
 	 * to a given settings instance.

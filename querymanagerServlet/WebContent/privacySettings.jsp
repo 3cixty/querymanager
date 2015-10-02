@@ -20,8 +20,8 @@ Invalid request
 <div class="table">
   <div class="row">
     <div class="left">
-      <div class="button">Show</div>
-      <div class="button">Manage</div>
+      <div class="button" id="show">Show</div>
+      <div class="button" id="manage">Manage</div>
     </div>
     <div class="spaceCell"></div>
     <div class="right" id="mainContent">
@@ -33,5 +33,23 @@ Invalid request
 </body>
 
 </html>
+
+    <script type="text/javascript">
+       
+       $(document).ready(function () {
+       // TODO: need to be updated
+           $("#show").click(function() {
+    	       $.ajax({url: "<%=Configuration.get3CixtyRoot()%>/getAllUserRelatedInfoByUser",
+    	    	       beforeSend: function(xhr) {
+    	    	    	   xhr.setRequestHeader('access_token', '<%=session.getAttribute("accessToken")%>');
+    	    	       },
+    	    		   success: function(result){
+    	    			   $("#mainContent").html("<pre>" + result + "</pre>");
+    		   			}
+    	    	});
+    		});
+       });
+       
+    </script>
 
 <%}%>
