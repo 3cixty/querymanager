@@ -266,7 +266,7 @@ public class SettingsServices {
 			try {
 				UserRelatedInformation uri = SPEServices.getUserRelatedInfo(
 						userAccessToken.getUid(), language, userAccessToken.getAppkey());
-				return Response.ok().entity(JSONObject.wrap(uri).toString()).build();
+				return Response.ok().entity(((JSONObject) JSONObject.wrap(uri)).toString(4)).build();
 			} catch (TooManyConnections e) {
 				e.printStackTrace();
 				return Response.serverError().build();
