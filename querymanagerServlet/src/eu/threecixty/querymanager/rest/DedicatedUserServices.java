@@ -215,10 +215,6 @@ public class DedicatedUserServices {
 		boolean ok = DedicatedUserUtils.checkPassword(email, password);
 		if (ok) {
 			String uid = DedicatedUserUtils.getUid(email);
-			AccessToken accessToken = OAuthWrappers.findAccessToken(uid, app);
-			if (accessToken != null) {
-				return redirect_uri_client2(accessToken, accessToken.getExpires_in(), app);
-			}
 			
 			// bypass authorization for 3cixty's apps
 			if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {

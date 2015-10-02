@@ -72,7 +72,7 @@ public class OAuthWrappers {
 	 * @param app
 	 * @return
 	 */
-	public static AccessToken findAccessToken(String uid, AppCache app) {
+/*	public static AccessToken findAccessToken(String uid, AppCache app) {
 		AccessToken at = TokenCacheManager.getInstance().getAccessTokenFrom(uid, app.getAppkey());
 		if (at != null) return at;
 
@@ -90,6 +90,7 @@ public class OAuthWrappers {
 		return null;
 	}
 
+*/
 	/**
 	 * Before calling this method, make sure 'scope' only contains valid "scope". 
 	 * @param uid
@@ -188,6 +189,9 @@ public class OAuthWrappers {
 	public static AccessToken refreshAccessToken(String lastRefreshToken) {
 		AccessToken lastAccessToken = OAuthModelsUtils.findTokenInfoFromRefreshToken(lastRefreshToken);
 		if (lastAccessToken == null) return null;
+		if (lastAccessToken.getUsed() != null) {
+			if (lastAccessToken.getUsed().booleanValue()) return null;
+		}
 		String appkey = lastAccessToken.getAppkey();
 		boolean oauthServerBypassed = OAuthBypassedManager.getInstance().isFound(appkey);
 		AccessToken newAccessToken = oauthServerBypassed ?
@@ -202,6 +206,7 @@ public class OAuthWrappers {
 		// update user access token as OAuth server already deleted old one
 		if (!OAuthModelsUtils.saveOrUpdateUserAccessToken(lastAccessToken, newAccessToken)) return null;
 		TokenCacheManager.getInstance().update(newAccessToken);
+		TokenCacheManager.getInstance().update(lastAccessToken);
 		return newAccessToken;
 	}
 
@@ -211,6 +216,7 @@ public class OAuthWrappers {
 		accessToken.setAccess_token(UUID.randomUUID().toString());
 		accessToken.setExpires_in(EXPIRATION_FIXED);
 		accessToken.setRefresh_token(UUID.randomUUID().toString());
+		accessToken.setUsed(false);
 		accessToken.getScopeNames().addAll(lastAccessToken.getScopeNames());
 		return accessToken;
 	}
@@ -420,6 +426,7 @@ public class OAuthWrappers {
 		accessToken.setAccess_token(UUID.randomUUID().toString());
 		accessToken.setExpires_in(EXPIRATION_FIXED);
 		accessToken.setRefresh_token(UUID.randomUUID().toString());
+		accessToken.setUsed(false);
 		addScopeNames(scope, accessToken.getScopeNames());
 		return accessToken;
 	}
