@@ -44,7 +44,7 @@ Invalid request
     	    	    	   xhr.setRequestHeader('access_token', '<%=session.getAttribute("accessToken")%>');
     	    	       },
     	    		   success: function(result){
-    	    			   $("#mainContent").html(result);
+    	    			   $("#mainContent").html("<pre>" + result + "</pre>");
     		   			}
     	    	});
     		});
