@@ -29,7 +29,7 @@ public class TokenCacheManager {
 	private static final String APP_ID_CACHE_KEY = "appIdCache";
 	private static final String APPKEY_CACHE_KEY = "appkeyCache";
 	
-	private static final int TIME_OUT_TO_GET_CACHE = 200; // in millisecond
+	private static final int TIME_OUT_TO_GET_CACHE = 500; // in millisecond
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 TokenCacheManager.class.getName());
@@ -67,9 +67,11 @@ public class TokenCacheManager {
 					AccessToken at = (AccessToken) myObj;
 					return at;
 				}
+				if (DEBUG_MOD) LOGGER.info("Empty object");
 			} catch(TimeoutException e) {
 			    // Since we don't need this, go ahead and cancel the operation.  This
 			    // is not strictly necessary, but it'll save some work on the server.
+				e.printStackTrace();
 			    f.cancel(false);
 			    // Do other timeout related stuff
 			} catch (InterruptedException e) {
