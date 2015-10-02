@@ -134,12 +134,11 @@ public class TrayCacheManager {
 		}
 	}
 	
-	private <T> void putData(String key, T data) {
+	private void putData(String key, List <Tray> trays) {
 		if (memcachedClients != null) {
 			MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TRAY_KEY + key);
 			if (memcachedClient == null) return;
-			memcachedClient.set(TRAY_KEY + key, 0, data);
-			memcachedClient.flush();
+			memcachedClient.set(TRAY_KEY + key, 0, trays);
 		}
 	}
 	

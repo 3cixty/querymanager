@@ -1,5 +1,6 @@
 package eu.threecixty.cache;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -214,12 +215,11 @@ public class TokenCacheManager {
 			
 	}
 	
-	private <T> void putData(String key, T data) {
+	private <T extends Serializable> void putData(String key, T data) {
 		if (memcachedClients != null) {
 			MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, key);
 			if (memcachedClient == null) return;
 			memcachedClient.set(key, 0, data);
-			memcachedClient.flush();
 		}
 	}
 
