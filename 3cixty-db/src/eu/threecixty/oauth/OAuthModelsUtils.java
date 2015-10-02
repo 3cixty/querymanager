@@ -588,19 +588,33 @@ public class OAuthModelsUtils {
 				return false;
 			}
 			UserAccessToken userAccessToken = (UserAccessToken) results.get(0);
-			userAccessToken.setAccessToken(newAccessToken.getAccess_token());
-			userAccessToken.setRefreshToken(newAccessToken.getRefresh_token());
+			userAccessToken.setUsed(true);
+			//userAccessToken.setAccessToken(newAccessToken.getAccess_token());
+			//userAccessToken.setRefreshToken(newAccessToken.getRefresh_token());
+			
+			UserAccessToken newUserAccessToken = new UserAccessToken();
+			newUserAccessToken.set_3cixty_app_id(userAccessToken.get_3cixty_app_id());
+			newUserAccessToken.setAccessToken(newAccessToken.getAccess_token());
+			newUserAccessToken.setCreation(System.currentTimeMillis());
+			newUserAccessToken.setExpiration(newAccessToken.getExpires_in());
+			newUserAccessToken.setRefreshToken(newAccessToken.getRefresh_token());
+			newUserAccessToken.setScope(userAccessToken.getScope());
+			newUserAccessToken.setUid(userAccessToken.getUid());
+			newUserAccessToken.setUsed(false);
 			
 			session.beginTransaction();
 			
-			session.saveOrUpdate(userAccessToken);
+			session.update(userAccessToken);
+			session.save(newUserAccessToken);
 
 			session.getTransaction().commit();
 			session.close();
+			lastAccessToken.setUsed(true);
 			return true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 			if (session != null) session.close();
+			lastAccessToken.setUsed(false);
 			return false;
 		}
 	}
@@ -790,6 +804,7 @@ public class OAuthModelsUtils {
 		ac.setUid(userAccessToken.getUid());
 		ac.setAppkey(app.getAppkey());
 		ac.setAppkeyId(app.getId());
+		ac.setUsed(userAccessToken.getUsed());
 		if (userAccessToken.getCreation() != null && userAccessToken.getExpiration() != null) {
 			ac.setExpires_in(userAccessToken.getExpiration() - (int) ((System.currentTimeMillis() - userAccessToken.getCreation()) / 1000));
 		}
