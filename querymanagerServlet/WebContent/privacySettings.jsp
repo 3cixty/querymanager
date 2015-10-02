@@ -20,8 +20,9 @@ Invalid request
 <div class="table">
   <div class="row">
     <div class="left">
-      <div class="button" id="show">Show</div>
-      <div class="button" id="manage">Manage</div>
+      <div class="button" id="show">Show Profile</div>
+      <div class="button" id="showHeatMap">Show Heatmap</div>
+      <div class="button" id="manage">Manage Profile</div>
     </div>
     <div class="spaceCell"></div>
     <div class="right" id="mainContent">
