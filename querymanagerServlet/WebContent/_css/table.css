@@ -6,6 +6,11 @@
     display: table-row;
     }
 
+  .row-middle {
+    display: table-row;
+    vertical-align: middle;
+    }
+
   .cell {
     display: table-cell;
     }
