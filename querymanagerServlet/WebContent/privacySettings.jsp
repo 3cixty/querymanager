@@ -52,7 +52,6 @@ Invalid request
        		
        		$("#manage").click(function() {
 	    		$("#mainContent").html("<iframe src='<%=Configuration.get3CixtyRoot()%>/privacySettingsManagement.html?access_token=<%=session.getAttribute("accessToken")%>'></iframe>");
-	    		$("#friendUid").val("<%=session.getAttribute("accessToken")%>");
 	    	});
        });
        

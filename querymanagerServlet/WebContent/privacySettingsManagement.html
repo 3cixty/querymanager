@@ -9,11 +9,20 @@
 		data[params[x].split('=')[0]] = params[x].split('=')[1];
  	}
 	var accessToken = data["access_token"];
-	alert(accessToken);
 </script>
 <body>
+<form>
+<input type="hidden" id="access_token" value="">
 <div>
 <input type="text" id="friendUid" name="friendUid">
 </div>
+</form>
 </body>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#access_token").html(accessToken);
+	}
+</script>
+
 </html>
