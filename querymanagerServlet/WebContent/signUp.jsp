@@ -111,7 +111,7 @@ if (key != null) {
       <div class="one">
         <div class="register">
           <h3>Create your account</h3>
-          <form id="reg-form" onsubmit="return validation()" method="post" action="./signUp">
+          <form id="reg-form" onsubmit="return allValidation()" method="post" action="./signUp">
             <div>
               <label for="firstName">First Name</label>
               <input type="text" id="firstName" name="firstName" spellcheck="false" required/>
@@ -137,6 +137,10 @@ if (key != null) {
               <input type="submit" value="Create Account" id="create-account" class="button"/>
             </div>
             <input type="hidden" name="key" value='<%=key%>'>
+            
+            <div>
+              <input type="checkbox" name="termsNConditions" id="termsNConditions">By clicking on this you are accepting <a href="./terms.html">Terms and Conditions</a> for using 3cixty platform.
+            </div>
           </form>
           
           <span class="pwdNote">Password must contain at least one digit, one lower case, one upper case, and between 8 and 30 characters</span>
@@ -167,6 +171,13 @@ if (key != null) {
     		        }});
     		    }  
     		});
+           
+           function allValidation() {
+        	   if (!validation()) return false;
+        	   if (!document.getElementById("termsNConditions").checked) {
+        		   alert("You have to accept Terms and Conditions for signing up an account");
+        	   }
+           }
        });
        
     </script>
