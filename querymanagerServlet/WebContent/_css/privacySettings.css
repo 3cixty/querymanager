@@ -36,3 +36,9 @@
 .right {
     display: inline-block;
 }
+
+.removalCell {
+    display: table-cell;
+    vertical-align: middle;
+    height: 50px;
+}
