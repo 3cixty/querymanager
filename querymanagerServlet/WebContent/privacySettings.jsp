@@ -51,7 +51,7 @@ Invalid request
     		});
        		
        		$("#manage").click(function() {
-	    		$("#mainContent").html("<iframe src='<%=Configuration.get3CixtyRoot()%>/privacySettingsManagement.html?access_token=<%=session.getAttribute("accessToken")%>'></iframe>");
+	    		$("#mainContent").html("<iframe frameborder='0' src='<%=Configuration.get3CixtyRoot()%>/privacySettingsManagement.html?access_token=<%=session.getAttribute("accessToken")%>'></iframe>");
 	    	});
        });
        
