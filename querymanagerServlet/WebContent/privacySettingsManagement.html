@@ -1,6 +1,7 @@
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<link href="_css/table.css" rel="stylesheet" type="text/css">
 </head>
 <script>
 	var params = location.href.split('?')[1].split('&');
@@ -13,15 +14,40 @@
 <body>
 <form>
 <input type="hidden" id="access_token" value="">
-<div>
-<input type="text" id="friendUid" name="friendUid">
+
+<div class="table">
+  <div class="row">
+    <div class="cell">
+    Friends in my knows
+    </div>
+    <div class="cell">
+      <select multiple="multiple" id="myKnows" name="myKnows"></select>
+    </div>
+    <div class="cell">
+      <button value="Remove"></button>
+    </div>
+  </div>
 </div>
+
 </form>
 </body>
 
 <script type="text/javascript">
 	$(document).ready(function () {
 		$("#access_token").val(accessToken);
+	    
+		$.ajax({url: "./getAllUserRelatedInfoByUser",
+    	       beforeSend: function(xhr) {
+    	    	   xhr.setRequestHeader('access_token', accessToken);
+    	       },
+    		   success: function(result){
+    			   for (var i = 0; i < result.knows.length; i++) {
+    				   $("#myKnows").append($("<option></option>")
+    					         .attr("value", result.knows[i].uid)
+    					         .text(result.knows[i].uid)); 
+    			   }
+	   			}
+    	});
 	});
 </script>
 
