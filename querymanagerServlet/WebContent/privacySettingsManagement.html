@@ -41,10 +41,11 @@
     	    	   xhr.setRequestHeader('access_token', accessToken);
     	       },
     		   success: function(result){
-    			   for (var i = 0; i < result.knows.length; i++) {
+    			   var jsonObj = eval ("(" + result + ")");
+    			   for (var i = 0; i < jsonObj.knows.length; i++) {
     				   $("#myKnows").append($("<option></option>")
-    					         .attr("value", result.knows[i].uid)
-    					         .text(result.knows[i].uid)); 
+    					         .attr("value", jsonObj.knows[i].uid)
+    					         .text(jsonObj.knows[i].uid)); 
     			   }
 	   			}
     	});
