@@ -16,7 +16,7 @@
 <input type="hidden" id="access_token" value="">
 
 <div class="table">
-  <div class="row">
+  <div class="row-middle">
     <div class="cell-middle">
     Friends in my knows
     </div>
@@ -43,9 +43,11 @@
     		   success: function(result){
     			   var jsonObj = eval ("(" + result + ")");
     			   for (var i = 0; i < jsonObj.knows.length; i++) {
+    				   var fullName = jsonObj.knows[i].firstName + " " + jsonObj.knows[i].lastName;
+    				   if (fullName == "Unknown Unknown") fullName = "Unknown";
     				   $("#myKnows").append($("<option></option>")
     					         .attr("value", jsonObj.knows[i].uid)
-    					         .text(jsonObj.knows[i].uid)); 
+    					         .text(fullName); 
     			   }
 	   			}
     	});
