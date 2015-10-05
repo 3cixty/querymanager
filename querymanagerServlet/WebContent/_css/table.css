@@ -9,6 +9,11 @@
   .cell {
     display: table-cell;
     }
+    
+  .cell-middle {
+    display: table-cell;
+    vertical-align: middle;
+  }
  .heading
     {
         display: table-row;
