@@ -1,17 +1,21 @@
 package eu.threecixty.querymanager.rest;
 
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import eu.threecixty.logs.CallLoggingDisplay;
 import eu.threecixty.logs.CallLoggingManager;
@@ -70,6 +74,30 @@ public class CallLogServices  {
 		}
 	}
 
+	@GET
+	@Path("/getCallsGroupedByMonth")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getCallsGroupedByMonth() {
+        HttpSession session = httpRequest.getSession();
+		Boolean admin = (Boolean) session.getAttribute("admin");
+		if (admin) {
+			Collection <CallLoggingDisplay> calls = CallLoggingManager.getInstance().getCallsWithCountByMonth();
+			StringBuilder sb = new StringBuilder();
+			if (calls != null && calls.size() > 0) {
+				for (CallLoggingDisplay call: calls) {
+					sb.append(call.getDateCall()).append(',');
+					sb.append(call.getNumberOfCalls()).append(',');
+					sb.append(call.getCallLogging().getKey()).append('\n');
+				}
+			}
+			ResponseBuilder response = Response.ok(sb.toString(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
+			SimpleDateFormat format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+			response.header("Content-Disposition", "attachment; filename=3cixty_" + format.format(new Date()) + ".csv");
+			return response.build();
+		} else {
+			return Response.status(400).entity("Invalid request").build();
+		}
+	}
     
 	/**
 	 * execute query
