@@ -299,9 +299,10 @@
 </script>
 </head>
 <body>
-<form action="./logoutAdmin" method="get">
+<form name="formDashboard" action="./logoutAdmin" method="get">
 <div>
-<input type="submit" name="logout" value="Logout">
+<input type="button" value="Download data grouped by month" onclick="downloadCsv();" >
+<input type="submit" name="logout" value="Logout" onclick="logout();">
 </div>
 </form>
 
@@ -350,6 +351,18 @@
 				</tr>
 		</table>
 	</div>
+	
+	<script type="text/javascript">
+	    function downloadCsv() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/getCallsGroupedByMonth";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	    
+	    function logout() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/logoutAdmin";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	</script>
 	
 	<%
     }
