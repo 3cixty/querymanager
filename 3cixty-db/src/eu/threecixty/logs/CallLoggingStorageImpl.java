@@ -153,7 +153,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 	public List<CallLoggingDisplay> getCallsWithCountByMonth() {
 		List <CallLoggingDisplay> loggings = new ArrayList<CallLoggingDisplay>();
 		
-		String sql = "SELECT 3cixty_app.app_name AS app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y,%m') AS starttime, COUNT(3cixty_app.app_name) AS numberOfCalls FROM logcall,3cixty_app WHERE logcall.appkey LIKE 3cixty_app.app_key  GROUP BY 3cixty_app.app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y,%m') ORDER BY starttime;";
+		String sql = "SELECT 3cixty_app.app_name AS app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y-%m') AS starttime, COUNT(3cixty_app.app_name) AS numberOfCalls FROM logcall,3cixty_app WHERE logcall.appkey LIKE 3cixty_app.app_key GROUP BY 3cixty_app.app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y-%m') ORDER BY starttime;";
 		
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		if (DEBUG_MOD) LOGGER.info(sql);
