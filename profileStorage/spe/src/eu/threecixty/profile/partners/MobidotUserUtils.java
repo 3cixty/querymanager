@@ -25,7 +25,7 @@ public class MobidotUserUtils {
 	 private static String DOMAIN="3cixty";
 	 private static String GROUP="ExpoVisitor";
 	 
-	 public static int getMobibotId(String uid) {
+	 public static int getMobidotId(String uid) {
 		 if (uid == null || "".equals(uid)) return -1;
 		 PartnerAccount account = PartnerAccountUtils.retrieveMobidotUser(uid);
 		 if (account == null) return -1;
