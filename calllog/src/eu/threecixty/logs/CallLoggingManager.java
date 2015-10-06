@@ -118,6 +118,10 @@ public class CallLoggingManager {
 		return storage.getRelativeNumberofUsers();
 	}
 	
+	public List<CallLoggingDisplay> getCallsWithCountByMonth() {
+		return storage.getCallsWithCountByMonth();
+	}
+	
 	private CallLoggingManager() {
 		storage = new CallLoggingStorageImpl();
 		callLoggings = new ConcurrentLinkedQueue<CallLogging>();
