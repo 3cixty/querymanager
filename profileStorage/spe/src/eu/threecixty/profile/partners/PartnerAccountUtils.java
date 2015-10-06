@@ -17,6 +17,17 @@ public class PartnerAccountUtils {
 			PartnerAccountUtils.class.getName());
 	private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
+	public static PartnerAccount retrieveMobidotUser(String _3cixtyUID) {
+		Partner partner = ProfileManagerImpl.getInstance().getPartner();
+    	PartnerUser mobidotUser = partner.getUser(_3cixtyUID);
+    	if (DEBUG_MOD) {
+    		if (mobidotUser == null) LOGGER.info("Not found the corresponding partner of " + _3cixtyUID);
+    		else LOGGER.info("Found the corresponding partner of " +  _3cixtyUID);
+    	}
+		PartnerAccount account = partner.findAccount(mobidotUser, MOBIDOT_APP_ID, null);
+		return account;
+	}
+	
 	/**
 	 * Try to create a Mobidot user if it doesn't exist on Movesmarter server.
 	 * @param _3cixty
