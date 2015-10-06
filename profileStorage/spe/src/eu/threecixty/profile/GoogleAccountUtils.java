@@ -139,6 +139,20 @@ public class GoogleAccountUtils {
 		return _3cixtyUID;
 	}
 	
+	public static boolean existUserProfile(String accessToken) {
+		try {
+			String reqMsg = Utils.readUrl(
+					"https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken);
+			JSONObject json = new JSONObject(reqMsg);
+			String user_id = json.getString("id");
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(user_id, SPEConstants.GOOGLE_SOURCE);
+			if (profile != null) return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	private static void updateKnows(String accessToken, String user_id,
 			UserProfile profile) {
 		KnowsPersistence persistence = new KnowsPersistence(accessToken, SPEConstants.GOOGLE_SOURCE, user_id, profile);

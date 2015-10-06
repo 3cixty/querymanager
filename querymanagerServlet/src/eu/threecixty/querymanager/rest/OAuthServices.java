@@ -37,6 +37,7 @@ import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.utils.ScopeUtils;
 import eu.threecixty.profile.FaceBookAccountUtils;
 import eu.threecixty.profile.GoogleAccountUtils;
+import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.querymanager.AuthorizationBypassManager;
 import eu.threecixty.querymanager.filter.DynamicCORSFilter;
 
@@ -67,6 +68,11 @@ public class OAuthServices {
 	public static final String REDIRECT_URI_CLIENT = V2_ROOT + "redirect_uri_client";
 	public static final String ONLY_GOOGLE_ACCESS_TOKEN = "only_google_access_token";
 	public static final String SCOPES = "Profile,WishList";
+	
+	private static final String OUTSIDE_TOKEN = "outsideToken";
+	private static final String SOURCE = "source";
+	private static final String WIDTH = "width";
+	private static final String HEIGHT = "height";
 
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -416,45 +422,41 @@ public class OAuthServices {
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
 		
-		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside)
-				: FaceBookAccountUtils.getUID(accessTokenFromOutside, width, height);
+		boolean existed = SPEConstants.GOOGLE_SOURCE.equals(source) ?
+				GoogleAccountUtils.existUserProfile(accessTokenFromOutside) : FaceBookAccountUtils.existUserProfile(accessTokenFromOutside);
 		
-		if (uid == null || uid.equals(""))
-			return Response.status(Response.Status.BAD_REQUEST)
-		        .entity(" {\"response\": \"failed\", \"reason\": \"Google or Facebook access token is invalid or expired\"} ")
+		if (!existed) {
+			session.setAttribute(OUTSIDE_TOKEN, accessTokenFromOutside);
+			session.setAttribute(SOURCE, source);
+			session.setAttribute(WIDTH, width);
+			session.setAttribute(HEIGHT, height);
+			try {
+				return Response.seeOther(new URI("./tnc.html")).build();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+		return processOutsideToken(app, accessTokenFromOutside, source, width, height, session);
+	}
+	
+	@GET
+	@Path("/terms")
+	public Response terms(@FormParam("terms") String terms) {
+		if (!"on".equalsIgnoreCase(terms)) return Response.status(400).entity("Invalid request").build();
+
+		HttpSession session = httpRequest.getSession();
+		String accessTokenFromOutside = (String) session.getAttribute(OUTSIDE_TOKEN);
+		String source = (String) session.getAttribute(SOURCE);
+		int width = (Integer) session.getAttribute(WIDTH);
+		int height = (Integer) session.getAttribute(HEIGHT);
+		if (accessTokenFromOutside == null || source == null)
+			return Response.status(400).entity("Invalid request").build();
+		AppCache app = (AppCache) session.getAttribute(APP_KEY);
+		if (app == null) return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Session is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-		
-		session.setAttribute(UID_KEY, uid);
-		
-		// bypass authorization for 3cixty's apps
-		if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
-			AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, SCOPES);
-			if (at != null) {
-				if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), SCOPES, app, at.getExpires_in())) {
-					return redirect_uri_client2(at, at.getExpires_in(), app);
-				}
-			}
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-					" {\"response\": \"failed\" } ").type(MediaType.APPLICATION_JSON_TYPE).build();
-		}
-		
-		try {
-			
-			return Response.temporaryRedirect(new URI(
-					OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
-			+ SCOPES + "&client_id="
-			+ app.getAppClientKey() + "&redirect_uri="
-		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
-		    		OAuthWrappers.getBasicAuth(app.getAppClientKey(), app.getAppClientPwd()))
-		    		.header("Access-Control-Allow-Origin", "*")
-                    .cacheControl(cacheControlNoStore())
-                    .header("Pragma", "no-cache")
-		    		.build();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return processOutsideToken(app, accessTokenFromOutside, source, width, height, session);
 	}
 
 	@GET
@@ -564,6 +566,47 @@ public class OAuthServices {
 				gson.toJson(accessToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
+	private Response processOutsideToken(AppCache app, String accessTokenFromOutside, String source, int width, int height, HttpSession session) {
+		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside)
+				: FaceBookAccountUtils.getUID(accessTokenFromOutside, width, height);
+		
+		if (uid == null || uid.equals(""))
+			return Response.status(Response.Status.BAD_REQUEST)
+		        .entity(" {\"response\": \"failed\", \"reason\": \"Google or Facebook access token is invalid or expired\"} ")
+		        .type(MediaType.APPLICATION_JSON_TYPE)
+		        .build();
+		
+		session.setAttribute(UID_KEY, uid);
+		
+		// bypass authorization for 3cixty's apps
+		if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
+			AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, SCOPES);
+			if (at != null) {
+				if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), SCOPES, app, at.getExpires_in())) {
+					return redirect_uri_client2(at, at.getExpires_in(), app);
+				}
+			}
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+					" {\"response\": \"failed\" } ").type(MediaType.APPLICATION_JSON_TYPE).build();
+		}
+		
+		try {
+			
+			return Response.temporaryRedirect(new URI(
+					OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
+			+ SCOPES + "&client_id="
+			+ app.getAppClientKey() + "&redirect_uri="
+		    + THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
+		    		OAuthWrappers.getBasicAuth(app.getAppClientKey(), app.getAppClientPwd()))
+		    		.header("Access-Control-Allow-Origin", "*")
+                    .cacheControl(cacheControlNoStore())
+                    .header("Pragma", "no-cache")
+		    		.build();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public static String join(List<String> scopeNames, String strJoined) {
 		if (scopeNames.size() == 0) return "null";

@@ -94,7 +94,18 @@ public class FaceBookAccountUtils {
 		return null;
 	}
 	
-
+	public static boolean existUserProfile(String accessToken) {
+		try {
+			String reqMsg = Utils.readUrl(FACE_BOOK_ACCESS_TOKEN_VALIDATION + accessToken);
+			JSONObject json = new JSONObject(reqMsg);
+			String user_id = json.getString("id");
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(user_id, SPEConstants.FACEBOOK_SOURCE);
+			if (profile != null) return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
 	private static void updateKnows(String accessToken, String user_id,
 			UserProfile profile) {
