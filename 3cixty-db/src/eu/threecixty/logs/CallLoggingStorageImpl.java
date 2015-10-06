@@ -86,6 +86,7 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 				+ "ORDER BY starttime";
 		
 		Session session = HibernateUtil.getSessionFactory().openSession();
+		if (DEBUG_MOD) LOGGER.info(sql);
 		
 		SQLQuery query = session.createSQLQuery(sql);
 		query.setTimestamp(0, new Timestamp(from));
