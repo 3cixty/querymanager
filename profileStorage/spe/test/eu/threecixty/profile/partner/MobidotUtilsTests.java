@@ -9,14 +9,14 @@ public class MobidotUtilsTests {
 
 	@Test
 	public void testName() {
-		String ID="";
+		int ID=0;
 		try{
-			 ID=MobidotUserUtils.getMaxMobidotID("10118", "9429");
+			 ID=MobidotUserUtils.getMaxMobidotID(10118, 9429);
 			System.out.println(ID);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		Assert.assertTrue(ID.equals("9429"));
+		Assert.assertTrue(ID==9429);
 	}
 
 }

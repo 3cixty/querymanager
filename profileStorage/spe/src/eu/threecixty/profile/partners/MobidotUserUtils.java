@@ -100,7 +100,7 @@ public class MobidotUserUtils {
 	  * @return
 	  * @throws Exception
 	  */
-	 public static String getMaxMobidotID(String movesmarterID1, String movesmarterID2, String movesmarterID3) throws Exception{
+	 public static int getMaxMobidotID(int movesmarterID1, int movesmarterID2, int movesmarterID3) throws Exception{
 		 long endtime=GregorianCalendar.getInstance().getTimeInMillis() / 1000;
 		 float distance1=getStatistics(movesmarterID1,endtime);
 		 float distance2=getStatistics(movesmarterID2,endtime);
@@ -122,7 +122,7 @@ public class MobidotUserUtils {
 	  * @return
 	  * @throws Exception
 	  */
-	 public static String getMaxMobidotID(String movesmarterID1, String movesmarterID2) throws Exception{
+	 public static int getMaxMobidotID(int movesmarterID1, int movesmarterID2) throws Exception{
 		 long endtime=GregorianCalendar.getInstance().getTimeInMillis() / 1000;
 		 float distance1=getStatistics(movesmarterID1,endtime);
 		 float distance2=getStatistics(movesmarterID2,endtime);
@@ -136,7 +136,7 @@ public class MobidotUserUtils {
 	  * @return
 	  * @throws Exception
 	  */
-	 private static float getStatistics(String movesmarterID, long endTime) throws Exception{
+	 private static float getStatistics(int movesmarterID, long endTime) throws Exception{
 	
 			if (DEBUG_MOD) LOGGER.info("getStats for the movesmarter user = "+movesmarterID);
 	
