@@ -431,7 +431,7 @@ public class OAuthServices {
 			session.setAttribute(WIDTH, width);
 			session.setAttribute(HEIGHT, height);
 			try {
-				return Response.seeOther(new URI("./tnc.html")).build();
+				return Response.seeOther(new URI(Configuration.get3CixtyRoot() + "/tnc.html")).build();
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
