@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.threecixty.partners.PartnerAccount;
+
 public class MobidotUserUtils {
 	private static final Logger LOGGER = Logger.getLogger(
 			MobidotUserUtils.class.getName());
@@ -22,6 +24,13 @@ public class MobidotUserUtils {
 	 private static String MOBIDOT_API_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
 	 private static String DOMAIN="3cixty";
 	 private static String GROUP="ExpoVisitor";
+	 
+	 public static int getMobibotId(String uid) {
+		 if (uid == null || "".equals(uid)) return -1;
+		 PartnerAccount account = PartnerAccountUtils.retrieveMobidotUser(uid);
+		 if (account == null) return -1;
+		 return Integer.parseInt(account.getUser_id().trim());
+	 }
 	  
 	 /**
 	  * To Create users on MoveSmarter server using HttpURLConnection use this method. 
