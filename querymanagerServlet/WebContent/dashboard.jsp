@@ -299,7 +299,7 @@
 </script>
 </head>
 <body>
-<form name="formDashboard" action="./logoutAdmin" method="get">
+<form id="formDashboard" action="./logoutAdmin" method="get">
 <div>
 <input type="button" value="Download data grouped by month" onclick="downloadCsv();" >
 <input type="submit" name="logout" value="Logout" onclick="logout();">
