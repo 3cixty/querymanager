@@ -139,7 +139,7 @@ if (key != null) {
             <input type="hidden" name="key" value='<%=key%>'>
             
             <div>
-              <input type="checkbox" name="termsNConditions" id="termsNConditions">By clicking on this you are accepting <a href="./terms.html">Terms and Conditions</a> for using 3cixty platform.
+              <input type="checkbox" name="termsNConditions" id="termsNConditions">I agree <a href="./terms.html">Terms & Conditions</a> for using 3cixty platform.
             </div>
           </form>
           
