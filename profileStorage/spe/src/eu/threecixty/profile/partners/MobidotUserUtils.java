@@ -6,16 +6,10 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import eu.threecixty.profile.UserProfile;
-import eu.threecixty.profile.oldmodels.Accompanying;
-import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 public class MobidotUserUtils {
 	private static final Logger LOGGER = Logger.getLogger(
