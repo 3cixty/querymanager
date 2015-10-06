@@ -102,11 +102,28 @@
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="password.js"></script>
+<script>
+ function disableSubmit() {
+  document.getElementById("create-account").disabled = true;
+ }
+
+  function activateButton(element) {
+
+      if(element.checked) {
+        document.getElementById("create-account").disabled = false;
+       }
+       else  {
+        document.getElementById("create-account").disabled = true;
+      }
+
+  }
+</script>
 </head>
 <%
 String key = request.getParameter("key");
 if (key != null) {
 %>
+<body onload="disableSubmit()">
  <div class="main">
       <div class="one">
         <div class="register">
@@ -139,7 +156,7 @@ if (key != null) {
             <input type="hidden" name="key" value='<%=key%>'>
             
             <div>
-              <input type="checkbox" name="termsNConditions" id="termsNConditions">I agree <a href="./terms.html">Terms & Conditions</a> for using 3cixty platform.
+              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree <a href="./terms.html">Terms & Conditions</a> for using 3cixty platform.
             </div>
           </form>
           
@@ -147,7 +164,7 @@ if (key != null) {
         </div>
       </div>
     </div>
-    
+  </body>
     <script type="text/javascript">
        
 
