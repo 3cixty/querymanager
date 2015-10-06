@@ -10,9 +10,6 @@
 	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
 	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
 
-    <script type="text/javascript" src="login/google_translate.js"></script>
-	<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-	
 	<title>3cixty Privacy Policy</title>
 </head>
 
@@ -342,15 +339,5 @@
 			</div>
 		</div>
 	</div>
-	<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
-	<script type="text/javascript"> 
-		function googleTranslateElementInit() {
-			new google.translate.TranslateElement({
-				pageLanguage : 'en',
-				layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
-				multilanguagePage : true
-			}, 'google_translate_element');
-		}
-	</script>
 </body>
 </html>
