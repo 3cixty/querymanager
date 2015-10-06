@@ -439,7 +439,7 @@ public class OAuthServices {
 		return processOutsideToken(app, accessTokenFromOutside, source, width, height, session);
 	}
 	
-	@GET
+	@POST
 	@Path("/terms")
 	public Response terms(@FormParam("terms") String terms) {
 		if (!"on".equalsIgnoreCase(terms)) return Response.status(400).entity("Invalid request").build();
