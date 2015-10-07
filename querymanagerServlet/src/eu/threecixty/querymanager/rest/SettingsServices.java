@@ -66,7 +66,7 @@ public class SettingsServices {
 
 	@GET
 	@Path("/viewSettings")
-	public void view(@HeaderParam("access_token") String access_token, @Context HttpServletResponse response,
+	public void view(@QueryParam("access_token") String access_token, @Context HttpServletResponse response,
             @Context HttpServletRequest request) {
 		try {
 
