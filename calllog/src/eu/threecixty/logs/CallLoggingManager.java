@@ -122,6 +122,10 @@ public class CallLoggingManager {
 		return storage.getCallsWithCountByMonth();
 	}
 	
+	public List<CallLoggingDisplay> getCallsWithCountByDay() {
+		return storage.getCallsWithCountByDay();
+	}
+	
 	private CallLoggingManager() {
 		storage = new CallLoggingStorageImpl();
 		callLoggings = new ConcurrentLinkedQueue<CallLogging>();

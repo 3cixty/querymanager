@@ -39,6 +39,7 @@ public interface CallLoggingStorage {
 			int minTimeConsumed, int maxTimeConsumed);
 	
 	List<CallLoggingDisplay> getCallsWithCountByMonth();
+	List<CallLoggingDisplay> getCallsWithCountByDay();
 	
 	List<RelativeNumberOfUsers> getRelativeNumberofUsers();
 }
