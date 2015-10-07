@@ -16,7 +16,7 @@
     <module>3cixty-db</module>
     <module>appkey</module>
     <module>profileStorage</module>
-    <!--module>3cixty-cache</module-->
+    <module>3cixty-cache</module>
     <module>CrawlerCron</module>
     <module>calllog</module>
     <module>querymanager-java</module>

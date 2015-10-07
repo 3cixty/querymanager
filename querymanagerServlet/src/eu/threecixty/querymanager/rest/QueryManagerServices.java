@@ -33,7 +33,6 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 
 import eu.threecixty.Configuration;
-import eu.threecixty.cache.CacheManager;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -1019,7 +1018,6 @@ public class QueryManagerServices {
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		long startTime = System.currentTimeMillis();
-		ret = CacheManager.getInstance().getContent(query, stressTestOn);
 		
 		long time = System.currentTimeMillis();
 		if (DEBUG_MOD) LOGGER.info("Time to get data from map: " + (time - startTime));

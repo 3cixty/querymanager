@@ -1,15 +1,15 @@
 package eu.threecixty.cache;
 
-public class CacheElement {
+import java.util.Calendar;
 
-	private static final int VALIDATION = 1000 * 60 * 60 * 24; // one day
-	private long creationTime;
+public class CacheElement {
 	private long lastValidTime;
 	public String content;
 	
 	public CacheElement() {
-		creationTime = System.currentTimeMillis();
-		lastValidTime = creationTime + VALIDATION;
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 23, 59);
+		lastValidTime = calendar.getTimeInMillis();
 	}
 	
 	public boolean isValid() {
