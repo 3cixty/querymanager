@@ -98,6 +98,32 @@ public class CallLogServices  {
 			return Response.status(400).entity("Invalid request").build();
 		}
 	}
+	
+	@GET
+	@Path("/getCallsGroupedByDay")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getCallsGroupedByDay() {
+        HttpSession session = httpRequest.getSession();
+		Boolean admin = (Boolean) session.getAttribute("admin");
+		if (admin) {
+			long from = 1430438400000L;
+			Collection <CallLoggingDisplay> calls = CallLoggingManager.getInstance().getCallsWithCount(from, System.currentTimeMillis());
+			StringBuilder sb = new StringBuilder();
+			if (calls != null && calls.size() > 0) {
+				for (CallLoggingDisplay call: calls) {
+					sb.append(call.getDateCall()).append(',');
+					sb.append(call.getNumberOfCalls()).append(',');
+					sb.append(call.getCallLogging().getKey()).append('\n');
+				}
+			}
+			ResponseBuilder response = Response.ok(sb.toString(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
+			SimpleDateFormat format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+			response.header("Content-Disposition", "attachment; filename=3cixty_" + format.format(new Date()) + ".csv");
+			return response.build();
+		} else {
+			return Response.status(400).entity("Invalid request").build();
+		}
+	}
     
 	/**
 	 * execute query
