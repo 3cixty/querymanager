@@ -47,7 +47,7 @@
     all WishList items created while signing in with those accounts will be merged to your current account if there isn't any conflict. 
     The conflict means that you can find two items coming from your current account or those accounts have the same identity.</li>
   </ol>
-  <i>If you already links your current account to a Google or Facebook, the corresponding Sign-In button for Google and Facebook will not appear.</i>
+  <i>If you already linked your current account to a Google or Facebook, the corresponding Sign-In button for Google and Facebook would not appear.</i>
 </div>
 <div>
     <input type="hidden" readonly="readonly" value="<%=uid%>" name="uid">
