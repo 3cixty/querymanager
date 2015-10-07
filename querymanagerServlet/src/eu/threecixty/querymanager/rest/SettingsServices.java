@@ -129,6 +129,8 @@ public class SettingsServices {
 			if ((piSum % FACEBOOK_PROFILE_IDENTITIES == 0) && isNotNullOrEmpty(uidDerivedFromFacebook))
 				return Response.status(400).entity("A Facebook account was already linked to your current account").build();
 			try {
+				boolean ok = mergeMobidotUsers(uidDerivedFromGoogle, uidDerivedFromFacebook, userAccessToken.getUid());
+				if (!ok) return Response.status(400).entity("We failed to merge Mobidot users").build();
 				List <Tray> traysDerivedFromGoogle = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromGoogle);
 				List <Tray> traysDerivedFromFacebook = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromFacebook);
 				List <Tray> traysDerivedFrom3cixtyAccount = ProfileManagerImpl.getInstance().getTrayManager().getTrays(userAccessToken.getUid());
@@ -193,8 +195,6 @@ public class SettingsServices {
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromGoogleInKnows, uidDerivedFromGoogle, profile.getHasUID());
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromFacebookInKnows, uidDerivedFromFacebook, profile.getHasUID());
 				
-				// TODO: add code for merging Mobidot accounts
-				
 				String accountsAffected = (uidDerivedFromGoogle != null && uidDerivedFromFacebook != null) ? "Google and Facebook" : (uidDerivedFromGoogle != null ? "Google" : (uidDerivedFromFacebook != null ? "Facebook" : null)); 
 				return Response.ok().entity("You are successful to link your account with " + accountsAffected).build();
 			} catch (InvalidTrayElement e) {
@@ -203,6 +203,9 @@ public class SettingsServices {
 			} catch (TooManyConnections e) {
 				e.printStackTrace();
 				return Response.serverError().build();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return Response.status(500).entity("We couldn't check best Mobidot user at Movesmarter server").build();
 			}
 		}
 		return Response.status(400).entity("The token " + accessToken + " is invalid").build();
@@ -212,7 +215,6 @@ public class SettingsServices {
 		int mobidotIdFromGoogle = MobidotUserUtils.getMobidotId(uidFromGoogle);
 		int mobidotIdFromFb = MobidotUserUtils.getMobidotId(uidFromFb);
 		if (mobidotIdFromGoogle == -1 && mobidotIdFromGoogle == -1) return true; // no trips existed
-		// TODO:
 		PartnerAccount accountFromGoogle = mobidotIdFromGoogle == -1 ? null :
 			PartnerAccountUtils.retrieveOrAddMobidotUser(uidFromGoogle, uidFromGoogle);
 		PartnerAccount accountFromFb = mobidotIdFromFb == -1 ? null :
@@ -221,9 +223,38 @@ public class SettingsServices {
 		int mobidotIdFromNew = Integer.parseInt(accountFromNew.getUser_id().trim());
 		if (accountFromGoogle == null) { // accountFb != null due to line 215
 			int bestId = MobidotUserUtils.getMaxMobidotID(mobidotIdFromFb, mobidotIdFromNew);
-			
+			if (mobidotIdFromFb == bestId) { // no need to merge data if best Id is current one
+				return replacePartnerAccount(accountFromNew, accountFromFb);
+			}
+			return true;
+		} else if (accountFromFb == null) { // accountGoogle != null due to line 215
+			int bestId = MobidotUserUtils.getMaxMobidotID(mobidotIdFromGoogle, mobidotIdFromNew);
+			if (mobidotIdFromGoogle == bestId) {
+				return replacePartnerAccount(accountFromNew, accountFromGoogle);
+			}
+			return true;
+		} else { // there are three partner accounts
+			int bestId = MobidotUserUtils.getMaxMobidotID(mobidotIdFromGoogle, mobidotIdFromGoogle, mobidotIdFromNew);
+			if (bestId == mobidotIdFromGoogle) {
+				return replacePartnerAccount(accountFromNew, accountFromGoogle);
+			} else if (bestId == mobidotIdFromFb) {
+				return replacePartnerAccount(accountFromNew, accountFromFb);
+			}
+			return true;
 		}
-		return false;
+	}
+
+	private boolean replacePartnerAccount(PartnerAccount accountFromNew,
+			PartnerAccount account) {
+		PartnerAccount pa = new PartnerAccount();
+		pa.setAppId(account.getAppId());
+		pa.setPartnerUser(account.getPartnerUser());
+		pa.setPassword(account.getPassword());
+		pa.setRole(account.getRole());
+		pa.setUser_id(account.getUser_id());
+		pa.setUsername(account.getUsername());
+		return ProfileManagerImpl.getInstance().getPartner().replaceAccount(
+				accountFromNew, pa);
 	}
 
 	private void updateFriendsHavingMyUIDInKnows(
