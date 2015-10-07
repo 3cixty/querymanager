@@ -106,8 +106,7 @@ public class CallLogServices  {
         HttpSession session = httpRequest.getSession();
 		Boolean admin = (Boolean) session.getAttribute("admin");
 		if (admin) {
-			long from = 1430438400000L;
-			Collection <CallLoggingDisplay> calls = CallLoggingManager.getInstance().getCallsWithCount(from, System.currentTimeMillis());
+			Collection <CallLoggingDisplay> calls = CallLoggingManager.getInstance().getCallsWithCountByDay();
 			StringBuilder sb = new StringBuilder();
 			if (calls != null && calls.size() > 0) {
 				for (CallLoggingDisplay call: calls) {
