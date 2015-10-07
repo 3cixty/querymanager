@@ -27,7 +27,7 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-
+import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.profile.FaceBookAccountUtils;
 import eu.threecixty.profile.Friend;
 import eu.threecixty.profile.GoogleAccountUtils;
@@ -39,10 +39,11 @@ import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.UserProfile;
-
 import eu.threecixty.profile.UserRelatedInformation;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
+import eu.threecixty.profile.partners.MobidotUserUtils;
+import eu.threecixty.profile.partners.PartnerAccountUtils;
 
 /**
  * This class is to store settings information into UserProfile.
@@ -207,6 +208,23 @@ public class SettingsServices {
 		return Response.status(400).entity("The token " + accessToken + " is invalid").build();
 	}
 	
+	private boolean mergeMobidotUsers(String uidFromGoogle, String uidFromFb, String newUid) throws Exception {
+		int mobidotIdFromGoogle = MobidotUserUtils.getMobidotId(uidFromGoogle);
+		int mobidotIdFromFb = MobidotUserUtils.getMobidotId(uidFromFb);
+		if (mobidotIdFromGoogle == -1 && mobidotIdFromGoogle == -1) return true; // no trips existed
+		// TODO:
+		PartnerAccount accountFromGoogle = mobidotIdFromGoogle == -1 ? null :
+			PartnerAccountUtils.retrieveOrAddMobidotUser(uidFromGoogle, uidFromGoogle);
+		PartnerAccount accountFromFb = mobidotIdFromFb == -1 ? null :
+			PartnerAccountUtils.retrieveOrAddMobidotUser(uidFromFb, uidFromFb);
+		PartnerAccount accountFromNew = PartnerAccountUtils.retrieveOrAddMobidotUser(newUid, newUid);
+		int mobidotIdFromNew = Integer.parseInt(accountFromNew.getUser_id().trim());
+		if (accountFromGoogle == null) { // accountFb != null due to line 215
+			int bestId = MobidotUserUtils.getMaxMobidotID(mobidotIdFromFb, mobidotIdFromNew);
+			
+		}
+		return false;
+	}
 
 	private void updateFriendsHavingMyUIDInKnows(
 			List<Friend> allFriendsHavingMyUIDInKnows,
