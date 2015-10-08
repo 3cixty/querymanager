@@ -196,7 +196,7 @@
 		
 			<div>
 			<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
-				<h3 class="privacy-title"> Sign In using </h3>
+				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
                 <div  align="center">
 				    <table><col width="165">
@@ -229,7 +229,7 @@
 			
 			<div>
 			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
-				  <h3 class="privacy-title"> or 3cixty account </h3>
+				  <h3 class="privacy-title"> or using your ExplorMI 360 account </h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
                     <div>
@@ -239,13 +239,13 @@
     					<input type="password" name="password" id="password" placeholder="Password" required class="loginInput">
   					</div>
   					<div style="height: 3px;"></div>
-  					<input class="signinButton" type="submit" value=" Sign in ">
+  					<input class="signinButton" type="submit" value=" Sign In ">
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./forgotPassword.jsp?key=<%=key%>"><font class="link">Forgot password?</font></a>
+			 	  	<a href="./forgotPassword.jsp?key=<%=key%>"><font class="link">Did you forget your password?</font></a>
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Sign up</font></a>
+			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create a 3cixty account</font></a>
 			 	  </div>
 			 	</form>
 			</div>
@@ -253,10 +253,11 @@
 	    	<div class="login-benefits">
                 <h3 class="privacy-title">Benefits of Signing in</h3>
 				<p class="privacy-desc"> 
-					 You can save your WishList and access it from the mobile version of <strong>3cixty</strong> apps. 
-					 You can ask the application to take into account things like the ratings given by your friends.
-					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>3cixty</strong> apps to track your movements there, you can view summary of your movements. 
-					<br><br>
+					 You can save items on your Wish List and access them from the mobile apps of <strong>ExplorMI 360<strong>. 
+					 You can ask the application to take into account things like the ratings given by your friends. 
+					 If you have been in <i>Milan</i> and have allowed the mobile part of <strong>ExplorMI 360<strong> to track your movements 
+					 there, you can view a summary of your movements.
+					 <br><br>
 					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
 				</p>
 			</div>

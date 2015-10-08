@@ -127,7 +127,7 @@ if (key != null) {
  <div class="main">
       <div class="one">
         <div class="register">
-          <h3>Create your account</h3>
+          <h3>Create an ExplorMI 360 account</h3>
           <form id="reg-form" onsubmit="return allValidation()" method="post" action="./signUp">
             <div>
               <label for="firstName">First Name</label>
@@ -138,7 +138,7 @@ if (key != null) {
               <input type="text" id="lastName" name="lastName" spellcheck="false" required/>
             </div>
             <div>
-              <label for="email">Email</label>
+              <label for="email">Email Address</label>
               <input type="email" id="email" name="email" spellcheck="false" required/>
             </div>
             <div>
@@ -146,7 +146,7 @@ if (key != null) {
               <input type="password" id="password" name="password" required />
             </div>
             <div>
-              <label for="password-again">Password Again</label>
+              <label for="password-again">Confirm Password</label>
               <input type="password" id="password-again" name="password-again" required />
             </div>
             <div>
@@ -156,11 +156,11 @@ if (key != null) {
             <input type="hidden" name="key" value='<%=key%>'>
             
             <div>
-              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree <a href="./terms.html">Terms & Conditions</a> and <a href="./privacy.jsp">Privacy Policy</a> for using 3cixty platform.
+              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree to the <a href="./privacy.jsp">Privacy Policy</a> for ExplorMI 360.
             </div>
           </form>
           
-          <span class="pwdNote">Password must contain at least one digit, one lower case, one upper case, and between 8 and 30 characters</span>
+          <span class="pwdNote">The password must contain at least one digit and one lower-case and one upper-case letter; and it must be between 8 and 30 characters long.</span>
         </div>
       </div>
     </div>
@@ -192,7 +192,7 @@ if (key != null) {
            function allValidation() {
         	   if (!validation()) return false;
         	   if (!document.getElementById("termsNConditions").checked) {
-        		   alert("You have to accept Terms & Conditions and Privacy Policy for signing up an account");
+        		   alert("You have to accept ExplorMI 360 privacy policy");
         	   }
            }
        });
