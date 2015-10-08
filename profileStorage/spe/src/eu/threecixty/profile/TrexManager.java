@@ -7,11 +7,18 @@ import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import eu.threecixty.Configuration;
 
 public class TrexManager {
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 TrexManager.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	private static final TrexManager SINGLETON = new TrexManager();
 	private static final ScheduledExecutorService ses = Executors.newScheduledThreadPool(10);
@@ -54,6 +61,9 @@ public class TrexManager {
 			output = conn.getOutputStream();
 			if (output == null) return;
 			output.write(json.toString().getBytes("UTF-8"));
+			output.flush();
+			int responseCode = conn.getResponseCode();
+			if (DEBUG_MOD) LOGGER.info("response code = " + responseCode);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -62,6 +72,7 @@ public class TrexManager {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			
 			conn.disconnect();
 		}
 	}
