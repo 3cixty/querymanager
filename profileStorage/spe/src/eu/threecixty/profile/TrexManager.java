@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.json.JSONObject;
 
@@ -12,6 +14,7 @@ import eu.threecixty.Configuration;
 public class TrexManager {
 
 	private static final TrexManager SINGLETON = new TrexManager();
+	private static final ScheduledExecutorService ses = Executors.newScheduledThreadPool(10);
 	
 	public static TrexManager getInstance() {
 		return SINGLETON;
@@ -19,7 +22,7 @@ public class TrexManager {
 	
 	public void publish(String id, String title, String image) {
 		if (isNullOrEmpty(id) || isNullOrEmpty(title) || isNullOrEmpty(image)) return;
-		JSONObject json = new JSONObject();
+		final JSONObject json = new JSONObject();
 		json.put("evtType", 1111);
 		json.put("timeStamp", 0);
 		JSONObject attrJson = new JSONObject();
@@ -27,7 +30,15 @@ public class TrexManager {
 		attrJson.put("item_id", id);
 		attrJson.put("title", title);
 		json.put("attr", attrJson);
-		sendData(json);
+		
+		Runnable runnable = new Runnable() {
+
+			@Override
+			public void run() {
+				sendData(json);
+			}
+		};
+		ses.execute(runnable);
 	}
 	
 	private void sendData(JSONObject json) {
