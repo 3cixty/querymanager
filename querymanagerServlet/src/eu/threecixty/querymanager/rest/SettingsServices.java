@@ -31,6 +31,7 @@ import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.SettingsStorage;
 import eu.threecixty.profile.ThreeCixtySettings;
 import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.UserRelatedInformation;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.oldmodels.UserInteractionMode;
@@ -247,7 +248,20 @@ public class SettingsServices {
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(userAccessToken.getUid(), friendUid);
 			
-			if (ok) return Response.ok().build();
+			if (ok) {
+				try {
+					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
+					Set <String> newKnows = profile.getKnows();
+					if (newKnows != null) {
+						newKnows.remove(friendUid);
+						ProfileManagerImpl.getInstance().updateKnows(profile, newKnows);
+					}
+					return Response.ok().build();
+				} catch (TooManyConnections e) {
+					e.printStackTrace();
+					return Response.serverError().build();
+				}
+			}
 			return Response.status(400).entity("Failed to remove the friend " + friendUid + " from your profile").build();
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIEND_BY_USER,
@@ -280,7 +294,20 @@ public class SettingsServices {
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(userAccessToken.getUid(), setOfFriendUIDs);
 			
-			if (ok) return Response.ok().build();
+			if (ok) {
+				try {
+					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
+					Set <String> newKnows = profile.getKnows();
+					if (newKnows != null) {
+						newKnows.removeAll(setOfFriendUIDs);
+						ProfileManagerImpl.getInstance().updateKnows(profile, newKnows);
+					}
+					return Response.ok().build();
+				} catch (TooManyConnections e) {
+					e.printStackTrace();
+					return Response.serverError().build();
+				}
+			}
 			return Response.status(400).entity("Failed to remove friends " + friendUids + " from your profile").build();
 		} else {
 			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIENDS_BY_USER,
