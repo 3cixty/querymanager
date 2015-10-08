@@ -5,14 +5,20 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Admin login page</title>
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+		
+		
+<title>3cixty administrator login page</title>
 </head>
 <body>
 
 <form action="<%=Configuration.get3CixtyRoot()%>/loginAdmin" method="post">
 
 <div>
-    Username
+    Administrator username
 </div>
 <div>
     <input type="text" name="username">
@@ -29,5 +35,16 @@
 </div>
 <input type="hidden" name="nextAction" value="<%=session.getAttribute("nextAction") == null ? "dashboard.jsp" : session.getAttribute("nextAction") %>">
 </form>
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
 </body>
 </html>
