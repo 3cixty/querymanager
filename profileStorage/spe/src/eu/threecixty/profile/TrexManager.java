@@ -50,6 +50,7 @@ public class TrexManager {
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Content-Type", "application/json");
 			output = conn.getOutputStream();
 			if (output == null) return;
 			output.write(json.toString().getBytes("UTF-8"));
