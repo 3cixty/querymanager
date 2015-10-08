@@ -49,6 +49,7 @@ public class TrexManager {
 			url = new URL(Configuration.getTrexServer());
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
+			conn.setRequestMethod("POST");
 			output = conn.getOutputStream();
 			if (output == null) return;
 			output.write(json.toString().getBytes("UTF-8"));
