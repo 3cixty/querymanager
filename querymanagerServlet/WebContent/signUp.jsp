@@ -156,7 +156,7 @@ if (key != null) {
             <input type="hidden" name="key" value='<%=key%>'>
             
             <div>
-              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree <a href="./terms.html">Terms & Conditions</a> for using 3cixty platform.
+              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree <a href="./terms.html">Terms & Conditions</a> and <a href="./privacy.jsp">Privacy Policy</a> for using 3cixty platform.
             </div>
           </form>
           
@@ -192,7 +192,7 @@ if (key != null) {
            function allValidation() {
         	   if (!validation()) return false;
         	   if (!document.getElementById("termsNConditions").checked) {
-        		   alert("You have to accept Terms and Conditions for signing up an account");
+        		   alert("You have to accept Terms & Conditions and Privacy Policy for signing up an account");
         	   }
            }
        });
