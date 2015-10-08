@@ -8,21 +8,7 @@
   <name>3cixty cache</name>
   <packaging>jar</packaging>
   <version>1.0</version>
-  
-  <dependencies>
-    <dependency>
-      <groupId>eu.3cixty</groupId>
-      <artifactId>spe</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>eu.3cixty</groupId>
-          <artifactId>models</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  </dependencies>
-  
+
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>

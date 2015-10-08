@@ -35,6 +35,8 @@ public class Configuration {
 
 	private static String http_virtuoso_server = null;
 	private static String http_virtuoso_server_for_outside = null;
+	
+	private static String trexServer = null;
 
 	public synchronized static void setPath(String path) {
 		Configuration.path = path;
@@ -101,6 +103,13 @@ public class Configuration {
 			target = props.getProperty("PURPOSE");
 		}
 		return "prod".equalsIgnoreCase(target);
+	}
+	
+	public static String getTrexServer() {
+		if (trexServer == null) {
+			trexServer = getProperty("TREX");
+		}
+		return trexServer;
 	}
 	
 	private static String getProperty(String key) {
