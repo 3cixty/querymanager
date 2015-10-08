@@ -25,7 +25,7 @@
       <select multiple="multiple" id="myKnows" name="myKnows" size="7"></select>
     </div>
     <div class="removalCell">
-      <input type="button" value ="Remove">
+      <input type="button" value ="Remove" id="knowsRemoval">
     </div>
   </div>
 </div>
@@ -52,6 +52,31 @@
     			   }
 	   			}
     	});
+		
+		$("#knowsRemoval").click(function() {
+			var select1 = document.getElementById("myKnows");
+			var selected1 = [];
+			var selectedIndexes = [];
+		    for (var i = 0; i < select1.length; i++) {
+		        if (select1.options[i].selected) selected1.push(select1.options[i].value);
+		        selectedIndexes[i] = select1.options[i].selected;
+		    }
+		    
+			$.ajax({url: "./removeFriends",
+				   type: "POST",
+	    	       data: "access_token=" + accessToken + "&friendUids=" + selected1.join(),
+	    		   success: function(result){
+	    			   var j = select1.options.length;
+	    			   while (j--)
+	    			   {
+	    			       if (selectedIndexes[i])
+	    			       {
+	    			    	   select1.remove(i);
+	    			       }
+	    			   }
+		   			}
+	    	});
+		});
 	});
 </script>
 

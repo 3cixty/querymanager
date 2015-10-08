@@ -427,6 +427,39 @@ public class SettingsServices {
 		}
 	}
 	
+	@POST
+	@Path("/removeFriends")
+	public Response removeFriendsByUser(@FormParam("access_token") String access_token,
+			@FormParam("friendUids") String friendUids,
+			@Context HttpServletResponse response) {
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+
+			if (!isNotNullOrEmpty(friendUids)) return Response.status(400).entity("Empty friend UID").build();
+			
+			String key = userAccessToken.getAppkey();
+			CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIENDS_BY_USER,
+					CallLoggingConstants.SUCCESSFUL);
+			
+			Set <String> setOfFriendUIDs = new HashSet<String>();
+			String[] tmpFriends = friendUids.split(",");
+			for (String tmpFriend: tmpFriends) {
+				setOfFriendUIDs.add(tmpFriend.trim());
+			}
+			
+			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
+					.add(userAccessToken.getUid(), setOfFriendUIDs);
+			
+			if (ok) return Response.ok().build();
+			return Response.status(400).entity("Failed to remove friends " + friendUids + " from your profile").build();
+		} else {
+			CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.SETTINGS_REMOVE_FRIENDS_BY_USER,
+					CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return Response.status(400).entity("Your access token '" + access_token + "' is invalid.").build();
+		}
+	}
+	
 	@GET
 	@Path("/getAllUserRelatedInfoByUser")
 	public Response getAllUserRelatedInfoByUser(@HeaderParam("access_token") String access_token,
