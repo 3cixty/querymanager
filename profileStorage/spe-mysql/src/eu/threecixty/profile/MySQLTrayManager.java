@@ -22,6 +22,10 @@ public class MySQLTrayManager implements TrayManager {
 		boolean successful = TrayUtils.addTray(tray);
 		if (successful) {
 			TrayCacheManager.getInstance().putTray(tray);
+			if (tray.getElement_type().equals(SPEConstants.EVENT_TYPE)) {
+				TrexManager.getInstance().publish(tray.getElement_id(),
+						tray.getElement_title(), tray.getImage_url());
+			}
 		}
 		return successful;
 	}
