@@ -9,6 +9,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="google-signin-client_id" content="<%=Configuration.getGoogleClientId()%>">
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+	 	
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <link href="<%=Configuration.get3CixtyRoot()%>/3cixty.css" rel="stylesheet" type="text/css">
 <title>Settings</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -42,7 +47,7 @@
 <div>
   <h4>To link your current account (a 3cixty dedicated account, or a 3cixty account based on Google or Facebook) with Google or Facebook account, you need to do two following steps:</h4>
   <ol class="note">
-    <li>Signing in with the corresponding <b>Sign in</b> button. You can click on both of them if you intend to link both Google and Facebook account to your 3cixty account.</li>
+    <li>Sign in with the corresponding <b>Sign in</b> button. You can click on both the Sign in buttons, if you intend to link both Google and Facebook account to your 3cixty account.</li>
     <li>Confirming the link between your current account with Google account or Facebook, or both of them. In the case you have used either or both of them to sign in to 3cixty platform, 
     all WishList items created while signing in with those accounts will be merged to your current account if there isn't any conflict. 
     The conflict means that you can find two items coming from your current account or those accounts have the same identity.</li>
@@ -208,5 +213,16 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 	   <%
    }
 %>
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
 </body>
 </html>
