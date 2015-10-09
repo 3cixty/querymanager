@@ -1,8 +1,14 @@
 <html>
 <head>
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+	 	
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <link href="_css/table.css" rel="stylesheet" type="text/css">
 <link href="_css/privacySettings.css" rel="stylesheet" type="text/css">
+
 </head>
 <script>
 	var params = location.href.split('?')[1].split('&');
@@ -31,6 +37,19 @@
 </div>
 
 </form>
+
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
+
 </body>
 
 <script type="text/javascript">
