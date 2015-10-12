@@ -304,11 +304,12 @@ public class SettingsServices {
 			if (ok) {
 				try {
 					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
-					Set <String> newKnows = profile.getKnows();
-					if (newKnows != null) {
-						for (String friendUid: setOfFriendUIDs) {
-							boolean removed = newKnows.remove(friendUid);
-							if (DEBUG_MOD) LOGGER.info("Removed: " + removed);
+					Set <String> oldKnows = profile.getKnows();
+					Set <String> newKnows = new HashSet <String>();
+					if (oldKnows != null) {
+						for (String friendUid: oldKnows) {
+							if (setOfFriendUIDs.contains(friendUid)) continue;
+							newKnows.add(friendUid);
 						}
 						profile.setKnows(newKnows);
 						ProfileManagerImpl.getInstance().updateKnows(profile, newKnows);
