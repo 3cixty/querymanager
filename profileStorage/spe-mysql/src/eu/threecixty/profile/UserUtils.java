@@ -559,13 +559,7 @@ public class UserUtils {
 		}
 		else {
 			if (DEBUG_MOD) LOGGER.info("Knows size: " + knowsStrs.size()+ ", " + knowsStrs);
-			Set <String> knowsModel = userModel.getKnows();
-			if (knowsModel == null) {
-				knowsModel = new HashSet <String>();
-				userModel.setKnows(knowsModel);
-			}
-			knowsModel.clear();
-			knowsModel.addAll(knowsStrs);
+			userModel.setKnows(knowsStrs);
 		}
 	}
 
