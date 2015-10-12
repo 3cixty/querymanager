@@ -20,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import eu.threecixty.Configuration;
@@ -61,6 +62,11 @@ public class SettingsServices {
 	private static final String ACCESS_TOKEN_PARAM = "accessToken";
 
 	private static final String PROFILE_URI = Configuration.PROFILE_URI;
+	private static final Logger LOGGER = Logger.getLogger(
+			SettingsServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	@Context 
 	private HttpServletRequest httpRequest;
@@ -461,6 +467,7 @@ public class SettingsServices {
 			for (String tmpFriend: tmpFriends) {
 				setOfFriendUIDs.add(tmpFriend.trim());
 			}
+			if (DEBUG_MOD) LOGGER.info("Friends list to be forgotten: " + setOfFriendUIDs);
 			
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(userAccessToken.getUid(), setOfFriendUIDs);
@@ -471,7 +478,8 @@ public class SettingsServices {
 					Set <String> newKnows = profile.getKnows();
 					if (newKnows != null) {
 						for (String friendUid: setOfFriendUIDs) {
-							newKnows.remove(friendUid);
+							boolean removed = newKnows.remove(friendUid);
+							if (DEBUG_MOD) LOGGER.info("Removed: " + removed);
 						}
 						profile.setKnows(newKnows);
 						ProfileManagerImpl.getInstance().updateKnows(profile, newKnows);
