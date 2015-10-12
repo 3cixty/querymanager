@@ -470,7 +470,10 @@ public class SettingsServices {
 					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
 					Set <String> newKnows = profile.getKnows();
 					if (newKnows != null) {
-						newKnows.removeAll(setOfFriendUIDs);
+						for (String friendUid: setOfFriendUIDs) {
+							newKnows.remove(friendUid);
+						}
+						profile.setKnows(newKnows);
 						ProfileManagerImpl.getInstance().updateKnows(profile, newKnows);
 					}
 					return Response.ok().build();
