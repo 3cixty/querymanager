@@ -300,7 +300,7 @@ public class SettingsServices {
 			
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(userAccessToken.getUid(), setOfFriendUIDs);
-			
+			if (DEBUG_MOD) LOGGER.info("Check Friends list: " + setOfFriendUIDs);
 			if (ok) {
 				try {
 					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
@@ -311,8 +311,10 @@ public class SettingsServices {
 							if (setOfFriendUIDs.contains(friendUid)) continue;
 							newKnows.add(friendUid);
 						}
+						if (DEBUG_MOD) LOGGER.info("Before updating knows: " + newKnows);
 						profile.setKnows(newKnows);
 						ProfileManagerImpl.getInstance().updateKnows(profile, newKnows);
+						ProfileManagerImpl.getInstance().saveProfile(profile, null);
 					}
 					return Response.ok().build();
 				} catch (TooManyConnections e) {
