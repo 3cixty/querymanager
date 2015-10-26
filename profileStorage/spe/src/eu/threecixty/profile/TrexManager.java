@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -21,7 +21,7 @@ public class TrexManager {
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	private static final TrexManager SINGLETON = new TrexManager();
-	private static final ScheduledExecutorService ses = Executors.newScheduledThreadPool(10);
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
 	
 	public static TrexManager getInstance() {
 		return SINGLETON;
@@ -45,7 +45,7 @@ public class TrexManager {
 				sendData(json);
 			}
 		};
-		ses.execute(runnable);
+		executorService.execute(runnable);
 	}
 	
 	private void sendData(JSONObject json) {

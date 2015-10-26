@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Terms and Conditions</title>
+<script>
+ function disableSubmit() {
+  document.getElementById("submit").disabled = true;
+ }
+
+  function activateButton(element) {
+
+      if(element.checked) {
+        document.getElementById("submit").disabled = false;
+       }
+       else  {
+        document.getElementById("submit").disabled = true;
+      }
+
+  }
+</script>
+</head>
+
+<body onload="disableSubmit()">
+<form action="./terms" method="post">
+ <input type="checkbox" name="terms" id="terms" onchange="activateButton(this)">  I Agree <a href="./terms.html">Terms & Conditions</a> and <a href="./privacy.jsp">Privacy Policy</a>
+<br><br>
+  <input type="submit" name="submit" id="submit" value="Continue">
+  </form>
+</body>
+</html>

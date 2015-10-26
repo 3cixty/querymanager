@@ -102,16 +102,33 @@
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="password.js"></script>
+<script>
+ function disableSubmit() {
+  document.getElementById("create-account").disabled = true;
+ }
+
+  function activateButton(element) {
+
+      if(element.checked) {
+        document.getElementById("create-account").disabled = false;
+       }
+       else  {
+        document.getElementById("create-account").disabled = true;
+      }
+
+  }
+</script>
 </head>
 <%
 String key = request.getParameter("key");
 if (key != null) {
 %>
+<body onload="disableSubmit()">
  <div class="main">
       <div class="one">
         <div class="register">
           <h3>Create your account</h3>
-          <form id="reg-form" onsubmit="return validation()" method="post" action="./signUp">
+          <form id="reg-form" onsubmit="return allValidation()" method="post" action="./signUp">
             <div>
               <label for="firstName">First Name</label>
               <input type="text" id="firstName" name="firstName" spellcheck="false" required/>
@@ -137,13 +154,17 @@ if (key != null) {
               <input type="submit" value="Create Account" id="create-account" class="button"/>
             </div>
             <input type="hidden" name="key" value='<%=key%>'>
+            
+            <div>
+              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree <a href="./terms.html">Terms & Conditions</a> and <a href="./privacy.jsp">Privacy Policy</a> for using 3cixty platform.
+            </div>
           </form>
           
           <span class="pwdNote">Password must contain at least one digit, one lower case, one upper case, and between 8 and 30 characters</span>
         </div>
       </div>
     </div>
-    
+  </body>
     <script type="text/javascript">
        
 
@@ -167,6 +188,13 @@ if (key != null) {
     		        }});
     		    }  
     		});
+           
+           function allValidation() {
+        	   if (!validation()) return false;
+        	   if (!document.getElementById("termsNConditions").checked) {
+        		   alert("You have to accept Terms & Conditions and Privacy Policy for signing up an account");
+        	   }
+           }
        });
        
     </script>
