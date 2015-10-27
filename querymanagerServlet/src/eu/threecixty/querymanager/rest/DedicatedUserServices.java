@@ -88,9 +88,10 @@ public class DedicatedUserServices {
 		try {
 			Integer appId = DedicatedUserUtils.activateForCreation(code);
 			String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
+			String appUrl = getAppUrl(TokenCacheManager.getInstance().getAppCache(appId));
 			if (appId != null) return Response.ok().entity(
 					"Successful! Your account has been successfully created on 3cixty platform. Please <a href=\""
-			        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>.").build();
+			        + appUrl + "\">proceed to the site</a>.").build();
 			return Response.status(400).entity("Failed to activate! Please check if your activation code is valid (one time-use)").build();
 		} catch (ActivationException e) {
 			e.printStackTrace();
@@ -98,6 +99,13 @@ public class DedicatedUserServices {
 		}
 	}
 	
+	private String getAppUrl(AppCache appCache) {
+		if (appCache.getRedirectUri() == null) return null;
+		int index = appCache.getRedirectUri().lastIndexOf("/");
+		if (index < 0) return appCache.getRedirectUri();
+		return appCache.getRedirectUri().substring(0, index);
+	}
+
 	@POST
 	@Path("/resetPassword")
 	public Response resetPassword(@FormParam("email") String email, @FormParam("key") String key) {
@@ -165,9 +173,10 @@ public class DedicatedUserServices {
 						Integer appId = (Integer) session.getAttribute(APP_ID);
 						String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
 						session.removeAttribute(APP_ID);
+						String appUrl = getAppUrl(TokenCacheManager.getInstance().getAppCache(appId));
 						return Response.ok().entity(
 								"Password updates successfully! Please <a href=\""
-						        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>").build();
+						        + appUrl + "\">proceed to the site</a>").build();
 					}
 				}
 			} catch (Exception e) {
