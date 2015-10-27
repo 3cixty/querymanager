@@ -257,7 +257,7 @@
 					 You can ask the application to take into account things like the ratings given by your friends.
 					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>3cixty</strong> apps to track your movements there, you can view summary of your movements. 
 					<br><br>
-					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
+					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>. While to understand the terms of use, please check <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of use</a>.
 				</p>
 			</div>
 			

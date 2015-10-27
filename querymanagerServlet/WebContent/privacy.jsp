@@ -303,7 +303,7 @@
 					of the relevant privacy policy in force shall apply.</p>
 				As of July 2015
 				<br>
-+				<br>
+				<br>
 				<h2 class="privacy-title">Liability Disclaimer</h2>
 				<span class="tag-desc"></span>
 				<br>
@@ -350,7 +350,7 @@
 	<div id="footer">
 		<div class="wrapper">
 			<div class="left footer-menu">
-				<span>&copy 2015, 3cixty. All rights reserved</span>
+				<span>&copy 2015, 3cixty. All rights reserved. <a href="./terms.html">Terms of use</a>.</span>
 			</div>
 		</div>
 	</div>

@@ -1,9 +1,21 @@
 <%@page import="eu.threecixty.cache.AppCache" %>
+<%@page import="eu.threecixty.Configuration" %>
 <%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
+<%@page import="eu.threecixty.cache.TokenCacheManager" %>
 <html>
 <head>
 <title>Sign up for a new account</title>
-
+<link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/layout.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
+	    
+	    <script src="login/jquery-1.js"></script>
+	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <style type="text/css">
 .main > div {
   display: inline-block;
@@ -121,10 +133,30 @@
 </head>
 <%
 String key = request.getParameter("key");
+AppCache app = TokenCacheManager.getInstance().getAppCache(key);
 if (key != null) {
 %>
-<body onload="disableSubmit()">
- <div class="main">
+<body class="login-body" onload="disableSubmit()">
+<div class="wrapper">
+	<div class="logo">
+		<table>
+			<tr>
+		  		<td>
+    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')"/>
+    			</td>
+    			<td>
+    				<div  align="center">
+    					<h3 class="privacy-title"> Powered by </h3>
+   					</div>
+   				</td>
+    			<td>
+    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')"/>
+    			</td>
+    		</tr>
+    	</table>
+    </div>
+
+ 	<div class="main">
       <div class="one">
         <div class="register">
           <h3>Create your account</h3>
@@ -156,7 +188,7 @@ if (key != null) {
             <input type="hidden" name="key" value='<%=key%>'>
             
             <div>
-              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree <a href="./terms.html">Terms & Conditions</a> and <a href="./privacy.jsp">Privacy Policy</a> for using 3cixty platform.
+              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree with <a href="./terms.html">Terms of use</a> and <a href="./privacy.jsp">Privacy Policy</a> for using 3cixty platform.
             </div>
           </form>
           
@@ -164,6 +196,27 @@ if (key != null) {
         </div>
       </div>
     </div>
+      </div> 
+    <div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+	<script type="text/javascript">
+	    function googleTranslateElementInit() {
+	        new google.translate.TranslateElement({
+	            pageLanguage : 'en',
+	            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+	            autoDisplay: false,
+	            multilanguagePage : true
+	            }, 'google_translate_element');
+	        }
+	</script>
+	<div id="footer">
+		<div class="wrapper">
+			<div class="left footer-menu">
+				<span>&copy 2015, 3cixty. All rights reserved. </span>
+			</div>
+		</div>
+	</div>
+    
+    
   </body>
     <script type="text/javascript">
        
