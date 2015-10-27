@@ -75,9 +75,9 @@ public class DedicatedUserServices {
 		String code = DedicatedUserUtils.createDedicatedUser(email, password, firstName, lastName, key);
 		if (code == null) return Response.status(500).entity("Internal error! Please contact with 3cixty platform for help").build();
 		EmailUtils.send("Activation Code",
-				"Please click on the following link to activate your account "
+				"Please click on the following link to activate your ExplorMI 360 account:\n"
 						+ Configuration.get3CixtyRoot() + "/activate?code=" + code, email);
-		return Response.ok().entity("Successful to sign up! Please check your email to activate your account!").build();
+		return Response.ok().entity("Your account has been created. Please check your email for a message from 3cixty that will enable you to activate the account.").build();
 	}
 	
 	@GET
