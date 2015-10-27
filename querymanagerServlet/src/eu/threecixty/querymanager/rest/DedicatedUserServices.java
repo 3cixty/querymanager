@@ -19,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.log4j.Logger;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.cache.AppCache;
@@ -43,6 +44,12 @@ public class DedicatedUserServices {
 	private final Pattern hasNumber = Pattern.compile("\\d");
 	//private final Pattern hasSpecialChar = Pattern.compile("[^a-zA-Z0-9 ]");
 	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 DedicatedUserServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	@Context 
 	private HttpServletRequest httpRequest;
 	
@@ -52,6 +59,7 @@ public class DedicatedUserServices {
 			@FormParam("email") String email, @FormParam("password") String password,
 			@FormParam("firstName") String firstName, @FormParam("lastName") String lastName,
 			@FormParam("key") String key) {
+		if (DEBUG_MOD) LOGGER.info("email = " + email + ", firstName = " + firstName + ", lastName = " + lastName);
 		if (isNullOrEmpty(key)) return Response.status(400).entity("App key is empty").build();
 		if (TokenCacheManager.getInstance().getAppCache(key) == null) return Response.status(400).entity("App key is invalid").build();
 		if (isNullOrEmpty(email)) return Response.status(400).entity("Email is empty").build();
