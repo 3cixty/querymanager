@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -102,6 +103,10 @@ public class SPEServices {
 							.entity("There is no information of your profile in the KB")
 							.type(MediaType.TEXT_PLAIN)
 							.build());
+				}
+				if (profile.getProfileImage() == null || profile.getProfileImage().equals("")) {
+					// use default profile image
+					profile.setProfileImage(Configuration.get3CixtyRoot() + "/explormi360-example-user.jpg");
 				}
 				String ret = JSONObject.wrap(profile).toString();
 				if (DEBUG_MOD) LOGGER.info(ret);
