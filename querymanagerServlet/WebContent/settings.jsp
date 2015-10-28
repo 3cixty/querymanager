@@ -1,4 +1,5 @@
 <%@page import="eu.threecixty.querymanager.rest.Constants" %>
+<%@page import="eu.threecixty.querymanager.rest.SettingsServices" %>
 <%@page import="eu.threecixty.Configuration" %>
 <%@ page language="java" import="eu.threecixty.profile.ThreeCixtySettings" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -7,92 +8,197 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="google-signin-client_id" content="<%=Configuration.getGoogleClientId()%>">
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+	 	
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <link href="<%=Configuration.get3CixtyRoot()%>/3cixty.css" rel="stylesheet" type="text/css">
 <title>Settings</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<style type="text/css">
+  .hide { display: none;}
+  .show { display: block;}
+  
+  .note {
+  	font-size: 9 px;
+  	font-style: italic;
+  }
+</style>
+<script src="https://apis.google.com/js/plusone.js" type="text/javascript"></script>
 </head>
 <body>
 
 <%
     String accessToken = (String) session.getAttribute("accessToken");
-
    if (accessToken == null) {
-	   response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
+	   response.sendError(400, "Invalid request");
+	   //response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
    } else  {
-        ThreeCixtySettings settings = (ThreeCixtySettings) session.getAttribute("settings");
+        String uid = (String) session.getAttribute("uid");
+        int piSum = (Integer) session.getAttribute(SettingsServices.PROFILE_IDENTITIES_KEY);
 %>
 
-<form action="<%=Configuration.get3CixtyRoot()%>/saveSettings" method="post">
+<form action="<%=Configuration.get3CixtyRoot()%>/linkAccounts" method="post" onsubmit="return validation()">
 <div>
     <input type="hidden" name="access_token" value="<%=accessToken%>">
 </div>
 <div>
-<span >Google UID</span>
+  <h4>To link your current account (a 3cixty dedicated account, or a 3cixty account based on Google or Facebook) with Google or Facebook account, you need to do two following steps:</h4>
+  <ol class="note">
+    <li>Sign in with the corresponding <b>Sign in</b> button. You can click on both the Sign in buttons, if you intend to link both Google and Facebook account to your 3cixty account.</li>
+    <li>Confirming the link between your current account with Google account or Facebook, or both of them. In the case you have used either or both of them to sign in to 3cixty platform, 
+    all WishList items created while signing in with those accounts will be merged to your current account if there isn't any conflict. 
+    The conflict means that you can find two items coming from your current account or those accounts have the same identity.</li>
+  </ol>
+  <i>If you already linked your current account to a Google or Facebook, the corresponding Sign-In button for Google and Facebook would not appear.</i>
 </div>
 <div>
-    <input type="text" readonly="readonly" value="<%=settings.getUid()%>" name="uid">
+    <input type="hidden" readonly="readonly" value="<%=uid%>" name="uid">
+</div>
+<%
+if (piSum % SettingsServices.GOOGLE_PROFILE_IDENTITIES != 0) {
+%>
+  <div id="signin-button" class="show">
+     <div class="g-signin" data-callback="loginFinishedCallback"
+      data-approvalprompt="force"
+      data-clientid="<%=Configuration.getGoogleClientId()%>"
+      data-scope="https://www.googleapis.com/auth/plus.login"
+      data-height="short"
+      data-cookiepolicy="single_host_origin"
+      >
+    </div>
+  </div>
+<div>
+<input type="text" name="googleAccessToken" id="googleAccessToken" value="" placeHolder="Google token" readonly="readonly">
+</div>
+<% }
+
+if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
+%>
+<div>
+	<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();">Sign in
+	</fb:login-button>
 </div>
 <div>
- <span >First Name<!--<font color="red">*</font>--></span>
+<input type="text" name="fbAccessToken" id="fbAccessToken" value="" placeHolder="Facebook token" readonly="readonly">
 </div>
+<% } %>
+<br>
 <div>
-    <input type="text" name="firstName" readonly="readonly"  value="<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>" required>
-</div>
-<div><span >Last Name<!--<font color="red">*</font>--></span></div>
-<div>
-    <input type="text" name="lastName" readonly="readonly"  value="<%=settings.getLastName() == null ? "" : settings.getLastName()%>" required>
-</div>
-<div><span >Country</span></div>
-<div>
-    <input type="text" name="countryName" value="<%=settings.getCountryName() == null ? "" : settings.getCountryName()%>">
-</div>
-<div><span >City</span></div>
-<div>
-    <input type="text" name="townName" value="<%=settings.getTownName() == null ? "" : settings.getTownName()%>">
-</div>
-<div><span >Latitude</span></div>
-<div>
-    <input type="text" name="lat" value="<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>">
-</div>
-<div><span >Longitude</span></div>
-<div>
-    <input type="text" name="lon" value="<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>">
-</div>
-<div><span >Mobidot Account</span></div>
-<div>
-<input type="hidden" name="pi_sources" value="Mobidot">
-<input type="hidden" name="pi_ats" value="">
-    <input type="text" name="pi_ids" value="<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>">
-</div>
-<div style="height: 10px;"></div>
-<div align="justify" style="font-size: 11px;"  >
-Disclaimer: <!--The information marked by red star are required. -->For Mobidot account, if the user specifies it, it will help us crawl the mobility profile and associate mobility related preferences while augmenting the query. If the Mobidot account is not specified, we will not augment the query based on mobility preferences and we will not crawl the mobility profile of the user.
-</div>
-<div style="height: 10px;"></div>
-<div align="center"  >
-    <input type="submit" value="Save">
-    <input type="button" value="Reset" onclick="reset();">
+<input type="submit" value="Confirm" />
 </div>
 </form>
 
-<script type="text/javascript">
-    function reset() {
-    	var firstName = document.getElementById("firstName");
-    	firstName.value = "<%=settings.getFirstName() == null ? "" : settings.getFirstName()%>";
-    	var lastName = document.getElementById("lastName");
-    	lastName.value = "<%=settings.getLastName() == null ? "" : settings.getLastName()%>";
-    	var countryName = document.getElementById("countryName");
-    	countryName.value = "<%=settings.getCountryName() == null ? "" : settings.getCountryName()%>";
-    	var townName = document.getElementById("townName");
-    	townName.value = "<%=settings.getTownName() == null ? "" : settings.getTownName()%>";
-    	var lat = document.getElementById("lat");
-    	lat.value = "<%=settings.getCurrentLatitude() == 0 ? "" : settings.getCurrentLatitude()%>";
-    	var lon = document.getElementById("lon");
-    	lon.value = "<%=settings.getCurrentLongitude() == 0 ? "" : settings.getCurrentLongitude()%>";
-    	var pi_id = document.getElementById("pi_ids");
-    	pi_id.value = "<%=settings.getIdentities() == null ? "" : settings.getIdentities().size() == 0 ? "" : (settings.getIdentities().get(0) == null ? "" : (settings.getIdentities().get(0).getHasUserAccountID() == null ? "" : settings.getIdentities().get(0).getHasUserAccountID()))%>";
+<script>
+  var fbClicked = false;
+
+  // This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      if (!fbClicked) {
+    	  FB.logout(function(response) {
+    		  // user is now logged out
+    		});
+      }
+      else {
+    	  testAPI();
+      }
     }
+  }
+
+  // This function is called when someone finishes with the Login
+  // Button.  See the onlogin handler attached to it in the sample
+  // code below.
+  function checkLoginState() {
+	  fbClicked = true;
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    //cookie     : true,  // enable cookies to allow the server to access
+    cookie     : false,
+    appId      : '<%=Configuration.getFacebookAppID()%>',
+    xfbml      : true,
+    version    : 'v2.3'
+  });
+
+  // Now that we've initialized the JavaScript SDK, we call 
+  // FB.getLoginStatus().  This function gets the state of the
+  // person visiting this page and can return one of three states to
+  // the callback you provide.  They can be:
+  //
+  // 1. Logged into your app ('connected')
+  // 2. Logged into Facebook, but not your app ('not_authorized')
+  // 3. Not logged into Facebook and can't tell if they are logged into
+  //    your app or not.
+  //
+  // These three cases are handled in the callback function.
+
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function testAPI() {
+    var access_token =   FB.getAuthResponse()['accessToken'];
+    var fbTokenInput = document.getElementById("fbAccessToken");
+    fbTokenInput.value = access_token;
+  }
 </script>
 
+  <script type="text/javascript">
+
+  function loginFinishedCallback(authResult) {
+    if (authResult) {
+      if (authResult['error'] == undefined){
+    	  document.getElementById("googleAccessToken").value = authResult.access_token;
+  	      $('#signin-button').on("click", function (e) {
+	          e.preventDefault();
+	      });
+      } else {
+        console.log('An error occurred');
+      }
+    } else {
+      console.log('Empty authResult');  // Un problème s'est produit
+    }
+  }
+  
+  function validation() {
+	  var gtk = document.getElementById("googleAccessToken").value;
+	  var fbtk = document.getElementById("fbAccessToken").value;
+	  if ((gtk == '') && (fbtk == '')) {
+		  alert("You haven't yet signed in with neither Google nor Facebook account");
+		  return false;
+	  }
+  }
+
+  </script>
+
+  
 <%
 
    }
@@ -107,5 +213,16 @@ Disclaimer: <!--The information marked by red star are required. -->For Mobidot 
 	   <%
    }
 %>
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
 </body>
 </html>

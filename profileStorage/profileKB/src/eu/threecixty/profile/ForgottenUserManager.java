@@ -89,4 +89,11 @@ public interface ForgottenUserManager {
 	 * @return
 	 */
 	ForgottenUser getForgottenUser(String uid);
+	
+	/**
+	 * Deletes user profile.
+	 * @param uid
+	 * @return
+	 */
+	boolean deleteUserProfile(String uid);
 }

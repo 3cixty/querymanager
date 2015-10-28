@@ -197,6 +197,11 @@ public class ForgottenUserManagerImpl implements ForgottenUserManager {
 		boolean ok = ForgottenUserUtils.update(forgottenUser);
 		return ok;
 	}
+
+	@Override
+	public boolean deleteUserProfile(String uid) {
+		return ForgottenUserUtils.deleteProfile(uid);
+	}
 	
 	
 }

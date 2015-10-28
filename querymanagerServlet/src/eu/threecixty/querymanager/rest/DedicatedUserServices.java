@@ -19,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.log4j.Logger;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.cache.AppCache;
@@ -43,6 +44,12 @@ public class DedicatedUserServices {
 	private final Pattern hasNumber = Pattern.compile("\\d");
 	//private final Pattern hasSpecialChar = Pattern.compile("[^a-zA-Z0-9 ]");
 	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 DedicatedUserServices.class.getName());
+
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	
 	@Context 
 	private HttpServletRequest httpRequest;
 	
@@ -52,6 +59,7 @@ public class DedicatedUserServices {
 			@FormParam("email") String email, @FormParam("password") String password,
 			@FormParam("firstName") String firstName, @FormParam("lastName") String lastName,
 			@FormParam("key") String key) {
+		if (DEBUG_MOD) LOGGER.info("email = " + email + ", firstName = " + firstName + ", lastName = " + lastName);
 		if (isNullOrEmpty(key)) return Response.status(400).entity("App key is empty").build();
 		if (TokenCacheManager.getInstance().getAppCache(key) == null) return Response.status(400).entity("App key is invalid").build();
 		if (isNullOrEmpty(email)) return Response.status(400).entity("Email is empty").build();
@@ -67,9 +75,9 @@ public class DedicatedUserServices {
 		String code = DedicatedUserUtils.createDedicatedUser(email, password, firstName, lastName, key);
 		if (code == null) return Response.status(500).entity("Internal error! Please contact with 3cixty platform for help").build();
 		EmailUtils.send("Activation Code",
-				"Please click on the following link to activate your account "
+				"Please click on the following link to activate your ExplorMI 360 account:\n"
 						+ Configuration.get3CixtyRoot() + "/activate?code=" + code, email);
-		return Response.ok().entity("Successful to sign up! Please check your email to activate your account!").build();
+		return Response.ok().entity("Your account has been created. Please check your email for a message from 3cixty that will enable you to activate the account.").build();
 	}
 	
 	@GET
@@ -79,10 +87,8 @@ public class DedicatedUserServices {
 			return Response.status(400).entity("Activation code is empty").build();
 		try {
 			Integer appId = DedicatedUserUtils.activateForCreation(code);
-			String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
 			if (appId != null) return Response.ok().entity(
-					"Successful! Your account has been successfully created on 3cixty platform. Please <a href=\""
-			        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>.").build();
+					"Your ExplorMI 360 account has been activated. You can return to the ExplorMI 360 website by going back to your previous tab or window. There, you can sign in using your new username and password.").build();
 			return Response.status(400).entity("Failed to activate! Please check if your activation code is valid (one time-use)").build();
 		} catch (ActivationException e) {
 			e.printStackTrace();
@@ -90,6 +96,13 @@ public class DedicatedUserServices {
 		}
 	}
 	
+	private String getAppUrl(AppCache appCache) {
+		if (appCache.getRedirectUri() == null) return null;
+		int index = appCache.getRedirectUri().lastIndexOf("/");
+		if (index < 0) return appCache.getRedirectUri();
+		return appCache.getRedirectUri().substring(0, index);
+	}
+
 	@POST
 	@Path("/resetPassword")
 	public Response resetPassword(@FormParam("email") String email, @FormParam("key") String key) {
@@ -155,11 +168,11 @@ public class DedicatedUserServices {
 						session.removeAttribute(RESETTING);
 						session.removeAttribute(EMAIL);
 						Integer appId = (Integer) session.getAttribute(APP_ID);
-						String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
 						session.removeAttribute(APP_ID);
+						String appUrl = getAppUrl(TokenCacheManager.getInstance().getAppCache(appId));
 						return Response.ok().entity(
 								"Password updates successfully! Please <a href=\""
-						        + Configuration.get3CixtyRoot() + "/login.jsp?key=" + key + "\">proceed to the site</a>").build();
+						        + appUrl + "\">proceed to the site</a>").build();
 					}
 				}
 			} catch (Exception e) {

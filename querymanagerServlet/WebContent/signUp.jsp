@@ -4,6 +4,11 @@
 <%@page import="eu.threecixty.cache.TokenCacheManager" %>
 <html>
 <head>
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <title>Sign up for a new account</title>
 <link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
@@ -131,6 +136,7 @@
   }
 </script>
 </head>
+<body onload="disableSubmit()">
 <%
 String key = request.getParameter("key");
 AppCache app = TokenCacheManager.getInstance().getAppCache(key);
@@ -142,7 +148,8 @@ if (key != null) {
 		<table>
 			<tr>
 		  		<td>
-    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')"/>
+    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')">
+    				</div>
     			</td>
     			<td>
     				<div  align="center">
@@ -150,16 +157,18 @@ if (key != null) {
    					</div>
    				</td>
     			<td>
-    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')"/>
+    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')">
+    				</div>
     			</td>
     		</tr>
     	</table>
     </div>
 
  	<div class="main">
+
       <div class="one">
         <div class="register">
-          <h3>Create your account</h3>
+          <h3>Create an ExplorMI 360 account</h3>
           <form id="reg-form" onsubmit="return allValidation()" method="post" action="./signUp">
             <div>
               <label for="firstName">First Name</label>
@@ -170,7 +179,7 @@ if (key != null) {
               <input type="text" id="lastName" name="lastName" spellcheck="false" required/>
             </div>
             <div>
-              <label for="email">Email</label>
+              <label for="email">Email Address</label>
               <input type="email" id="email" name="email" spellcheck="false" required/>
             </div>
             <div>
@@ -178,7 +187,7 @@ if (key != null) {
               <input type="password" id="password" name="password" required />
             </div>
             <div>
-              <label for="password-again">Password Again</label>
+              <label for="password-again">Confirm Password</label>
               <input type="password" id="password-again" name="password-again" required />
             </div>
             <div>
@@ -188,14 +197,15 @@ if (key != null) {
             <input type="hidden" name="key" value='<%=key%>'>
             
             <div>
-              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree with <a href="./terms.html">Terms of use</a> and <a href="./privacy.jsp">Privacy Policy</a> for using 3cixty platform.
+              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree with <a href="./terms.html">Terms of use</a> and <a href="./privacy.jsp">Privacy Policy</a> for ExplorMI 360.
             </div>
           </form>
           
-          <span class="pwdNote">Password must contain at least one digit, one lower case, one upper case, and between 8 and 30 characters</span>
+          <span class="pwdNote">The password must contain at least one digit and one lower-case and one upper-case letter; and it must be between 8 and 30 characters long.</span>
         </div>
       </div>
     </div>
+
       </div> 
     <div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
 	<script type="text/javascript">
@@ -218,6 +228,7 @@ if (key != null) {
     
     
   </body>
+
     <script type="text/javascript">
        
 
@@ -245,19 +256,21 @@ if (key != null) {
            function allValidation() {
         	   if (!validation()) return false;
         	   if (!document.getElementById("termsNConditions").checked) {
-        		   alert("You have to accept Terms & Conditions and Privacy Policy for signing up an account");
+        		   alert("You have to accept ExplorMI 360 privacy policy");
         	   }
            }
        });
        
     </script>
     
-</html>
+
 
 <%
 } else {
 	%>
-	Don't find application key!!!
+	Did not find the application key!!!
 	<%
 }
 %>
+
+</html>

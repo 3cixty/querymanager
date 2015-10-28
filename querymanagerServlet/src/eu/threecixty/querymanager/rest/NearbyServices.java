@@ -42,6 +42,7 @@ public class NearbyServices {
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("") @QueryParam("topCategories") String topCategories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
@@ -54,7 +55,7 @@ public class NearbyServices {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(
-					SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key),
+					SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key, city),
 					poiID, tmpCats, tmpTopCats,
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
@@ -75,6 +76,7 @@ public class NearbyServices {
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("") @QueryParam("topCategories") String topCategories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
@@ -87,7 +89,7 @@ public class NearbyServices {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(SparqlChooser.getEndPointUrl(key),
-					SparqlChooser.getPoIGraph(key), lat, lon, tmpCats, tmpTopCats,
+					SparqlChooser.getPoIGraph(key, city), lat, lon, tmpCats, tmpTopCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -106,6 +108,7 @@ public class NearbyServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
@@ -116,7 +119,7 @@ public class NearbyServices {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(key),
-					SparqlChooser.getEventGraph(key), id, tmpCats,
+					SparqlChooser.getEventGraph(key, city), id, tmpCats,
 					tmpLanguages, distance, offset, limit);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -135,6 +138,7 @@ public class NearbyServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key, @HeaderParam("Accept-Language") String languages) {
 		
 		if (!OAuthWrappers.validateAppKey(key)) return Response.status(Response.Status.BAD_REQUEST).entity("Invalid appkey").build();
@@ -145,7 +149,7 @@ public class NearbyServices {
 			long time1 = System.currentTimeMillis();
 			String [] tmpLanguages = LanguageUtils.getLanguages(languages);
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(key),
-					SparqlChooser.getEventGraph(key), lat, lon, tmpCats,
+					SparqlChooser.getEventGraph(key, city), lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, null);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -166,6 +170,7 @@ public class NearbyServices {
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("") @QueryParam("topCategories") String topCategories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("access_token") String accessToken, @HeaderParam("Accept-Language") String languages) {
 		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
 		if (at != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
@@ -184,7 +189,7 @@ public class NearbyServices {
 					e.printStackTrace();
 				}
 				List <ElementDetails> nearbyElements = NearbyUtils.getNearbyPoIElements(SparqlChooser.getEndPointUrl(at.getAppkey()),
-						SparqlChooser.getPoIGraph(at.getAppkey()), lat, lon, tmpCats, tmpTopCats,
+						SparqlChooser.getPoIGraph(at.getAppkey(), city), lat, lon, tmpCats, tmpTopCats,
 						tmpLanguages, distance > 10 ? 2 : distance, offset, limit, listPoIsFromFriendsWishList);
 				long time2 = System.currentTimeMillis();
 				if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");
@@ -205,6 +210,7 @@ public class NearbyServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("") @QueryParam("categories") String categories,
 			@DefaultValue("-1") @QueryParam("distance") double distance,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("access_token") String accessToken, @HeaderParam("Accept-Language") String languages) {
 		AccessToken at = OAuthWrappers.findAccessTokenFromDB(accessToken);
 		if (at != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
@@ -221,7 +227,7 @@ public class NearbyServices {
 				e.printStackTrace();
 			}
 			List <ElementDetails> nearbyElements = NearbyUtils.getNearbyEvents(SparqlChooser.getEndPointUrl(at.getAppkey()),
-					SparqlChooser.getEventGraph(at.getAppkey()), lat, lon, tmpCats,
+					SparqlChooser.getEventGraph(at.getAppkey(), city), lat, lon, tmpCats,
 					tmpLanguages, distance > 10 ? 2 : distance, offset, limit, null, listEventsFromFriendsWishList);
 			long time2 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to make nearby query: " + (time2 - time1) + " ms");

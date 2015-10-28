@@ -3,6 +3,11 @@
 <%@page import="eu.threecixty.cache.TokenCacheManager" %>
 <html>
 <head>
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <title>Forgot password</title>
 <meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
 	 	
@@ -73,17 +78,20 @@
 	    }
 	</style>
 </head>
+<body>
 <%
     String key = request.getParameter("key");
 	AppCache app = TokenCacheManager.getInstance().getAppCache(key);
 %>
+
 <body class="login-body">
 <div class="wrapper">
 	<div class="logo">
 		<table>
 			<tr>
 		  		<td>
-    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')"/>
+    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')">
+    				</div>
     			</td>
     			<td>
     				<div  align="center">
@@ -91,7 +99,8 @@
    					</div>
    				</td>
     			<td>
-    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')"/>
+    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')">
+    				</div>
     			</td>
     		</tr>
     	</table>
