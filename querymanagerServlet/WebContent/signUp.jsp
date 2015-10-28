@@ -10,12 +10,19 @@
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <title>Sign up for a new account</title>
+<link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/layout.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
 	    
 	    <script src="login/jquery-1.js"></script>
 	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <style type="text/css">
-.main > div {
+.mainReg > div {
   display: inline-block;
   width: 49%;
   margin-top: 10px;
@@ -157,7 +164,7 @@ if (key != null) {
     	</table>
     </div>
 
- 	<div class="main">
+ 	<div class="mainReg">
 
         <div class="register">
           <h3>Create an ExplorMI 360 account</h3>
@@ -197,7 +204,7 @@ if (key != null) {
         </div>
     </div>
 
- 
+      </div> 
     <div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
 	<script type="text/javascript">
 	    function googleTranslateElementInit() {
