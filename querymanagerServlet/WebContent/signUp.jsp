@@ -6,17 +6,12 @@
 <head>
 <meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
 
+<script type="text/javascript" src="login/google_translate.js"></script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <title>Sign up for a new account</title>
-<link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/layout.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/style.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
 	    
+	    <script src="login/jquery-1.js"></script>
 	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <style type="text/css">
@@ -164,7 +159,6 @@ if (key != null) {
 
  	<div class="main">
 
-      <div class="one">
         <div class="register">
           <h3>Create an ExplorMI 360 account</h3>
           <form id="reg-form" onsubmit="return allValidation()" method="post" action="./signUp">
@@ -201,11 +195,20 @@ if (key != null) {
           
           <span class="pwdNote">The password must contain at least one digit and one lower-case and one upper-case letter; and it must be between 8 and 30 characters long.</span>
         </div>
-      </div>
     </div>
 
-      </div> 
-
+ 
+    <div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+	<script type="text/javascript">
+	    function googleTranslateElementInit() {
+	        new google.translate.TranslateElement({
+	            pageLanguage : 'en',
+	            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+	            autoDisplay: false,
+	            multilanguagePage : true
+	            }, 'google_translate_element');
+	        }
+	</script>
 	<div id="footer">
 		<div class="wrapper">
 			<div class="left footer-menu">
