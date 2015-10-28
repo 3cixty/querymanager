@@ -468,7 +468,8 @@ public class SettingsServices {
 				setOfFriendUIDs.add(tmpFriend.trim());
 			}
 			if (DEBUG_MOD) LOGGER.info("Friends list to be forgotten: " + setOfFriendUIDs);
-			
+			// FIXME: friendUI is Google UID, not 3cixty UID
+			// need to fix from getFriends, export 3cixty UID instead of Google or Facebook UID.
 			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager()
 					.add(userAccessToken.getUid(), setOfFriendUIDs);
 			if (DEBUG_MOD) LOGGER.info("Check Friends list: " + setOfFriendUIDs);
