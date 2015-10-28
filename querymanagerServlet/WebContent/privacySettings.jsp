@@ -11,7 +11,6 @@ Invalid request
 <head>
 <meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
 
-<script type="text/javascript" src="login/google_translate.js"></script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <title>Privacy settings</title>
