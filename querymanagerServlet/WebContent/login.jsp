@@ -245,7 +245,7 @@
 			 	  	<a href="./forgotPassword.jsp?key=<%=key%>"><font class="link">Did you forget your password?</font></a>
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create a 3cixty account</font></a>
+			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create an ExplorMI 360 account</font></a>
 			 	  </div>
 			 	</form>
 			</div>
@@ -253,12 +253,12 @@
 	    	<div class="login-benefits">
                 <h3 class="privacy-title">Benefits of Signing in</h3>
 				<p class="privacy-desc"> 
-					 You can save items on your Wish List and access them from the mobile apps of <strong>ExplorMI 360<strong>. 
+					 You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. 
 					 You can ask the application to take into account things like the ratings given by your friends. 
-					 If you have been in <i>Milan</i> and have allowed the mobile part of <strong>ExplorMI 360<strong> to track your movements 
+					 If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
 					 there, you can view a summary of your movements.
 					 <br><br>
-					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
+					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>; then hit the "Back" button to return to this page.
 				</p>
 			</div>
 			

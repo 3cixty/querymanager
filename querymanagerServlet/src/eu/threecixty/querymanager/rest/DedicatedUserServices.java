@@ -87,11 +87,8 @@ public class DedicatedUserServices {
 			return Response.status(400).entity("Activation code is empty").build();
 		try {
 			Integer appId = DedicatedUserUtils.activateForCreation(code);
-			String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
-			String appUrl = getAppUrl(TokenCacheManager.getInstance().getAppCache(appId));
 			if (appId != null) return Response.ok().entity(
-					"Successful! Your account has been successfully created on 3cixty platform. Please <a href=\""
-			        + appUrl + "\">proceed to the site</a>.").build();
+					"Your ExplorMI 360 account has been activated. You can return to the ExplorMI 360 website by going back to your previous tab or window. There, you can sign in using your new username and password.").build();
 			return Response.status(400).entity("Failed to activate! Please check if your activation code is valid (one time-use)").build();
 		} catch (ActivationException e) {
 			e.printStackTrace();
@@ -171,7 +168,6 @@ public class DedicatedUserServices {
 						session.removeAttribute(RESETTING);
 						session.removeAttribute(EMAIL);
 						Integer appId = (Integer) session.getAttribute(APP_ID);
-						String key = TokenCacheManager.getInstance().getAppCache(appId).getAppkey();
 						session.removeAttribute(APP_ID);
 						String appUrl = getAppUrl(TokenCacheManager.getInstance().getAppCache(appId));
 						return Response.ok().entity(
