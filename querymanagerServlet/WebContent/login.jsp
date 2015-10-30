@@ -228,10 +228,20 @@
 			 	</div>
 			 	</form>
 			</div>
-	<!-- 		
+	    	<div class="login-benefits">
+                <h3 class="privacy-title">Benefits of Signing in</h3>
+				<p class="privacy-desc"> 
+					 You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. 
+					 You can ask the application to take into account things like the ratings given by your friends. 
+					 If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
+					 there, you can view a summary of your movements.
+					 <br><br>
+					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
+				</p>
+			</div>
 			<div>
 			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
-				  <h3 class="privacy-title"> or using your ExplorMI 360 account </h3>
+				  <h3 class="privacy-title">Invited testers can also sign in using an ExplorMI 360 account: </h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
                     <div>
@@ -251,19 +261,6 @@
 			 	  </div>
 			 	</form>
 			</div>
-		 -->	
-	    	<div class="login-benefits">
-                <h3 class="privacy-title">Benefits of Signing in</h3>
-				<p class="privacy-desc"> 
-					 You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. 
-					 You can ask the application to take into account things like the ratings given by your friends. 
-					 If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
-					 there, you can view a summary of your movements.
-					 <br><br>
-					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
-				</p>
-			</div>
-			
 		
 	</div>
 </div>
