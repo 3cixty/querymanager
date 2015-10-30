@@ -1,5 +1,6 @@
 package eu.threecixty.monitor;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Security;
@@ -88,7 +89,7 @@ public class EmailUtils {
 	}
 	
 	public static synchronized void loadProperties(String reportFile) throws IOException {
-		InputStream input = EmailUtils.class.getResourceAsStream(reportFile);
+		InputStream input = new FileInputStream(reportFile);
 		Properties props = new Properties();
 		props.load(input);
 		input.close();
