@@ -228,7 +228,7 @@
 			 	</div>
 			 	</form>
 			</div>
-			
+	<!-- 		
 			<div>
 			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
 				  <h3 class="privacy-title"> or using your ExplorMI 360 account </h3>
@@ -251,7 +251,7 @@
 			 	  </div>
 			 	</form>
 			</div>
-			
+		 -->	
 	    	<div class="login-benefits">
                 <h3 class="privacy-title">Benefits of Signing in</h3>
 				<p class="privacy-desc"> 
