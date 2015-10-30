@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>eu.3cixty</groupId>
+  <artifactId>3cixty-monirtor</artifactId>
+  <name>3cixty API monitor</name>
+  <packaging>war</packaging>
+  <version>1.0</version>
+
+  
+  <dependencies>
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-web-api</artifactId>
+      <version>6.0</version>
+      <scope>provided</scope>
+    </dependency>
+    
+
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxrs</artifactId>
+        <version>3.0.6.Final</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxb-provider</artifactId>
+        <version>3.0.6.Final</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>javax.portlet</groupId>
+	  <artifactId>portlet-api</artifactId>
+	  <version>2.0</version>
+    </dependency>
+    
+    <dependency>
+	  <groupId>javax.mail</groupId>
+	  <artifactId>mail</artifactId>
+	  <version>1.4.7</version>
+    </dependency>
+    
+<dependency>
+	<groupId>commons-validator</groupId>
+	<artifactId>commons-validator</artifactId>
+	<version>1.4.1</version>
+</dependency>
+
+<dependency>
+	<groupId>org.json</groupId>
+	<artifactId>json</artifactId>
+	<version>20150729</version>
+</dependency>
+
+    <dependency>
+	  <groupId>javax.servlet</groupId>
+	  <artifactId>servlet-api</artifactId>
+	  <version>2.5</version>
+	  <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+	<resources>
+		<resource>
+			<directory>resources</directory>
+		</resource>
+	</resources>
+	
+	<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>${basedir}/WebContent/WEB-INF</directory>
+              <includes><include>web.xml</include></includes>
+              <filtering>true</filtering>
+              <targetPath>WEB-INF</targetPath>
+            </resource>
+          </webResources>
+          <warSourceDirectory>${basedir}/WebContent</warSourceDirectory>
+          <archiveClasses>false</archiveClasses>
+        </configuration>
+      </plugin>
+      
+    <plugin>
+      <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+    </plugin>
+	</plugins>
+  </build>
+</project>
