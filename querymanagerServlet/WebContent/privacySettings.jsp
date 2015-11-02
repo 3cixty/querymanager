@@ -69,6 +69,20 @@ Invalid request
        		$("#manage").click(function() {
 	    		$("#mainContent").html("<iframe frameborder='0' src='<%=Configuration.get3CixtyRoot()%>/privacySettingsManagement.html?access_token=<%=session.getAttribute("accessToken")%>'></iframe>");
 	    	});
+       		
+            $("#showHeatMap").click(function() {
+     	       $.ajax({url: "<%=Configuration.get3CixtyRoot()%>/getMobidotToken",
+     	    	       beforeSend: function(xhr) {
+     	    	    	   xhr.setRequestHeader('access_token', '<%=session.getAttribute("accessToken")%>');
+     	    	       },
+     	    		   success: function(msg){
+     	    			   var result = eval('(' + msg + ')');
+     	    			   var mobidotToken = result.token;
+     	    			   
+     	    			   $("#mainContent").html("To view your Mobility Profile on Movesmarter server, please click <a href='https://www.3cixty.com/webApp/mobility.php?type=heatmap&token=" + mobidotToken + "'>here</a>");
+     		   		   }
+     	    	});
+     		});
        });
        
     </script>
