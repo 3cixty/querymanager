@@ -59,11 +59,11 @@ public class EmailUtils {
 				// Get a Properties object
 				Properties props = System.getProperties();
 				props.put("mail.smtp.host", "80.237.132.17");
-				props.put("mail.smtp.socketFactory.port", "25");
-				//props.put("mail.smtp.socketFactory.class",
-				//		"javax.net.ssl.SSLSocketFactory");
+				props.put("mail.smtp.socketFactory.port", "465");
+				props.put("mail.smtp.socketFactory.class",
+						"javax.net.ssl.SSLSocketFactory");
 				props.put("mail.smtp.auth", "true");
-				props.put("mail.smtp.port", "25");
+				props.put("mail.smtp.port", "465");
 				
 				Session session = Session.getDefaultInstance(props,
 						new javax.mail.Authenticator() {
