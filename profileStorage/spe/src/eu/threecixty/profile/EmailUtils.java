@@ -25,8 +25,9 @@ import eu.threecixty.Configuration;
  *
  */
 public class EmailUtils {
-	private static final String GMAIL_ACCOUNT_KEY = "GMAIL_ACCOUNT";
-	private static final String GMAIL_PWD_KEY = "GMAIL_PWD";
+	private static final String ACCOUNT_KEY = "ACCOUNT";
+	private static final String PWD_KEY = "PWD";
+	private static final String EMAIL = "EMAIL";
 	private static final String DESTINATIONS_KEY = "DESTINATION";
 	
 	 private static final Logger LOGGER = Logger.getLogger(
@@ -35,14 +36,15 @@ public class EmailUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
-	private static String gmailAccount = null;
-	private static String gmailPwd;
+	private static String accountUser = null;
+	private static String accountPwd;
+	private static String email;
 	private static String[] destinations;
 	
 	public static boolean send(String subject, String content, String... dests) {
-		if (gmailAccount == null) {
+		if (accountUser == null) {
 			synchronized (EmailUtils.class) {
-				if (gmailAccount == null) {
+				if (accountUser == null) {
 					try {
 						loadProperties();
 					} catch (IOException e) {
@@ -51,8 +53,7 @@ public class EmailUtils {
 				}
 			}
 		}
-		if (DEBUG_MOD) LOGGER.info("Gmail used to send feedback: " + gmailAccount);
-		if (gmailAccount != null && !gmailAccount.equals("")) {
+		if (accountUser != null && !accountUser.equals("")) {
 			try {
 				Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 
@@ -68,7 +69,7 @@ public class EmailUtils {
 				Session session = Session.getDefaultInstance(props,
 						new javax.mail.Authenticator() {
 							protected PasswordAuthentication getPasswordAuthentication() {
-								return new PasswordAuthentication(gmailAccount, gmailPwd);
+								return new PasswordAuthentication(accountUser, accountPwd);
 							}
 						});
 
@@ -76,7 +77,7 @@ public class EmailUtils {
 				final MimeMessage msg = new MimeMessage(session);
 
 				// -- Set the FROM and TO fields --
-				msg.setFrom(new InternetAddress(gmailAccount));
+				msg.setFrom(new InternetAddress(email));
 				if (dests == null || dests.length == 0) {
 					for (String dest: destinations) {
 						if (DEBUG_MOD) LOGGER.info(dest);
@@ -109,8 +110,9 @@ public class EmailUtils {
 		Properties props = new Properties();
 		props.load(input);
 		input.close();
-		gmailAccount = props.getProperty(GMAIL_ACCOUNT_KEY);
-		gmailPwd = props.getProperty(GMAIL_PWD_KEY);
+		accountUser = props.getProperty(ACCOUNT_KEY);
+		accountPwd = props.getProperty(PWD_KEY);
+		email = props.getProperty(EMAIL);
 		String tmpDests = props.getProperty(DESTINATIONS_KEY);
 		if (tmpDests != null && !tmpDests.equals("")) {
 			String [] dests = tmpDests.split(",");
