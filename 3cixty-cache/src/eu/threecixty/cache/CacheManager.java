@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
+
 public class CacheManager {
 	
 	private static final CacheManager instance = new CacheManager();
@@ -25,6 +27,10 @@ public class CacheManager {
 	}
 	
 	public void putCacheData(String query, String result) {
+		if (result == null || result.equals("")) return;
+		JSONObject rootJson = new JSONObject(result);
+		// empty result should not be cached
+		if (rootJson.getJSONObject("results").getJSONArray("bindings").length() == 0) return;
 		CacheElement cacheElement = new CacheElement();
 		cacheElement.content = result;
 		cacheElements.put(query, cacheElement);
