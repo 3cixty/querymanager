@@ -216,7 +216,7 @@ public class SettingsServices {
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromGoogleInKnows, uidDerivedFromGoogle, profile.getHasUID());
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromFacebookInKnows, uidDerivedFromFacebook, profile.getHasUID());
 				 
-				return Response.ok().entity("Your accounts have been merged").build();
+				return Response.ok().entity("Your accounts have been merged.").build();
 			} catch (InvalidTrayElement e) {
 				e.printStackTrace();
 				return Response.status(400).entity(e.getMessage()).build();

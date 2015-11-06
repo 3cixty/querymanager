@@ -110,7 +110,15 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 <% } %>
 <br>
 <div>
+<%
+if ((piSum != 0) && (piSum % SettingsServices.GOOGLE_PROFILE_IDENTITIES == 0) && (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES == 0)) {
+%>
+    <input type="submit" value="Account already merge" disabled id="buttonMerge"/>
+<%
+} else {
+%>
 <input type="submit" value="Merge accounts now" disabled id="buttonMerge"/>
+<%} %>
 </div>
 </form>
 
@@ -191,7 +199,7 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
     var fbTokenInput = document.getElementById("fbAccessToken");
     fbTokenInput.value = access_token;
     document.getElementById("buttonMerge").disabled = false;
-    showDiv("googleReadyText");
+    showDiv("fbReadyText");
   }
 </script>
 
@@ -234,6 +242,8 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 <%
 
    }
+   
+   
    
    Boolean successful = (Boolean) session.getAttribute("successful");
    if (successful != null && successful.booleanValue()) {
