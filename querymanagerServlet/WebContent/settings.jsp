@@ -45,14 +45,36 @@
     <input type="hidden" name="access_token" value="<%=accessToken%>">
 </div>
 <div>
-  <h4>To link your current account (a 3cixty dedicated account, or a 3cixty account based on Google or Facebook) with Google or Facebook account, you need to do two following steps:</h4>
-  <ol class="note">
-    <li>Sign in with the corresponding <b>Sign in</b> button. You can click on both the Sign in buttons, if you intend to link both Google and Facebook account to your 3cixty account.</li>
-    <li>Confirming the link between your current account with Google account or Facebook, or both of them. In the case you have used either or both of them to sign in to 3cixty platform, 
-    all WishList items created while signing in with those accounts will be merged to your current account if there isn't any conflict. 
-    The conflict means that you can find two items coming from your current account or those accounts have the same identity.</li>
-  </ol>
-  <i>If you already linked your current account to a Google or Facebook, the corresponding Sign-In button for Google and Facebook would not appear.</i>
+    <h4>Why You May Want to Merge your Accounts</h4>
+	<ul>
+	  <li>It is possible for you to sign into ExplorMI 360 in three different ways:
+	      <ul>
+	        <li>Via your Google account</li>
+	        <li>Via your Facebook account</li>
+	        <li>Via a dedicated ExplorMI 360 account that you have created</li>
+	      </ul>
+	  </li>
+	  <li>If you have already signed in in two (or all three) of these ways, you will have two (or three) separate accounts, each with its separate Wish List.</li>
+	  <li>You can leave things that way if you like.</li>
+	  <li>But if you would like to have just a single account from now on, you can merge the accounts that you now have.</li>
+	  <li>Then, no matter which method you use to sign in, you will be visiting the same account with the same Wish List.</li>
+	</ul>
+	<h4>How to Merge Your Accounts</h4>
+	<ol>
+	    <li>If one of the accounts that you want to merge is a dedicated ExplorMI 360 account but you are currently signed in via Google or Facebook, please
+	        <ul>
+	            <li>sign out,</li>
+	            <li>sign in via your dedicated account, and</li>
+	            <li>click again on the profile picture to get back to this page.</li>
+	        </ul>
+	    </li>
+	    <li>At the bottom of this page, click on the button for signing in via Google or Facebook and then continue the sign-in process
+	        <ul>
+	            <li>If you see both Google and Facebook buttons below, click on one of them, complete the signing in, and then do the same for the other button</li>
+	        </ul>
+	    </li>
+	    <li>Then click on "Merge accounts now" to complete the procedure.</li>
+	</ol>
 </div>
 <div>
     <input type="hidden" readonly="readonly" value="<%=uid%>" name="uid">
@@ -71,7 +93,8 @@ if (piSum % SettingsServices.GOOGLE_PROFILE_IDENTITIES != 0) {
     </div>
   </div>
 <div>
-<input type="text" name="googleAccessToken" id="googleAccessToken" value="" placeHolder="Google token" readonly="readonly">
+<div id="googleReadyText" style="display: none;">Ready for merging</div>
+<input type="hidden" name="googleAccessToken" id="googleAccessToken" value="" placeHolder="Google token" readonly="readonly">
 </div>
 <% }
 
@@ -82,12 +105,13 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 	</fb:login-button>
 </div>
 <div>
-<input type="text" name="fbAccessToken" id="fbAccessToken" value="" placeHolder="Facebook token" readonly="readonly">
+<div id="fbReadyText" style="display: none;">Ready for merging</div>
+<input type="hidden" name="fbAccessToken" id="fbAccessToken" value="" placeHolder="Facebook token" readonly="readonly">
 </div>
 <% } %>
 <br>
 <div>
-<input type="submit" value="Confirm" />
+<input type="submit" value="Merge accounts now" />
 </div>
 </form>
 
@@ -167,6 +191,7 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
     var access_token =   FB.getAuthResponse()['accessToken'];
     var fbTokenInput = document.getElementById("fbAccessToken");
     fbTokenInput.value = access_token;
+    showDiv("googleReadyText");
   }
 </script>
 
@@ -176,6 +201,7 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
     if (authResult) {
       if (authResult['error'] == undefined){
     	  document.getElementById("googleAccessToken").value = authResult.access_token;
+    	  showDiv("googleReadyText");
   	      $('#signin-button').on("click", function (e) {
 	          e.preventDefault();
 	      });
@@ -194,6 +220,11 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 		  alert("You haven't yet signed in with neither Google nor Facebook account");
 		  return false;
 	  }
+  }
+  
+  function showDiv(id) {
+	  var divEl = document.getElementById(id);
+	  divEl.style.display = 'block';
   }
 
   </script>
