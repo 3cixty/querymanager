@@ -113,7 +113,7 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 <%
 if ((piSum != 0) && (piSum % SettingsServices.GOOGLE_PROFILE_IDENTITIES == 0) && (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES == 0)) {
 %>
-    <input type="submit" value="Account already merge" disabled id="buttonMerge"/>
+    <input type="submit" value="Accounts already merged" disabled id="buttonMerge"/>
 <%
 } else {
 %>
