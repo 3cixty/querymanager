@@ -117,7 +117,7 @@ public class DedicatedUserServices {
 			String code = DedicatedUserUtils.resetPassword(email, key);
 			if (code == null) return Response.status(500).entity(
 					"Internal error").build();
-			EmailUtils.send("Reset code", "Please click on the following link to activate the reset code "
+			EmailUtils.send("Reset code", "Please click on the following link to activate the reset code:\n"
 					+ Configuration.get3CixtyRoot() + "/activateForResettingPassword?code=" + code, email);
 			return Response.ok().entity(
 					"Your password reset code has been successfully sent to "+ email +". Please check your inbox for the next step.").build();
