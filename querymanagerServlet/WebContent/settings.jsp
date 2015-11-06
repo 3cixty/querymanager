@@ -111,7 +111,7 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
 <% } %>
 <br>
 <div>
-<input type="submit" value="Merge accounts now" />
+<input type="submit" value="Merge accounts now" disabled id="buttonMerge"/>
 </div>
 </form>
 
@@ -191,6 +191,7 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
     var access_token =   FB.getAuthResponse()['accessToken'];
     var fbTokenInput = document.getElementById("fbAccessToken");
     fbTokenInput.value = access_token;
+    document.getElementById("buttonMerge").disabled = false;
     showDiv("googleReadyText");
   }
 </script>
@@ -202,6 +203,7 @@ if (piSum % SettingsServices.FACEBOOK_PROFILE_IDENTITIES != 0) {
       if (authResult['error'] == undefined){
     	  document.getElementById("googleAccessToken").value = authResult.access_token;
     	  showDiv("googleReadyText");
+    	  document.getElementById("buttonMerge").disabled = false;
   	      $('#signin-button').on("click", function (e) {
 	          e.preventDefault();
 	      });
