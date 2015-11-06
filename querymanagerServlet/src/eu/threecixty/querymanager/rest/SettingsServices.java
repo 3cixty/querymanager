@@ -141,14 +141,28 @@ public class SettingsServices {
 				List <Tray> traysDerivedFromGoogle = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromGoogle);
 				List <Tray> traysDerivedFromFacebook = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getTrayManager().getTrays(uidDerivedFromFacebook);
 				List <Tray> traysDerivedFrom3cixtyAccount = ProfileManagerImpl.getInstance().getTrayManager().getTrays(userAccessToken.getUid());
-				if (conflict(traysDerivedFromGoogle, traysDerivedFromFacebook)) return Response.status(400).entity(
-						"There are at least two WishList items under your Google and Facebook account have the same identity").build();
-				if (conflict(traysDerivedFromGoogle, traysDerivedFrom3cixtyAccount)) return Response.status(400).entity(
-						"There are at least two WishList items under your Google and 3cixty dedicated account have the same identity").build();
-				if (conflict(traysDerivedFromFacebook, traysDerivedFrom3cixtyAccount)) return Response.status(400).entity(
-						"There are at least two WishList items under your Facebook and 3cixty dedicated account have the same identity").build();
-				if (uidDerivedFromGoogle != null) ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromGoogle, userAccessToken.getUid());
-				if (uidDerivedFromFacebook != null) ProfileManagerImpl.getInstance().getTrayManager().replaceUID(uidDerivedFromFacebook, userAccessToken.getUid());
+				if (uidDerivedFromGoogle != null && !userAccessToken.getUid().equals(uidDerivedFromGoogle)) {
+					if (traysDerivedFromGoogle != null && traysDerivedFromGoogle.size() > 0) {
+						// FIXME: to avoid poor performance
+						for (Tray tmp: traysDerivedFromGoogle) {
+							if (exist(tmp.getElement_id(), traysDerivedFrom3cixtyAccount)) continue;
+							tmp.setToken(userAccessToken.getUid());
+							ProfileManagerImpl.getInstance().getTrayManager().addTray(tmp);
+						}
+					    ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(uidDerivedFromGoogle);
+					}
+				}
+				if (uidDerivedFromFacebook != null && !userAccessToken.getUid().equals(uidDerivedFromFacebook)) {
+					// FIXME: to avoid poor performance
+					if (traysDerivedFromFacebook != null && traysDerivedFromFacebook.size() > 0) {
+						for (Tray tmp: traysDerivedFromFacebook) {
+							if (exist(tmp.getElement_id(), traysDerivedFrom3cixtyAccount)) continue;
+							tmp.setToken(userAccessToken.getUid());
+							ProfileManagerImpl.getInstance().getTrayManager().addTray(tmp);
+						}
+						ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(uidDerivedFromGoogle);
+					}
+				}
 				
 				Set <String> googleKnows = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getKnows();
 				Set <String> fbKnows = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getKnows();
@@ -201,9 +215,8 @@ public class SettingsServices {
 				
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromGoogleInKnows, uidDerivedFromGoogle, profile.getHasUID());
 				updateFriendsHavingMyUIDInKnows(allFriendsHavingMyUIDDerivedFromFacebookInKnows, uidDerivedFromFacebook, profile.getHasUID());
-				
-				String accountsAffected = (uidDerivedFromGoogle != null && uidDerivedFromFacebook != null) ? "Google and Facebook" : (uidDerivedFromGoogle != null ? "Google" : (uidDerivedFromFacebook != null ? "Facebook" : null)); 
-				return Response.ok().entity("You are successful to link your account with " + accountsAffected).build();
+				 
+				return Response.ok().entity("Your accounts have been merged").build();
 			} catch (InvalidTrayElement e) {
 				e.printStackTrace();
 				return Response.status(400).entity(e.getMessage()).build();
@@ -581,19 +594,6 @@ public class SettingsServices {
 
 	private void checkPermission(AccessToken accessToken) throws ThreeCixtyPermissionException {
 		SPEServices.checkPermission(accessToken);
-	}
-	
-	private boolean conflict(List <Tray> trays1, List <Tray> trays2) {
-		if (trays1 == null || trays1.size() == 0) return false;
-		if (trays2 == null || trays2.size() == 0) return false;
-		boolean found = false;
-		for (Tray tray1: trays1) {
-			if (exist(tray1.getElement_id(), trays2)) {
-				found = true;
-				break;
-			}
-		}
-		return found;
 	}
 	
 	private boolean exist(String itemId, List <Tray> inTrays) {
