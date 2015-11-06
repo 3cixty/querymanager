@@ -258,7 +258,7 @@ public class DedicatedUserServices {
 			}
 			return null;
 		}
-		return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Your email and password don't matche!!!\"} ").build();
+		return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Your email and password don't match.\"} ").build();
 	}
 	
 	@GET
