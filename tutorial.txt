@@ -1,0 +1,52 @@
+This document describes how to deploy 3cixty backend
+
+1. Use current configurations on VMs:
+
+1.1. Development environment (DEV server)
+
+- Go to the host `dev.3cixty.com`
+- Go to the `/home/kinh/3cixty_github/querymanager` folder
+- Execute the command: `$ sh dev.deployment.sh`
+
+1.2. Production environment
+
+You need to do the following steps on both two Tomcat servers (`176.28.49.52` and `91.250.80.148`):
+
+- Access to each Tomcat server, then go to the `/home/kinh/github/querymanager` folder
+- Execute the command: `$ sh api.deployment.sh`
+
+2. Configure fresh clone from github:
+
+- Clone code from github
+- Go to `querymanagerServlet/WebContent/WEB-INF`
+- Open the `report.properties` file, fill in the password for noreply@3cixty.com, then redo the section 1.2
+
+3. Configuration files
+
+3.1. Development environment
+
+- appkey/oauth/apis-authorization-server-war/src/main/resources/dev.apis.application.properties (OAuth server database)
+- 3cixty-db/resources/dev.hibernate.cfg.xml (3cixty database)
+- 3cixty-db/resources/dev.memcached.conf (memcached server addresses)
+- querymanagerServlet/WebContent/WEB-INF/dev.3cixty.properties (specify database server, virtuoso endpoint, trex server through HAProxy)
+- querymanagerServlet/WebContent/WEB-INF/prefix.properties (prefixes used by Virtuoso)
+- querymanagerServlet/WebContent/WEB-INF/authBypass.list (a list of app keys which makes 3cixty authorization process invisible)
+- querymanagerServlet/WebContent/WEB-INF/report.properties (account information for reporting API)
+
+Note that only the list file (report.properties) needs to be filled in when you redeploy backend!
+
+3.2. Production environment
+
+- appkey/oauth/apis-authorization-server-war/src/main/resources/api.apis.application.properties (OAuth server database)
+- 3cixty-db/resources/api.hibernate.cfg.xml (3cixty database)
+- 3cixty-db/resources/api.memcached.conf (memcached server addresses)
+- querymanagerServlet/WebContent/WEB-INF/api.3cixty.properties (specify database server, virtuoso endpoint, trex server through HAProxy)
+- querymanagerServlet/WebContent/WEB-INF/prefix.properties (prefixes used by Virtuoso)
+- querymanagerServlet/WebContent/WEB-INF/authBypass.list (a list of app keys which makes 3cixty authorization process invisible)
+- querymanagerServlet/WebContent/WEB-INF/report.properties (account information for reporting API)
+
+Note that only the list file (report.properties) needs to be filled in when you redeploy backend!
+
+
+
+
