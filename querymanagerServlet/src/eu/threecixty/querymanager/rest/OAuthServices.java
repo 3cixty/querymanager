@@ -41,6 +41,13 @@ import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.querymanager.AuthorizationBypassManager;
 import eu.threecixty.querymanager.filter.DynamicCORSFilter;
 
+/**
+ * 
+ * This class provides RESTful APIs to bridge 3cixty with OAuth server.
+ * The class provides APIs to get 3cixty token, validate token, revoke token, and
+ * refresh token.
+ *
+ */
 @Path("/" + Constants.VERSION_2)
 public class OAuthServices {
 	

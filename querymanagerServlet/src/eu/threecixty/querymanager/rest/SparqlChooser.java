@@ -3,6 +3,11 @@ package eu.threecixty.querymanager.rest;
 import eu.threecixty.Configuration;
 import eu.threecixty.querymanager.AuthorizationBypassManager;
 
+/**
+ * 
+ * This utility class is to get SPARQL endpoint, graph based on application key, city.
+ *
+ */
 public class SparqlChooser {
 	
 	private static String END_POINT_WITH_E015 = null;

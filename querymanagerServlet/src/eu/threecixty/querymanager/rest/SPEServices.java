@@ -46,7 +46,9 @@ import eu.threecixty.profile.partners.PartnerAccountUtils;
 import eu.threecixty.querymanager.AdminValidator;
 
 /**
- * The class is an end point for Rest ProfileAPI to expose to other components.
+ * The class is an end point for getting user profile (used by getProfile), and
+ * getting all user-related information including profile, knows, WishList, accounts.
+ *
  * @author Cong-Kinh Nguyen
  *
  */

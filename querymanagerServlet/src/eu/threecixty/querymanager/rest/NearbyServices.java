@@ -24,6 +24,12 @@ import eu.threecixty.profile.elements.ElementDetails;
 import eu.threecixty.profile.elements.LanguageUtils;
 import eu.threecixty.profile.elements.NearbyUtils;
 
+/**
+ * 
+ * This class provides RESTful nearby APIs based on a GPS location or item ID. The results
+ * are a list of items which are ordered by distance to the GPS location or given item ID.
+ *
+ */
 
 @Path("/" + Constants.PREFIX_NAME)
 public class NearbyServices {

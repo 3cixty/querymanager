@@ -31,7 +31,11 @@ import eu.threecixty.profile.DedicatedUserUtils;
 import eu.threecixty.profile.EmailUtils;
 import eu.threecixty.querymanager.AuthorizationBypassManager;
 
-
+/**
+ * 
+ * This class provides RESTful APIs for dealing with dedicated 3cixty users.
+ *
+ */
 @Path("/" + Constants.PREFIX_NAME)
 public class DedicatedUserServices {
 	

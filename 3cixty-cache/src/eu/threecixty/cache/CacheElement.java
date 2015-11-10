@@ -2,6 +2,11 @@ package eu.threecixty.cache;
 
 import java.util.Calendar;
 
+/**
+ * 
+ * @author kinh
+ *
+ */
 public class CacheElement {
 	private long lastValidTime;
 	public String content;

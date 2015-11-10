@@ -34,6 +34,13 @@ import eu.threecixty.profile.Utils;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.partners.PartnerAccountUtils;
 
+/**
+ * 
+ * This class provides RESTful APIs to work with Movesmarter services: retrieve or create Mobidot user,
+ * and create one-time Mobidot access token.
+ *
+ */
+
 @Path("/" + Constants.VERSION_2)
 public class MobidotServices {
 	

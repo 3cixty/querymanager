@@ -20,6 +20,12 @@ import eu.threecixty.Configuration;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.querymanager.AdminValidator;
 
+/**
+ * 
+ *This class provides RESTful endpoints required using username and password. Basically,
+ *those services are only available for 3cixty administrator who possesses a user name and password.
+ *
+ */
 @Path("/" + Constants.PREFIX_NAME)
 public class AdminServices {
 

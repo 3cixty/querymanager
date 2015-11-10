@@ -38,7 +38,8 @@ import eu.threecixty.profile.elements.ElementDetailsUtils;
 import eu.threecixty.profile.elements.LanguageUtils;
 
 /**
- * This class is an end point to expose Rest TrayAPIs to other components.
+ * This class contains all RESTful APIs for dealing with WishList.
+ *
  * @author Cong-Kinh NGUYEN
  *
  */

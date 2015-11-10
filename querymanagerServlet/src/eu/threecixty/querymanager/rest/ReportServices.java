@@ -26,6 +26,12 @@ import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.EmailUtils;
 import eu.threecixty.profile.ReportRequest;
 
+/**
+ * 
+ * This class is for providing report API which is invoked from mobile applications to
+ * notify 3cixty about incorrect data, etc.
+ *
+ */
 @Path("/" + Constants.PREFIX_NAME)
 public class ReportServices {
 
