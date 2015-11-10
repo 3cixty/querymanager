@@ -24,7 +24,15 @@ import eu.threecixty.profile.elements.CategoryUtils;
 @Path("/" + Constants.PREFIX_NAME)
 public class CategoryServices {
 
-	
+	/**
+	 * This API is to get a list of top categories which are found from KB.
+	 *
+	 * @param key
+	 * 			The application key.
+	 * @param city
+	 * 			The city (Milan or London).
+	 * @return
+	 */
 	@GET
 	@Path("/getTopCategories")
 	public Response getTopCategories(
