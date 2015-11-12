@@ -40,6 +40,23 @@ public class NearbyServices {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
+	 /**
+	  * This API is to get nearby PoIs of a given PoI ID.
+	  * <br>
+	  * This can be done because each PoI has a longitude and latitude. We can calculate
+	  * distances from the given PoI to other PoIs based on their longitude and latitude.
+	  * 
+	  * @param poiID
+	  * @param offset
+	  * @param limit
+	  * @param categories
+	  * @param topCategories
+	  * @param distance
+	  * @param city
+	  * @param key
+	  * @param languages
+	  * @return
+	  */
 	@GET
 	@Path("/getNearbyPoIs")
 	public Response getNearbyPoIs(@QueryParam("poi") String poiID,
@@ -74,6 +91,21 @@ public class NearbyServices {
 		}
 	}
 	
+	/**
+	 * This API is to get nearby PoIs of a given location represented by a longitude and latitude.
+	 *
+	 * @param lat
+	 * @param lon
+	 * @param offset
+	 * @param limit
+	 * @param categories
+	 * @param topCategories
+	 * @param distance
+	 * @param city
+	 * @param key
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getNearbyPoIsBasedOnGPS")
 	public Response getNearbyPoIsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
@@ -107,6 +139,19 @@ public class NearbyServices {
 		}
 	}
 	
+	/**
+	 * This API is to get nearby events from a given event.
+	 *
+	 * @param id
+	 * @param offset
+	 * @param limit
+	 * @param categories
+	 * @param distance
+	 * @param city
+	 * @param key
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getNearbyEvents")
 	public Response getNearbyEvents(@QueryParam("id") String id,
@@ -137,6 +182,19 @@ public class NearbyServices {
 		}
 	}
 	
+	/**
+	 * This API is to get nearby events of a given location represented by a longitude and latitude.
+	 * @param lat
+	 * @param lon
+	 * @param offset
+	 * @param limit
+	 * @param categories
+	 * @param distance
+	 * @param city
+	 * @param key
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getNearbyEventsBasedOnGPS")
 	public Response getNearbyEventsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
@@ -167,7 +225,23 @@ public class NearbyServices {
 		}
 	}
 	
-	
+	/**
+	 * This API is to get nearby PoIs of a given location represented by a longitude and latitude. If
+	 * any nearby PoI is in the WishList of any friend (a.k.a knows), the PoI will be highlighted by
+	 * the "highlighted" key (its value will be set to <code>true</code>).
+	 *
+	 * @param lat
+	 * @param lon
+	 * @param offset
+	 * @param limit
+	 * @param categories
+	 * @param topCategories
+	 * @param distance
+	 * @param city
+	 * @param accessToken
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getAugmentedNearbyPoIsBasedOnGPS")
 	public Response getAugmentedNearbyPoIsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
@@ -209,6 +283,22 @@ public class NearbyServices {
 		return Response.status(Response.Status.BAD_REQUEST).entity("Invalid access token").build();
 	}
 	
+	/**
+	 * This API is to get nearby events of a given location represented by a longitude and latitude. If
+	 * any nearby event is in the WishList of any friend (a.k.a knows), the event will be highlighted by
+	 * the "highlighted" key (its value will be set to <code>true</code>).
+	 *
+	 * @param lat
+	 * @param lon
+	 * @param offset
+	 * @param limit
+	 * @param categories
+	 * @param distance
+	 * @param city
+	 * @param accessToken
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getAugmentedNearbyEventsBasedOnGPS")
 	public Response getAugmentedNearbyEventsBasedOnGPS(@QueryParam("lat") double lat, @QueryParam("lon") double lon,
