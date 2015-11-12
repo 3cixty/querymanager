@@ -57,6 +57,28 @@ public class DedicatedUserServices {
 	@Context 
 	private HttpServletRequest httpRequest;
 	
+	/**
+	 * This API is used to sign up a new 3cixty dedicated account. The API can be invoked
+	 * from Web applications as well as mobile applications.
+	 * <br>
+	 * Note: there is a potential attack using automatic machines as there is not any mechanism
+	 * to verify whether or not the API is called by a person. Should this API be integrated with
+	 * a mechanism like Google Recaptcha?
+	 *
+	 * @param email
+	 * 			The email
+	 * @param password
+	 * 			The password which must contain one digital letter, one lowercase letter,
+	 * 			one uppercase letter, and at least 8 characters long
+	 * @param firstName
+	 * 			First name
+	 * @param lastName
+	 * 			Last name
+	 * @param key
+	 * 			Application key
+	 * @return 	The API returns HTTP status code 200 if it is able to create a new account; otherwise,
+	 * 			it will return a response with HTTP different status code (400 or 500).
+	 */
 	@POST
 	@Path("/signUp")
 	public Response signUp(
@@ -84,6 +106,14 @@ public class DedicatedUserServices {
 		return Response.ok().entity("Your account has been created. Please check your email for a message from 3cixty that will enable you to activate the account.").build();
 	}
 	
+	/**
+	 * This API is used to activate a 3cixty dedicated account. This is part of verifying
+	 * if the given email is accurate.
+	 *
+	 * @param code
+	 * 			The activation code sent when the user signs up for a new 3cixty dedicated account.
+	 * @return
+	 */
 	@GET
 	@Path("/activate")
 	public Response activate(@QueryParam("code") String code) {
@@ -100,13 +130,16 @@ public class DedicatedUserServices {
 		}
 	}
 	
-	private String getAppUrl(AppCache appCache) {
-		if (appCache.getRedirectUri() == null) return null;
-		int index = appCache.getRedirectUri().lastIndexOf("/");
-		if (index < 0) return appCache.getRedirectUri();
-		return appCache.getRedirectUri().substring(0, index);
-	}
-
+	/**
+	 * This API is used to initiate reseting password. Then, the API will email
+	 * an activation code to ask the user about confirming their request.
+	 *
+	 * @param email
+	 * 			The email which associates with the password which needs to be reset
+	 * @param key
+	 * 			The application key.
+	 * @return
+	 */
 	@POST
 	@Path("/resetPassword")
 	public Response resetPassword(@FormParam("email") String email, @FormParam("key") String key) {
@@ -131,6 +164,13 @@ public class DedicatedUserServices {
 		}
 	}
 	
+	/**
+	 * This API is used to confirm the request for reseting password.
+	 *
+	 * @param code
+	 * 			The activation code sent when the user asks for reseting their password.
+	 * @return
+	 */
 	@GET
 	@Path("/activateForResettingPassword")
 	public Response activateForResettingPassword(@QueryParam("code") String code) {
@@ -157,6 +197,13 @@ public class DedicatedUserServices {
 		}
 	}
 	
+	/**
+	 * This API is used to set a new password to the current user in HTTP session.
+	 *
+	 * @param password
+	 * 				The password to be set
+	 * @return
+	 */
 	@POST
 	@Path("/setPassword")
 	public Response setPassword(@FormParam("password") String password) {
@@ -186,6 +233,18 @@ public class DedicatedUserServices {
 					"Failed to set a new password").build();
 	}
 	
+	/**
+	 * This API is used to change password.
+	 *
+	 * @param email
+	 * 				The email which associates with the user who wants to change password
+	 * @param oldPassword
+	 * 				The old password
+	 * @param newPassword
+	 * 				The new password which must contain one digital letter, one lowercase letter,
+	 * 				one uppercase letter, and at least 8 characters long
+	 * @return
+	 */
 	@POST
 	@Path("/changePassword")
 	public Response changePassword(@FormParam("email") String email,
@@ -209,6 +268,20 @@ public class DedicatedUserServices {
 
 	}
 	
+	/**
+	 * This API is used to sign in with a 3cixty dedicated account.
+	 * <br>
+	 * Note: this endpoint only works with Web applications. For mobile applications, the developers
+	 * need to use <code>signinOnMobile</code>.
+	 *
+	 * @param email
+	 * 				The email
+	 * @param password
+	 * 				The password
+	 * @param key
+	 * 				The application key
+	 * @return
+	 */
 	@POST
 	@Path("/signin")
 	public Response login(@FormParam("email") String email,
@@ -265,6 +338,19 @@ public class DedicatedUserServices {
 		return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Your email and password don't match.\"} ").build();
 	}
 	
+	/**
+	 * This API is used to sign in with a 3cixty dedicated account.
+	 * <br>
+	 * Note: this endpoint only works with mobile applications. For Web applications, the developers
+	 * need to use <code>signin</code>. In addition, this API can only be invoked by trusted application keys.
+	 *
+	 * @param email
+	 * 			
+	 * @param password
+	 * @param key
+	 * @param scopes
+	 * @return
+	 */
 	@GET
 	@Path("/signinOnMobile")
 	public Response loginOnMobile(@HeaderParam("email") String email,
@@ -296,6 +382,12 @@ public class DedicatedUserServices {
 
 	}
 	
+	/**
+	 * This API is to check whether or not there exists a given email in database.
+	 *
+	 * @param email
+	 * @return
+	 */
 	@GET
 	@Path("/existEmail")
 	public Response existEmail(@QueryParam("email") String email) {
@@ -307,6 +399,18 @@ public class DedicatedUserServices {
 		return Response.ok().entity(ok + "").build();
 	}
 	
+	/**
+	 * Gets redirect_uri from 3cixty applications.
+	 *
+	 * @param appCache
+	 * @return
+	 */
+	private String getAppUrl(AppCache appCache) {
+		if (appCache.getRedirectUri() == null) return null;
+		int index = appCache.getRedirectUri().lastIndexOf("/");
+		if (index < 0) return appCache.getRedirectUri();
+		return appCache.getRedirectUri().substring(0, index);
+	}
 	
 	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, AppCache app) {
 		try {
