@@ -92,7 +92,7 @@ public class CellUtils {
 
 		}
 		double calcutedDistance = getDistanceFromLatLonInMeter(x_closest, y_closest, orgLat, orgLon);
-		if (DEBUG_MOD) LOGGER.info("calculated distance: " + calcutedDistance + ", distance = " + distance);
+		//if (DEBUG_MOD) LOGGER.info("calculated distance: " + calcutedDistance + ", distance = " + distance);
 		return calcutedDistance < distance; //(Math.pow(x_closest - lat, 2) + Math.pow(y_closest - lon, 2) < Math.pow(d,2));
 	}
 	

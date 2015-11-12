@@ -8,15 +8,13 @@ import java.util.Map;
 
 import eu.threecixty.profile.Review;
 
-import org.apache.log4j.Logger;
-
 public class ElementPoIDetails extends ElementDetails {
 	
-	 private static final Logger LOGGER = Logger.getLogger(
-			 ElementPoIDetails.class.getName());
+	 //private static final Logger LOGGER = Logger.getLogger(
+	//		 ElementPoIDetails.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
-	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 //private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
 	private String telephone;
 	private double aggregate_rating;
@@ -77,7 +75,7 @@ public class ElementPoIDetails extends ElementDetails {
 	}
 	public void putReview(String language, Review review) {
 		if (language == null || review == null) return;
-		if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
+		//if (DEBUG_MOD) LOGGER.info("language: " + language + ", review = " + review.getText());
 		if (reviewsLanguages == null) reviewsLanguages = new HashMap<String, List<Review>>();
 		int index = language.indexOf(TRANSLATION_TAG);
 		String tmpLanguage = index >= 0 ? language.substring(0, index) : language;
@@ -101,7 +99,7 @@ public class ElementPoIDetails extends ElementDetails {
 			epd.reviews = Collections.emptyList();
 		}
 		epd.review_counts = epd.reviews.size();
-		if (DEBUG_MOD) LOGGER.info("language: " + language + ", all reviews = " + reviewsLanguages);
+		//if (DEBUG_MOD) LOGGER.info("language: " + language + ", all reviews = " + reviewsLanguages);
 		return epd;
 	}
 }
