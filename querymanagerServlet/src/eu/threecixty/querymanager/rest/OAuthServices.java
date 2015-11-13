@@ -25,8 +25,6 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.gson.Gson;
-
 import eu.threecixty.Configuration;
 import eu.threecixty.cache.AppCache;
 import eu.threecixty.cache.TokenCacheManager;
@@ -84,13 +82,19 @@ public class OAuthServices {
 	@Context 
 	private HttpServletRequest httpRequest;
 
+	/**
+	 * This API is used to check whether or not a given 3cixty access token is still valid.
+	 *
+	 * @param access_token
+	 * @param key
+	 * @return
+	 */
 	@GET
 	@Path("/validateAccessToken")
 	public Response validateAccessToken(@HeaderParam("access_token") String access_token,
 			@HeaderParam("key") String key) {
 		if (OAuthWrappers.validateAppKey(key)) {
 			if (OAuthWrappers.validateUserAccessToken(access_token)) {
-				// TODO: add callLog
 				return Response.status(Response.Status.OK)
 						.entity(" {\"response\": \"ok\"} ")
 						.type(MediaType.APPLICATION_JSON_TYPE)
@@ -108,6 +112,23 @@ public class OAuthServices {
 		}
 	}
 
+	/**
+	 * This API is used to get 3cixty access token from a Google token.
+	 * <br>
+	 * The API also gets the list of friends extracted from Google token which the user gives permission to 3cixty.
+	 * The friends list is stored in the <code>knows</code> property of user profile.
+	 * <br>
+	 * All actions done inside this API are performed in the {@link GoogleAccountUtils.getUID}. Please have a look
+	 * at this class for more detail.
+	 *
+	 * @param g_access_token
+	 * 				Google access token
+	 * @param appkey
+	 * 				3cixty application key
+	 * @param scope
+	 * 				3cixty scope (Profile,WishList)
+	 * @return
+	 */
 	@GET
 	@Path("/getAccessToken")
 	public Response getAccessToken(@HeaderParam("google_access_token") String g_access_token, @HeaderParam("key") String appkey,
@@ -137,6 +158,27 @@ public class OAuthServices {
 		return response;
 	}
 	
+	/**
+	 * This API is used to get 3cixty access token from a Facebook token.
+	 * <br>
+	 * The API also gets the list of friends extracted from Facebook token which the user gives permission to 3cixty.
+	 * The friends list is stored in the <code>knows</code> property of user profile.
+	 * <br>
+	 * All actions done inside this API are performed in the {@link FaceBookAccountUtils.getUID}. Please have a look
+	 * at this class for more detail.
+	 *
+	 * @param fb_access_token
+	 * 				Facebook access token
+	 * @param appkey
+	 * 				Application key
+	 * @param scope
+	 * 				3cixty scope (Profile,WishList).
+	 * @param width
+	 * 				The width for profile image
+	 * @param height
+	 * 				The height for profile image
+	 * @return
+	 */
 	@GET
 	@Path("/getAccessTokenForFB")
 	public Response getAccessTokenForFB(@HeaderParam("fb_access_token") String fb_access_token,
@@ -170,6 +212,34 @@ public class OAuthServices {
 
 	}
 
+	/**
+	 * This API is to create a 3cixty application key.
+	 * <br>
+	 * Currently, creating an application key is only available with Google token. Each application needs
+	 * to have unique application ID which is provided by developer. Developers are able to change
+	 * information about the application key at any moment, but the application ID provided by developers
+	 * needs to be constant. To change information about the application, please use {@link updateAppInfo}.
+	 *
+	 * @param g_access_token
+	 * 				Google token
+	 * @param appid
+	 * 				Application ID
+	 * @param appname
+	 * 				Application name
+	 * @param desc
+	 * 				Application description
+	 * @param cat
+	 * 				Application category
+	 * @param scopeNames
+	 * 				3cixty scope (Profile,WishList)
+	 * @param redirect_uri
+	 * 				The redirect URI which is to return 3cixty access token to the application.
+	 * 				This parameter is required for Web application.
+	 * @param thumbNailUrl
+	 * 				The link to application logo. The logo is shown during authorization to ask
+	 * 				the user to give permission to the application.
+	 * @return
+	 */
 	@GET
 	@Path("/getAppKey")
 	public Response getAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid,
@@ -216,6 +286,28 @@ public class OAuthServices {
 		        .build();
 	}
 
+	/**
+	 * This API is used to update information about a given application key.
+	 *
+	 * @param googleAccessToken
+	 * 				The Google token of the user which created the application key.
+	 * @param appid
+	 * 				The application ID which needs to be immutable.
+	 * @param appname
+	 * 				The application name.
+	 * @param desc
+	 * 				The application description.
+	 * @param cat
+	 * 				The application category.
+	 * @param scopeNames
+	 * 				The scopes (no longer used) as the API always gets the list of scopes by default.
+	 * @param redirect_uri
+	 * 				The redirect URI which is used to return 3cixty access token to application.
+	 * @param thumbNailUrl
+	 * 				The link to application logo. The logo is shown during authorization to ask
+	 * 				the user to give permission to the application.
+	 * @return
+	 */
 	@POST
 	@Path("/updateAppInfo")
 	public Response updateAppKey(@FormParam("google_access_token") String googleAccessToken,
@@ -249,6 +341,16 @@ public class OAuthServices {
 		        .build();
 	}
 
+	/**
+	 * This API is to list all application information which have been created by the corresponding
+	 * user of a given Google access token.
+	 * 
+	 * @param g_access_token
+	 * 				Google token.
+	 * @param format
+	 * 				The data format, either <code>html</code> or <code>json</code>.
+	 * @return
+	 */
 	@GET
 	@Path("/getApps")
 	public Response getApps(@QueryParam("google_access_token") String g_access_token, @DefaultValue("json") @QueryParam("format") String format) {
@@ -289,6 +391,15 @@ public class OAuthServices {
 		}
 	}
 
+	/**
+	 * This API is used to retrieve the application key.
+	 *
+	 * @param g_access_token
+	 * 				Google token of the corresponding user who created the application key.
+	 * @param appid
+	 * 				The application ID.
+	 * @return
+	 */
 	@GET
 	@Path("/retrieveAppKey")
 	public Response retrieveAppKey(@QueryParam("google_access_token") String g_access_token, @QueryParam("appid") String appid) {
@@ -311,6 +422,13 @@ public class OAuthServices {
 		        .build();
 	}
 	
+	/**
+	 * This API is used to retrieve application information of a given application key.
+	 *
+	 * @param key
+	 * 				The applciation key.
+	 * @return
+	 */
 	@GET
 	@Path("/retrieveKeyInfo")
 	public Response retrieveKeyInfo(@HeaderParam("key") String key) {
@@ -332,6 +450,13 @@ public class OAuthServices {
 		}
 	}
 
+	/**
+	 * This API is used to retrieve application ID and name from a given 3cixty access token.
+	 *
+	 * @param access_token
+	 * 				The 3cixty access token.
+	 * @return
+	 */
 	@GET
 	@Path("/retrieveKeyInfoFromAccessToken")
 	public Response retrieveKeyInfoFromAccessToken(@HeaderParam("access_token") String access_token) {
@@ -354,6 +479,11 @@ public class OAuthServices {
 		}
 	}
 
+	/**
+	 * This API is used to get all scopes. Currently, there are only two scopes (Profile, WishList).
+	 *
+	 * @return
+	 */
 	@GET
 	@Path("/getScopes")
 	public Response getScopes() {
@@ -363,13 +493,26 @@ public class OAuthServices {
 			DeveloperScope ds = new DeveloperScope(scope.getScopeName(), scope.getDescription());
 			retScopes.add(ds);
 		}
-		Gson gson = new Gson();
 		return Response.status(Response.Status.OK)
-				.entity(gson.toJson(retScopes))
+				.entity(JSONObject.wrap(retScopes).toString())
 				.type(MediaType.APPLICATION_JSON_TYPE)
 				.build();
 	}
 
+	/**
+	 * This API is used to sign in with Google account, then returns 3cixty access token,
+	 * refresh token and expiration time in millisecond after its creation.
+	 * <br>
+	 * The API first extracts user information such as first name, last name, and Google UID.
+	 * Then, the API extracts friends list from Google Plus if you gave any permission
+	 * to 3cixty to access to them. All those information are persisted in database.
+	 * <br>
+	 * Using this API, during 3cixty authorization, there will appear a dialog box to ask you to
+	 * give permission to the application represented by a given app key.
+	 * 
+	 * @param appkey
+	 * @return
+	 */
 	@GET
 	@Path("/auth")
 	public Response auth(@QueryParam("key") String appkey) {
@@ -399,6 +542,11 @@ public class OAuthServices {
 		return null;
 	}
 	
+	/**
+	 * This API is used to get Google access token;
+	 *
+	 * @return
+	 */
 	@GET
 	@Path("/getGoogleAccessToken")
 	public Response getGoogleAccessToken() {
@@ -416,6 +564,26 @@ public class OAuthServices {
 		return null;
 	}
 	
+	/**
+	 * This API is used to sign in 3cixty from a given external token (Google or Facebook).
+	 * <br>
+	 * The API first extracts user information such as first name, last name, and Google UID
+	 * or Facebook UID. Then, the API extracts friends list from Google Plus / Facebook if you
+	 * gave any permission to 3cixty to access to them. All those information are persisted in
+	 * database.
+	 * <br>
+	 * Using this API, during 3cixty authorization, there will appear a dialog box to ask you to
+	 * give permission to the application represented by a given app key.
+	 * <br>
+	 * Note that it's only possible to extract friends list from Facebook if your friends already
+	 * used 3cixty applications.
+	 *
+	 * @param accessTokenFromOutside
+	 * @param source
+	 * @param width
+	 * @param height
+	 * @return
+	 */
 	@GET
 	@Path("/redirect_uri")
 	public Response redirect_uri(@QueryParam("access_token_outside") String accessTokenFromOutside,
@@ -446,6 +614,17 @@ public class OAuthServices {
 		return processOutsideToken(app, accessTokenFromOutside, source, width, height, session);
 	}
 	
+	/**
+	 * This API is used to check whether or not you agree with 3cixty Terms of Use and Privacy Policy.
+	 * <br>
+	 * Note that the API cannot be invoked directly from third party developers. The process to show
+	 * and call it is performed through {@link auth} or {@link redirect_uri}. The check-box is shown
+	 * just after receiving external token and before extracting information which can be found from
+	 * the external token.
+	 * 
+	 * @param terms
+	 * @return
+	 */
 	@POST
 	@Path("/terms")
 	public Response terms(@FormParam("terms") String terms) {
@@ -466,6 +645,19 @@ public class OAuthServices {
 		return processOutsideToken(app, accessTokenFromOutside, source, width, height, session);
 	}
 
+	/**
+	 * This API is used to send information about 3cixty access token to 3cixty applications.
+	 * <br>
+	 * The API also persists 3cixty access token generated by OAuth server to 3cixty database.
+	 * <br>
+	 * Note that the API cannot directly be called from third party developers.
+	 *
+	 * @param accessToken
+	 * @param refreshToken
+	 * @param expires_in
+	 * @param scope
+	 * @return
+	 */
 	@GET
 	@Path("/redirect_uri_client")
 	public Response redirect_uri_client(@QueryParam("access_token") String accessToken,
@@ -498,7 +690,20 @@ public class OAuthServices {
 		return redirect_uri_client2(tokenInfo, expires_in, app);
 	}
 	
-	// TODO
+	/**
+	 * This API is used to refresh 3cixty token.
+	 * <br>
+	 * A given <code>refresh_token</code> is a one-time-use token. So, the <code>refresh_token</code>
+	 * will be invalid just after using it.
+	 * <br>
+	 * The API also persists the new 3cixty token generated by OAuth server from a given <code>refresh_token</code>
+	 * into database.
+	 * <br>
+	 * Note that for each 3cixty access token, there is only one corresponding refresh_token.
+	 * 
+	 * @param refresh_token
+	 * @return
+	 */
 	@GET
 	@Path("/token")
 	public Response token(@HeaderParam("refresh_token") String refresh_token) {
@@ -507,13 +712,18 @@ public class OAuthServices {
 		        .entity(" {\"response\": \"failed\", \"reason\": \"refresh_token is invalid\"} ")
 		        .type(MediaType.APPLICATION_JSON_TYPE)
 		        .build();
-
-		Gson gson = new Gson();
-		
 		return Response.status(Response.Status.OK).entity(
-				gson.toJson(refreshedToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
+				JSONObject.wrap(refreshedToken).toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
+	/**
+	 * This API is used to revoke a given 3cixty access token.
+	 * <br>
+	 * Note that invoking the API means deleting the given 3cixty token from database.
+	 *
+	 * @param access_token
+	 * @return
+	 */
 	@POST
 	@Path("/revoke")
 	public Response revoke(@HeaderParam("access_token") String access_token) {
@@ -527,6 +737,14 @@ public class OAuthServices {
 				" {\"response\": \"successful\" }").type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
+	/**
+	 * This method uses <code>redirect_uri</code> from application key to send back 3cixty access token to the application.
+	 *
+	 * @param accessToken
+	 * @param expires_in
+	 * @param app
+	 * @return
+	 */
 	private Response redirect_uri_client2(AccessToken accessToken, int expires_in, AppCache app) {
 		HttpSession session = httpRequest.getSession();
 		session.removeAttribute(APP_KEY);
@@ -543,7 +761,14 @@ public class OAuthServices {
 		return null;
 	}
 	
-	
+	/**
+	 * This method is used to create a new 3cixty access token, then persist it into database.
+	 *
+	 * @param _3cixtyUID
+	 * @param app
+	 * @param scope
+	 * @return
+	 */
 	public static Response getAccessTokenFromUid(String _3cixtyUID, AppCache app, String scope) {
 		if (!checkValidScope(scope)) {
 			return Response.status(Response.Status.BAD_REQUEST)
@@ -568,11 +793,22 @@ public class OAuthServices {
 			        .type(MediaType.APPLICATION_JSON_TYPE)
 			        .build();
 		}
-		Gson gson = new Gson();
 		return Response.status(Response.Status.OK).entity(
-				gson.toJson(accessToken)).type(MediaType.APPLICATION_JSON_TYPE).build();
+				JSONObject.wrap(accessToken).toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
+	/**
+	 * This method is used to process a given external token including information extraction (firstName, lastName, profileImage, etc.),
+	 * and creating a new 3cixty token based on extracted information. Then, the 3cixty token is persisted into database.
+	 *
+	 * @param app
+	 * @param accessTokenFromOutside
+	 * @param source
+	 * @param width
+	 * @param height
+	 * @param session
+	 * @return
+	 */
 	private Response processOutsideToken(AppCache app, String accessTokenFromOutside, String source, int width, int height, HttpSession session) {
 		String uid = "Google".equals(source) ? GoogleAccountUtils.getUID(accessTokenFromOutside)
 				: FaceBookAccountUtils.getUID(accessTokenFromOutside, width, height);
@@ -676,7 +912,6 @@ public class OAuthServices {
 			this.scopeName = scopeName;
 			this.description = desc;
 		}
-		// used by gson
 		@SuppressWarnings("unused")
 		private String scopeName;
 		@SuppressWarnings("unused")
