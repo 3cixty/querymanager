@@ -230,7 +230,7 @@
 			</div>
 			<div>
 			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
-				  <h3 class="privacy-title">Invited testers can also sign in using an ExplorMI 360 account: </h3>
+				  <h3 class="privacy-title">You can also sign in using an ExplorMI 360 account:</h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
                     <div>

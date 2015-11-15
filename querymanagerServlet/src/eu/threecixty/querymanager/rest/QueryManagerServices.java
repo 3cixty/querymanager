@@ -72,9 +72,36 @@ public class QueryManagerServices {
 		groupTriples.put("artist", "?event lode:involvedAgent ?involvedAgent .\n ?involvedAgent rdfs:label ?artist .\n");
 	}
 
+	/**The attribute which is real path to Servlet*/
 	public static String realPath;
 	
-
+	/**
+	 * This API is used to augment a given query based on the user's reviews or his/her friends/travelmates
+	 * crawled from Google places. Then, the augmented query is sent to KB to execute. The result received
+	 * from KB will be sent back to the requester of this API.
+	 * <br>
+	 * To augment the query, the formula <code>totalScore = coef * socialScore + editorialScore</code> is used
+	 * to order items by <code>totalScore</code>. To change the order of result, third party developers just
+	 * need to change a different <code>coef</code>. Check documentation for Query Augmentation to get more
+	 * detail about the algorithm used to calculate <code>socialScore</code> (task 2).
+	 * 
+	 * @param access_token
+	 * 				The 3cixty access token
+	 * @param format
+	 * 				Output format (json)
+	 * @param query
+	 * 				The SPARQL query
+	 * @param coef
+	 * 				The coefficient value
+	 * @param filter
+	 * 				The filter which is currently either <code>friends</code> or <code>enteredrating</code>. Note that
+	 * 				the value <code>null</code> means that the query doesn't need to be augmented.
+	 * @param debug
+	 * 				The flag for debug
+	 * @param turnOffQA
+	 * 				The flag to turn off query augmentation.
+	 * @return
+	 */
 	@POST
 	@Path("/augmentAndExecute2")
 	public Response executeQueryPOST(@HeaderParam("access_token") String access_token,
@@ -121,21 +148,18 @@ public class QueryManagerServices {
 		        .build();
 	}
 
-	
 	/**
-	 * This method firstly augments a given query, then sends to Eurecom to execute and receives data back.
-	 *
-	 * @param key
-	 * 				Application key
+	 * This API is a GET version of {@link augmentAndExecute2}.
+	 * @see augmentAndExecute2
+	 * 
 	 * @param access_token
-	 * 				Google access token
 	 * @param format
-	 * 				JSON or RDF format
 	 * @param query
-	 * 				Sparql query
+	 * @param coef
 	 * @param filter
-	 * 				Filter to augment the query
-	 * @return Data received from Eurecom when executing a query augmented. 
+	 * @param debug
+	 * @param turnOffQA
+	 * @return
 	 */
 	@GET
 	@Path("/augmentAndExecute")
@@ -182,6 +206,18 @@ public class QueryManagerServices {
 		        .build();
 	}
 	
+	/**
+	 * This method is used to augment a query for both GET and POST methods.
+	 *
+	 * @param access_token
+	 * @param format
+	 * @param query
+	 * @param coef
+	 * @param filter
+	 * @param debug
+	 * @param httpMethod
+	 * @return
+	 */
 	private Response executeQueryWithHttpMethod(String access_token,
 			String format, String query, double coef,
 			String filter, String debug, String httpMethod) {
@@ -232,7 +268,8 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Make query without information about 3cixty access token
+	 * This API is used to execute a given query with Virtuoso KB through HTTP POST.
+	 *
 	 * @param key
 	 * @param format
 	 * @param query
@@ -247,11 +284,11 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Make query without information about 3cixty access token
+	 * This API is used to execute a given query with Virtuoso KB through HTTP POST.
+	 *
 	 * @param key
 	 * @param format
 	 * @param query
-	 * @param filter
 	 * @return
 	 */
 	@GET
@@ -261,6 +298,15 @@ public class QueryManagerServices {
 		return executeQueryNoAccessTokenWithHttpMethod(key, format, query, SparqlEndPointUtils.HTTP_GET);
 	}
 	
+	/**
+	 * This method is used to execute a given query with Virtuoso through either HTTP GET or POST.
+	 *
+	 * @param key
+	 * @param format
+	 * @param query
+	 * @param httpMethod
+	 * @return
+	 */
 	private Response executeQueryNoAccessTokenWithHttpMethod(String key, 
 			String format, String query, String httpMethod) {
 		logInfo("Start executeQuery method ----------------------");
@@ -299,10 +345,18 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Make query to get elements in details.
+	 * This API is used to get events or places in detail.
+	 *
 	 * @param key
+	 * 				The application key
+	 * @param languages
+	 * 				The language code (two characters)
 	 * @param events
+	 * 				The list of event IDs separated by comma
 	 * @param pois
+	 * 				The list of place IDs separated by comma
+	 * @param city
+	 * 				The city
 	 * @return
 	 */
 	@GET
@@ -325,6 +379,7 @@ public class QueryManagerServices {
 							SparqlChooser.getEndPointUrl(key),
 							SparqlChooser.getEventGraph(key, city), eventIds, null, tmpLanguages);
 					if (eventsDetails != null) {
+						// use Events key for all events
 						result.put("Events", eventsDetails);
 					}
 
@@ -336,6 +391,7 @@ public class QueryManagerServices {
 							SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key, city),
 							poiIds, null, null, tmpLanguages);
 					if (poisDetails != null) {
+						// use POIs key for all places
 						result.put("POIs", poisDetails);
 					}
 				}
