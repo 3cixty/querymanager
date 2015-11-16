@@ -53,6 +53,15 @@ public class ReportServices {
 	
 	private static final String REPORT_SERVICE = "Report service";
 
+	/**
+	 * This API is used to report whether or not something is improper.
+	 * <br>
+	 * The method sends reported information to a mailing-list to distribute the report.
+	 *
+	 * @param input
+	 * @param req
+	 * @return
+	 */
 	@POST
 	@Path("/reporting")
     public Response report(InputStream input, @Context Request req) {
