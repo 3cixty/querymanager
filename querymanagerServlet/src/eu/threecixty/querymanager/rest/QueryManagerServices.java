@@ -413,8 +413,10 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Counts the number of items in the KB at EventMedia.
+	 * This API is used to count number of events.
+	 *
 	 * @param key
+	 * 				The application key.
 	 * @return
 	 */
 	@GET
@@ -443,8 +445,10 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Counts the number of PoIs in the KB.
+	 * This API is used to count number of PoIs.
+	 *
 	 * @param key
+	 * 				The application key
 	 * @return
 	 */
 	@GET
@@ -474,7 +478,7 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Gets aggregated information of a given group in the KB at EventMedia.
+	 * This API is used to get aggregated information about events.
 	 * @param group
 	 * @param offset
 	 * @param limit
@@ -537,7 +541,8 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Gets aggregated information of PoIs categories in the KB at EventMedia.
+	 * This API is used to get aggregated information about PoIs.
+	 *
 	 * @param group
 	 * @param offset
 	 * @param limit
@@ -577,7 +582,7 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Gets items in details.
+	 * This API is used to get information (ID, title, description) about events.
 	 *
 	 * @param access_token
 	 * @param offset
@@ -638,7 +643,7 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Gets PoIs in details.
+	 * This API is used to get information (ID, title - name) about PoIs.
 	 *
 	 * @param access_token
 	 * @param offset
@@ -682,7 +687,17 @@ public class QueryManagerServices {
 		}
 	}
 	
-
+	/**
+	 * This API is used to get information (ID, title, description) about events without using 3cixty token.
+	 *
+	 * @param offset
+	 * @param limit
+	 * @param filter1
+	 * @param filter2
+	 * @param city
+	 * @param key
+	 * @return
+	 */
 	@GET
 	@Path("/getItemsWithoutAccessToken")
 	public Response getItemsWithoutUserInfo(
@@ -730,6 +745,17 @@ public class QueryManagerServices {
 		}
 	}
 
+	/**
+	 * This API is used to get information (ID, title - name) about PoIs without using 3cixty token.
+	 * @param offset
+	 * @param limit
+	 * @param category
+	 * @param minRating
+	 * @param maxRating
+	 * @param city
+	 * @param key
+	 * @return
+	 */
 	@GET
 	@Path("/getPoIsWithoutAccessToken")
 	public Response getPoIsWithoutUserInfo(
@@ -763,6 +789,18 @@ public class QueryManagerServices {
 		}
 	}
 	
+	/**
+	 * This API is used to get information in detail about events.
+	 *
+	 * @param offset
+	 * @param limit
+	 * @param filter1
+	 * @param filter2
+	 * @param city
+	 * @param key
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getEventsInDetailsWithoutAccessToken")
 	public Response getEventsInDetailsWithoutUserInfo(
@@ -818,6 +856,19 @@ public class QueryManagerServices {
 		}
 	}
 	
+	/**
+	 * This API is used to get information in detail about PoIs.
+	 *
+	 * @param offset
+	 * @param limit
+	 * @param category
+	 * @param minRating
+	 * @param maxRating
+	 * @param city
+	 * @param key
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getPoIsInDetailsWithoutAccessToken")
 	public Response getPoIsInDetailsWithoutUserInfo(
@@ -858,6 +909,12 @@ public class QueryManagerServices {
 		}
 	}
 	
+	/**
+	 * This API is used to check whether or not a given query conforms to SPARQL 1.1.
+	 *
+	 * @param query
+	 * @return
+	 */
 	@GET
 	@Path("/validateQuery")
 	public Response validateSPARLQuery(@DefaultValue("") @QueryParam("query") String query) {
@@ -871,6 +928,25 @@ public class QueryManagerServices {
 		return Response.status(Response.Status.BAD_REQUEST).entity("incomprehensive query").build();
 	}
 
+	/**
+	 * Execute a given query with KB.
+	 * <br>
+	 * If the given query is for events, the given query will not be augmented.
+	 * <br>
+	 * If the given query is for PoIs, and the given <code>filter</code> is null, the given query
+	 * will not be augmented; otherwise, the given query will be augmented based on either friends / travel-mate
+	 * rating or your own rating.
+	 *
+	 * @param uid
+	 * @param query
+	 * @param filter
+	 * @param format
+	 * @param httpMethod
+	 * @param coef
+	 * @param key
+	 * @return
+	 * @throws IOException
+	 */
 	private String executeQuery(String uid, String query, String filter, String format,
 			String httpMethod, double coef, String key) throws IOException {
 
@@ -916,6 +992,15 @@ public class QueryManagerServices {
 		}
 	}
 
+	/**
+	 * Gets the list of element IDs (event or place ID) received by executing a given query.
+	 *
+	 * @param query
+	 * @param httpMethod
+	 * @param endPointUrl
+	 * @return
+	 * @throws IOException
+	 */
 	public static List <String> getElementIDs(String query, String httpMethod, String endPointUrl) throws IOException {
 
 		String formatType = "application/sparql-results+json";
@@ -924,6 +1009,7 @@ public class QueryManagerServices {
 		
 		List <String> elementIds = new LinkedList <String>();
 
+		// execute the given query and store results into StringBuilder
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, endPointUrl, sb);
 		JSONObject json = new JSONObject(sb.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -942,6 +1028,19 @@ public class QueryManagerServices {
 		return elementIds;
 	}
 	
+	/**
+	 * Creates SPARQL query for grouping category, publisher, etc.
+	 * @param group
+	 * @param offset
+	 * @param limit
+	 * @param groupname1
+	 * @param groupvalue1
+	 * @param groupname2
+	 * @param groupvalue2
+	 * @param key
+	 * @param city
+	 * @return
+	 */
 	private String createGroupQuery(String group, int offset, int limit,
 			String groupname1, String groupvalue1, String groupname2, String groupvalue2, String key, String city) {
 		StringBuffer buffer = new StringBuffer("select ?" + group + " (COUNT(*) as ?count) \n WHERE {\n { graph "
@@ -971,6 +1070,19 @@ public class QueryManagerServices {
 		return "";
 	}
 	
+	/**
+	 * Create SPARQL query for getting information about events.
+	 *
+	 * @param offset
+	 * @param limit
+	 * @param groupname1
+	 * @param groupvalue1
+	 * @param groupname2
+	 * @param groupvalue2
+	 * @param key
+	 * @param city
+	 * @return
+	 */
 	private String createSelectSparqlQuery(int offset, int limit, String groupname1, String groupvalue1,
 			String groupname2, String groupvalue2, String key, String city) {
 		StringBuffer buffer = new StringBuffer("SELECT ?event ?title ?description \n	WHERE {\n { graph "
@@ -988,6 +1100,17 @@ public class QueryManagerServices {
 				offset, limit);
 	}
 
+	/**
+	 * Create SPARQL query for getting information about PoIs.
+	 * @param offset
+	 * @param limit
+	 * @param category
+	 * @param minRating
+	 * @param maxRating
+	 * @param key
+	 * @param city
+	 * @return
+	 */
 	private String createSelectSparqlQueryForPoI(int offset, int limit,
 			String category, int minRating, int maxRating, String key, String city) {
 		StringBuffer buffer = new StringBuffer();
@@ -1002,6 +1125,14 @@ public class QueryManagerServices {
 		return createSelectSparqlQuery(buffer.toString(), offset, limit);
 	}
 
+	/**
+	 * Adds <code>LIMIT</code> and <code>OFFSET</code> to the given query.
+	 *
+	 * @param initQuery
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
 	private String createSelectSparqlQuery(String initQuery, int offset, int limit) {
 		StringBuffer query =  new StringBuffer(initQuery);
 		if (offset > 0) {
@@ -1014,7 +1145,8 @@ public class QueryManagerServices {
 	}
 
 	/**
-     * To validate the sparql query, we need prefixes. These prefixes are same as those used by EventMedia.
+     * Get all prefixes predefined. Those prefixes are defined by Virtuoso KB.
+     *
      * @return string
      */
     private String getAllPrefixes() {
@@ -1073,7 +1205,7 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Executes query without creating a new instance of QueryManager.
+	 * Executes query without using 3cixty access token.
 	 * <br>
 	 * Note that this method doesn't augment the given query.
 	 * @param query
@@ -1083,6 +1215,7 @@ public class QueryManagerServices {
 	private String executeQuery(String query, EventMediaFormat format, String httpMethod, String key, boolean stressTestOn) throws IOException {
 		if (query == null || format == null) return "";
 		String ret = null;
+		// get format to send to Virtuoso KB
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		long startTime = System.currentTimeMillis();
@@ -1091,6 +1224,7 @@ public class QueryManagerServices {
 		if (DEBUG_MOD) LOGGER.info("Time to get data from map: " + (time - startTime));
 		if (ret == null) {
 			StringBuilder builder = new StringBuilder();
+			// execute the query at Virtuoso KB, then store results into StringBuilder
 			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, SparqlChooser.getEndPointUrl(key), builder);
 			ret = builder.toString();
 		}
