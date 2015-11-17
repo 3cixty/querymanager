@@ -21,6 +21,11 @@ import eu.threecixty.querymanager.rest.AdminServices;
 import eu.threecixty.querymanager.rest.QueryManagerServices;
 import eu.threecixty.querymanager.rest.CallLogServices;
 
+/**
+ * 
+ * This class is listener to initiate variables used by 3cixty classes.
+ *
+ */
 @WebListener
 public class ThreeCixtyContextListener implements ServletContextListener {
 	private static final String FOLDER_ROOT = "3cixtyData";
@@ -34,6 +39,7 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	}
 
 	public void contextInitialized(ServletContextEvent context) {
+		// get current system path
 	    String realPath = context.getServletContext().getRealPath("/");
 	    System.setProperty("contextPath", context.getServletContext().getContextPath());
 	    String pathTo3CixtyDataFolder =  new File(new File(realPath).getParent()).getParent()
