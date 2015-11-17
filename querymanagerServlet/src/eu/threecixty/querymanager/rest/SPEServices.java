@@ -125,6 +125,18 @@ public class SPEServices {
 		}
 	}
 	
+	/**
+	 * This API is used to get all user information (including knows, WishList, accounts, firstName,
+	 * lastName, profile image) with a user name and password admin.
+	 * FIXME: This API is a subject to be reviewed for privacy.
+	 *
+	 * @param username
+	 * @param password
+	 * @param key
+	 * @param _3cixtyUID
+	 * @param language
+	 * @return
+	 */
 	@GET
 	@Path("/getUserRelatedInformation")
 	public Response getProfiles(@HeaderParam("username") String username,
@@ -147,6 +159,16 @@ public class SPEServices {
 		return Response.serverError().build();
 	}
 	
+	/**
+	 * Get all information about firstName, lastName, WishList elements, knows (people the user knows,
+	 * and people know the user), accounts.
+	 *
+	 * @param _3cixtyUID
+	 * @param language
+	 * @param key
+	 * @return
+	 * @throws TooManyConnections
+	 */
 	public static UserRelatedInformation getUserRelatedInfo(String _3cixtyUID, String language, String key) throws TooManyConnections {
 		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
 		if (profile == null) {
@@ -169,18 +191,29 @@ public class SPEServices {
 			e.printStackTrace();
 		}
 		
+		// Find all friends who have my UID in their knows
 		List <Friend> peopleHaveMeInKnows = ProfileManagerImpl.getInstance()
 				.findAll3cixtyFriendsHavingMyUIDInKnows(_3cixtyUID);
 		uri.setPeopleHaveMeInKnows(peopleHaveMeInKnows);
 		
+		// find all friends in my knows
 		findFriendsInMyKnows(uri, profile, _3cixtyUID);
 		
+		// find all accounts I have (Google, Facebook, Mobidot)
 		findAccountsAssociated(uri, profile);
 		
+		// find all accompanying interfered by using Mobidot algorithm
 		findAccompanyings(uri, profile);
 		return uri;
 	}
 	
+	/**
+	 * Find all accompanying with the given user. The accompanying is interfered by using
+	 * Mobidot algorithm.
+	 *
+	 * @param uri
+	 * @param profile
+	 */
 	private static void findAccompanyings(UserRelatedInformation uri,
 			UserProfile profile) {
 		if (profile.getAccompanyings() != null
@@ -194,8 +227,6 @@ public class SPEServices {
 		if (friendsInMyKnows == null) friendsInMyKnows = new LinkedList <Friend>();
 		
 		Set <String> myKnows = profile.getKnows();
-		// FIXME: what if two users have been using Google, Facebook, 3cixty dedicated account.
-		// They are on friends list of each other, how to show 
 		if (myKnows != null) {
 			for (String myKnow: myKnows) {
 				boolean found = false;
@@ -205,7 +236,7 @@ public class SPEServices {
 						break;
 					}
 				}
-				if (!found) {
+				if (!found) { // friends who never sign in to 3cixty
 					Friend friend = new Friend();
 					friend.setFirstName("Unknown");
 					friend.setLastName("Unknown");
