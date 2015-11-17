@@ -127,6 +127,7 @@ public class TokenCacheManager {
 		}
 
 		App app = OAuthModelsUtils.getApp(appkey);
+		if (app == null) return null;
 		AppCache appCache = createAppCache(app);
 		update(app);
 		return appCache;
