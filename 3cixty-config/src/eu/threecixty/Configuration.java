@@ -7,9 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * 
+ * The configuration class to define common variables for development, production environment.
+ *  <br>
+ *  The class loads the properties file 3cixty.properties and extracts key/value from this file.
+ */
 public class Configuration {
 
-	public static String path;
+	public static String path; // real system path to find 3cixty.properties file from .war.
+
 	private static Properties props;
 
 	private static String version;
@@ -50,10 +57,18 @@ public class Configuration {
 		return version;
 	}
 
+	/**
+	 * This method to get URL of 3cixty server (https://api.3cixty.com, https://dev.3cixty.com, http://localhost:8080).
+	 * @return
+	 */
 	public static String getHttpServer() {
 		return getProperty("HTTP_SERVER");
 	}
 	
+	/**
+	 * This method is used to get Virtuoso endpoint for trusted apps.
+	 * @return
+	 */
 	public static String getVirtuosoServer() {
 		if (http_virtuoso_server == null) {
 			http_virtuoso_server = getProperty("VIRTUOSO_SERVER");
@@ -72,6 +87,10 @@ public class Configuration {
 		http_virtuoso_server = getProperty("VIRTUOSO_SERVER");
 	}
 	
+	/**
+	 * This method is used to get Virtuoso endpoint for other apps.
+	 * @return
+	 */
 	public static String getVirtuosoServerForOutside() {
 		if (http_virtuoso_server_for_outside == null) {
 			http_virtuoso_server_for_outside = getProperty("VIRTUOSO_SERVER_FOR_OUTSIDES");
@@ -80,18 +99,35 @@ public class Configuration {
 		return getProperty("VIRTUOSO_SERVER_FOR_OUTSIDES");
 	}
 
+	/**
+	 * This method is used to get URL for 3cixty servlet.
+	 * @return
+	 */
 	public static String get3CixtyRoot() {
 		return getHttpServer() + getVersion();
 	}
 	
+	/**
+	 * This method is used to get Google client for authenticating with Google Plus.
+	 * @return
+	 */
 	public static String getGoogleClientId() {
 		return getProperty("CLIENT_ID");
 	}
 	
+	/**
+	 * This method is no longer used as 3cixty does not store user profile in Virtuoso anymore.
+	 * @deprecated
+	 * @return
+	 */
 	public static String getVirtuosoJDBC() {
 		return getProperty("VIRTUOSO_JDBC");
 	}
 	
+	/**
+	 * This method is used to 
+	 * @return
+	 */
 	public static String getFacebookAppID() {
 		return getProperty("FB_APP_ID");
 	}
@@ -105,6 +141,10 @@ public class Configuration {
 		return "prod".equalsIgnoreCase(target);
 	}
 	
+	/**
+	 * This method is used to get Trex server.
+	 * @return
+	 */
 	public static String getTrexServer() {
 		if (trexServer == null) {
 			trexServer = getProperty("TREX");
