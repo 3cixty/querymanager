@@ -21,6 +21,12 @@ import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
 
+/**
+ * 
+ * This class is no longer used for augmenting queries.
+ * @deprecated
+ *
+ */
 public class QueryAugmenterImpl implements QueryAugmenter {
 	
 	public static String allPrefixes;
