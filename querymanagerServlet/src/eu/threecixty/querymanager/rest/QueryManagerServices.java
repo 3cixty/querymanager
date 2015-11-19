@@ -37,7 +37,10 @@ import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.SparqlEndPointUtils;
+import eu.threecixty.profile.TooManyConnections;
+import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.elements.ElementDetails;
 import eu.threecixty.profile.elements.ElementDetailsUtils;
 import eu.threecixty.profile.elements.LanguageUtils;
@@ -927,6 +930,51 @@ public class QueryManagerServices {
 		}
 		return Response.status(Response.Status.BAD_REQUEST).entity("incomprehensive query").build();
 	}
+	
+	/**
+	 * This API is used to get social scores for either the user themselves or the user's friends.
+	 *
+	 * @param query
+	 * @return
+	 */
+	@GET
+	@Path("/getSocialScores")
+	public Response getSocialScores(@HeaderParam("access_token") String access_token,
+			@DefaultValue("3.0") @QueryParam("rating") double rating,
+			@DefaultValue("true") @QueryParam("ratedByFriends") boolean ratedByFriends) {
+		long starttime = System.currentTimeMillis();
+
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String user_id =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
+			String endpointUrl = SparqlChooser.getEndPointUrl(key);
+			try {
+				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+				List <String> placeIds = new LinkedList <String>();
+				List <Double> socialScores = new LinkedList <Double>();
+				if (ratedByFriends) { // my friends / travel-mates rated places
+					ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScoreForFriends(userProfile,
+							(float) rating, placeIds, socialScores, endpointUrl);
+				} else { // I rated places
+					ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScore(userProfile,
+							(float) rating, placeIds, socialScores, endpointUrl);
+				}
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_SOCIAL_SCORE_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				JSONArray jsonArray = createJSONArray(placeIds, socialScores);
+				return Response.ok(jsonArray.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (TooManyConnections e) {
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
+		} else {
+			if (access_token != null && !access_token.equals(""))
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
+		}
+	}
 
 	/**
 	 * Execute a given query with KB.
@@ -1234,6 +1282,26 @@ public class QueryManagerServices {
 			LOGGER.info("Time to make the query: " + (endTime - startTime) + " ms");
 		}
 		return ret;
+	}
+	
+	/**
+	 * Creates a JSONArray to represent a list of JSON objects made of a placeID and its corresponding social score.
+	 *
+	 * @param placeIds
+	 * @param socialScores
+	 * @return
+	 */
+	private JSONArray createJSONArray(List <String> placeIds, List <Double> socialScores) {
+		JSONArray jsonArray = new JSONArray();
+		for (int i = 0; i < placeIds.size(); i++) {
+			String placeId = placeIds.get(i);
+			Double socialScore = socialScores.get(i);
+			JSONObject json = new JSONObject();
+			json.put("placeId", placeId);
+			json.put("socialScore", socialScore);
+			jsonArray.put(0, json);
+		}
+		return jsonArray;
 	}
 
     public class KeyValuePair {

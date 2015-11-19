@@ -37,6 +37,8 @@ public class CallLoggingConstants {
 	public static final String QA_GET_ITEMS_RESTSERVICE = "QA get items rest service";
 	public static final String QA_GET_POIS_RESTSERVICE = "QA get PoIs rest service";
 	
+	public static final String QA_GET_SOCIAL_SCORE_SERVICE = "QA get social score service";
+	
 	public static final String KEY_VALIDATE_SERVICE = "Key validate service";
 	
 	public static final String MOBIDOT_EXIST_USER_SERVICE = "Mobidot exist account service";
