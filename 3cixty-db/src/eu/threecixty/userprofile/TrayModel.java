@@ -8,6 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * 
+ * This class represents information about WishList items.
+ *
+ */
 @Entity
 @Table(name = "3cixty_tray")
 public class TrayModel implements java.io.Serializable {

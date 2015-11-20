@@ -11,6 +11,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * 
+ * This class represents information about 3cixty accounts which are corresponding
+ * with ProfileIdentities.
+ *
+ */
 @Entity
 @Table(name = "3cixty_account")
 public class AccountModel implements java.io.Serializable {

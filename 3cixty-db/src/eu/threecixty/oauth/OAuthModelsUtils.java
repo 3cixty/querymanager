@@ -21,6 +21,12 @@ import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.model.User;
 import eu.threecixty.oauth.model.UserAccessToken;
 
+/**
+ * 
+ * Utility class to persist classes in the package <code>eu.threecixty.oauth.model</code>
+ * into database. The classes in the <code>eu.threecixty.oauth.model</code> package are for
+ * just OAuth purposes.
+ */
 public class OAuthModelsUtils {
 	
 	 private static final Logger LOGGER = Logger.getLogger(

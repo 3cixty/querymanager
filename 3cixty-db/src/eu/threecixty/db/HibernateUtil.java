@@ -3,6 +3,11 @@ package eu.threecixty.db;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 
+/**
+ * 
+ * Utility class to create Hibernate session.
+ *
+ */
 public class HibernateUtil {
 
     private static final SessionFactory sessionFactory = buildSessionFactory();

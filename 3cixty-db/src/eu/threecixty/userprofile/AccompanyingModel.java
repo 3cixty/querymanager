@@ -12,8 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * This model seems to be changed in the near future. So, I don't use a common class
- * for sharing code between Know and Accompanying class.
+ * This class is to represent an accompaying which is interfered by Mobidot algorithm.
  *
  * @author Cong-Kinh Nguyen
  *

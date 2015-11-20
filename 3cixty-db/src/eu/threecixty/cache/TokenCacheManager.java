@@ -16,9 +16,12 @@ import eu.threecixty.oauth.OAuthModelsUtils;
 import eu.threecixty.oauth.model.App;
 
 /**
- * This class is to deal with tokens cached in a machine. The ideal solution
- * should use distributed map for clusters.
- * XXX: improve for cluster: hazelcast or infinicache
+ * This class is used to cache 3cixty token and appkey in memcached servers.
+ * <br>
+ * Currently, there are two memcached servers which serve to cache data. The fact
+ * to choose which memcached server to cache data depends on the corresponding key
+ * used to cache. The corresponding memcached server of the given key is found by
+ * calculating the key's hexCode.
  *
  * @author Cong-Kinh Nguyen
  *

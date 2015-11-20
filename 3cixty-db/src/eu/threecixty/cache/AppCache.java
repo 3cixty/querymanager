@@ -2,6 +2,12 @@ package eu.threecixty.cache;
 
 import java.io.Serializable;
 
+/**
+ * 
+ * This class is to create a corresponding class for appkey information from database.
+ * The class is used to store in memory.
+ *
+ */
 public class AppCache implements Serializable {
 
 	/**

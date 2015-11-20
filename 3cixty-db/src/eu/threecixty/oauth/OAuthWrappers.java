@@ -25,6 +25,15 @@ import eu.threecixty.oauth.model.Scope;
 import eu.threecixty.oauth.utils.ResourceServerUtils;
 import eu.threecixty.oauth.utils.ScopeUtils;
 
+/**
+ * 
+ * Wrapper class to invoke APIs provided by OAuth server to create access token,
+ * refresh access token, and revoke token. After creating access token, this class
+ * uses the utility class <code>eu.threecixty.oauth.OAuthModelsUtils</code> to persist
+ * access token into database.
+ * <br>
+ * We suppose that appkey is a kind of access token which lasts forever.
+ */
 public class OAuthWrappers { 
 	
 	private static final String ROOT_LOCALHOST = "http://localhost:8080/";
@@ -182,10 +191,24 @@ public class OAuthWrappers {
 		return appkey;
 	}
 
+	/**
+	 * Lists all appkeys in 3cixty database which associate with the given UID.
+	 * @param uid
+	 * @return
+	 */
 	public static List <App> getApps(String uid) {
 		return OAuthModelsUtils.getApps(uid);
 	}
 	
+	/**
+	 * Refreshes token to get a new token without showing the authorization process.
+	 * <br>
+	 * This method calls the OAuth server to refresh token. After getting a new access
+	 * token, the method calls <code>OAuthModelsUtils</code> to persist it into 3cixty
+	 * database.
+	 * @param lastRefreshToken
+	 * @return
+	 */
 	public static AccessToken refreshAccessToken(String lastRefreshToken) {
 		AccessToken lastAccessToken = OAuthModelsUtils.findTokenInfoFromRefreshToken(lastRefreshToken);
 		if (lastAccessToken == null) return null;
@@ -210,6 +233,13 @@ public class OAuthWrappers {
 		return newAccessToken;
 	}
 
+	/**
+	 * Refreshes access token without asking OAuth server.
+	 * <br>
+	 * This method does not persist access token into database. Just create a new access token in memory.
+	 * @param lastAccessToken
+	 * @return
+	 */
 	private static AccessToken refreshAccessTokenWithoutUsingOAuthServer(
 			AccessToken lastAccessToken) {
 		AccessToken accessToken = new AccessToken();
@@ -221,6 +251,11 @@ public class OAuthWrappers {
 		return accessToken;
 	}
 
+	/**
+	 * Finds access token information from database.
+	 * @param accessToken
+	 * @return
+	 */
 	public static AccessToken findAccessTokenFromDB(String accessToken) {
 		AccessToken  at = TokenCacheManager.getInstance().getAccessToken(accessToken);
 		if (at != null) return at;
@@ -231,12 +266,30 @@ public class OAuthWrappers {
 		return at;
 	}
 	
+	/**
+	 * Revokes access token.
+	 * <br>
+	 * This method removes access token from 3cixty database.
+	 * <br>
+	 * Note that there is no need to remove access token from OAuth database as
+	 * checking access token validity is always done with 3cixty database first.
+	 * So, if there doesn't exist a token in 3cixty database, there will be no
+	 * need to check at OAuth database.
+	 *
+	 * @param accessToken
+	 * @return
+	 */
 	public static boolean revokeAccessToken(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return false;
 		TokenCacheManager.getInstance().remove(accessToken);
 		return OAuthModelsUtils.deleteUserAccessToken(accessToken);
 	}
 
+	/**
+	 * Finds UID from a given access token.
+	 * @param accessToken
+	 * @return
+	 */
 	public static String findUIDFrom(String accessToken) {
 		if (accessToken == null || accessToken.equals("")) return null;
 		AccessToken  at = findAccessTokenFromDB(accessToken);
@@ -244,6 +297,18 @@ public class OAuthWrappers {
 		return at.getUid();
 	}
 
+	/**
+	 * Updates information about a given appkey.
+	 * @param uid
+	 * @param appid
+	 * @param appname
+	 * @param description
+	 * @param category
+	 * @param scopeNames
+	 * @param redirect_uri
+	 * @param thumbNailUrl
+	 * @return
+	 */
 	public static boolean updateAppKey(String uid, String appid, String appname, String description,
 			String category, List<String> scopeNames, String redirect_uri, String thumbNailUrl) {
 		App app = OAuthModelsUtils.retrieveApp(uid, appid);
@@ -299,6 +364,10 @@ public class OAuthWrappers {
 		return true;
 	}
 
+	/**
+	 * Gets authentication information to authenticate with OAuth server.
+	 * @return
+	 */
 	public static String getBasicAuth() {
 		if (firstTimeForClientCoolApp) {
 			try {
@@ -366,6 +435,14 @@ public class OAuthWrappers {
 //	    return null;
 //	}
 	
+	/**
+	 * Calls OAuth server to create access token.
+	 * <br>
+	 * This method should be only called by a web application as there will appear a dialog
+	 * to ask the user about giving permission to the application to access to their
+	 * Profile / WishList.
+	 * @return
+	 */
 	private static String createAccessTokenUsingOAuthServer() {
 
 	    String postParams = "grant_type=client_credentials";
@@ -386,6 +463,15 @@ public class OAuthWrappers {
 		return null;
 	}
 
+	/**
+	 * Calls OAuth server to create access token.
+	 * <br>
+	 * This method should be used by trusted applications as there won't appear any dialogs to
+	 * ask the user about giving permission to the applications to access to Profile/WishList.
+	 * @param app
+	 * @param scope
+	 * @return
+	 */
 	public static AccessToken createAccessTokenForMobileApp(AppCache app, String scope) {
 	    boolean oauthServerBypassed = OAuthBypassedManager.getInstance().isFound(app.getAppkey());
 		if (oauthServerBypassed) {
@@ -435,6 +521,11 @@ public class OAuthWrappers {
 		return OAuthModelsUtils.getAllRedirectUris();
 	}
 	
+	/**
+	 * Calls OAuth server to refresh access token.
+	 * @param lastAccessToken
+	 * @return
+	 */
 	private static AccessToken refreshAccessTokenUsingOAuthServer(AccessToken lastAccessToken) {
 	    
 	    String postParams = "grant_type=refresh_token&refresh_token" + lastAccessToken.getRefresh_token();
@@ -476,7 +567,15 @@ public class OAuthWrappers {
 		}
 		return accessToken;
 	}
-
+	
+	/**
+	 * Creates a client to communicate with OAuth server for each application.
+	 * @param clientId
+	 * @param app_name
+	 * @param scopeNames
+	 * @param thumbNailUrl
+	 * @return
+	 */
 	private static String createClientIdForApp(String clientId,
 			String app_name, List<String> scopeNames, String thumbNailUrl) {
 		try {
@@ -507,6 +606,14 @@ public class OAuthWrappers {
 		return null;
 	}
 
+	/**
+	 * Update client for each application.
+	 * @param clientId
+	 * @param app_name
+	 * @param scopeNames
+	 * @param thumbNailUrl
+	 * @return
+	 */
 	private static boolean updateClientIdForApp(String clientId,
 			String app_name, List<String> scopeNames, String thumbNailUrl) {
 		try {

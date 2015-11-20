@@ -9,6 +9,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * 
+ * This class represents information about 3cixty dedicated user.
+ *
+ */
 @Entity
 @Table(name = "3cixty_dedicated_user", uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"email", "uid"})})

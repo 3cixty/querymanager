@@ -18,6 +18,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * 
+ * This class is to represent application key.
+ *
+ */
 @Entity
 @Table(name = "3cixty_app", uniqueConstraints = {
 		@UniqueConstraint(columnNames = "app_key"),

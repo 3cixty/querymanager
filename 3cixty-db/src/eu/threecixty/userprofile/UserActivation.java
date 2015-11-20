@@ -9,6 +9,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * 
+ * This class is to deal with activating a 3cixty dedicated account, resetting password.
+ *
+ */
 @Entity
 @Table(name = "3cixty_user_activation", uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"code"})})

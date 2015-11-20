@@ -15,6 +15,12 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.CollectionOfElements;
 
+/**
+ * 
+ * This class is to persist mapping between a friend and a user. The friend should be avoided crawling
+ * next times.
+ *
+ */
 @Entity
 @Table(name = "3cixty_forgotten_user", uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"uid"})})

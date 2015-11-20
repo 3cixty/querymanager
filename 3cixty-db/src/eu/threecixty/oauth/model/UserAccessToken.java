@@ -10,6 +10,11 @@ import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * 
+ *This class is to contain all information about 3cixty access token within 3cixty database.
+ *
+ */
 @Entity
 @Table(name = "3cixty_user_accessToken", uniqueConstraints = {
 		@UniqueConstraint(columnNames = "access_token"),
