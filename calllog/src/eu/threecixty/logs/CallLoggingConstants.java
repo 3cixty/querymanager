@@ -1,5 +1,10 @@
 package eu.threecixty.logs;
 
+/**
+ * 
+ * Constant to use for logging.
+ *
+ */
 public class CallLoggingConstants {
 
 	public static final String SETTINGS_VIEW_SERVICE = "settings view service";
