@@ -196,11 +196,17 @@ public class NearbyUtils {
 		if (listPoIsFromFriendsWishlist == null || listPoIsFromFriendsWishlist.size() == 0) {
 		    builder.append("ORDER BY ?distance \n");
 		} else {
-			builder.append("ORDER BY");
+			builder.append("ORDER BY DESC (");
+			boolean firstItem = true;
 			for (String poiFromWishList: listPoIsFromFriendsWishlist) {
-				builder.append(" DESC(?poi = <" + poiFromWishList + ">)");
+				if (firstItem) {
+					firstItem = false;
+				} else {
+					builder.append(" || ");
+				}
+				builder.append("?poi = <" + poiFromWishList + ">");
 			}
-			builder.append(" ?distance \n");
+			builder.append(") ?distance \n");
 		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
