@@ -256,11 +256,8 @@
 	    	<div class="login-benefits">
                 <h3 class="privacy-title">Benefits of Signing In</h3>
 				
-			</div>
-		
-	</div>
-</div>
-<ul class="privacy-desc">
+				  
+<ul>
   <li>You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. (Note: Google accounts are not supported by the iOS mobile app.)</li>
   <li>You can ask the application to take into account things like the ratings given by your friends.</li>
   <li>If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
@@ -270,10 +267,12 @@
 					  
 					 
 					<p class="privacy-desc">
-					<br>
 					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
 				</p>
-
+			</div>
+		
+	</div>
+</div>
 <div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
 <script type="text/javascript">
     function googleTranslateElementInit() {
