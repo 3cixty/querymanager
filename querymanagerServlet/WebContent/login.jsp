@@ -86,6 +86,9 @@
 		    box-sizing: border-box;
 		    position: relative;
 		}
+		.socialButtons {
+		    display: inline-block;
+		}
 	</style>
 </head>
 
@@ -210,10 +213,7 @@
 				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
                 <div  align="center">
-				    <table><col width="165">
-				    <tr>
-				    <td>
-				    <div>
+				    <div class="socialButtons">
 				        <button id="customBtn" class="customGPlusSignIn">
 	                        <span class="ico"></span>
 	                        <span class="buttonText">Google</span>
@@ -224,16 +224,11 @@
 						  });
 						</script>
 	                </div>
-				    </td>
-				    <td>
-				    <div>
+				    <div class="socialButtons">
 						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="xlarge">
 						Facebook
 						</fb:login-button>
 					</div>
-				    </td>
-				    </tr>
-				    </table>
 			 	</div>
 			 	</form>
 			</div>
