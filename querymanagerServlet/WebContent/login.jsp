@@ -212,8 +212,7 @@
 			<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
 				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
-                <div  align="center">
-				    <div class="socialButtons">
+                  <div  align="center">
 				        <button id="customBtn" class="customGPlusSignIn">
 	                        <span class="ico"></span>
 	                        <span class="buttonText">Google</span>
@@ -224,12 +223,12 @@
 						  });
 						</script>
 	                </div>
-				    <div class="socialButtons">
+	                <div style="height: 20px;"></div>
+				    <div align="center">
 						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="xlarge">
 						Facebook
 						</fb:login-button>
 					</div>
-			 	</div>
 			 	</form>
 			</div>
 			<div>
@@ -260,7 +259,7 @@
 					 You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. 
 					 You can ask the application to take into account things like the ratings given by your friends. 
 					 If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
-					 there, you can view a summary of your movements.
+					 there, you can view summaries of your movements.
 					 <br><br>
 					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
 				</p>
