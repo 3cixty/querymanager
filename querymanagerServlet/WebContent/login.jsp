@@ -183,7 +183,7 @@
     			</td>
     			<td>
     				<div  align="center">
-    					<h3 class="privacy-title"> Powered by </h3>
+    					<h3 class="privacy-title"> powered by </h3>
    					</div>
    				</td>
     			<td>
@@ -251,7 +251,7 @@
 			 	</form>
 			</div>
 	    	<div class="login-benefits">
-                <h3 class="privacy-title">Benefits of Signing in</h3>
+                <h3 class="privacy-title">Benefits of Signing In</h3>
 				<p class="privacy-desc"> 
 					 You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. 
 					 You can ask the application to take into account things like the ratings given by your friends. 
