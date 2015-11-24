@@ -77,6 +77,15 @@
 	    .link {
 	        color: blue;
 	    }
+	    #goog-gt-tt { display:none !important; }
+
+
+		.goog-text-highlight {
+		    background-color: inherit !important;
+		    box-shadow: 0px 0px 0px #9999aa !important;
+		    box-sizing: border-box;
+		    position: relative;
+		}
 	</style>
 </head>
 
