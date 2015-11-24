@@ -210,7 +210,7 @@
 				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
                 <div  align="center">
-				    <table align="center"><col width="165">
+				    <table><col width="165">
 				    <tr>
 				    <td>
 				    <div>
