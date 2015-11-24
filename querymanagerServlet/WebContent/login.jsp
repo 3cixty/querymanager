@@ -223,7 +223,7 @@
 						  });
 						</script>
 	                </div>
-	                <div style="height: 20px;"></div>
+	                <div style="height: 15px;"></div>
 				    <div align="center">
 						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="xlarge">
 						Facebook
@@ -255,12 +255,19 @@
 			</div>
 	    	<div class="login-benefits">
                 <h3 class="privacy-title">Benefits of Signing In</h3>
-				<p class="privacy-desc"> 
-					 You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. 
-					 You can ask the application to take into account things like the ratings given by your friends. 
-					 If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
-					 there, you can view summaries of your movements.
-					 <br><br>
+				
+				  
+<ul class="privacy-desc">
+  <li>You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. (Note: Google accounts are not supported by the iOS mobile app.)</li>
+  <li>You can ask the application to take into account things like the ratings given by your friends.</li>
+  <li>If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
+					 there, you can view summaries of your movements.</li>
+</ul>
+					  
+					  
+					 
+					<p class="privacy-desc">
+					<br>
 					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
 				</p>
 			</div>
