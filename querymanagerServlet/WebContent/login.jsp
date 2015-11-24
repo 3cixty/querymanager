@@ -265,7 +265,7 @@
 </ul>
 					  
 					  
-					 
+					 <br>
 					<p class="privacy-desc">
 					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
 				</p>
