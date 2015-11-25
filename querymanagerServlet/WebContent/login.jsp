@@ -23,8 +23,8 @@
 		        display: inline-block;
 		        background: #dd4b39;
 		        color: white;
-		        width: 164px;
-		        height: 39px;
+		        width: 98px;
+		        height: 29px;
 		        border-radius: 4px;
 		        border-color:#dd4b39;
 		        white-space: nowrap;
@@ -39,16 +39,16 @@
 		        background: url('../v2/btn_red.png') no-repeat;
 		        display: inline-block;
 		        vertical-align: middle;
-		        width: 39px;
-		        height: 39px;
+		        width: 25px;
+		        height: 25px;
 		    }
 		    span.buttonText {
 		        display: inline-block;
 		        vertical-align: middle;
-		        padding-left: 30px;
-		        padding-right: 30px;
-		        font-size: 14px;
-		        font-weight: bold;
+		        padding-left: 0px;
+		        padding-top: 1px;
+		        font-size: 13px;
+		        height: 26px;
 		        /* Use the Roboto font that is loaded in the <head> */
 		        font-family: 'Roboto', sans-serif;
 	    }
@@ -219,7 +219,7 @@
 	                </div>
 	                <div style="height: 15px;"></div>
 				    <div align="center">
-						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="xlarge">
+						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
 						Facebook
 						</fb:login-button>
 					</div>
