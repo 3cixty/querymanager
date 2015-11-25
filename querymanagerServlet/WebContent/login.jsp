@@ -11,16 +11,12 @@
 	 	
 	 	
 	 	<link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/layout.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/style.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
 	    
-	    <script src="login/jquery-1.js"></script>
 	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-		<script type="text/javascript" src="login/google_translate.js"></script>
 		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 		
 
