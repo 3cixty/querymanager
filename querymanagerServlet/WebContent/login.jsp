@@ -46,7 +46,7 @@
 		        display: inline-block;
 		        vertical-align: middle;
 		        padding-left: 0px;
-		        padding-top: 1px;
+		        padding-top: 2px;
 		        font-size: 13px;
 		        height: 26px;
 		        /* Use the Roboto font that is loaded in the <head> */
@@ -207,6 +207,7 @@
 				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
+                      <div class="socialButtons">
 				        <button id="customBtn" class="customGPlusSignIn">
 	                        <span class="ico"></span>
 	                        <span class="buttonText">Google</span>
@@ -217,12 +218,13 @@
 						  });
 						</script>
 	                </div>
-	                <div style="height: 15px;"></div>
-				    <div align="center">
+	                
+				    <div class="socialButtons">
 						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
 						Facebook
 						</fb:login-button>
 					</div>
+				  </div>
 			 	</form>
 			</div>
 			<div>
