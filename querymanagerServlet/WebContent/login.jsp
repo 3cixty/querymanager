@@ -87,6 +87,7 @@
 		.googleNotSupported
 		{
 		    font-size: 12px;
+		    color: #777;
 		}
 	</style>
 </head>
