@@ -229,7 +229,7 @@
 					</td>
                     </tr>
                   </table>
-                  <div class="privacy-title">Google accounts are not supported by the iOS mobile app.</div>
+                  <div class="privacy-title">(Google accounts are not supported by the iOS mobile app.)</div>
 				  </div>
 			 	</form>
 			</div>
