@@ -83,6 +83,12 @@
 		.socialButtons {
 		    display: inline-block;
 		}
+		
+		.googleNotSupported
+		{
+		    font-size: 12px;
+		    font-weight: normal !important;
+		}
 	</style>
 </head>
 
@@ -229,7 +235,7 @@
 					</td>
                     </tr>
                   </table>
-                  <div class="privacy-title">(Google accounts are not supported by the iOS mobile app.)</div>
+                  <div class="googleNotSupported">(Google accounts are not supported by the iOS mobile app.)</div>
 				  </div>
 			 	</form>
 			</div>
