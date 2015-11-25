@@ -80,9 +80,6 @@
 		    box-sizing: border-box;
 		    position: relative;
 		}
-		.socialButtons {
-		    display: inline-block;
-		}
 		
 		.googleNotSupported
 		{
@@ -186,7 +183,7 @@
   }
 </script>
 <div class="wrapper">
-	<div class="logo">
+	<div class="logo" align="center" >
 		<table>
 			<tr>
 		  		<td>
