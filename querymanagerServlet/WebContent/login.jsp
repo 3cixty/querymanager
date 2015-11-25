@@ -36,9 +36,10 @@
 		        font-weight: bold;
 		    }
 		    span.ico {
-		        background: url('../v2/btn_red.png') no-repeat;
+		        background: url('../v2/btn_red.svg') no-repeat;
 		        display: inline-block;
 		        vertical-align: middle;
+		        background-size: 20px;
 		        width: 23px;
 		        height: 23px;
 		    }
