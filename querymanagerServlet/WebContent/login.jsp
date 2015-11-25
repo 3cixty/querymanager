@@ -229,6 +229,7 @@
 					</td>
                     </tr>
                   </table>
+                  <div>Google accounts are not supported by the iOS mobile app</div>
 				  </div>
 			 	</form>
 			</div>
@@ -259,7 +260,7 @@
 				
 				  
 <ul>
-  <li>You can save items on your Wish List and access them from the mobile apps of ExplorMI 360. (Note: Google accounts are not supported by the iOS mobile app.)</li>
+  <li>You can save items on your Wish List and access them from the mobile apps of ExplorMI 360.</li>
   <li>You can ask the application to take into account things like the ratings given by your friends.</li>
   <li>If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
 					 there, you can view summaries of your movements.</li>
