@@ -9,6 +9,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 		<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
 	 	
+    	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
 	    
 	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
