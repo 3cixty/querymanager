@@ -64,7 +64,8 @@
    			padding: 9px;
    			display: inline-block;
    			color: rgba(0,0,0,1);
-   			text-shadow: 0px 1px 1px rgba(227,227,227,1)
+   			text-shadow: 0px 1px 1px rgba(227,227,227,1);
+   			cursor: pointer;
 	    }
 	    .link {
 	        color: blue;
