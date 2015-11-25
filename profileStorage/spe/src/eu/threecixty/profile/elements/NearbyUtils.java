@@ -91,12 +91,18 @@ public class NearbyUtils {
 		builder.append("} \n");
 		if (listEventsFromFriendsWishlist == null || listEventsFromFriendsWishlist.size() == 0) {
 		    builder.append("ORDER BY ?distance \n");
-		} else {
-			builder.append("ORDER BY");
+		} else {	
+			builder.append("ORDER BY DESC (");
+			boolean firstItem = true;
 			for (String eventFromWishList: listEventsFromFriendsWishlist) {
-				builder.append(" DESC(?event = <" + eventFromWishList + ">)");
+				if (firstItem) {
+					firstItem = false;
+				} else {
+					builder.append(" || ");
+				}
+				builder.append("?event = <" + eventFromWishList + ">");
 			}
-			builder.append(" ?distance \n");
+			builder.append(") ?distance \n");
 		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
