@@ -24,7 +24,7 @@
 		        background: #dd4b39;
 		        color: white;
 		        width: 98px;
-		        height: 29px;
+		        height: 27px;
 		        border-radius: 4px;
 		        border-color:#dd4b39;
 		        white-space: nowrap;
@@ -39,8 +39,8 @@
 		        background: url('../v2/btn_red.png') no-repeat;
 		        display: inline-block;
 		        vertical-align: middle;
-		        width: 25px;
-		        height: 25px;
+		        width: 23px;
+		        height: 23px;
 		    }
 		    span.buttonText {
 		        display: inline-block;
@@ -48,7 +48,7 @@
 		        padding-left: 0px;
 		        padding-top: 2px;
 		        font-size: 13px;
-		        height: 26px;
+		        height: 24px;
 		        /* Use the Roboto font that is loaded in the <head> */
 		        font-family: 'Roboto', sans-serif;
 	    }
@@ -207,7 +207,10 @@
 				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
-                      <div class="socialButtons">
+                  <table>
+                    <tr>
+                      <td>
+                      
 				        <button id="customBtn" class="customGPlusSignIn">
 	                        <span class="ico"></span>
 	                        <span class="buttonText">Google</span>
@@ -217,13 +220,15 @@
 					    		$('#form').submit();
 						  });
 						</script>
-	                </div>
+	                </td>
 	                
-				    <div class="socialButtons">
+				    <td>
 						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
 						Facebook
 						</fb:login-button>
-					</div>
+					</td>
+                    </tr>
+                  </table>
 				  </div>
 			 	</form>
 			</div>
