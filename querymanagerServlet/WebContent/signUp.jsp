@@ -163,7 +163,7 @@ if (key != null) {
     	</table>
     </div>
 
- 	<div class="mainReg">
+ 	<div class="mainReg" align="center">
 
         <div class="register">
           <h3>Create an ExplorMI 360 account</h3>
@@ -188,8 +188,7 @@ if (key != null) {
               <label for="password-again">Confirm Password</label>
               <input type="password" id="password-again" name="password-again" required />
             </div>
-            <div>
-              <label></label>
+            <div align="center">
               <input type="submit" value="Create Account" id="create-account" class="button"/>
             </div>
             <input type="hidden" name="key" value='<%=key%>'>
