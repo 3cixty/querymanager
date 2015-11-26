@@ -2,13 +2,25 @@ package eu.threecixty.profile;
 
 import java.util.List;
 
+/**
+ * 
+ * This class is used to export user-related information.
+ *
+ */
 public class Friend {
 
-	private String uid;
-	private String firstName;
-	private String lastName;
-	private String source;
-	private String accountId;
+	private String uid; // 3cixty UID
+	private String firstName; // first name
+	private String lastName; // last name
+	private String source; // source
+	private String accountId; // account ID (Google UID, Facebook UID)
+	
+	/*
+	 * This attribute can be only used if the user has been merged their account.
+	 * So, <code>source</code> and <code>accountId</code> in the instance of
+	 * Friend (container instance to expose to the world) must be empty as the
+	 * instance is just a container to contain    
+	 */
 	private List <Friend> derivedFrom;
 	
 	public String getUid() {
