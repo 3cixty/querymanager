@@ -1,13 +1,19 @@
 package eu.threecixty.profile;
 
+import java.io.Serializable;
+
 /**
  * This class defines tray item information.
  * Question: should we need to check whether or not event information is correct.
  * @author Cong-Kinh NGUYEN
  *
  */
-public class Tray {
+public class Tray implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7343223023348165957L;
 	private String element_id;
 	private String element_type;
 	private String element_title;
@@ -21,6 +27,7 @@ public class Tray {
 	private int rating = -1;
 	
 	private String image_url;
+	private Long creationTimestamp;
 	
 	public String getElement_id() {
 		return element_id;
@@ -100,6 +107,14 @@ public class Tray {
 
 	public void setImage_url(String image_url) {
 		this.image_url = image_url;
+	}
+
+	public Long getCreationTimestamp() {
+		return creationTimestamp;
+	}
+
+	public void setCreationTimestamp(Long creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
 	}
 
 	public enum OrderType {

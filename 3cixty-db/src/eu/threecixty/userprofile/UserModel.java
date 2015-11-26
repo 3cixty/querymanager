@@ -17,6 +17,11 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.CollectionOfElements;
 
+/**
+ * 
+ * This class is to represent the user profile.
+ *
+ */
 @Entity
 @Table(name = "3cixty_user_profile", uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"uid"})})
@@ -30,8 +35,8 @@ public class UserModel implements java.io.Serializable {
 	private String firstName;
 	private String lastName;
 	private String uid;
-	private String gender;
 	private String profileImage;
+	
 	
 	private Set <String> knows;
 	
@@ -73,14 +78,6 @@ public class UserModel implements java.io.Serializable {
 	}
 	public void setUid(String uid) {
 		this.uid = uid;
-	}
-	
-	@Column(name = "gender", nullable = true, length = 100)
-	public String getGender() {
-		return gender;
-	}
-	public void setGender(String gender) {
-		this.gender = gender;
 	}
 	
 	@Column(name = "profileImage", nullable = true, length = 255)

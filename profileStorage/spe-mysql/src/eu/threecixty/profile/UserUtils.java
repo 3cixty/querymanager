@@ -1,10 +1,12 @@
 package eu.threecixty.profile;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -34,8 +36,28 @@ public class UserUtils {
 			 UserUtils.class.getName());
 
 	 /**Attribute which is used to improve performance for logging out information*/
-	 //private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
+	public static boolean remove(UserProfile profile) {
+		if (profile == null) return false;
+		Session session = null;
+		boolean ok = false;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			
+			session.beginTransaction();
+			
+			session.getTransaction().commit();
+			
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+			session.getTransaction().rollback();
+		} finally {
+			if (session != null) session.close();
+		}
+		return ok;
+	}
+	
 	 /**
 	  * Checks whether or not a given 3cixty UID exists in the DB.
 	  * @param _3cixtyUid
@@ -65,10 +87,9 @@ public class UserUtils {
 	 * Finds the corresponding 3cixtyUID with a given 
 	 * @param uid
 	 * @param source
-	 * @param profileImage
 	 * @return
 	 */
-	public static String find3cixtyUID(String uid, String source, String profileImage) {
+	public static String find3cixtyUID(String uid, String source) {
 		if (isNullOrEmpty(uid)) return null;
 		String _3cixtyUID = null;
 		Session session = null;
@@ -80,13 +101,6 @@ public class UserUtils {
 			List <?> results = query.setString(0, uid).setString(1, source).list();
 			if (results.size() > 0) {
 				_3cixtyUID = ((AccountModel) results.get(0)).getUserModel().getUid();
-			} else if (!isNullOrEmpty(profileImage)) {
-				hql = "FROM UserModel U WHERE U.profileImage = ?";
-				query = session.createQuery(hql);
-				results = query.setString(0, profileImage).list();
-				if (results.size() > 0) {
-					_3cixtyUID = ((UserModel) results.get(0)).getUid();
-				}
 			}
 
 		} catch (HibernateException e) {
@@ -152,26 +166,36 @@ public class UserUtils {
 
 			session.beginTransaction();
 			
+			Map <String , UserModel> localUserModels = new HashMap<String, UserModel>();
+			
 			for (UserProfile profile: profiles) {
 
 				UserModel userModel = new UserModel();
 				userModel.setUid(profile.getHasUID());
 
 				session.save(userModel);
-
-				profile.setModelIdInPersistentDB(userModel.getId());
-
+				
+				localUserModels.put(userModel.getUid(), userModel);
 			}
 			
 			session.getTransaction().commit();
 
 			for (UserProfile profile: profiles) {
-				ProfileCacheManager.getInstance().put(profile);
+				UserModel tmpModel = localUserModels.get(profile.getHasUID());
+				if (tmpModel != null) {
+					if (tmpModel.getId() != null) {
+					    profile.setModelIdInPersistentDB(tmpModel.getId());
+				        ProfileCacheManager.getInstance().put(profile);
+					}
+				}
 			}
 			added = true;
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 			if (session != null) session.getTransaction().rollback();
+			for (UserProfile profile: profiles) {
+				ProfileCacheManager.getInstance().remove(profile);
+			}
 		} finally {
 			if (session != null) session.close();
 		}
@@ -240,13 +264,15 @@ public class UserUtils {
 						tmpUids.add(generatedID);
 					}
 				}
-				String userModelSql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
-				List <?> userModelList = session.createSQLQuery(userModelSql).setParameterList("uids",
-						tmpUids).list();
-				for (Object obj: userModelList) {
-					String tmpUid = obj.toString();
-					_3cixtyUids.add(tmpUid);
-					accountIdsExisted.add(tmpUid.substring(2));
+				if (tmpUids.size() > 0) {
+					String userModelSql = "SELECT uid FROM 3cixty_user_profile  WHERE uid IN (:uids)";
+					List <?> userModelList = session.createSQLQuery(userModelSql).setParameterList("uids",
+							tmpUids).list();
+					for (Object obj: userModelList) {
+						String tmpUid = obj.toString();
+						_3cixtyUids.add(tmpUid);
+						accountIdsExisted.add(tmpUid.substring(2));
+					}
 				}
 			}
 			
@@ -271,8 +297,7 @@ public class UserUtils {
 	 * @param profileImage
 	 * @return
 	 */
-	public static UserProfile findUserProfile(String uid, String source,
-			String profileImage) {
+	public static UserProfile findUserProfile(String uid, String source) {
 		Session session = null;
 		UserProfile userProfile = null;
 		try {
@@ -286,10 +311,10 @@ public class UserUtils {
 			UserModel userModel = null;
 			if (results.size() > 0) {
 				userModel = ((AccountModel) results.get(0)).getUserModel();
-			} else if (!isNullOrEmpty(profileImage)) {
-				hql = "FROM UserModel U WHERE U.profileImage = ? OR U.uid = ?";
+			} else {
+				hql = "FROM UserModel U WHERE U.uid = ?";
 				query = session.createQuery(hql);
-				results = query.setString(0, profileImage).setString(1, tmpUid).list();
+				results = query.setString(0, tmpUid).list();
 				if (results.size() > 0) {
 					userModel = ((UserModel) results.get(0));
 				}
@@ -303,6 +328,85 @@ public class UserUtils {
 		}
 		return userProfile;
 	}
+	
+	/**
+	 * Find all friends which have a list of knows containing the given 3cixty UID.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {
+		Session session = null;
+		List <Friend> friends = new LinkedList<Friend>();
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT DISTINCT accountId, uid, source, firstName, lastName, element FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id=3cixty_user_profile_knows.3cixty_user_profile_id AND (3cixty_user_profile.id = 3cixty_account.3cixty_user_id) AND (source like 'Google' OR source like 'Facebook') AND element = :myUID";
+			List <Object[]> results = session.createSQLQuery(sql).setParameter("myUID", my3cixtyUID).list();
+			
+			Map <String, Friend> uidFriends = new HashMap<String, Friend>();
+			processFriendData(results, uidFriends);
+			friends.addAll(uidFriends.values());
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return friends;
+	}
+	
+	/**
+	 * Find all friends in the list of knows of the given 3cixty UID.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Friend> findAllFriendsInMyListOfKnows(String my3cixtyUID) {
+		Session session = null;
+		List <Friend> friends = new LinkedList<Friend>();
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+
+			String sql = "SELECT DISTINCT accountId, uid, source, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_account where 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid in (SELECT element FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id= 3cixty_user_profile_id AND 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid = :myUID)";
+			List <Object[]> results = session.createSQLQuery(sql).setParameter("myUID", my3cixtyUID).list();
+			Map <String, Friend> uidFriends = new HashMap<String, Friend>();
+			processFriendData(results, uidFriends);
+			friends.addAll(uidFriends.values());
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			if (session != null) session.close();
+		}
+		return friends;
+	}
+	
+	private static void processFriendData(List <Object[]> listFromQuery, Map <String, Friend> uidFriends) {
+		for (Object [] obj: listFromQuery) {
+			Friend friend = new Friend();
+			friend.setUid(obj[1].toString());
+			friend.setAccountId(obj[0].toString());
+			friend.setSource(obj[2].toString());
+			friend.setFirstName(obj[3].toString());
+			friend.setLastName(obj[4].toString());
+			if (friend.getSource().equals(SPEConstants.MOBIDOT_SOURCE)) continue;
+			if (!uidFriends.containsKey(friend.getUid())) uidFriends.put(friend.getUid(), friend);
+			else {
+				Friend existingFriend = uidFriends.get(friend.getUid());
+				Friend newFriendCreatedFromExistingFriend = existingFriend.clone();
+				List <Friend> derivedFrom = new LinkedList<Friend>();
+				derivedFrom.add(friend);
+				derivedFrom.add(newFriendCreatedFromExistingFriend);
+				existingFriend.setDerivedFrom(derivedFrom);
+				if (friend.getSource().equals(SPEConstants.GOOGLE_SOURCE)) {
+					existingFriend.setFirstName(friend.getFirstName());
+					existingFriend.setLastName(friend.getLastName());
+					existingFriend.setSource(null);
+					existingFriend.setAccountId(null);
+				}
+			}
+		}
+	}
+	
 	
 	private static boolean updateUserProfile(UserProfile userProfile) {
 		Session session = null;
@@ -350,6 +454,8 @@ public class UserUtils {
 			session.update(userModel);
 			
 			session.getTransaction().commit();
+			
+			userProfile.setModelIdInPersistentDB(userModel.getId());
 
 			added = true;
 		} catch (HibernateException e) {
@@ -365,12 +471,11 @@ public class UserUtils {
 			UserModel userModel, Session session) throws HibernateException {
 		convertNameForPersistence(userProfile, userModel);
 		convertAddressForPersistence(userProfile, userModel, session);
-		userModel.setGender(userProfile.getHasGender());
 		userModel.setProfileImage(userProfile.getProfileImage());
 		if (!isNullOrEmpty(userProfile.getHasLastCrawlTime())) {
 			userModel.setLastCrawlTimeToKB(Long.parseLong(userProfile.getHasLastCrawlTime()));
 		}
-		//convertKnowsForPersistence(userProfile, userModel);
+		convertKnowsForPersistence(userProfile.getKnows(), userModel);
 		convertAccountsForPersistence(userProfile, userModel, session);
 		convertAccompanyingsForPersistence(userProfile, userModel, session);
 	}
@@ -380,11 +485,13 @@ public class UserUtils {
 		Set <Accompanying> accompanyings = profile.getAccompanyings();
 		Set <AccompanyingModel> accompanyingModels = userModel.getAccompanyings();
 		if (accompanyings == null || accompanyings.size() == 0) {
+			if (DEBUG_MOD) LOGGER.info("list of accompanyings before saving: empty");
 			if (accompanyingModels != null && accompanyingModels.size() > 0) {
 				accompanyingModels.clear();
 			}
 			return;
 		}
+		if (DEBUG_MOD) LOGGER.info("number of accompanyings before saving: " + accompanyings.size());
 		if (accompanyingModels == null) {
 			accompanyingModels = new HashSet<AccompanyingModel>();
 			userModel.setAccompanyings(accompanyingModels);
@@ -461,15 +568,14 @@ public class UserUtils {
 
 	private static void convertKnowsForPersistence(Set <String> knowsStrs,
 			UserModel userModel) {
-		if (knowsStrs == null || knowsStrs.size() == 0) userModel.setKnows(null);
+		if (DEBUG_MOD) LOGGER.info("Entering in the method convertKnowsForPersistence");
+		if (knowsStrs == null || knowsStrs.size() == 0) {
+			if (DEBUG_MOD) LOGGER.info("Empty knows");
+			userModel.setKnows(null);
+		}
 		else {
-			Set <String> knowsModel = userModel.getKnows();
-			if (knowsModel == null) {
-				knowsModel = new HashSet <String>();
-				userModel.setKnows(knowsModel);
-			}
-			knowsModel.clear();
-			knowsModel.addAll(knowsStrs);
+			if (DEBUG_MOD) LOGGER.info("Knows size: " + knowsStrs.size()+ ", " + knowsStrs);
+			userModel.setKnows(knowsStrs);
 		}
 	}
 
@@ -513,8 +619,6 @@ public class UserUtils {
 		
 		convertName(userModel, userProfile);
 		convertAddress(userModel, userProfile);
-		
-		if (!isNullOrEmpty(userModel.getGender())) userProfile.setHasGender(userModel.getGender());
 		
 		if (!isNullOrEmpty(userModel.getProfileImage()))
 			userProfile.setProfileImage(userModel.getProfileImage());
@@ -613,8 +717,8 @@ public class UserUtils {
 			mappings = new HashSet <IDMapping>();
 			for (Object[] row: results) {
 				IDMapping idMapping = new IDMapping();
-				idMapping.setThreeCixtyID((String) row[0]);
-				idMapping.setMobidotID((String) row[1]);
+				idMapping.setThreeCixtyID(((String) row[0]).trim());
+				idMapping.setMobidotID(((String) row[1]).trim());
 				mappings.add(idMapping);
 			}
 		} catch (HibernateException e) {

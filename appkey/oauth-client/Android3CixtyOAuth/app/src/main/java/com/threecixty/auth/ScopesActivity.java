@@ -24,7 +24,7 @@ public class ScopesActivity extends Activity {
 		setContentView(R.layout.activity_scopes);
 		
 		TextView titleView = (TextView) findViewById(R.id.scopeTitle);
-		titleView.setText(appName + " wants to retrieve data from 3Cixty platform");
+		titleView.setText(appName + " wants to retrieve data from 3cixty platform");
 
 		TextView decView = (TextView) findViewById(R.id.scopeDeclaration);
 		decView.setText("This data will be shared");

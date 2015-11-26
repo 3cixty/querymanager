@@ -49,7 +49,7 @@ public class FaceBookAccountUtils {
 			
 			String _3cixtyUID = null;
 			
-			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(uid, SPEConstants.FACEBOOK_SOURCE, picture);
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(uid, SPEConstants.FACEBOOK_SOURCE);
 			if (profile == null) {
 				_3cixtyUID = Utils.gen3cixtyUID(uid, UidSource.FACEBOOK);
 				profile = new UserProfile();
@@ -57,6 +57,7 @@ public class FaceBookAccountUtils {
 			} else {
 				_3cixtyUID = profile.getHasUID();
 			}
+			ProfileManagerImpl.getInstance().getForgottenUserManager().remove(_3cixtyUID); // remove from forgotten user table
 			boolean generalInfoModified = Utils.checkNameAndProfileImageModified(profile, firstName, lastName, picture);
 			if (generalInfoModified) {
 				if (picture != null) profile.setProfileImage(picture);
@@ -93,7 +94,18 @@ public class FaceBookAccountUtils {
 		return null;
 	}
 	
-
+	public static boolean existUserProfile(String accessToken) {
+		try {
+			String reqMsg = Utils.readUrl(FACE_BOOK_ACCESS_TOKEN_VALIDATION + accessToken);
+			JSONObject json = new JSONObject(reqMsg);
+			String user_id = json.getString("id");
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(user_id, SPEConstants.FACEBOOK_SOURCE);
+			if (profile != null) return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
 	private static void updateKnows(String accessToken, String user_id,
 			UserProfile profile) {

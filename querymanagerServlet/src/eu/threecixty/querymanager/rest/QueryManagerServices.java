@@ -25,33 +25,29 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 
-import eu.threecixty.cache.CacheManager;
+import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
-import eu.threecixty.profile.IProfiler;
 import eu.threecixty.profile.ProfileManagerImpl;
-import eu.threecixty.profile.Profiler;
 import eu.threecixty.profile.SparqlEndPointUtils;
 import eu.threecixty.profile.TooManyConnections;
-import eu.threecixty.profile.UnknownException;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.elements.ElementDetails;
-import eu.threecixty.profile.elements.ElementPoIDetails;
 import eu.threecixty.profile.elements.ElementDetailsUtils;
 import eu.threecixty.profile.elements.LanguageUtils;
 import eu.threecixty.querymanager.EventMediaFormat;
-import eu.threecixty.querymanager.IQueryManager;
-import eu.threecixty.querymanager.QueryManager;
-import eu.threecixty.querymanager.QueryManagerDecision;
-import eu.threecixty.querymanager.ThreeCixtyQuery;
+import eu.threecixty.querymanager.QueryAugmentationUtils;
+import eu.threecixty.querymanager.QueryAugmenterFilter;
+import eu.threecixty.querymanager.QueryAugmenterImpl;
 
 /**
  * The class is an end point for QA RestAPIs to expose to other components.
@@ -79,111 +75,194 @@ public class QueryManagerServices {
 		groupTriples.put("artist", "?event lode:involvedAgent ?involvedAgent .\n ?involvedAgent rdfs:label ?artist .\n");
 	}
 
+	/**The attribute which is real path to Servlet*/
 	public static String realPath;
-	private static String allPrefixes;
 	
-
+	/**
+	 * This API is used to augment a given query based on the user's reviews or his/her friends/travelmates
+	 * crawled from Google places. Then, the augmented query is sent to KB to execute. The result received
+	 * from KB will be sent back to the requester of this API.
+	 * <br>
+	 * To augment the query, the formula <code>totalScore = coef * socialScore + editorialScore</code> is used
+	 * to order items by <code>totalScore</code>. To change the order of result, third party developers just
+	 * need to change a different <code>coef</code>. Check documentation for Query Augmentation to get more
+	 * detail about the algorithm used to calculate <code>socialScore</code> (task 2).
+	 * 
+	 * @param access_token
+	 * 				The 3cixty access token
+	 * @param format
+	 * 				Output format (json)
+	 * @param query
+	 * 				The SPARQL query
+	 * @param coef
+	 * 				The coefficient value
+	 * @param filter
+	 * 				The filter which is currently either <code>friends</code> or <code>enteredrating</code>. Note that
+	 * 				the value <code>null</code> means that the query doesn't need to be augmented.
+	 * @param debug
+	 * 				The flag for debug
+	 * @param turnOffQA
+	 * 				The flag to turn off query augmentation.
+	 * @return
+	 */
 	@POST
 	@Path("/augmentAndExecute2")
 	public Response executeQueryPOST(@HeaderParam("access_token") String access_token,
 			@FormParam("format") String format, @FormParam("query") String query,
-			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug) {
+			@DefaultValue("1") @FormParam("coef") double coef,
+			@FormParam("filter") String filter, @DefaultValue("off") @FormParam("debug") String debug,
+			@DefaultValue("false") @QueryParam("turnOffQA") String turnOffQA) {
 		
-		return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		//return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, coef, filter, debug, SparqlEndPointUtils.HTTP_POST);
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String key = userAccessToken.getAppkey();
+			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+			if (eventMediaFormat == null || query == null) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("The format is not supported or query is null")
+						.type(MediaType.TEXT_PLAIN)
+						.build();
+			} else {
+
+				try {
+					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, key, false);
+
+					// log calls
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+
+					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+				} catch (IOException e) {
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
+			}
+		}
+		return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity("Invalid access token")
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
 	}
 
-	
 	/**
-	 * This method firstly augments a given query, then sends to Eurecom to execute and receives data back.
-	 *
-	 * @param key
-	 * 				Application key
+	 * This API is a GET version of {@link augmentAndExecute2}.
+	 * @see augmentAndExecute2
+	 * 
 	 * @param access_token
-	 * 				Google access token
 	 * @param format
-	 * 				JSON or RDF format
 	 * @param query
-	 * 				Sparql query
+	 * @param coef
 	 * @param filter
-	 * 				Filter to augment the query
-	 * @return Data received from Eurecom when executing a query augmented. 
+	 * @param debug
+	 * @param turnOffQA
+	 * @return
 	 */
 	@GET
 	@Path("/augmentAndExecute")
 	public Response executeQuery(@HeaderParam("access_token") String access_token,
 			@QueryParam("format") String format, @QueryParam("query") String query,
-			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug) {
-		return executeQueryWithHttpMethod(access_token, format, query, filter, debug, SparqlEndPointUtils.HTTP_GET);
-	}
-	
-	private Response executeQueryWithHttpMethod(String access_token,
-			String format, String query,
-			String filter, String debug, String httpMethod) {
-		logInfo("Start augmentAndExecute method ----------------------");
+			@DefaultValue("1") @QueryParam("coef") double coef,
+			@QueryParam("filter") String filter, @DefaultValue("off") @QueryParam("debug") String debug,
+			@DefaultValue("false") @QueryParam("turnOffQA") String turnOffQA) {
+		// check whether or not the flag for turning off QA is true
+		if (!"true".equalsIgnoreCase(turnOffQA)) return executeQueryWithHttpMethod(access_token, format, query, coef, filter, debug, SparqlEndPointUtils.HTTP_GET);
 		long starttime = System.currentTimeMillis();
 		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
 		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			logInfo("Found a valid access token");
+			String key = userAccessToken.getAppkey();
+			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
+			if (eventMediaFormat == null || query == null) {
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.entity("The format is not supported or query is null")
+						.type(MediaType.TEXT_PLAIN)
+						.build();
+			} else {
+
+				try {
+					String result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_POST, key, false);
+
+					// log calls
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+
+					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
+							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+				} catch (IOException e) {
+					LOGGER.error(e.getMessage());
+					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					        .entity(e.getMessage())
+					        .type(MediaType.TEXT_PLAIN)
+					        .build();
+				}
+			}
+		}
+		return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+		        .entity("Invalid access token")
+		        .type(MediaType.TEXT_PLAIN)
+		        .build();
+	}
+	
+	/**
+	 * This method is used to augment a query for both GET and POST methods.
+	 *
+	 * @param access_token
+	 * @param format
+	 * @param query
+	 * @param coef
+	 * @param filter
+	 * @param debug
+	 * @param httpMethod
+	 * @return
+	 */
+	private Response executeQueryWithHttpMethod(String access_token,
+			String format, String query, double coef,
+			String filter, String debug, String httpMethod) {
+		if (DEBUG_MOD) LOGGER.info("Start augmentAndExecute method ----------------------");
+		long starttime = System.currentTimeMillis();
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			if (DEBUG_MOD) LOGGER.info("Found a valid access token");
 			String user_id =  userAccessToken.getUid();
 			if ("on".equals(debug)) {
 				user_id = "107217557295681360318";
 			}
 			String key = userAccessToken.getAppkey();
 
-			EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
-			if (eventMediaFormat == null || query == null) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.UNSUPPORTED_FORMAT);
-				throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-						.entity("The format is not supported or query is null")
-						.type(MediaType.TEXT_PLAIN)
-						.build());
-			} else {
-				logInfo("Before reading user profile");
+			try {
+				if (DEBUG_MOD) LOGGER.info("Before augmenting and executing a query");
 
-				try {
-					UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-					IProfiler profiler = new Profiler(userProfile);
-					QueryManager qm = new QueryManager(user_id);
-					logInfo("Before augmenting and executing a query");
-					
-					String result = executeQuery(profiler, qm, query, filter,
-							eventMediaFormat, true, isLimitForProfile(userAccessToken), httpMethod);
+				String result = executeQuery(user_id, query, filter, format, httpMethod, coef, key);
 
-					// log calls
-					
-					if (filter == null) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("location")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("enteredrating")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("preferred")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else if (filter.equals("friends")) {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					} else {
-						CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
-					}
+				// log calls
 
-					return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
-							MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
-				} catch (ThreeCixtyPermissionException tcpe) {
-					CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.ILLEGAL_QUERY + query);
-					return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					        .entity(tcpe.getMessage())
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
-				} catch (TooManyConnections e) {
-					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					        .entity(e.getMessage())
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
-				} catch (UnknownException e) {
-					return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					        .entity(e.getMessage())
-					        .type(MediaType.TEXT_PLAIN)
-					        .build();
+				if (filter == null) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("location")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_LOCATION_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("enteredrating")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_USERENTERED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("preferred")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_PREFERRED_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else if (filter.equals("friends")) {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_WITH_FRIENDS_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				} else {
+					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
 				}
+
+				return Response.ok(result, Constants.JSON.equals(format) ?
+						MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
+			} catch (IOException e) {
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+						.entity(e.getMessage())
+						.type(MediaType.TEXT_PLAIN)
+						.build();
 			}
 		} else {
 			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_SPARQL_SERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
@@ -192,7 +271,8 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Make query without information about 3cixty access token
+	 * This API is used to execute a given query with Virtuoso KB through HTTP POST.
+	 *
 	 * @param key
 	 * @param format
 	 * @param query
@@ -207,11 +287,11 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Make query without information about 3cixty access token
+	 * This API is used to execute a given query with Virtuoso KB through HTTP POST.
+	 *
 	 * @param key
 	 * @param format
 	 * @param query
-	 * @param filter
 	 * @return
 	 */
 	@GET
@@ -246,6 +326,15 @@ public class QueryManagerServices {
 		return executeQueryNoAccessTokenWithHttpMethod(key, format, query, SparqlEndPointUtils.HTTP_GET);
 	}
 	
+	/**
+	 * This method is used to execute a given query with Virtuoso through either HTTP GET or POST.
+	 *
+	 * @param key
+	 * @param format
+	 * @param query
+	 * @param httpMethod
+	 * @return
+	 */
 	private Response executeQueryNoAccessTokenWithHttpMethod(String key, 
 			String format, String query, String httpMethod) {
 		logInfo("Start executeQuery method ----------------------");
@@ -262,7 +351,7 @@ public class QueryManagerServices {
 			} else {
 
 				try {
-					String result = executeQuery(query, eventMediaFormat, httpMethod, false);
+					String result = executeQuery(query, eventMediaFormat, httpMethod, key, false);
 
 					// log calls
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_SPARQL_NO_FILTER_SERVICE, CallLoggingConstants.SUCCESSFUL);
@@ -284,17 +373,26 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Make query to get elements in details.
+	 * This API is used to get events or places in detail.
+	 *
 	 * @param key
+	 * 				The application key
+	 * @param languages
+	 * 				The language code (two characters)
 	 * @param events
+	 * 				The list of event IDs separated by comma
 	 * @param pois
+	 * 				The list of place IDs separated by comma
+	 * @param city
+	 * 				The city
 	 * @return
 	 */
 	@GET
 	@Path("/getElementsInDetails")
 	public Response getElementsInDetails(@HeaderParam("key") String key,
 			@HeaderParam("Accept-Language") String languages, 
-			@QueryParam("events") String events, @QueryParam("pois") String pois) {
+			@QueryParam("events") String events, @QueryParam("pois") String pois,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			logInfo("App key is validated");
@@ -306,8 +404,10 @@ public class QueryManagerServices {
 				if (events != null && !events.equals("")) {
 					List <String> eventIds = createList(events);
 					List <ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(
-							eventIds, null, tmpLanguages);
+							SparqlChooser.getEndPointUrl(key),
+							SparqlChooser.getEventGraph(key, city), eventIds, null, tmpLanguages);
 					if (eventsDetails != null) {
+						// use Events key for all events
 						result.put("Events", eventsDetails);
 					}
 
@@ -315,9 +415,11 @@ public class QueryManagerServices {
 				if (pois != null && !pois.equals("")) {
 					List <String> poiIds = createList(pois);
 
-					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null,
-							tmpLanguages);
+					List <ElementDetails> poisDetails = ElementDetailsUtils.createPoIsDetails(
+							SparqlChooser.getEndPointUrl(key), SparqlChooser.getPoIGraph(key, city),
+							poiIds, null, null, tmpLanguages);
 					if (poisDetails != null) {
+						// use POIs key for all places
 						result.put("POIs", poisDetails);
 					}
 				}
@@ -339,18 +441,21 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Counts the number of items in the KB at EventMedia.
+	 * This API is used to count number of events.
+	 *
 	 * @param key
+	 * 				The application key.
 	 * @return
 	 */
 	@GET
 	@Path("/countItems")
-	public Response countItems(@HeaderParam("key") String key) {
+	public Response countItems(@HeaderParam("key") String key,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n ?event a lode:Event. \n } ";
+			String query = "SELECT (COUNT(*) AS ?count) \n WHERE { \n { graph " + SparqlChooser.getEventGraph(key, city) + " { ?event a lode:Event. } } \n } ";
 			try {
-				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -368,19 +473,22 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Counts the number of PoIs in the KB.
+	 * This API is used to count number of PoIs.
+	 *
 	 * @param key
+	 * 				The application key
 	 * @return
 	 */
 	@GET
 	@Path("/countPoIs")
-	public Response countPoIs(@HeaderParam("key") String key) {
+	public Response countPoIs(@HeaderParam("key") String key,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place }";
+			String query = "SELECT DISTINCT  (count(*) AS ?count)\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key, city) + "  {?venue rdf:type dul:Place.} } }";
 
 			try {
-				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_COUNT_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
@@ -398,7 +506,7 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Gets aggregated information of a given group in the KB at EventMedia.
+	 * This API is used to get aggregated information about events.
 	 * @param group
 	 * @param offset
 	 * @param limit
@@ -414,6 +522,7 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
@@ -435,9 +544,9 @@ public class QueryManagerServices {
 						&& groupTriples.containsKey(pair2.getGroupBy());
 				String query = createGroupQuery(group, offset, limit,
 						existed1 ? pair1.getGroupBy() : null, pair1.getValue(),
-						existed2 ? pair2.getGroupBy() : null, pair2.getValue());
+						existed2 ? pair2.getGroupBy() : null, pair2.getValue(), key, city);
 				try {
-					String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+					String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (IOException e) {
@@ -460,7 +569,8 @@ public class QueryManagerServices {
 	}
 
 	/**
-	 * Gets aggregated information of PoIs categories in the KB at EventMedia.
+	 * This API is used to get aggregated information about PoIs.
+	 *
 	 * @param group
 	 * @param offset
 	 * @param limit
@@ -474,14 +584,16 @@ public class QueryManagerServices {
 	public Response getAggregatedPoIs(
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key) {
 		long starttime = System.currentTimeMillis();
 		if (OAuthWrappers.validateAppKey(key)) {
 			int tmpOffset = offset < 0 ? 0 : offset;
-			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
+			String query ="SELECT DISTINCT  (?catRead AS ?category) (count(*) AS ?count)\nWHERE\n  {  { graph "
+			+ SparqlChooser.getPoIGraph(key, city) + " { ?venue rdf:type dul:Place .} }\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead\n }\nGROUP BY ?catRead\nORDER BY DESC(?count)\nOFFSET  "
 			+ tmpOffset +( limit < 0 ? "" : "\nLIMIT  " + limit);
 			try {
-				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+				String ret = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_AGGREGATE_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(ret, MediaType.APPLICATION_JSON_TYPE).build();
 			} catch (IOException e) {
@@ -498,7 +610,7 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Gets items in details.
+	 * This API is used to get information (ID, title, description) about events.
 	 *
 	 * @param access_token
 	 * @param offset
@@ -515,7 +627,8 @@ public class QueryManagerServices {
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
+			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -538,115 +651,15 @@ public class QueryManagerServices {
 					(pair1 == null ? null : pair1.getGroupBy()),
 					(pair1 == null ? null : pair1.getValue()),
 					(pair2 == null ? null : pair2.getGroupBy()),
-					(pair2 == null ? null : pair2.getValue()));
+					(pair2 == null ? null : pair2.getValue()), key, city);
 
 			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String result = executeQuery(profiler, qm, query, preference,
-						EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken), SparqlEndPointUtils.HTTP_GET);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1, key);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			}
-		} else {
-			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			return createResponseForAccessToken(access_token);
-		}
-	}
-	
-	
-	/**
-	 * Gets Events in details.
-	 *
-	 * @param access_token
-	 * @param offset
-	 * @param limit
-	 * @param filter1
-	 * @param filter2
-	 * @param key
-	 * @return
-	 */
-	@GET
-	@Path("/getEventsInDetails")
-	public Response getItemsInDetails(@HeaderParam("access_token") String access_token,
-			@HeaderParam("Accept-Language") String languages,
-			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2) {
-		
-		long starttime = System.currentTimeMillis();
-
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String user_id =  userAccessToken.getUid();
-			String key = userAccessToken.getAppkey();
-
-			Gson gson = new Gson();
-			KeyValuePair pair1 = null;
-			KeyValuePair pair2 = null;
-			try {
-				pair1 = gson.fromJson(filter1, KeyValuePair.class);
-			} catch (Exception e) {}
-			try {
-				pair2 = gson.fromJson(filter2, KeyValuePair.class);
-			} catch (Exception e) {}
-
-			String query = createSelectSparqlQuery(offset, limit,
-					(pair1 == null ? null : pair1.getGroupBy()),
-					(pair1 == null ? null : pair1.getValue()),
-					(pair2 == null ? null : pair2.getGroupBy()),
-					(pair2 == null ? null : pair2.getValue()));
-
-			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-				Map <String, Boolean> result = executeQuery(profiler, qm, query, null, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> elementsInDetails = ElementDetailsUtils.createEventsDetails(result.keySet(), null, tmpLanguages);
-				
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				String content = JSONObject.wrap(elementsInDetails).toString();
-				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
 			} catch (IOException e) {
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -658,7 +671,7 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Gets PoIs in details.
+	 * This API is used to get information (ID, title - name) about PoIs.
 	 *
 	 * @param access_token
 	 * @param offset
@@ -674,7 +687,8 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
 			@DefaultValue("") @QueryParam("category") String category,
 			@DefaultValue("0") @QueryParam("minRating") int minRating,
-			@DefaultValue("5") @QueryParam("maxRating") int maxRating) {
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -683,30 +697,14 @@ public class QueryManagerServices {
 			String user_id =  userAccessToken.getUid();
 			String key = userAccessToken.getAppkey();
 
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key, city);
 
 			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String result = executeQuery(profiler, qm, query, preference,
-						EventMediaFormat.JSON, false, isLimitForProfile(userAccessToken), SparqlEndPointUtils.HTTP_GET);
+				String result = executeQuery(user_id, query, preference, Constants.JSON, SparqlEndPointUtils.HTTP_GET, 1, key);
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY );
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
+			} catch (IOException e) {
 				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 				        .entity(e.getMessage())
 				        .type(MediaType.TEXT_PLAIN)
 				        .build();
@@ -718,85 +716,25 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Gets PoIs in details.
+	 * This API is used to get information (ID, title, description) about events without using 3cixty token.
 	 *
-	 * @param access_token
 	 * @param offset
 	 * @param limit
-	 * @param preference
-	 * @param category
+	 * @param filter1
+	 * @param filter2
+	 * @param city
+	 * @param key
 	 * @return
 	 */
-	@GET
-	@Path("/getPoIsInDetails")
-	public Response getPoIsInDetails(@HeaderParam("access_token") String access_token,
-			@HeaderParam("Accept-Language") String languages,
-			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit, @DefaultValue("") @QueryParam("preference") String preference,
-			@DefaultValue("") @QueryParam("category") String category,
-			@DefaultValue("0") @QueryParam("minRating") int minRating,
-			@DefaultValue("5") @QueryParam("maxRating") int maxRating) {
-		
-		long starttime = System.currentTimeMillis();
-
-		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
-		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
-			String user_id =  userAccessToken.getUid();
-			String key = userAccessToken.getAppkey();
-
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
-
-			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
-				IProfiler profiler = new Profiler(userProfile);
-				QueryManager qm = new QueryManager(user_id);
-				String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-				Map <String, Boolean> result = executeQuery(profiler, qm, query, preference, false, isLimitForProfile(userAccessToken));
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(result.keySet(), null, tmpLanguages);
-				for (ElementDetails poi: poisInDetails) {
-					((ElementPoIDetails) poi).setAugmented(result.get(poi.getId()));
-				}
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				String content = JSONObject.wrap(poisInDetails).toString();
-				return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (ThreeCixtyPermissionException tcpe) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.ILLEGAL_QUERY );
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(tcpe.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (TooManyConnections e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED );
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (IOException e) {
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.FAILED);
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			} catch (UnknownException e) {
-				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			}
-		} else {
-			if (access_token != null && !access_token.equals("")) CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
-			return createResponseForAccessToken(access_token);
-		}
-	}
-	
-
 	@GET
 	@Path("/getItemsWithoutAccessToken")
 	public Response getItemsWithoutUserInfo(
 			@DefaultValue("0") @QueryParam("offset") int offset,
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
-			@DefaultValue("{}") @QueryParam("filter2") String filter2, @HeaderParam("key") String key) {
+			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
+			@HeaderParam("key") String key) {
 		
 		long starttime = System.currentTimeMillis();
 
@@ -816,10 +754,10 @@ public class QueryManagerServices {
 						(pair1 == null ? null : pair1.getGroupBy()),
 						(pair1 == null ? null : pair1.getValue()),
 						(pair2 == null ? null : pair2.getGroupBy()),
-						(pair2 == null ? null : pair2.getValue()));
+						(pair2 == null ? null : pair2.getValue()), key, city);
 
 				try {
-					String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
+					String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 				} catch (Exception e) {
@@ -834,7 +772,63 @@ public class QueryManagerServices {
 			return createResponseForInvalidKey(key);
 		}
 	}
+
+	/**
+	 * This API is used to get information (ID, title - name) about PoIs without using 3cixty token.
+	 * @param offset
+	 * @param limit
+	 * @param category
+	 * @param minRating
+	 * @param maxRating
+	 * @param city
+	 * @param key
+	 * @return
+	 */
+	@GET
+	@Path("/getPoIsWithoutAccessToken")
+	public Response getPoIsWithoutUserInfo(
+			@DefaultValue("0") @QueryParam("offset") int offset,
+			@DefaultValue("20") @QueryParam("limit") int limit,
+			@DefaultValue("") @QueryParam("category") String category,
+			@DefaultValue("0") @QueryParam("minRating") int minRating,
+			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
+			@HeaderParam("key") String key) {
+		
+		long starttime = System.currentTimeMillis();
+
+		if (OAuthWrappers.validateAppKey(key)) {
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key, city);
+
+			try {
+				String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, key, false);
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
+				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
+		} else {
+			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
+			return createResponseForInvalidKey(key);
+		}
+	}
 	
+	/**
+	 * This API is used to get information in detail about events.
+	 *
+	 * @param offset
+	 * @param limit
+	 * @param filter1
+	 * @param filter2
+	 * @param city
+	 * @param key
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getEventsInDetailsWithoutAccessToken")
 	public Response getEventsInDetailsWithoutUserInfo(
@@ -842,6 +836,7 @@ public class QueryManagerServices {
 			@DefaultValue("20") @QueryParam("limit") int limit,
 			@DefaultValue("{}") @QueryParam("filter1") String filter1,
 			@DefaultValue("{}") @QueryParam("filter2") String filter2,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key,
 			@HeaderParam("Accept-Language") String languages) {
 		
@@ -863,13 +858,15 @@ public class QueryManagerServices {
 						(pair1 == null ? null : pair1.getGroupBy()),
 						(pair1 == null ? null : pair1.getValue()),
 						(pair2 == null ? null : pair2.getGroupBy()),
-						(pair2 == null ? null : pair2.getValue()));
+						(pair2 == null ? null : pair2.getValue()), key, city);
 
 				try {
-					List <String> eventIds = QueryManager.getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
+					List <String> eventIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET,
+							SparqlChooser.getEndPointUrl(key));
 				
 					String [] tmpLanguages = LanguageUtils.getLanguages(languages);
-					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
+					List<ElementDetails> eventsDetails = ElementDetailsUtils.createEventsDetails(SparqlChooser.getEndPointUrl(key),
+							SparqlChooser.getEventGraph(key, city), eventIds, null, tmpLanguages);
 					CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_ITEMS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 					String content = JSONObject.wrap(eventsDetails).toString();
 					return Response.ok(content, MediaType.APPLICATION_JSON_TYPE).build();
@@ -886,39 +883,20 @@ public class QueryManagerServices {
 			return createResponseForInvalidKey(key);
 		}
 	}
-
-	@GET
-	@Path("/getPoIsWithoutAccessToken")
-	public Response getPoIsWithoutUserInfo(
-			@DefaultValue("0") @QueryParam("offset") int offset,
-			@DefaultValue("20") @QueryParam("limit") int limit,
-			@DefaultValue("") @QueryParam("category") String category,
-			@DefaultValue("0") @QueryParam("minRating") int minRating,
-			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
-			@HeaderParam("key") String key) {
-		
-		long starttime = System.currentTimeMillis();
-
-		if (OAuthWrappers.validateAppKey(key)) {
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
-
-			try {
-				String result = executeQuery(query, EventMediaFormat.JSON, SparqlEndPointUtils.HTTP_GET, false);
-				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
-				return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
-			} catch (IOException e) {
-				LOGGER.error(e.getMessage());
-				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-				        .entity(e.getMessage())
-				        .type(MediaType.TEXT_PLAIN)
-				        .build();
-			}
-		} else {
-			if (key != null && !key.equals("")) CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_APP_KEY + key);
-			return createResponseForInvalidKey(key);
-		}
-	}
 	
+	/**
+	 * This API is used to get information in detail about PoIs.
+	 *
+	 * @param offset
+	 * @param limit
+	 * @param category
+	 * @param minRating
+	 * @param maxRating
+	 * @param city
+	 * @param key
+	 * @param languages
+	 * @return
+	 */
 	@GET
 	@Path("/getPoIsInDetailsWithoutAccessToken")
 	public Response getPoIsInDetailsWithoutUserInfo(
@@ -927,18 +905,20 @@ public class QueryManagerServices {
 			@DefaultValue("") @QueryParam("category") String category,
 			@DefaultValue("0") @QueryParam("minRating") int minRating,
 			@DefaultValue("5") @QueryParam("maxRating") int maxRating,
+			@DefaultValue(Constants.CITY_MILAN)@QueryParam("city") String city,
 			@HeaderParam("key") String key,
 			@HeaderParam("Accept-Language") String languages) {
 		
 		long starttime = System.currentTimeMillis();
 
 		if (OAuthWrappers.validateAppKey(key)) {
-			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating);
+			String query = createSelectSparqlQueryForPoI(offset, limit, category, minRating, maxRating, key, city);
 
 			try {
-				List <String> poiIds = QueryManager.getElementIDs(query, SparqlEndPointUtils.HTTP_GET);
+				List <String> poiIds = getElementIDs(query, SparqlEndPointUtils.HTTP_GET, SparqlChooser.getEndPointUrl(key));
 				String[] tmpLanguages = LanguageUtils.getLanguages(languages);
-				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
+				List <ElementDetails> poisInDetails = ElementDetailsUtils.createPoIsDetails(SparqlChooser.getEndPointUrl(key),
+						SparqlChooser.getPoIGraph(key, city), poiIds, null, null, tmpLanguages);
 				
 				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.SUCCESSFUL);
 				String content = JSONObject.wrap(poisInDetails).toString();
@@ -956,55 +936,188 @@ public class QueryManagerServices {
 			return createResponseForInvalidKey(key);
 		}
 	}
-
-	private String executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter, EventMediaFormat eventMediaFormat,
-			boolean needToCheckPredicate, boolean limitToProfile, String httpMethod) throws ThreeCixtyPermissionException,
-			TooManyConnections, UnknownException {
-
-		Query jenaQuery = createJenaQuery(query);
-		
-		// XXX: is for events
-		boolean isForEvents = (query.indexOf("lode:Event") > 0);
-		qm.setForEvents(isForEvents);
-		
-		/// XXX: hack for date ranges query
-		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
-		qm.setForDateRanges(isForDateRages);
-
-		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
-
-		qm.setQuery(threecixtyQuery);
-		
-		String result = QueryManagerDecision.run(profiler, qm, filter, eventMediaFormat, httpMethod);
-		return  result;
+	
+	/**
+	 * This API is used to check whether or not a given query conforms to SPARQL 1.1.
+	 *
+	 * @param query
+	 * @return
+	 */
+	@GET
+	@Path("/validateQuery")
+	public Response validateSPARLQuery(@DefaultValue("") @QueryParam("query") String query) {
+		String fullQuery = getAllPrefixes() + " " + Configuration.PREFIXES + " " + query;
+		try {
+		    Query q = QueryFactory.create(fullQuery);
+		    if (q != null) return Response.ok().entity("The given query conforms to SPARQL 1.1!!!").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).entity("incomprehensive query").build();
 	}
 	
-	private Map <String, Boolean> executeQuery(IProfiler profiler, IQueryManager qm,
-			String query, String filter,
-			boolean needToCheckPredicate, boolean limitToProfile) throws ThreeCixtyPermissionException,
-			TooManyConnections, UnknownException {
+	/**
+	 * This API is used to get social scores for either the user themselves or the user's friends.
+	 *
+	 * @param query
+	 * @return
+	 */
+	@GET
+	@Path("/getSocialScores")
+	public Response getSocialScores(@HeaderParam("access_token") String access_token,
+			@DefaultValue("3.0") @QueryParam("rating") double rating,
+			@DefaultValue("true") @QueryParam("ratedByFriends") boolean ratedByFriends) {
+		long starttime = System.currentTimeMillis();
 
-		Query jenaQuery = createJenaQuery(query);
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(access_token);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(access_token)) {
+			String user_id =  userAccessToken.getUid();
+			String key = userAccessToken.getAppkey();
+			String endpointUrl = SparqlChooser.getEndPointUrl(key);
+			try {
+				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+				List <String> placeIds = new LinkedList <String>();
+				List <Double> socialScores = new LinkedList <Double>();
+				if (ratedByFriends) { // my friends / travel-mates rated places
+					ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScoreForFriends(userProfile,
+							(float) rating, placeIds, socialScores, endpointUrl);
+				} else { // I rated places
+					ProfileManagerImpl.getInstance().findPlaceIdsAndSocialScore(userProfile,
+							(float) rating, placeIds, socialScores, endpointUrl);
+				}
+				CallLoggingManager.getInstance().save(key, starttime, CallLoggingConstants.QA_GET_SOCIAL_SCORE_SERVICE, CallLoggingConstants.SUCCESSFUL);
+				JSONArray jsonArray = createJSONArray(placeIds, socialScores);
+				return Response.ok(jsonArray.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+			} catch (TooManyConnections e) {
+				return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+				        .entity(e.getMessage())
+				        .type(MediaType.TEXT_PLAIN)
+				        .build();
+			}
+		} else {
+			if (access_token != null && !access_token.equals(""))
+				CallLoggingManager.getInstance().save(access_token, starttime, CallLoggingConstants.QA_GET_POIS_RESTSERVICE, CallLoggingConstants.INVALID_ACCESS_TOKEN + access_token);
+			return createResponseForAccessToken(access_token);
+		}
+	}
+
+	/**
+	 * Execute a given query with KB.
+	 * <br>
+	 * If the given query is for events, the given query will not be augmented.
+	 * <br>
+	 * If the given query is for PoIs, and the given <code>filter</code> is null, the given query
+	 * will not be augmented; otherwise, the given query will be augmented based on either friends / travel-mate
+	 * rating or your own rating.
+	 *
+	 * @param uid
+	 * @param query
+	 * @param filter
+	 * @param format
+	 * @param httpMethod
+	 * @param coef
+	 * @param key
+	 * @return
+	 * @throws IOException
+	 */
+	private String executeQuery(String uid, String query, String filter, String format,
+			String httpMethod, double coef, String key) throws IOException {
+
+		if (QueryAugmenterImpl.allPrefixes == null) QueryAugmenterImpl.allPrefixes = getAllPrefixes();
+		if (QueryAugmentationUtils.allPrefixes == null) QueryAugmentationUtils.allPrefixes = getAllPrefixes();
 		
 		// XXX: is for events
 		boolean isForEvents = (query.indexOf("lode:Event") > 0);
-		qm.setForEvents(isForEvents);
+//		StringBuilder sb = new StringBuilder();
+//		String formatType = Constants.JSON.equalsIgnoreCase(format) ? "application/sparql-results+json"
+//				: (Constants.RDF.equals(format) ? "application/rdf+xml" : "application/sparql-results+json");
+//		if (isForEvents) {
+//			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+//		} else {
+//			QueryAugmenterFilter qaf = eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)
+//					? QueryAugmenterFilter.FriendsRating : eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)
+//							? QueryAugmenterFilter.MyRating : null;
+//			try {
+//				String augmentedQuery = new QueryAugmenterImpl().createQueryAugmented(query, qaf, uid, coef);
+//				if (DEBUG_MOD) LOGGER.info(augmentedQuery);
+//				SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery, formatType, httpMethod, sb);
+//			} catch (InvalidSparqlQuery e) {
+//				if (DEBUG_MOD) LOGGER.info(e.getMessage());
+//				// try with original query
+//				SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, sb);
+//			}
+//		}
+//		return sb.toString();
 		
-		/// XXX: hack for date ranges query
-		boolean isForDateRages = query.indexOf("?Begin time:inXSDDateTime ?datetimeBegin") > 0;
-		qm.setForDateRanges(isForDateRages);
-
-		ThreeCixtyQuery threecixtyQuery = new ThreeCixtyQuery(jenaQuery);
-
-		qm.setQuery(threecixtyQuery);
 		
-		return QueryManagerDecision.run(profiler, qm, filter, SparqlEndPointUtils.HTTP_GET);
+		String formatType = Constants.JSON.equalsIgnoreCase(format) ? "application/sparql-results+json"
+				: (Constants.RDF.equals(format) ? "application/rdf+xml" : "application/sparql-results+json");
+		String endPointUrl = SparqlChooser.getEndPointUrl(key);
+		if (isForEvents) {
+			StringBuilder sb = new StringBuilder();
+			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, endPointUrl, sb);
+			return sb.toString();
+		} else {
+			QueryAugmenterFilter qaf = eu.threecixty.querymanager.Constants.FRIENDS.equalsIgnoreCase(filter)
+					? QueryAugmenterFilter.FriendsRating : eu.threecixty.querymanager.Constants.ENTERED_RATING.equalsIgnoreCase(filter)
+							? QueryAugmenterFilter.MyRating : null;
+			return QueryAugmentationUtils.augmentAndExecuteQuery(query, qaf, uid, coef, httpMethod, endPointUrl);
+		}
 	}
 
+	/**
+	 * Gets the list of element IDs (event or place ID) received by executing a given query.
+	 *
+	 * @param query
+	 * @param httpMethod
+	 * @param endPointUrl
+	 * @return
+	 * @throws IOException
+	 */
+	public static List <String> getElementIDs(String query, String httpMethod, String endPointUrl) throws IOException {
+
+		String formatType = "application/sparql-results+json";
+
+		StringBuilder sb = new StringBuilder();
+		
+		List <String> elementIds = new LinkedList <String>();
+
+		// execute the given query and store results into StringBuilder
+		SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, endPointUrl, sb);
+		JSONObject json = new JSONObject(sb.toString());
+		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
+
+		int len = jsonArrs.length();
+		for (int i = 0; i < len; i++) {
+			JSONObject jsonElement = jsonArrs.getJSONObject(i);
+			String elementId = null;
+			if (jsonElement.has("event")) {
+				elementId = jsonElement.getJSONObject("event").get("value").toString();
+			} else if (jsonElement.has("venue")) {
+				elementId = jsonElement.getJSONObject("venue").get("value").toString();
+			}
+			if (elementId != null) elementIds.add(elementId);
+		}
+		return elementIds;
+	}
+	
+	/**
+	 * Creates SPARQL query for grouping category, publisher, etc.
+	 * @param group
+	 * @param offset
+	 * @param limit
+	 * @param groupname1
+	 * @param groupvalue1
+	 * @param groupname2
+	 * @param groupvalue2
+	 * @param key
+	 * @param city
+	 * @return
+	 */
 	private String createGroupQuery(String group, int offset, int limit,
-			String groupname1, String groupvalue1, String groupname2, String groupvalue2) {
-		StringBuffer buffer = new StringBuffer("select ?" + group + " (COUNT(*) as ?count) \n WHERE {\n ?event a lode:Event .\n" + getTriples(group));
+			String groupname1, String groupvalue1, String groupname2, String groupvalue2, String key, String city) {
+		StringBuffer buffer = new StringBuffer("select ?" + group + " (COUNT(*) as ?count) \n WHERE {\n { graph "
+			+ SparqlChooser.getEventGraph(key, city) + " {?event a lode:Event . } }\n" + getTriples(group));
 		if (groupname1 != null && groupname2 == null) {
 			if (!group.equals(groupvalue1)) {
 				buffer.append(getTriples(groupname1));
@@ -1030,8 +1143,23 @@ public class QueryManagerServices {
 		return "";
 	}
 	
-	private String createSelectSparqlQuery(int offset, int limit, String groupname1, String groupvalue1, String groupname2, String groupvalue2) {
-		StringBuffer buffer = new StringBuffer("SELECT ?event ?title ?description \n	WHERE {\n	?event a lode:Event. \n	OPTIONAL{?event rdfs:label ?title.}\n	OPTIONAL{?event dc:description ?description.} \n");
+	/**
+	 * Create SPARQL query for getting information about events.
+	 *
+	 * @param offset
+	 * @param limit
+	 * @param groupname1
+	 * @param groupvalue1
+	 * @param groupname2
+	 * @param groupvalue2
+	 * @param key
+	 * @param city
+	 * @return
+	 */
+	private String createSelectSparqlQuery(int offset, int limit, String groupname1, String groupvalue1,
+			String groupname2, String groupvalue2, String key, String city) {
+		StringBuffer buffer = new StringBuffer("SELECT ?event ?title ?description \n	WHERE {\n { graph "
+			+ SparqlChooser.getEventGraph(key, city) + "	{ ?event a lode:Event. } } \n	OPTIONAL{?event rdfs:label ?title.}\n	OPTIONAL{?event dc:description ?description.} \n");
 		if (groupTriples.containsKey(groupname1)) {
 			buffer.append(groupTriples.get(groupname1));
 			buffer.append("FILTER(STR(?" + groupname1 + ") = \"" + groupvalue1 + "\") .\n");
@@ -1045,20 +1173,39 @@ public class QueryManagerServices {
 				offset, limit);
 	}
 
+	/**
+	 * Create SPARQL query for getting information about PoIs.
+	 * @param offset
+	 * @param limit
+	 * @param category
+	 * @param minRating
+	 * @param maxRating
+	 * @param key
+	 * @param city
+	 * @return
+	 */
 	private String createSelectSparqlQueryForPoI(int offset, int limit,
-			String category, int minRating, int maxRating) {
+			String category, int minRating, int maxRating, String key, String city) {
 		StringBuffer buffer = new StringBuffer();
 		if (category != null && !category.equals("")) {
-			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n    ?venue rdf:type dul:Place .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key, city) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n    ?venue <http://data.linkedevents.org/def/location#businessType> ?cat .\n    ?cat skos:prefLabel ?catRead .\n   ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n    FILTER ( str(?catRead) = \""
 		            + category + "\" )\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 					+ minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < " + maxRating + " )\n  }\n");
 		} else {
-			buffer.append("PREFIX schema: <http://schema.org/>\n SELECT DISTINCT  ?venue ?title\nWHERE\n  { ?venue rdf:type dul:Place .\n    ?venue schema:name ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
+			buffer.append("SELECT DISTINCT  ?venue ?title\nWHERE\n  { { graph " + SparqlChooser.getPoIGraph(key, city) + " {?venue a dul:Place.} } .\n    ?venue rdfs:label ?title .\n    ?venue schema:location ?location .\n  ?venue schema:aggregateRating ?rating .\n    ?rating schema:ratingValue ?ratingValue .\n  FILTER ( xsd:decimal(?ratingValue) >= " 
 		                + minRating + " )\n    FILTER ( xsd:decimal(?ratingValue) < "  + maxRating + " )\n  }");
 		}
 		return createSelectSparqlQuery(buffer.toString(), offset, limit);
 	}
 
+	/**
+	 * Adds <code>LIMIT</code> and <code>OFFSET</code> to the given query.
+	 *
+	 * @param initQuery
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
 	private String createSelectSparqlQuery(String initQuery, int offset, int limit) {
 		StringBuffer query =  new StringBuffer(initQuery);
 		if (offset > 0) {
@@ -1070,18 +1217,9 @@ public class QueryManagerServices {
 		return query.toString();
 	}
 
-	private Query createJenaQuery(String queryStr) {
-		if (queryStr == null) return null;
-		if (allPrefixes == null) {
-			allPrefixes = getAllPrefixes() + " ";
-		}
-
-		Query jenaQuery = QueryFactory.create(allPrefixes + queryStr);
-		return jenaQuery;
-	}
-
 	/**
-     * To validate the sparql query, we need prefixes. These prefixes are same as those used by EventMedia.
+     * Get all prefixes predefined. Those prefixes are defined by Virtuoso KB.
+     *
      * @return string
      */
     private String getAllPrefixes() {
@@ -1105,13 +1243,6 @@ public class QueryManagerServices {
 			e.printStackTrace();
 		}
     	return "";
-    }
-    
-    private boolean isLimitForProfile(AccessToken accessToken) {
-    	List <String> scopes = accessToken.getScopeNames();
-    	if (scopes == null || scopes.size() == 0) return true;
-    	if (scopes.contains(Constants.PROFILE_SCOPE_NAME)) return false;
-    	return true;
     }
     
     private List <String> createList(String idsStr) {
@@ -1147,26 +1278,27 @@ public class QueryManagerServices {
 	}
 	
 	/**
-	 * Executes query without creating a new instance of QueryManager.
+	 * Executes query without using 3cixty access token.
 	 * <br>
 	 * Note that this method doesn't augment the given query.
 	 * @param query
 	 * @param format
 	 * @return
 	 */
-	private String executeQuery(String query, EventMediaFormat format, String httpMethod, boolean stressTestOn) throws IOException {
+	private String executeQuery(String query, EventMediaFormat format, String httpMethod, String key, boolean stressTestOn) throws IOException {
 		if (query == null || format == null) return "";
 		String ret = null;
+		// get format to send to Virtuoso KB
 		String formatType = EventMediaFormat.JSON == format ? "application/sparql-results+json"
 				: (EventMediaFormat.RDF == format ? "application/rdf+xml" : "");
 		long startTime = System.currentTimeMillis();
-		ret = CacheManager.getInstance().getContent(query, stressTestOn);
 		
 		long time = System.currentTimeMillis();
 		if (DEBUG_MOD) LOGGER.info("Time to get data from map: " + (time - startTime));
 		if (ret == null) {
 			StringBuilder builder = new StringBuilder();
-			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, builder);
+			// execute the query at Virtuoso KB, then store results into StringBuilder
+			SparqlEndPointUtils.executeQueryViaSPARQL(query, formatType, httpMethod, SparqlChooser.getEndPointUrl(key), builder);
 			ret = builder.toString();
 			long endTime = System.currentTimeMillis();
 			if (DEBUG_MOD) {
@@ -1175,6 +1307,26 @@ public class QueryManagerServices {
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 * Creates a JSONArray to represent a list of JSON objects made of a placeID and its corresponding social score.
+	 *
+	 * @param placeIds
+	 * @param socialScores
+	 * @return
+	 */
+	private JSONArray createJSONArray(List <String> placeIds, List <Double> socialScores) {
+		JSONArray jsonArray = new JSONArray();
+		for (int i = 0; i < placeIds.size(); i++) {
+			String placeId = placeIds.get(i);
+			Double socialScore = socialScores.get(i);
+			JSONObject json = new JSONObject();
+			json.put("placeId", placeId);
+			json.put("socialScore", socialScore);
+			jsonArray.put(0, json);
+		}
+		return jsonArray;
 	}
 
     public class KeyValuePair {

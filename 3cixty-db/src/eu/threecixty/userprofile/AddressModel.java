@@ -11,6 +11,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+/**
+ * 
+ * Address for user.
+ * <br>
+ * Currently, this class hasn't yet used.
+ *
+ */
 @Entity
 @Table(name = "3cixty_address")
 public class AddressModel implements java.io.Serializable {

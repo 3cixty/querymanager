@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import eu.threecixty.Configuration;
 import eu.threecixty.partners.Partner;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
@@ -27,8 +26,6 @@ public class ProfileManagerImpl implements ProfileManager {
 
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
-	
-	public static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql?default-graph-uri=&query=";
 	
 	private static final String MYSQL_PM_IMPL = "eu.threecixty.profile.MySQLProfileManagerImpl";
 	
@@ -109,8 +106,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getPlaceIdsFromRating(userProfile, rating);
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating, String endPointUrl) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getPlaceIdsFromRating(userProfile, rating, endPointUrl);
 		return new ArrayList<String>();
 	}
 
@@ -124,8 +121,8 @@ public class ProfileManagerImpl implements ProfileManager {
 
 	@Override
 	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
-			float rating) throws TooManyConnections {
-		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(userProfile, rating);
+			float rating, String endPointUrl) throws TooManyConnections {
+		if (profileManager != null) return profileManager.getPlaceIdsFromRatingOfFriends(userProfile, rating, endPointUrl);
 		return new ArrayList <String>();
 	}
 
@@ -218,8 +215,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public String find3cixtyUID(String uid, String source, String profileImage) {
-		if (profileManager != null) return profileManager.find3cixtyUID(uid, source, profileImage);
+	public String find3cixtyUID(String uid, String source) {
+		if (profileManager != null) return profileManager.find3cixtyUID(uid, source);
 		return null;
 	}
 
@@ -239,9 +236,8 @@ public class ProfileManagerImpl implements ProfileManager {
 	}
 	
 	@Override
-	public UserProfile findUserProfile(String uid, String source,
-			String profileImage) {
-		if (profileManager != null) return profileManager.findUserProfile(uid, source, profileImage);
+	public UserProfile findUserProfile(String uid, String source) {
+		if (profileManager != null) return profileManager.findUserProfile(uid, source);
 		return null;
 	}
 	
@@ -297,5 +293,43 @@ public class ProfileManagerImpl implements ProfileManager {
 	public boolean updateKnows(UserProfile profile, Set<String> knows) {
 		if (profileManager != null) return profileManager.updateKnows(profile, knows);
 		return false;
+	}
+
+	@Override
+
+	public void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List<String> toPlaceIds, List<Double> toSocialScores, String endPointUrl) {
+		if (profileManager != null) profileManager.findPlaceIdsAndSocialScore(
+				profile, rating, toPlaceIds, toSocialScores, endPointUrl);
+	}
+
+	@Override
+	public void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
+			float rating, List<String> toPlaceIds, List<Double> toSocialScores, String endPointUrl) {
+		if (profileManager != null) profileManager.findPlaceIdsAndSocialScoreForFriends(
+				profile, rating, toPlaceIds, toSocialScores, endPointUrl);
+	}
+
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {
+		if (profileManager != null) return profileManager.findAll3cixtyFriendsHavingMyUIDInKnows(my3cixtyUID);
+		return null;
+	}
+
+	@Override
+	public List<Friend> findAllFriends(String my3cixtyUID) {
+		if (profileManager != null) return profileManager.findAllFriends(my3cixtyUID);
+		return null;
+	}
+
+	@Override
+	public ForgottenUserManager getForgottenUserManager() {
+		if (profileManager != null) return profileManager.getForgottenUserManager();
+		return null;
+	}
+
+	@Override
+	public String findAccountId(UserProfile profile, String source) {
+		if (profileManager != null) return profileManager.findAccountId(profile, source);
+		return null;
 	}
 }

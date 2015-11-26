@@ -1,9 +1,20 @@
 package eu.threecixty.logs;
 
+/**
+ * 
+ * Constant to use for logging.
+ *
+ */
 public class CallLoggingConstants {
 
 	public static final String SETTINGS_VIEW_SERVICE = "settings view service";
 	public static final String SETTINGS_SAVE_SERVICE = "settings save service";
+	
+	public static final String PRIVACY_SETTINGS_VIEW_SERVICE = "privacy settings view service";
+	//public static final String PRIVACY_SETTINGS_VIEW_M = "privacy settings view service";
+	public static final String SETTINGS_REMOVE_FRIEND_BY_USER = "settings: remove friend by user service";
+	public static final String SETTINGS_REMOVE_FRIENDS_BY_USER = "settings: remove friends by user service";
+	public static final String SETTINGS_GET_ALL_INFORMATION_BY_USER = "settings: get all information by user service";
 	
 	public static final String TRAY_ADD_SERVICE = "tray add service";
 	public static final String TRAY_GET_SERVICE = "tray get service";
@@ -31,6 +42,8 @@ public class CallLoggingConstants {
 	public static final String QA_GET_ITEMS_RESTSERVICE = "QA get items rest service";
 	public static final String QA_GET_POIS_RESTSERVICE = "QA get PoIs rest service";
 	
+	public static final String QA_GET_SOCIAL_SCORE_SERVICE = "QA get social score service";
+	
 	public static final String KEY_VALIDATE_SERVICE = "Key validate service";
 	
 	public static final String MOBIDOT_EXIST_USER_SERVICE = "Mobidot exist account service";
@@ -55,6 +68,8 @@ public class CallLoggingConstants {
 	public static final String UNSUPPORTED_FORMAT = "Unsupported format";
 	
 	public static final String GOFLOW_SERVICE = "GoFlow services";
+	
+	public static final String NEARBY_SERVICES = "Nearby services";
 	
 	
 	private CallLoggingConstants() {

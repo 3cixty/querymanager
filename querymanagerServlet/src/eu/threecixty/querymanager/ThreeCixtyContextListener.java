@@ -8,25 +8,38 @@ import javax.servlet.annotation.WebListener;
 
 import eu.threecixty.Configuration;
 import eu.threecixty.CrawlerCron.CrawlerCron;
-import eu.threecixty.cache.CacheManager;
+
+import eu.threecixty.cache.ProfileCacheManager;
+import eu.threecixty.cache.TokenCacheManager;
+import eu.threecixty.cache.TrayCacheManager;
+
 import eu.threecixty.oauth.OAuthBypassedManager;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.PersistenceWorkerManager;
-import eu.threecixty.profile.RdfFileManager;
-import eu.threecixty.profile.TrayStorage;
 import eu.threecixty.profile.partners.GoFlowServer;
+import eu.threecixty.querymanager.rest.AdminServices;
 import eu.threecixty.querymanager.rest.QueryManagerServices;
 import eu.threecixty.querymanager.rest.CallLogServices;
 
+/**
+ * 
+ * This class is listener to initiate variables used by 3cixty classes.
+ *
+ */
 @WebListener
 public class ThreeCixtyContextListener implements ServletContextListener {
 	private static final String FOLDER_ROOT = "3cixtyData";
 
 	public void contextDestroyed(ServletContextEvent context) {
+
+		TokenCacheManager.getInstance().stop();
+		TrayCacheManager.getInstance().stop();
+		ProfileCacheManager.getInstance().stop();
 		PersistenceWorkerManager.getInstance().stop();
 	}
 
 	public void contextInitialized(ServletContextEvent context) {
+		// get current system path
 	    String realPath = context.getServletContext().getRealPath("/");
 	    System.setProperty("contextPath", context.getServletContext().getContextPath());
 	    String pathTo3CixtyDataFolder =  new File(new File(realPath).getParent()).getParent()
@@ -38,12 +51,9 @@ public class ThreeCixtyContextListener implements ServletContextListener {
 	    	File originalFile = new File(realPath + "/WEB-INF/UserProfileKBmodelWithIndividuals.rdf");
 	    	originalFile.renameTo(rdfFile);
 	    }
-	    CacheManager.getInstance().loadQueries(realPath + File.separatorChar + "WEB-INF"
-	            + File.separatorChar + "cacheQueries");
-	    RdfFileManager.getInstance().setPathToRdfFile(rdfFile.getAbsolutePath());
-	    TrayStorage.setPath(pathTo3CixtyDataFolder);
 	    QueryManagerServices.realPath = realPath;
         CallLogServices.realPath = realPath;
+        AdminServices.realPath = realPath;
 	    GoFlowServer.setPath(realPath + File.separatorChar + "WEB-INF" + File.separatorChar + "goflow.properties");
 	    OAuthWrappers.addScopesByDefault();
 	    

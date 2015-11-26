@@ -5,18 +5,91 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"  pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
- <meta charset="UTF-8">
- <link href="login/normalize.css" rel="stylesheet">
-    <link href="login/layout.css" rel="stylesheet">
-    <link href="login/basic.css" rel="stylesheet">
-    <link href="login/style2.css" rel="stylesheet">
-    <link href="login/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="login/fontello.css">
-    <script src="login/jquery-1.js"></script>
-<title>Sign in to 3cixty Platform</title>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+		<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+	 	
+    	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
+	    
+	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+		
+
+     	<title>Sign in to 3cixty Platform</title>
+		
+		<style type="text/css">
+    		#customBtn {
+		        display: inline-block;
+		        background: #dd4b39;
+		        color: white;
+		        width: 98px;
+		        height: 27px;
+		        border-radius: 4px;
+		        border-color:#dd4b39;
+		        white-space: nowrap;
+		    }
+		    #customBtn:hover {
+		        cursor: pointer;
+		    }
+		    span.label {
+		        font-weight: bold;
+		    }
+		    span.ico {
+		        background: url('../v2/btn_red.svg') no-repeat;
+		        display: inline-block;
+		        vertical-align: middle;
+		        background-size: 20px;
+		        width: 23px;
+		        height: 23px;
+		    }
+		    span.buttonText {
+		        display: inline-block;
+		        vertical-align: middle;
+		        padding-left: 0px;
+		        padding-top: 2px;
+		        font-size: 13px;
+		        height: 24px;
+		        /* Use the Roboto font that is loaded in the <head> */
+		        font-family: 'Roboto', sans-serif;
+	    }
+	    .loginInput {
+	        width: 330px;
+	    }
+	    .signinButton {
+          	background-color: rgba(255,252,255,1);
+   			border: solid 2px rgba(0,0,0,1);
+   			-webkit-border-radius: 7px;
+      		-moz-border-radius: 7px;
+           	border-radius: 7px;
+   			padding: 9px;
+   			display: inline-block;
+   			color: rgba(0,0,0,1);
+   			text-shadow: 0px 1px 1px rgba(227,227,227,1);
+   			cursor: pointer;
+   			font-size: 14px;
+	    }
+	    .link {
+	        color: blue;
+	    }
+	    #goog-gt-tt { display:none !important; }
+
+
+		.goog-text-highlight {
+		    background-color: inherit !important;
+		    box-shadow: 0px 0px 0px #9999aa !important;
+		    box-sizing: border-box;
+		    position: relative;
+		}
+		
+		.googleNotSupported
+		{
+		    font-size: 12px;
+		    color: #777;
+		}
+	</style>
 </head>
+
 <body class="login-body">
 <%
     String key = request.getParameter("key");
@@ -63,7 +136,7 @@
     cookie     : false,
     appId      : '<%=Configuration.getFacebookAppID()%>',
     xfbml      : true,
-    version    : 'v2.2'
+    version    : 'v2.3'
   });
 
   // Now that we've initialized the JavaScript SDK, we call 
@@ -111,50 +184,117 @@
   }
 </script>
 <div class="wrapper">
-	<div class="logo">
-    	<div class="logo-icon">
-    	</div>
+	<div class="logo" align="center" >
+		<table>
+			<tr>
+		  		<td>
+    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')">
+    				</div>
+    			</td>
+    			<td>
+    				<div  align="center">
+    					<h3 class="privacy-title"> powered by </h3>
+   					</div>
+   				</td>
+    			<td>
+    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')">
+    				</div>
+    			</td>
+    		</tr>
+    	</table>
+    				
     </div>
-    
-	<div class="connect-area">
-		<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
+	<div>
+		
 			<div>
+			<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
+				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
-			    <div class="social-login-buttons">
-			        <!-- <div class="icon-facebook-1 social-btn fb-btn"></div>
-			        <div class="icon-gplus-1 social-btn google-btn"></div> -->
-			        <div>
-			        	<img src="./Red-signin_Long_base_44dp.png" height="30" width="180" onclick="document.getElementById('form').submit();" style="border: none;padding: 0px; margin: 0px; cursor: pointer;"/>
-			        </div>
-					<div>
+                  <div  align="center">
+                  <table>
+                    <tr>
+                      <td>
+                      
+				        <button id="customBtn" class="customGPlusSignIn">
+	                        <span class="ico"></span>
+	                        <span class="buttonText">Google</span>
+	                    </button>
+						<script>
+						  $('#customBtn').click(function(){
+					    		$('#form').submit();
+						  });
+						</script>
+	                </td>
+	                
+				    <td>
 						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
-						Sign in with Facebook
+						Facebook
 						</fb:login-button>
-					</div>
-			    </div>
-			   <!--  <div class="login-info"> 
-			    	Note that 3cixty Platform uses Google or Facebook account to authenticate you.
-			    </div> -->
+					</td>
+                    </tr>
+                  </table>
+                  <div class="googleNotSupported">(Google accounts are not supported by the iOS mobile app.)</div>
+				  </div>
+			 	</form>
+			</div>
+			<div>
+			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
+				  <h3 class="privacy-title">You can also sign in using an ExplorMI 360 account:</h3>
+			      <input type=hidden name="key" value="<%=key%>">
+                  <div  align="center">
+                    <div>
+    					<input type="text" name="email" id="email" placeholder="Email" required class="loginInput">
+  					</div>
+  					<div>
+    					<input type="password" name="password" id="password" placeholder="Password" required class="loginInput">
+  					</div>
+  					<div style="height: 3px;"></div>
+  					<input class="signinButton" type="submit" value=" Sign In ">
+			 	  </div>
+			 	  <div  align="center">
+			 	  	<a href="./forgotPassword.jsp?key=<%=key%>"><font class="link">Did you forget your password?</font></a>
+			 	  </div>
+			 	  <div  align="center">
+			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create an ExplorMI 360 account</font></a>
+			 	  </div>
+			 	</form>
 			</div>
 	    	<div class="login-benefits">
-        		<div class="login2-info">
-        			<strong> Benefits of Signing in </strong>
-        		</div>
-        		
-				<div class="login-info"> 
-					 You can save your WishList and access it from the mobile version of <strong>ExplorMI 360</strong>. 
-					 You can ask the application to take into account things like the ratings given by your friends.
-					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>ExplorMI 360</strong> to track your movements there, you can view summary of your movements. 
-					<br><br>
-					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
-				</div>
+                <h3 class="privacy-title">Benefits of Signing In</h3>
+				
+				  
+<ul>
+  <li>You can save items on your Wish List and access them from the mobile apps of ExplorMI 360.</li>
+  <li>You can ask the application to take into account things like the ratings given by your friends.</li>
+  <li>If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
+					 there, you can view summaries of your movements.</li>
+</ul>
+					  
+					  
+					 <br>
+					<p class="privacy-desc">
+					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
+				</p>
 			</div>
-			<div class="login-benefitsCopyright">
-				<div class="login3-info"> 
-					© 2015, 3cixty. All Rights Reserved.
-				</div>
-			</div>
-		</form>
+		
+	</div>
+</div>
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
+<div id="footer">
+	<div class="wrapper">
+		<div class="left footer-menu">
+			<span>&copy 2015, 3cixty. All rights reserved</span>
+		</div>
 	</div>
 </div>
 </body>

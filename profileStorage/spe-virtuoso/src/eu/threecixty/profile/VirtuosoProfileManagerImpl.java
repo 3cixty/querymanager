@@ -282,7 +282,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public String find3cixtyUID(String uid, String source, String profileImage) {
+	public String find3cixtyUID(String uid, String source) {
 		StringBuilder qStr = new StringBuilder(Configuration.PREFIXES);
 	    qStr.append("\nSELECT  DISTINCT *\n");
 	    qStr.append("FROM <" + VirtuosoManager.getInstance().getGraph(uid) + "> \n");
@@ -297,11 +297,9 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
     	qStr.append("OPTIONAL { \n");
     	qStr.append("           ?root foaf:img ?profileImage . \n");
     	qStr.append("         } \n");
-    	if (profileImage != null && !profileImage.equals("")) {
-    	    qStr.append("FILTER (str(?uid) = \"" + uid + "\" || str(?profileImage) = \"" + profileImage + "\") ");
-    	} else {
-    		qStr.append("FILTER (str(?uid) = \"" + uid + "\") ");
-    	}
+
+    	qStr.append("FILTER (str(?uid) = \"" + uid + "\") ");
+
 
 	    qStr.append("}");
 	    System.out.println(qStr.toString());
@@ -357,7 +355,7 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	}
 
 	@Override
-	public UserProfile findUserProfile(String arg0, String arg1, String arg2) {
+	public UserProfile findUserProfile(String arg0, String arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -366,5 +364,36 @@ class VirtuosoProfileManagerImpl implements ProfileManager {
 	public boolean updateKnows(UserProfile arg0, Set<String> arg1) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+
+	public void findPlaceIdsAndSocialScore(UserProfile arg0, float arg1,
+			List<String> arg2, List<Double> arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void findPlaceIdsAndSocialScoreForFriends(UserProfile arg0,
+			float arg1, List<String> arg2, List<Double> arg3) {
+		// TODO Auto-generated method stub
+	}
+
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Friend> findAllFriends(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ForgottenUserManager getForgottenUserManager() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

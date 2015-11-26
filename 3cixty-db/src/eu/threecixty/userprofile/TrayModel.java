@@ -8,6 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * 
+ * This class represents information about WishList items.
+ *
+ */
 @Entity
 @Table(name = "3cixty_tray")
 public class TrayModel implements java.io.Serializable {
@@ -29,6 +34,7 @@ public class TrayModel implements java.io.Serializable {
 	private boolean attended;
 	private String imageUrl;
 	private int rating = -1;
+	private Long creationTimestamp;
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -118,5 +124,13 @@ public class TrayModel implements java.io.Serializable {
 	}
 	public void setRating(int rating) {
 		this.rating = rating;
+	}
+	
+	@Column(name = "creationTimestamp", nullable = true)
+	public Long getCreationTimestamp() {
+		return creationTimestamp;
+	}
+	public void setCreationTimestamp(Long creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
 	}
 }

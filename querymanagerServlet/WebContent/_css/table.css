@@ -1,0 +1,27 @@
+ .table {
+    display: table;
+    }
+
+  .row  {
+    display: table-row;
+    }
+
+  .row-middle {
+    display: table-row;
+    vertical-align: middle;
+    }
+
+  .cell {
+    display: table-cell;
+    }
+    
+  .cell-middle {
+    display: table-cell;
+    vertical-align: middle;
+  }
+ .heading
+    {
+        display: table-row;
+        font-weight: bold;
+        text-align: center;
+    }

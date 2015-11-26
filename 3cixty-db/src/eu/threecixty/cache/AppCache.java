@@ -1,7 +1,19 @@
 package eu.threecixty.cache;
 
-public class AppCache {
+import java.io.Serializable;
 
+/**
+ * 
+ * This class is to create a corresponding class for appkey information from database.
+ * The class is used to store in memory.
+ *
+ */
+public class AppCache implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8640296419076568401L;
 	private String appkey;
 	private String appClientKey;
 	private String appClientPwd;

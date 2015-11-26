@@ -1,10 +1,19 @@
 package eu.threecixty.oauth;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+/**
+ * 
+ * This class is to create a corresponding class for 3cixty access token information from database.
+ * The class is used to store in memory.
+ */
+public class AccessToken implements Serializable {
 
-public class AccessToken {
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5897771990001680958L;
 	private String access_token;
 	private String refresh_token;
 	private int expires_in = -1;
@@ -19,6 +28,9 @@ public class AccessToken {
 	private String appkey; // App Key
 	
 	private Integer appkeyId;
+	private Boolean used;
+	
+	private Long creation; // might be null
 	
 	public AccessToken() {
 	}
@@ -96,5 +108,21 @@ public class AccessToken {
 
 	public void setAppkeyId(Integer appkeyId) {
 		this.appkeyId = appkeyId;
+	}
+
+	public Long getCreation() {
+		return creation;
+	}
+
+	public void setCreation(Long creation) {
+		this.creation = creation;
+	}
+
+	public Boolean getUsed() {
+		return used;
+	}
+
+	public void setUsed(Boolean used) {
+		this.used = used;
 	}
 }

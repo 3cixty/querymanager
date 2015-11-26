@@ -77,8 +77,8 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 				+ "DATE_FORMAT(DATE_SUB("+TABLE_NAME +".starttime, INTERVAL 1 Month),'%Y,%m,%d') AS starttime, "
 				+ "COUNT("+APPKEY_TABLE_NAME +".app_name) AS numberOfCalls "
 				+ "FROM " + TABLE_NAME +"," + APPKEY_TABLE_NAME
-				+ " WHERE "+ TABLE_NAME+".appkey LIKE "+ APPKEY_TABLE_NAME+".app_key"// AND "
-						/*+ TABLE_NAME +".starttime >=? AND "
+				+ " WHERE "+ TABLE_NAME+".appkey LIKE "+ APPKEY_TABLE_NAME+".app_key AND "
+						+ TABLE_NAME +".starttime >=? " /* AND "
 						+ TABLE_NAME +".starttime <= ? AND "
 						+ TABLE_NAME +".timeConsumed >= ? AND "
 						+ TABLE_NAME +".timeConsumed <= ? "*/
@@ -86,8 +86,10 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 				+ "ORDER BY starttime";
 		
 		Session session = HibernateUtil.getSessionFactory().openSession();
+		if (DEBUG_MOD) LOGGER.info(sql);
 		
 		SQLQuery query = session.createSQLQuery(sql);
+		query.setTimestamp(0, new Timestamp(from));
 		
 		List <Object[]> list = query.list();
 		
@@ -106,6 +108,30 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		return loggings;
 	}
 
+	public List<RelativeNumberOfUsers> getRelativeNumberofUsers(){
+		List <RelativeNumberOfUsers> relativeNumberOfUsers = new ArrayList<RelativeNumberOfUsers>();
+		
+		String sql = "SELECT 3cixty_account.source, count(3cixty_account.source) AS count FROM 3cixty.3cixty_account group by 3cixty_account.source;";
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		
+		@SuppressWarnings("unchecked")
+		List <Object[]> list = query.list();
+		
+		session.close();
+		
+		for (Object[] row: list) {
+			RelativeNumberOfUsers relativeNumberOfUser = new RelativeNumberOfUsers();
+			relativeNumberOfUser.setPlatform((String) row[0]);
+			relativeNumberOfUser.setNumberOfUsers(((java.math.BigInteger) row[1]).intValue());
+			relativeNumberOfUsers.add(relativeNumberOfUser);
+		}
+		
+		return relativeNumberOfUsers;
+	}
+	
 	@Override
 	public boolean save(List<CallLogging> loggings) {
 		if (DEBUG_MOD) LOGGER.info("Before logging call to DB");
@@ -121,5 +147,63 @@ public class CallLoggingStorageImpl implements CallLoggingStorage {
 		session.close();
 		if (DEBUG_MOD) LOGGER.info("After logging call to DB");
 		return true;
-	}	
+	}
+
+	@Override
+	public List<CallLoggingDisplay> getCallsWithCountByMonth() {
+		List <CallLoggingDisplay> loggings = new ArrayList<CallLoggingDisplay>();
+		
+		String sql = "SELECT 3cixty_app.app_name AS app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y-%m') AS starttime, COUNT(3cixty_app.app_name) AS numberOfCalls FROM logcall,3cixty_app WHERE logcall.appkey LIKE 3cixty_app.app_key GROUP BY 3cixty_app.app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y-%m') ORDER BY starttime;";
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		if (DEBUG_MOD) LOGGER.info(sql);
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		
+		List <?> list = query.list();
+		
+		session.close();
+		
+		for (Object item: list) {
+	    	CallLoggingDisplay loggingDisplay = new CallLoggingDisplay();
+	    	Object [] row = (Object[]) item;
+	    	CallLogging logging = new CallLogging();
+	    	logging.setKey((String) row[0]);
+	    	loggingDisplay.setCallLogging(logging);
+	    	loggingDisplay.setDateCall((String) row[1]);;
+	    	loggingDisplay.setNumberOfCalls(((java.math.BigInteger) row[2]).intValue());
+	    	loggings.add(loggingDisplay);
+		}
+		
+		return loggings;
+	}
+
+	@Override
+	public List<CallLoggingDisplay> getCallsWithCountByDay() {
+		List <CallLoggingDisplay> loggings = new ArrayList<CallLoggingDisplay>();
+		
+		String sql = "SELECT 3cixty_app.app_name AS app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y-%m-%d') AS starttime, COUNT(3cixty_app.app_name) AS numberOfCalls FROM logcall,3cixty_app WHERE logcall.appkey LIKE 3cixty_app.app_key GROUP BY 3cixty_app.app_name, DATE_FORMAT(DATE_SUB(logcall.starttime, INTERVAL 1 Month),'%Y-%m-%d') ORDER BY starttime;";
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		if (DEBUG_MOD) LOGGER.info(sql);
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		
+		List <?> list = query.list();
+		
+		session.close();
+		
+		for (Object item: list) {
+	    	CallLoggingDisplay loggingDisplay = new CallLoggingDisplay();
+	    	Object [] row = (Object[]) item;
+	    	CallLogging logging = new CallLogging();
+	    	logging.setKey((String) row[0]);
+	    	loggingDisplay.setCallLogging(logging);
+	    	loggingDisplay.setDateCall((String) row[1]);;
+	    	loggingDisplay.setNumberOfCalls(((java.math.BigInteger) row[2]).intValue());
+	    	loggings.add(loggingDisplay);
+		}
+		
+		return loggings;
+	}
 }

@@ -7,12 +7,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * 
+ * The configuration class to define common variables for development, production environment.
+ *  <br>
+ *  The class loads the properties file 3cixty.properties and extracts key/value from this file.
+ */
 public class Configuration {
 
-	public static String path;
+	public static String path; // real system path to find 3cixty.properties file from .war.
+
 	private static Properties props;
 
 	private static String version;
+	
+	private static String target; // DEV or PROD
 	
 	public static final String PROFILE_GRAPH = "http://3cixty.com";
 	public static final String SCHEMA_URI = "http://schema.org/";
@@ -31,6 +40,10 @@ public class Configuration {
 	
 	public static final String PROFILE_URI = "http://data.linkedevents.org/person/";
 
+	private static String http_virtuoso_server = null;
+	private static String http_virtuoso_server_for_outside = null;
+	
+	private static String trexServer = null;
 
 	public synchronized static void setPath(String path) {
 		Configuration.path = path;
@@ -44,36 +57,108 @@ public class Configuration {
 		return version;
 	}
 
+	/**
+	 * This method to get URL of 3cixty server (https://api.3cixty.com, https://dev.3cixty.com, http://localhost:8080).
+	 * @return
+	 */
 	public static String getHttpServer() {
 		return getProperty("HTTP_SERVER");
 	}
 	
+	/**
+	 * This method is used to get Virtuoso endpoint for trusted apps.
+	 * @return
+	 */
 	public static String getVirtuosoServer() {
+		if (http_virtuoso_server == null) {
+			http_virtuoso_server = getProperty("VIRTUOSO_SERVER");
+		}
+		if (http_virtuoso_server != null) return http_virtuoso_server;
 		return getProperty("VIRTUOSO_SERVER");
 	}
 
+	public static synchronized void setVirtuosoServer(String virtuoso_server) {
+		if (virtuoso_server != null && !"".equals(virtuoso_server)) {
+			http_virtuoso_server = virtuoso_server;
+		}
+	}
+	
+	public static synchronized void resetVirtuosoServerByDefault() {
+		http_virtuoso_server = getProperty("VIRTUOSO_SERVER");
+	}
+	
+	/**
+	 * This method is used to get Virtuoso endpoint for other apps.
+	 * @return
+	 */
+	public static String getVirtuosoServerForOutside() {
+		if (http_virtuoso_server_for_outside == null) {
+			http_virtuoso_server_for_outside = getProperty("VIRTUOSO_SERVER_FOR_OUTSIDES");
+		}
+		if (http_virtuoso_server_for_outside != null) return http_virtuoso_server_for_outside;
+		return getProperty("VIRTUOSO_SERVER_FOR_OUTSIDES");
+	}
+
+	/**
+	 * This method is used to get URL for 3cixty servlet.
+	 * @return
+	 */
 	public static String get3CixtyRoot() {
 		return getHttpServer() + getVersion();
 	}
 	
+	/**
+	 * This method is used to get Google client for authenticating with Google Plus.
+	 * @return
+	 */
 	public static String getGoogleClientId() {
 		return getProperty("CLIENT_ID");
 	}
 	
+	/**
+	 * This method is no longer used as 3cixty does not store user profile in Virtuoso anymore.
+	 * @deprecated
+	 * @return
+	 */
 	public static String getVirtuosoJDBC() {
 		return getProperty("VIRTUOSO_JDBC");
 	}
 	
+	/**
+	 * This method is used to 
+	 * @return
+	 */
 	public static String getFacebookAppID() {
 		return getProperty("FB_APP_ID");
 	}
 	
+	public static boolean isForProdTarget() {
+		if (target == null) {
+			if (props == null) load();
+			if (props == null) return false;
+			target = props.getProperty("PURPOSE");
+		}
+		return "prod".equalsIgnoreCase(target);
+	}
+	
+	/**
+	 * This method is used to get Trex server.
+	 * @return
+	 */
+	public static String getTrexServer() {
+		if (trexServer == null) {
+			trexServer = getProperty("TREX");
+		}
+		return trexServer;
+	}
+	
 	private static String getProperty(String key) {
 		if (props == null) load();
-		String purpose = props.getProperty("PURPOSE");
-		if (purpose == null) return null;
-		else if (purpose.equals("localhost")) return props.getProperty(key + "_LOCAL");
-		else if (purpose.equals("prod")) return props.getProperty(key + "_PROD");
+		if (props == null) return null;
+		target = props.getProperty("PURPOSE");
+		if (target == null) return null;
+		else if (target.equals("localhost")) return props.getProperty(key + "_LOCAL");
+		else if (target.equals("prod")) return props.getProperty(key + "_PROD");
 		else return props.getProperty(key + "_DEV");
 	}
 

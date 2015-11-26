@@ -1,6 +1,8 @@
 package eu.threecixty.profile.oldmodels;
 
 
+import java.io.Serializable;
+
 import eu.threecixty.profile.annotations.Description;
  
  
@@ -9,7 +11,11 @@ import eu.threecixty.profile.annotations.Description;
  * https://www.movesmarter.nl/portal/appdev/jsonschema/IzonePlatformService.Data.PersonalPlace
  * @author Mobidot
  */
-public class PersonalPlace {
+public class PersonalPlace implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -994407409016913860L;
 	@Description(hasText="PersonalPlace URI")
 	private String hasPersonalPlaceURI="";
 	@Description(hasText = "Place ID")

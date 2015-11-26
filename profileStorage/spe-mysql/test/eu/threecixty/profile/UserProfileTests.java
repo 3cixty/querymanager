@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.threecixty.profile.oldmodels.Accompanying;
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.Name;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
@@ -95,29 +96,19 @@ public class UserProfileTests {
 	}
 	
 	@Test
-	public void testGenderAndProfileImageAndLastTime() throws TooManyConnections {
+	public void testProfileImageAndLastTime() throws TooManyConnections {
 		String _3cixtyUID = System.currentTimeMillis() + "";
-		String gender = "Male";
 		String profileImage = "fake url img";
 		UserProfile userProfile = new UserProfile();
 		userProfile.setHasUID(_3cixtyUID);
-		userProfile.setHasGender(gender);
 		userProfile.setProfileImage(profileImage);
 		String lastTime = System.currentTimeMillis() + "";
 		userProfile.setHasLastCrawlTime(lastTime);
 		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
 		
 		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
-		Assert.assertTrue(gender.equals(loadedProfile.getHasGender()));
 		Assert.assertTrue(profileImage.equals(loadedProfile.getProfileImage()));
 		Assert.assertTrue(lastTime.equals(loadedProfile.getHasLastCrawlTime()));
-		
-		gender = "Female";
-		loadedProfile.setHasGender(gender);
-		new MySQLProfileManagerImpl().saveProfile(loadedProfile, null);
-		
-		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
-		Assert.assertTrue(gender.equals(loadedProfile2.getHasGender()));
 	}
 	
 	@Test
@@ -197,6 +188,45 @@ public class UserProfileTests {
 		Assert.assertTrue(loadedPis2.size() == 1);
 		Assert.assertTrue(exists(account3, source3, loadedPis2));
 	}
+	
+	@Test
+	public void testAccompanyings() throws TooManyConnections {
+		String _3cixtyUID = System.currentTimeMillis() + "";
+		UserProfile userProfile = new UserProfile();
+		userProfile.setHasUID(_3cixtyUID);
+
+		Accompanying accompany = new Accompanying();
+		Long id1 = 12L;
+		String IDUser2 = "32";
+		String IDUser1 = "22";
+		Double score = 2d;
+		Long time = 100L;
+		Long validity = 200L;
+        accompany.setHasAccompanyId(id1);
+        accompany.setHasAccompanyUserid2ST(IDUser2);
+        accompany.setHasAccompanyUserid1ST(IDUser1);
+        accompany.setHasAccompanyScore(score);
+        accompany.setHasAccompanyTime(time);
+        accompany.setHasAccompanyValidity(validity);
+        
+        Set <Accompanying> accompanyings = new HashSet <Accompanying>();
+        accompanyings.add(accompany);
+        userProfile.setAccompanyings(accompanyings);
+        new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+        
+        UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+        Set <Accompanying> loadedAccompanyings = loadedProfile.getAccompanyings();
+        Assert.assertNotNull(loadedAccompanyings);
+        Assert.assertTrue(loadedAccompanyings.size() == 1);
+        Accompanying loadedAccompanying = loadedAccompanyings.iterator().next();
+        Assert.assertTrue(accompany.getHasAccompanyId().equals(loadedAccompanying.getHasAccompanyId()));
+        Assert.assertTrue(accompany.getHasAccompanyUserid1ST().equals(loadedAccompanying.getHasAccompanyUserid1ST()));
+        Assert.assertTrue(accompany.getHasAccompanyUserid2ST().equals(loadedAccompanying.getHasAccompanyUserid2ST()));
+        Assert.assertTrue(accompany.getHasAccompanyScore().equals(loadedAccompanying.getHasAccompanyScore()));
+        Assert.assertTrue(accompany.getHasAccompanyTime().equals(loadedAccompanying.getHasAccompanyTime()));
+        Assert.assertTrue(accompany.getHasAccompanyValidity().equals(loadedAccompanying.getHasAccompanyValidity()));
+	}
+	
 	
 	@Test
 	public void testListGoogleUids() throws Exception {

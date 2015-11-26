@@ -9,8 +9,6 @@ import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 
-import eu.threecixty.Configuration;
-
 
 public class SparqlEndPointUtils {
 	
@@ -20,30 +18,34 @@ public class SparqlEndPointUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
-	private static final String LOCN_PREFIX = "PREFIX locn: <http://www.w3.org/ns/locn#> ";
-	private static final String CE_MILANO_PREFIX = "PREFIX ce: <http://data.linkedevents.org/cell/milano/> ";
-	
-	private static final String SPARQL_ENDPOINT_URL = Configuration.getVirtuosoServer() + "/sparql";
 	private static final String UTF8 = "UTF-8";
 	
-	private static final String SPARQL_ENDPOINT_URL_GET = ProfileManagerImpl.SPARQL_ENDPOINT_URL;
 	public static final String HTTP_POST = "POST";
 	public static final String HTTP_GET = "GET";
 	
 	
 	public static void executeQueryViaSPARQL(String query, String format,
-			String httpMethod, StringBuilder result) throws IOException {
+			String httpMethod, String endPointUrl, StringBuilder result) throws IOException {
 		long startTime = System.currentTimeMillis();
-		if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, result);
-		else executeQueryViaSPARQL_POST(query, format, result);
-		long endTime = System.currentTimeMillis();
-		if (DEBUG_MOD) LOGGER.info("Time to make query from server to KB without processing: "
-		        + (endTime - startTime) + " ms");
+//		String key = query + format + httpMethod + endPointUrl;
+//		String content = CacheManager.getInstance().getCacheData(key);
+//		if (content != null) {
+//			if (DEBUG_MOD) LOGGER.info("Result of the query " + query + " was cached");
+//			result.append(content);
+//		} else {
+		System.out.println("come here friends");
+			if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, endPointUrl, result);
+			else executeQueryViaSPARQL_POST(query, format, endPointUrl, result);
+//			CacheManager.getInstance().putCacheData(key, result.toString());
+			long endTime = System.currentTimeMillis();
+			if (DEBUG_MOD) LOGGER.info("Query sent to KB: " + query);
+			if (DEBUG_MOD) LOGGER.info("Time to make query from server to KB without processing: "
+					+ (endTime - startTime) + " ms");
+//		}
 	}
 
-	private static void executeQueryViaSPARQL_GET(String query, String format, StringBuilder result) throws IOException {
-		String urlStr = SPARQL_ENDPOINT_URL_GET + URLEncoder.encode(
-					LOCN_PREFIX + CE_MILANO_PREFIX + query, "UTF-8");
+	private static void executeQueryViaSPARQL_GET(String query, String format, String endPointUrl, StringBuilder result) throws IOException {
+		String urlStr = endPointUrl + "?debug=on&default-graph-uri=&query=" + URLEncoder.encode(query, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
 			URL url = new URL(urlStr);
 	
@@ -56,10 +58,10 @@ public class SparqlEndPointUtils {
 		input.close();
 	}
 	
-	private static void executeQueryViaSPARQL_POST(String query, String format,
+	private static void executeQueryViaSPARQL_POST(String query, String format, String endPointUrl,
 			StringBuilder result) throws IOException {
 		HttpURLConnection.setFollowRedirects(true);
-		URL url = new URL(SPARQL_ENDPOINT_URL);
+		URL url = new URL(endPointUrl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -69,7 +71,7 @@ public class SparqlEndPointUtils {
 		conn.setAllowUserInteraction(true);
 	
 		StringBuilder queryBuilder = new StringBuilder("query=").append(
-				URLEncoder.encode(CE_MILANO_PREFIX + LOCN_PREFIX + query, UTF8));
+				URLEncoder.encode(query, UTF8));
 		queryBuilder.append("&format=").append(URLEncoder.encode(format, UTF8));
 		
 		OutputStream output = conn.getOutputStream();

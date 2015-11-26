@@ -12,6 +12,7 @@ import eu.threecixty.partners.Partner;
 import eu.threecixty.partners.PartnerImpl;
 import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.oldmodels.Address;
+import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 class MySQLProfileManagerImpl implements ProfileManager {
 	
@@ -28,10 +29,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return UserUtils.exists(_3cixtyUid);
 	}
 
-	public String find3cixtyUID(String uid, String source, String profileImage) {
-		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source, profileImage);
+	public String find3cixtyUID(String uid, String source) {
+		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source);
 		if (userProfile != null) return userProfile.getHasUID();
-		return UserUtils.find3cixtyUID(uid, source, profileImage);
+		return UserUtils.find3cixtyUID(uid, source);
 	}
 
 	public List<UserProfile> getAllUserProfiles() {
@@ -106,10 +107,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return PartnerImpl.getInstance();
 	}
 
-	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating)
+	public List<String> getPlaceIdsFromRating(UserProfile userProfile, float rating, String endPointUrl)
 			throws TooManyConnections {
 		try {
-			return MySQLProfilerPlaceUtils.getPlaceIdsFromRating(userProfile, rating);
+			return MySQLProfilerPlaceUtils.getPlaceIdsFromRating(userProfile, rating, endPointUrl);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		} catch (UnknownException e) {
@@ -118,9 +119,9 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	}
 
 	public List<String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile,
-			float rating) throws TooManyConnections {
+			float rating, String endPointUrl) throws TooManyConnections {
 		try {
-			return MySQLProfilerPlaceUtils.getPlaceIdsFromRatingOfFriends(userProfile, rating);
+			return MySQLProfilerPlaceUtils.getPlaceIdsFromRatingOfFriends(userProfile, rating, endPointUrl);
 		} catch (IOException e) {
 			throw new TooManyConnections(e.getMessage());
 		} catch (UnknownException e) {
@@ -174,7 +175,7 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		if (accountIds == null || accountIds.size() == 0) return Collections.emptySet();
 		Set <String> _3cixtyUidsInCache = new HashSet <String>();
 		for (String accountId: accountIds) {
-			UserProfile tmpProfile = ProfileCacheManager.getInstance().findProfile(accountId, source, null);
+			UserProfile tmpProfile = ProfileCacheManager.getInstance().findProfile(accountId, source);
 			if (tmpProfile != null) _3cixtyUidsInCache.add(tmpProfile.getHasUID());
 		}
 		if (_3cixtyUidsInCache.size() == accountIds.size()) return _3cixtyUidsInCache;
@@ -192,10 +193,10 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return successful;
 	}
 
-	public UserProfile findUserProfile(String uid, String source, String profileImage) {
-		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source, profileImage);
+	public UserProfile findUserProfile(String uid, String source) {
+		UserProfile userProfile = ProfileCacheManager.getInstance().findProfile(uid, source);
 		if (userProfile != null) return userProfile;
-		userProfile = UserUtils.findUserProfile(uid, source, profileImage);
+		userProfile = UserUtils.findUserProfile(uid, source);
 		if (userProfile != null) {
 			ProfileCacheManager.getInstance().put(userProfile);
 		}
@@ -208,5 +209,59 @@ class MySQLProfileManagerImpl implements ProfileManager {
 			ProfileCacheManager.getInstance().put(profile);
 		}
 		return successful;
+	}
+
+	@Override
+	public void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List<String> placeIds, List<Double> socialScores, String endPointUrl) {
+		try {
+			MySQLProfilerPlaceUtils.findPlaceIdsAndSocialScore(profile,
+					rating, placeIds, socialScores, endPointUrl);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UnknownException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void findPlaceIdsAndSocialScoreForFriends(UserProfile profile,
+			float rating, List<String> placeIds, List<Double> socialScores, String endPointUrl) {
+		try {
+			MySQLProfilerPlaceUtils.findPlaceIdsAndSocialScoreForFriends(
+					profile, rating, placeIds, socialScores, endPointUrl);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UnknownException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public List<Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID) {
+		return UserUtils.findAll3cixtyFriendsHavingMyUIDInKnows(my3cixtyUID);
+	}
+
+	/**
+	 * Find all my friends in my list of knows.
+	 */
+	@Override
+	public List<Friend> findAllFriends(String my3cixtyUID) {
+		return UserUtils.findAllFriendsInMyListOfKnows(my3cixtyUID);
+	}
+
+	@Override
+	public ForgottenUserManager getForgottenUserManager() {
+		return new ForgottenUserManagerImpl();
+	}
+
+	@Override
+	public String findAccountId(UserProfile profile, String source) {
+		if (profile == null || source == null) return null;
+		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
+		if (pis == null) return null;
+		for (ProfileIdentities pi: pis) {
+			if (source.equals(pi.getHasSourceCarrier())) return pi.getHasUserAccountID();
+		}
+		return null;
 	}
 }

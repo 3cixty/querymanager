@@ -114,7 +114,7 @@ public interface ProfileManager {
 	 * 				Rating score.
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRating(UserProfile userProfile, float rating) throws TooManyConnections;
+	List <String> getPlaceIdsFromRating(UserProfile userProfile, float rating, String endPointUrl) throws TooManyConnections;
 
 	/**
 	 * Gets a list of place names which were visited more than <code>number</code> times.
@@ -134,7 +134,27 @@ public interface ProfileManager {
 	 * 				Rating score
 	 * @return A list of place IDs if Google UID is valid, <code>null</code> otherwise.
 	 */
-	List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile, float rating) throws TooManyConnections;
+	List <String> getPlaceIdsFromRatingOfFriends(UserProfile userProfile, float rating, String endPointUrl) throws TooManyConnections;
+	
+	/**
+	 * Find place IDs and corresponding social scores for places rated by me.
+	 * @param profile
+	 * @param rating
+	 * @param toPlaceIds
+	 * @param toSocialScores
+	 */
+	void findPlaceIdsAndSocialScore(UserProfile profile, float rating,
+			List <String> toPlaceIds, List <Double> toSocialScores, String endPointUrl);
+	
+	/**
+	 * Find place IDs and corresponding social scores for places rated by my friends.
+	 * @param profile
+	 * @param rating
+	 * @param toPlaceIds
+	 * @param toSocialScores
+	 */
+	void findPlaceIdsAndSocialScoreForFriends(UserProfile profile, float rating,
+			List <String> toPlaceIds, List <Double> toSocialScores, String endPointUrl);
 	
 	/**
 	 * Gets a list of place names which were visited by friends more than <code>number</code> times.
@@ -248,7 +268,7 @@ public interface ProfileManager {
 	 * @param profileImage
 	 * @return
 	 */
-	String find3cixtyUID(String uid, String source, String profileImage);
+	String find3cixtyUID(String uid, String source);
 	
 	/**
 	 * Finds the corresponding 3cixty UIDs from a given list of account IDs and source.
@@ -277,9 +297,37 @@ public interface ProfileManager {
 	 * @param profileImage
 	 * @return
 	 */
-	UserProfile findUserProfile(String uid, String source, String profileImage);
+	UserProfile findUserProfile(String uid, String source);
 	
 	boolean updateKnows(UserProfile profile, Set <String> knows);
+	
+	/**
+	 * It's possible that I don't have any information at all about them within 3cixty context.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	List <Friend> findAll3cixtyFriendsHavingMyUIDInKnows(String my3cixtyUID);
+	
+	/**
+	 * Find all my friends in my knows.
+	 * @param my3cixtyUID
+	 * @return
+	 */
+	List <Friend> findAllFriends(String my3cixtyUID);
+	
+	/**
+	 * Gets interface to manage forgotten users.
+	 * @return
+	 */
+	ForgottenUserManager getForgottenUserManager();
+	
+	/**
+	 * Finds account Id from a given user profile and a given source.
+	 * @param profile
+	 * @param source
+	 * @return
+	 */
+	String findAccountId(UserProfile profile, String source);
 	
 	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.

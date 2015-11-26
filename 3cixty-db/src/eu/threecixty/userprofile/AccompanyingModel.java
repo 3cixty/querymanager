@@ -12,8 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * This model seems to be changed in the near future. So, I don't use a common class
- * for sharing code between Know and Accompanying class.
+ * This class is to represent an accompaying which is interfered by Mobidot algorithm.
  *
  * @author Cong-Kinh Nguyen
  *
@@ -30,6 +29,7 @@ public class AccompanyingModel implements java.io.Serializable {
 	private Integer id;
 	private UserModel userModel;
 
+	private Long accompanyId;
 	private Long accompanyTime; 
 	private Long accompanyValidity; 
 	private String hasAccompanyUserid1ST; 
@@ -93,5 +93,13 @@ public class AccompanyingModel implements java.io.Serializable {
 	}
 	public void setAccompanyScore(Double accompanyScore) {
 		this.accompanyScore = accompanyScore;
+	}
+	
+	@Column(name = "accompanyId", nullable = true)
+	public Long getAccompanyId() {
+		return accompanyId;
+	}
+	public void setAccompanyId(Long accompanyId) {
+		this.accompanyId = accompanyId;
 	}
 }

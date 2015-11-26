@@ -91,7 +91,7 @@ public class GoogleAccountUtils {
 			String picture = json.getString("picture");
 			
 			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(
-					user_id, SPEConstants.GOOGLE_SOURCE, picture);
+					user_id, SPEConstants.GOOGLE_SOURCE);
 			if (profile == null) {
 				_3cixtyUID = Utils.gen3cixtyUID(user_id, UidSource.GOOGLE);
 				profile = new UserProfile();
@@ -99,6 +99,7 @@ public class GoogleAccountUtils {
 			} else {
 				_3cixtyUID = profile.getHasUID();
 			}
+			ProfileManagerImpl.getInstance().getForgottenUserManager().remove(_3cixtyUID); // remove from forgotten user table
 			boolean generalInfoModified = Utils.checkNameAndProfileImageModified(profile, givenName, familyName, picture);
 			if (generalInfoModified) {
 				profile.setProfileImage(picture);
@@ -108,6 +109,7 @@ public class GoogleAccountUtils {
 				name.setFamilyName(familyName);
 			}
 
+			if (DEBUG_MOD) LOGGER.info("user_id = " + user_id + ", 3cixty UID = " + _3cixtyUID + ", givenName = " + givenName + ", familyName = " + familyName);
 
 			Set <ProfileIdentities> profileIdentities = null;
 			if (profile.getHasProfileIdenties() == null) {
@@ -119,13 +121,16 @@ public class GoogleAccountUtils {
 			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, user_id, SPEConstants.GOOGLE_SOURCE, profileIdentities);
 			
 			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
-			
-			if (generalInfoModified || profileIdentitiesModified) {
-				boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
-				if (successful) {
-					updateKnows(accessToken, user_id, profile);
-				}
-			} else updateKnows(accessToken, user_id, profile);
+			try {
+				if (generalInfoModified || profileIdentitiesModified) {
+					boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+					if (successful) {
+						updateKnows(accessToken, user_id, profile);
+					}
+				} else updateKnows(accessToken, user_id, profile);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+			}
 			long time3 = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Time to process info (relevant to UserProfile model) at backend for one log-in process: " + (time3 - time1) + " ms");
 		} catch (Exception e) {
@@ -134,6 +139,20 @@ public class GoogleAccountUtils {
 		}
 		if (_3cixtyUID == null) return "";
 		return _3cixtyUID;
+	}
+	
+	public static boolean existUserProfile(String accessToken) {
+		try {
+			String reqMsg = Utils.readUrl(
+					"https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken);
+			JSONObject json = new JSONObject(reqMsg);
+			String user_id = json.getString("id");
+			UserProfile profile = ProfileManagerImpl.getInstance().findUserProfile(user_id, SPEConstants.GOOGLE_SOURCE);
+			if (profile != null) return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	private static void updateKnows(String accessToken, String user_id,

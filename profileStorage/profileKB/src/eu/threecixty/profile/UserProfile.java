@@ -1,5 +1,6 @@
 package eu.threecixty.profile;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import eu.threecixty.profile.annotations.*;
@@ -11,8 +12,12 @@ import eu.threecixty.profile.oldmodels.*;
  *
  */
 @Extend(hasText = "http://www.w3.org/2006/vcard/ns#Individual //extends individual in current ontology")
-public class UserProfile{
-    //following are the required fields
+public class UserProfile implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6517187548873919594L;
+	//following are the required fields
     @RequiredNotNullEntities
     @Description(hasText="User ID on the 3cxity Plateform")
     private String hasUID="";
@@ -25,8 +30,8 @@ public class UserProfile{
     @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Gender")
     private String hasGender;      
     @Description(hasText = "Collection hold the various identities that the user has holds other than 3cixty ID. "
-    		+ "These identities are the source from where user data is gathered. some sample identities are user�s"
-    		+ " facebook identity, user�s twitter identity etc." )
+    		+ "These identities are the source from where user data is gathered. some sample identities are users"
+    		+ " facebook identity, users twitter identity etc." )
     private Set<ProfileIdentities> hasProfileIdenties; 
     
     //each of the following can be empty 
@@ -34,7 +39,7 @@ public class UserProfile{
 //    @Exists(hasText = "http://www.w3.org/2006/vcard/ns#Email")
 //    private String hasEmail; 
     @Description(hasText = "Collection of preferences of the user.")
-    private Preference preferences;
+    private transient Preference preferences;
 //    @Description(hasText = "Collection of Hobbies of the user.")
 //    private Set <String> hasHobbies;
 //    @Description(hasText = "Collection of languages the user speaks.")
@@ -46,15 +51,6 @@ public class UserProfile{
     //@Description(hasText = "History of user made query. Check this new architecture")
     //private Set<QueryHistory> hasQueryHistory; 
     
-//    @ComingSoonEntities
-//    @Description(hasText = "Collection of skills of the user.")
-//    private Set <Skills> hasSkills;
-//    @Description(hasText = "Collection that holds the Education information about the user. "
-//    				+"This collection holds the level of education user has completed or is currently enroled in")
-//    private Set <Eduation> hasEducation;
-//    @Description(hasText = "Collection that holds the Employment history of the user. "
-//    				+ "This collection holds the user�s previous employers and the current employer if any")
-//    private Set <EmployerInformation> hasEmployerInformation;
   
     /**Attribute to store profile picture*/
     private String profileImage;

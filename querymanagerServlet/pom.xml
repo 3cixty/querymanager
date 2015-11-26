@@ -67,12 +67,6 @@
     </dependency>
 
     <dependency>
-	  <groupId>com.google.code.gson</groupId>
-	  <artifactId>gson</artifactId>
-	  <version>1.7.1</version>
-    </dependency>
-
-    <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
         <version>3.0.6.Final</version>
@@ -114,6 +108,12 @@
 	  <artifactId>mail</artifactId>
 	  <version>1.4.7</version>
     </dependency>
+    
+<dependency>
+	<groupId>commons-validator</groupId>
+	<artifactId>commons-validator</artifactId>
+	<version>1.4.1</version>
+</dependency>
     
         <!-- javamelody-core -->
         <dependency>

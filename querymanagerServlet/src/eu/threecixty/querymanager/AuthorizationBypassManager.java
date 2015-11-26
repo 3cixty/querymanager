@@ -11,6 +11,11 @@ import java.util.Map;
 
 import eu.threecixty.Configuration;
 
+/**
+ * 
+ * This class is used to check whether or not an app key is ignored to show authorization dialog.
+ *
+ */
 public class AuthorizationBypassManager {
 
 	private static final AuthorizationBypassManager instance = new AuthorizationBypassManager();

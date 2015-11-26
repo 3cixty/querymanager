@@ -1,6 +1,7 @@
 package eu.threecixty.profile.elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ public class ElementDetailsUtils {
 	
 	private static final String COMMENT_ATTRIBUTE = "reviewBody"; // to get comment
 	private static final String CATEGORY_ATTRIBUTE = "category";
+	private static final String TOP_CATEGORY_ATTRIBUTE = "topCategory";
 	
 	private static final String TRANSLATION_TAG = "-tr";
 	private static final String REVIEW_LANG = "reviewLang";
@@ -44,16 +46,17 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createEventsDetails(Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
+	public static List <ElementDetails> createEventsDetails(String endPointUrl, String eventGraph, Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return Collections.emptyList();
 		
-		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
+		List <ElementDetails> finalList = new ArrayList <ElementDetails>();
 
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT ?item ?title ?description ?category ?beginTime ?endTime ?lat ?lon ?street ?locality ?image_url ?source (lang(?description)  as ?language) ?url ?url1 ?url2 \n");
 		queryBuff.append("WHERE {\n");
-		queryBuff.append("{ graph <http://3cixty.com/events> {?item a lode:Event.} } \n");
+		queryBuff.append("{ graph " + eventGraph + " {?item a lode:Event.} } \n");
 		queryBuff.append("?item rdfs:label ?title . \n");
 		queryBuff.append(" OPTIONAL { ?item rdfs:seeAlso ?url . } \n");
+		queryBuff.append(" OPTIONAL { ?item owl:sameAs ?url2 . } \n");
 		queryBuff.append(" OPTIONAL { ?item dc:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
@@ -68,6 +71,8 @@ public class ElementDetailsUtils {
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
 		queryBuff.append("              ?inSpace geo:long ?lon . }\n");
+		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place1. \n");
+		queryBuff.append("          ?place1 schema:url ?url1 . } \n");
 		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place. \n");
 		queryBuff.append("              ?place schema:location ?address .\n");
 		queryBuff.append("              ?address schema:streetAddress ?street .\n");
@@ -78,7 +83,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("              }\n");
 		queryBuff.append(" UNION { ?time time:inXSDDateTime ?beginTime .  } \n");
 		queryBuff.append("}");
-		queryBuff.append("OPTIONAL{ ?item lode:poster ?image_url .}\n");
+		queryBuff.append("OPTIONAL{ ?item lode:poster/ma-ont:locator ?image_url .}\n");
 		queryBuff.append("OPTIONAL{ ?item dc:publisher ?source .}\n");
 		
 		queryBuff.append("VALUES ?item {");
@@ -86,7 +91,12 @@ public class ElementDetailsUtils {
 			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(eventId);
 			if (tmp != null) {
 				for (String language: languages) {
-				    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+				    if (!language.contains(TRANSLATION_TAG)) {
+				    	ElementEventDetails eed = (ElementEventDetails) tmp;
+				    	if (eed.containsDescIn(language)) finalList.add((eed).export(language));
+				    	else if (eed.containsDescIn("en")) finalList.add((eed).export("en"));
+				    	else finalList.add((eed).export(language));
+				    }
 				}
 				continue;
 			}
@@ -96,14 +106,17 @@ public class ElementDetailsUtils {
 		queryBuff.append("} \n");
 		queryBuff.append("}");
 		
-		if (finalList.size() == eventIds.size()) return finalList;
+		if (finalList.size() == eventIds.size()) {
+			reorder(finalList, eventIds);
+			return finalList;
+		}
 		
 		if (DEBUG_MOD) LOGGER.info("Get events in detail: " + queryBuff.toString());
 
 		StringBuilder result = new StringBuilder();
 		
 		SparqlEndPointUtils.executeQueryViaSPARQL(queryBuff.toString(), "application/sparql-results+json", 
-				SparqlEndPointUtils.HTTP_POST, result);
+				SparqlEndPointUtils.HTTP_POST, endPointUrl, result);
 
 		JSONObject json = new JSONObject(
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
@@ -142,11 +155,41 @@ public class ElementDetailsUtils {
 		DetailItemsCacheManager.getInstance().put(elementsDetails);
 		for (ElementDetails tmp: elementsDetails) {
 			for (String language: languages) {
-			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementEventDetails) tmp).export(language));
+			    if (!language.contains(TRANSLATION_TAG)) {
+			    	ElementEventDetails eed = (ElementEventDetails) tmp;
+			    	if (eed.containsDescIn(language)) finalList.add((eed).export(language));
+			    	else if (eed.containsDescIn("en")) finalList.add((eed).export("en"));
+			    	else finalList.add((eed).export(language));
+			    }
 			}
 		}
 		
+		// reOrder final list
+		reorder(finalList, eventIds);
 		return finalList;
+	}
+
+	/**
+	 * Reorder the list to keep the same order compared to input.
+	 * @param finalList
+	 * @param itemIds
+	 */
+	private static void reorder(List<ElementDetails> finalList,
+			Collection<String> itemIds) {
+		String [] ids = new String [itemIds.size()];
+		List <ElementDetails> newList = new LinkedList <ElementDetails>();
+		itemIds.toArray(ids);
+		for (int i = 0; i < ids.length; i++) {
+			String itemId = ids[i];
+			for (ElementDetails ed: finalList) {
+				if (itemId.equals(ed.getId())) {
+					newList.add(ed);
+					break;
+				}
+			}
+		}
+		finalList.clear();
+		finalList.addAll(newList);
 	}
 
 	/**
@@ -155,23 +198,36 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createPoIsDetails(Collection <String> poiIds, String[] categories, String[] languages) throws IOException {
+	public static List <ElementDetails> createPoIsDetails(String endPointUrl, String poiGraph, Collection <String> poiIds,
+			String[] categories, String[] topCategories, String[] languages) throws IOException {
 		if (poiIds == null || poiIds.size() == 0) return Collections.emptyList();
 
 		List <ElementDetails> finalList = new LinkedList <ElementDetails>();
 		
-		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url  \n");
+		StringBuilder queryBuff = new StringBuilder("SELECT DISTINCT  ?poi ?name ?description (lang(?description)  as ?descLang) ?category ?topCategory  ?lat ?lon ?address ?reviewBody (lang(?reviewBody)  as ?reviewLang) ?ratingValue1 ?ratingValue2 ?ratingValue3 ?image_url ?source  ?telephone ?url ?url1 ?url2  \n");
 		queryBuff.append("WHERE {\n");
-		queryBuff.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
+		queryBuff.append(" { graph " + poiGraph + " {?poi a dul:Place.} }  \n");
 		
 		queryBuff.append(" ?poi rdfs:label ?name .  \n");
 		queryBuff.append(" OPTIONAL { ?poi owl:sameAs ?url . } \n");
+		queryBuff.append(" OPTIONAL { ?poi schema:url ?url1 . } \n");
+		queryBuff.append(" OPTIONAL { ?poi rdfs:seeAlso ?url2 . } \n");
 		queryBuff.append(" OPTIONAL { ?poi schema:description ?description . \n");
 		//addLanguageFilter("description", languages, queryBuff);
 		queryBuff.append(" } \n");
-		queryBuff.append("?poi locationOnt:businessType/skos:prefLabel ?category . \n");
+		
 		if (categories != null && categories.length > 0) {
+			queryBuff.append("?poi locationOnt:businessType/skos:prefLabel ?category . \n");
 			appendCategoriesFilter(queryBuff, categories);
+		} else {
+			queryBuff.append("OPTIONAL {?poi locationOnt:businessType/skos:prefLabel ?category . }\n");
+		}
+		
+		if (topCategories != null && topCategories.length > 0) {
+			queryBuff.append("?poi locationOnt:businessTypeTop/skos:prefLabel ?topCategory . \n");
+			appendTopCategoriesFilter(queryBuff, topCategories);
+		} else {
+			queryBuff.append("OPTIONAL {?poi locationOnt:businessTypeTop/skos:prefLabel ?topCategory . }\n");
 		}
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:location/schema:streetAddress ?address . } \n");
@@ -180,7 +236,8 @@ public class ElementDetailsUtils {
 		queryBuff.append("?geoLocation geo:lat  ?lat . \n");
 		queryBuff.append("?geoLocation geo:long  ?lon . \n");
 		queryBuff.append("} \n");
-		queryBuff.append("OPTIONAL{ ?poi schema:reviewBody ?reviewBody .  \n");
+		queryBuff.append("OPTIONAL{ ?poi schema:review ?review .  \n");
+		queryBuff.append("?review schema:reviewBody ?reviewBody .  \n");
 		//addLanguageFilter("reviewBody", languages, queryBuff);
 		queryBuff.append(" } \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating ?ratingValue1 . } \n");
@@ -188,7 +245,7 @@ public class ElementDetailsUtils {
 		queryBuff.append("OPTIONAL{ ?poi schema:aggregateRating/schema:reviewRating/schema:ratingValue ?ratingValue3  .} \n");
 		
 		queryBuff.append("OPTIONAL{ ?poi schema:interactionCount ?reviewCounts .} \n");
-		queryBuff.append("OPTIONAL{ ?poi lode:poster ?image_url .} \n");
+		queryBuff.append("OPTIONAL{ ?poi lode:poster/ma-ont:locator ?image_url .} \n");
 		queryBuff.append("OPTIONAL{ ?poi dc:publisher ?source .} \n");
 		queryBuff.append("OPTIONAL{ ?poi schema:telephone ?telephone .} \n");
 		
@@ -197,7 +254,12 @@ public class ElementDetailsUtils {
 			ElementDetails tmp = DetailItemsCacheManager.getInstance().get(poiId);
 			if (tmp != null) {
 				for (String language: languages) {
-				    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementPoIDetails) tmp).export(language));
+				    if (!language.contains(TRANSLATION_TAG)) {
+				    	ElementPoIDetails epd = (ElementPoIDetails) tmp;
+				    	if (epd.containsDescIn(language)) finalList.add((epd).export(language));
+				    	else if (epd.containsDescIn("en")) finalList.add((epd).export("en"));
+				    	else finalList.add((epd).export(language));
+				    }
 				}
 				continue;
 			}
@@ -207,14 +269,17 @@ public class ElementDetailsUtils {
 		queryBuff.append("} \n");
 		queryBuff.append("}");
 		
-		if (finalList.size() == poiIds.size()) return finalList;
+		if (finalList.size() == poiIds.size()) {
+			reorder(finalList, poiIds);
+			return finalList;
+		}
 		
 		if (DEBUG_MOD) LOGGER.info("Get PoIs in detail: " + queryBuff.toString());
 		
 		StringBuilder result = new StringBuilder();
 		
 		SparqlEndPointUtils.executeQueryViaSPARQL(queryBuff.toString(),
-				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, result);
+				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, endPointUrl, result);
 
 		JSONObject json = new JSONObject(
 				SparqlEndPointUtils.cleanResultReceivedFromVirtuoso(result.toString()));
@@ -224,12 +289,12 @@ public class ElementDetailsUtils {
 
 		Map <String, ElementDetails> maps = new HashMap <String, ElementDetails>();
 		
-		ElementDetails tmpPoIDetails = null;
+		ElementPoIDetails tmpPoIDetails = null;
 		for (int i = 0; i  < len; i++) {
 			JSONObject tmpObj = jsonArrs.getJSONObject(i);
 			String currentId = tmpObj.get("poi").toString();
 			if (currentId == null) continue;
-			tmpPoIDetails = maps.get(currentId);
+			tmpPoIDetails = (ElementPoIDetails) maps.get(currentId);
 			if (tmpPoIDetails == null) {
 				tmpPoIDetails = createPoIDetails(tmpObj, languages);
 				maps.put(currentId, tmpPoIDetails);
@@ -248,6 +313,11 @@ public class ElementDetailsUtils {
 					if (!tmpPoIDetails.getCategories().contains(category))
 						tmpPoIDetails.getCategories().add(category);
 				}
+				String topCategory = getAttributeValue(tmpObj, TOP_CATEGORY_ATTRIBUTE);
+				if (!isNullOrEmpty(topCategory)) {
+					if (!tmpPoIDetails.getTopCategories().contains(topCategory))
+						tmpPoIDetails.getTopCategories().add(topCategory);
+				}
 				String descLang = getAttributeValue(tmpObj, "descLang");
 				
 				String desc = getAttributeValue(tmpObj, "description");
@@ -260,11 +330,17 @@ public class ElementDetailsUtils {
 		List <ElementDetails> elementsDetails = new LinkedList <ElementDetails>();
 		elementsDetails.addAll(maps.values());
 		processCategories(elementsDetails);
+		processTopCategories(elementsDetails);
 		
 		DetailItemsCacheManager.getInstance().put(elementsDetails);
 		for (ElementDetails tmp: elementsDetails) {
 			for (String language: languages) {
-			    if (!language.contains(TRANSLATION_TAG)) finalList.add(((ElementPoIDetails) tmp).export(language));
+			    if (!language.contains(TRANSLATION_TAG)) {
+			    	ElementPoIDetails epd = (ElementPoIDetails) tmp;
+			    	if (epd.containsDescIn(language)) finalList.add((epd).export(language));
+			    	else if (epd.containsDescIn("en")) finalList.add((epd).export("en"));
+			    	else finalList.add((epd).export(language));
+			    }
 			}
 		}
 		
@@ -275,6 +351,8 @@ public class ElementDetailsUtils {
 			}
 		}
 		
+		// reOrder final list
+		reorder(finalList, poiIds);
 		return finalList;
 	}
 	
@@ -298,6 +376,11 @@ public class ElementDetailsUtils {
 		poiDetails.setCategories(categories);
 		String category = getAttributeValue(json, CATEGORY_ATTRIBUTE);
 		if (!isNullOrEmpty(category)) categories.add(category);
+		
+		List <String> topCategories = new LinkedList <String>();
+		poiDetails.setTopCategories(topCategories);
+		String topCategory = getAttributeValue(json, TOP_CATEGORY_ATTRIBUTE);
+		if (!isNullOrEmpty(topCategory)) topCategories.add(topCategory);
 		
 		String lat = getAttributeValue(json, "lat");
 		if (!isNullOrEmpty(lat)) poiDetails.setLat(lat);
@@ -332,6 +415,8 @@ public class ElementDetailsUtils {
 		}
 		
 		String url = getAttributeValue(json, "url");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url2");
 		if (!isNullOrEmpty(url)) poiDetails.setUrl(url);
 		
 		return poiDetails;
@@ -378,6 +463,8 @@ public class ElementDetailsUtils {
 		String source = getAttributeValue(json, "source");
 		if (!isNullOrEmpty(source)) eventDetails.setSource(source);
 		String url = getAttributeValue(json, "url");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url1");
+		if (isNullOrEmpty(url)) url = getAttributeValue(json, "url2");
 		if (!isNullOrEmpty(url)) eventDetails.setUrl(url);
 		return eventDetails;
 	}
@@ -392,6 +479,19 @@ public class ElementDetailsUtils {
 			}
 			ed.setCategory(catBuilder.toString());
 			ed.setCategories(null);
+		}
+	}
+	
+	private static void processTopCategories(List<ElementDetails> elementsDetails) {
+		StringBuilder topCatBuilder = new StringBuilder();
+		for (ElementDetails ed: elementsDetails) {
+			topCatBuilder.setLength(0);
+			for (String topCategory: ((ElementPoIDetails) ed).getTopCategories()) {
+				if (topCatBuilder.length() > 0) topCatBuilder.append(", ");
+				topCatBuilder.append(topCategory);
+			}
+			((ElementPoIDetails) ed).setTopCategory(topCatBuilder.toString());
+			((ElementPoIDetails) ed).setTopCategories(null);
 		}
 	}
 	
@@ -421,6 +521,21 @@ public class ElementDetailsUtils {
 				}
 				index++;
 				sb.append("STR(?category) = \"" + tmpCat + "\"");
+			}
+			sb.append(") .\n");
+		}
+	}
+	
+	private static void appendTopCategoriesFilter(StringBuilder sb, String[] topCategories) {
+		if (topCategories.length > 0) {
+			sb.append("FILTER (");
+			int index = 0;
+			for (String tmpCat: topCategories) {
+				if (index > 0) {
+					sb.append(" || ");
+				}
+				index++;
+				sb.append("STR(?topCategory) = \"" + tmpCat + "\"");
 			}
 			sb.append(") .\n");
 		}

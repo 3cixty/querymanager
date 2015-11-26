@@ -1,6 +1,7 @@
 package eu.threecixty.profile.oldmodels;
 
-import eu.threecixty.ThreeCixtyExpression;
+import java.io.Serializable;
+
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -8,7 +9,11 @@ import eu.threecixty.profile.annotations.Description;
  * @author Rachit.Agarwal@inria.fr
  *
  */
-public class Address {
+public class Address implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2326217996176079219L;
 	@Description(hasText="UniqueID")
 	private String hasAddressURI="";
 	@Description(hasText="Post office box")
@@ -29,10 +34,6 @@ public class Address {
 	private double longitute=0.0;
 	@Description(hasText="latitude information. Uses http://www.w3.org/2006/vcard/ns#latitude")
 	private double latitude=0.0;
-	
-	// For generating expression filter
-	private ThreeCixtyExpression threeCixtyExpr;
-	
 	
 	public String getHasAddressURI() {
 		return hasAddressURI;
@@ -96,11 +97,5 @@ public class Address {
 	}
 	public void setLatitude(double latitude) {
 		this.latitude = latitude;
-	}
-	public ThreeCixtyExpression getThreeCixtyExpr() {
-		return threeCixtyExpr;
-	}
-	public void setThreeCixtyExpr(ThreeCixtyExpression threeCixtyExpr) {
-		this.threeCixtyExpr = threeCixtyExpr;
 	}
 }

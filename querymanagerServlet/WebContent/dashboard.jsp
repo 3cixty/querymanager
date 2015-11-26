@@ -6,13 +6,19 @@
 
 <html>
 <head>
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+	 	
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <%
     if (session.getAttribute("admin") == null) {
-    	response.sendRedirect(Constants.OFFSET_LINK_TO_ERROR_PAGE + "error.jsp");
+    	session.setAttribute("nextAction", "dashboard.jsp");
+    	response.sendRedirect(eu.threecixty.Configuration.get3CixtyRoot() + "/adminLogin.jsp");
     } else {
 %>
 
@@ -36,13 +42,23 @@
                                dataType:"json",
                                async: false
                                }) .responseText;
+		var jsonDataUsers = $.ajax({
+             			type:"GET",
+             			url: "<%=Configuration.get3CixtyRoot()%>/getRelativeNumberofUsers",
+             			dataType:"json",
+             			async: false
+             			}) .responseText;
 
 		// Create our data table. sample
         //var jsonData='{"cols": [{"label":"date","type":"datetime"},{"label":"AppName","type":"string"},{"label":"Requests","type":"number"}],"rows": [{"c":[{"v":"Date(2014,9,30)"},{"v":"test"},{"v":1}]}, {"c":[{"v":"Date(2014,9,31)"},{"v":"test"},{"v":3}]}]}'
 
         var myObject = eval('(' + jsonData + ')');
 
+	var myObject2 = eval('(' + jsonDataUsers + ')');
+        
         var data = new google.visualization.DataTable(myObject);
+
+	var data2 = new google.visualization.DataTable(myObject2);
 
 		var grouped_data = google.visualization.data.group(data, [ 1 ], [ {
 			'column' : 2,
@@ -139,6 +155,18 @@
 			}
 		});
 
+		var completeTableUser = new google.visualization.ChartWrapper({
+            		'chartType' : 'Table',
+        		'containerId' : 'completeTableUser_div',
+            		'dataTable' : data2,
+            		'options' : {
+                		'page' : 'enable'
+        		}
+            	});
+
+
+        	completeTableUser.draw();
+
 		var completeTable = new google.visualization.ChartWrapper({
 			'chartType' : 'Table',
 			'containerId' : 'completeTable_div',
@@ -152,6 +180,9 @@
 			'containerId' : 'ColumnChartTotalRequests_div',
 			'dataTable' : grouped_data,
 			'options' : {
+				'chartArea' : {
+					'width' : 1000
+				},
 				'hAxis' : {
 					'title' : 'App Name'
 				},
@@ -200,13 +231,13 @@
 				},
 				'hAxis' : {
 					'slantedText' : false,
-					'direction' : -1
+					'direction' : 1
 				//'title':'Date'
 				},
 				'vAxis' : {
 					'viewWindow' : {
 						'min' : 0,
-						'max' : 20
+						'max' : 10000
 					},
 					'title' : 'Requests'
 				},
@@ -269,28 +300,32 @@
 				[ completeTable ]);
 		dashboard.bind([ chartRangeFilterControl, appSelectorFilter ],
 				areaChart);
-		dashboard.draw(data);
+		dashboard.draw(data,data2);
 	}
 </script>
 </head>
 <body>
-<form action="./logoutAdmin" method="get">
+<form id="formDashboard" action="./logoutAdmin" method="get">
 <div>
-<input type="submit" name="logout" value="Logout">
+<input type="button" value="Download data grouped by day" onclick="downloadDailyCsv();" >
+<input type="button" value="Download data grouped by month" onclick="downloadMonthlyCsv();" >
+<input type="submit" name="logout" value="Logout" onclick="logout();">
 </div>
 </form>
 
 	<div id="dashboard_div"
 		style="border: 1px solid rgb(204, 204, 204); margin-top: 1em; position: relative;"padding-left: 1em">
 		</p>
-		<table class="columns">
-			<tbody>
+		<table class="columns" width="100%">
 				<tr>
-					<td colspan="4">
-						<div id="ColumnChartTotalRequests_div" style="position: relative;"></div>
+					<td colspan="5">
+						<div id="ColumnChartTotalRequests_div" style="width: 1215px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
+					<td>
+                        			<div id="completeTableUser_div" style="position: relative;"></div>
+                    			</td>
 					<td valign=center><font face="Sans-serif">Total Number
 							of Calls made by an App</font>
 						<div id="pieChart_div" style="position: relative;"></div></td>
@@ -305,28 +340,56 @@
 					</td>
 				</tr>
 				<tr>
-					<td colspan="4">
+					<td colspan="5">
 						<div id="areaChart_div"
-							style="width: 915px; height: 300px; position: relative;"></div>
+							style="width: 1215px; height: 300px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="4">
+					<td colspan="5">
 						<div id="chartRangeFilterControl_div"
-							style="width: 915px; height: 50px; position: relative;"></div>
+							style="width: 1215px; height: 50px; position: relative;"></div>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="4">
+					<td colspan="5">
 						<div id="appSelector_div" style="display: none"></div>
 					</td>
 				</tr>
-			</tbody>
 		</table>
 	</div>
+	
+	<script type="text/javascript">
+	    function downloadMonthlyCsv() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/getCallsGroupedByMonth";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	    
+	    function downloadDailyCsv() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/getCallsGroupedByDay";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	    
+	    function logout() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/logoutAdmin";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	</script>
 	
 	<%
     }
 	%>
+	
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
 </body>
 </html>

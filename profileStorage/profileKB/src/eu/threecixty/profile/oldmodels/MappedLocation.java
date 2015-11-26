@@ -1,5 +1,7 @@
 package eu.threecixty.profile.oldmodels;
 
+import java.io.Serializable;
+
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -8,7 +10,11 @@ import eu.threecixty.profile.annotations.Description;
  * @author Mobidot
  *
  */
-public class MappedLocation  {
+public class MappedLocation implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3437314189907918195L;
 	@Description(hasText = "Local ID")
     Long hasMappedLocationId; 
     @Description(hasText = "OSM node ID")

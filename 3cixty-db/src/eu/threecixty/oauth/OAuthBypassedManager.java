@@ -3,6 +3,12 @@ package eu.threecixty.oauth;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * This class is to check whether or not a given appkey is found in the list of appkeys which
+ * are fully trusted. This means there is no authorization process for asking permission.
+ *
+ */
 public class OAuthBypassedManager {
 
 	private static final OAuthBypassedManager INSTANCE = new OAuthBypassedManager();

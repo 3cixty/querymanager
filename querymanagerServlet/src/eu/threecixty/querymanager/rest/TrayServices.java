@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -39,7 +38,8 @@ import eu.threecixty.profile.elements.ElementDetailsUtils;
 import eu.threecixty.profile.elements.LanguageUtils;
 
 /**
- * This class is an end point to expose Rest TrayAPIs to other components.
+ * This class contains all RESTful APIs for dealing with WishList.
+ *
  * @author Cong-Kinh NGUYEN
  *
  */
@@ -67,6 +67,14 @@ public class TrayServices {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
+	 /**
+	  * This API is used to manipulate with WishList elements.
+	  * <br>
+	  * The detail about the API specification can be found at https://docs.google.com/document/d/11yKLBgdIr_JgU4SXqP8gF0QTndDQOMW-_xAj_9maPkc/edit.
+	  * @param input
+	  * @param req
+	  * @return
+	  */
     @POST
     @Path("/tray")
     public Response invokeTrayServices(InputStream input, @Context Request req) {
@@ -109,9 +117,9 @@ public class TrayServices {
     				        //Verify if it matched with etag available in http request
     				        rb = req.evaluatePreconditions(etag);
 					        //Create cache control header
-					         CacheControl cc = new CacheControl();
+					         //CacheControl cc = new CacheControl();
 					         //Set max age to one day
-					         cc.setMaxAge(86400);
+					         //cc.setMaxAge(86400);
     						if (rb == null) { // changed
     							String content = JSONObject.wrap(trays).toString();
     							
@@ -121,11 +129,10 @@ public class TrayServices {
     							return Response.status(Response.Status.OK)
     									.entity(content)
     									.type(MediaType.APPLICATION_JSON_TYPE)
-    									.cacheControl(cc)
     									.tag(etag)
     									.build();
     						} else {
-    							return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
+    							return rb.tag(etag).status(Status.NOT_MODIFIED).build();
     						}
     					}
     				} else if (LOGIN_ACTION.equalsIgnoreCase(action)) {
@@ -186,23 +193,44 @@ public class TrayServices {
 
     }
 	
-//	@POST
-//	@Path("/allTrays")
-//	public Response showAllTrays(@FormParam("username") String username, @FormParam("password") String password) {
-//		try {
-//			AdminValidator admin = new AdminValidator();
-//			if (admin.validate(username, password, CallLogServices.realPath)) {
-//				List <Tray> allProfiles = ProfileManagerImpl.getInstance().getTrayManager().getAllTrays();
-//				Gson gson = new Gson();
-//				return Response.ok(gson.toJson(allProfiles), MediaType.APPLICATION_JSON_TYPE).build();
-//			} else {
-//				return Response.temporaryRedirect(new URI(Constants.OFFSET_LINK_TO_ERROR_PAGE + "errorLogin.jsp")).build();
-//			}
-//		} catch (URISyntaxException e) {
-//			e.printStackTrace();
+//    @GET
+//    @Path("/getTraysInDetail")
+//    public Response getTraysInDetail(@Context HttpHeaders headers, @Context Request req) {
+//    	try {
+//    		if (DEBUG_MOD) LOGGER.info("Get trays in detail");
+//    		RestTrayObject restTrayObject = new RestTrayObject();
+//    		List <String> accessTokens = headers.getRequestHeader("access_token");
+//    		if (accessTokens != null && accessTokens.size() > 0) {
+//    		    restTrayObject.setToken(accessTokens.get(0));
+//    		}
+//    		AccessToken at = OAuthWrappers.findAccessTokenFromDB(restTrayObject.getToken());
+//    		if (at != null) {
+//    			restTrayObject.setKey(at.getAppkey());
+//    		}
+//    		restTrayObject.setAction(GET_ACTION_IN_DETAILS);
+//			return get_tray_elements_details(restTrayObject, req, System.currentTimeMillis());
+//		} catch (ThreeCixtyPermissionException e) {
+//			return Response.status(Response.Status.FORBIDDEN)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN)
+//					.build();
+//		} catch (InvalidTrayElement e) {
+//			return Response.status(Response.Status.BAD_REQUEST)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
+//		} catch (TooManyConnections e) {
+//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
+//		} catch (IOException e) {
+//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//					.entity(e.getMessage())
+//					.type(MediaType.TEXT_PLAIN_TYPE)
+//					.build();
 //		}
-//		return Response.serverError().build();
-//	}
+//    }
     
     private String getRestTrayString(InputStream input) {
     	if (input == null) return null;
@@ -220,22 +248,23 @@ public class TrayServices {
 	}
 
 	/**
-     * Add tray into the KB.
+     * Persists Tray element to database.
+     *
      * @param restTray
      * @return
      */
 	private boolean addTrayElement(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
-		if (itemId == null || itemId.equals("")) return false;
+		if (itemId == null || itemId.equals("")) throw new InvalidTrayElement("element_id is invalid");
 		String itemTypeStr = restTray.getElement_type();
-		if (itemTypeStr == null) return false;
+		if (itemTypeStr == null) throw new InvalidTrayElement("element type is invalid");
 
 		String token = restTray.getToken();
-		if (token == null || token.equals("")) return false;
+		if (token == null || token.equals("")) throw new InvalidTrayElement("token is invalid");
 		
 		String source = restTray.getSource();
-		if (source == null) return false;
+		if (source == null) throw new InvalidTrayElement("source is missed");
 		
 		String image_url = restTray.getImage_url();
 		
@@ -296,10 +325,10 @@ public class TrayServices {
 	private List<Tray> loginTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String junkToken = restTray.getJunk_token();
-		if (junkToken == null || junkToken.equals("")) return null;
+		if (junkToken == null || junkToken.equals("")) throw new InvalidTrayElement("junk token is invalid");
 		String threeCixtyToken = restTray.getThree_cixty_token();
 		String uid = OAuthWrappers.findUIDFrom(threeCixtyToken);
-		if (uid == null || uid.equals("")) return null;
+		if (uid == null || uid.equals("")) throw new InvalidTrayElement("3cixty token is invalid");
 		if (!ProfileManagerImpl.getInstance().getTrayManager().replaceUID(junkToken, uid)) return null;
 		checkPermission(threeCixtyToken);
 		return ProfileManagerImpl.getInstance().getTrayManager().getTrays(uid, 0, -1, OrderType.Desc, true);
@@ -313,7 +342,7 @@ public class TrayServices {
 	private boolean cleanTrays(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String token = restTray.getToken();
-		if (token == null || token.equals("")) return false;
+		if (token == null || token.equals("")) throw new InvalidTrayElement("token is null or empty");
 		String uid = OAuthWrappers.findUIDFrom(token);
 		if (uid == null || uid.equals("")) {
 			return ProfileManagerImpl.getInstance().getTrayManager().cleanTrays(token);
@@ -330,7 +359,7 @@ public class TrayServices {
 	private boolean updateTray(RestTrayObject restTray) throws ThreeCixtyPermissionException,
 	        InvalidTrayElement, TooManyConnections {
 		String itemId = restTray.getElement_id();
-		if (itemId == null || itemId.equals("")) return false;
+		if (itemId == null || itemId.equals("")) throw new InvalidTrayElement("element_id is invalid");
 		String token = restTray.getToken();
 
 		String uid = OAuthWrappers.findUIDFrom(token);
@@ -341,7 +370,7 @@ public class TrayServices {
 		}
 		
 		Tray tray = ProfileManagerImpl.getInstance().getTrayManager().getTray((uid == null || uid.equals("")) ? token : uid, itemId);
-		if (tray == null) return false;
+		if (tray == null) throw new InvalidTrayElement("Don't find any items with " + itemId);
 		tray.setElement_id(itemId);
 		
 		String itemTypeStr = restTray.getElement_type();
@@ -385,7 +414,7 @@ public class TrayServices {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (!okDatetime) return false;
+			if (!okDatetime) throw new InvalidTrayElement("attend_datetime is in incorrect format. The format looks like dd-MM-yyyy HH:mm");
 			tray.setAttend_datetime(datetimeAttendedStr);
 		}
 		
@@ -411,9 +440,7 @@ public class TrayServices {
 	        //Verify if it matched with etag available in http request
 	        rb = req.evaluatePreconditions(etag);
 	        //Create cache control header
-	         CacheControl cc = new CacheControl();
 	         //Set max age to one day
-	         cc.setMaxAge(86400);
 			if (rb == null) { // changed
 				List <ElementDetails> trayDetailsList = new ArrayList <ElementDetails>();
 				findTrayDetails(trays, trayDetailsList, restTray);
@@ -425,40 +452,17 @@ public class TrayServices {
 				return Response.status(Response.Status.OK)
 						.entity(content)
 						.type(MediaType.APPLICATION_JSON_TYPE)
-						.cacheControl(cc)
 						.tag(etag)
 						.build();
 			} else {
-				return rb.cacheControl(cc).tag(etag).status(Status.NOT_MODIFIED).build();
+				return rb.tag(etag).status(Status.NOT_MODIFIED).build();
 			}
 		}
 	}
 	
 	private void findTrayDetails(List<Tray> trays,
 			List<ElementDetails> trayDetailsList, RestTrayObject restTray) throws IOException {
-		List <String> eventIds = new LinkedList <String>();
-		List <String> poiIds = new LinkedList <String>();
-		for (Tray tray: trays) {
-			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
-			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
-		}
-		
-		String [] tmpLanguages = LanguageUtils.getLanguages(restTray.getLanguage());
-		
-		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(eventIds, null, tmpLanguages);
-		if (elementEventsDetails != null) {
-			for (ElementDetails eventDetails: elementEventsDetails) {
-				eventDetails.setType(EVENT_TYPE);
-			}
-			trayDetailsList.addAll(elementEventsDetails);
-		}
-		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(poiIds, null, tmpLanguages);
-		if (elementPoIsDetails != null) {
-			for (ElementDetails poiDetails: elementPoIsDetails) {
-				poiDetails.setType(POI_TYPE);
-			}
-			trayDetailsList.addAll(elementPoIsDetails);
-		}
+		findTrayDetails(restTray.getKey(), trays, LanguageUtils.getLanguages(restTray.getLanguage()), trayDetailsList);
 	}
 
 	private long getNewestTimestamp(List <Tray> trays) {
@@ -484,5 +488,51 @@ public class TrayServices {
 		        .entity(msg)
 		        .type(MediaType.TEXT_PLAIN)
 		        .build();
+	}
+	
+	
+	public static void findTrayDetails(String key, List<Tray> trays, String []languages,
+			List<ElementDetails> trayDetailsList) throws IOException {
+		List <String> eventIds = new LinkedList <String>();
+		List <String> poiIds = new LinkedList <String>();
+		for (Tray tray: trays) {
+			if (tray.getElement_type().equalsIgnoreCase(EVENT_TYPE)) eventIds.add(tray.getElement_id());
+			else if (tray.getElement_type().equalsIgnoreCase(POI_TYPE)) poiIds.add(tray.getElement_id());
+		}
+		
+		List <ElementDetails> elementEventsDetails = ElementDetailsUtils.createEventsDetails(
+				SparqlChooser.getEndPointUrl(key),
+				SparqlChooser.getEventGraph(key, null), eventIds, null, languages);
+		if (elementEventsDetails != null) {
+			for (ElementDetails eventDetails: elementEventsDetails) {
+				eventDetails.setType(EVENT_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(eventDetails.getId())) {
+						eventDetails.setAttend_datetime(tray.getAttend_datetime());
+						eventDetails.setRating(tray.getRating());
+						eventDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
+			}
+			trayDetailsList.addAll(elementEventsDetails);
+		}
+		List <ElementDetails> elementPoIsDetails = ElementDetailsUtils.createPoIsDetails(
+				SparqlChooser.getEndPointUrl(key),
+				SparqlChooser.getPoIGraph(key, null), poiIds, null, null, languages);
+		if (elementPoIsDetails != null) {
+			for (ElementDetails poiDetails: elementPoIsDetails) {
+				poiDetails.setType(POI_TYPE);
+				for (Tray tray: trays) {
+					if (tray.getElement_id().equals(poiDetails.getId())) {
+						poiDetails.setAttend_datetime(tray.getAttend_datetime());
+						poiDetails.setRating(tray.getRating());
+						poiDetails.setCreationTimestamp(tray.getCreationTimestamp() == null ? 0 : tray.getCreationTimestamp());
+						break;
+					}
+				}
+			}
+			trayDetailsList.addAll(elementPoIsDetails);
+		}
 	}
 }

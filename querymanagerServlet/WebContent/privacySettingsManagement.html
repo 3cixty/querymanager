@@ -1,0 +1,77 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<link href="_css/table.css" rel="stylesheet" type="text/css">
+<link href="_css/privacySettings.css" rel="stylesheet" type="text/css">
+</head>
+<script>
+	var params = location.href.split('?')[1].split('&');
+	var data = {};
+	for (x in params) {
+		data[params[x].split('=')[0]] = params[x].split('=')[1];
+ 	}
+	var accessToken = data["access_token"];
+</script>
+<body>
+<form>
+<input type="hidden" id="access_token" value="">
+
+<div class="table">
+  <div class="row-middle">
+    <div class="cell-middle">
+    Friends in my knows
+    </div>
+    <div class="cell">
+      <select multiple="multiple" id="myKnows" name="myKnows" size="7"></select>
+    </div>
+    <div class="removalCell">
+      <input type="button" value ="Remove" id="knowsRemoval" class="removeButton">
+    </div>
+  </div>
+</div>
+
+</form>
+</body>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#access_token").val(accessToken);
+	    
+		$.ajax({url: "./getAllUserRelatedInfoByUser",
+    	       beforeSend: function(xhr) {
+    	    	   xhr.setRequestHeader('access_token', accessToken);
+    	       },
+    		   success: function(result){
+    			   var jsonObj = eval ("(" + result + ")");
+    			   for (var i = 0; i < jsonObj.knows.length; i++) {
+    				   var fullName = jsonObj.knows[i].firstName + " " + jsonObj.knows[i].lastName;
+    				   if (fullName == "Unknown Unknown") fullName = "Unknown";
+    				   $("#myKnows").append($("<option></option>")
+    					         .attr("value", jsonObj.knows[i].uid)
+    					         .text(fullName)); 
+    			   }
+	   			}
+    	});
+		
+		$("#knowsRemoval").click(function() {
+			var select1 = document.getElementById("myKnows");
+			var selected1 = [];
+		    for (var i = 0; i < select1.length; i++) {
+		        if (select1.options[i].selected) selected1.push(select1.options[i].value);
+		    }
+		    
+			$.ajax({url: "./removeFriends",
+				   type: "POST",
+	    	       data: "access_token=" + accessToken + "&friendUids=" + selected1.join(),
+	    		   success: function(result){
+	    			    for (var i = 0; i < select1.length; i++) {
+	    			        if (select1.options[i].selected)
+	    			        	$("#myKnows option[value='" + select1.options[i].value + "']").remove();
+	    			    }
+		   		   }
+	    	});
+		});
+	});
+</script>
+
+</html>

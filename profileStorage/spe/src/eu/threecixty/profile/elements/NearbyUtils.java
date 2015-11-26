@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,19 +18,37 @@ import eu.threecixty.profile.SparqlEndPointUtils;
 
 //TODO: need to remove condition with new Virtuoso updated
 public class NearbyUtils {
+	
+	private static final double MIN_LAT = 45.35668565341486;
+	private static final double MIN_LON = 9.011490619692509;
+	private static final double SIZE_LAT = 0.00211498;
+	private static final double SIZE_LON = 0.00300033;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_EVENT = 15;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI = 2;
+	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 15;
+	private static final double CELL_SIZE =CellUtils.DX / 1000; // km
+	
+	 private static final Logger LOGGER = Logger.getLogger(
+			 NearbyUtils.class.getName());
 
-	public static List <ElementDetails> getNearbyEvents(double lat, double lon, String[] categories, String[] languages,
-			double distance, int offset, int limit, String notId) throws IOException {
+	 /**Attribute which is used to improve performance for logging out information*/
+	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
+
+	public static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, double lat, double lon, String[] categories, String[] languages,
+			double distance, int offset, int limit, String notId,
+			List <String> listEventsFromFriendsWishlist) throws IOException {
 		
-		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance \n");
+		StringBuilder builder = new StringBuilder("SELECT distinct ?event ?distance ?title \n");
 
 		builder.append("WHERE { \n");
-		builder.append("        { graph <http://3cixty.com/events> {?event a lode:Event.} } \n");
-		
+		builder.append("        { graph " + eventGraph + " {?event a lode:Event.} } \n");
+		builder.append("?event rdfs:label ?title . \n");
+		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_EVENT;
 		if (categories != null && categories.length > 0) {
 			builder.append("?event lode:hasCategory ?category . \n");
 		
 			filterCategories(categories, builder);
+			numberOfCells = NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY;
 		}
 		
 		builder.append(" ?event ?p ?inSpace. \n");
@@ -39,15 +58,19 @@ public class NearbyUtils {
 
 		builder.append("BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) .\n");
 
-		builder.append(" OPTIONAL{ ?event lode:atTime ?time. \n");
+		builder.append(" ?event lode:atTime ?time. \n");
 		builder.append("              { ?time time:hasEnd ?end .\n");
 		builder.append("              ?end time:inXSDDateTime ?endTime . } \n");
 		builder.append(" UNION {?time time:inXSDDateTime ?endTime . } \n");
-		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . } \n");
+		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . \n");
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
+		
+		builder.append("?event locationOnt:cell ?cell .");
 		
 		if (distance >= 0) {
 			builder.append("FILTER (?distance <= " + distance + ") \n");
+			int floor = (int) Math.floor(distance / CELL_SIZE) + 1; 
+			if (distance > 0) numberOfCells = floor < numberOfCells ? floor : numberOfCells;
 		}
 		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
 		
@@ -56,17 +79,40 @@ public class NearbyUtils {
 			builder.append("FILTER (?event != <" + notId + ">) \n");
 		}
 		
+		builder.append("VALUES ?cell {");
+		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
+		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
+		if (cellIds.size() == 0) return Collections.emptyList();
+		for (int cellId: cellIds) {
+			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
+		}
+		builder.append("}. \n");
+		
 		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
+		if (listEventsFromFriendsWishlist == null || listEventsFromFriendsWishlist.size() == 0) {
+		    builder.append("ORDER BY ?distance \n");
+		} else {	
+			builder.append("ORDER BY DESC (");
+			boolean firstItem = true;
+			for (String eventFromWishList: listEventsFromFriendsWishlist) {
+				if (firstItem) {
+					firstItem = false;
+				} else {
+					builder.append(" || ");
+				}
+				builder.append("?event = <" + eventFromWishList + ">");
+			}
+			builder.append(") ?distance \n");
+		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		System.out.println(builder.toString());
+		if (DEBUG_MOD) LOGGER.info(builder.toString());
 		
-		return getNearbyEvents(builder.toString(), categories, languages);
+		return getNearbyEvents(endPointUrl, eventGraph, builder.toString(), categories, languages, listEventsFromFriendsWishlist);
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String id, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, String id, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
 		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
@@ -91,7 +137,7 @@ public class NearbyUtils {
 		
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(builder.toString(),
-				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, resultBuilder); 
+				"application/sparql-results+json", SparqlEndPointUtils.HTTP_POST, endPointUrl, resultBuilder); 
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
 		int len = jsonArrs.length();
@@ -103,36 +149,75 @@ public class NearbyUtils {
 		String lonStr = getAttributeValue(jsonElement, "lon");
 		lon = Double.parseDouble(lonStr);
 		
-		return getNearbyEvents(lat, lon, categories, languages, distance, offset, limit, id);
+		return getNearbyEvents(endPointUrl, eventGraph, lat, lon, categories, languages, distance, offset, limit, id, null);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(double lat, double lon, String[] categories, String[] languages,
-			double distance, int offset, int limit) throws IOException {
-		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance \n");
+	public static List <ElementDetails> getNearbyPoIElements(String endPointUrl, String poiGraph, double lat, double lon,
+			String[] categories, String[] topCategories, String[] languages,
+			double distance, int offset, int limit,
+			List <String> listPoIsFromFriendsWishlist) throws IOException {
+		StringBuilder builder = new StringBuilder("SELECT distinct ?poi ?distance ?name \n");
+		int numberOfCells = NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI;
 
 		builder.append("WHERE { \n");
-		builder.append(" { graph <http://3cixty.com/places> {?poi a dul:Place.} }  \n");
-		
+		builder.append(" { graph " + poiGraph + " {?poi a dul:Place.} }  \n");
+		builder.append(" ?poi rdfs:label ?name .  \n");
 		if (categories != null && categories.length > 0) {
 			builder.append("?poi locationOnt:businessType ?businessType. \n");
 			builder.append("?businessType skos:prefLabel ?category .\n");
 			
 			filterCategories(categories, builder);
+			numberOfCells = NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY;
 		}
+		
+		if (topCategories != null && topCategories.length > 0) {
+			builder.append("?poi locationOnt:businessTypeTop ?businessTypeTop. \n");
+			builder.append("?businessTypeTop skos:prefLabel ?topCategory .\n");
+			
+			filterTopCategories(topCategories, builder);
+			numberOfCells = NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY;
+		}
+		
+		builder.append("?poi locationOnt:cell ?cell .");
 		
 		builder.append("?poi geo:location ?loc . ?loc geo:lat ?lat . ?loc geo:long ?lon . BIND(bif:st_point(xsd:decimal(?lon), xsd:decimal(?lat)) as ?geo) . \n");
 
 		builder.append(" BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) \n");
 		if (distance >= 0) {
-			builder.append("FILTER (?distance <= " + distance + ") \n");
+			builder.append("FILTER (?distance <= " + distance + ") .\n");
+			int floor = (int) Math.floor(distance / CELL_SIZE) + 1; 
+			if (distance > 0) numberOfCells = floor < numberOfCells ? floor : numberOfCells;
 		}
 		
+		builder.append("VALUES ?cell {");
+		List <Integer> cellIds = calcCellIds(lat, lon, numberOfCells);
+		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
+		if (cellIds.size() == 0) return Collections.emptyList();
+		for (int cellId: cellIds) {
+			builder.append("<http://data.linkedevents.org/cell/milano/" + cellId + ">");
+		}
+		builder.append("}. \n");
+		
 		builder.append("} \n");
-		builder.append("ORDER BY ?distance \n");
+		if (listPoIsFromFriendsWishlist == null || listPoIsFromFriendsWishlist.size() == 0) {
+		    builder.append("ORDER BY ?distance \n");
+		} else {
+			builder.append("ORDER BY DESC (");
+			boolean firstItem = true;
+			for (String poiFromWishList: listPoIsFromFriendsWishlist) {
+				if (firstItem) {
+					firstItem = false;
+				} else {
+					builder.append(" || ");
+				}
+				builder.append("?poi = <" + poiFromWishList + ">");
+			}
+			builder.append(") ?distance \n");
+		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, languages);
+		return getNearbyPoIs(endPointUrl, poiGraph, builder.toString(), categories, topCategories, languages, listPoIsFromFriendsWishlist);
 	}
 	
 	/**
@@ -145,7 +230,8 @@ public class NearbyUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> getNearbyPoIElements(String locId, String[] categories, String[] languages,
+	public static List <ElementDetails> getNearbyPoIElements(String endPointUrl, String poiGraph, String locId, String[] categories, String[] topCategories,
+			String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();
 		
@@ -159,6 +245,13 @@ public class NearbyUtils {
 			builder.append("?businessType skos:prefLabel ?category .\n");
 			
 			filterCategories(categories, builder);
+		}
+		
+		if (topCategories != null && topCategories.length > 0) {
+			builder.append("?poi locationOnt:businessTypeTop ?businessTypeTop. \n");
+			builder.append("?businessTypeTop skos:prefLabel ?topCategory .\n");
+			
+			filterTopCategories(topCategories, builder);
 		}
 		
 		builder.append("?poi geo:location ?loc . ?loc geo:lat ?lat . ?loc geo:long ?lon . BIND(bif:st_point(xsd:decimal(?lon), xsd:decimal(?lat)) as ?geo) . \n");
@@ -176,16 +269,18 @@ public class NearbyUtils {
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
 		
-		return getNearbyPoIs(builder.toString(), categories, languages);
+		return getNearbyPoIs(endPointUrl, poiGraph, builder.toString(), categories, topCategories, languages, null);
 
 	}
 	
-	private static List <ElementDetails> getNearbyPoIs(String query, String[] categories, String [] languages) throws IOException {
-		System.out.println(query);
+	private static List <ElementDetails> getNearbyPoIs(String endPointUrl, String poiGraph, String query, String[] categories,
+			String[] topCategories, String [] languages,
+			List <String> listPoIsFromFriendsWishlist) throws IOException {
+		if (DEBUG_MOD) LOGGER.info(query);
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
-				SparqlEndPointUtils.HTTP_POST, resultBuilder);
+				SparqlEndPointUtils.HTTP_POST, endPointUrl, resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -196,20 +291,25 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(maps.keySet(), categories, languages);
+		List <ElementDetails> results = ElementDetailsUtils.createPoIsDetails(endPointUrl, poiGraph, maps.keySet(),
+				categories, topCategories, languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
+			
+			// set highlighted field
+			setHighlightedField(elementDetails, listPoIsFromFriendsWishlist);
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
 	}
 	
-	private static List <ElementDetails> getNearbyEvents(String query, String[] categories, String [] languages) throws IOException {
+	private static List <ElementDetails> getNearbyEvents(String endPointUrl, String eventGraph, String query, String[] categories, String [] languages,
+			List <String> listEventsFromFriendsWishlist) throws IOException {
 		Map <String, Double> maps = new HashMap <String, Double>();
         StringBuilder resultBuilder = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(query, "application/sparql-results+json",
-				SparqlEndPointUtils.HTTP_POST, resultBuilder);
+				SparqlEndPointUtils.HTTP_POST, endPointUrl, resultBuilder);
 		
 		JSONObject json = new JSONObject(resultBuilder.toString());
 		JSONArray jsonArrs = json.getJSONObject("results").getJSONArray("bindings");
@@ -220,13 +320,30 @@ public class NearbyUtils {
 		}
 		if (maps.size() == 0) return new LinkedList <ElementDetails>();
 		
-		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(maps.keySet(), categories, languages);
+		List <ElementDetails> results = ElementDetailsUtils.createEventsDetails(endPointUrl, eventGraph, maps.keySet(), categories, languages);
 		
 		for (ElementDetails elementDetails: results) {
 			elementDetails.setDistance(maps.get(elementDetails.getId()));
+			// set highlighted field
+			setHighlightedField(elementDetails, listEventsFromFriendsWishlist);
 		}
 		Collections.sort(results, new ElementDistance());
 		return results;
+	}
+	
+	private static void setHighlightedField(ElementDetails elementDetails,
+			List <String> listItemsFromFriendsWishlist) {
+		if (listItemsFromFriendsWishlist != null && listItemsFromFriendsWishlist.size() > 0) {
+			String elementId = elementDetails.getId();
+			boolean found = false;
+			for (String tmpId: listItemsFromFriendsWishlist) {
+				if (elementId.equals(tmpId)) {
+					found = true;
+					break;
+				}
+			}
+			elementDetails.setHighlighted(found);
+		}
 	}
 	
 	private static void filterCategories(String[] categories, StringBuilder result) {
@@ -241,6 +358,23 @@ public class NearbyUtils {
 			}
 			index++;
 			result.append("STR(?category) = \"").append(category).append("\"");
+
+		}
+		result.append(") \n");
+	}
+	
+	private static void filterTopCategories(String[] topCategories, StringBuilder result) {
+		if (topCategories.length == 0) return;
+		result.append("FILTER (");
+		int index = 0;
+		for (String topCategory: topCategories) {
+			if (topCategory != null) topCategory = topCategory.trim();
+			if (topCategory == null || topCategory.equals("")) continue;
+			if (index > 0) {
+				result.append(" || ");
+			}
+			index++;
+			result.append("STR(?topCategory) = \"").append(topCategory).append("\"");
 
 		}
 		result.append(") \n");
@@ -267,6 +401,26 @@ public class NearbyUtils {
 		return null;
 	}
 	
+	private static List <Integer> calcCellIds(double lat, double lon, int numberOfCellsAsRadius) {
+		List <Integer> rets = new LinkedList <Integer>();
+		for (int i = - numberOfCellsAsRadius; i <= numberOfCellsAsRadius; i++) {
+			for (int j = - numberOfCellsAsRadius; j <= numberOfCellsAsRadius; j++) {
+				double newLat = lat + i * SIZE_LAT;
+				double newLon = lon + j * SIZE_LON;
+				int cellId = calcCellId(newLat, newLon);
+				rets.add(cellId);
+			}
+		}
+		return rets;
+	}
+	
+	private static int calcCellId(double lat, double lon) {
+		int tmpLat = (int) Math.floor((lat - MIN_LAT)/(SIZE_LAT));
+		int tmpLon = (int) Math.floor(((lon - MIN_LON)/(SIZE_LON)));
+		int ret = tmpLat * 100 + tmpLon;
+		return ret;
+	}
+	
 	private static boolean isNullOrEmpty(String input) {
 		if (input == null || input.equals("")) return true;
 		return false;
@@ -279,6 +433,14 @@ public class NearbyUtils {
 
 		@Override
 		public int compare(ElementDetails o1, ElementDetails o2) {
+			Boolean highlighted1 = o1.getHighlighted();
+			Boolean highlighted2 = o2.getHighlighted();
+			if (highlighted1 != null && highlighted1.booleanValue() == true) {
+				if (highlighted2 == null || highlighted2.booleanValue() == false) return -1;
+			}
+			if (highlighted2 != null && highlighted2.booleanValue() == true) {
+				if (highlighted1 == null || highlighted1.booleanValue() == false) return 1;
+			}
 			double d1 = o1.getDistance() == null ? 0 : o1.getDistance().doubleValue();
 			double d2 = o2.getDistance() == null ? 0 : o2.getDistance().doubleValue();
 			if (d1 == d2) return 0;
