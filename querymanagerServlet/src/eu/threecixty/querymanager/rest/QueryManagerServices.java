@@ -286,33 +286,6 @@ public class QueryManagerServices {
 		return executeQueryNoAccessTokenWithHttpMethod(key, format, query, SparqlEndPointUtils.HTTP_POST);
 	}
 	
-	/**
-	 * This API is used to execute a given query with Virtuoso KB through HTTP POST.
-	 *
-	 * @param key
-	 * @param format
-	 * @param query
-	 * @return
-	 */
-	@GET
-	@Path("/executeQueryNoKey")
-	public Response executeQueryNoAccessToken( 
-			@QueryParam("format") String format, @QueryParam("query") String query) {
-		EventMediaFormat eventMediaFormat = EventMediaFormat.parse(format);
-		String result;
-		try {
-			result = executeQuery(query, eventMediaFormat, SparqlEndPointUtils.HTTP_GET, true);
-			return Response.ok(result, EventMediaFormat.JSON.equals(eventMediaFormat) ?
-					MediaType.APPLICATION_JSON_TYPE : MediaType.TEXT_PLAIN_TYPE).build();
-		} catch (IOException e) {
-			LOGGER.error(e.getMessage());
-			return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-			        .entity(e.getMessage())
-			        .type(MediaType.TEXT_PLAIN)
-			        .build();
-		}
-	}
-	
 	@GET
 	@Path("/returnInput")
 	public Response returnInput(String input) {
