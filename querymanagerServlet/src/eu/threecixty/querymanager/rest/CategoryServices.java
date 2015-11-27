@@ -16,10 +16,23 @@ import org.json.JSONObject;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.profile.elements.CategoryUtils;
 
+/**
+ * 
+ * This class provides a RESTful API for getting a list of top categories.
+ *
+ */
 @Path("/" + Constants.PREFIX_NAME)
 public class CategoryServices {
 
-	
+	/**
+	 * This API is to get a list of top categories which are found from KB.
+	 *
+	 * @param key
+	 * 			The application key.
+	 * @param city
+	 * 			The city (Milan or London).
+	 * @return
+	 */
 	@GET
 	@Path("/getTopCategories")
 	public Response getTopCategories(

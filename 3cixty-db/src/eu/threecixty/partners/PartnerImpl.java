@@ -186,4 +186,23 @@ public class PartnerImpl implements Partner {
 		if (session != null) session.close();
 		return null;
 	}
+
+	@Override
+	public boolean replaceAccount(PartnerAccount oldAccount,
+			PartnerAccount newAccount) {
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction();
+			session.delete(oldAccount);
+			session.save(newAccount);
+			session.getTransaction().commit();
+			return true;
+		} catch (HibernateException e) {
+			LOGGER.error(e.getMessage());
+		} finally {
+			session.close();
+		}
+		return false;
+	}
 }

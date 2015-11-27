@@ -1,11 +1,27 @@
 <%@page import="eu.threecixty.cache.AppCache" %>
+<%@page import="eu.threecixty.Configuration" %>
 <%@page import="eu.threecixty.querymanager.rest.OAuthServices" %>
+<%@page import="eu.threecixty.cache.TokenCacheManager" %>
 <html>
 <head>
-<title>Sign up for a new account</title>
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
 
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<title>Sign up for a new account</title>
+<link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/layout.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/style.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
+    	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
+	    
+	    <script src="login/jquery-1.js"></script>
+	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <style type="text/css">
-.main > div {
+.mainReg > div {
   display: inline-block;
   width: 49%;
   margin-top: 10px;
@@ -102,16 +118,56 @@
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="password.js"></script>
+<script>
+ function disableSubmit() {
+  document.getElementById("create-account").disabled = true;
+ }
+
+  function activateButton(element) {
+
+      if(element.checked) {
+        document.getElementById("create-account").disabled = false;
+       }
+       else  {
+        document.getElementById("create-account").disabled = true;
+      }
+
+  }
+</script>
 </head>
+<body onload="disableSubmit()">
 <%
 String key = request.getParameter("key");
+AppCache app = TokenCacheManager.getInstance().getAppCache(key);
 if (key != null) {
 %>
- <div class="main">
-      <div class="one">
+<body class="login-body" onload="disableSubmit()">
+<div class="wrapper">
+	<div class="logo">
+		<table>
+			<tr>
+		  		<td>
+    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')">
+    				</div>
+    			</td>
+    			<td>
+    				<div  align="center">
+    					<h3 class="privacy-title"> Powered by </h3>
+   					</div>
+   				</td>
+    			<td>
+    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')">
+    				</div>
+    			</td>
+    		</tr>
+    	</table>
+    </div>
+
+ 	<div class="mainReg" align="center">
+
         <div class="register">
-          <h3>Create your account</h3>
-          <form id="reg-form" onsubmit="return validation()" method="post" action="./signUp">
+          <h3>Create an ExplorMI 360 account</h3>
+          <form id="reg-form" onsubmit="return allValidation()" method="post" action="./signUp">
             <div>
               <label for="firstName">First Name</label>
               <input type="text" id="firstName" name="firstName" spellcheck="false" required/>
@@ -121,7 +177,7 @@ if (key != null) {
               <input type="text" id="lastName" name="lastName" spellcheck="false" required/>
             </div>
             <div>
-              <label for="email">Email</label>
+              <label for="email">Email Address</label>
               <input type="email" id="email" name="email" spellcheck="false" required/>
             </div>
             <div>
@@ -129,21 +185,46 @@ if (key != null) {
               <input type="password" id="password" name="password" required />
             </div>
             <div>
-              <label for="password-again">Password Again</label>
+              <label for="password-again">Confirm Password</label>
               <input type="password" id="password-again" name="password-again" required />
             </div>
-            <div>
-              <label></label>
+            <div align="center">
               <input type="submit" value="Create Account" id="create-account" class="button"/>
             </div>
             <input type="hidden" name="key" value='<%=key%>'>
+            
+            <div>
+              <input type="checkbox" name="termsNConditions" id="termsNConditions" onchange="activateButton(this)">I agree with <a href="./terms.html">Terms of use</a> and <a href="./privacy.jsp">Privacy Policy</a> for ExplorMI 360.
+            </div>
           </form>
           
-          <span class="pwdNote">Password must contain at least one digit, one lower case, one upper case, and between 8 and 30 characters</span>
+          <span class="pwdNote">The password must contain at least one digit and one lower-case and one upper-case letter; and it must be between 8 and 30 characters long.</span>
         </div>
-      </div>
     </div>
+
+      </div> 
+    <div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+	<script type="text/javascript">
+	    function googleTranslateElementInit() {
+	        new google.translate.TranslateElement({
+	            pageLanguage : 'en',
+	            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+	            autoDisplay: false,
+	            multilanguagePage : true
+	            }, 'google_translate_element');
+	        }
+	</script>
+	<div id="footer">
+		<div class="wrapper">
+			<div class="left footer-menu">
+				<span>&copy 2015, 3cixty. All rights reserved. </span>
+			</div>
+		</div>
+	</div>
     
+    
+  </body>
+
     <script type="text/javascript">
        
 
@@ -167,16 +248,25 @@ if (key != null) {
     		        }});
     		    }  
     		});
+           
+           function allValidation() {
+        	   if (!validation()) return false;
+        	   if (!document.getElementById("termsNConditions").checked) {
+        		   alert("You have to accept ExplorMI 360 privacy policy");
+        	   }
+           }
        });
        
     </script>
     
-</html>
+
 
 <%
 } else {
 	%>
-	Don't find application key!!!
+	Did not find the application key!!!
 	<%
 }
 %>
+
+</html>

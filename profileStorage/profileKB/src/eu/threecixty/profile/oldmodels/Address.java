@@ -2,7 +2,6 @@ package eu.threecixty.profile.oldmodels;
 
 import java.io.Serializable;
 
-import eu.threecixty.ThreeCixtyExpression;
 import eu.threecixty.profile.annotations.Description;
 
 /**
@@ -35,10 +34,6 @@ public class Address implements Serializable {
 	private double longitute=0.0;
 	@Description(hasText="latitude information. Uses http://www.w3.org/2006/vcard/ns#latitude")
 	private double latitude=0.0;
-	
-	// For generating expression filter
-	private ThreeCixtyExpression threeCixtyExpr;
-	
 	
 	public String getHasAddressURI() {
 		return hasAddressURI;
@@ -102,11 +97,5 @@ public class Address implements Serializable {
 	}
 	public void setLatitude(double latitude) {
 		this.latitude = latitude;
-	}
-	public ThreeCixtyExpression getThreeCixtyExpr() {
-		return threeCixtyExpr;
-	}
-	public void setThreeCixtyExpr(ThreeCixtyExpression threeCixtyExpr) {
-		this.threeCixtyExpr = threeCixtyExpr;
 	}
 }

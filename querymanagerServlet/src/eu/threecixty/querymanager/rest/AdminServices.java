@@ -20,6 +20,12 @@ import eu.threecixty.Configuration;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.querymanager.AdminValidator;
 
+/**
+ * 
+ *This class provides RESTful endpoints required using username and password. Basically,
+ *those services are only available for 3cixty administrator who possesses a user name and password.
+ *
+ */
 @Path("/" + Constants.PREFIX_NAME)
 public class AdminServices {
 
@@ -38,6 +44,20 @@ public class AdminServices {
 	@Context 
 	private HttpServletRequest httpRequest;
 	
+	/**
+	 * This method is called when administrator wants to let 3cixty backend know that the
+	 * given UID is marked to avoid being crawled next times. But the method still keeps
+	 * information existed in database about the corresponding user of the given UID.
+	 * <br>
+	 * This API uses HTTP session for admin, so it can be invoked after signing in with
+	 * admin user name and password.
+	 * <br>
+	 * Note: third party developers are not able to called this API.
+	 *
+	 * @param uid
+	 * 			3cixty UID.
+	 * @return
+	 */
 	@POST
 	@Path("/forgetUser")
 	public Response forgetUser(@FormParam("uid") String uid) {
@@ -73,6 +93,20 @@ public class AdminServices {
 		return null;
 	}
 	
+	/**
+	 * This method specifies to forget a given know.
+	 * <br>
+	 * This API uses HTTP session for admin, so it can be invoked after signing in with
+	 * admin user name and password.
+	 * <br>
+	 * Note: third party developers are not able to called this API.
+	 * 
+	 * @param uid
+	 * 			3cixty UID.
+	 * @param know
+	 * 			A given know
+	 * @return
+	 */
 	@POST
 	@Path("/forgetKnowFromUser")
 	public Response forgetKnowFromUser(@FormParam("uid") String uid,
@@ -111,6 +145,20 @@ public class AdminServices {
 		return null;
 	}
 	
+	/**
+	 * This method specifies to forget a given list of knows which is separated by comma.
+	 * <br>
+	 * This API uses HTTP session for admin, so it can be invoked after signing in with
+	 * admin user name and password.
+	 * <br>
+	 * Note: third party developers are not able to called this API.
+	 *
+	 * @param uid
+	 * 			3cixty UID.
+	 * @param knows
+	 * 			List of knows separated by comma to be avoided being crawled.
+	 * @return
+	 */
 	@POST
 	@Path("/forgetUserWithKnows")
 	public Response forgetUserWithKnows(@FormParam("uid") String uid,

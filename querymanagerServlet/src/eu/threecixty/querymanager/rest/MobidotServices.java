@@ -34,6 +34,13 @@ import eu.threecixty.profile.Utils;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 import eu.threecixty.profile.partners.PartnerAccountUtils;
 
+/**
+ * 
+ * This class provides RESTful APIs to work with Movesmarter services: retrieve or create Mobidot user,
+ * and create one-time Mobidot access token.
+ *
+ */
+
 @Path("/" + Constants.VERSION_2)
 public class MobidotServices {
 	
@@ -44,6 +51,16 @@ public class MobidotServices {
 	private static final Logger LOGGER = Logger.getLogger(
 			MobidotServices.class.getName());
 
+	/**
+	 * This API is to either retrieve or create a Mobidot account.
+	 * <br>
+	 * Retrieving the account is performed in the case if the API can find it in 3cixty database;
+	 * otherwise, the API goes to Movesmarter server to create an account, then save the account
+	 * into database.
+	 *
+	 * @param access_token
+	 * @return
+	 */
 	@GET
 	@Path("/getMobidotAccount")
 	public Response getAccount(@HeaderParam("access_token") String access_token) {
@@ -85,6 +102,14 @@ public class MobidotServices {
 		}
 	}
 	
+	/**
+	 * This API is to get a Mobidot one-time-use token.
+	 * <br>
+	 * The Mobidot token is not persisted in 3cixty database.
+	 * 
+	 * @param access_token
+	 * @return
+	 */
 	@GET
 	@Path("/getMobidotToken")
 	public Response getMobidotToken(@HeaderParam("access_token") String access_token) {
@@ -157,6 +182,13 @@ public class MobidotServices {
 		return null;
 	}
 
+	/**
+	 * Persists Mobidot account to database.
+	 *
+	 * @param uid
+	 * @param account
+	 * @throws TooManyConnections
+	 */
 	private void setMobidotAccountToUserProfile(String uid,
 			PartnerAccount account) throws TooManyConnections {
 		
@@ -170,7 +202,7 @@ public class MobidotServices {
 		} else profileIdentities = profile.getHasProfileIdenties();
 		Utils.setProfileIdentities(uid, account.getUser_id(), SPEConstants.MOBIDOT_SOURCE, profileIdentities);
 		
-		ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+		ProfileManagerImpl.getInstance().saveProfile(profile, attrs); // persist user profile to database
 	}
 	
 	private Map <String, Boolean> getAttributesForProfileIdentities() {

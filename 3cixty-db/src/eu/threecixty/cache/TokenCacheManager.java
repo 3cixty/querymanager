@@ -1,5 +1,6 @@
 package eu.threecixty.cache;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -15,9 +16,12 @@ import eu.threecixty.oauth.OAuthModelsUtils;
 import eu.threecixty.oauth.model.App;
 
 /**
- * This class is to deal with tokens cached in a machine. The ideal solution
- * should use distributed map for clusters.
- * XXX: improve for cluster: hazelcast or infinicache
+ * This class is used to cache 3cixty token and appkey in memcached servers.
+ * <br>
+ * Currently, there are two memcached servers which serve to cache data. The fact
+ * to choose which memcached server to cache data depends on the corresponding key
+ * used to cache. The corresponding memcached server of the given key is found by
+ * calculating the key's hexCode.
  *
  * @author Cong-Kinh Nguyen
  *
@@ -29,7 +33,7 @@ public class TokenCacheManager {
 	private static final String APP_ID_CACHE_KEY = "appIdCache";
 	private static final String APPKEY_CACHE_KEY = "appkeyCache";
 	
-	private static final int TIME_OUT_TO_GET_CACHE = 200; // in millisecond
+	private static final int TIME_OUT_TO_GET_CACHE = 500; // in millisecond
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 TokenCacheManager.class.getName());
@@ -67,9 +71,11 @@ public class TokenCacheManager {
 					AccessToken at = (AccessToken) myObj;
 					return at;
 				}
+				if (DEBUG_MOD) LOGGER.info("Empty object");
 			} catch(TimeoutException e) {
 			    // Since we don't need this, go ahead and cancel the operation.  This
 			    // is not strictly necessary, but it'll save some work on the server.
+				e.printStackTrace();
 			    f.cancel(false);
 			    // Do other timeout related stuff
 			} catch (InterruptedException e) {
@@ -124,6 +130,7 @@ public class TokenCacheManager {
 		}
 
 		App app = OAuthModelsUtils.getApp(appkey);
+		if (app == null) return null;
 		AppCache appCache = createAppCache(app);
 		update(app);
 		return appCache;
@@ -212,12 +219,11 @@ public class TokenCacheManager {
 			
 	}
 	
-	private <T> void putData(String key, T data) {
+	private <T extends Serializable> void putData(String key, T data) {
 		if (memcachedClients != null) {
 			MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, key);
 			if (memcachedClient == null) return;
 			memcachedClient.set(key, 0, data);
-			memcachedClient.flush();
 		}
 	}
 

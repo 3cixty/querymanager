@@ -8,6 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
+/**
+ * 
+ * For developers who register to be 3cixty developers.
+ *
+ */
 @Entity
 @DiscriminatorValue("Developer")
 public class Developer extends User {

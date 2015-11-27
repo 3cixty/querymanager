@@ -5,9 +5,13 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import eu.threecixty.partners.PartnerAccount;
 
 public class MobidotUserUtils {
 	private static final Logger LOGGER = Logger.getLogger(
@@ -20,6 +24,13 @@ public class MobidotUserUtils {
 	 private static String MOBIDOT_API_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
 	 private static String DOMAIN="3cixty";
 	 private static String GROUP="ExpoVisitor";
+	 
+	 public static int getMobidotId(String uid) {
+		 if (uid == null || "".equals(uid)) return -1;
+		 PartnerAccount account = PartnerAccountUtils.retrieveMobidotUser(uid);
+		 if (account == null) return -1;
+		 return Integer.parseInt(account.getUser_id().trim());
+	 }
 	  
 	 /**
 	  * To Create users on MoveSmarter server using HttpURLConnection use this method. 
@@ -83,6 +94,103 @@ public class MobidotUserUtils {
 				return null;
 			}
 	 }
+	 
+	 /**
+	  * To get moveSmarterID that has max distance traveled. 
+	  * @param movesmarterID1
+	  * @param movesmarterID2
+	  * @param movesmarterID3
+	  * @return
+	  * @throws Exception
+	  */
+	 public static int getMaxMobidotID(int movesmarterID1, int movesmarterID2, int movesmarterID3) throws Exception{
+		 long endtime=GregorianCalendar.getInstance().getTimeInMillis() / 1000;
+		 float distance1=getStatistics(movesmarterID1,endtime);
+		 float distance2=getStatistics(movesmarterID2,endtime);
+		 float distance3=getStatistics(movesmarterID3,endtime);
+		 
+		 if (distance1>distance2 && distance1>distance3){
+			 return movesmarterID1;
+		 }
+		 else if (distance2>distance1 && distance2>distance3){
+			 return movesmarterID2;
+		 } 
+		 else
+			 return movesmarterID3;
+	 }
+	 /**
+	  * To get moveSmarterID that has max distance traveled. 
+	  * @param movesmarterID1
+	  * @param movesmarterID2
+	  * @return
+	  * @throws Exception
+	  */
+	 public static int getMaxMobidotID(int movesmarterID1, int movesmarterID2) throws Exception{
+		 long endtime=GregorianCalendar.getInstance().getTimeInMillis() / 1000;
+		 float distance1=getStatistics(movesmarterID1,endtime);
+		 float distance2=getStatistics(movesmarterID2,endtime);
+		 return distance1>distance2 ? movesmarterID1:movesmarterID2;
+		 
+	 }
+	 /**
+	  * To Create users on MoveSmarter server using HttpURLConnection use this method. 
+	  * @param movesmarterID
+	  * @param endtime
+	  * @return
+	  * @throws Exception
+	  */
+	 private static float getStatistics(int movesmarterID, long endTime) throws Exception{
+	
+			if (DEBUG_MOD) LOGGER.info("getStats for the movesmarter user = "+movesmarterID);
+	
+			String urlStr = MOBIDOT_BASEURL + "/external/personalmobility/PeriodStatistics/"
+					+movesmarterID+"/Month/false/"+"0"+"/"+endTime
+					+ "?key=" + MOBIDOT_API_KEY;
+			
+			JSONArray resultStats = getStatsForMobidotID(urlStr);
+			System.out.println(urlStr);
+			if (DEBUG_MOD) LOGGER.info("Finished downloading the stats from mobidot for the user = "+movesmarterID);
+			
+			int length = resultStats.length();
+			float sumDistance=0;
+			for (int i = 0; i < length; i++) {
+				
+				JSONObject jsonobj = resultStats.getJSONObject(i);
+				System.out.println(jsonobj);
+				float distance = jsonobj.getLong("totalDistance");
+				sumDistance+=distance;
+
+			}
+		    
+			if (DEBUG_MOD) LOGGER.info("Finished aggregating the stats for the user = " +movesmarterID);
+			return sumDistance;
+		}
+	 /**
+		 * get Travel Info for specified user. The urlStr is the call for specific
+		 * mobidot facility.
+		 * 
+		 * @param String
+		 *            urlStr
+		 * @return JSONArray
+		 */
+		private static JSONArray getStatsForMobidotID(String urlStr) {
+				StringBuilder sb = new StringBuilder();
+				try {
+					URL url = new URL(urlStr);
+					InputStream input = url.openStream();
+					byte[] b = new byte[1024];
+					int readBytes = 0;
+					while ((readBytes = input.read(b)) >= 0) {
+						sb.append(new String(b, 0, readBytes));
+					}
+					JSONArray jsonob = new JSONArray(sb.toString());
+					input.close();
+					return jsonob;
+				} catch (Exception e) {
+					if (DEBUG_MOD) LOGGER.info(e.getMessage());
+					return null;
+				}
+		}
 	 
 	 private static String getContent(InputStream input) {
 		 StringBuilder sb = new StringBuilder();

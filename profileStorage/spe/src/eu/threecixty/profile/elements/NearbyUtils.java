@@ -58,11 +58,11 @@ public class NearbyUtils {
 
 		builder.append("BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) .\n");
 
-		builder.append(" OPTIONAL{ ?event lode:atTime ?time. \n");
+		builder.append(" ?event lode:atTime ?time. \n");
 		builder.append("              { ?time time:hasEnd ?end .\n");
 		builder.append("              ?end time:inXSDDateTime ?endTime . } \n");
 		builder.append(" UNION {?time time:inXSDDateTime ?endTime . } \n");
-		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . } \n");
+		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . \n");
 		builder.append("BIND (now() AS ?thisMillisecond) . \n");
 		
 		builder.append("?event locationOnt:cell ?cell .");
@@ -91,12 +91,18 @@ public class NearbyUtils {
 		builder.append("} \n");
 		if (listEventsFromFriendsWishlist == null || listEventsFromFriendsWishlist.size() == 0) {
 		    builder.append("ORDER BY ?distance \n");
-		} else {
-			builder.append("ORDER BY");
+		} else {	
+			builder.append("ORDER BY DESC (");
+			boolean firstItem = true;
 			for (String eventFromWishList: listEventsFromFriendsWishlist) {
-				builder.append(" DESC(?event = <" + eventFromWishList + ">)");
+				if (firstItem) {
+					firstItem = false;
+				} else {
+					builder.append(" || ");
+				}
+				builder.append("?event = <" + eventFromWishList + ">");
 			}
-			builder.append(" ?distance \n");
+			builder.append(") ?distance \n");
 		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);
@@ -196,11 +202,17 @@ public class NearbyUtils {
 		if (listPoIsFromFriendsWishlist == null || listPoIsFromFriendsWishlist.size() == 0) {
 		    builder.append("ORDER BY ?distance \n");
 		} else {
-			builder.append("ORDER BY");
+			builder.append("ORDER BY DESC (");
+			boolean firstItem = true;
 			for (String poiFromWishList: listPoIsFromFriendsWishlist) {
-				builder.append(" DESC(?poi = <" + poiFromWishList + ">)");
+				if (firstItem) {
+					firstItem = false;
+				} else {
+					builder.append(" || ");
+				}
+				builder.append("?poi = <" + poiFromWishList + ">");
 			}
-			builder.append(" ?distance \n");
+			builder.append(") ?distance \n");
 		}
 		builder.append("OFFSET ").append(offset <= 0 ? 0 : offset).append(" \n");
 		builder.append("LIMIT ").append(limit <= 0 ? 0 : limit);

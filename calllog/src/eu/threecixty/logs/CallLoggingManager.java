@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * 
+ * This class to provide interfaces to persist callLog and retrieve them from database.
+ *
+ */
 public class CallLoggingManager {
 
 	private CallLoggingStorage storage;
@@ -17,6 +22,15 @@ public class CallLoggingManager {
 		return SingletonHolder.INSTANCE;
 	}
 
+	/**
+	 * Persists callLog into database.
+	 * <br>
+	 * This method persists callLog every 50 items. If the current queue has less than 50 items,
+	 * the method just stores callLog information in memory.
+	 *
+	 * @param stats
+	 * @return
+	 */
 	public boolean save(CallLogging stats) {
 		callLoggings.add(stats);
 		List <CallLogging> listToStore = null;
@@ -116,6 +130,14 @@ public class CallLoggingManager {
 
 	public List<RelativeNumberOfUsers> getRelativeNumberofUsers(){
 		return storage.getRelativeNumberofUsers();
+	}
+	
+	public List<CallLoggingDisplay> getCallsWithCountByMonth() {
+		return storage.getCallsWithCountByMonth();
+	}
+	
+	public List<CallLoggingDisplay> getCallsWithCountByDay() {
+		return storage.getCallsWithCountByDay();
 	}
 	
 	private CallLoggingManager() {

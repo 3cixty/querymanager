@@ -10,6 +10,11 @@ import org.apache.log4j.Logger;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
 
+/**
+ * 
+ * Utility class to find the corresponding memcached server with a given key.
+ *
+ */
 public class MemcachedUtils {
 
 	private static final Logger LOGGER = Logger.getLogger(
@@ -21,6 +26,10 @@ public class MemcachedUtils {
 	// server1:11211,server2:11211
 	private static List <String> memcachedServers;
 	
+	/**
+	 * Creates a list of clients which connect to memcached servers.
+	 * @return
+	 */
 	public static List <MemcachedClient> createClients() {
 		List <MemcachedClient> rets = new ArrayList <MemcachedClient>();
 		if (memcachedServers == null || memcachedServers.size() == 0) loadMemcachedConfig();
@@ -31,6 +40,13 @@ public class MemcachedUtils {
 		return rets;
 	}
 	
+	/**
+	 * Gets the corresponding client with a given key to connect to the memcached server which
+	 * stores information about the value of the given key.
+	 * @param clients
+	 * @param key
+	 * @return
+	 */
 	public static MemcachedClient getMemcachedClient(List <MemcachedClient> clients, String key) {
 		if (clients == null || key == null) return null;
 		int size = clients.size();
@@ -52,6 +68,9 @@ public class MemcachedUtils {
 		return null;
 	}
 	
+	/**
+	 * Loads configuration file.
+	 */
 	private static void loadMemcachedConfig() {
 		InputStream input = MemcachedUtils.class.getResourceAsStream("/memcached.conf");
 		if (input != null) {

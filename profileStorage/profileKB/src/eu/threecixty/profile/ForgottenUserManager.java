@@ -4,10 +4,16 @@ import java.util.Set;
 
 import eu.threecixty.userprofile.ForgottenUser;
 
+/**
+ * 
+ * This interface is to mark a friend being avoided crawling from a user and to
+ * mark that a user who wants to be ignored from all crawling jobs.
+ *
+ */
 public interface ForgottenUserManager {
 
 	/**
-	 * Checks whether or not a given UID is forbidden to crawl.
+	 * Checks whether or not a given UID is blocked to crawl.
 	 *
 	 * @param uid
 	 * @return
@@ -89,4 +95,11 @@ public interface ForgottenUserManager {
 	 * @return
 	 */
 	ForgottenUser getForgottenUser(String uid);
+	
+	/**
+	 * Deletes user profile.
+	 * @param uid
+	 * @return
+	 */
+	boolean deleteUserProfile(String uid);
 }

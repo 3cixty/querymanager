@@ -27,6 +27,11 @@ import eu.threecixty.profile.SparqlEndPointUtils;
 import eu.threecixty.profile.TooManyConnections;
 import eu.threecixty.profile.UserProfile;
 
+/**
+ * 
+ * Utility class for query augmentation.
+ *
+ */
 public class QueryAugmentationUtils {
 	
 	private static final String FORMAT = "application/sparql-results+json";
@@ -43,6 +48,26 @@ public class QueryAugmentationUtils {
 	
 	public static String allPrefixes;
 
+	/**
+	 * This method first augments the given original query, then executes the query.
+	 * <br>
+	 * There are two cases: 1) The original query can be augmented. 2) The original query cannot
+	 * be augmented due to either incompatibility with SPARQL 1.1 or incomprehensible query.
+	 * <br>
+	 * If the original query can be augmented, the augmented query is only sent to KB if the original
+	 * one has a limit. This condition is to prevent Virtuoso from taking too many resources
+	 * for just one augmentation query because the nature of query augmentation takes a lot of resources
+	 * to perform. Otherwise, the original query will be sent to Virtuoso KB to execute.
+	 * 
+	 * @param original
+	 * @param filter
+	 * @param uid
+	 * @param coef
+	 * @param httpMethod
+	 * @param endPointUrl
+	 * @return
+	 * @throws IOException
+	 */
 	public static String augmentAndExecuteQuery(String original, QueryAugmenterFilter filter,
 			String uid, double coef, String httpMethod, String endPointUrl) throws IOException {
 		try {
@@ -57,6 +82,7 @@ public class QueryAugmentationUtils {
 				if (queries.size() == 2) { // one query augmented
 					Query augmentedQuery = queries.get(0);
 					Query originalQuery = queries.get(1);
+					// only execute augmented query if the original one has a limit due to QA using a lot KB resources
 					if (originalQuery.hasLimit()) {
 						return executeQueries(augmentedQuery, originalQuery, httpMethod, coef, endPointUrl);
 					}
@@ -71,12 +97,25 @@ public class QueryAugmentationUtils {
 		} catch (InvalidSparqlQuery e) {
 			e.printStackTrace();
 		}
+		
+		// the following lines address to queries which cannot be augmented
 		StringBuilder sb = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(original, FORMAT, httpMethod, endPointUrl, sb);
 		return sb.toString();
 	}
 	
 	
+	/**
+	 * Execute the augmented query.
+	 *
+	 * @param augmentedQuery
+	 * @param originalQuery
+	 * @param httpMethod
+	 * @param coef
+	 * @param endPointUrl
+	 * @return
+	 * @throws IOException
+	 */
 	private static String executeQueries(Query augmentedQuery,
 			Query originalQuery, String httpMethod, double coef, String endPointUrl) throws IOException {
 		if (DEBUG_MOD) LOGGER.info("query 1: " + augmentedQuery.toString());
@@ -86,9 +125,12 @@ public class QueryAugmentationUtils {
 		SparqlEndPointUtils.executeQueryViaSPARQL(augmentedQuery.toString(), FORMAT, httpMethod,endPointUrl, sbForAug);
 		JSONObject rootJsonAug = new JSONObject(sbForAug.toString());
 		JSONArray jsonArrsAug = rootJsonAug.getJSONObject("results").getJSONArray("bindings");
-		if (jsonArrsAug.length() == limit) {
+		if (jsonArrsAug.length() == limit) { // if results already contains the limit number
 			return sbForAug.toString();
 		}
+		
+		// execute the original query, then combine two results of augmented query and original one
+		// to get the first limit number of items. Those items are descent in terms of total score.
 		StringBuilder sbForOri = new StringBuilder();
 		SparqlEndPointUtils.executeQueryViaSPARQL(originalQuery.toString(), FORMAT, httpMethod, endPointUrl, sbForOri);
 		JSONObject rootJsonOri = new JSONObject(sbForOri.toString());
@@ -185,6 +227,24 @@ public class QueryAugmentationUtils {
 		createAugmentedQueries(original, placeIds, socialScores, coef, queries);
 	}
 	
+	/**
+	 * Creates the augmented query and adds into the list.
+	 * <br>
+	 * Note that if the original query can be augmented, the augmented query will be the first query in the list.
+	 * The latter will be the original query.
+	 *
+	 * @param original
+	 * 				The original query
+	 * @param placeIds
+	 * 				The list of place IDs
+	 * @param socialScores
+	 * 				The list of social scores
+	 * @param coef
+	 * 				The coefficient
+	 * @param queries
+	 * 				The list of output queries
+	 * @throws InvalidSparqlQuery
+	 */
 	private static void createAugmentedQueries(String original, List<String> placeIds,
 			List <Double> socialScores, double coef, List <Query> queries) throws InvalidSparqlQuery {
 		String queryWithPrefixes = allPrefixes == null ? Configuration.PREFIXES + " "+ original
@@ -195,7 +255,7 @@ public class QueryAugmentationUtils {
 			Query originalQuery = query.cloneQuery();
 			originalQuery.setPrefixMapping(null);
 			
-			if (query.hasAggregators() || query.hasGroupBy()) {
+			if (query.hasAggregators() || query.hasGroupBy()) { // for COUNT and GROUP BY query
 				queries.add(originalQuery);
 				return;
 			}
@@ -216,6 +276,18 @@ public class QueryAugmentationUtils {
 		}
 	}
 	
+	/**
+	 * Augment the given query.
+	 * <br>
+	 * This method can augment the current query used by DFKI. If a completely new query is used instead,
+	 * there is none guarantee that it works.
+	 *
+	 * @param query
+	 * @param expr
+	 * @param elementBind
+	 * @param coef
+	 * @param subQuery
+	 */
 	private static void augmentQuery(Query query, Expr expr, ElementBind elementBind, double coef, boolean subQuery) {
 		if (query.getOrderBy() != null && query.getOrderBy().size() == 1) {
 			if (subQuery) {
@@ -254,6 +326,13 @@ public class QueryAugmentationUtils {
 		}
 	}
 	
+	/**
+	 * Create elementBind for social score.
+	 *
+	 * @param placeIds
+	 * @param socialScores
+	 * @return
+	 */
 	private static ElementBind createElementBind(List<String> placeIds,
 			List<Double> socialScores) {
 		StringBuilder sb = new StringBuilder();

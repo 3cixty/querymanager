@@ -5,8 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.File;
 import java.util.Scanner;
 
+/**
+ * 
+ * This class is used to check whether or not a given user name and password match with predefined admin info.
+ *
+ */
 public class AdminValidator {
-	private String adminPwd = null;
+	private static String adminPwd = null;
 	
     public AdminValidator(){}
 	public boolean validate(String username, String password,String path){

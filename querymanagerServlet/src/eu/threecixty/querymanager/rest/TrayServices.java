@@ -38,7 +38,8 @@ import eu.threecixty.profile.elements.ElementDetailsUtils;
 import eu.threecixty.profile.elements.LanguageUtils;
 
 /**
- * This class is an end point to expose Rest TrayAPIs to other components.
+ * This class contains all RESTful APIs for dealing with WishList.
+ *
  * @author Cong-Kinh NGUYEN
  *
  */
@@ -66,6 +67,14 @@ public class TrayServices {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 	
+	 /**
+	  * This API is used to manipulate with WishList elements.
+	  * <br>
+	  * The detail about the API specification can be found at https://docs.google.com/document/d/11yKLBgdIr_JgU4SXqP8gF0QTndDQOMW-_xAj_9maPkc/edit.
+	  * @param input
+	  * @param req
+	  * @return
+	  */
     @POST
     @Path("/tray")
     public Response invokeTrayServices(InputStream input, @Context Request req) {
@@ -239,7 +248,8 @@ public class TrayServices {
 	}
 
 	/**
-     * Add tray into the KB.
+     * Persists Tray element to database.
+     *
      * @param restTray
      * @return
      */

@@ -11,6 +11,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * 
+ * This class is to represent Mobidot acccount.
+ *
+ */
 @Entity
 @Table(name = "3cixty_partner_account")
 public class PartnerAccount implements java.io.Serializable {

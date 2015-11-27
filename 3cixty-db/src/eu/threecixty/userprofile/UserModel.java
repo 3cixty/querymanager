@@ -17,6 +17,11 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.CollectionOfElements;
 
+/**
+ * 
+ * This class is to represent the user profile.
+ *
+ */
 @Entity
 @Table(name = "3cixty_user_profile", uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"uid"})})

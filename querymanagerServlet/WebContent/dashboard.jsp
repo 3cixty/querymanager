@@ -6,9 +6,15 @@
 
 <html>
 <head>
+<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
+	 	
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="login/google_translate.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <%
     if (session.getAttribute("admin") == null) {
     	session.setAttribute("nextAction", "dashboard.jsp");
@@ -299,9 +305,11 @@
 </script>
 </head>
 <body>
-<form action="./logoutAdmin" method="get">
+<form id="formDashboard" action="./logoutAdmin" method="get">
 <div>
-<input type="submit" name="logout" value="Logout">
+<input type="button" value="Download data grouped by day" onclick="downloadDailyCsv();" >
+<input type="button" value="Download data grouped by month" onclick="downloadMonthlyCsv();" >
+<input type="submit" name="logout" value="Logout" onclick="logout();">
 </div>
 </form>
 
@@ -351,8 +359,37 @@
 		</table>
 	</div>
 	
+	<script type="text/javascript">
+	    function downloadMonthlyCsv() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/getCallsGroupedByMonth";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	    
+	    function downloadDailyCsv() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/getCallsGroupedByDay";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	    
+	    function logout() {
+	    	document.getElementById("formDashboard").action = "<%=Configuration.get3CixtyRoot()%>/logoutAdmin";
+	    	document.getElementById("formDashboard").submit();
+	    }
+	</script>
+	
 	<%
     }
 	%>
+	
+<div style="position: absolute; top: 0; right: 0; z-index: 10000;" id="google_translate_element"></div>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage : 'en',
+            layout : google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilanguagePage : true
+            }, 'google_translate_element');
+        }
+</script>
 </body>
 </html>

@@ -341,17 +341,12 @@ public class UserUtils {
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String sql = "SELECT DISTINCT accountId, uid, source, element, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id=3cixty_user_profile_knows.3cixty_user_profile_id AND (3cixty_user_profile.id = 3cixty_account.3cixty_user_id) AND (source like 'Google' OR source like 'Facebook') AND element = :myUID";
+			String sql = "SELECT DISTINCT accountId, uid, source, firstName, lastName, element FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id=3cixty_user_profile_knows.3cixty_user_profile_id AND (3cixty_user_profile.id = 3cixty_account.3cixty_user_id) AND (source like 'Google' OR source like 'Facebook') AND element = :myUID";
 			List <Object[]> results = session.createSQLQuery(sql).setParameter("myUID", my3cixtyUID).list();
 			
-			for (Object [] obj: results) {
-				Friend friend = new Friend();
-				friend.setUid(obj[0].toString());
-				friend.setSource(obj[2].toString());
-				friend.setFirstName(obj[4].toString());
-				friend.setLastName(obj[5].toString());
-				friends.add(friend);
-			}
+			Map <String, Friend> uidFriends = new HashMap<String, Friend>();
+			processFriendData(results, uidFriends);
+			friends.addAll(uidFriends.values());
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 		} finally {
@@ -372,23 +367,44 @@ public class UserUtils {
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
 
-			String sql = "SELECT accountId, uid, source, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_account where 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid in (SELECT element FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id= 3cixty_user_profile_id AND 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid = :myUID)";
+			String sql = "SELECT DISTINCT accountId, uid, source, firstName, lastName FROM 3cixty.3cixty_user_profile, 3cixty_account where 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid in (SELECT element FROM 3cixty.3cixty_user_profile, 3cixty_user_profile_knows, 3cixty_account where 3cixty_user_profile.id= 3cixty_user_profile_id AND 3cixty_user_profile.id = 3cixty_account.3cixty_user_id AND (source like 'Google' OR source like 'Facebook') AND uid = :myUID)";
 			List <Object[]> results = session.createSQLQuery(sql).setParameter("myUID", my3cixtyUID).list();
-			
-			for (Object [] obj: results) {
-				Friend friend = new Friend();
-				friend.setUid(obj[0].toString());
-				friend.setSource(obj[2].toString());
-				friend.setFirstName(obj[3].toString());
-				friend.setLastName(obj[4].toString());
-				friends.add(friend);
-			}
+			Map <String, Friend> uidFriends = new HashMap<String, Friend>();
+			processFriendData(results, uidFriends);
+			friends.addAll(uidFriends.values());
 		} catch (HibernateException e) {
 			LOGGER.error(e.getMessage());
 		} finally {
 			if (session != null) session.close();
 		}
 		return friends;
+	}
+	
+	private static void processFriendData(List <Object[]> listFromQuery, Map <String, Friend> uidFriends) {
+		for (Object [] obj: listFromQuery) {
+			Friend friend = new Friend();
+			friend.setUid(obj[1].toString());
+			friend.setAccountId(obj[0].toString());
+			friend.setSource(obj[2].toString());
+			friend.setFirstName(obj[3].toString());
+			friend.setLastName(obj[4].toString());
+			if (friend.getSource().equals(SPEConstants.MOBIDOT_SOURCE)) continue;
+			if (!uidFriends.containsKey(friend.getUid())) uidFriends.put(friend.getUid(), friend);
+			else {
+				Friend existingFriend = uidFriends.get(friend.getUid());
+				Friend newFriendCreatedFromExistingFriend = existingFriend.clone();
+				List <Friend> derivedFrom = new LinkedList<Friend>();
+				derivedFrom.add(friend);
+				derivedFrom.add(newFriendCreatedFromExistingFriend);
+				existingFriend.setDerivedFrom(derivedFrom);
+				if (friend.getSource().equals(SPEConstants.GOOGLE_SOURCE)) {
+					existingFriend.setFirstName(friend.getFirstName());
+					existingFriend.setLastName(friend.getLastName());
+					existingFriend.setSource(null);
+					existingFriend.setAccountId(null);
+				}
+			}
+		}
 	}
 	
 	
@@ -559,13 +575,7 @@ public class UserUtils {
 		}
 		else {
 			if (DEBUG_MOD) LOGGER.info("Knows size: " + knowsStrs.size()+ ", " + knowsStrs);
-			Set <String> knowsModel = userModel.getKnows();
-			if (knowsModel == null) {
-				knowsModel = new HashSet <String>();
-				userModel.setKnows(knowsModel);
-			}
-			knowsModel.clear();
-			knowsModel.addAll(knowsStrs);
+			userModel.setKnows(knowsStrs);
 		}
 	}
 

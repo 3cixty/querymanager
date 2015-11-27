@@ -16,4 +16,6 @@ public interface Partner {
 	List <PartnerAccount> getPartnerAccounts(String uid);
 	
 	boolean addAccount(PartnerAccount account);
+	
+	boolean replaceAccount(PartnerAccount oldAccount, PartnerAccount newAccount);
 }

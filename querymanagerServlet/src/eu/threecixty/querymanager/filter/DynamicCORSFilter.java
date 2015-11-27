@@ -13,6 +13,11 @@ import com.thetransactioncompany.cors.ValidatedOrigin;
 
 import eu.threecixty.oauth.OAuthWrappers;
 
+/**
+ * 
+ * This class is used to dynamically add domains to avoid CORS at runtime.
+ *
+ */
 public class DynamicCORSFilter extends CORSFilter {
 
 	/**This attribute is used to dynamically add CORSConfiguration*/

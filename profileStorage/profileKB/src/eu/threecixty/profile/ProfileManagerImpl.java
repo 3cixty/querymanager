@@ -326,4 +326,10 @@ public class ProfileManagerImpl implements ProfileManager {
 		if (profileManager != null) return profileManager.getForgottenUserManager();
 		return null;
 	}
+
+	@Override
+	public String findAccountId(UserProfile profile, String source) {
+		if (profileManager != null) return profileManager.findAccountId(profile, source);
+		return null;
+	}
 }

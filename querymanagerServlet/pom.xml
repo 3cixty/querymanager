@@ -67,12 +67,6 @@
     </dependency>
 
     <dependency>
-	  <groupId>com.google.code.gson</groupId>
-	  <artifactId>gson</artifactId>
-	  <version>1.7.1</version>
-    </dependency>
-
-    <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
         <version>3.0.6.Final</version>

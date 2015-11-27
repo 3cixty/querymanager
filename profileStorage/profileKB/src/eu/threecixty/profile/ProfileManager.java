@@ -322,6 +322,14 @@ public interface ProfileManager {
 	ForgottenUserManager getForgottenUserManager();
 	
 	/**
+	 * Finds account Id from a given user profile and a given source.
+	 * @param profile
+	 * @param source
+	 * @return
+	 */
+	String findAccountId(UserProfile profile, String source);
+	
+	/**
 	 * Checks a given attribute to know whether or not it is going to be stored from a given list of attributes.
 	 * @param attributes
 	 * @param attrChecked

@@ -3,6 +3,11 @@ package eu.threecixty.querymanager.rest;
 import eu.threecixty.Configuration;
 import eu.threecixty.querymanager.AuthorizationBypassManager;
 
+/**
+ * 
+ * This utility class is to get SPARQL endpoint, graph based on application key, city.
+ *
+ */
 public class SparqlChooser {
 	
 	private static String END_POINT_WITH_E015 = null;
@@ -16,8 +21,10 @@ public class SparqlChooser {
 	 * @return
 	 */
 	public static String getEventGraph(String key, String city) {
-		if (city == null) return Constants.GRAPH_EVENTS;
-		else return "<http://3cixty.com/" + city + "/events>";
+		// FIXME for two cities
+//		if (city == null) return Constants.GRAPH_EVENTS;
+//		else return "<http://3cixty.com/" + city + "/events>";
+		return Constants.GRAPH_EVENTS;
 	}
 	
 	/**
@@ -28,8 +35,10 @@ public class SparqlChooser {
 	 * @return
 	 */
 	public static String getPoIGraph(String key, String city) {
-		if (city == null) return Constants.GRAPH_POIS;
-		else return "<http://3cixty.com/" + city + "/places>";
+		// FIXME
+//		if (city == null) return Constants.GRAPH_POIS;
+//		else return "<http://3cixty.com/" + city + "/places>";
+		return Constants.GRAPH_POIS;
 	}
 	
 	/**

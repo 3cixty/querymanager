@@ -9,18 +9,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 		<meta name="google-translate-customization" content="83bfcc196b36ca47-c4c32ed5fd4f4f55-g50148814a343d054-f"/>
 	 	
-	 	
-	 	<link href="login/normalize.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/assets.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/layout.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/style2.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/style.css" rel="stylesheet" type="text/css" media="screen">
-    	<link href="login/fontello.css" rel="stylesheet" type="text/css" media="screen">
     	<link href="login/landing.css" rel="stylesheet" type="text/css" media="screen">
 	    
-	    <script src="login/jquery-1.js"></script>
 	    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-		<script type="text/javascript" src="login/google_translate.js"></script>
 		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 		
 
@@ -31,8 +23,8 @@
 		        display: inline-block;
 		        background: #dd4b39;
 		        color: white;
-		        width: 164px;
-		        height: 39px;
+		        width: 98px;
+		        height: 27px;
 		        border-radius: 4px;
 		        border-color:#dd4b39;
 		        white-space: nowrap;
@@ -44,19 +36,20 @@
 		        font-weight: bold;
 		    }
 		    span.ico {
-		        background: url('../v2/btn_red.png') no-repeat;
+		        background: url('../v2/btn_red.svg') no-repeat;
 		        display: inline-block;
 		        vertical-align: middle;
-		        width: 39px;
-		        height: 39px;
+		        background-size: 20px;
+		        width: 23px;
+		        height: 23px;
 		    }
 		    span.buttonText {
 		        display: inline-block;
 		        vertical-align: middle;
-		        padding-left: 30px;
-		        padding-right: 30px;
-		        font-size: 14px;
-		        font-weight: bold;
+		        padding-left: 0px;
+		        padding-top: 2px;
+		        font-size: 13px;
+		        height: 24px;
 		        /* Use the Roboto font that is loaded in the <head> */
 		        font-family: 'Roboto', sans-serif;
 	    }
@@ -72,11 +65,28 @@
    			padding: 9px;
    			display: inline-block;
    			color: rgba(0,0,0,1);
-   			text-shadow: 0px 1px 1px rgba(227,227,227,1)
+   			text-shadow: 0px 1px 1px rgba(227,227,227,1);
+   			cursor: pointer;
+   			font-size: 14px;
 	    }
 	    .link {
 	        color: blue;
 	    }
+	    #goog-gt-tt { display:none !important; }
+
+
+		.goog-text-highlight {
+		    background-color: inherit !important;
+		    box-shadow: 0px 0px 0px #9999aa !important;
+		    box-sizing: border-box;
+		    position: relative;
+		}
+		
+		.googleNotSupported
+		{
+		    font-size: 12px;
+		    color: #777;
+		}
 	</style>
 </head>
 
@@ -174,19 +184,21 @@
   }
 </script>
 <div class="wrapper">
-	<div class="logo">
+	<div class="logo" align="center" >
 		<table>
 			<tr>
 		  		<td>
-    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')"/>
+    				<div class="logo-icon" style="background-image:url('<%=app.getThumbnail()%>')">
+    				</div>
     			</td>
     			<td>
     				<div  align="center">
-    					<h3 class="privacy-title"> Powered by </h3>
+    					<h3 class="privacy-title"> powered by </h3>
    					</div>
    				</td>
     			<td>
-    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')"/>
+    				<div class="logo-icon" style="background-image:url('<%=Configuration.get3CixtyRoot()%>/3cixty.png')">
+    				</div>
     			</td>
     		</tr>
     	</table>
@@ -196,13 +208,13 @@
 		
 			<div>
 			<form id="form" action="<%=Configuration.get3CixtyRoot()%>/auth">
-				<h3 class="privacy-title"> Sign In using </h3>
+				<h3 class="privacy-title"> Sign in using your account on</h3>
 			    <input type=hidden name="key" value="<%=key%>">
-                <div  align="center">
-				    <table><col width="165">
-				    <tr>
-				    <td>
-				    <div>
+                  <div  align="center">
+                  <table>
+                    <tr>
+                      <td>
+                      
 				        <button id="customBtn" class="customGPlusSignIn">
 	                        <span class="ico"></span>
 	                        <span class="buttonText">Google</span>
@@ -212,24 +224,22 @@
 					    		$('#form').submit();
 						  });
 						</script>
-	                </div>
-				    </td>
+	                </td>
+	                
 				    <td>
-				    <div>
-						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="xlarge">
+						<fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();" data-size="large">
 						Facebook
 						</fb:login-button>
-					</div>
-				    </td>
-				    </tr>
-				    </table>
-			 	</div>
+					</td>
+                    </tr>
+                  </table>
+                  <div class="googleNotSupported">(Google accounts are not supported by the iOS mobile app.)</div>
+				  </div>
 			 	</form>
 			</div>
-			
 			<div>
 			    <form action="<%=Configuration.get3CixtyRoot()%>/signin" method="post">
-				  <h3 class="privacy-title"> or 3cixty account </h3>
+				  <h3 class="privacy-title">You can also sign in using an ExplorMI 360 account:</h3>
 			      <input type=hidden name="key" value="<%=key%>">
                   <div  align="center">
                     <div>
@@ -239,28 +249,33 @@
     					<input type="password" name="password" id="password" placeholder="Password" required class="loginInput">
   					</div>
   					<div style="height: 3px;"></div>
-  					<input class="signinButton" type="submit" value=" Sign in ">
+  					<input class="signinButton" type="submit" value=" Sign In ">
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./forgotPassword.jsp?key=<%=key%>"><font class="link">Forgot password?</font></a>
+			 	  	<a href="./forgotPassword.jsp?key=<%=key%>"><font class="link">Did you forget your password?</font></a>
 			 	  </div>
 			 	  <div  align="center">
-			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Sign up</font></a>
+			 	  	<a href="./signUp.jsp?key=<%=key%>"><font class="link">Create an ExplorMI 360 account</font></a>
 			 	  </div>
 			 	</form>
 			</div>
-			
 	    	<div class="login-benefits">
-                <h3 class="privacy-title">Benefits of Signing in</h3>
-				<p class="privacy-desc"> 
-					 You can save your WishList and access it from the mobile version of <strong>3cixty</strong> apps. 
-					 You can ask the application to take into account things like the ratings given by your friends.
-					 If you have been in <i>Milan</i> and have asked the mobile version of <strong>3cixty</strong> apps to track your movements there, you can view summary of your movements. 
-					<br><br>
-					To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a>.
+                <h3 class="privacy-title">Benefits of Signing In</h3>
+				
+				  
+<ul>
+  <li>You can save items on your Wish List and access them from the mobile apps of ExplorMI 360.</li>
+  <li>You can ask the application to take into account things like the ratings given by your friends.</li>
+  <li>If you have been in Milan and have allowed the mobile part of ExplorMI 360 to track your movements 
+					 there, you can view summaries of your movements.</li>
+</ul>
+					  
+					  
+					 <br>
+					<p class="privacy-desc">
+					 To see how the privacy of your data will be protected, please check our <a href="<%=Configuration.get3CixtyRoot()%>/privacy.jsp">Privacy Statement</a> and <a href="<%=Configuration.get3CixtyRoot()%>/terms.html">Terms of Use</a>; then hit the "Back" button to return to this page.
 				</p>
 			</div>
-			
 		
 	</div>
 </div>
