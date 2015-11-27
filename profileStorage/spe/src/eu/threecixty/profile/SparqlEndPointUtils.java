@@ -33,7 +33,6 @@ public class SparqlEndPointUtils {
 //			if (DEBUG_MOD) LOGGER.info("Result of the query " + query + " was cached");
 //			result.append(content);
 //		} else {
-		System.out.println("come here friends");
 			if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, endPointUrl, result);
 			else executeQueryViaSPARQL_POST(query, format, endPointUrl, result);
 //			CacheManager.getInstance().putCacheData(key, result.toString());
