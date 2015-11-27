@@ -21,10 +21,9 @@ public class SparqlChooser {
 	 * @return
 	 */
 	public static String getEventGraph(String key, String city) {
-		// FIXME for two cities
-//		if (city == null) return Constants.GRAPH_EVENTS;
-//		else return "<http://3cixty.com/" + city + "/events>";
-		return Constants.GRAPH_EVENTS;
+		if (city == null) return Constants.GRAPH_EVENTS;
+		else return "<http://3cixty.com/" + city + "/events>";
+//		return Constants.GRAPH_EVENTS;
 	}
 	
 	/**
@@ -35,10 +34,9 @@ public class SparqlChooser {
 	 * @return
 	 */
 	public static String getPoIGraph(String key, String city) {
-		// FIXME
-//		if (city == null) return Constants.GRAPH_POIS;
-//		else return "<http://3cixty.com/" + city + "/places>";
-		return Constants.GRAPH_POIS;
+		if (city == null) return Constants.GRAPH_POIS;
+		else return "<http://3cixty.com/" + city + "/places>";
+//		return Constants.GRAPH_POIS;
 	}
 	
 	/**
