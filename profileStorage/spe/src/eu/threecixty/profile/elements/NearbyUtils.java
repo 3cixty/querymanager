@@ -84,7 +84,7 @@ public class NearbyUtils {
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		if (cellIds.size() == 0) return Collections.emptyList();
 		for (int cellId: cellIds) {
-			builder.append("<http://data.linkedevents.org/cell/" + city + "/" + cellId + ">");
+			builder.append("<http://data.linkedevents.org/cell/" + convertCity(city) + "/" + cellId + ">");
 		}
 		builder.append("}. \n");
 		
@@ -194,7 +194,7 @@ public class NearbyUtils {
 		cellIds = CellUtils.calcEffectiveCellIds(cellIds, distance * 1000, lat, lon);
 		if (cellIds.size() == 0) return Collections.emptyList();
 		for (int cellId: cellIds) {
-			builder.append("<http://data.linkedevents.org/cell/" + city + "/" + cellId + ">");
+			builder.append("<http://data.linkedevents.org/cell/" + convertCity(city) + "/" + cellId + ">");
 		}
 		builder.append("}. \n");
 		
@@ -424,6 +424,11 @@ public class NearbyUtils {
 	private static boolean isNullOrEmpty(String input) {
 		if (input == null || input.equals("")) return true;
 		return false;
+	}
+	
+	private static String convertCity(String city) {
+		if (city.equals("milan")) return "milano";
+		return city;
 	}
 	
 	private NearbyUtils() {
