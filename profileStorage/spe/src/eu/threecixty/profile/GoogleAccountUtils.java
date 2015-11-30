@@ -26,62 +26,17 @@ public class GoogleAccountUtils {
 	 private static final Logger LOGGER = Logger.getLogger(
 			 GoogleAccountUtils.class.getName());
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
-	
-//	/**
-//	 * Validates a given access token, 
-//   * then extract Google info (name, knows) to update UserProfile if there is
-//	 * no information about this user.
-//	 * @param accessToken
-//	 * @return public user ID if the given access token is valid. Otherwise, the method returns an empty string.
-//	 */
-
 
 	public static String getUID(String accessToken) {
 		if (accessToken == null) return "";
 		String user_id = null;
 		String _3cixtyUID = null;
 		try {
-			/*
-			if (!accessToken.equals("")) { // TODO: remove after testing
-				String uid = String.valueOf(System.nanoTime()); // random uid
-				
-				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
-				profile.setHasUID(uid);
-				String picture = "https://www.google.fr/images/srpr/logo11w.png";
-				profile.setProfileImage(picture);
-				Name name = new Name();
-				profile.setHasName(name);
-				String givenName = "GN" + RandomStringUtils.random(20);
-				String familyName = RandomStringUtils.random(20) + "FN";
-				name.setGivenName(givenName);
-				name.setFamilyName(familyName);
-				
-				Random random = new Random();
-				int val = random.nextInt(2);
-				if (val == 0) {
-					profile.setHasGender("Female");
-				} else {
-					profile.setHasGender("Male");
-				}
-				
-				Set<String> knows = new HashSet<String>();
-				
-				knows.add("103411760688868522737"); // this would be useful to test augmentation query
-				
-				ProfileManagerImpl.getInstance().saveProfile(profile);
-				
-				return uid;
-			}
-			*/
-			// due to error asked by Christian
-//			String reqMsg = readUrl(
-//					"https://www.googleapis.com/plus/v1/people/me?access_token=" + accessToken);
 			long time1 = System.currentTimeMillis();
 			String reqMsg = Utils.readUrl(
 					"https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken);
 			JSONObject json = new JSONObject(reqMsg);
 			user_id = json.getString("id");
-//			JSONObject nameObj = json.getJSONObject("name");
 			String givenName = json.getString("given_name");
 			String familyName = json.getString("family_name");
 						
