@@ -1,5 +1,11 @@
 package eu.threecixty.profile;
 
+/**
+ * 
+ * This class is to easily export associated account for user-related information.
+ * The class is used in the SPEServices.
+ *
+ */
 public class AssociatedAccount {
 
 	private String accountId;

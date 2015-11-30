@@ -104,6 +104,10 @@ public class EmailUtils {
 		return false;
 	}
 	
+	/**
+	 * Loads user, password and email from a properties file.
+	 * @throws IOException
+	 */
 	private static synchronized void loadProperties() throws IOException {
 		InputStream input = new FileInputStream(Configuration.path + File.separatorChar + "WEB-INF"
 	            + File.separatorChar + "report.properties");

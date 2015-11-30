@@ -28,6 +28,29 @@ public class FaceBookAccountUtils {
 			 FaceBookAccountUtils.class.getName());
 	private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
+	/**
+	 * Input: 		a Facebook access token, a width and height of profile image.
+	 * Output: 		3cixty UID.
+	 * 
+	 * <br>
+	 * <br>
+	 * The method does the following things:
+	 * <pre>
+	 * 1. Extract Facebook UID, firstName, lastName, profile image with the given width height.
+	 * 2. Extract friends list who have been using 3cixty applications.
+	 * 3. Check whether or not there is a profile corresponding with this Facebook UID. If yes, go to step 4; otherwise, go to step 5.
+	 * 4. Update user profile into MySQL.
+	 * 5. Create a new user profile and persist in MySQL.
+	 * </pre>
+	 * Each Facebook UID is always considered to contain a ProfileIdentities which is used to distinguish
+	 * from which source the user profile is. Besides, the method also checks whether or not there is any
+	 * friends in the forgotten list to be ignored by crawling job.
+	 * 
+	 * @param accessToken
+	 * @param width
+	 * @param height
+	 * @return
+	 */
 	public static String getUID(String accessToken, int width, int height) {
 		if (accessToken == null) return "";
 		long time1 = System.currentTimeMillis();
@@ -40,7 +63,7 @@ public class FaceBookAccountUtils {
 			String firstName = json.getString("first_name");
 			String lastName = json.getString("last_name");
 
-			String picture = getProfileImage(accessToken, width, height);
+			String picture = getProfileImage(accessToken, width, height); // customize profile image
 			
 			// TODO: 1. need to check ProfileIdentities to know whether or not there is a profile corresponding with this uid
 			//       2. need to check email to know whether or not there is a profile corresponding with this uid
@@ -91,6 +114,14 @@ public class FaceBookAccountUtils {
 		return null;
 	}
 	
+	/**
+	 * This method is to check whether or not a given Facebook token corresponds with a 3cixty user.
+	 * The method is used just before showing Term of Use and Privacy Policy while signing to 3cixty
+	 * with Facebook.
+	 *
+	 * @param accessToken
+	 * @return
+	 */
 	public static boolean existUserProfile(String accessToken) {
 		try {
 			String reqMsg = Utils.readUrl(FACE_BOOK_ACCESS_TOKEN_VALIDATION + accessToken);
@@ -104,14 +135,26 @@ public class FaceBookAccountUtils {
 		return false;
 	}
 
+	/**
+	 * Extract friends list and persist into database. The method creates a worker to run on background to avoid
+	 * reducing performance.
+	 *
+	 * @param accessToken
+	 * @param user_id
+	 * @param profile
+	 */
 	private static void updateKnows(String accessToken, String user_id,
 			UserProfile profile) {
 		KnowsPersistence persistence = new KnowsPersistence(accessToken, SPEConstants.FACEBOOK_SOURCE, user_id, profile);
 		PersistenceWorkerManager.getInstance().add(persistence);
 	}
 
-
-
+	/**
+	 * Find all Facebook UIDs from friends list and store in <code>facebookUidsFromFriends</code>.
+	 * @param url
+	 * @param accessToken
+	 * @param facebookUidsFromFriends
+	 */
 	protected static void findFacebookUidsFromFriends(String url, String accessToken,
 			List <String> facebookUidsFromFriends) {
 		// XXX: Note: we can only get friends' UID if your friends and you are using 3cixty.
@@ -136,6 +179,13 @@ public class FaceBookAccountUtils {
 		}
 	}
 	
+	/**
+	 * Get the profile image link.
+	 * @param accessToken
+	 * @param width
+	 * @param height
+	 * @return
+	 */
 	private static String getProfileImage(String accessToken, int width, int height) {
 		try {
 			String content = Utils.readUrl(FACEBOOK_PROFILE_IMAGE_PREFIX + accessToken
