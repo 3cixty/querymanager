@@ -16,7 +16,7 @@ import eu.threecixty.profile.oldmodels.Name;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 /**
- * Utility class to update account info.
+ * Utility class to extract information via Google access token.
  *
  * @author Rachit Agarwal
  *

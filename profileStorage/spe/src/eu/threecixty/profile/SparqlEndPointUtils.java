@@ -29,20 +29,20 @@ public class SparqlEndPointUtils {
 	public static void executeQueryViaSPARQL(String query, String format,
 			String httpMethod, String endPointUrl, StringBuilder result) throws IOException {
 		long startTime = System.currentTimeMillis();
-		String key = query + format + httpMethod + endPointUrl;
-		String content = CacheManager.getInstance().getCacheData(key);
-		if (content != null) {
-			if (DEBUG_MOD) LOGGER.info("Result of the query " + query + " was cached");
-			result.append(content);
-		} else {
+//		String key = query + format + httpMethod + endPointUrl;
+//		String content = CacheManager.getInstance().getCacheData(key);
+//		if (content != null) {
+//			if (DEBUG_MOD) LOGGER.info("Result of the query " + query + " was cached");
+//			result.append(content);
+//		} else {
 			if (HTTP_GET.equals(httpMethod)) executeQueryViaSPARQL_GET(query, format, endPointUrl, result);
 			else executeQueryViaSPARQL_POST(query, format, endPointUrl, result);
-			CacheManager.getInstance().putCacheData(key, result.toString());
+//			CacheManager.getInstance().putCacheData(key, result.toString());
 			long endTime = System.currentTimeMillis();
 			if (DEBUG_MOD) LOGGER.info("Query sent to KB: " + query);
 			if (DEBUG_MOD) LOGGER.info("Time to make query from server to KB without processing: "
 					+ (endTime - startTime) + " ms");
-		}
+//		}
 	}
 
 	private static void executeQueryViaSPARQL_GET(String query, String format, String endPointUrl, StringBuilder result) throws IOException {
