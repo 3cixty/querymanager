@@ -5,7 +5,7 @@ import java.util.List;
 import eu.threecixty.profile.Tray.OrderType;
 
 /**
- * This interface to switch between a simple text file and Virtuoso for Tray.
+ * This interface to manipulate with Tray items.
  */
 public interface TrayManager {
 

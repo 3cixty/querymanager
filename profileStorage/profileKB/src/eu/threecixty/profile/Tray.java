@@ -3,8 +3,7 @@ package eu.threecixty.profile;
 import java.io.Serializable;
 
 /**
- * This class defines tray item information.
- * Question: should we need to check whether or not event information is correct.
+ * This class represents a tray item.
  * @author Cong-Kinh NGUYEN
  *
  */

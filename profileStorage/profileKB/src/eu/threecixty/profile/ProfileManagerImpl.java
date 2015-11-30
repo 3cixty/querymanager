@@ -13,8 +13,8 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 
 /**
  * This class is to switch ProfileManager among implementation versions of a RDF model file, Virtuoso code,
- * and Thales code. This will be done by using a corresponding dependency. By default, a RDF model file will
- * be used if there isn't any corresponding dependency included.
+ * and mysql code. This will be done by using a corresponding dependency. By default, mySQL is used to
+ * persist user profile.
  * @author Cong Kinh Nguyen
  *
  */

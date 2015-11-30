@@ -25,7 +25,7 @@ public interface ProfileManager {
 	UserProfile getProfile(String uid) throws TooManyConnections;
 
 	/**
-	 * Saves a given user profile into the KB.
+	 * Persist user profile.
 	 * @param userProfile
 	 * 				The user profile.
 	 * @return <code>true</code> if the method is successful to save data, <code>false</code> otherwise. 
