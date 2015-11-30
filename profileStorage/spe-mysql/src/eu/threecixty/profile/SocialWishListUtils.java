@@ -42,7 +42,7 @@ public class SocialWishListUtils {
 	private static List <String> getTrayIdsFromFriendsWishList(String _3cixtyUID,
 			String type) throws TooManyConnections {
 		if (_3cixtyUID == null) return null;
-		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
+		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID);
 		if (profile == null) return null;
 		Set <String> knows = profile.getKnows();
 		if (knows == null) return null;

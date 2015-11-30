@@ -27,14 +27,14 @@ public class UserProfileTests {
 		userProfile.setHasUID(_3cixtyUID);
 		userProfile.setHasName(name);
 		try {
-			new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+			new MySQLProfileManagerImpl().saveProfile(userProfile);
 		} catch (TooManyConnections e) {
 			e.printStackTrace();
 		}
 		
 		UserProfile loadedProfile = null;
 		try {
-			loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+			loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 			Name loadedName = loadedProfile.getHasName();
 			Assert.assertTrue(firstName.equals(loadedName.getGivenName()));
 			Assert.assertTrue(lastName.equals(loadedName.getFamilyName()));
@@ -45,9 +45,9 @@ public class UserProfileTests {
 		lastName = null;
 		loadedProfile.getHasName().setFamilyName(lastName);
 		try {
-			new MySQLProfileManagerImpl().saveProfile(loadedProfile, null);
+			new MySQLProfileManagerImpl().saveProfile(loadedProfile);
 			
-			loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+			loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 			Name loadedName = loadedProfile.getHasName();
 			Assert.assertTrue(loadedName.getFamilyName() == null);
 		} catch (TooManyConnections e) {
@@ -76,9 +76,9 @@ public class UserProfileTests {
 		userProfile.setHasUID(_3cixtyUID);
 		userProfile.setHasAddress(address);
 
-		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(userProfile);
 		
-		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		Address loadedAddress = loadedProfile.getHasAddress();
 		Assert.assertTrue(country.equals(loadedAddress.getCountryName()));
 		Assert.assertTrue(town.equals(loadedAddress.getTownName()));
@@ -89,8 +89,8 @@ public class UserProfileTests {
 		
 		country = null;
 		loadedProfile.getHasAddress().setCountryName(country);
-		new MySQLProfileManagerImpl().saveProfile(loadedProfile, null);
-		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		new MySQLProfileManagerImpl().saveProfile(loadedProfile);
+		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		String loadedCountry = loadedProfile2.getHasAddress().getCountryName();
 		Assert.assertTrue(loadedCountry == null || loadedCountry.equals(""));
 	}
@@ -104,9 +104,9 @@ public class UserProfileTests {
 		userProfile.setProfileImage(profileImage);
 		String lastTime = System.currentTimeMillis() + "";
 		userProfile.setHasLastCrawlTime(lastTime);
-		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(userProfile);
 		
-		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		Assert.assertTrue(profileImage.equals(loadedProfile.getProfileImage()));
 		Assert.assertTrue(lastTime.equals(loadedProfile.getHasLastCrawlTime()));
 	}
@@ -122,9 +122,9 @@ public class UserProfileTests {
 		knows.add(know1);
 		knows.add(know2);
 		userProfile.setKnows(knows);
-		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(userProfile);
 		
-		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		Set <String> loadedKnows = loadedProfile.getKnows();
 		Assert.assertTrue(loadedKnows.contains(know1));
 		Assert.assertTrue(loadedKnows.contains(know2));
@@ -134,9 +134,9 @@ public class UserProfileTests {
 		String know3 = "333333333333";
 		loadedKnows.add(know3);
 		loadedProfile.setKnows(loadedKnows);
-		new MySQLProfileManagerImpl().saveProfile(loadedProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(loadedProfile);
 		
-		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		Set <String> loadedKnows2 = loadedProfile2.getKnows();
 		Assert.assertTrue(loadedKnows2.contains(know1));
 		Assert.assertTrue(!loadedKnows2.contains(know2));
@@ -165,9 +165,9 @@ public class UserProfileTests {
 		pis.add(pi2);
 		
 		userProfile.setHasProfileIdenties(pis);
-		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(userProfile);
 		
-		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		Set <ProfileIdentities> loadedPis = loadedProfile.getHasProfileIdenties();
 		Assert.assertTrue(loadedPis.size() == 2);
 		Assert.assertTrue(exists(account1, source1, loadedPis));
@@ -181,9 +181,9 @@ public class UserProfileTests {
 		loadedPis.clear();
 		loadedPis.add(pi3);
 		loadedProfile.setHasProfileIdenties(loadedPis);
-		new MySQLProfileManagerImpl().saveProfile(loadedProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(loadedProfile);
 		
-		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		UserProfile loadedProfile2 = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		Set <ProfileIdentities> loadedPis2 = loadedProfile2.getHasProfileIdenties();
 		Assert.assertTrue(loadedPis2.size() == 1);
 		Assert.assertTrue(exists(account3, source3, loadedPis2));
@@ -212,9 +212,9 @@ public class UserProfileTests {
         Set <Accompanying> accompanyings = new HashSet <Accompanying>();
         accompanyings.add(accompany);
         userProfile.setAccompanyings(accompanyings);
-        new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+        new MySQLProfileManagerImpl().saveProfile(userProfile);
         
-        UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+        UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
         Set <Accompanying> loadedAccompanyings = loadedProfile.getAccompanyings();
         Assert.assertNotNull(loadedAccompanyings);
         Assert.assertTrue(loadedAccompanyings.size() == 1);
@@ -250,7 +250,7 @@ public class UserProfileTests {
 		pis.add(pi2);
 		
 		userProfile.setHasProfileIdenties(pis);
-		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(userProfile);
 		
 		Set <String> _3cixtyUIDs = new HashSet <String>();
 		_3cixtyUIDs.add(_3cixtyUID);
@@ -282,7 +282,7 @@ public class UserProfileTests {
 		pis.add(pi2);
 		
 		userProfile.setHasProfileIdenties(pis);
-		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(userProfile);
 		
 		List <String> googleUids = new LinkedList<String>();
 		googleUids.add(account1);

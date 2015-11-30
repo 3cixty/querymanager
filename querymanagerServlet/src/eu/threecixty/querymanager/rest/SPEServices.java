@@ -170,7 +170,7 @@ public class SPEServices {
 	 * @throws TooManyConnections
 	 */
 	public static UserRelatedInformation getUserRelatedInfo(String _3cixtyUID, String language, String key) throws TooManyConnections {
-		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
+		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID);
 		if (profile == null) {
 			return null;
 		}

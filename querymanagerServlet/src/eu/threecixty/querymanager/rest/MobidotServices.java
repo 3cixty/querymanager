@@ -6,9 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -25,7 +23,6 @@ import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
 import eu.threecixty.partners.PartnerAccount;
-import eu.threecixty.profile.ProfileManager;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.profile.TooManyConnections;
@@ -192,9 +189,7 @@ public class MobidotServices {
 	private void setMobidotAccountToUserProfile(String uid,
 			PartnerAccount account) throws TooManyConnections {
 		
-		Map <String, Boolean> attrs = getAttributesForProfileIdentities();
-		
-		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, attrs);
+		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
 		Set <ProfileIdentities> profileIdentities = null;
 		if (profile.getHasProfileIdenties() == null) {
 			profileIdentities = new HashSet <ProfileIdentities>();
@@ -202,12 +197,6 @@ public class MobidotServices {
 		} else profileIdentities = profile.getHasProfileIdenties();
 		Utils.setProfileIdentities(uid, account.getUser_id(), SPEConstants.MOBIDOT_SOURCE, profileIdentities);
 		
-		ProfileManagerImpl.getInstance().saveProfile(profile, attrs); // persist user profile to database
-	}
-	
-	private Map <String, Boolean> getAttributesForProfileIdentities() {
-		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
-		return attrs;
-	}
+		ProfileManagerImpl.getInstance().saveProfile(profile); // persist user profile to database
+	}	
 }

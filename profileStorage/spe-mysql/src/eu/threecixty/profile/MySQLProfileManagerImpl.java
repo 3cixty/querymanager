@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.cache.ProfileCacheManager;
@@ -18,10 +17,6 @@ class MySQLProfileManagerImpl implements ProfileManager {
 	
 	private static final int DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED = 1;
 	private static final float DEFAULT_MINIMUM_SCORE_RATED = 3;
-
-	public boolean checkAttributeToStore(Map<String, Boolean> arg0, String arg1) {
-		return true;
-	}
 
 	public boolean existUID(String _3cixtyUid) throws TooManyConnections {
 		UserProfile profile = ProfileCacheManager.getInstance().getProfile(_3cixtyUid);
@@ -143,7 +138,7 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return null;
 	}
 
-	public UserProfile getProfile(String _3cixtyUID, Map<String, Boolean> arg1)
+	public UserProfile getProfile(String _3cixtyUID)
 			throws TooManyConnections {
 		UserProfile profile = ProfileCacheManager.getInstance().getProfile(_3cixtyUID);
 		if (profile != null) return profile;
@@ -163,7 +158,7 @@ class MySQLProfileManagerImpl implements ProfileManager {
 		return MySQLTrayManager.getInstance();
 	}
 
-	public boolean saveProfile(UserProfile userProfile, Map<String, Boolean> arg1)
+	public boolean saveProfile(UserProfile userProfile)
 			throws TooManyConnections {
 		boolean successful = UserUtils.saveUserProfile(userProfile);
 		if (successful) ProfileCacheManager.getInstance().put(userProfile);

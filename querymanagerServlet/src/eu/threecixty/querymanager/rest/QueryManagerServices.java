@@ -950,7 +950,7 @@ public class QueryManagerServices {
 			String key = userAccessToken.getAppkey();
 			String endpointUrl = SparqlChooser.getEndPointUrl(key);
 			try {
-				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id, null);
+				UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(user_id);
 				List <String> placeIds = new LinkedList <String>();
 				List <Double> socialScores = new LinkedList <Double>();
 				if (ratedByFriends) { // my friends / travel-mates rated places

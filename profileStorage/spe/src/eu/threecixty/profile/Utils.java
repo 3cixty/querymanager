@@ -3,11 +3,9 @@ package eu.threecixty.profile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.Configuration;
@@ -113,26 +111,6 @@ public class Utils {
 	            reader.close();
 	    }
 	    return buffer.toString();
-	}
-	
-	protected static Map <String, Boolean> getAttributesToStoreForCrawlingSocialProfile() {
-		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
-		attrs.put(ProfileManager.ATTRIBUTE_KNOWS, true);
-		attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
-		return attrs;
-	}
-	
-	protected static Map <String, Boolean> getAttributesToLoadProfileFromGoogleFB() {
-		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
-		attrs.put(ProfileManager.ATTRIBUTE_KNOWS, true);
-		attrs.put(ProfileManager.ATTRIBUTE_GENDER, true);
-		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
-		return attrs;
 	}
 	
 	protected static boolean checkProfileIdentitiesModified(

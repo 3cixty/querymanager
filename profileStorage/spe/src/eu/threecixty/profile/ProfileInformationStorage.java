@@ -1,8 +1,5 @@
 package eu.threecixty.profile;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.Name;
 
@@ -22,10 +19,7 @@ public class ProfileInformationStorage {
 	 */
 	public static ProfileInformation loadProfile(String uid) throws TooManyConnections {
 		if (uid == null || uid.equals("")) return null;
-
-		Map <String, Boolean> attrs = getAttributesForProfileInfo();
-		
-		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid, attrs);
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
 
 		if (userProfile == null) return null;
 
@@ -65,10 +59,8 @@ public class ProfileInformationStorage {
 		if (!isNullOrEmpty(profile.getProfileImage())) {
 			kbUserProfile.setProfileImage(profile.getProfileImage());
 		}
-
-		Map <String, Boolean> attrs = getAttributesForProfileInfo();
 		
-		ProfileManagerImpl.getInstance().saveProfile(kbUserProfile, attrs);
+		ProfileManagerImpl.getInstance().saveProfile(kbUserProfile);
 		return true;
 	}
 
@@ -187,14 +179,6 @@ public class ProfileInformationStorage {
 		if (addr.getLongitute() > 0) {
 			to.setLongitude(addr.getLongitute());
 		}
-	}
-	
-	private static Map <String, Boolean> getAttributesForProfileInfo() {
-		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
-		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IMAGE, true);
-		return attrs;
 	}
 	
 	/**

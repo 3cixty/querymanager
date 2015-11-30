@@ -72,7 +72,7 @@ public class QueryAugmentationUtils {
 			String uid, double coef, String httpMethod, String endPointUrl) throws IOException {
 		try {
 			List <Query> queries = new LinkedList <Query>();
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, null);
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
 			if (profile != null) {
 				if (filter == QueryAugmenterFilter.FriendsRating) {
 					createAugmentedQueriesBasedOnFriends(original, profile, coef, queries, endPointUrl);

@@ -1,10 +1,8 @@
 package eu.threecixty.profile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import eu.threecixty.profile.oldmodels.Address;
@@ -27,16 +25,14 @@ public class SettingsStorage {
 	public static void save(ThreeCixtySettings settings) throws TooManyConnections {
 		if (settings == null) return;
 		
-		Map <String, Boolean> attrs = getAttributesForSetting();
-		
-		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(settings.getUid(), attrs);
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(settings.getUid());
 		userProfile.setHasUID(settings.getUid());
 
 		saveNameInfoToKB(settings, userProfile);
 		saveAddressInfoToKB(settings, userProfile);
 		addProfileIdentitiesIntoUserProfile(settings, userProfile);
 
-		ProfileManagerImpl.getInstance().saveProfile(userProfile, attrs);
+		ProfileManagerImpl.getInstance().saveProfile(userProfile);
 	}
 
 	/**
@@ -48,9 +44,7 @@ public class SettingsStorage {
 	public static ThreeCixtySettings load(String uid) throws TooManyConnections {
 		if (!isNotNullOrEmpty(uid)) return null;
 		
-		Map <String, Boolean> attrs = getAttributesForSetting();
-		
-		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid, attrs);
+		UserProfile userProfile = ProfileManagerImpl.getInstance().getProfile(uid);
 		if (userProfile == null) return null;
 
 		ThreeCixtySettings settings = new ThreeCixtySettings();
@@ -185,14 +179,6 @@ public class SettingsStorage {
 		if (settings.getCurrentLongitude() != 0) {
 			addr.setLongitute(settings.getCurrentLongitude());
 		}
-	}
-	
-	private static Map <String, Boolean> getAttributesForSetting() {
-		Map <String, Boolean> attrs = new HashMap <String, Boolean>();
-		attrs.put(ProfileManager.ATTRIBUTE_NAME, true);
-		attrs.put(ProfileManager.ATTRIBUTE_ADDRESS, true);
-		attrs.put(ProfileManager.ATTRIBUTE_PROFILE_IDENTITIES, true);
-		return attrs;
 	}
 
 	/**

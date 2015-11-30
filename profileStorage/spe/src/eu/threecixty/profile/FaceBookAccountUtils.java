@@ -2,7 +2,6 @@ package eu.threecixty.profile;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -77,10 +76,8 @@ public class FaceBookAccountUtils {
 			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, uid, SPEConstants.FACEBOOK_SOURCE);
 			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, uid, SPEConstants.FACEBOOK_SOURCE, profileIdentities);
 			
-			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
-			
 			if (generalInfoModified || profileIdentitiesModified) {
-				boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+				boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile);
 				if (successful) {
 					updateKnows(accessToken, uid, profile);
 				}

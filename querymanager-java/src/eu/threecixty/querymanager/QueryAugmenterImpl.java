@@ -66,7 +66,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 		if (original == null) return null;
 		if (uid == null) return original;
 		try {
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, null);
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
 			if (profile == null) return original;
 			
 			List <String> placeIds = new LinkedList <String>();
@@ -95,7 +95,7 @@ public class QueryAugmenterImpl implements QueryAugmenter {
 		if (original == null) return null;
 		if (uid == null) return original;
 		try {
-			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid, null);
+			UserProfile profile = ProfileManagerImpl.getInstance().getProfile(uid);
 			if (profile == null) return original;
 			List <String> placeIds = new LinkedList <String>();
 			List <Double> socialScores = new LinkedList <Double>();

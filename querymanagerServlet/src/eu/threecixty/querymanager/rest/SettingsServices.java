@@ -193,10 +193,10 @@ public class SettingsServices {
 					}
 				}
 				
-				Set <String> googleKnows = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getKnows();
-				Set <String> fbKnows = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getKnows();
+				Set <String> googleKnows = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle).getKnows();
+				Set <String> fbKnows = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook).getKnows();
 								
-				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
+				UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid());
 				Set <String> knows = profile.getKnows();
 				if (knows == null) {
 					knows = new HashSet<String>();
@@ -215,8 +215,8 @@ public class SettingsServices {
 					}
 				}
 				// always use Google profile image if existed
-				String googleProfileImage = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null).getProfileImage();
-				String fbProfileImage = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null).getProfileImage();
+				String googleProfileImage = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle).getProfileImage();
+				String fbProfileImage = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook).getProfileImage();
 				if (googleProfileImage == null) {
 					if (fbProfileImage != null) profile.setProfileImage(fbProfileImage);
 				} else {
@@ -228,16 +228,16 @@ public class SettingsServices {
 					pis = new HashSet<ProfileIdentities>();
 					profile.setHasProfileIdenties(pis);
 				}
-				String g_user_id = uidDerivedFromGoogle == null ? null: ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle, null), SPEConstants.GOOGLE_SOURCE);
+				String g_user_id = uidDerivedFromGoogle == null ? null: ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromGoogle), SPEConstants.GOOGLE_SOURCE);
 				if (g_user_id != null) eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), g_user_id, SPEConstants.GOOGLE_SOURCE, pis);
 				
-				String fb_user_id = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook, null), SPEConstants.FACEBOOK_SOURCE);
+				String fb_user_id = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().findAccountId(ProfileManagerImpl.getInstance().getProfile(uidDerivedFromFacebook), SPEConstants.FACEBOOK_SOURCE);
 				if (fb_user_id != null) eu.threecixty.profile.Utils.setProfileIdentities(profile.getHasUID(), fb_user_id, SPEConstants.FACEBOOK_SOURCE, pis);
 				
 				if (uidDerivedFromGoogle != null) ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromGoogle);
 				if (uidDerivedFromFacebook != null) ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uidDerivedFromFacebook);
 				
-				ProfileManagerImpl.getInstance().saveProfile(profile, null);
+				ProfileManagerImpl.getInstance().saveProfile(profile);
 				
 				List <Friend> allFriendsHavingMyUIDDerivedFromGoogleInKnows = uidDerivedFromGoogle == null ? null : ProfileManagerImpl.getInstance().findAll3cixtyFriendsHavingMyUIDInKnows(uidDerivedFromGoogle);
 				List <Friend> allFriendsHavingMyUIDDerivedFromFacebookInKnows = uidDerivedFromFacebook == null ? null : ProfileManagerImpl.getInstance().findAll3cixtyFriendsHavingMyUIDInKnows(uidDerivedFromFacebook);
@@ -326,14 +326,14 @@ public class SettingsServices {
 			String uidDerivedFromOutSide, String newUID) throws TooManyConnections {
 		if (allFriendsHavingMyUIDInKnows != null) {
 			for (Friend friend: allFriendsHavingMyUIDInKnows) {
-				UserProfile tmpUP = ProfileManagerImpl.getInstance().getProfile(friend.getUid(), null);
+				UserProfile tmpUP = ProfileManagerImpl.getInstance().getProfile(friend.getUid());
 				if (tmpUP == null) continue;
 				Set <String> tmpKnows = tmpUP.getKnows();
 				if (tmpKnows != null) {
 					tmpKnows.remove(uidDerivedFromOutSide);
 					tmpKnows.add(newUID);
 					tmpUP.setKnows(tmpKnows);
-					ProfileManagerImpl.getInstance().saveProfile(tmpUP, null);
+					ProfileManagerImpl.getInstance().saveProfile(tmpUP);
 				}
 			}
 		}
@@ -415,7 +415,7 @@ public class SettingsServices {
 			
 			if (ok) {
 				try {
-					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
+					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid());
 					Set <String> newKnows = profile.getKnows();
 					if (newKnows != null) {
 						newKnows.remove(friendUid);
@@ -474,7 +474,7 @@ public class SettingsServices {
 			if (DEBUG_MOD) LOGGER.info("Check Friends list: " + setOfFriendUIDs);
 			if (ok) {
 				try {
-					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid(), null);
+					UserProfile profile = ProfileManagerImpl.getInstance().getProfile(userAccessToken.getUid());
 					Set <String> oldKnows = profile.getKnows();
 					Set <String> newKnows = new HashSet <String>();
 					if (oldKnows != null) {
@@ -485,7 +485,7 @@ public class SettingsServices {
 						if (DEBUG_MOD) LOGGER.info("Before updating knows: " + newKnows);
 						profile.setKnows(newKnows);
 						ProfileManagerImpl.getInstance().updateKnows(profile, newKnows);
-						ProfileManagerImpl.getInstance().saveProfile(profile, null);
+						ProfileManagerImpl.getInstance().saveProfile(profile);
 					}
 					return Response.ok().build();
 				} catch (TooManyConnections e) {
@@ -544,7 +544,7 @@ public class SettingsServices {
 	 */
 	public static int madeOf(String _3cixtyUID) throws TooManyConnections {
 		if (_3cixtyUID == null) return 1;
-		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID, null);
+		UserProfile profile = ProfileManagerImpl.getInstance().getProfile(_3cixtyUID);
 		if (profile == null) return 1;
 		Set <ProfileIdentities> pis = profile.getHasProfileIdenties();
 		if (pis == null) return 1;

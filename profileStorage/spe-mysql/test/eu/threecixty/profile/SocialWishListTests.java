@@ -20,16 +20,16 @@ public class SocialWishListTests {
 		knows.add(know1);
 		knows.add(know2);
 		userProfile.setKnows(knows);
-		new MySQLProfileManagerImpl().saveProfile(userProfile, null);
+		new MySQLProfileManagerImpl().saveProfile(userProfile);
 		
-		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID, null);
+		UserProfile loadedProfile = new MySQLProfileManagerImpl().getProfile(_3cixtyUID);
 		Assert.assertNotNull(loadedProfile);
 		
 		
 		// create know1 profile with two trays
 		UserProfile profile1 = new UserProfile();
 		userProfile.setHasUID(know1);
-		new MySQLProfileManagerImpl().saveProfile(profile1, null);
+		new MySQLProfileManagerImpl().saveProfile(profile1);
 		String elementId1 = "Tray 0001";
 		String type = "Poi";
 		Tray tray1 = createTray(know1, elementId1, type);
@@ -41,7 +41,7 @@ public class SocialWishListTests {
 		// create know2 profile with one tray
 		UserProfile profile2 = new UserProfile();
 		userProfile.setHasUID(know2);
-		new MySQLProfileManagerImpl().saveProfile(profile2, null);
+		new MySQLProfileManagerImpl().saveProfile(profile2);
 		String elementId3 = "Tray 0003";
 		Tray tray3 = createTray(know1, elementId3, type);
 		MySQLTrayManager.getInstance().addTray(tray3);

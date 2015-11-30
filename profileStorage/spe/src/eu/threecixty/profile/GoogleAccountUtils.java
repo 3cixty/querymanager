@@ -3,7 +3,6 @@ package eu.threecixty.profile;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -117,11 +116,10 @@ public class GoogleAccountUtils {
 			
 			boolean profileIdentitiesModified = Utils.checkProfileIdentitiesModified(profileIdentities, user_id, SPEConstants.GOOGLE_SOURCE);
 			if (profileIdentitiesModified) Utils.setProfileIdentities(_3cixtyUID, user_id, SPEConstants.GOOGLE_SOURCE, profileIdentities);
-			
-			Map <String, Boolean> attrs = Utils.getAttributesToStoreForCrawlingSocialProfile();
+
 			try {
 				if (generalInfoModified || profileIdentitiesModified) {
-					boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile, attrs);
+					boolean successful = ProfileManagerImpl.getInstance().saveProfile(profile);
 					if (successful) {
 						updateKnows(accessToken, user_id, profile);
 					}
