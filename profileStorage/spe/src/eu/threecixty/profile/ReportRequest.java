@@ -1,5 +1,13 @@
 package eu.threecixty.profile;
 
+/**
+ * 
+ * This class represents a reporting request sent from Mobile Guide apps.
+ * Please visit the documentation at https://docs.google.com/document/d/1sSLww8gZVepBsTWs6asT0W4P17j6zfiSqhIvim254mw/edit
+ * for more detail.
+ * <br>
+ * Note that some fields in this class can be null.
+ */
 public class ReportRequest {
 
 	private String clientTimeStamp;

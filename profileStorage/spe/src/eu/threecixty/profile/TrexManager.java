@@ -12,6 +12,11 @@ import org.json.JSONObject;
 
 import eu.threecixty.Configuration;
 
+/**
+ * 
+ * The class is used to publish WishList actions to Trex server.
+ *
+ */
 public class TrexManager {
 	
 	 private static final Logger LOGGER = Logger.getLogger(
@@ -21,6 +26,8 @@ public class TrexManager {
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
 	private static final TrexManager SINGLETON = new TrexManager();
+	
+	/**The attribute which creates a thread pool of two threads to publish WishList action to Trex server*/
 	private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
 	
 	public static TrexManager getInstance() {

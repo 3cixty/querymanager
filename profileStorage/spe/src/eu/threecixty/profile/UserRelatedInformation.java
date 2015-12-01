@@ -6,12 +6,21 @@ import java.util.Set;
 import eu.threecixty.profile.elements.ElementDetails;
 import eu.threecixty.profile.oldmodels.Accompanying;
 
+/**
+ * 
+ * This class is used to represent all personal information stored by 3cixty platform.
+ * The class is used to address the question about user privacy.
+ *
+ */
 public class UserRelatedInformation {
 
 	private String firstName;
 	private String lastName;
+	/**Google account, Facebook account, Mobidot account*/
 	private List <AssociatedAccount> accounts;
 	private List <ElementDetails> wishesList;
+	
+	/**The attribute which contains information about what the user knows (about other users)*/
 	private List <Friend> knows;
 	private List <Friend> peopleHaveMeInKnows;
 	private Set <Accompanying> accompanyings;

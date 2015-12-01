@@ -10,6 +10,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+/**
+ * 
+ * Utility class to calculate cell IDs within a given distance from a given point.
+ *
+ */
 public class CellUtils {
 	
 

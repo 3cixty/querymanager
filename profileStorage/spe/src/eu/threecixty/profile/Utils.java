@@ -38,6 +38,13 @@ public class Utils {
 		return NO_SOCIAL_NETWORK_PREFIX + originalUID;
 	}
 
+	/**
+	 * This method adds a given UID which can be Google UID, Facebook UID, Mobidot UID to the user profile.
+	 * @param _3cixtyUID
+	 * @param uid
+	 * @param source
+	 * @param profileIdentities
+	 */
 	public static void setProfileIdentities(String _3cixtyUID, String uid, String source,
 			Set<ProfileIdentities> profileIdentities) {
 		boolean found = false;
@@ -51,6 +58,16 @@ public class Utils {
 		addProfileIdentities(_3cixtyUID, uid, source, profileIdentities);
 	}
 	
+	/**
+	 * This method gets 3cixty UIDs for a list of UIDs (Google UIDs, or Facebook UIDs).
+	 * If there is any UIDs which doesn't correspond with a 3cixty UID, then the method
+	 * will create a new 3cixty UID for the UID.
+	 * @param uids
+	 * @param source
+	 * @return
+	 * @throws IOException
+	 * @throws UnknownException
+	 */
 	protected static Set <String> getOrCreate3cixtyUIDsForKnows(List <String> uids,
 			String source) throws IOException, UnknownException {
 		List <String> unfoundAccountIds = new LinkedList<String>();

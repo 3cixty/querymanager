@@ -1,5 +1,10 @@
 package eu.threecixty.profile;
 
+/**
+ * 
+ * This class is used to represent a review to be exported to JSON format.
+ *
+ */
 public class Review {
 	private String text;
 	private boolean translated;

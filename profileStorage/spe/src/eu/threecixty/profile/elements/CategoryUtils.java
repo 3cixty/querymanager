@@ -10,6 +10,11 @@ import org.json.JSONObject;
 
 import eu.threecixty.profile.SparqlEndPointUtils;
 
+/**
+ * 
+ * Utility class to get top categories from KB.
+ *
+ */
 public class CategoryUtils {
 	
 	public static List <String> getTopCategories(String endPointUrl) throws IOException {

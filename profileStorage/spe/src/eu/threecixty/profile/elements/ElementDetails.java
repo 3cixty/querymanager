@@ -4,7 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * 
+ * This class is used to represent an item which can be an Event or a PoI so that
+ * it's easy to export to JSON format. All results to the call from Mobile Guide apps
+ * should be represented by this class.
+ *
+ */
 public class ElementDetails {
 	
 	protected static final String TRANSLATION_TAG = "-tr";
@@ -30,8 +36,8 @@ public class ElementDetails {
 	
 	// asked by Christian to avoid calling API twice to get trays list in detail
 	private Long creationTimestamp;
-	private String attend_datetime;
-	private Integer rating;
+	private String attend_datetime; // for WishList purpose
+	private Integer rating; // for WishList purpose
 	
 	// for highlighting results
 	private Boolean highlighted;

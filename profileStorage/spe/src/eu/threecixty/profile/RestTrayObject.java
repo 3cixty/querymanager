@@ -1,5 +1,13 @@
 package eu.threecixty.profile;
 
+/**
+ * This class represents a WishList request.
+ * Please visit the documentation at https://docs.google.com/document/d/11yKLBgdIr_JgU4SXqP8gF0QTndDQOMW-_xAj_9maPkc/edit
+ * for more detail.
+ * <br>
+ * Note that some fields in this class can be null.
+ *
+ */
 public class RestTrayObject {
 
 	private String action;

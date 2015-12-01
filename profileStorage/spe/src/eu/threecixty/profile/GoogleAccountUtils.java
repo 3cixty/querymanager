@@ -27,6 +27,28 @@ public class GoogleAccountUtils {
 			 GoogleAccountUtils.class.getName());
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
+	/**
+	/**
+	 * Input: 		a Google access token.
+	 * Output: 		3cixty UID.
+	 * 
+	 * <br>
+	 * <br>
+	 * The method does the following things:
+	 * <pre>
+	 * 1. Extract Google UID, firstName, lastName, and profile image.
+	 * 2. Extract friends list if the user gives permission to 3cixty to crawl it.
+	 * 3. Check whether or not there is a profile corresponding with this Google UID. If yes, go to step 4; otherwise, go to step 5.
+	 * 4. Update user profile into MySQL.
+	 * 5. Create a new user profile and persist in MySQL.
+	 * </pre>
+	 * Each Google UID is always considered to contain a ProfileIdentities which is used to distinguish
+	 * from which source the user profile is. Besides, the method also checks whether or not there is any
+	 * friends in the forgotten list to be ignored by crawling job.
+	 *
+	 * @param accessToken
+	 * @return
+	 */
 	public static String getUID(String accessToken) {
 		if (accessToken == null) return "";
 		String user_id = null;
@@ -92,6 +114,11 @@ public class GoogleAccountUtils {
 		return _3cixtyUID;
 	}
 	
+	/**
+	 * Checks whether or not the is a user profile corresponding with a given Google access token.
+	 * @param accessToken
+	 * @return
+	 */
 	public static boolean existUserProfile(String accessToken) {
 		try {
 			String reqMsg = Utils.readUrl(
@@ -106,12 +133,24 @@ public class GoogleAccountUtils {
 		return false;
 	}
 	
+	/**
+	 * Updates knows from different threads.
+	 * @param accessToken
+	 * @param user_id
+	 * @param profile
+	 */
 	private static void updateKnows(String accessToken, String user_id,
 			UserProfile profile) {
 		KnowsPersistence persistence = new KnowsPersistence(accessToken, SPEConstants.GOOGLE_SOURCE, user_id, profile);
-		PersistenceWorkerManager.getInstance().add(persistence);
+		PersistenceWorkerManager.getInstance().add(persistence); // create a task to run on background
 	}
 
+	/**
+	 * Get the list of friends UID from Google Plus.
+	 * @param accessToken
+	 * @return
+	 * @throws Exception
+	 */
 	protected static List <String> getGoogleUidsOfFriends(String accessToken) throws Exception {
 		String nextPageToken = null;
 		List <String> googleUidsOfFriends = new LinkedList <String>();

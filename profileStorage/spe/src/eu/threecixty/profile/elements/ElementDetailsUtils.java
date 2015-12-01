@@ -19,8 +19,7 @@ import eu.threecixty.profile.SparqlEndPointUtils;
 
 
 /**
- * This is a utility class to get a list of events or PoIs in details as requested by TI team.
- * @author Cong-Kinh Nguyen
+ * Utility class to get a list of events or PoIs in details as requested by TI team.
  *
  */
 public class ElementDetailsUtils {

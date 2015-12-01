@@ -8,6 +8,11 @@ import org.apache.log4j.Logger;
 
 import eu.threecixty.db.PersistentObjectForWorker;
 
+/**
+ * 
+ * This class is to save or update knows.
+ *
+ */
 public class KnowsPersistence implements PersistentObjectForWorker {
 	
 	private static final Logger LOGGER = Logger.getLogger(

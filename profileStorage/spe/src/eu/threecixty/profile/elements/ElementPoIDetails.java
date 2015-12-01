@@ -8,6 +8,11 @@ import java.util.Map;
 
 import eu.threecixty.profile.Review;
 
+/**
+ * 
+ * This class represents a PoI in detail.
+ *
+ */
 public class ElementPoIDetails extends ElementDetails {
 	
 	 //private static final Logger LOGGER = Logger.getLogger(

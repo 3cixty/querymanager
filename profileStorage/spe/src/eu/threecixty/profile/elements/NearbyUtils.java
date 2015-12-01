@@ -16,7 +16,11 @@ import org.json.JSONObject;
 import eu.threecixty.profile.SparqlEndPointUtils;
 
 
-//TODO: need to remove condition with new Virtuoso updated
+/**
+ * 
+ * Utility class to make nearby queries.
+ *
+ */
 public class NearbyUtils {
 	
 	private static final double MIN_LAT = 45.35668565341486;
@@ -34,7 +38,32 @@ public class NearbyUtils {
 	 /**Attribute which is used to improve performance for logging out information*/
 	 private static final boolean DEBUG_MOD = LOGGER.isInfoEnabled();
 
-	public static List <ElementDetails> getNearbyEvents(String city, String endPointUrl, String eventGraph, double lat, double lon, String[] categories, String[] languages,
+	/**
+	 * Get nearby events from a given latitude and longitude.
+	 * <br>
+	 * In order to improve total performance, the method does two things
+	 * <pre>
+	 * 1. Create a nearby event query to just get the list of event IDs and distances.
+	 * 2. Get all detail information about the list of event IDs received in step 1. 
+	 * </pre>
+	 * 
+	 * @param city
+	 * @param endPointUrl
+	 * @param eventGraph
+	 * @param lat
+	 * @param lon
+	 * @param categories
+	 * @param languages
+	 * @param distance
+	 * @param offset
+	 * @param limit
+	 * @param notId
+	 * @param listEventsFromFriendsWishlist
+	 * @return
+	 * @throws IOException
+	 */
+	public static List <ElementDetails> getNearbyEvents(String city, String endPointUrl,
+			String eventGraph, double lat, double lon, String[] categories, String[] languages,
 			double distance, int offset, int limit, String notId,
 			List <String> listEventsFromFriendsWishlist) throws IOException {
 		
@@ -112,7 +141,29 @@ public class NearbyUtils {
 		return getNearbyEvents(endPointUrl, eventGraph, builder.toString(), categories, languages, listEventsFromFriendsWishlist);
 	}
 	
-	public static List <ElementDetails> getNearbyEvents(String city, String endPointUrl, String eventGraph, String id, String[] categories, String[] languages,
+	/**
+	 * Get nearby events from a given event ID.
+	 * <br>
+	 * In order to improve total performance, the method does two things
+	 * <pre>
+	 * 1. Create a nearby event query to just get the list of event IDs and distances.
+	 * 2. Get all detail information about the list of event IDs received in step 1. 
+	 * </pre>
+	 * 
+	 * @param city
+	 * @param endPointUrl
+	 * @param eventGraph
+	 * @param id
+	 * @param categories
+	 * @param languages
+	 * @param distance
+	 * @param offset
+	 * @param limit
+	 * @return
+	 * @throws IOException
+	 */
+	public static List <ElementDetails> getNearbyEvents(String city, String endPointUrl,
+			String eventGraph, String id, String[] categories, String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(id)) return new LinkedList <ElementDetails>();
 		StringBuilder builder = new StringBuilder("SELECT ?lat ?lon \n");
@@ -152,7 +203,32 @@ public class NearbyUtils {
 		return getNearbyEvents(city, endPointUrl, eventGraph, lat, lon, categories, languages, distance, offset, limit, id, null);
 	}
 	
-	public static List <ElementDetails> getNearbyPoIElements(String city, String endPointUrl, String poiGraph, double lat, double lon,
+	/**
+	 * Get nearby PoIs from a given latitude and longitude.
+	 * <br>
+	 * In order to improve total performance, the method does two things
+	 * <pre>
+	 * 1. Create a nearby PoI query to just get the list of PoI IDs and distances.
+	 * 2. Get all detail information about the list of PoI IDs received in step 1. 
+	 * </pre>
+	 *
+	 * @param city
+	 * @param endPointUrl
+	 * @param poiGraph
+	 * @param lat
+	 * @param lon
+	 * @param categories
+	 * @param topCategories
+	 * @param languages
+	 * @param distance
+	 * @param offset
+	 * @param limit
+	 * @param listPoIsFromFriendsWishlist
+	 * @return
+	 * @throws IOException
+	 */
+	public static List <ElementDetails> getNearbyPoIElements(String city,
+			String endPointUrl, String poiGraph, double lat, double lon,
 			String[] categories, String[] topCategories, String[] languages,
 			double distance, int offset, int limit,
 			List <String> listPoIsFromFriendsWishlist) throws IOException {
@@ -221,16 +297,28 @@ public class NearbyUtils {
 	}
 	
 	/**
-	 * Gets nearby locations based on a given location ID and other parameters.
+	 * Get nearby PoIs from a given latitude and longitude.
+	 * <br>
+	 * In order to improve total performance, the method does two things
+	 * <pre>
+	 * 1. Create a nearby PoI query to just get the list of event IDs and distances.
+	 * 2. Get all detail information about the list of PoI IDs received in step 1. 
+	 * </pre>
+	 *
+	 * @param endPointUrl
+	 * @param poiGraph
 	 * @param locId
-	 * @param category
+	 * @param categories
+	 * @param topCategories
+	 * @param languages
 	 * @param distance
 	 * @param offset
 	 * @param limit
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> getNearbyPoIElements(String endPointUrl, String poiGraph, String locId, String[] categories, String[] topCategories,
+	public static List <ElementDetails> getNearbyPoIElements(String endPointUrl,
+			String poiGraph, String locId, String[] categories, String[] topCategories,
 			String[] languages,
 			double distance, int offset, int limit) throws IOException {
 		if (isNullOrEmpty(locId)) return new LinkedList <ElementDetails>();

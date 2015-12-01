@@ -13,6 +13,11 @@ import org.json.JSONObject;
 
 import eu.threecixty.partners.PartnerAccount;
 
+/**
+ * 
+ * Utility class to create, retrieve Mobidot users.
+ *
+ */
 public class MobidotUserUtils {
 	private static final Logger LOGGER = Logger.getLogger(
 			MobidotUserUtils.class.getName());
@@ -27,7 +32,7 @@ public class MobidotUserUtils {
 	 
 	 public static int getMobidotId(String uid) {
 		 if (uid == null || "".equals(uid)) return -1;
-		 PartnerAccount account = PartnerAccountUtils.retrieveMobidotUser(uid);
+		 PartnerAccount account = PartnerAccountUtils.retrieveMobidotUser(uid); // check in 3cixty database
 		 if (account == null) return -1;
 		 return Integer.parseInt(account.getUser_id().trim());
 	 }
@@ -81,6 +86,12 @@ public class MobidotUserUtils {
 			else return null;
 		}
 	 
+	 /**
+	  * Get Mobidot User ID from Mobidot user name.
+	  * @param username
+	  * @return
+	  * @throws Exception
+	  */
 	 public static String getMobidotID(String username) throws Exception{
 		 if (DEBUG_MOD) LOGGER.info("Start check Mobidot user");
 			

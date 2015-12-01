@@ -1,5 +1,10 @@
 package eu.threecixty.profile.elements;
 
+/**
+ * 
+ * The class represents an event in detail.
+ *
+ */
 public class ElementEventDetails extends ElementDetails {
 
 	

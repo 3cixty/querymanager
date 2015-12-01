@@ -11,7 +11,11 @@ import org.apache.log4j.Logger;
 
 import eu.threecixty.cache.CacheManager;
 
-
+/**
+ * 
+ * This class is used to send SPARQL queries to Virtuoso and receive results.
+ *
+ */
 public class SparqlEndPointUtils {
 	
 	 private static final Logger LOGGER = Logger.getLogger(
@@ -25,7 +29,19 @@ public class SparqlEndPointUtils {
 	public static final String HTTP_POST = "POST";
 	public static final String HTTP_GET = "GET";
 	
-	
+	/**
+	 * This method sends the given query to KB and receives data, then store the data in the string builder.
+	 *
+	 * @param query
+	 * @param format
+	 * @param httpMethod
+	 * 				The HTTP method. The value can be either <code>GET</code> or <code>POST</code>.
+	 * @param endPointUrl
+	 * 				The SPARQL endpoint.
+	 * @param result
+	 * 				The string builder to contain data received from KB by executing the query.
+	 * @throws IOException
+	 */
 	public static void executeQueryViaSPARQL(String query, String format,
 			String httpMethod, String endPointUrl, StringBuilder result) throws IOException {
 		long startTime = System.currentTimeMillis();
@@ -45,20 +61,35 @@ public class SparqlEndPointUtils {
 //		}
 	}
 
+	/**
+	 * Sends the SPARQL queries to KB via HTTP GET method, and store result in the string builder.
+	 * @param query
+	 * @param format
+	 * @param endPointUrl
+	 * @param result
+	 * @throws IOException
+	 */
 	private static void executeQueryViaSPARQL_GET(String query, String format, String endPointUrl, StringBuilder result) throws IOException {
 		String urlStr = endPointUrl + "?debug=on&default-graph-uri=&query=" + URLEncoder.encode(query, "UTF-8");
 			urlStr += "&format=" + URLEncoder.encode(format, "UTF-8");
 			URL url = new URL(urlStr);
-	
 			InputStream input = url.openStream();
-		byte [] b = new byte[1024];
-		int readBytes = 0;
+			byte [] b = new byte[1024];
+			int readBytes = 0;
 			while ((readBytes = input.read(b)) >= 0) {
-			result.append(new String(b, 0, readBytes, "UTF-8"));
+				result.append(new String(b, 0, readBytes, "UTF-8"));
 			}
-		input.close();
+			input.close();
 	}
 	
+	/**
+	 * Sends the SPARQL queries to KB via HTTP POST method, and store result in the string builder.
+	 * @param query
+	 * @param format
+	 * @param endPointUrl
+	 * @param result
+	 * @throws IOException
+	 */
 	private static void executeQueryViaSPARQL_POST(String query, String format, String endPointUrl,
 			StringBuilder result) throws IOException {
 		HttpURLConnection.setFollowRedirects(true);

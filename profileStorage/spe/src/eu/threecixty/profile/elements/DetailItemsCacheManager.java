@@ -4,8 +4,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
+/**
+ * 
+ * This class is used to cache detail about items (Event or PoI) in Tomcat memory.
+ *
+ */
 public class DetailItemsCacheManager {
 	
 	private static final DetailItemsCacheManager INSTANCE = new DetailItemsCacheManager();

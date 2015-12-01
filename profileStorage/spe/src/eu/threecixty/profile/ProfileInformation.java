@@ -3,7 +3,7 @@ package eu.threecixty.profile;
 import eu.threecixty.profile.oldmodels.Preference;
 
 /**
- * This class is to represent information which is provided at SPE API.
+ * This class is to represent information which is provided at SPE API (for getting user profile).
  * @author Cong-Kinh NGUYEN
  *
  */

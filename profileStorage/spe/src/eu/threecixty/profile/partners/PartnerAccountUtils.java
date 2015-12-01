@@ -10,6 +10,11 @@ import eu.threecixty.partners.PartnerAccount;
 import eu.threecixty.partners.PartnerUser;
 import eu.threecixty.profile.ProfileManagerImpl;
 
+/**
+ * 
+ * Utility class to create, retrieve Mobidot /Goflow user within 3cixty database.
+ *
+ */
 public class PartnerAccountUtils {
 	public static final String MOBIDOT_APP_ID = "MobidotAppID";
 	

@@ -12,6 +12,7 @@ import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
 /**
  * This class is to deal with storing settings information into KB and loading the settings.
+ * @deprecated
  * @author Cong-Kinh NGUYEN
  *
  */

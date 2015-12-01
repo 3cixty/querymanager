@@ -7,6 +7,11 @@ import java.util.concurrent.TimeUnit;
 
 import eu.threecixty.db.PersistentObjectForWorker;
 
+/**
+ * 
+ * This class is used to update knows on background.
+ *
+ */
 public class PersistenceWorkerManager {
 	
 	private volatile ThreadPoolExecutor threadPool;
@@ -30,7 +35,6 @@ public class PersistenceWorkerManager {
 	}
 	
 	public void stop() {
-		// knows and friends are not critical
 		threadPool.shutdown();
 	}
 	
