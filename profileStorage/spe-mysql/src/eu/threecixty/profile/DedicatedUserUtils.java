@@ -17,6 +17,11 @@ import eu.threecixty.userprofile.UserActivation;
 import eu.threecixty.userprofile.UserActivation.ActivationType;
 import eu.threecixty.userprofile.UserModel;
 
+/**
+ * 
+ * Utility class to create, update and activate 3cixty dedicated accounts in database. 
+ *
+ */
 public class DedicatedUserUtils {
 	
 	private static final int ITERATION_NUMBER = 1000;

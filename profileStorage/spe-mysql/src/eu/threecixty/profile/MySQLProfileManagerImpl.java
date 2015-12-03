@@ -13,6 +13,11 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
 import eu.threecixty.profile.oldmodels.Address;
 import eu.threecixty.profile.oldmodels.ProfileIdentities;
 
+/**
+ * 
+ * Implementation of ProfileManager to manipulate user profile with mySQL database.
+ *
+ */
 class MySQLProfileManagerImpl implements ProfileManager {
 	
 	private static final int DEFAULT_MINIMUM_NUMBER_OF_TIMES_VISITED = 1;

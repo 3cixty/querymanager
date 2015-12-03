@@ -8,6 +8,11 @@ import eu.threecixty.profile.oldmodels.Accompanying;
 import eu.threecixty.userprofile.AccompanyingModel;
 import eu.threecixty.userprofile.UserModel;
 
+/**
+ * 
+ * Utility class to persist and read Accompanying to/from 3cixty database.
+ *
+ */
 public class AccompanyingUtils {
 
 	public static boolean findAccompanying(AccompanyingModel am,

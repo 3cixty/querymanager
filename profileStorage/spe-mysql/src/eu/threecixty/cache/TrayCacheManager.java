@@ -9,17 +9,28 @@ import java.util.concurrent.TimeoutException;
 import net.spy.memcached.MemcachedClient;
 import eu.threecixty.profile.Tray;
 
+/**
+ * 
+ * This class is to manipulate WishList items with memcached servers.
+ *
+ */
 public class TrayCacheManager {
 	
 	private static final String TRAY_KEY = "tray";
 	private static final int TIME_OUT_TO_GET_CACHE = 200; // in millisecond
 	
+	/**The attribute which is the list of clients where each client connects to different memcached server*/
 	private List<MemcachedClient> memcachedClients;
 	
 	public static TrayCacheManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 	
+	/**
+	 * Gets the list of Trays from a given token.
+	 * @param token
+	 * @return
+	 */
 	public List <Tray> getTrays(String token) {
 		if (token == null) return null;
 		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TRAY_KEY + token);
@@ -48,6 +59,12 @@ public class TrayCacheManager {
 		return null;
 	}
 	
+	/**
+	 * Gets the Tray from a given token and a given ID.
+	 * @param token
+	 * @param elementId
+	 * @return
+	 */
 	public Tray getTray(String token, String elementId) {
 		List <Tray> list = getTrays(token);
 		if (list == null) return null;
@@ -57,6 +74,10 @@ public class TrayCacheManager {
 		return null;
 	}
 	
+	/**
+	 * Persists a given Tray in memcached server.
+	 * @param tray
+	 */
 	public void putTray(Tray tray) {
 		if (tray == null) return;
 		List <Tray> list = getTrays(tray.getToken());
@@ -78,6 +99,10 @@ public class TrayCacheManager {
 		putData(tray.getToken(), list);
 	}
 	
+	/**
+	 * Removes a given Tray from memcached server.
+	 * @param tray
+	 */
 	public void removeTray(Tray tray) {
 		List <Tray> list = getTrays(tray == null ? null : tray.getToken());
 		if (list == null) return;
@@ -96,6 +121,10 @@ public class TrayCacheManager {
 		}
 	}
 	
+	/**
+	 * Removes the corresponding Trays of a given token from memcached server.
+	 * @param token
+	 */
 	public void removeTrays(String token) {
 		if (token == null) return;
 		MemcachedClient memcachedClient = MemcachedUtils.getMemcachedClient(memcachedClients, TRAY_KEY + token);
@@ -105,6 +134,10 @@ public class TrayCacheManager {
 		}
 	}
 	
+	/**
+	 * Persists a list of Trays to memcached server.
+	 * @param trays
+	 */
 	public void addTrays(List <Tray> trays) {
 		if (trays == null || trays.size() == 0) return;
 		String token = trays.get(0).getToken();

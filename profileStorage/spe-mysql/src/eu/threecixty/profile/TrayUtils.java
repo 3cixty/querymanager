@@ -11,6 +11,11 @@ import org.hibernate.Session;
 import eu.threecixty.db.HibernateUtil;
 import eu.threecixty.userprofile.TrayModel;
 
+/**
+ * 
+ * Utility class to manipulate Tray with mySQL database.
+ *
+ */
 public class TrayUtils {
 
     private static final Logger LOGGER = Logger.getLogger(

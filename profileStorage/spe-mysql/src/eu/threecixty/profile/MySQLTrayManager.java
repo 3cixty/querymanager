@@ -9,6 +9,11 @@ import java.util.List;
 import eu.threecixty.cache.TrayCacheManager;
 import eu.threecixty.profile.Tray.OrderType;
 
+/**
+ * 
+ * Implementation of TrayManager to manipulate WishList items with mySQL database.
+ *
+ */
 public class MySQLTrayManager implements TrayManager {
 	
 	private static final TrayManager instance = new MySQLTrayManager();
@@ -21,7 +26,7 @@ public class MySQLTrayManager implements TrayManager {
 			TooManyConnections {
 		boolean successful = TrayUtils.addTray(tray);
 		if (successful) {
-			TrayCacheManager.getInstance().putTray(tray);
+			TrayCacheManager.getInstance().putTray(tray); // cache Tray
 			TrexManager.getInstance().publish(tray.getElement_id(),
 					tray.getElement_title(), tray.getImage_url());
 		}
@@ -31,7 +36,7 @@ public class MySQLTrayManager implements TrayManager {
 	public boolean cleanTrays(String token) throws InvalidTrayElement,
 			TooManyConnections {
 		boolean successful = TrayUtils.cleanTrays(token);
-		if (successful) TrayCacheManager.getInstance().removeTrays(token);
+		if (successful) TrayCacheManager.getInstance().removeTrays(token); // remove caching
 		return successful;
 	}
 

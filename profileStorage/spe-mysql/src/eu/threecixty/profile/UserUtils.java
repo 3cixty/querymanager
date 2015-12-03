@@ -27,7 +27,11 @@ import eu.threecixty.userprofile.AccountModel;
 import eu.threecixty.userprofile.AddressModel;
 import eu.threecixty.userprofile.UserModel;
 
-
+/**
+ * 
+ * Utility class to manipulate the user profile with mySQL database.
+ *
+ */
 public class UserUtils {
 	
 	public static final String MOBIDOT = "Mobidot";

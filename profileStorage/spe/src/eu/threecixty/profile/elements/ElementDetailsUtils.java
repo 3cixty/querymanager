@@ -45,7 +45,8 @@ public class ElementDetailsUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List <ElementDetails> createEventsDetails(String endPointUrl, String eventGraph, Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
+	public static List <ElementDetails> createEventsDetails(String endPointUrl, String eventGraph,
+			Collection <String> eventIds, String[] categories, String[] languages) throws IOException {
 		if (eventIds == null || eventIds.size() == 0) return Collections.emptyList();
 		
 		List <ElementDetails> finalList = new ArrayList <ElementDetails>();
