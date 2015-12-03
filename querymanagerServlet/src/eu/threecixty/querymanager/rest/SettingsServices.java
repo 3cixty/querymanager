@@ -34,7 +34,6 @@ import eu.threecixty.profile.InvalidTrayElement;
 import eu.threecixty.profile.ProfileManagerImpl;
 import eu.threecixty.profile.SPEConstants;
 import eu.threecixty.profile.TooManyConnections;
-
 import eu.threecixty.profile.Tray;
 import eu.threecixty.profile.UserProfile;
 import eu.threecixty.profile.UserRelatedInformation;
@@ -379,6 +378,36 @@ public class SettingsServices {
 			}
 		} catch (IOException e2) {
 			e2.printStackTrace();
+		}
+	}
+	
+	/**
+	 * This method is called when administrator wants to let 3cixty backend know that the
+	 * given UID is marked to avoid being crawled next times. But the method still keeps
+	 * information existed in database about the corresponding user of the given UID.
+	 * <br>
+	 * This API uses HTTP session for admin, so it can be invoked after signing in with
+	 * admin user name and password.
+	 * <br>
+	 * Note: third party developers are not able to called this API.
+	 *
+	 * @param uid
+	 * 			3cixty UID.
+	 * @return
+	 */
+	@POST
+	@Path("/deleteUser")
+	public Response deleteUser(@FormParam("access_token") String accessToken) {
+		AccessToken userAccessToken = OAuthWrappers.findAccessTokenFromDB(accessToken);
+		if (userAccessToken != null && OAuthWrappers.validateUserAccessToken(accessToken)) {
+			String uid = userAccessToken.getUid();
+			boolean ok = ProfileManagerImpl.getInstance().getForgottenUserManager().deleteUserProfile(uid);
+			if (ok) {
+				return Response.ok("successfull").build();
+			}
+			return Response.status(500).entity("Sorry, we were unable to perform your request. Please contact with 3cixty for help.").build();
+		} else {
+			return Response.status(400).entity("Sorry, your access token is invalid.").build();
 		}
 	}
 
