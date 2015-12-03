@@ -297,9 +297,10 @@ public class DedicatedUserUtils {
 	 * @param email
 	 * @param password
 	 * @return
+	 * @throws AccountNotActivatedException 
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean checkPassword(String email, String password) {
+	public static boolean checkPassword(String email, String password) throws AccountNotActivatedException {
 		if (isNullOrEmpty(email) || isNullOrEmpty(password)) return false;
 		Session session = null;
 		boolean ok = false;
@@ -313,6 +314,7 @@ public class DedicatedUserUtils {
 			
 			if (list != null && list.size() > 0) {
 				DedicatedUser dedicatedUser = (DedicatedUser) list.get(0);
+				if (!dedicatedUser.isEmailConfirmed()) throw new AccountNotActivatedException();
 				String hashedPassword = hashPassword(password, email);
 				if (hashedPassword.equals(dedicatedUser.getPassword())) {
 					ok = true;

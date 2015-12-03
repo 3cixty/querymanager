@@ -26,6 +26,7 @@ import eu.threecixty.cache.AppCache;
 import eu.threecixty.cache.TokenCacheManager;
 import eu.threecixty.oauth.AccessToken;
 import eu.threecixty.oauth.OAuthWrappers;
+import eu.threecixty.profile.AccountNotActivatedException;
 import eu.threecixty.profile.ActivationException;
 import eu.threecixty.profile.DedicatedUserUtils;
 import eu.threecixty.profile.EmailUtils;
@@ -302,38 +303,42 @@ public class DedicatedUserServices {
 		} catch (Exception e) {
 			return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \""+ e.getMessage() + "\" }").build();
 		}
-		boolean ok = DedicatedUserUtils.checkPassword(email, password);
-		if (ok) {
-			String uid = DedicatedUserUtils.getUid(email);
-			
-			// bypass authorization for 3cixty's apps
-			if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
-				AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, OAuthServices.SCOPES);
-				if (at != null) {
-					if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), OAuthServices.SCOPES, app, at.getExpires_in())) {
-						return redirect_uri_client2(at, at.getExpires_in(), app);
+		try {
+			boolean ok = DedicatedUserUtils.checkPassword(email, password);
+			if (ok) {
+				String uid = DedicatedUserUtils.getUid(email);
+
+				// bypass authorization for 3cixty's apps
+				if (AuthorizationBypassManager.getInstance().isFound(app.getAppkey())) {
+					AccessToken at = OAuthWrappers.createAccessTokenForMobileApp(app, OAuthServices.SCOPES);
+					if (at != null) {
+						if (OAuthWrappers.storeAccessTokenWithUID(uid, at.getAccess_token(), at.getRefresh_token(), OAuthServices.SCOPES, app, at.getExpires_in())) {
+							return redirect_uri_client2(at, at.getExpires_in(), app);
+						}
 					}
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+							" {\"response\": \"failed\" } ").type(MediaType.APPLICATION_JSON_TYPE).build();
 				}
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-						" {\"response\": \"failed\" } ").type(MediaType.APPLICATION_JSON_TYPE).build();
+
+				try {
+
+					return Response.temporaryRedirect(new URI(
+							OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
+									+ OAuthServices.SCOPES + "&client_id="
+									+ app.getAppClientKey() + "&redirect_uri="
+									+ OAuthServices.THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
+											OAuthWrappers.getBasicAuth(app.getAppClientKey(), app.getAppClientPwd()))
+											.header("Access-Control-Allow-Origin", "*")
+											.cacheControl(OAuthServices.cacheControlNoStore())
+											.header("Pragma", "no-cache")
+											.build();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+				return null;
 			}
-			
-			try {
-				
-				return Response.temporaryRedirect(new URI(
-						OAuthWrappers.ENDPOINT_AUTHORIZATION + "?response_type=token&scope="
-				+ OAuthServices.SCOPES + "&client_id="
-				+ app.getAppClientKey() + "&redirect_uri="
-			    + OAuthServices.THREECIXTY_CALLBACK)).header(OAuthWrappers.AUTHORIZATION,
-			    		OAuthWrappers.getBasicAuth(app.getAppClientKey(), app.getAppClientPwd()))
-			    		.header("Access-Control-Allow-Origin", "*")
-	                    .cacheControl(OAuthServices.cacheControlNoStore())
-	                    .header("Pragma", "no-cache")
-			    		.build();
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-			return null;
+		} catch (AccountNotActivatedException e) {
+			return Response.status(400).entity(e.getMessage()).build();
 		}
 		return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \"Your email and password don't match.\"} ").build();
 	}
@@ -371,14 +376,18 @@ public class DedicatedUserServices {
 		} catch (Exception e) {
 			return Response.status(400).entity(" {\"response\": \"failed\", \"reason\": \""+ e.getMessage() + "\" }").build();
 		}
-		boolean ok = DedicatedUserUtils.checkPassword(email, password);
-		if (ok) {
-			String uid = DedicatedUserUtils.getUid(email);
-			Response response = OAuthServices.getAccessTokenFromUid(uid, app, scopes);
-			return response;
+		try {
+			boolean ok = DedicatedUserUtils.checkPassword(email, password);
+			if (ok) {
+				String uid = DedicatedUserUtils.getUid(email);
+				Response response = OAuthServices.getAccessTokenFromUid(uid, app, scopes);
+				return response;
+			}
+			return Response.status(400).entity(
+					" {\"response\": \"failed\", \"reason\": \"Your email and password do not match.\"} ").build();
+		} catch (AccountNotActivatedException e) {
+			return Response.status(400).entity(e.getMessage()).build();
 		}
-		return Response.status(400).entity(
-				" {\"response\": \"failed\", \"reason\": \"Your email and password do not match.\"} ").build();
 
 	}
 	
