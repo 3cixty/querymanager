@@ -36,7 +36,7 @@ public class MySQLTrayManager implements TrayManager {
 	public boolean cleanTrays(String token) throws InvalidTrayElement,
 			TooManyConnections {
 		boolean successful = TrayUtils.cleanTrays(token);
-		if (successful) TrayCacheManager.getInstance().removeTrays(token); // remove caching
+		if (successful) TrayCacheManager.getInstance().removeTrays(token); // remove tray cached
 		return successful;
 	}
 
@@ -44,7 +44,7 @@ public class MySQLTrayManager implements TrayManager {
 			TooManyConnections {
 		boolean successful = TrayUtils.deleteTray(tray);
 		if (successful) {
-			TrayCacheManager.getInstance().removeTray(tray);
+			TrayCacheManager.getInstance().removeTray(tray); // remove tray cached
 		}
 		return successful;
 	}
@@ -56,14 +56,14 @@ public class MySQLTrayManager implements TrayManager {
 
 	public Tray getTray(String token, String elementId) throws InvalidTrayElement,
 			TooManyConnections {
-		Tray tray = TrayCacheManager.getInstance().getTray(token, elementId);
+		Tray tray = TrayCacheManager.getInstance().getTray(token, elementId); // get from cache
 		if (tray != null) return tray;
 		return TrayUtils.getTray(token, elementId);
 	}
 
 	public List<Tray> getTrays(String token) throws InvalidTrayElement,
 			TooManyConnections {
-		List <Tray> trays = TrayCacheManager.getInstance().getTrays(token);
+		List <Tray> trays = TrayCacheManager.getInstance().getTrays(token); // get from cache
 		if (trays != null) return trays;
 		trays = TrayUtils.getTrays(token);
 		TrayCacheManager.getInstance().addTrays(trays);
