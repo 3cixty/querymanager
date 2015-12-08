@@ -28,20 +28,7 @@
 	  <groupId>eu.3cixty</groupId>
 	  <artifactId>spe</artifactId>
 	  <version>1.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>eu.3cixty</groupId>
-          <artifactId>models</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-<!-- 
-    <dependency>
-	  <groupId>org.json</groupId>
-	  <artifactId>json</artifactId>
-	  <version>20140107</version>
-    </dependency>
-      -->       
+    </dependency>      
     <dependency>
 	  <groupId>junit</groupId>
 	  <artifactId>junit</artifactId>
