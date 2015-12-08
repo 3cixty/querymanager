@@ -44,6 +44,9 @@ public class ElementDetails {
 	
 	protected Map <String, String> descriptions;
 	protected Map <String, Boolean> translateds;
+	
+	// additional URLs
+	private List <String> additionalUrls;
 
 	public String getDescription() {
 		return description;
@@ -212,8 +215,16 @@ public class ElementDetails {
 		element.setName(this.getName());
 		element.setSource(this.getSource());
 		element.setUrl(this.getUrl());
+		element.setAdditionalUrls(additionalUrls);
 	}
 	
+	public List<String> getAdditionalUrls() {
+		return additionalUrls;
+	}
+	public void setAdditionalUrls(List<String> additionalUrls) {
+		this.additionalUrls = additionalUrls;
+	}
+
 	public int hashCode() {
 		if (id == null) return -1;
 		return id.hashCode();
