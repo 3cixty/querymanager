@@ -1,3 +1,14 @@
+/*===========================================================
+This file is part of the 3cixty platform software.
+
+The 3cixty platform software contains proprietary and confidential information
+of Inria. All rights reserved. Reproduction, adaptation or distribution, in
+whole or in part, is forbidden except by express written permission of Inria.
+Version v2, December 2015.
+Authors: Cong-Kinh Nguyen, Rachit Agarwal, Animesh Pathak.
+Copyright (C) 2015, Inria.
+===========================================================*/
+
 package eu.threecixty.profile;
 
 import java.io.IOException;
@@ -15,7 +26,6 @@ import eu.threecixty.profile.GpsCoordinateUtils.GpsCoordinate;
  * This class is to switch ProfileManager among implementation versions of a RDF model file, Virtuoso code,
  * and mysql code. This will be done by using a corresponding dependency. By default, mySQL is used to
  * persist user profile.
- * @author Cong Kinh Nguyen
  *
  */
 public class ProfileManagerImpl implements ProfileManager {

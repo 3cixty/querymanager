@@ -1,3 +1,14 @@
+/*===========================================================
+This file is part of the 3cixty platform software.
+
+The 3cixty platform software contains proprietary and confidential information
+of Inria. All rights reserved. Reproduction, adaptation or distribution, in
+whole or in part, is forbidden except by express written permission of Inria.
+Version v2, December 2015.
+Authors: Cong-Kinh Nguyen, Rachit Agarwal, Animesh Pathak.
+Copyright (C) 2015, Inria.
+===========================================================*/
+
 package eu.threecixty.querymanager.rest;
 
 import java.io.IOException;
@@ -48,8 +59,6 @@ import eu.threecixty.querymanager.AdminValidator;
 /**
  * The class is an end point for getting user profile (used by getProfile), and
  * getting all user-related information including profile, knows, WishList, accounts.
- *
- * @author Cong-Kinh Nguyen
  *
  */
 @Path("/" + Constants.PREFIX_NAME)
