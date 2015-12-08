@@ -382,14 +382,10 @@ public class SettingsServices {
 	}
 	
 	/**
-	 * This method is called when administrator wants to let 3cixty backend know that the
-	 * given UID is marked to avoid being crawled next times. But the method still keeps
-	 * information existed in database about the corresponding user of the given UID.
+	 * This method is called when a user wants to remove their data from 3cixty platform.
 	 * <br>
-	 * This API uses HTTP session for admin, so it can be invoked after signing in with
-	 * admin user name and password.
-	 * <br>
-	 * Note: third party developers are not able to called this API.
+	 * Basically, the method deletes all associated user information, then marks an entry
+	 * in the database so that this user won't be crawled from Friends list next times.
 	 *
 	 * @param uid
 	 * 			3cixty UID.
