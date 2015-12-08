@@ -1,3 +1,14 @@
+/*===========================================================
+This file is part of the 3cixty platform software.
+
+The 3cixty platform software contains proprietary and confidential information
+of Inria. All rights reserved. Reproduction, adaptation or distribution, in
+whole or in part, is forbidden except by express written permission of Inria.
+Version v2, December 2015.
+Authors: Cong-Kinh Nguyen, Rachit Agarwal, Animesh Pathak.
+Copyright (C) 2015, Inria.
+===========================================================*/
+
 package com.threecixty.auth;
 
 import java.util.ArrayList;
@@ -16,7 +27,6 @@ import org.json.JSONObject;
  * the end user about permission if the end user doesn't revoke it.
  * <br>
  * <code>expires_in</code> is time in second for the expiration of an access token.
- * @author Cong-Kinh NGUYEN
  *
  */
 public class TokenInfo {
