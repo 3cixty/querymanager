@@ -115,7 +115,6 @@ public class NearbyUtils {
 			int floor = (int) Math.floor(distance / CELL_SIZE) + 1; 
 			if (distance > 0) numberOfCells = floor < numberOfCells ? floor : numberOfCells;
 		}
-		builder.append("FILTER (?dtEndTime > ?thisMillisecond) \n");
 		
 
 		if (!isNullOrEmpty(notId)) {
