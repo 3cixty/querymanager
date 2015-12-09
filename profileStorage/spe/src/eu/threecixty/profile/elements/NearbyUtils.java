@@ -12,8 +12,10 @@ Copyright (C) 2015, Inria.
 package eu.threecixty.profile.elements;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +44,8 @@ public class NearbyUtils {
 	private static final int NUMBER_CELLS_AS_RADIUS_WITHOUT_CATEGORY_POI = 2;
 	private static final int NUMBER_CELLS_AS_RADIUS_WITH_CATEGORY = 15;
 	private static final double CELL_SIZE =CellUtils.DX / 1000; // km
+	
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
 	 private static final Logger LOGGER = Logger.getLogger(
 			 NearbyUtils.class.getName());
@@ -98,12 +102,11 @@ public class NearbyUtils {
 
 		builder.append("BIND(bif:st_distance(?geo, bif:st_point(" + Double.toString(lon) + ", " + Double.toString(lat) + ")) as ?distance) .\n");
 
+		builder.append(" VALUES (?now) {(\"" + getToday() + "\"^^xsd:dateTime)} . \n");
 		builder.append(" ?event lode:atTime ?time. \n");
-		builder.append("              { ?time time:hasEnd ?end .\n");
-		builder.append("              ?end time:inXSDDateTime ?endTime . } \n");
-		builder.append(" UNION {?time time:inXSDDateTime ?endTime . } \n");
-		builder.append("BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . \n");
-		builder.append("BIND (now() AS ?thisMillisecond) . \n");
+		builder.append(" ?time time:hasEnd/time:inXSDDateTime ?endTime .\n");
+		builder.append(" BIND (xsd:dateTime(?endTime) as ?dtEndTime ) . \n");
+		builder.append(" FILTER (?dtEndTime > ?now)  . \n");
 		
 		builder.append("?event locationOnt:cell ?cell .");
 		
@@ -518,6 +521,10 @@ public class NearbyUtils {
 		int tmpLon = (int) Math.floor(((lon - MIN_LON)/(SIZE_LON)));
 		int ret = tmpLat * 100 + tmpLon;
 		return ret;
+	}
+	
+	private static String getToday() {
+		return dateFormat.format(new Date()) + "T00:00Z";
 	}
 	
 	private static boolean isNullOrEmpty(String input) {
