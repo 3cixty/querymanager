@@ -89,12 +89,9 @@ public class ElementDetailsUtils {
 		queryBuff.append("              ?place schema:location ?address .\n");
 		queryBuff.append("              ?address schema:streetAddress ?street .\n");
 		queryBuff.append("              ?address schema:addressLocality ?locality . }\n");
-		queryBuff.append(" OPTIONAL{ ?item lode:atTime ?time.");
-		queryBuff.append("              { ?time time:hasBeginning/time:inXSDDateTime ?beginTime .\n");
-		queryBuff.append("                ?time time:hasEnd/time:inXSDDateTime ?endTime .\n");
-		queryBuff.append("              }\n");
-		queryBuff.append(" UNION { ?time time:inXSDDateTime ?beginTime .  } \n");
-		queryBuff.append("}");
+		queryBuff.append(" ?item lode:atTime ?time. \n");
+		queryBuff.append(" ?time time:hasEnd/time:inXSDDateTime ?endTime .\n");
+		queryBuff.append(" ?time time:hasBeginning/time:inXSDDateTime ?beginTime .\n");
 		queryBuff.append("OPTIONAL{ ?item lode:poster/ma-ont:locator ?image_url .}\n");
 		queryBuff.append("OPTIONAL{ ?item dc:publisher ?source .}\n");
 		
