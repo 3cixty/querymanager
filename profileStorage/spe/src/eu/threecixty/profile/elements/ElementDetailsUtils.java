@@ -83,7 +83,6 @@ public class ElementDetailsUtils {
 		queryBuff.append("OPTIONAL { ?item ?p ?inSpace. \n");
 		queryBuff.append("              ?inSpace geo:lat ?lat .\n");
 		queryBuff.append("              ?inSpace geo:long ?lon . }\n");
-		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place1. \n");
 		//queryBuff.append("          ?place1 schema:url ?url1 . } \n");
 		queryBuff.append("OPTIONAL{ ?item lode:atPlace ?place. \n");
 		queryBuff.append("              ?place schema:location ?address .\n");
