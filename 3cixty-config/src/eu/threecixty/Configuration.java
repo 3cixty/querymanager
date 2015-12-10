@@ -175,6 +175,10 @@ public class Configuration {
 
 	private synchronized static void load() {
 		try {
+			if (path == null) {
+				loadFromResourceByDefault();
+				return;
+			}
 			InputStream input = new FileInputStream(path + File.separatorChar
 					+ "WEB-INF" + File.separatorChar + "3cixty.properties");
 			if (input != null) {
@@ -189,6 +193,15 @@ public class Configuration {
 		}
 	}
 	
+	private static void loadFromResourceByDefault() throws IOException {
+		InputStream input = Configuration.class.getResourceAsStream("/3cixty.properties");
+		if (input != null) {
+			props = new Properties();
+			props.load(input);
+			input.close();
+		}
+	}
+
 	private Configuration() {
 	}
 }

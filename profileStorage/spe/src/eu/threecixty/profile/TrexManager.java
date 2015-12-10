@@ -83,15 +83,14 @@ public class TrexManager {
 			int responseCode = conn.getResponseCode();
 			if (DEBUG_MOD) LOGGER.info("response code = " + responseCode);
 		} catch (IOException e) {
-			e.printStackTrace();
 		} finally {
 			try {
-				output.close();
+				if (output != null) output.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 			
-			conn.disconnect();
+			if (conn != null) conn.disconnect();
 		}
 	}
 
