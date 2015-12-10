@@ -47,6 +47,13 @@ Note that only the list file (report.properties) needs to be filled in when you 
 
 Note that only the list file (report.properties) needs to be filled in when you redeploy backend!
 
+3.3. Local machine environment
 
+  (in case you want to deploy QueryManager on your localhost machine)
 
-
+- Create a database schema `3cixty` in mySQL
+- Create a user `3cixty` and give permission to the user so that the user can be able to create table, alter, drop, ... for just the schema `3cixty`
+- Go to files `appkey/oauth/apis-authorization-server-war/src/main/resources/apis.application.properties` and `3cixty-db/resources/hibernate.cfg.xml` and give the password for `3cixty` user there.
+- If you use a memcached server, go to 3cixty-db/resources/memcached.conf and give a new IP address; otherwise, you don't need to modify it as this configuration is not mandatory.
+- Go to  `querymanagerServlet/WebContent/WEB-INF/report.properties` and give the password for `noreply@3cixty.com` so that QueryManager is able to send messages using the email.
+- Run $ mvn clean install, then copy two .war files in appkey/oauth/apis-authorization-server-war/target/ and querymanagerServlet/target/ to Tomcat/webapps
