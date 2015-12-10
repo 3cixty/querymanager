@@ -56,4 +56,7 @@ Note that only the list file (report.properties) needs to be filled in when you 
 - Go to files `appkey/oauth/apis-authorization-server-war/src/main/resources/apis.application.properties` and `3cixty-db/resources/hibernate.cfg.xml` and give the password for `3cixty` user there.
 - If you use a memcached server, go to 3cixty-db/resources/memcached.conf and give a new IP address; otherwise, you don't need to modify it as this configuration is not mandatory.
 - Go to  `querymanagerServlet/WebContent/WEB-INF/report.properties` and give the password for `noreply@3cixty.com` so that QueryManager is able to send messages using the email.
-- Run $ mvn clean install, then copy two .war files in appkey/oauth/apis-authorization-server-war/target/ and querymanagerServlet/target/ to Tomcat/webapps
+- Run $ mvn clean install
+- Copy .war file in appkey/oauth/apis-authorization-server-war/target/ to Tomcat/webapps, then start Tomcat (make sure first time running, there is empty database so that OAuth server is able to create tables - a limit for OAuth server).
+- Copy .war file in querymanagerServlet/target/ to Tomcat/webapps
+- Check if you can get http://localhost:8080/v2/getScopes
