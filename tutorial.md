@@ -1,6 +1,16 @@
-#Tutorial on QueryManager Deployement
+# Tutorial on the Deployement of the QueryManager
 
-##MySQL configuration
+1. [MySQL configuration](#mysql)
+2. [On Localhost](#localhost)
+    1. [QueryManager compilation and installation](#compilation)
+	2. [API documentation installation](#api-documentation)
+	3. [Testing](#testing)
+        1. [Get a 3cixty app key](#get-app-key)
+	    2. [Test the 3cixty app key](#test-app-key) 
+3. [On Prod Server](#prod-server)
+4. [On Dev Server](#dev-server)
+
+##MySQL configuration <a name="mysql"></a>
 
 The following steps must be done only once in order to be able to compile and use the QueryManager
 
@@ -12,9 +22,9 @@ The following steps must be done only once in order to be able to compile and us
 6. `GRANT ALL ON 3cixtyTest.* TO '3cixty'@'localhost';`
 7. `exit;`
 
-##On Localhost
+##On Localhost <a name="localhost"></a>
 
-###QueryManager Compilation and installation
+###QueryManager compilation and installation <a name="compilation"></a>
 
 1. `git clone https://github.com/3cixty/querymanager.git`
 2. `cd querymanager`
@@ -24,8 +34,7 @@ The following steps must be done only once in order to be able to compile and us
 6. `<TOMCAT_HOME>/bin/shutdown.sh`
 7. `<TOMCAT_HOME>/bin/startup.sh`
 
-Now go to *http://localhost:8080/v2/getScopes* and the following result should be displayed:
-
+Now go to http://localhost:8080/v2/getScopes and the following result should be displayed:
 ```
 [
 	{ },
@@ -33,7 +42,7 @@ Now go to *http://localhost:8080/v2/getScopes* and the following result should b
 ]
 ```
 
-###API documentation installation
+###API documentation installation <a name="api-documentation"></a>
 
 1. `git clone https://github.com/3cixty/apidocs.git`
 2. `cd apidocs`
@@ -50,47 +59,46 @@ Now go to *http://localhost:8080/v2/getScopes* and the following result should b
 13. `<TOMCAT_HOME>/bin/shutdown.sh`
 14. `<TOMCAT_HOME>/bin/startup.sh`
 
-Now go to *http://localhost:8080/apidocs* and the documentation page should be displayed.
+Now go to http://localhost:8080/apidocs and the documentation page should be displayed
 
-###Test if everything is correctly working
+###Testing <a name="testing"></a>
 
-####Get a 3cixty app key
+####Get a 3cixty app key <a name="get-app-key"></a>
 
-1. Go to *http://localhost:8080/v2/googleToken.jsp*
+1. Go to http://localhost:8080/v2/googleToken.jsp
 2. Click on the button "Login to Google to get access token"
-3. Sign in using a Google account
+3. Sign-in using a Google account
 4. A token appears on the screen, it is the Google token, copy it
-5. Go to *http://localhost:8080/v2/getAppKey?google_access_token=<GOOGLE_TOKEN>&appid=MyID&appname=AppTest&category=Exploration&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fweb-client-sample%2Fwelcome.html*
+5. Go to http://localhost:8080/v2/getAppKey?google_access_token=<GOOGLE_TOKEN>&appid=MyID&appname=AppTest&category=Exploration&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fweb-client-sample%2Fwelcome.html
 
 The following result should be displayed:
-
 ```
 {
   "key": "<APP_KEY>"
 }
 ```
 
-####Test the APP_KEY
+####Test the 3cixty app key <a name="test-app-key"></a>
 
-1. ``git clone https://github.com/3cixty/web-client-sample.git`
+1. `git clone https://github.com/3cixty/web-client-sample.git`
 2. `cd web-client-sample`
 3. `sed -i 's#https://api.3cixty.com#http://localhost:8080#g' login.html`
 4. `sed -i 's/"[a-z0-9-]*"/"<APP_KEY>"/g' login.html`
 5. `cd ..`
 2. `cp -R web-client-sample <TOMCAT_HOME>/webapps/`
-3. ``<TOMCAT_HOME>/bin/shutdown.sh`
+3. `<TOMCAT_HOME>/bin/shutdown.sh`
 4. `<TOMCAT_HOME>/bin/startup.sh`
-5. Go to *http://localhost:8080/web-client-sample/login.html*
+5. Go to http://localhost:8080/web-client-sample/login.html
 6. Click on the button *Login using 3cixty*
 7. Sign in using a Google account
 8. Click on the button *Grant Permission*
 
-If **Log in to Pizza4ever!!** is displayed, everything went well.
+If **Log in to Pizza4ever!!** is displayed, everything wents well
 
-##On Prod server
+##On Prod server <a name="prod-server"></a>
 
 Same steps than before but replace *localhost:8080* by *api.3cixty.com* and *http* by *https*.
 
-##On Dev server
+##On Dev server <a name="dev-server"></a>
 
 Same steps than before but replace *localhost:8080* by *dev.3cixty.com* and *http* by *https*.
