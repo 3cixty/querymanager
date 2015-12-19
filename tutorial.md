@@ -34,7 +34,7 @@ The following steps must be done only once in order to be able to compile and us
 6. `<TOMCAT_HOME>/bin/shutdown.sh`
 7. `<TOMCAT_HOME>/bin/startup.sh`
 
-Now go to http://localhost:8080/v2/getScopes and the following result should be displayed:
+Now go to ```http://localhost:8080/v2/getScopes``` and the following result should be displayed:
 ```
 [
 	{ },
@@ -59,7 +59,7 @@ Now go to http://localhost:8080/v2/getScopes and the following result should be 
 13. `<TOMCAT_HOME>/bin/shutdown.sh`
 14. `<TOMCAT_HOME>/bin/startup.sh`
 
-Now go to http://localhost:8080/apidocs and the documentation page should be displayed
+Now go to ```http://localhost:8080/apidocs``` and the documentation page should be displayed
 
 ###Testing <a name="testing"></a>
 
@@ -69,7 +69,7 @@ Now go to http://localhost:8080/apidocs and the documentation page should be dis
 2. Click on the button "Login to Google to get access token"
 3. Sign-in using a Google account
 4. A token appears on the screen, it is the Google token, copy it
-5. Go to http://localhost:8080/v2/getAppKey?google_access_token=<GOOGLE_TOKEN>&appid=MyID&appname=AppTest&category=Exploration&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fweb-client-sample%2Fwelcome.html
+5. Go to ```http://localhost:8080/v2/getAppKey?google_access_token=<GOOGLE_TOKEN>&appid=MyID&appname=AppTest&category=Exploration&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fweb-client-sample%2Fwelcome.html```
 
 The following result should be displayed:
 ```
@@ -97,8 +97,8 @@ If **Log in to Pizza4ever!!** is displayed, everything wents well
 
 ##On Prod server <a name="prod-server"></a>
 
-Same steps than before but replace *localhost:8080* by *api.3cixty.com* and *http* by *https*.
+Same steps than before but replace ```localhost:8080``` by ```api.3cixty.com``` and ```http``` by ```https```.
 
 ##On Dev server <a name="dev-server"></a>
 
-Same steps than before but replace *localhost:8080* by *dev.3cixty.com* and *http* by *https*.
+Same steps than before but replace ```localhost:8080``` by ```dev.3cixty.com``` and ```http``` by ```https```.
