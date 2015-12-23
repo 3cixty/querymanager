@@ -143,6 +143,10 @@ public class Configuration {
 		return getProperty("FB_APP_ID");
 	}
 	
+	public static String getMobidotKey() {
+		return getProperty("MOBIDOT_KEY");
+	}
+	
 	public static boolean isForProdTarget() {
 		if (target == null) {
 			if (props == null) load();

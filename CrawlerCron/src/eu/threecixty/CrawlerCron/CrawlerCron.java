@@ -21,6 +21,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.MobilityCrawlerCron.MobilityCrawlerCron;
 import eu.threecixty.profile.IDMapping;
 import eu.threecixty.profile.ProfileManagerImpl;
@@ -56,8 +57,9 @@ public class CrawlerCron {
 	private int fZERO_MINUTES = 0;
 
 	private String MOBIDOT_BASEURL = "https://www.movesmarter.nl/external/";
-	private String MOBIDOT_API_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
 	private String DOMAIN = "3cixty";
+	
+	public String MOBIDOT_API_KEY = Configuration.getMobidotKey();
 
 	public CrawlerCron() {
 	}

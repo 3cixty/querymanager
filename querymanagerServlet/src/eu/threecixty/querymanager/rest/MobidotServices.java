@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import eu.threecixty.Configuration;
 import eu.threecixty.logs.CallLoggingConstants;
 import eu.threecixty.logs.CallLoggingManager;
 import eu.threecixty.oauth.AccessToken;
@@ -52,7 +53,7 @@ import eu.threecixty.profile.partners.PartnerAccountUtils;
 @Path("/" + Constants.VERSION_2)
 public class MobidotServices {
 	
-	private static final String MOBIDOT_KEY = "SRjHX5yHgqqpZyiYaHSXVqhlFWzIEoxUBmbFcSxiZn58Go02rqB9gKwFqsGx5dks";
+	private static final String MOBIDOT_KEY = Configuration.getMobidotKey();
 	private static final String MOBIDOT_ENDPOINT = "https://www.movesmarter.nl/external/identitymanager/user/onetimetoken?";
 	private static final int TWO_HOURS_IN_SECOND = 60 * 60 * 2;
 	
