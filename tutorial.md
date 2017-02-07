@@ -61,13 +61,13 @@ Now go to ```http://localhost:8080/v2/getScopes``` and the following result shou
 
 Now go to ```http://localhost:8080/apidocs``` and the documentation page should be displayed
 
-###Testing <a name="testing"></a>
+###Testing a New Deployment City <a name="testing"></a>
 
-####Get a 3cixty app key <a name="get-app-key"></a>
+####Get a (new) 3cixty app key for this City <a name="get-app-key"></a>
 
 1. Go to http://localhost:8080/v2/googleToken.jsp
 2. Click on the button "Login to Google to get access token"
-3. Sign-in using a Google account
+3. Sign-in using the 3cixty Google account
 4. A token appears on the screen, it is the Google token, copy it
 5. Go to ```http://localhost:8080/v2/getAppKey?google_access_token=<GOOGLE_TOKEN>&appid=MyID&appname=AppTest&category=Exploration&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fweb-client-sample%2Fwelcome.html```
 
