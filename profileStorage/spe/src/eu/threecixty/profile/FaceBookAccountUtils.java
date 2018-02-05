@@ -71,6 +71,14 @@ public class FaceBookAccountUtils {
 			String uid = json.getString("id");
 			String firstName = json.getString("first_name");
 			String lastName = json.getString("last_name");
+			String firstName = "";
+			String lastName = "";
+			if (json.has("first_name")) {
+				firstName = json.getString("first_name");
+			}
+			if (json.has("last_name")) {
+				lastName = json.getString("last_name");
+			}
 
 			String picture = getProfileImage(accessToken, width, height); // customize profile image
 			
